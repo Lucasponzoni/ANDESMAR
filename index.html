@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andesmar API Etiquetas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">   
+</head>
+<body>
+    <h1>Formulario Andesmar API</h1>
+    <div id="Andesmar-img">
+        <img id="Andesmar" src="./Img/Andesmar Novogar.png" alt="Andesmar Novogar">
+    </div>
+    <form id="andesmarForm">
+
+        <input type="text" id="calleRemitente" name="CalleRemitente" value="Mendoza" required>
+
+        <input type="text" id="calleNroRemitente" name="CalleNroRemitente" value="2799" required>
+
+        <input type="text" id="codigoPostalRemitente" name="CodigoPostalRemitente" value="2000" required>
+
+        <label for="nombreApellidoDestinatario">Nombre y Apellido Destinatario:</label>
+        <input type="text" id="nombreApellidoDestinatario" name="NombreApellidoDestinatario" value="LUCAS PONZONI" required>
+
+        <label for="codigoPostalDestinatario">Código Postal Destinatario:</label>
+        <input type="text" id="codigoPostalDestinatario" name="CodigoPostalDestinatario" value="5000" required>
+
+        <label for="calleDestinatario">Calle Destinatario:</label>
+        <input type="text" id="calleDestinatario" name="CalleDestinatario" value="URQUIZA" required>
+
+        <label for="calleNroDestinatario">Número de Calle Destinatario:</label>
+        <input type="text" id="calleNroDestinatario" name="CalleNroDestinatario" value="1234" required>
+
+        <label for="telefonoDestinatario">Teléfono Destinatario:</label>
+        <input type="text" id="telefonoDestinatario" name="TelefonoDestinatario" value="3416292861" required>
+
+        <label for="nroRemito">Número de Remito:</label>
+        <input type="text" id="nroRemito" name="NroRemito" value="123456789NOV2" required>
+
+        <label for="bultos">Cantidad de Bultos:</label>
+        <input type="number" id="bultos" name="Bultos" value="1" required>
+
+        <label for="peso">Peso Total (kg):</label>
+        <input type="number" id="peso" name="Peso" step="0.001" value="23" required>
+
+        <label for="valorDeclarado">Valor Declarado:</label>
+        <input type="number" id="valorDeclarado" name="ValorDeclarado" value="25999" required>
+
+        <label for="alto">Alto (cm):</label>
+        <input type="number" id="alto" name="Alto" step="0.001" value="35" required>
+
+        <label for="ancho">Ancho (cm):</label>
+        <input type="number" id="ancho" name="Ancho" step="0.001" value="25" required>
+
+        <label for="largo">Largo (cm):</label>
+        <input type="number" id="largo" name="Largo" step="0.001" value="35" required>
+
+        <input type="number" id="m3" name="M3" step="0.001" value="0.1">
+
+        <label for="observaciones">Observaciones:</label>
+        <textarea id="observaciones" name="Observaciones">Fragil</textarea>
+
+        <label for="modalidadEntrega">Modalidad de Entrega:</label>
+        <select id="modalidadEntrega" required>
+            <option value="Terminal-Terminal">Terminal a Terminal</option>
+            <option value="Puerta-Puerta">Puerta a Puerta</option>
+            <option selected value="Terminal-Puerta">Terminal a Puerta</option>
+            <option value="Puerta-Terminal">Puerta a Terminal</option>
+        </select>
+
+        <label for="unidadVenta">Unidad de Venta:</label>
+        <select id="unidadVenta" name="UnidadVenta" required>
+            <option value="express rto conformado">PAQUETERIA EXPRESS (-30Kg)</option>
+            <option value="cargas remito conformado">CARGA PESADA (+30Kg)</option>
+        </select>
+
+        <label for="esFletePagoDestino">¿Es Flete Pago en Destino?</label>
+        <select id="esFletePagoDestino" name="EsFletePagoDestino" required>
+            <option value="true">Sí</option>
+            <option selected value="false">No</option>
+        </select>
+
+        <label for="esRemitoConformado">¿Es Remito Conformado?</label>
+        <select id="esRemitoConformado" name="EsRemitoconformado" required>
+            <option selected value="true">Sí</option>
+            <option value="false">No</option>
+        </select>
+
+        <button type="button" onclick="enviarSolicitud()">Generar Etiqueta</button>
+
+        <div id="respuesta"></div>
+    </form>
+
+    <div id="spinner" class="spinner-container">
+        <div class="spinner"></div>
+    </div>
+
+
+    <script src="formulario-andesmar.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+*{
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: rgb(52,152,219);
+    background: linear-gradient(183deg, rgba(52,152,219,1) 0%, rgba(0,70,139,1) 100%);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    display: none;
+}
+
+form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 25px;
+}
+
+#Andesmar-img {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    flex-shrink: 1;
+    margin-bottom: 20px;
+    margin-top: 25px;
+}
+
+#Andesmar{
+    max-width: 400px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+button {
+    background-color: cornflowerblue;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: rgb(11, 72, 185);
+}
+
+.spinner-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}
+
+.spinner {
+    border: 8px solid #3498db;
+    border-radius: 50%;
+    border-top: 8px solid #ffffff;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#calleRemitente, #calleNroRemitente, #codigoPostalRemitente, #m3{
+    display: none;
+}
