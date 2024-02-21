@@ -57,10 +57,10 @@ function enviarSolicitud() {
             }
         };
     
-        const proxyUrl = 'https://cors-anywhere.herokuapp.com';
-        const apiUrl = 'https://api.andesmarcargas.com/api/InsertEtiqueta';
-        
-        fetch(`${proxyUrl}/${apiUrl}`, {
+        const proxyUrl = "https://api.codetabs.com/v1/proxy?quest=";
+const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
+
+fetch(proxyUrl + apiUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
