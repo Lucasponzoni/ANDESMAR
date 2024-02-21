@@ -57,13 +57,14 @@ function enviarSolicitud() {
             }
         };
     
-        const proxyUrl = "https://api.codetabs.com/v1/proxy?quest=";
-const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
-
-fetch(proxyUrl + apiUrl, {
+        const proxyUrl = "https://proxy.cors.sh/";
+        const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
+        
+        fetch(proxyUrl + apiUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "x-cors-api-key": "temp_45198468b3247a4fd319f51f849cb97b",
             },
             body: JSON.stringify(requestObj),
         })
