@@ -1,0 +1,28 @@
+name: CORS Proxy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  cors-proxy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '16'
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: List files
+      run: ls -al
+
+    - name: Run CORS Proxy
+      run: node cors-proxy.js
