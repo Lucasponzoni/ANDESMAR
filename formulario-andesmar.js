@@ -41,9 +41,9 @@ function enviarSolicitud() {
             Peso: parseFloat(peso),
             ValorDeclarado: parseInt(valorDeclarado),
             M3: parseInt(m3),
-            Alto: [alto],   
-            Ancho: [ancho],   
-            Largo: [largo],              Observaciones: observaciones,
+            Alto: Array.from({ length: parseInt(bultos) }, () => alto),
+            Ancho: Array.from({ length: parseInt(bultos) }, () => ancho),
+            Largo: Array.from({ length: parseInt(bultos) }, () => largo),             Observaciones: observaciones,
             ModalidadEntrega: modalidadEntrega,
             UnidadVenta: unidadVenta,
             servicio: {
@@ -126,3 +126,4 @@ function enviarSolicitud() {
         contenedorRespuesta.appendChild(botonDescarga); // Añadir el botón al contenedor
         respuestaElemento.appendChild(contenedorRespuesta); // Añadir el contenedor al elemento de respuesta
     }
+    
