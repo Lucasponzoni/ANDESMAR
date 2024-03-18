@@ -64,7 +64,7 @@ function enviarSolicitud() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "x-cors-api-key": "temp_b7b12b60af419dd2f5da8003075f8bb4",
+                "x-cors-api-key": "temp_4e42e708847e7e9a2f0e4a23bc3d15d8",
             },
             body: JSON.stringify(requestObj),
         })
