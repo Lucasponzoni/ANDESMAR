@@ -67,7 +67,7 @@ function enviarSolicitud() {
                 "x-cors-api-key": "temp_c5e6b82c087ca730862f6477ba81b3ee",
             },
             body: JSON.stringify(requestObj),
-        })
+        })
         .then(response => response.json())
         .then(data => {
             spinner.style.display = "none";
