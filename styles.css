@@ -99,3 +99,15 @@ button:hover {
 #calleRemitente, #calleNroRemitente, #codigoPostalRemitente, #m3{
     display: none;
 }
+
+.contenedorError{
+    background-color: #3498db;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.contenedorError p{
+    color: white;
+}

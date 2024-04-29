@@ -100,12 +100,7 @@ function enviarSolicitud() {
         if (data.Message && data.Message === "ERRORNo es posible realizar el envío hacia el destino seleccionado.") {
             // Crear un contenedor para el mensaje de error con estilos
             const contenedorError = document.createElement("div");
-            contenedorError.style.textAlign = "center";
-            contenedorError.style.marginTop = "20px";
-            contenedorError.style.backgroundColor = "red"; // Color de fondo rojo
-            contenedorError.style.color = "white"; // Color del texto blanco
-            contenedorError.style.borderRadius = "10px"; // Borde redondeado
-            contenedorError.style.padding = "20px"; // Añadir relleno
+            contenedorError.classList.add('contenedorError');
     
             // Crear un mensaje de error con el texto deseado
             const mensajeError = document.createElement("p");
