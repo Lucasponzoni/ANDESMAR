@@ -27,6 +27,30 @@ form {
     border-radius: 25px;
 }
 
+.six{
+    background-color: cornflowerblue;
+    border-radius: 10px;
+    padding: .3rem;
+    margin-bottom: .5rem;
+}
+
+.doble{
+    display: flex;
+    justify-content: space-between;
+    gap: .5rem;
+    color: white;
+    padding: .3rem;
+}
+
+.doble input{
+    margin: 0;
+    margin-bottom: .3rem;
+}
+
+.doble label{
+    margin: 0;
+}
+
 #Andesmar-img {
     display: flex;
     justify-content: center;
@@ -83,7 +107,7 @@ button:hover {
 }
 
 .spinner {
-    border: 8px solid #3498db;
+    border: 8px solid cornflowerblue;
     border-radius: 50%;
     border-top: 8px solid #ffffff;
     width: 50px;
@@ -96,12 +120,47 @@ button:hover {
     100% { transform: rotate(360deg); }
 }
 
-#calleRemitente, #calleNroRemitente, #codigoPostalRemitente, #m3{
+#calleRemitente, #calleNroRemitente, #codigoPostalRemitente, #m3, #esRemitoConformado, #esFletePagoDestino{
     display: none;
 }
 
+.contenedorRespuesta{
+    margin-top: 1rem;
+    background-color: #e1f4e5;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.contenedorRespuesta img{
+    width: 200px;
+}
+
+.contenedorRespuesta h2{
+    font-family: "Signika Negative", sans-serif;
+    color: #32d554;
+    margin-top: 0;
+    padding-top: 1rem;
+    font-size: 2rem;
+}
+
+.botonDescarga{
+    font-family: "Signika Negative", sans-serif;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+    background-color: #32d554;
+    color: white;
+    border-radius: 15px;
+    padding: 1rem;
+}
+
 .contenedorError{
-    background-color: #3498db;
+    margin-top: 1rem;
+    background-color: #52c6b8;
     text-align: center;
     justify-content: center;
     align-items: center;
@@ -109,5 +168,64 @@ button:hover {
 }
 
 .contenedorError p{
+    font-family: "Signika Negative", sans-serif;
     color: white;
+    margin: 0;
+}
+
+.contenedorError img{
+    width: 200px;
+}
+
+.mensajeErrorUndefinedContainer{
+    margin-top: 1rem;
+    background-color: red;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mensajeErrorUndefinedContainer p{
+    color: white;
+    font-size: 2rem;
+    font-weight: 600px;
+}
+
+#ultimasEtiquetas{
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: gray;
+    border-radius: 0 0 10px 10px;
+}
+
+.ultimasEtiquetasTitulo{
+    font-family: "Signika Negative", sans-serif;
+    background-color: #333;
+    padding: .5rem;
+    margin: 0;
+    margin-top: .5rem;
+    color: white;
+}
+
+.reDescarga{
+    font-family: "Signika Negative", sans-serif;
+    font-weight: 400px;
+    gap: .2rem;
+    display: flex;
+    background-color: #333;
+    margin: .3rem;
+    margin-top: 0;
+    text-align: center;
+    justify-content: baseline;
+    text-align: center;
+}
+
+.reDescarga img {
+    width: 20px;
+    filter: invert(100%);
 }
