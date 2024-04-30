@@ -229,3 +229,28 @@ button:hover {
     width: 20px;
     filter: invert(100%);
 }
+
+#ultimasEtiquetas button:last-child {
+    color: yellow;
+    font-weight: 800;
+}
+
+#ultimasEtiquetas button:last-child {
+    margin-top: 1rem;
+    filter: invert(0%);
+    border: 2px solid yellow;
+}
+
+#ultimasEtiquetas button:last-child::before {
+    text-align: center;
+    content: "última generada";
+    position: absolute;
+    top: -15px;
+    left: 10px;
+    background-color: red;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    z-index: 1000;
+}
