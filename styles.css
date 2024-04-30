@@ -236,17 +236,18 @@ button:hover {
 }
 
 #ultimasEtiquetas button:last-child {
-    margin-top: 1rem;
+    text-align: center;
+    align-items: center;
     filter: invert(0%);
     border: 2px solid yellow;
 }
 
 #ultimasEtiquetas button:last-child::before {
     text-align: center;
-    content: "última generada";
-    position: absolute;
-    top: -15px;
-    left: 10px;
+    content: "última";
+    position: relative;
+    top: 0;
+    left: -2px;
     background-color: red;
     color: white;
     padding: 4px 8px;
