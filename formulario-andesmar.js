@@ -87,12 +87,12 @@ function verificarCP() {
     let mensaje = "";
 
     // Elemento de respuesta
-    const respuestaElement = document.getElementById("respuesta");
+    const respuestaElement = document.getElementById("respuesta2");
     const respuestaElement2 = document.getElementById("respuestaNegativa");
 
     // Cambiar ID a "respuesta" si el input está vacío
     if (codigoPostal.length < 4) {
-        respuestaElement2.id = "respuesta"; // Restablecer ID
+        respuestaElement2.id = "respuesta2"; // Restablecer ID
         respuestaElement2.style.display = "none"; // Asegurarse de que esté oculto
         respuestaElement.style.display = "none"; // Asegurarse de que esté oculto
         respuestaElement.innerText = "";
