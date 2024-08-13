@@ -2,6 +2,135 @@ window.onload = function() {
     mostrarEtiquetasPrevias();
 };
 
+// Listas de códigos postales
+const cpMenor30Kg = [
+    ...new Set([
+        ...Array.from({length: 501}, (_, i) => i + 1000), // Del 1000 al 1500
+        1602, 1603, 1604, 1605, 1606, 1607, 1609, 1611, 1612, 1613,
+        1614, 1615, 1617, 1618, 1619, 1620, 1621, 1623, 1625,
+        1627, 1629, 1631, 1633, 1635, 1636, 1638, 1640, 1641,
+        1642, 1643, 1644, 1646, 1648, 1650, 1651, 1653, 1655,
+        1657, 1659, 1661, 1663, 1664, 1665, 1667, 1669, 1671,
+        1672, 1674, 1676, 1678, 1682, 1684, 1686, 1702, 1704,
+        1706, 1708, 1712, 1713, 1714, 1716, 1718, 1722, 1723,
+        1742, 1744, 1746, 1748, 1752, 1754, 1755, 1757, 1759,
+        1763, 1765, 1766, 1770, 1771, 1772, 1773, 1774, 1776,
+        1778, 1802, 1804, 1805, 1806, 1812, 1822, 1824, 1825,
+        1826, 1828, 1832, 1834, 1835, 1836, 1842, 1852, 1854,
+        1856, 1870, 1871, 1872, 1874, 1875, 1876, 1878, 1881,
+        1882, 1884, 1885, 1886, 1888, 1890, 1891, 1894, 1895,
+        1896, 1897, 1900, 1901, 1923, 1925, 8000, 4700, 2400,
+        2415, 2424, 2434, 2550, 2553, 2555, 2557, 2559, 2563,
+        2568, 2572, 2580, 2581, 2587, 2589, 2594, 2624, 2645,
+        2657, 2659, 2661, 2671, 2675, 2679, 5000, 5001, 5002,
+        5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010, 5011,
+        5012, 5013, 5014, 5015, 5016, 5017, 5021, 5022, 5023,
+        5101, 5103, 5105, 5107, 5109, 5111, 5113, 5123, 5125,
+        5145, 5147, 5151, 5152, 5153, 5155, 5158, 5162, 5164,
+        5166, 5168, 5172, 5182, 5184, 5186, 5189, 5191, 5194,
+        5196, 5197, 5199, 5220, 5223, 5280, 5800, 5811, 5813,
+        5815, 5817, 5823, 5825, 5845, 5850, 5851, 5853, 5854,
+        5856, 5859, 5862, 5864, 5870, 5881, 5883, 6216, 6277,
+        6279, 6389, 9011, 9400, 9405, 4200, 4300, 4400, 4500,
+        4600, 4707, 5400, 5500, 5600, 5700, 5800, 5900, 6000,
+        6100, 6200, 6300, 6400, 6500, 6600, 6700, 6800, 6900,
+        7000, 7100, 7200, 7300, 7400, 7500, 7600, 7700, 7800,
+        7900, 8000, 8100, 8200, 8300, 8400, 8500, 8600, 8700,
+        8800, 8900, 9000, 9100, 9200, 9300, 9400, 9500, 9600,
+        9700, 9800, 9900
+    ])
+];
+
+const cpMayor30Kg = [
+    ...new Set([
+        ...Array.from({length: 501}, (_, i) => i + 1000), // Del 1000 al 1500
+        1602, 1603, 1605, 1606, 1607, 1609, 1611, 1612, 1613,
+        1614, 1615, 1617, 1618, 1619, 1620, 1621, 1623, 1625,
+        1627, 1629, 1631, 1633, 1635, 1636, 1638, 1640, 1641,
+        1642, 1643, 1644, 1646, 1648, 1650, 1651, 1653, 1655,
+        1657, 1659, 1661, 1663, 1664, 1665, 1667, 1669, 1671,
+        1672, 1674, 1676, 1678, 1682, 1684, 1686, 1702, 1704,
+        1706, 1708, 1712, 1713, 1714, 1716, 1718, 1722, 1723,
+        1742, 1744, 1746, 1748, 1752, 1754, 1755, 1757, 1759,
+        1763, 1765, 1766, 1770, 1772, 1773, 1774, 1776, 1778,
+        1802, 1804, 1805, 1806, 1812, 1822, 1824, 1825, 1826,
+        1828, 1832, 1834, 1835, 1836, 1842, 1852, 1854, 1856,
+        1870, 1871, 1872, 1874, 1875, 1876, 1878, 1882, 1884,
+        1885, 1886, 1888, 1890, 1891, 1894, 1895, 1896, 1897,
+        1900, 1901, 1923, 1925, 8000, 4700, 2400, 2415, 2419,
+        2424, 2434, 2566, 2568, 2587, 2594, 2624, 2657, 2677,
+        2681, 5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007,
+        5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016,
+        5017, 5021, 5022, 5023, 5101, 5103, 5105, 5107, 5109,
+        5111, 5113, 5123, 5125, 5145, 5147, 5151, 5166, 5168,
+        5172, 5182, 5184, 5186, 5194, 5220, 5223, 5236, 5280,
+        5800, 5817, 5841, 5850, 5870, 5885, 5889, 5891, 5900,
+        5903, 5923, 5960, 5972, 5974, 5980, 5986, 5988, 9000,
+        9001, 9100, 9103, 4400, 4530, 2123, 2142, 2144, 2170,
+        2440, 2449, 2451, 2452, 2453, 2454, 2505, 2535, 2580,
+        2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+        2009, 2010, 2011, 2012, 2013, 2130, 2131, 2132, 2134,
+        2152, 5400, 5401, 5403, 5405, 5406, 5407, 5411, 5413,
+        5415, 5417, 5421, 5423, 5425, 5427, 5431, 5435, 5438,
+        5442, 5443, 5444, 5460, 5700, 5701, 5703, 5705, 5710,
+        5711, 5713, 5719, 5730, 5731, 5733, 5735, 5736, 5738,
+        5750, 5753, 5755, 5759, 5770, 5773, 5777, 5831, 5881,
+        6216, 6277, 6279, 6389, 9011, 9400, 4000, 4101, 4103,
+        4105, 4107, 4109, 4111, 4117, 4128, 4129, 4132, 4142,
+        4144, 4152, 4153, 4158, 4166, 4168, 4178, 4182
+    ])
+];
+
+// Función para verificar disponibilidad de envío
+function verificarCP() {
+    const codigoPostal = document.getElementById("codigoPostalDestinatario").value;
+    let mensaje = "";
+
+    // Elemento de respuesta
+    const respuestaElement = document.getElementById("respuesta");
+    const respuestaElement2 = document.getElementById("respuestaNegativa");
+
+    // Cambiar ID a "respuesta" si el input está vacío
+    if (codigoPostal.length < 4) {
+        respuestaElement2.id = "respuesta"; // Restablecer ID
+        respuestaElement2.style.display = "none"; // Asegurarse de que esté oculto
+        respuestaElement.style.display = "none"; // Asegurarse de que esté oculto
+        respuestaElement.innerText = "";
+        respuestaElement2.innerText = "";
+        return; // Salir de la función
+    }
+
+    // Ocultar el elemento de respuesta por defecto
+    respuestaElement.style.display = "none"; // Ocultar inicialmente
+
+    // Verificar si el código postal tiene 4 caracteres
+    if (codigoPostal.length === 4) {
+        const disponibleMenor30Kg = cpMenor30Kg.includes(parseInt(codigoPostal));
+        const disponibleMayor30Kg = cpMayor30Kg.includes(parseInt(codigoPostal));
+
+        if (disponibleMenor30Kg && disponibleMayor30Kg) {
+            mensaje = "Envio disponible para Paqueteria pequeña (-30Kg) y Envios Bigger (+30Kg)";
+            respuestaElement.id = "respuesta"; // Asegurarse de que el ID sea correcto
+        } else if (disponibleMenor30Kg) {
+            mensaje = "Envio disponible para Paqueteria pequeña (-30Kg)";
+            respuestaElement.id = "respuesta"; // Asegurarse de que el ID sea correcto
+        } else if (disponibleMayor30Kg) {
+            mensaje = "Envio disponible para Envios Bigger (+30Kg)";
+            respuestaElement.id = "respuesta"; // Asegurarse de que el ID sea correcto
+        } else {
+            mensaje = "Envio no disponible a este CP";
+            respuestaElement.id = "respuestaNegativa"; // Cambiar ID si no hay envíos disponibles
+        }
+
+        // Mostrar el mensaje en la pantalla
+        respuestaElement.innerText = mensaje;
+        respuestaElement.style.display = "block"; // Mostrar solo si hay mensaje
+    }
+}
+
+// Agregar el evento al input de código postal
+document.getElementById("codigoPostalDestinatario").addEventListener("input", verificarCP);
+
 function enviarSolicitud() {
     let spinner = document.getElementById("spinner");
     spinner.style.display = "block";
