@@ -347,3 +347,9 @@ button:hover {
     background-color: rgb(253, 242, 240);
     border-radius: 10px;
 }
+
+#tipoElectrodomestico{
+    color: white;
+    background-color: red;
+    border: none;
+}
