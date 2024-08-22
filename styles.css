@@ -349,7 +349,7 @@ button:hover {
 }
 
 #tipoElectrodomestico{
-    color: white;
-    background-color: red;
-    border: none;
+    color: red;
+    border: 1px solid red;
+    font-weight: 800;
 }
