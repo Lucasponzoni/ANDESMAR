@@ -94,11 +94,11 @@ function rellenarMedidas() {
             agregarBulto("split4500");
             break;
         case "split5500":
-            alto = 36; ancho = 70; largo = 85; peso = 80; valor = 900000; // Medidas de la unidad exterior
+            alto = 36; ancho = 90; largo = 38; peso = 80; valor = 900000; // Medidas de la unidad exterior
             agregarBulto("split5500");
             break;
         case "split6000":
-            alto = 220; ancho = 100.7; largo = 42.4; peso = 99; valor = 1100000; // Medidas de la unidad exterior
+            alto = 110; ancho = 100.7; largo = 42.4; peso = 99; valor = 1100000; // Medidas de la unidad exterior
             agregarBulto("split6000");
             break;
         case "pisoTecho18000":
