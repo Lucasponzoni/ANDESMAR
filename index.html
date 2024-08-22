@@ -9,9 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300..700&display=swap" rel="stylesheet">  
+
 </head>
 <body>
     <h1>Formulario Andesmar API</h1>
@@ -20,26 +19,25 @@
     </div>
     <form id="andesmarForm">
 
-            <input type="text" id="calleRemitente" name="CalleRemitente" value="Mendoza" required>
+        <input type="text" id="calleRemitente" name="CalleRemitente" value="Mendoza" required>
+        <input type="text" id="calleNroRemitente" name="CalleNroRemitente" value="2799" required>
+        
+        <div class="origenEnvio">
+            <label class="nuevo" for="codigoPostalRemitente">Origen: (Disponible origen NQN & Cipolletti)</label>
+            <select id="codigoPostalRemitente" name="CodigoPostalRemitente" required>
+                <option value="2000" selected>Rosario (2000)</option>
+                <option value="8300">Neuquén (8300)</option>
+                <option value="8324">Cipolletti (8324)</option>
+            </select>
+        </div>
+        
+        <label for="nombreApellidoDestinatario">Nombre y Apellido Destinatario:</label>
+        <input type="text" id="nombreApellidoDestinatario" name="NombreApellidoDestinatario" value="" required>
 
-            <input type="text" id="calleNroRemitente" name="CalleNroRemitente" value="2799" required>
-            
-            <div class="origenEnvio">
-                <label for="codigoPostalRemitente">Origen: (Disponible origen NQN & Cipolletti)</label>
-                <select id="codigoPostalRemitente" name="CodigoPostalRemitente" required>
-                    <option value="2000" selected>Rosario (2000)</option>
-                    <option value="8300">Neuquén (8300)</option>
-                    <option value="8324">Cipolletti (8324)</option>
-                </select>
-            </div>
-            
-            <label for="nombreApellidoDestinatario">Nombre y Apellido Destinatario:</label>
-            <input type="text" id="nombreApellidoDestinatario" name="NombreApellidoDestinatario" value="" required>
+        <p id="respuesta2"></p>
 
-            <p id="respuesta2"></p>
-
-            <label for="codigoPostalDestinatario">Código Postal Destinatario:</label>
-            <input type="text" id="codigoPostalDestinatario" name="CodigoPostalDestinatario" value="" required>
+        <label for="codigoPostalDestinatario">Código Postal Destinatario:</label>
+        <input type="text" id="codigoPostalDestinatario" name="CodigoPostalDestinatario" value="" required>
 
         <label for="calleDestinatario">Calle Destinatario:</label>
         <input type="text" id="calleDestinatario" name="CalleDestinatario" value="" required>
@@ -53,45 +51,93 @@
         <label for="nroRemito">Número de Remito:</label>
         <input type="text" id="nroRemito" name="NroRemito" value="" required>
 
+        <label for="tipoElectrodomestico">Tipo de Electrodoméstico:</label>
+        <select id="tipoElectrodomestico" name="TipoElectrodomestico" onchange="rellenarMedidas()">
+            <option value="">Seleccione un producto</option>
+            <option value="heladera">Heladera</option>
+            <option value="cocina">Cocina</option>
+            <option value="hornoEmpotrable">Horno Empotrable</option>
+            <option value="lavavajillas">Lavavajillas</option>
+            <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
+            <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
+            <option value="split2700">Split 2700W</option>
+            <option value="split3300">Split 3300W</option>
+            <option value="split4500">Split 4500W</option>
+            <option value="split5500">Split 5500W</option>
+            <option value="split6000">Split 6000W</option>
+            <option value="pisoTecho18000">Piso Techo 18000 Frigorías</option>
+            <option value="termotanque50">Termotanque 50L</option>
+            <option value="termotanque80">Termotanque 80L</option>
+            <option value="termotanque110">Termotanque 110L</option>
+            <option value="termotanque150">Termotanque 150L</option>
+            <option value="termotanque180">Termotanque 180L</option>
+            <option value="smartTV32">Smart TV 32"</option>
+            <option value="smartTV40">Smart TV 40"</option>
+            <option value="smartTV43">Smart TV 43"</option>
+            <option value="smartTV50">Smart TV 50"</option>
+            <option value="smartTV58">Smart TV 58"</option>
+            <option value="smartTV65">Smart TV 65"</option>
+            <option value="smartTV70">Smart TV 70"</option>
+            <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
+            <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
+            <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
+            <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
+            <option value="bulto20">Bulto Pequeño 20x20</option>
+            <option value="bulto30">Bulto Pequeño 30x30</option>
+            <option value="bulto40">Bulto Pequeño 40x40</option>
+            <option value="bulto50">Bulto Pequeño 50x50</option>
+        </select>        
+
         <div class="six">
-            <div class="doble" >
-                <label for="bultos">Cantidad de Bultos</label>
-        
+            <div class="doble">
+                <label for="bultos">Cantidad de Bultos Diferentes</label>
                 <label for="peso">Peso Total (kg)</label>
-        
                 <label for="valorDeclarado">Valor Declarado</label>
-        
-                </div>
-        
-                <div class="doble" >
-                    <input type="number" id="bultos" name="Bultos" value="1" required>
-            
-                    <input type="number" id="peso" name="Peso" step="0.001" value="" required>
-        
-                    <input type="number" id="valorDeclarado" name="ValorDeclarado" value="" required>
-                    </div>
-        
-                <div class="doble" >
-                    <label for="alto">Alto (cm)</label>
-            
-                    <label for="ancho">Ancho (cm)</label>
-            
-                    <label for="largo">Largo (cm)</label>
-                </div>
-        
-                <div class="doble" >
-                    <input type="number" id="alto" name="Alto" step="0.001" value="" required>
-            
-                    <input type="number" id="ancho" name="Ancho" step="0.001" value="" required>
-            
-                    <input type="number" id="largo" name="Largo" step="0.001" value="" required>
-                </div>
+            </div>
+            <div class="doble">
+                <input type="number" id="bultos" name="Bultos" value="1" min="1" required readonly>
+                <input type="number" id="peso" name="Peso" step="1" value="" required>
+                <input type="number" id="valorDeclarado" name="ValorDeclarado" value="" required>
+            </div>
         </div>
 
-        <input type="number" id="m3" name="M3" step="0.001" value="0.1">
+        <div id="medidasBultosContainer">
+            <div class="bulto" id="bulto0">
+                <h3 class="bultoTitle" >Bulto: Paquete 1</h3>
+
+                <div class="bultoDescripccion">
+                    <label for="alto0">Alto (cm)</label>
+                    <label for="ancho0">Ancho (cm)</label>
+                    <label for="largo0">Largo (cm)</label>
+                    <label for="Cantidad0">Cantidad</label>
+                </div>
+                
+            
+                <div class="bultoImput">
+                    <input type="number" id="alto0" name="Alto0" step="1" value="" required>
+                    <input type="number" id="ancho0" name="Ancho0" step="1" value="" required>
+                    <input type="number" id="largo0" name="Largo0" step="1" value="" required>
+                    <input type="number" id="cantidad0" name="Cantidad0" step="1" value="1" min="1" required>
+                </div>
+                
+                
+                
+                <button type="button" class="removeBultoButton">Eliminar Bulto</button>
+            </div>
+        </div>
+
+        <button type="button" id="addBultoButton">Agregar otro bulto</button>
+
+        <div id="volumenVisual">
+            <strong>Volumen Total (m³):</strong> <span id="volumenTotal">0.00</span>
+        </div>
+
+        <input type="number" id="m3" name="M3" step="0.001" value="0.1" style="display:none;">
 
         <label for="observaciones">Observaciones:</label>
-        <textarea id="observaciones" name="Observaciones">Fragil, Unidad enviada por WWW.NOVOGAR.COM.AR, ante cualquier consulta comunicarse a (0341) 156680658</textarea>
+        <textarea id="observaciones" lass="mensaje-personalizado" name="Observaciones"></textarea>
+        <div id="mensajePersonalizado" class="mensaje-personalizado"></div>
+
 
         <label for="modalidadEntrega">Modalidad de Entrega:</label>
         <select id="modalidadEntrega" required>
@@ -104,7 +150,7 @@
         <label for="unidadVenta">Unidad de Venta:</label>
         <select id="unidadVenta" name="UnidadVenta" required>
             <option value="express rto conformado">PAQUETERIA EXPRESS (-30Kg)</option>
-            <option value="cargas remito conformado"selected >CARGA PESADA (+30Kg)</option>
+            <option value="cargas remito conformado" selected>CARGA PESADA (+30Kg)</option>
         </select>
 
         <label for="esFletePagoDestino"></label>
@@ -120,18 +166,20 @@
         </select>
 
         <button type="button" onclick="enviarSolicitud()">Generar Etiqueta</button>
-        <h3 class="ultimasEtiquetasTitulo" >Ultimas Etiquetas Generadas:</h3>
+        <h3 class="ultimasEtiquetasTitulo">Últimas Etiquetas Generadas:</h3>
         <div id="ultimasEtiquetas"></div>
         <div class="respuesta" id="respuesta"></div>
 
     </form>
 
-    <div id="spinner" class="spinner-container">
+    <div id="spinner" class="spinner-container" style="display:none;">
         <div class="spinner"></div>
     </div>
 
-
     <script src="formulario-andesmar.js"></script>
+    <script src="bultos.js"></script>
+    <script src="script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

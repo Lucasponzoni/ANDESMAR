@@ -1,6 +1,32 @@
 window.onload = function() {
     mostrarEtiquetasPrevias();
+    actualizarMensajePersonalizado();
 };
+
+// Agregar el evento al contenedor de bultos para recalcular el volumen al cambiar
+document.getElementById('medidasBultosContainer').addEventListener('input', actualizarVolumen);
+
+function actualizarVolumen() {
+    const bultosContainer = document.getElementById('medidasBultosContainer');
+    let totalVolumen = 0;
+
+    Array.from(bultosContainer.children).forEach(bulto => {
+        const alto = parseFloat(bulto.querySelector(`input[name^="Alto"]`).value) || 0;
+        const ancho = parseFloat(bulto.querySelector(`input[name^="Ancho"]`).value) || 0;
+        const largo = parseFloat(bulto.querySelector(`input[name^="Largo"]`).value) || 0;
+        const cantidad = parseInt(bulto.querySelector(`input[name^="Cantidad"]`).value) || 1; // Obtener cantidad
+
+        // Calcular volumen de este bulto y multiplicar por la cantidad
+        const volumenBulto = (alto * ancho * largo) / 1000000; // Convertir cm³ a m³
+        totalVolumen += volumenBulto * cantidad; // Sumar al volumen total
+    });
+
+    // Actualizar el elemento del volumen total
+    document.getElementById('volumenTotal').innerText = totalVolumen.toFixed(2); // Mostrar con 2 decimales
+}
+
+// Llama a la función al cargar la página para establecer el volumen inicial
+actualizarVolumen();
 
 // Listas de códigos postales
 const cpMenor30Kg = [
@@ -131,9 +157,37 @@ function verificarCP() {
 // Agregar el evento al input de código postal
 document.getElementById("codigoPostalDestinatario").addEventListener("input", verificarCP);
 
+// Función para actualizar el mensaje personalizado en tiempo real
+function actualizarMensajePersonalizado() {
+    const calleDestinatario = document.getElementById("calleDestinatario").value;
+    const calleNroDestinatario = document.getElementById("calleNroDestinatario").value;
+    const codigoPostalDestinatario = document.getElementById("codigoPostalDestinatario").value;
+    const nombreApellidoDestinatario = document.getElementById("nombreApellidoDestinatario").value;
+    const telefonoDestinatario = document.getElementById("telefonoDestinatario").value;
+
+    const mensajePersonalizado = `Enviar a CP ${codigoPostalDestinatario}, Calle: ${calleDestinatario}, Altura: ${calleNroDestinatario}, Entregar a: ${nombreApellidoDestinatario}, Coordinar al telefono: ${telefonoDestinatario}, envio propiedad de WWW.NOVOGAR.COM.AR, ante cualquier consulta comunicarse a (0341) 156680658`;
+
+    // Mostrar el mensaje en un elemento HTML
+    document.getElementById("mensajePersonalizado").innerText = mensajePersonalizado;
+
+    // También puedes asignar el mensaje al textarea de observaciones si es necesario
+    document.getElementById("observaciones").value = mensajePersonalizado;
+}
+
+// Agregar eventos de entrada a los campos relevantes
+document.getElementById("calleDestinatario").addEventListener("input", actualizarMensajePersonalizado);
+document.getElementById("calleNroDestinatario").addEventListener("input", actualizarMensajePersonalizado);
+document.getElementById("codigoPostalDestinatario").addEventListener("input", actualizarMensajePersonalizado);
+document.getElementById("nombreApellidoDestinatario").addEventListener("input", actualizarMensajePersonalizado);
+document.getElementById("telefonoDestinatario").addEventListener("input", actualizarMensajePersonalizado);
+
+// Llama a la función al cargar la página para establecer el mensaje inicial
+actualizarMensajePersonalizado();
+
 function enviarSolicitud() {
     let spinner = document.getElementById("spinner");
     spinner.style.display = "block";
+
     const calleRemitente = document.getElementById("calleRemitente").value;
     const calleNroRemitente = document.getElementById("calleNroRemitente").value;
     const codigoPostalRemitente = document.getElementById("codigoPostalRemitente").value;
@@ -143,13 +197,8 @@ function enviarSolicitud() {
     const calleNroDestinatario = document.getElementById("calleNroDestinatario").value;
     const telefonoDestinatario = document.getElementById("telefonoDestinatario").value;
     const nroRemito = document.getElementById("nroRemito").value;
-    const bultos = document.getElementById("bultos").value;
     const peso = document.getElementById("peso").value;
     const valorDeclarado = document.getElementById("valorDeclarado").value;
-    const alto = parseFloat(document.getElementById("alto").value);
-    const ancho = parseFloat(document.getElementById("ancho").value);
-    const largo = parseFloat(document.getElementById("largo").value);
-    const m3 = document.getElementById("m3").value;
     const observaciones = document.getElementById("observaciones").value;
     const modalidadEntrega = document.getElementById("modalidadEntrega").value;
     const unidadVenta = document.getElementById("unidadVenta").value;
@@ -159,6 +208,38 @@ function enviarSolicitud() {
     const usuario = "BOM6765";
     const clave = "BOM6765";
     const codigoCliente = "6765";
+
+    // Calcular m³ y dimensiones
+    const bultosContainer = document.getElementById('medidasBultosContainer');
+    let totalVolumen = 0;
+    let totalBultos = 0;
+
+    // Arreglos para almacenar las dimensiones
+    const altos = [];
+    const anchos = [];
+    const largos = [];
+
+    Array.from(bultosContainer.children).forEach(bulto => {
+        const alto = parseFloat(bulto.querySelector(`input[name^="Alto"]`).value) || 0;
+        const ancho = parseFloat(bulto.querySelector(`input[name^="Ancho"]`).value) || 0;
+        const largo = parseFloat(bulto.querySelector(`input[name^="Largo"]`).value) || 0;
+        const cantidad = parseInt(bulto.querySelector(`input[name^="Cantidad"]`).value) || 1; // Obtener cantidad
+
+        // Calcular volumen de este bulto y multiplicar por la cantidad
+        const volumenBulto = (alto * ancho * largo) / 1000000; // Convertir cm³ a m³
+        totalVolumen += volumenBulto * cantidad; // Sumar al volumen total
+        totalBultos += cantidad; // Sumar la cantidad total de bultos
+
+        // Agregar dimensiones al arreglo
+        for (let i = 0; i < cantidad; i++) {
+            altos.push(alto);
+            anchos.push(ancho);
+            largos.push(largo);
+        }
+    });
+
+    // Actualizar el volumen visual
+    document.getElementById("volumenTotal").innerText = totalVolumen.toFixed(2);
 
     const requestObj = {
         CalleRemitente: calleRemitente,
@@ -170,13 +251,13 @@ function enviarSolicitud() {
         CalleNroDestinatario: calleNroDestinatario,
         TelefonoDestinatario: telefonoDestinatario,
         NroRemito: nroRemito,
-        Bultos: parseInt(bultos),
+        Bultos: totalBultos, // Cantidad total de bultos
         Peso: parseFloat(peso),
         ValorDeclarado: parseInt(valorDeclarado),
-        M3: parseInt(m3),
-        Alto: Array.from({ length: parseInt(bultos) }, () => alto),
-        Ancho: Array.from({ length: parseInt(bultos) }, () => ancho),
-        Largo: Array.from({ length: parseInt(bultos) }, () => largo),
+        M3: totalVolumen,
+        Alto: altos, // Arreglo de alturas
+        Ancho: anchos, // Arreglo de anchos
+        Largo: largos, // Arreglo de largos
         Observaciones: observaciones,
         ModalidadEntrega: modalidadEntrega,
         UnidadVenta: unidadVenta,
@@ -206,10 +287,7 @@ function enviarSolicitud() {
     .then(data => {
         spinner.style.display = "none";
         console.log("Respuesta de la API:", data);
-
-        // Mostrar la respuesta en pantalla
         mostrarRespuesta(data);
-        // Llevar la pantalla al contenedor de la respuesta
         document.getElementById("respuesta").scrollIntoView({ behavior: "smooth" });
     })
     .catch(error => {
@@ -323,7 +401,7 @@ function mostrarEtiquetasPrevias() {
         const nombreEnMayusculas = etiqueta.NombreApellidoDestinatario.toUpperCase();
         const etiquetaElemento = document.createElement("button");
         etiquetaElemento.classList.add("reDescarga");
-        etiquetaElemento.innerHTML = `Descargar etiqueta ${etiqueta.NroPedido} - ${nombreEnMayusculas} <img src="./Img/Download.png" class="download-icon">`;
+        etiquetaElemento.innerHTML = `Descargar ${etiqueta.NroPedido} - ${nombreEnMayusculas} <img src="./Img/Download.png" class="download-icon">`;
             
         // Agregar evento de clic para abrir el enlace
         etiquetaElemento.addEventListener("click", function () {

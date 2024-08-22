@@ -129,7 +129,7 @@ button:hover {
 }
 
 .origenEnvio{
-    background-color: #95a7ff;
+    background-color: cornflowerblue;
     padding: .5rem;
     border-radius: 10px;
     margin-bottom: 5px;
@@ -242,7 +242,7 @@ button:hover {
 }
 
 #ultimasEtiquetas button:last-child {
-    color: yellow;
+    color: white;
     font-weight: 800;
 }
 
@@ -250,7 +250,7 @@ button:hover {
     text-align: center;
     align-items: center;
     filter: invert(0%);
-    border: 2px solid yellow;
+    border: 2px dashed red;
 }
 
 #ultimasEtiquetas button:last-child::before {
@@ -269,7 +269,7 @@ button:hover {
 
 #respuesta2{
     display: none;
-    background-color: green;
+    background-color: #32d554;
     padding: .5rem;
     border-radius: 12px;
     color: white;
@@ -285,4 +285,65 @@ button:hover {
     color: white;
     font-weight: 600;
     margin-top: 0;
+}
+
+.nuevo{
+    color: white;
+}
+
+.removeBultoButton{
+    background-color: red;
+}
+
+.removeBultoButton:hover{
+    background-color: rgb(43, 43, 43);
+}
+
+#volumenVisual{
+    background-color: #32d554;
+    color: white;
+    width: max-content;
+    border-radius: 10px;
+    padding: 1rem;
+    margin: .5rem;
+    margin-left: 0;
+}
+
+#bultos{
+    background-color: #bebebe;
+}
+
+.bulto {
+    border: 2px dashed red;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: rgb(246, 190, 190);
+    border-radius: 10px;
+}
+
+.bultoImput, .bultoDescripccion{
+    display: flex;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.bultoTitle{
+    background-color: red;
+    color: white;
+    width: max-content;
+    padding: .4rem;
+    border-radius: 10px;
+    margin-top: 0;
+}
+
+#mensajePersonalizado{
+    display: none;
+}
+
+#observaciones{
+    text-transform: lowercase;
+    height: 6rem;
+    border: dashed 2px red;
+    background-color: rgb(253, 242, 240);
+    border-radius: 10px;
 }
