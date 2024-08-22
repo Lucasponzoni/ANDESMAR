@@ -391,21 +391,27 @@ function mostrarRespuesta(data) {
 
 function mostrarEtiquetasPrevias() {
     const ultimasEtiquetasDiv = document.getElementById("ultimasEtiquetas");
-    ultimasEtiquetasDiv.innerHTML = "";
+    ultimasEtiquetasDiv.innerHTML = ""; // Limpiar el contenido anterior
 
     // Obtener las etiquetas previas del almacenamiento local
     let etiquetasPrevias = JSON.parse(localStorage.getItem("etiquetasPrevias")) || [];
 
-        // Mostrar las últimas etiquetas generadas
-        etiquetasPrevias.forEach(etiqueta => {
+    // Agregar botón "Mostrar más" al principio
+    const mostrarMasButton = document.createElement("button");
+    mostrarMasButton.innerText = "Mostrar más";
+    mostrarMasButton.classList.add("mostrarMasButton");
+    ultimasEtiquetasDiv.appendChild(mostrarMasButton); // Añadir el botón al principio
+
+    // Mostrar solo las últimas 5 etiquetas inicialmente
+    const etiquetasAMostrar = etiquetasPrevias.slice(-5);
+    etiquetasAMostrar.forEach(etiqueta => {
         const nombreEnMayusculas = etiqueta.NombreApellidoDestinatario.toUpperCase();
         const etiquetaElemento = document.createElement("button");
         etiquetaElemento.classList.add("reDescarga");
         etiquetaElemento.innerHTML = `Descargar ${etiqueta.NroPedido} - ${nombreEnMayusculas} <img src="./Img/Download.png" class="download-icon">`;
-            
+
         // Agregar evento de clic para abrir el enlace
         etiquetaElemento.addEventListener("click", function () {
-            // Obtener el enlace asociado al número de pedido
             const enlace = etiquetasPrevias.find(et => et.NroPedido === etiqueta.NroPedido)?.Link;
             if (enlace) {
                 window.open(enlace, "_blank");
@@ -415,5 +421,34 @@ function mostrarEtiquetasPrevias() {
         });
 
         ultimasEtiquetasDiv.appendChild(etiquetaElemento);
+    });
+
+    // Evento para mostrar todas las etiquetas al hacer clic en "Mostrar más"
+    mostrarMasButton.addEventListener("click", function () {
+        if (mostrarMasButton.innerText === "Mostrar más") {
+            ultimasEtiquetasDiv.innerHTML = ""; // Limpiar el contenido
+            etiquetasPrevias.forEach(etiqueta => {
+                const nombreEnMayusculas = etiqueta.NombreApellidoDestinatario.toUpperCase();
+                const etiquetaElemento = document.createElement("button");
+                etiquetaElemento.classList.add("reDescarga");
+                etiquetaElemento.innerHTML = `Descargar ${etiqueta.NroPedido} - ${nombreEnMayusculas} <img src="./Img/Download.png" class="download-icon">`;
+
+                // Agregar evento de clic para abrir el enlace
+                etiquetaElemento.addEventListener("click", function () {
+                    const enlace = etiquetasPrevias.find(et => et.NroPedido === etiqueta.NroPedido)?.Link;
+                    if (enlace) {
+                        window.open(enlace, "_blank");
+                    } else {
+                        alert("El enlace no está disponible.");
+                    }
+                });
+
+                ultimasEtiquetasDiv.appendChild(etiquetaElemento);
+            });
+            mostrarMasButton.innerText = "Mostrar menos"; // Cambiar el texto del botón
+        } else {
+            mostrarEtiquetasPrevias(); // Volver a mostrar solo las últimas 5 etiquetas
+            mostrarMasButton.innerText = "Mostrar más"; // Cambiar el texto de vuelta
+        }
     });
 }

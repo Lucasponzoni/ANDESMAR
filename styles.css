@@ -225,6 +225,7 @@ button:hover {
 
 .reDescarga{
     font-family: "Signika Negative", sans-serif;
+    border-radius: 20px;
     font-weight: 400px;
     gap: .2rem;
     display: flex;
@@ -250,7 +251,9 @@ button:hover {
     text-align: center;
     align-items: center;
     filter: invert(0%);
-    border: 2px dashed red;
+    border: 2px dashed rgb(255, 255, 255);
+    background-color: black;
+    border-radius: 20px;
 }
 
 #ultimasEtiquetas button:last-child::before {
@@ -353,3 +356,14 @@ button:hover {
     border: 1px solid red;
     font-weight: 800;
 }
+
+.mostrarMasButton {
+    border-radius: 20px;
+    color: white;
+    background-color: red;
+    margin-left: .3rem;
+    padding: 10px;
+    margin-bottom: .3rem;
+    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.3); /* Ajusta los valores según tus preferencias */
+}
+
