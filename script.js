@@ -49,25 +49,25 @@ function rellenarMedidas() {
             alto = 180; ancho = 50; largo = 50; peso = 40; valor = 300000;
             break;
         case "smartTV32":
-            alto = 45; ancho = 73; largo = 10; peso = 6; valor = 250000;
+            alto = 45; ancho = 73; largo = 20; peso = 6; valor = 250000;
             break;
         case "smartTV40":
-            alto = 55; ancho = 91; largo = 10; peso = 8; valor = 350000;
+            alto = 55; ancho = 91; largo = 25; peso = 8; valor = 350000;
             break;
         case "smartTV43":
-            alto = 58; ancho = 97; largo = 10; peso = 9; valor = 400000;
+            alto = 58; ancho = 97; largo = 25; peso = 9; valor = 400000;
             break;
         case "smartTV50":
-            alto = 65; ancho = 112; largo = 10; peso = 11; valor = 550000;
+            alto = 65; ancho = 112; largo = 28; peso = 11; valor = 550000;
             break;
         case "smartTV58":
-            alto = 73; ancho = 130; largo = 10; peso = 14; valor = 600000;
+            alto = 73; ancho = 130; largo = 32; peso = 14; valor = 600000;
             break;
         case "smartTV65":
-            alto = 81; ancho = 145; largo = 10; peso = 17; valor = 750000;
+            alto = 81; ancho = 145; largo = 35; peso = 17; valor = 750000;
             break;
         case "smartTV70":
-            alto = 90; ancho = 157; largo = 10; peso = 20; valor = 850000;
+            alto = 90; ancho = 157; largo = 38; peso = 20; valor = 850000;
             break;
         case "calefactor2000":
             alto = 60; ancho = 70; largo = 30; peso = 15; valor = 150000;
