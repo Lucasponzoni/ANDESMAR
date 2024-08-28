@@ -143,16 +143,16 @@ function verificarCP() {
         const disponibleMayor30Kg = cpMayor30Kg.includes(parseInt(codigoPostal));
 
         if (disponibleMenor30Kg && disponibleMayor30Kg) {
-            mensaje = "Envio disponible para Paqueteria pequeña (-30Kg) y Envios Bigger (+30Kg)";
+            mensaje = "Envio Andesmar para Paqueteria pequeña (-30Kg) y Envios Bigger (+30Kg)";
             respuestaElement.id = "respuesta2"; // Asegurarse de que el ID sea correcto
         } else if (disponibleMenor30Kg) {
-            mensaje = "Envio disponible para Paqueteria pequeña (-30Kg)";
+            mensaje = "Envio Andesmar para Paqueteria pequeña (-30Kg)";
             respuestaElement.id = "respuesta2"; // Asegurarse de que el ID sea correcto
         } else if (disponibleMayor30Kg) {
-            mensaje = "Envio disponible para Envios Bigger (+30Kg)";
+            mensaje = "Envio Andesmar para Paqueteria Bigger (+30Kg)";
             respuestaElement.id = "respuesta2"; // Asegurarse de que el ID sea correcto
         } else {
-            mensaje = "Envio no disponible a este CP";
+            mensaje = "Envio Andesmar no disponible a este CP";
             respuestaElement.id = "respuestaNegativa"; // Cambiar ID si no hay envíos disponibles
         }
 
