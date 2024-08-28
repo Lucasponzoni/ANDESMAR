@@ -27,6 +27,13 @@ form {
     border-radius: 25px;
 }
 
+@media (max-width: 600px) {
+    form {
+        border-top-left-radius: 0; 
+        border-top-right-radius: 0; 
+    }
+}
+
 .six{
     background-color: cornflowerblue;
     border-radius: 10px;
@@ -444,16 +451,20 @@ button:hover {
     transition: 0.3s;
 }
 
-@media (max-width: 850px) {
+@media (max-width: 940px) {
     .nav-links {
         flex-direction: column;
         width: 100%;
         background-color: #ffffff;
-        border-radius: 5px;
+        border-radius: 0px;
         position: absolute;
-        top: 60px;
+        top: 70px;
         left: -100%;
         transition: left 0.3s ease-in-out;
+    }
+
+    .nav-item a {
+        border-radius: 0;
     }
 
     .nav-links.active {
