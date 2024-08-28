@@ -3,6 +3,14 @@ window.onload = function() {
     actualizarMensajePersonalizado();
 };
 
+const mobileMenu = document.getElementById('mobile-menu');
+const navLinks = document.querySelector('.nav-links');
+
+mobileMenu.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+    mobileMenu.classList.toggle('is-active');
+});
+
 // Agregar el evento al contenedor de bultos para recalcular el volumen al cambiar
 document.getElementById('medidasBultosContainer').addEventListener('input', actualizarVolumen);
 
