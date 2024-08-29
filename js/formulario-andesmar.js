@@ -383,7 +383,7 @@ function mostrarRespuesta(data) {
             etiquetasPrevias.push(etiquetaGenerada);
 
             // Limitar el número de etiquetas previas a mostrar
-            const MAX_ETIQUETAS_PREVIAS = 100;
+            const MAX_ETIQUETAS_PREVIAS = 150;
             if (etiquetasPrevias.length > MAX_ETIQUETAS_PREVIAS) {
                 etiquetasPrevias = etiquetasPrevias.slice(-MAX_ETIQUETAS_PREVIAS);
             }
