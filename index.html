@@ -19,6 +19,16 @@
 
 </head>
 
+<script>
+    // Verificar si el usuario ha iniciado sesión
+    window.onload = function() {
+        const loggedIn = localStorage.getItem('loggedIn');
+        if (!loggedIn) {
+            window.location.href = 'login.html'; // Redirigir a la página de login
+        }
+    };
+</script>
+
 <nav class="navbar">
     <div class="logo">
         <img src="./Img/Novogar N.png" alt="Logo" class="navbar-logo">
@@ -249,6 +259,13 @@
     <script src="./js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
+    <footer class="center">
+        <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
+        <a class="www" href="https://novogar.com.ar/" target="_blank" >WWW.NOVOGAR.COM.AR</a>
+        <a href="https://novogar.com.ar/info/empresa" target="_blank" >Quienes somos</a>
+        <a href="https://novogar.com.ar/info/Sucursales" target="_blank" >Sucursales</a>
+        <a href="https://novogar.com.ar/info/ventaTelefonica" target="_blank" >Atención al cliente</a>
+    </footer>
 
 </body>
 </html>

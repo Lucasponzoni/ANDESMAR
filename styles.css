@@ -689,8 +689,46 @@ button:hover {
 
 .cubic{
     font-family: "Chakra Petch", sans-serif;
-    font-weight: 400;
     font-size: 1.3rem;
 }
 
 /* FIN VOLUMENES */
+
+/* FOOTER */
+
+.logo-novogar{
+    width: 100px;
+    padding: .5rem;
+}
+
+footer{
+    padding: 1rem;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;    
+}
+
+footer > a{
+    text-decoration: none;
+    color: grey;
+    transition: .5s;
+}
+
+footer > a:hover{
+    text-decoration: underline;
+    font-weight: 900;
+    color: red;
+}
+
+.logo-foot{
+    width: 120px;
+}
+
+.www{
+    font-family: 'Modica Oft';
+    font-size: larger;
+}
+
+/* FIN FOOTER */
