@@ -32,6 +32,7 @@ document.getElementById('codigoPostalDestinatario').addEventListener('input', fu
                         clearButton.style.display = 'inline'; // Mostrar botón de borrar
                         lista.style.display = 'none'; // Ocultar la lista después de seleccionar
                         pisoDeptoDiv.classList.remove('hidden'); // Eliminar la clase hidden
+                        Andrean.classList.remove('hidden'); // Eliminar la clase hidden
                     };
                     lista.appendChild(option);
                 });
