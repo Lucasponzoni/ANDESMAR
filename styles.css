@@ -41,7 +41,7 @@ form {
     margin-bottom: .5rem;
 }
 
-.CpyLocalidad{
+.CpyLocalidad, .PisoyDepto{
     padding: .5rem;
     border: dashed 2px cornflowerblue;
     border-radius: 10px;
@@ -49,14 +49,11 @@ form {
     justify-content: space-between;
     justify-items: center;
     margin-bottom: .3rem;
+    gap: 10px;
 }
 
-.cp{
-    width: 49%;
-}
-
-.localidad{
-    width: 49%;
+.cp , .piso, .localidad, .depto{
+    flex: 1;
 }
 
 #localidad{
@@ -131,7 +128,7 @@ form {
 }
 
 .lista-localidades {
-    width: 48%;
+    width: 47.5%;
     border: 1px solid grey;
     font-size: small;
     max-height: 150px;
@@ -140,6 +137,7 @@ form {
     position: absolute;
     background-color: white;
     z-index: 1000;
+    border-radius: 0 0 10px 10px;
 }
 .lista-localidades div {
     padding: 5px;
@@ -160,7 +158,7 @@ form {
     animation: spin 1s linear infinite;
     position: absolute;
     right: 16px;
-    top: 48%;
+    top: 58%;
     transform: translateY(-50%);
 }
 @keyframes spin {
@@ -171,12 +169,12 @@ form {
 .clear-button {
     background-color: #ffffff;
     padding: .2rem;
-    border-radius: 50px;
+    border-radius: 10px;
     display: none;
     cursor: pointer;
     position: absolute;
     right: 16px; /* Posición de la "X" dentro del input */
-    top: 58%;
+    top: 70%;
     transform: translateY(-50%);
     color: cornflowerblue;
     font-size: 18px;
@@ -638,3 +636,18 @@ button:hover {
 }
 
 /* FIN NAVBAR */
+
+#deptoDestinatario , #pisolDestinatario, #codigoPostalDestinatario, #localidad{
+    margin-bottom: 0;
+}
+
+.PisoyDepto{
+    border: dashed 2px red;
+}
+
+.hidden {
+    display: none;
+}
+
+
+
