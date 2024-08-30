@@ -2,6 +2,7 @@ const spinner = document.getElementById('loadingSpinner'); // Usar el nuevo ID d
 const clearButton = document.getElementById('clearButton');
 const localidadInput = document.getElementById('localidad');
 const pisoDeptoDiv = document.querySelector('.PisoyDepto'); // Seleccionar el div que contiene piso y departamento
+const Andrean = document.querySelector('.Andrean'); 
 
 document.getElementById('codigoPostalDestinatario').addEventListener('input', function() {
     const codigoPostal = this.value;
@@ -77,6 +78,7 @@ localidadInput.addEventListener('focus', function() {
                         clearButton.style.display = 'inline'; // Mostrar botón de borrar
                         lista.style.display = 'none'; // Ocultar la lista después de seleccionar
                         pisoDeptoDiv.classList.remove('hidden'); // Eliminar la clase hidden
+                        Andrean.classList.remove('hidden'); // Eliminar la clase hidden
                     };
                     lista.appendChild(option);
                 });
@@ -106,4 +108,5 @@ clearButton.addEventListener('click', function() {
     clearButton.style.display = 'none'; // Ocultar botón de borrar
     document.getElementById('listaLocalidades').style.display = 'none'; // Ocultar la lista
     pisoDeptoDiv.classList.add('hidden'); // Agregar la clase hidden nuevamente
+    Andrean.classList.add('hidden'); // Agregar la clase hidden nuevamente
 });

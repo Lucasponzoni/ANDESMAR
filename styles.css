@@ -62,8 +62,25 @@ form {
     gap: 10px;
 }
 
-.cp , .piso, .localidad, .depto{
+.cp, .localidad{
     flex: 1;
+}
+
+.piso, .depto{
+    width: 20%;
+}
+
+.email{
+    width: 60%;
+}
+
+.Andrean{
+    background-color: red;
+    color: white;
+    font-size: 1rem;
+    padding: .3rem;
+    border-radius: 5px;
+    width: fit-content;
 }
 
 #localidad{
@@ -640,7 +657,7 @@ button:hover {
 
 /* FIN NAVBAR */
 
-#deptoDestinatario , #pisolDestinatario, #codigoPostalDestinatario, #localidad{
+#deptoDestinatario , #pisolDestinatario, #codigoPostalDestinatario, #emailDestinatario, #localidad{
     margin-bottom: 0;
 }
 
