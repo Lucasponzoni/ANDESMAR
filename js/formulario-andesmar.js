@@ -36,7 +36,7 @@ function actualizarVolumen() {
 
     // Actualizar los elementos del volumen total
     document.getElementById('volumenTotal').innerText = totalVolumen.toFixed(2); // Mostrar en m³ con 2 decimales
-    document.getElementById('volumenTotalcm').innerText = totalVolumenCm3.toFixed(2); // Mostrar en cm³ con 2 decimales
+    document.getElementById('volumenTotalcm').innerText = totalVolumenCm3.toFixed(0); // Mostrar en cm³ con 2 decimales
 }
 
 // Llama a la función al cargar la página para establecer el volumen inicial

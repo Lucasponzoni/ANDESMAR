@@ -208,12 +208,10 @@ function actualizarCantidadBultos() {
     document.getElementById('bultos').value = cantidadBultos || 1;
 }
 
-// Agregar el evento al contenedor de bultos para recalcular el volumen al cambiar
-document.getElementById('medidasBultosContainer').addEventListener('input', actualizarVolumen);
-
 function actualizarVolumen() {
     const bultosContainer = document.getElementById('medidasBultosContainer');
-    let totalVolumen = 0;
+    let totalVolumen = 0; // Volumen total en m³
+    let totalVolumenCm3 = 0; // Volumen total en cm³
 
     Array.from(bultosContainer.children).forEach(bulto => {
         const alto = parseFloat(bulto.querySelector(`input[name^="Alto"]`).value) || 0;
@@ -221,13 +219,18 @@ function actualizarVolumen() {
         const largo = parseFloat(bulto.querySelector(`input[name^="Largo"]`).value) || 0;
         const cantidad = parseInt(bulto.querySelector(`input[name^="Cantidad"]`).value) || 1; // Obtener cantidad
 
-        // Calcular volumen de este bulto y multiplicar por la cantidad
-        const volumenBulto = (alto * ancho * largo) / 1000000; // Convertir cm³ a m³
-        totalVolumen += volumenBulto * cantidad; // Sumar al volumen total
+        // Calcular volumen de este bulto en cm³
+        const volumenBultoCm3 = alto * ancho * largo; // En cm³
+        totalVolumenCm3 += volumenBultoCm3 * cantidad; // Sumar al volumen total en cm³
+
+        // Convertir a m³
+        const volumenBultoM3 = volumenBultoCm3 / 1000000; // Convertir cm³ a m³
+        totalVolumen += volumenBultoM3 * cantidad; // Sumar al volumen total en m³
     });
 
-    // Actualizar el elemento del volumen total
-    document.getElementById('volumenTotal').innerText = totalVolumen.toFixed(2); // Mostrar con 2 decimales
+    // Actualizar los elementos del volumen total
+    document.getElementById('volumenTotal').innerText = totalVolumen.toFixed(2); // Mostrar en m³ con 2 decimales
+    document.getElementById('volumenTotalcm').innerText = totalVolumenCm3.toFixed(0); // Mostrar en cm³ con 2 decimales
 }
 
 // Llama a la función al cargar la página para establecer el volumen inicial

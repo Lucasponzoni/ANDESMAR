@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Andesmar API Etiquetas</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -11,6 +13,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300..700&display=swap" rel="stylesheet">  
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
 
 </head>
 
@@ -42,7 +47,7 @@
         <input type="text" id="calleNroRemitente" name="CalleNroRemitente" value="2799" required>
         
         <div class="origenEnvio">
-            <label class="nuevo" for="codigoPostalRemitente">Origen: (Disponible origen NQN & Cipolletti)</label>
+            <label class="nuevo" for="codigoPostalRemitente">Origen ANDESMAR: (Disponible origen NQN & Cipolletti)</label>
             <select id="codigoPostalRemitente" name="CodigoPostalRemitente" required>
                 <option value="2000" selected>Rosario (2000)</option>
                 <option value="8300">Neuquén (8300)</option>
@@ -61,31 +66,26 @@
             </div>
         </div>
         
-        <label for="nombreApellidoDestinatario">Nombre y Apellido Destinatario:</label>
-        <input type="text" id="nombreApellidoDestinatario" name="NombreApellidoDestinatario" value="" required>
+        <input type="text" id="nombreApellidoDestinatario" name="NombreApellidoDestinatario" value="" required placeholder="Nombre & Apellido">
 
         <p id="respuesta2"></p>
 
         <div class="CpyLocalidad" style="position: relative;">
             <div class="cp">
-                <label for="codigoPostalDestinatario">Código Postal:</label>
-                <input type="text" id="codigoPostalDestinatario" name="CodigoPostalDestinatario" value="" required>
+                <input type="text" id="codigoPostalDestinatario" name="CodigoPostalDestinatario" value="" required placeholder="Código Postal">
             </div>
     
             <div class="localidad">
-                <label for="localidad">Localidad <span class="Andre">Andreani</span></label>
-                <input type="text" id="localidad" name="localidad" value="" autocomplete="off">
+                <input type="text" id="localidad" name="localidad" value="" autocomplete="off" placeholder="Localidad SOLO ANDREANI">
                 <span class="clear-button" id="clearButton">✖</span>
                 <div class="spinner2" id="loadingSpinner"></div>
                 <div class="lista-localidades" id="listaLocalidades"></div>
             </div>
         </div>
 
-        <label for="calleDestinatario">Calle Destinatario:</label>
-        <input type="text" id="calleDestinatario" name="CalleDestinatario" value="" required>
+        <input type="text" id="calleDestinatario" name="CalleDestinatario" value="" required placeholder="Calle del Destinatario">
 
-        <label for="calleNroDestinatario">Número de Calle Destinatario:</label>
-        <input type="text" id="calleNroDestinatario" name="CalleNroDestinatario" value="" required>
+        <input type="text" id="calleNroDestinatario" name="CalleNroDestinatario" value="" required placeholder="Número de Calle Destinatario">
 
         <div class="PisoyDepto hidden" style="position: relative;">
             <div class="piso">
@@ -97,11 +97,9 @@
             </div>
         </div>
         
-        <label for="telefonoDestinatario">Teléfono Destinatario:</label>
-        <input type="text" id="telefonoDestinatario" name="TelefonoDestinatario" value="" required>
+        <input type="text" id="telefonoDestinatario" name="TelefonoDestinatario" value="" required placeholder="Teléfono Destinatario">
 
-        <label for="nroRemito">Número de Remito:</label>
-        <input type="text" id="nroRemito" name="NroRemito" value="" required>
+        <input type="text" id="nroRemito" name="NroRemito" value="" required placeholder="REMITO Valor Unico ejemplo 23012345678R">
 
         <label for="tipoElectrodomestico">Tipo de Electrodoméstico:</label>
         <select id="tipoElectrodomestico" name="TipoElectrodomestico" onchange="rellenarMedidas()">
@@ -180,22 +178,33 @@
 
         <button type="button" id="addBultoButton">Agregar otro bulto</button>
 
-        <div id="volumenVisual">
-            <strong>Volumen Total (m³):</strong> <span id="volumenTotal">0.00</span>
-        </div>
-
-        <div id="volumenVisual">
-            <strong>Volumen Total (cm³):</strong> <span id="volumenTotalcm">0.00</span>
-        </div>
-
-        <input type="number" id="m3" name="M3" step="0.001" value="0.1" style="display:none;">
-
         <label for="observaciones">Observaciones:</label>
         <textarea id="observaciones" lass="mensaje-personalizado" name="Observaciones"></textarea>
         <div id="mensajePersonalizado" class="mensaje-personalizado"></div>
 
 
-        <label for="modalidadEntrega">Modalidad de Entrega:</label>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="volumen-container">
+                        <img src="./Img/m3.png" alt="m3">
+                        <div class="volumen-label">Volumen Total <span class="cubic">(m³):</span></div>
+                        <span id="volumenTotal">0.00</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="volumen-container">
+                        <img src="./Img/cm3.png" alt="cm3">
+                        <div class="volumen-label">Volumen Total <span class="cubic">(cm³):</span></div>
+                        <span id="volumenTotalcm">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="number" id="m3" name="M3" step="0.001" value="0.1" style="display:none;">
+
+        <label for="modalidadEntrega">Modalidad de Entrega Andesmar:</label>
         <select id="modalidadEntrega" required>
             <option value="Terminal-Terminal">Terminal a Terminal</option>
             <option selected value="Puerta-Puerta">Puerta a Puerta</option>
@@ -203,7 +212,7 @@
             <option value="Puerta-Terminal">Puerta a Terminal</option>
         </select>
 
-        <label for="unidadVenta">Unidad de Venta:</label>
+        <label for="unidadVenta">Unidad de Venta: (Solo Andesmar)</label>
         <select id="unidadVenta" name="UnidadVenta" required>
             <option value="express rto conformado">PAQUETERIA EXPRESS (-30Kg)</option>
             <option value="cargas remito conformado" selected>CARGA PESADA (+30Kg)</option>
@@ -222,9 +231,10 @@
         </select>
 
         <button type="button" onclick="enviarSolicitud()">Generar Etiqueta</button>
-        <h3 class="ultimasEtiquetasTitulo">Últimas Etiquetas Generadas:</h3>
-        <div id="ultimasEtiquetas"></div>        
         <div class="respuesta" id="respuesta"></div>
+        <h3 class="ultimasEtiquetasTitulo">Últimas Etiquetas Generadas ANDESMAR:</h3>
+        <div id="ultimasEtiquetas"></div>        
+        
 
     </form>
 
