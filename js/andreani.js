@@ -172,6 +172,7 @@ async function enviarSolicitudAndreani() {
             
             // Mostrar el contenedor de descarga
             document.getElementById('descargaAndreani').style.display = 'block';
+            
         } else {
             const errorMessage = await response.text();
             showError(errorMessage);
