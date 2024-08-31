@@ -352,8 +352,9 @@ function mostrarRespuesta(data) {
         botonDescarga.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PDF ${numeroRemito}`; // Actualiza el texto del botón con el ícono
         
         // Agregar evento al botón de descarga
-        botonDescarga.addEventListener("click", function () {
-            window.open(data.Link, "_blank");
+        botonDescarga.addEventListener("click", function (event) {
+        event.preventDefault(); // Evitar que se recargue la página
+        window.open(data.Link, "_blank");
         });
 
         descargaAndesmar.style.display = "block"; // Mostrar sección de descarga
