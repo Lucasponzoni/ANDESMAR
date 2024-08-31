@@ -6,7 +6,7 @@ const password = 'JoBOraCDJZC';
 // Mapeo de provincias a códigos de región
 const regionMap = {"Salta": "AR-A",
 "buenos aires": "AR-B",
-"capital federeal": "AR-C",
+"capital federal": "AR-C",
 "san luis": "AR-D",
 "entre rios": "AR-E",
 "la rioja": "AR-F",
