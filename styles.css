@@ -709,6 +709,10 @@ button:hover {
     font-size: 1.3rem;
 }
 
+.provincia{
+    display: none;
+}
+
 /* FIN VOLUMENES */
 
 /* FOOTER */
@@ -749,3 +753,76 @@ footer > a:hover{
 }
 
 /* FIN FOOTER */
+
+/* BOTON DESCARGA */
+
+#descargaAndreani{
+    background-color: #fee2e2;
+    padding: .5rem;
+    border-radius: 15px;
+    border: 2px dashed red;
+    transition: transform 0.2s;
+}
+
+#descargaAndreani:hover {
+    transform: scale(1.03);
+    cursor: pointer;
+}
+#descargaAndesmar{
+    background-color: rgb(228, 237, 255);
+    padding: .5rem;
+    border-radius: 15px;
+    border: 2px dashed cornflowerblue;
+    transition: transform 0.2s;
+}
+
+#descargaAndesmar:hover {
+    transform: scale(1.03);
+    cursor: pointer;
+}
+
+#titleAndreani{
+    background-color: white;
+    border: 2px dashed #fc522c;
+    border-radius: 10px;
+}
+
+#titleAndesmar{
+    background-color: white;
+    border: 2px dashed #5a6892;
+    border-radius: 10px;
+    Color: cornflowerblue;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    padding: .2rem;
+    font-weight: 600;
+}
+
+#titleAndreani > span{
+    color: red;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    padding: .2rem;
+    font-weight: 600;
+}
+
+#titleAndreaniName, #nombreAndreani, #titleAndesmarName{
+    font-size: 1.2rem;
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.btn-danger >i, .btn-primary >i{
+    font-size: 1.2rem;
+}
+
+.surprise{
+    width: 35px;
+}
+
+.btn-warning{
+    margin: 0!important;
+}
+
+/* FIN BOTON DESCARGA */

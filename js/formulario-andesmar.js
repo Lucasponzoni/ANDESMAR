@@ -180,7 +180,7 @@ function actualizarMensajePersonalizado() {
     const nombreApellidoDestinatario = document.getElementById("nombreApellidoDestinatario").value;
     const telefonoDestinatario = document.getElementById("telefonoDestinatario").value;
 
-    const mensajePersonalizado = `Enviar a CP ${codigoPostalDestinatario}, Calle: ${calleDestinatario}, Altura: ${calleNroDestinatario}, Entregar a: ${nombreApellidoDestinatario}, Coordinar al telefono: ${telefonoDestinatario}, envio propiedad de WWW.NOVOGAR.COM.AR, ante cualquier consulta comunicarse a (0341) 156680658`;
+    const mensajePersonalizado = `CP ${codigoPostalDestinatario}, Calle: ${calleDestinatario}, ${calleNroDestinatario}, Titular: ${nombreApellidoDestinatario}, Telefono: ${telefonoDestinatario}, envio propiedad de WWW.NOVOGAR.COM.AR, ante cualquier consulta comunicarse a (0341) 156680658`;
 
     // Mostrar el mensaje en un elemento HTML
     document.getElementById("mensajePersonalizado").innerText = mensajePersonalizado;
@@ -315,7 +315,7 @@ function enviarSolicitud() {
 function mostrarRespuesta(data) {
     let respuestaElemento = document.getElementById("respuesta");
 
-    // Eliminar cualquier contenido existente en el elemento respuesta
+    // Limpiar cualquier contenido existente
     if (respuestaElemento) {
         respuestaElemento.innerHTML = "";
     } else {
@@ -324,83 +324,40 @@ function mostrarRespuesta(data) {
         document.body.appendChild(respuestaElemento);
     }
 
-    if ((data.Message && data.Message === "ERRORNo es posible realizar el envío hacia el destino seleccionado.") || data.NroPedido == undefined)       {
-        // Si hay un mensaje de error específico en los datos
+    const descargaAndesmar = document.getElementById("descargaAndesmar");
+    
+    if ((data.Message && data.Message === "ERRORNo es posible realizar el envío hacia el destino seleccionado.") || data.NroPedido == undefined) {
+        const nombreApellidoDestinatario = document.getElementById("nombreApellidoDestinatario").value.toUpperCase();
 
-        // Crear un contenedor para el mensaje de error con estilos
-        const contenedorError = document.createElement("div");
-        contenedorError.classList.add('contenedorError');
+        // Actualizar el contenedor de descarga
+        document.getElementById("titleAndesmar").innerHTML = `<img class="surprise" src="./Img/404.gif"> ANDESMAR NO DISPONIBLE`; // Actualiza el título con el número de remito y el ícono
+        document.getElementById("titleAndesmarName").innerText = nombreApellidoDestinatario;
 
-        //Agregar imagen de error
-        const imgError = document.createElement("img");
-        imgError.src = "./Img/error.webp";
-        contenedorError.appendChild(imgError);
-
-        // Crear un mensaje de error con el texto deseado
-        const mensajeError = document.createElement("p");
-        mensajeError.style.fontSize = "2rem";  // Tamaño de fuente de 2 rem
-        mensajeError.innerText = "No es posible realizar el envío hacia el destino seleccionado.";
-        contenedorError.appendChild(mensajeError);
-
-        respuestaElemento.appendChild(contenedorError); // Añadir el contenedor de error al elemento de respuesta
+        const botonDescarga = document.querySelector("#descargaAndesmar .btn");
+        botonDescarga.classList.add("disabled");
+        botonDescarga.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Envio No Disponible`; // Actualiza el texto del botón con el ícono
+        
+        descargaAndesmar.style.display = "block"; // Mostrar sección de descarga
+        respuestaElemento.appendChild(descargaAndesmar); // Añadir el contenedor de descarga al elemento de respuesta
     } else {
         // Si la respuesta es exitosa
+        const nombreApellidoDestinatario = document.getElementById("nombreApellidoDestinatario").value.toUpperCase();
+        const numeroRemito = data.NroPedido; // Asegúrate de que esto obtenga el número correcto
 
-        // Crear un contenedor para la respuesta con estilos
-        const contenedorRespuesta = document.createElement("div");
-        contenedorRespuesta.classList.add('contenedorRespuesta');
+        // Actualizar el contenedor de descarga
+        document.getElementById("titleAndesmar").innerHTML = `<img class="surprise" src="./Img/download-file.gif"> ANDESMAR ${document.getElementById("nroRemito").value}`; // Actualiza el título con el número de remito y el ícono
+        document.getElementById("titleAndesmarName").innerText = nombreApellidoDestinatario;
 
-        //Agregar imagen de éxito
-        const imgSuccess = document.createElement("img");
-        imgSuccess.src = "./Img/success.gif";
-        contenedorRespuesta.appendChild(imgSuccess);
-
-        // Crear un encabezado con el NroPedido
-        const encabezado = document.createElement("h2");
-        encabezado.classList.add('respuestaTitulo');
-        encabezado.innerText = `Número de Pedido: ${data.NroPedido}`;
-        contenedorRespuesta.appendChild(encabezado);
-
-        // Crear un enlace (convertido en botón) para descargar la etiqueta
-        const botonDescarga = document.createElement("button"); // Crear un botón
-        botonDescarga.classList.add('botonDescarga');
-        botonDescarga.innerText = `Descargar etiqueta ${data.NroPedido}`;
-
-        // Agregar el evento click para abrir el enlace en una nueva pestaña
+        const botonDescarga = document.querySelector("#descargaAndesmar .btn");
+        botonDescarga.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PDF ${numeroRemito}`; // Actualiza el texto del botón con el ícono
+        
+        // Agregar evento al botón de descarga
         botonDescarga.addEventListener("click", function () {
             window.open(data.Link, "_blank");
         });
 
-        contenedorRespuesta.appendChild(botonDescarga); // Añadir el botón al contenedor
-        respuestaElemento.appendChild(contenedorRespuesta); // Añadir el contenedor al elemento de respuesta
-
-        // Guardar la información en el almacenamiento local si el número de pedido no es "undefined"
-        if (data.NroPedido !== undefined) {
-            const etiquetaGenerada = {
-                NroPedido: data.NroPedido,
-                NombreApellidoDestinatario: document.getElementById("nombreApellidoDestinatario").value,
-                Link: data.Link // Agregamos el enlace generado a la etiqueta
-            };
-
-            // Obtener las etiquetas previas del almacenamiento local
-            let etiquetasPrevias = JSON.parse(localStorage.getItem("etiquetasPrevias")) || [];
-
-            // Agregar la nueva etiqueta generada a la lista de etiquetas previas
-            etiquetasPrevias.push(etiquetaGenerada);
-
-            // Limitar el número de etiquetas previas a mostrar
-            const MAX_ETIQUETAS_PREVIAS = 150;
-            if (etiquetasPrevias.length > MAX_ETIQUETAS_PREVIAS) {
-                etiquetasPrevias = etiquetasPrevias.slice(-MAX_ETIQUETAS_PREVIAS);
-            }
-
-            // Guardar las etiquetas previas actualizadas en el almacenamiento local
-            localStorage.setItem("etiquetasPrevias", JSON.stringify(etiquetasPrevias));
-
-            // Mostrar las últimas etiquetas generadas
-            mostrarEtiquetasPrevias();
-
-        }
+        descargaAndesmar.style.display = "block"; // Mostrar sección de descarga
+        respuestaElemento.appendChild(descargaAndesmar); // Añadir el contenedor de descarga al elemento de respuesta
     }
 }
 

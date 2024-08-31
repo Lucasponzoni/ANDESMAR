@@ -3,6 +3,7 @@ const clearButton = document.getElementById('clearButton');
 const localidadInput = document.getElementById('localidad');
 const pisoDeptoDiv = document.querySelector('.PisoyDepto'); // Seleccionar el div que contiene piso y departamento
 const Andrean = document.querySelector('.Andrean'); 
+const provinciaDiv = document.querySelector('.provincia p'); // Seleccionar el párrafo dentro del div de provincia
 
 document.getElementById('codigoPostalDestinatario').addEventListener('input', function() {
     const codigoPostal = this.value;
@@ -33,6 +34,7 @@ document.getElementById('codigoPostalDestinatario').addEventListener('input', fu
                         lista.style.display = 'none'; // Ocultar la lista después de seleccionar
                         pisoDeptoDiv.classList.remove('hidden'); // Eliminar la clase hidden
                         Andrean.classList.remove('hidden'); // Eliminar la clase hidden
+                        provinciaDiv.textContent = item.provincia; // Mostrar la provincia en el div
                     };
                     lista.appendChild(option);
                 });
@@ -80,6 +82,7 @@ localidadInput.addEventListener('focus', function() {
                         lista.style.display = 'none'; // Ocultar la lista después de seleccionar
                         pisoDeptoDiv.classList.remove('hidden'); // Eliminar la clase hidden
                         Andrean.classList.remove('hidden'); // Eliminar la clase hidden
+                        provinciaDiv.textContent = item.provincia; // Mostrar la provincia en el div
                     };
                     lista.appendChild(option);
                 });
@@ -110,4 +113,5 @@ clearButton.addEventListener('click', function() {
     document.getElementById('listaLocalidades').style.display = 'none'; // Ocultar la lista
     pisoDeptoDiv.classList.add('hidden'); // Agregar la clase hidden nuevamente
     Andrean.classList.add('hidden'); // Agregar la clase hidden nuevamente
+    provinciaDiv.textContent = ''; // Limpiar el contenido del div de provincia
 });

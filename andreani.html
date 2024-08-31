@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mostrar Token y Generar Etiqueta</title>
+    <style>
+        #downloadDiv {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: none; /* Ocultar por defecto */
+        }
+    </style>
+</head>
+<body>
+    <button id="generateLabelButton">Generar Etiqueta</button>
+    <div id="downloadDiv">
+        <div id="apiResponse"></div>
+    </div>
+
+    <script>
+        const apiUrlLogin = 'https://apis.andreani.com/login';
+        const apiUrlLabel = 'https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio';
+        const username = 'novogar_gla';
+        const password = 'JoBOraCDJZC';
+        let authToken = '';
+        let numeroDeEnvio = '';
+
+        async function getAuthToken() {
+            try {
+                const response = await fetch(apiUrlLogin, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': Basic ${btoa(${username}:${password})}
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    console.log('Token de autenticación:', authToken);
+                    return authToken; 
+                } else {
+                    throw new Error('No se pudo obtener el token');
+                }
+            } catch (error) {
+                console.error('Error al obtener el token de autenticación:', error);
+                throw error; 
+            }
+        }
+
+        async function generateLabel() {
+            try {
+                const token = await getAuthToken();
+
+                const requestData = {
+                    "contrato": "351002753",
+                    "idPedido": "123456",
+                    "origen": {
+                        "postal": {
+                            "codigoPostal": "2126",
+                            "calle": "R. Prov. 21 Km",
+                            "numero": "4,9",
+                            "localidad": "ALVEAR",
+                            "region": "ROSARIO",
+                            "pais": "Argentina",
+                            "componentesDeDireccion": [
+                                {
+                                    "meta": "entreCalle",
+                                    "contenido": "NOVOGAR ALVEAR"
+                                }
+                            ]
+                        }
+                    },
+                    "destino": {
+                        "postal": {
+                            "codigoPostal": "1292",
+                            "calle": "Av Siempre Viva",
+                            "numero": "742",
+                            "localidad": "CIUDAD AUTONOMA DE BUENOS AIRES",
+                            "region": "AR-B",
+                            "pais": "Argentina",
+                            "componentesDeDireccion": [
+                                {
+                                    "meta": "piso",
+                                    "contenido": "2"
+                                },
+                                {
+                                    "meta": "departamento",
+                                    "contenido": "B"
+                                }
+                            ]
+                        }
+                    },
+                    "remitente": {
+                        "nombreCompleto": "NOVOGAR.COM.AR",
+                        "email": "posventa@novogar.com.ar",
+                        "documentoTipo": "CUIT",
+                        "documentoNumero": "30685437011",
+                        "telefonos": [
+                            {
+                                "tipo": 1,
+                                "numero": "3416680658"
+                            }
+                        ]
+                    },
+                    "destinatario": [
+                        {
+                            "nombreCompleto": "FERNANDO DADATTO",
+                            "email": "lucas.ponzoni@novogar.com.ar",
+                            "documentoTipo": "CUIT",
+                            "documentoNumero": "30685437011",
+                            "telefonos": [
+                                {
+                                    "tipo": 1,
+                                    "numero": "3416680658"
+                                }
+                            ]
+                        }
+                    ],
+                    "remito": {
+                        "numeroRemito": "2313789234599R43434"
+                    },
+                    "bultos": [
+                        {
+                            "kilos": 2,
+                            "largoCm": 50,
+                            "altoCm": 30,
+                            "anchoCm": 20,
+                            "volumenCm": 30000,
+                            "valorDeclaradoSinImpuestos": 80,
+                            "valorDeclaradoConImpuestos": 100,
+                            "referencias": [
+                                {
+                                    "meta": "detalle",
+                                    "contenido": "electrodomestico"
+                                },
+                                {
+                                    "meta": "idCliente",
+                                    "contenido": "POSVENTA WEB"
+                                },
+                                {
+                                    "meta": "observaciones",
+                                    "contenido": "color negro"
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                const response = await fetch(apiUrlLabel, {
+                    method: 'POST',
+                    headers: {
+                        'x-cors-api-key': 'temp_8af643011e844ffa8043d8aa3baa0d77',
+                        'x-authorization-token': token, 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    numeroDeEnvio = data.bultos[0].numeroDeEnvio;
+                    console.log('Respuesta de la API:', data);
+                    createDownloadButton(numeroDeEnvio, token);
+                } else {
+                    console.error('Error al generar la etiqueta:', response.status);
+                }
+            } catch (error) {
+                console.error('Error al generar la etiqueta:', error);
+            }
+        }
+
+        function createDownloadButton(numeroDeEnvio, token) {
+            const url = https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas;
+
+            fetch(url, {
+                method: "GET",
+                headers: {
+                    'x-cors-api-key': 'temp_a7ef250ec11e36ceef58b06a9e03d196',
+                    "x-authorization-token": token,
+                    "Accept": "application/PDF"
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(HTTP error! Status: ${response.status});
+                }
+                return response.blob();
+            })
+            .then(data => {
+                const pdfUrl = URL.createObjectURL(data);
+                const link = document.createElement('a');
+                link.href = pdfUrl;
+                link.target = '_blank';
+                link.textContent = 'Descargar Etiqueta PDF';
+                
+                const apiResponseContainer = document.getElementById('apiResponse');
+                apiResponseContainer.innerHTML = ''; // Limpiar contenido previo
+                apiResponseContainer.appendChild(link);
+                document.getElementById('downloadDiv').style.display = 'block'; // Mostrar el div de descarga
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const apiResponseContainer = document.getElementById('apiResponse');
+                apiResponseContainer.textContent = Error: ${error.message};
+            });
+        }
+
+        document.getElementById('generateLabelButton').addEventListener('click', generateLabel);
+    </script>
+</body>
+</html>
+
+
+2799&CodigoPostalRemitente=2000&NombreApellidoDestinatario=Maria+Carlota+Cornejo+Costas&CodigoPostalDestinatario=8000&localidad=BELLA+VISTA&CalleDestinatario=IBARROLA+&CalleNroDestinatario=4567&pisolDestinatario=4&deptoDestinatario=4&emailDestinatario=posventa%40novogar.com.ar&TelefonoDestinatario=112234234234&NroRemito=23000074565A6&TipoElectrodomestico=heladera&Bultos=1&Peso=60&ValorDeclarado=700000&Alto0=165&Ancho0=60&Largo0=60&Cantidad0=1&Observaciones=Enviar+a+CP+8000%2C+Calle%3A+IBARROLA+%2C+Altura%3A+4567%2C+Entregar+a%3A+Maria+Carlota+Cornejo+Costas%2C+Coordinar+al+telefono%3A+112234234234%2C+envio+propiedad+de+WWW.NOVOGAR.COM.AR%2C+ante+cualquier+consulta+comunicarse+a+%280341%29+156680658&M3=0.1&UnidadVenta=cargas+remito+conformado&EsFletePagoDestino=false&EsRemitoconformado=true

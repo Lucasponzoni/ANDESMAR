@@ -122,11 +122,24 @@ function rellenarMedidas() {
     }
 
     // Asignar medidas a los inputs de la unidad exterior
-    document.getElementById("alto0").value = alto; // Asegúrate de que el ID coincide
-    document.getElementById("ancho0").value = ancho; // Asegúrate de que el ID coincide
-    document.getElementById("largo0").value = largo; // Asegúrate de que el ID coincide
-    document.getElementById("peso").value = peso; // Asegúrate de que el ID coincide
-    document.getElementById("valorDeclarado").value = valor; // Asegúrate de que el ID coincide
+    document.getElementById("alto0").value = alto;
+    document.getElementById("ancho0").value = ancho;
+    document.getElementById("largo0").value = largo;
+    document.getElementById("peso").value = peso; // Peso inicial sin multiplicar
+    document.getElementById("valorDeclarado").value = valor;
+
+    // Actualizar el peso en función de la cantidad ingresada en la unidad exterior
+    const cantidadInput = document.querySelector(`#cantidad0`);
+    cantidadInput.addEventListener('input', function () {
+        const cantidad = parseInt(cantidadInput.value) || 1;
+
+        // Multiplicar peso solo para la unidad exterior
+        if (tipoElectrodomestico.includes('split')) {
+            document.getElementById("peso").value = peso * cantidad / 2; // Multiplicar por la cantidad completa
+        } else {
+            document.getElementById("peso").value = peso * cantidad; // Multiplicar por la cantidad completa
+        }
+    });
 
     // Actualizar cantidad de bultos y volumen
     actualizarCantidadBultos();
@@ -136,7 +149,6 @@ function rellenarMedidas() {
 function agregarBulto(tipoElectrodomestico) {
     const bultosContainer = document.getElementById('medidasBultosContainer');
 
-    // Solo agregar un bulto si no se ha agregado uno para el split
     if (!bultoSplitAgregado) {
         const bultoCount = bultosContainer.children.length;
 
@@ -168,7 +180,7 @@ function agregarBulto(tipoElectrodomestico) {
 
         // Crear bulto para la unidad interior
         const newBulto = document.createElement('div');
-        newBulto.classList.add('bulto', 'bultoSplit'); // Añadir clase para identificar el bulto del split
+        newBulto.classList.add('bulto', 'bultoSplit');
         newBulto.id = `bulto${bultoCount}`;
         newBulto.innerHTML = `
             <h3 class="bultoTitle">Bulto: Paquete ${bultoCount + 1} (Unidad Interior)</h3>
@@ -187,12 +199,19 @@ function agregarBulto(tipoElectrodomestico) {
             <button type="button" class="removeBultoButton">Eliminar Bulto</button>
         `;
         bultosContainer.appendChild(newBulto);
-        bultoSplitAgregado = true; // Marcar como agregado
+        bultoSplitAgregado = true;
 
         // Agregar evento para eliminar el bulto
         newBulto.querySelector('.removeBultoButton').addEventListener('click', function() {
             newBulto.remove();
-            bultoSplitAgregado = false; // Reiniciar la variable
+            bultoSplitAgregado = false;
+            actualizarCantidadBultos();
+            actualizarVolumen();
+        });
+
+        // Evento de input para actualizar volumen y cantidad de bultos sin afectar el peso
+        const cantidadInputInterior = newBulto.querySelector(`input[name="Cantidad${bultoCount}"]`);
+        cantidadInputInterior.addEventListener('input', function () {
             actualizarCantidadBultos();
             actualizarVolumen();
         });
