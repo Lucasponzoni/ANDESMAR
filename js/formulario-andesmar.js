@@ -358,6 +358,33 @@ function mostrarRespuesta(data) {
 
         descargaAndesmar.style.display = "block"; // Mostrar sección de descarga
         respuestaElemento.appendChild(descargaAndesmar); // Añadir el contenedor de descarga al elemento de respuesta
+
+        // Guardar la información en el almacenamiento local si el número de pedido no es "undefined"
+        if (data.NroPedido !== undefined) {
+            const etiquetaGenerada = {
+                NroPedido: data.NroPedido,
+                NombreApellidoDestinatario: document.getElementById("nombreApellidoDestinatario").value,
+                Link: data.Link // Agregamos el enlace generado a la etiqueta
+            };
+
+            // Obtener las etiquetas previas del almacenamiento local
+            let etiquetasPrevias = JSON.parse(localStorage.getItem("etiquetasPrevias")) || [];
+
+            // Agregar la nueva etiqueta generada a la lista de etiquetas previas
+            etiquetasPrevias.push(etiquetaGenerada);
+
+            // Limitar el número de etiquetas previas a mostrar
+            const MAX_ETIQUETAS_PREVIAS = 150;
+            if (etiquetasPrevias.length > MAX_ETIQUETAS_PREVIAS) {
+                etiquetasPrevias = etiquetasPrevias.slice(-MAX_ETIQUETAS_PREVIAS);
+            }
+
+            // Guardar las etiquetas previas actualizadas en el almacenamiento local
+            localStorage.setItem("etiquetasPrevias", JSON.stringify(etiquetasPrevias));
+
+            // Mostrar las últimas etiquetas generadas
+            mostrarEtiquetasPrevias();
+        }
     }
 }
 
