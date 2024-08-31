@@ -201,7 +201,7 @@ actualizarMensajePersonalizado();
 
 function enviarSolicitud() {
     let spinner = document.getElementById("spinner");
-    spinner.style.display = "block";
+    spinner.style.display = "flex";
 
     const calleRemitente = document.getElementById("calleRemitente").value;
     const calleNroRemitente = document.getElementById("calleNroRemitente").value;
