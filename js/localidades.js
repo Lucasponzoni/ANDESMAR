@@ -8,7 +8,7 @@ const provinciaDiv = document.querySelector('.provincia p'); // Seleccionar el p
 document.getElementById('codigoPostalDestinatario').addEventListener('input', function() {
     const codigoPostal = this.value;
 
-    if (codigoPostal.length > 0) {
+    if (codigoPostal.length > 3) {
         spinner.style.display = 'block'; // Mostrar spinner
 
         fetch(`https://apisqa.andreani.com/v1/localidades?codigosPostales=${codigoPostal}`)
@@ -24,7 +24,7 @@ document.getElementById('codigoPostalDestinatario').addEventListener('input', fu
             lista.style.display = 'none'; // Ocultar la lista inicialmente
             spinner.style.display = 'none'; // Ocultar spinner
 
-            if (data && data.length > 0) {
+            if (data && data.length > 3) {
                 data.forEach(item => {
                     const option = document.createElement('div');
                     option.textContent = `${item.localidad} (${item.provincia})`; // Formato: Localidad (Provincia)
@@ -57,7 +57,7 @@ document.getElementById('codigoPostalDestinatario').addEventListener('input', fu
 localidadInput.addEventListener('focus', function() {
     const codigoPostal = document.getElementById('codigoPostalDestinatario').value;
 
-    if (codigoPostal.length > 0) {
+    if (codigoPostal.length > 3) {
         spinner.style.display = 'block'; // Mostrar spinner
 
         fetch(`https://apisqa.andreani.com/v1/localidades?codigosPostales=${codigoPostal}`)
