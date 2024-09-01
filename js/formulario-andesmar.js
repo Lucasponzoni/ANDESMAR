@@ -1,6 +1,7 @@
 window.onload = function() {
     mostrarEtiquetasPrevias();
     actualizarMensajePersonalizado();
+    mostrarSpinner
 };
 
 const mobileMenu = document.getElementById('mobile-menu');
@@ -408,7 +409,7 @@ function mostrarEtiquetasPrevias() {
         const nombreEnMayusculas = etiqueta.NombreApellidoDestinatario.toUpperCase();
         const etiquetaElemento = document.createElement("button");
         etiquetaElemento.classList.add("reDescarga");
-        etiquetaElemento.innerHTML = `Descargar ${etiqueta.NroPedido} - ${nombreEnMayusculas} <img src="./Img/Download.png" class="download-icon">`;
+        etiquetaElemento.innerHTML = `${etiqueta.NroPedido} - ${nombreEnMayusculas} <img src="./Img/Download.png" class="download-icon">`;
 
         // Agregar evento de clic para abrir el enlace
         etiquetaElemento.addEventListener("click", function () {
@@ -431,7 +432,7 @@ function mostrarEtiquetasPrevias() {
                 const nombreEnMayusculas = etiqueta.NombreApellidoDestinatario.toUpperCase();
                 const etiquetaElemento = document.createElement("button");
                 etiquetaElemento.classList.add("reDescarga");
-                etiquetaElemento.innerHTML = `Descargar ${etiqueta.NroPedido} - ${nombreEnMayusculas} <img src="./Img/Download.png" class="download-icon">`;
+                etiquetaElemento.innerHTML = `${etiqueta.NroPedido} - ${nombreEnMayusculas} <img src="./Img/Download.png" class="download-icon">`;
 
                 // Agregar evento de clic para abrir el enlace
                 etiquetaElemento.addEventListener("click", function () {

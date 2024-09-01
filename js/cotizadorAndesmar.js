@@ -456,9 +456,6 @@ function manejarCambio() {
     }, 1000); // Retraso de 1 segundo
 }
 
-// Al cargar la página, mostrar el spinner
-window.onload = mostrarSpinner;
-
 // Observador para cambios en la provincia
 const provinciaElement = document.getElementById('nombre-provincia');
 if (provinciaElement) {

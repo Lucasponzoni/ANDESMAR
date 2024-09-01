@@ -400,6 +400,7 @@ button:hover {
 }
 
 .ultimasEtiquetasTitulo{
+    font-size: medium;
     font-family: "Signika Negative", sans-serif;
     background-color: #333;
     padding: .5rem;
@@ -410,11 +411,12 @@ button:hover {
 
 .reDescarga{
     font-family: "Signika Negative", sans-serif;
+    font-size: small;
     border-radius: 20px;
     font-weight: 400px;
     gap: .2rem;
     display: flex;
-    background-color: #333;
+    background-color: #32305b;
     margin: .3rem;
     margin-top: 0;
     text-align: center;
