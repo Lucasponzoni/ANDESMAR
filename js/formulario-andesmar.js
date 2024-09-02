@@ -4,6 +4,21 @@ window.onload = function() {
     mostrarSpinner
 };
 
+// Inicializar Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBIXlgOct2UzkrZbZYbyHu6_NbLDzTqqig",
+    authDomain: "despachos-novogar.firebaseapp.com",
+    databaseURL: "https://despachos-novogar-default-rtdb.firebaseio.com",
+    projectId: "despachos-novogar",
+    storageBucket: "despachos-novogar.appspot.com",
+    messagingSenderId: "346020771441",
+    appId: "1:346020771441:web:c4a29c0db4200352080dd0",
+    measurementId: "G-64DDP7D6Q2"
+  };
+  
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+
 const mobileMenu = document.getElementById('mobile-menu');
 const navLinks = document.querySelector('.nav-links');
 
@@ -316,63 +331,60 @@ function enviarSolicitud() {
 function mostrarRespuesta(data) {
     let respuestaElemento = document.getElementById("respuesta");
 
-    // Limpiar cualquier contenido existente
-    if (respuestaElemento) {
-        respuestaElemento.innerHTML = "";
-    } else {
+    // Limpiar cualquier contenido existente o crear el elemento si no existe
+    if (!respuestaElemento) {
         respuestaElemento = document.createElement("div");
         respuestaElemento.id = "respuesta";
         document.body.appendChild(respuestaElemento);
+    } else {
+        respuestaElemento.innerHTML = "";
     }
 
     const descargaAndesmar = document.getElementById("descargaAndesmar");
-    
-    if ((data.Message && data.Message === "ERRORNo es posible realizar el envío hacia el destino seleccionado.") || data.NroPedido == undefined) {
+
+    if ((data.Message && data.Message === "ERRORNo es posible realizar el envío hacia el destino seleccionado.") || data.NroPedido === undefined) {
         const nombreApellidoDestinatario = document.getElementById("nombreApellidoDestinatario").value.toUpperCase();
 
         // Actualizar el contenedor de descarga
-        document.getElementById("titleAndesmar").innerHTML = `<img class="surprise" src="./Img/404.gif"> ANDESMAR NO DISPONIBLE`; // Actualiza el título con el número de remito y el ícono
+        document.getElementById("titleAndesmar").innerHTML = `<img class="surprise" src="./Img/404.gif"> ANDESMAR NO DISPONIBLE`;
         document.getElementById("titleAndesmarName").innerText = nombreApellidoDestinatario;
 
         const botonDescarga = document.querySelector("#descargaAndesmar .btn");
         botonDescarga.classList.add("disabled");
-        botonDescarga.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Envio No Disponible`; // Actualiza el texto del botón con el ícono
-        
+        botonDescarga.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Envío No Disponible`;
+
         descargaAndesmar.style.display = "block"; // Mostrar sección de descarga
         respuestaElemento.appendChild(descargaAndesmar); // Añadir el contenedor de descarga al elemento de respuesta
     } else {
-        // Si la respuesta es exitosa
         const nombreApellidoDestinatario = document.getElementById("nombreApellidoDestinatario").value.toUpperCase();
-        const numeroRemito = data.NroPedido; // Asegúrate de que esto obtenga el número correcto
+        const numeroRemito = data.NroPedido;
 
         // Actualizar el contenedor de descarga
-        document.getElementById("titleAndesmar").innerHTML = `<img class="surprise" src="./Img/download-file.gif"> ANDESMAR ${document.getElementById("nroRemito").value}`; // Actualiza el título con el número de remito y el ícono
+        document.getElementById("titleAndesmar").innerHTML = `<img class="surprise" src="./Img/download-file.gif"> ANDESMAR ${document.getElementById("nroRemito").value}`;
         document.getElementById("titleAndesmarName").innerText = nombreApellidoDestinatario;
 
         const botonDescarga = document.querySelector("#descargaAndesmar .btn");
-        botonDescarga.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PDF ${numeroRemito}`; // Actualiza el texto del botón con el ícono
-        
+        botonDescarga.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PDF ${numeroRemito}`;
+
         // Agregar evento al botón de descarga
         botonDescarga.addEventListener("click", function (event) {
-        event.preventDefault(); // Evitar que se recargue la página
-        window.open(data.Link, "_blank");
+            event.preventDefault(); // Evitar que se recargue la página
+            window.open(data.Link, "_blank");
         });
 
         descargaAndesmar.style.display = "block"; // Mostrar sección de descarga
         respuestaElemento.appendChild(descargaAndesmar); // Añadir el contenedor de descarga al elemento de respuesta
 
-        // Guardar la información en el almacenamiento local si el número de pedido no es "undefined"
+        // Guardar la información en el almacenamiento local
         if (data.NroPedido !== undefined) {
             const etiquetaGenerada = {
                 NroPedido: data.NroPedido,
-                NombreApellidoDestinatario: document.getElementById("nombreApellidoDestinatario").value,
-                Link: data.Link // Agregamos el enlace generado a la etiqueta
+                NombreApellidoDestinatario: nombreApellidoDestinatario,
+                Link: data.Link
             };
 
             // Obtener las etiquetas previas del almacenamiento local
             let etiquetasPrevias = JSON.parse(localStorage.getItem("etiquetasPrevias")) || [];
-
-            // Agregar la nueva etiqueta generada a la lista de etiquetas previas
             etiquetasPrevias.push(etiquetaGenerada);
 
             // Limitar el número de etiquetas previas a mostrar
@@ -386,6 +398,38 @@ function mostrarRespuesta(data) {
 
             // Mostrar las últimas etiquetas generadas
             mostrarEtiquetasPrevias();
+        }
+
+        // Enviar datos a Firebase
+        const nombreApellido = document.getElementById("nombreApellidoDestinatario").value.toUpperCase();
+        const codigoPostal = document.getElementById("codigoPostalDestinatario").value.toUpperCase();
+        const localidad = (document.getElementById("localidad").value + ', ' + document.getElementById("nombre-provincia").innerText).toUpperCase();
+        const calleDelDestinatario = document.getElementById("calleDestinatario").value.toUpperCase();
+        const numeroDeCalle = document.getElementById("calleNroDestinatario").value.toUpperCase();
+        const telefono = document.getElementById("telefonoDestinatario").value.toUpperCase();
+        const remito = document.getElementById("nroRemito").value.toUpperCase();
+        const cotizacion = document.getElementById("valor-cotizacion2").innerText.toUpperCase();
+
+        // Verificar si todos los campos necesarios están definidos
+        if (numeroRemito && nombreApellido && codigoPostal && localidad && calleDelDestinatario && numeroDeCalle && telefono && remito && cotizacion) {
+            const nuevaEntradaRef = database.ref('envios').push(); // Cambia 'envios' por la ruta que necesites
+            nuevaEntradaRef.set({
+                nombreApellido: nombreApellido,
+                nroPedido: numeroRemito,
+                codigoPostal: codigoPostal,
+                localidad: localidad,
+                calleDelDestinatario: calleDelDestinatario,
+                numeroDeCalle: numeroDeCalle,
+                telefono: telefono,
+                remito: remito,
+                cotizacion: cotizacion
+            }).then(() => {
+                console.log("Datos guardados correctamente en Firebase.");
+            }).catch((error) => {
+                console.error("Error al guardar los datos:", error);
+            });
+        } else {
+            console.error("Faltan datos necesarios para guardar.");
         }
     }
 }

@@ -11,7 +11,7 @@ document.getElementById('codigoPostalDestinatario').addEventListener('input', fu
     if (codigoPostal.length > 3) {
         spinner.style.display = 'block'; // Mostrar spinner
 
-        fetch(`https://apisqa.andreani.com/v1/localidades?codigosPostales=${codigoPostal}`)
+        fetch(`https://apis.andreani.com/v1/localidades?codigosPostales=${codigoPostal}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -60,7 +60,7 @@ localidadInput.addEventListener('focus', function() {
     if (codigoPostal.length > 3) {
         spinner.style.display = 'block'; // Mostrar spinner
 
-        fetch(`https://apisqa.andreani.com/v1/localidades?codigosPostales=${codigoPostal}`)
+        fetch(`https://apis.andreani.com/v1/localidades?codigosPostales=${codigoPostal}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
