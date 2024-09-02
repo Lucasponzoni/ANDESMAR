@@ -412,7 +412,7 @@ function mostrarRespuesta(data) {
 
         // Verificar si todos los campos necesarios están definidos
         if (numeroRemito && nombreApellido && codigoPostal && localidad && calleDelDestinatario && numeroDeCalle && telefono && remito && cotizacion) {
-            const nuevaEntradaRef = database.ref('envios').push(); // Cambia 'envios' por la ruta que necesites
+            const nuevaEntradaRef = database.ref('enviosAndesmar').push(); // RUTA FIREBASE
             nuevaEntradaRef.set({
                 nombreApellido: nombreApellido,
                 nroPedido: numeroRemito,
