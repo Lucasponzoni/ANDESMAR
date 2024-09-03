@@ -52,15 +52,17 @@ document.addEventListener("DOMContentLoaded", function() {
                             <p class="card-text"><i class="fas fa-map-marker-alt"></i> ${item.codigoPostal}, ${item.localidad}</p>
                             <p class="card-text"><i class="fas fa-home"></i> ${item.calleDelDestinatario}, ALTURA: ${item.numeroDeCalle}</p>
                             <p class="card-text"><i class="fas fa-phone"></i> TELEFONO: ${item.telefono}</p>
-                            <p class="card-text"><i class="fas fa-receipt"></i> NÚMERO ANDESMAR: ${item.nroPedido}</p>
+                            <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> NÚMERO ANDESMAR: ${item.nroPedido}</p>
                             <p class="card-text"><i class="bi bi-file-earmark-text-fill"></i> ${item.remito}</p>
-                            <p class="card-text"><i class="bi bi-bank2"></i> COTIZACÓN: ${item.cotizacion}</p>
-                            <a href="#" class="btn btn-primary">Realizar seguimiento</a>
+                            <p class="card-text"><i class="bi bi-bank2"></i> COTIZACIÓN: ${item.cotizacion}</p>
+                            <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Realizar seguimiento</a>
+                            <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
                         </div>
                     </div>
                 `;
                 cardsContainer.appendChild(card);
             });
+            
 
             // Actualizar paginación
             updatePagination(data.length);
