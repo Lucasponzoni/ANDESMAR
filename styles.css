@@ -993,11 +993,12 @@ p.card-text:nth-child(5){
     font-weight: 300;
 }
 
-p.card-text:nth-child(6){
+p.card-text.mb-0{
+    text-align: center;
     padding: .2rem;
     width: fit-content;
     border-radius: 10px;
-    border: dashed rgb(210, 210, 210) 2px;
+    border: dashed #ffc107 2px;
     color: cornflowerblue;
     font-size: 1.3rem;
     font-family: "Oswald", sans-serif;
@@ -1008,6 +1009,10 @@ p.card-text:nth-child(7){
     color: green;
     font-family: "Oswald", sans-serif;
     font-weight: 400;
+}
+
+.btn-warning{
+    margin-bottom: 0 !important;
 }
 
 div.card-body > p > i{

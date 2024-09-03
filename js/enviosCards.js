@@ -53,17 +53,33 @@ document.addEventListener("DOMContentLoaded", function() {
                             <p class="card-text"><i class="fas fa-home"></i> ${item.calleDelDestinatario}, ALTURA: ${item.numeroDeCalle}</p>
                             <p class="card-text"><i class="fas fa-phone"></i> TELEFONO: ${item.telefono}</p>
                             <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> NÚMERO ANDESMAR: ${item.nroPedido}</p>
-                            <p class="card-text"><i class="bi bi-file-earmark-text-fill"></i> ${item.remito}</p>
+                            <div class="d-flex align-items-center">
+                                <p class="card-text mb-0">${item.remito}</p>
+                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
                             <p class="card-text"><i class="bi bi-bank2"></i> COTIZACIÓN: ${item.cotizacion}</p>
                             <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Realizar seguimiento</a>
                             <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
                         </div>
                     </div>
                 `;
-                cardsContainer.appendChild(card);
-            });
             
-
+                // Agregar la lógica del botón de copiar al portapapeles
+                const copyButton = card.querySelector('.copy-btn');
+                copyButton.addEventListener('click', () => {
+                    navigator.clipboard.writeText(item.remito).then(() => {
+                        copyButton.innerHTML = 'Copiado';
+                        setTimeout(() => {
+                            copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+                        }, 2000); // Después de 2 segundos, vuelve a mostrar el icono del portapapeles
+                    }).catch(err => console.error('Error al copiar al portapapeles: ', err));
+                });
+            
+                cardsContainer.appendChild(card);
+            });            
+            
             // Actualizar paginación
             updatePagination(data.length);
         }
