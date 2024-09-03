@@ -959,10 +959,10 @@ span > img {
 }
 
 .card-title {
-    font-family: "Chakra Petch", sans-serif;
+    font-family: "Oswald", sans-serif;
     color: rgb(55, 119, 238);
-    font-weight: 900;
-    font-size: 1rem;
+    font-weight: 400;
+    font-size: 1.3rem;
 }
 
 p.card-text{
@@ -970,25 +970,44 @@ p.card-text{
 }
 
 p.card-text:nth-child(2){
+    font-family: "Oswald", sans-serif;
+    font-weight: 300;
     width: fit-content;
-    font-size: small;
     background-color: gray;
     color: white;
     border-radius: 5px;
     padding: 5px;
 }
 p.card-text:nth-child(3){
-    font-size: small;
-    font-weight: 400;
+    font-family: "Oswald", sans-serif;
+    font-weight: 300;
+}
+
+p.card-text:nth-child(4){
+    font-family: "Oswald", sans-serif;
+    font-weight: 300;
+}
+
+p.card-text:nth-child(5){
+    font-family: "Oswald", sans-serif;
+    font-weight: 300;
 }
 
 p.card-text:nth-child(6){
+    padding: .2rem;
+    width: fit-content;
+    border-radius: 10px;
+    border: dashed rgb(210, 210, 210) 2px;
     color: cornflowerblue;
-    font-weight: 900;
+    font-size: 1.3rem;
+    font-family: "Oswald", sans-serif;
+    font-weight: 600;
 }
 
 p.card-text:nth-child(7){
-    color: #004701;
+    color: green;
+    font-family: "Oswald", sans-serif;
+    font-weight: 400;
 }
 
 div.card-body > p > i{
@@ -1030,7 +1049,13 @@ div.card-body > p > i{
     border: none; 
     border-radius: 8px; 
     box-shadow: 0 0px 10px #00000067; 
-    border: solid 1px rgba(128, 128, 128, 0.475);
+    border: dashed 2px cornflowerblue;
+}
+
+#envios-cards .card:hover{
+    color: rgb(0, 0, 0);
+    background-color: #ffe786;
+    border: dashed 2px orange;
 }
 
 .mt-5{

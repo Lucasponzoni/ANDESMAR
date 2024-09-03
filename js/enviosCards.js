@@ -50,11 +50,11 @@ document.addEventListener("DOMContentLoaded", function() {
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-user"></i> ${item.nombreApellido}</h5>
                             <p class="card-text"><i class="fas fa-map-marker-alt"></i> ${item.codigoPostal}, ${item.localidad}</p>
-                            <p class="card-text"><i class="fas fa-home"></i> ${item.calleDelDestinatario}, ${item.numeroDeCalle}</p>
-                            <p class="card-text"><i class="fas fa-phone"></i> Telefono: ${item.telefono}</p>
-                            <p class="card-text"><i class="fas fa-receipt"></i> Número de Andesmar: ${item.nroPedido}</p>
+                            <p class="card-text"><i class="fas fa-home"></i> ${item.calleDelDestinatario}, ALTURA: ${item.numeroDeCalle}</p>
+                            <p class="card-text"><i class="fas fa-phone"></i> TELEFONO: ${item.telefono}</p>
+                            <p class="card-text"><i class="fas fa-receipt"></i> NÚMERO ANDESMAR: ${item.nroPedido}</p>
                             <p class="card-text"><i class="bi bi-file-earmark-text-fill"></i> ${item.remito}</p>
-                            <p class="card-text"><i class="bi bi-bank2"></i> Cotización: ${item.cotizacion}</p>
+                            <p class="card-text"><i class="bi bi-bank2"></i> COTIZACÓN: ${item.cotizacion}</p>
                             <a href="#" class="btn btn-primary">Realizar seguimiento</a>
                         </div>
                     </div>
