@@ -42,14 +42,14 @@ document.addEventListener("DOMContentLoaded", function() {
             const endIndex = startIndex + itemsPerPage;
             const paginatedData = data.slice(startIndex, endIndex);
 
-            paginatedData.forEach(item => {
+            paginatedData.forEach(async (item) => {
                 const card = document.createElement("div");
                 card.className = "col-md-4"; // 3 cards por fila en desktop
                 card.innerHTML = `
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-user"></i> ${item.nombreApellido}</h5>
-                            <p class="card-text"><i class="fas fa-map-marker-alt"></i> ${item.codigoPostal}, ${item.localidad}</p>
+                            <p class="card-text cpLocalidad"><i class="fas fa-map-marker-alt"></i> ${item.codigoPostal}, ${item.localidad}</p>
                             <p class="card-text"><i class="fas fa-home"></i> ${item.calleDelDestinatario}, ALTURA: ${item.numeroDeCalle}</p>
                             <p class="card-text"><i class="fas fa-phone"></i> TELEFONO: ${item.telefono}</p>
                             <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> NÚMERO ANDESMAR: ${item.nroPedido}</p>
@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 </button>
                             </div>
                             <p class="card-text"><i class="bi bi-bank2"></i> COTIZACIÓN: ${item.cotizacion}</p>
+                            <!-- Aquí se agregará el estado del seguimiento -->
                             <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Realizar seguimiento</a>
                             <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
                         </div>
@@ -77,8 +78,54 @@ document.addEventListener("DOMContentLoaded", function() {
                     }).catch(err => console.error('Error al copiar al portapapeles: ', err));
                 });
             
+                // Realizar solicitud a la API para obtener el estado actual
+                try {
+                    const response = await fetch('https://proxy.cors.sh/https://api.andesmarcargas.com/api/EstadoActual', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-cors-api-key': 'temp_02193751c5190a008c46c2c6dfa7b919' // Llave de la API de CORS
+                        },
+                        body: JSON.stringify({
+                            "logueo": {
+                                "Usuario": "BOM6765",
+                                "Clave": "BOM6765",
+                                "CodigoCliente": "6765"
+                            },
+                            "NroPedido": item.nroPedido
+                        })
+                    });
+            
+                    const data = await response.json();
+            
+                    // Crear div para mostrar el estado de la respuesta de la API
+                    const estadoDiv = document.createElement('div');
+                    estadoDiv.className = 'mb-3 apiSeguimiento'; // Añadir un margen inferior
+            
+                    // Verificar el estado de la respuesta y mostrar la información
+                    const guia = data.NroGuia === "0" ? "PENDIENTE DE INGRESO" : `GUIA: ${data.NroGuia}`;
+                    const estadoActual = `ESTADO: ${data.EstadoActual.toUpperCase()}`;
+                    const fecha = `FECHA: ${new Date(data.FechaEmision).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+            
+                    estadoDiv.innerHTML = `
+                        <p class="card-text"><i class="bi bi-truck"></i> ${guia}</p>
+                        <p class="card-text"><i class="bi bi-info-circle"></i> ${estadoActual}</p>
+                        <p class="card-text"><i class="bi bi-calendar"></i> ${fecha}</p>
+                    `;
+            
+                    // Insertar el div de estado antes de los dos últimos elementos
+                    const cardBody = card.querySelector('.card-body');
+                    const lastTwoElements = cardBody.querySelectorAll('a.btn');
+                    if (lastTwoElements.length >= 2) {
+                        cardBody.insertBefore(estadoDiv, lastTwoElements[0]);
+                    }
+                } catch (error) {
+                    console.error('Error al obtener el estado de seguimiento:', error);
+                }
+            
                 cardsContainer.appendChild(card);
             });            
+                      
             
             // Actualizar paginación
             updatePagination(data.length);

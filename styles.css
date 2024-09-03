@@ -969,7 +969,7 @@ p.card-text{
     margin-bottom: 10px;
 }
 
-p.card-text:nth-child(2){
+.cpLocalidad{
     font-family: "Oswald", sans-serif;
     font-weight: 300;
     width: fit-content;
@@ -1127,6 +1127,22 @@ div.card-body > p > i{
 .custom-select:focus {
     border-color: cornflowerblue;
     box-shadow: none;
+}
+
+.apiSeguimiento{
+    border: dashed cornflowerblue 2px;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.apiSeguimiento p > i{
+    font-size: 1rem;
+}
+
+.apiSeguimiento p {
+    font-size: 1rem;
+    font-family: "Oswald", sans-serif;
+    font-weight: 400;
 }
 
 /* FIN ORDENAR MAS ANTIGUO Y NUEVO */
