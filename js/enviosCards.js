@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         </div>
                         <p class="card-text"><i class="bi bi-bank2"></i> COTIZACIÓN: ${item.cotizacion}</p>
                         <div class="apiSeguimiento" style="display: flex; justify-content: center; align-items: center; height: 100px;">
-                        <img src="./img/loading-buffering.gif" alt="Cargando..." style="width: 50px; height: 50px;">
+                        <img src="./Img/loading-buffering.gif" alt="Cargando..." style="width: 50px; height: 50px;">
                         </div>
 
                         <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Realizar seguimiento</a>
