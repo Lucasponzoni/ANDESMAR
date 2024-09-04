@@ -1025,6 +1025,7 @@ div.card-body > p > i{
 }
 
 #spinner {
+    margin-bottom: 2rem;
     color: cornflowerblue;
     display: flex; /* Mostrar el spinner al cargar */
     justify-content: center;
