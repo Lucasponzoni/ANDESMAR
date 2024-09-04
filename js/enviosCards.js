@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function() {
         paginationContainer.innerHTML = "";
         const totalPages = Math.ceil(totalItems / itemsPerPage);
         let startPage = currentPageGroup + 1;
-        let endPage = Math.min(currentPageGroup + 3, totalPages);
+        let endPage = Math.min(currentPageGroup + 4, totalPages);
         
         // Mostrar las páginas del grupo actual
         for (let i = startPage; i <= endPage; i++) {
@@ -160,10 +160,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 e.preventDefault();
                 currentPage = i;
                 renderCards(allData);
+                updatePagination(totalItems); // Actualizar la paginación para reflejar el estado actual
             });
             paginationContainer.appendChild(pageItem);
         }
-
+    
         // Botón "Cargar más"
         if (endPage < totalPages) {
             const loadMoreItem = document.createElement("li");
@@ -171,13 +172,13 @@ document.addEventListener("DOMContentLoaded", function() {
             loadMoreItem.innerHTML = `<a class="page-link" href="#">Cargar más</a>`;
             loadMoreItem.addEventListener("click", (e) => {
                 e.preventDefault();
-                currentPageGroup += 3; // Avanzar al siguiente grupo
+                currentPageGroup += 4; // Avanzar al siguiente grupo
                 renderCards(allData); // Renderizar las tarjetas
                 updatePagination(allData.length); // Actualizar la paginación
             });
             paginationContainer.appendChild(loadMoreItem);
         }
-
+    
         // Botón "Volver atrás"
         if (currentPageGroup > 0) {
             const backItem = document.createElement("li");
@@ -185,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function() {
             backItem.innerHTML = `<a class="page-link" href="#">Volver atrás</a>`;
             backItem.addEventListener("click", (e) => {
                 e.preventDefault();
-                currentPageGroup -= 3; // Retroceder al grupo anterior
+                currentPageGroup -= 4; // Retroceder al grupo anterior
                 renderCards(allData); // Renderizar las tarjetas
                 updatePagination(allData.length); // Actualizar la paginación
             });

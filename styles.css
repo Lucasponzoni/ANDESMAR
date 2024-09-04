@@ -1020,7 +1020,6 @@ div.card-body > p > i{
 }
 
 .spinner-border {
-    display: none; /* Ocultar spinner por defecto */
     margin: auto;
 }
 
