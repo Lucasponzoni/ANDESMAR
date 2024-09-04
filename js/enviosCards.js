@@ -79,6 +79,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             `;
 
+            // Lógica para el botón de filtrar etiquetas
+            const filterLabelsButton = document.getElementById("filter-labels");
+            filterLabelsButton.addEventListener("click", function() {
+            const filteredData = allData.filter(item => item.remito.startsWith("NOV"));
+            renderCards(filteredData);
+        });
+
             // Lógica del botón de copiar al portapapeles
             const copyButton = card.querySelector('.copy-btn');
             copyButton.addEventListener('click', () => {

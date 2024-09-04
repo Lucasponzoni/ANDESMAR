@@ -1119,6 +1119,7 @@ div.card-body > p > i{
 }
 
 .custom-select {
+    min-width: 130px;
     margin-bottom: 0;
     border-radius: 8px;
     padding: 8px;
@@ -1152,6 +1153,21 @@ div.card-body > p > i{
     margin-bottom: -15px;
 }
 
+@media (min-width: 768px) {
+    .col-md-3 {
+        max-width: 100% !important;
+    }}
+
+#filter-labels{
+    min-width: 170px;
+}
+
+#simbel{
+    width: 70px;
+}
+
+.simbel{
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* FIN ORDENAR MAS ANTIGUO Y NUEVO */
-
-
