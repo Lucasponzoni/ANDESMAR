@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentPage = 1;
     const itemsPerPage = 12;
     let allData = [];
+    let currentPageGroup = 0; // Grupo de páginas actual
 
     // Mostrar el spinner general
     spinner.style.display = "flex";
@@ -39,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
         renderCards(allData).then(() => {
             // Ocultar el spinner general después de renderizar las tarjetas
             spinner.style.display = "none";
+            updatePagination(allData.length); // Actualizar la paginación
         });
     });
 
@@ -47,11 +49,11 @@ document.addEventListener("DOMContentLoaded", function() {
         cardsContainer.innerHTML = ""; // Limpiar el contenedor
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        const paginatedData = data.slice(startIndex, endIndex); // Asegúrate de que esto esté definido
+        const paginatedData = data.slice(startIndex, endIndex); 
 
         const promises = paginatedData.map(async (item) => {
             const card = document.createElement("div");
-            card.className = "col-md-4"; // 3 cards por fila en desktop
+            card.className = "col-md-4"; 
             card.innerHTML = `
                 <div class="card">
                     <div class="card-body">
@@ -77,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             `;
 
-            // Agregar la lógica del botón de copiar al portapapeles
+            // Lógica del botón de copiar al portapapeles
             const copyButton = card.querySelector('.copy-btn');
             copyButton.addEventListener('click', () => {
                 navigator.clipboard.writeText(item.remito).then(() => {
@@ -92,66 +94,58 @@ document.addEventListener("DOMContentLoaded", function() {
             cardsContainer.appendChild(card);
 
             // Llamar a la API para obtener el estado actual
-try {
-    const response = await fetch('https://proxy.cors.sh/https://api.andesmarcargas.com/api/EstadoActual', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-cors-api-key': 'temp_02193751c5190a008c46c2c6dfa7b919' // Llave de la API de CORS
-        },
-        body: JSON.stringify({
-            "logueo": {
-                "Usuario": "BOM6765",
-                "Clave": "BOM6765",
-                "CodigoCliente": "6765"
-            },
-            "NroPedido": item.nroPedido
-        })
-    });
+            try {
+                const response = await fetch('https://proxy.cors.sh/https://api.andesmarcargas.com/api/EstadoActual', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-cors-api-key': 'temp_02193751c5190a008c46c2c6dfa7b919'
+                    },
+                    body: JSON.stringify({
+                        "logueo": {
+                            "Usuario": "BOM6765",
+                            "Clave": "BOM6765",
+                            "CodigoCliente": "6765"
+                        },
+                        "NroPedido": item.nroPedido
+                    })
+                });
 
-    const data = await response.json();
+                const data = await response.json();
+                const estadoDiv = document.createElement('div');
+                estadoDiv.className = 'mb-3';
 
-    // Crear div para mostrar el estado de la respuesta de la API
-    const estadoDiv = document.createElement('div');
-    estadoDiv.className = 'mb-3'; // Añadir un margen inferior
+                const guia = data.NroGuia === "0" ? "PENDIENTE DE INGRESO" : `GUIA: ${data.NroGuia}`;
+                const estadoActual = `ESTADO: ${data.EstadoActual.toUpperCase()}`;
+                const fecha = `FECHA: ${new Date(data.FechaEmision).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
 
-    // Verificar el estado de la respuesta y mostrar la información
-    const guia = data.NroGuia === "0" ? "PENDIENTE DE INGRESO" : `GUIA: ${data.NroGuia}`;
-    const estadoActual = `ESTADO: ${data.EstadoActual.toUpperCase()}`;
-    const fecha = `FECHA: ${new Date(data.FechaEmision).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+                estadoDiv.innerHTML = `
+                    <p class="card-text"><i class="bi bi-truck"></i> ${guia}</p>
+                    <p class="card-text"><i class="bi bi-info-circle"></i> ${estadoActual}</p>
+                    <p class="card-text"><i class="bi bi-calendar"></i> ${fecha}</p>
+                `;
 
-    estadoDiv.innerHTML = `
-        <p class="card-text"><i class="bi bi-truck"></i> ${guia}</p>
-        <p class="card-text"><i class="bi bi-info-circle"></i> ${estadoActual}</p>
-        <p class="card-text"><i class="bi bi-calendar"></i> ${fecha}</p>
-    `;
+                const apiSeguimientoDiv = card.querySelector('.apiSeguimiento');
+                apiSeguimientoDiv.innerHTML = ''; 
+                apiSeguimientoDiv.appendChild(estadoDiv); 
+                apiSeguimientoDiv.removeAttribute('style');
 
-    // Insertar el div de estado en el lugar correspondiente
-    const apiSeguimientoDiv = card.querySelector('.apiSeguimiento');
-    apiSeguimientoDiv.innerHTML = ''; // Limpiar el spinner
-    apiSeguimientoDiv.appendChild(estadoDiv); // Añadir el estado
-
-    // Eliminar el atributo style
-    apiSeguimientoDiv.removeAttribute('style');
-
-} catch (error) {
-    console.error('Error al obtener el estado de seguimiento:', error);
-}
-            
+            } catch (error) {
+                console.error('Error al obtener el estado de seguimiento:', error);
+            }
         });
 
-        // Esperar a que todas las promesas se resuelvan
         await Promise.all(promises);
-
-        // Actualizar paginación
-        updatePagination(data.length);
     }
 
     function updatePagination(totalItems) {
         paginationContainer.innerHTML = "";
         const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-        for (let i = 1; i <= totalPages; i++) {
+        let startPage = currentPageGroup + 1;
+        let endPage = Math.min(currentPageGroup + 3, totalPages);
+        
+        // Mostrar las páginas del grupo actual
+        for (let i = startPage; i <= endPage; i++) {
             const pageItem = document.createElement("li");
             pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
             pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
@@ -162,7 +156,35 @@ try {
             });
             paginationContainer.appendChild(pageItem);
         }
-    }
+
+        // Botón "Cargar más"
+        if (endPage < totalPages) {
+            const loadMoreItem = document.createElement("li");
+            loadMoreItem.className = "page-item";
+            loadMoreItem.innerHTML = `<a class="page-link" href="#">Cargar más</a>`;
+            loadMoreItem.addEventListener("click", (e) => {
+                e.preventDefault();
+                currentPageGroup += 3; // Avanzar al siguiente grupo
+                renderCards(allData); // Renderizar las tarjetas
+                updatePagination(allData.length); // Actualizar la paginación
+            });
+            paginationContainer.appendChild(loadMoreItem);
+        }
+
+        // Botón "Volver atrás"
+        if (currentPageGroup > 0) {
+            const backItem = document.createElement("li");
+            backItem.className = "page-item";
+            backItem.innerHTML = `<a class="page-link" href="#">Volver atrás</a>`;
+            backItem.addEventListener("click", (e) => {
+                e.preventDefault();
+                currentPageGroup -= 3; // Retroceder al grupo anterior
+                renderCards(allData); // Renderizar las tarjetas
+                updatePagination(allData.length); // Actualizar la paginación
+            });
+            paginationContainer.appendChild(backItem);
+        }
+    }    
 
     // Buscador
     searchInput.addEventListener("input", function() {
@@ -177,14 +199,11 @@ try {
 
     // Filtro de orden
     filterSelect.addEventListener("change", function() {
-    if (filterSelect.value === "nuevo") {
-        // Ordenar de más nuevo a más viejo
-        allData.sort((a, b) => b.id.localeCompare(a.id)); 
-    } else if (filterSelect.value === "antiguo") {
-        // Ordenar de más viejo a más nuevo
-        allData.sort((a, b) => a.id.localeCompare(b.id));
-    }
-    renderCards(allData);
-});
-
+        if (filterSelect.value === "nuevo") {
+            allData.sort((a, b) => b.id.localeCompare(a.id)); 
+        } else if (filterSelect.value === "antiguo") {
+            allData.sort((a, b) => a.id.localeCompare(b.id));
+        }
+        renderCards(allData);
     });
+});
