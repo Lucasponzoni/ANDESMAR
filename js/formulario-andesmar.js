@@ -19,14 +19,6 @@ const firebaseConfig = {
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
 
-const mobileMenu = document.getElementById('mobile-menu');
-const navLinks = document.querySelector('.nav-links');
-
-mobileMenu.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-    mobileMenu.classList.toggle('is-active');
-});
-
 // Agregar el evento al contenedor de bultos para recalcular el volumen al cambiar
 document.getElementById('medidasBultosContainer').addEventListener('input', actualizarVolumen);
 
@@ -188,8 +180,8 @@ function verificarCP() {
 // Agregar el evento al input de código postal
 document.getElementById("codigoPostalDestinatario").addEventListener("input", verificarCP);
 
-// Función para actualizar el mensaje personalizado en tiempo real
 function actualizarMensajePersonalizado() {
+    console.log("Función actualizar Observaciones Ejecutado");
     const calleDestinatario = document.getElementById("calleDestinatario").value;
     const calleNroDestinatario = document.getElementById("calleNroDestinatario").value;
     const codigoPostalDestinatario = document.getElementById("codigoPostalDestinatario").value;
@@ -198,14 +190,11 @@ function actualizarMensajePersonalizado() {
 
     const mensajePersonalizado = `CP ${codigoPostalDestinatario}, Calle: ${calleDestinatario}, ${calleNroDestinatario}, Titular: ${nombreApellidoDestinatario}, Telefono: ${telefonoDestinatario}, envio propiedad de WWW.NOVOGAR.COM.AR, ante cualquier consulta comunicarse a (0341) 156680658`;
 
-    // Mostrar el mensaje en un elemento HTML
     document.getElementById("mensajePersonalizado").innerText = mensajePersonalizado;
-
-    // También puedes asignar el mensaje al textarea de observaciones si es necesario
     document.getElementById("observaciones").value = mensajePersonalizado;
 }
 
-// Agregar eventos de entrada a los campos relevantes
+// Asignar eventos
 document.getElementById("calleDestinatario").addEventListener("input", actualizarMensajePersonalizado);
 document.getElementById("calleNroDestinatario").addEventListener("input", actualizarMensajePersonalizado);
 document.getElementById("codigoPostalDestinatario").addEventListener("input", actualizarMensajePersonalizado);
@@ -303,6 +292,8 @@ function enviarSolicitud() {
         }
     };
 
+    console.log("Datos enviado a API ANDESMAR:", requestObj)
+
     const proxyUrl = "https://proxy.cors.sh/";
     const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
     
@@ -317,7 +308,7 @@ function enviarSolicitud() {
     .then(response => response.json())
     .then(data => {
         spinner.style.display = "none";
-        console.log("Respuesta de la API:", data);
+        console.log("Respuesta de la API ANDESMAR:", data);
         mostrarRespuesta(data);
         document.getElementById("respuesta").scrollIntoView({ behavior: "smooth" });
     })

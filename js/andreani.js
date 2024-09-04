@@ -148,6 +148,8 @@ async function enviarSolicitudAndreani() {
         "bultos": bultos // Usar el array de bultos
     };
 
+    console.log("Datos enviado a API ANDREANI:", requestData)
+
     try {
         const response = await fetch(apiUrlLabel, {
             method: 'POST',
@@ -172,6 +174,7 @@ async function enviarSolicitudAndreani() {
             
             // Mostrar el contenedor de descarga
             document.getElementById('descargaAndreani').style.display = 'block';
+            console.log("Resuesta API ANDREANI:", response)
             
         } else {
             const errorMessage = await response.text();
