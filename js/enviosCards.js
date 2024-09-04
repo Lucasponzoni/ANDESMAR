@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentPage = 1;
     const itemsPerPage = 12;
     let allData = [];
+    let isFiltered = false;
     let currentPageGroup = 0; // Grupo de páginas actual
 
     // Mostrar el spinner general
@@ -78,13 +79,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     </div>
                 </div>
             `;
-
-            // Lógica para el botón de filtrar etiquetas
-            const filterLabelsButton = document.getElementById("filter-labels");
-            filterLabelsButton.addEventListener("click", function() {
-            const filteredData = allData.filter(item => item.remito.startsWith("NOV"));
-            renderCards(filteredData);
-        });
 
             // Lógica del botón de copiar al portapapeles
             const copyButton = card.querySelector('.copy-btn');
@@ -175,6 +169,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
         await Promise.all(promises);
     }
+
+    // Lógica para el botón de filtrar etiquetas
+    const filterLabelsButton = document.getElementById("filter-labels");
+    filterLabelsButton.addEventListener("click", function() {
+        if (!isFiltered) {
+            const filteredData = allData.filter(item => item.remito.startsWith("NOV"));
+            renderCards(filteredData);
+            filterLabelsButton.innerHTML = 'Volver atrás <i class="bi bi-arrow-left"></i>'; // Cambiar texto y agregar icono
+            isFiltered = true; // Cambiar estado a filtrado
+        } else {
+            renderCards(allData); // Mostrar datos originales
+            filterLabelsButton.innerHTML = 'Etiquetas <img id="simbel" src="./Img/simbel.png">'; // Restaurar texto original
+            isFiltered = false; // Cambiar estado a no filtrado
+        }
+    });
 
     function updatePagination(totalItems) {
         paginationContainer.innerHTML = "";
