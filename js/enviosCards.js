@@ -177,9 +177,14 @@ try {
 
     // Filtro de orden
     filterSelect.addEventListener("change", function() {
-        if (filterSelect.value === "nuevo") {
-            allData.sort((a, b) => b.id.localeCompare(a.id)); // Ordenar de más nuevo a más viejo
-        }
-        renderCards(allData);
-    });
+    if (filterSelect.value === "nuevo") {
+        // Ordenar de más nuevo a más viejo
+        allData.sort((a, b) => b.id.localeCompare(a.id)); 
+    } else if (filterSelect.value === "antiguo") {
+        // Ordenar de más viejo a más nuevo
+        allData.sort((a, b) => a.id.localeCompare(b.id));
+    }
+    renderCards(allData);
 });
+
+    });
