@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         <p class="card-text"><i class="fas fa-phone"></i> TELEFONO: ${item.telefono}</p>
                         <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> NÚMERO ANDESMAR: ${item.nroPedido}</p>
                         <div class="d-flex align-items-center">
-                            <p class="card-text mb-0">${item.remito}</p>
+                            <p class="remitoCard card-text mb-0">${item.remito}</p>
                             <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
                                 <i class="bi bi-clipboard"></i>
                             </button>
@@ -121,17 +121,48 @@ document.addEventListener("DOMContentLoaded", function() {
                 const data = await response.json();
                 const estadoDiv = document.createElement('div');
                 estadoDiv.className = 'mb-3';
-
+                
                 const guia = data.NroGuia === "0" ? "PENDIENTE DE INGRESO" : `GUIA: ${data.NroGuia}`;
                 const estadoActual = `ESTADO: ${data.EstadoActual.toUpperCase()}`;
                 const fecha = `FECHA: ${new Date(data.FechaEmision).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
-
-                estadoDiv.innerHTML = `
-                    <p class="card-text"><i class="bi bi-truck"></i> ${guia}</p>
+                
+                // Crear el contenedor para la guía y el botón
+                const guiaContainer = document.createElement('div');
+                guiaContainer.className = 'd-flex align-items-center';
+                
+                // Crear el párrafo para la guía
+                const guiaParagraph = document.createElement('p');
+                guiaParagraph.className = 'card-text mb-0';
+                guiaParagraph.innerHTML = `<i class="bi bi-truck"></i> ${guia}`;
+                
+                // Crear el botón de copiar
+                const copyGuideButton = document.createElement('button');
+                copyGuideButton.className = 'btn btn-link copy-guide-btn ms-2'; // Añadir margen a la izquierda
+                copyGuideButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+                
+                // Agregar evento al botón de copiar
+                copyGuideButton.addEventListener('click', () => {
+                    navigator.clipboard.writeText(data.NroGuia).then(() => {
+                        copyGuideButton.innerHTML = 'Copiado';
+                        setTimeout(() => {
+                            copyGuideButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+                        }, 2000);
+                    }).catch(err => console.error('Error al copiar al portapapeles: ', err));
+                });
+                
+                // Añadir el párrafo y el botón al contenedor
+                guiaContainer.appendChild(guiaParagraph);
+                guiaContainer.appendChild(copyGuideButton);
+                
+                // Agregar los otros párrafos al estadoDiv
+                estadoDiv.innerHTML += `
                     <p class="card-text"><i class="bi bi-info-circle"></i> ${estadoActual}</p>
                     <p class="card-text"><i class="bi bi-calendar"></i> ${fecha}</p>
                 `;
-
+                
+                // Agregar el contenedor de guía al estadoDiv
+                estadoDiv.insertBefore(guiaContainer, estadoDiv.firstChild); // Insertar al principio
+                
                 const apiSeguimientoDiv = card.querySelector('.apiSeguimiento');
                 apiSeguimientoDiv.innerHTML = ''; 
                 apiSeguimientoDiv.appendChild(estadoDiv); 

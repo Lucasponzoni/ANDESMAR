@@ -993,7 +993,7 @@ p.card-text:nth-child(5){
     font-weight: 300;
 }
 
-p.card-text.mb-0{
+.remitoCard{
     text-align: center;
     padding: .2rem;
     width: fit-content;
