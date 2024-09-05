@@ -436,7 +436,6 @@ function buscarPrecio(provincia, volumen) {
     }
 }
 
-// Función para manejar cambios en los campos
 function manejarCambio() {
     const provinciaElement = document.getElementById('nombre-provincia');
     const volumenElement = document.getElementById('volumenTotal');
@@ -449,12 +448,25 @@ function manejarCambio() {
     const provincia = provinciaElement.innerText.toLowerCase();
     const volumen = parseFloat(volumenElement.innerText);
 
-    mostrarSpinner(); // Mostrar spinner
+    // Mostrar spinner si los inputs están vacíos
+    mostrarSpinner();
+
+    // Verificar si la provincia y el volumen son válidos
+    if (!provincia || isNaN(volumen)) {
+        // Mantener el spinner visible y no cambiar a "No disponible"
+        return;
+    }
 
     setTimeout(() => {
         buscarPrecio(provincia, volumen);
     }, 1000); // Retraso de 1 segundo
 }
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    manejarCambio();
+});
+
 
 // Observador para cambios en la provincia
 const provinciaElement = document.getElementById('nombre-provincia');
