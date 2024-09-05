@@ -22,6 +22,36 @@ const firebaseConfig = {
 // Agregar el evento al contenedor de bultos para recalcular el volumen al cambiar
 document.getElementById('medidasBultosContainer').addEventListener('input', actualizarVolumen);
 
+function validarFormulario() {
+    const camposRequeridos = [
+        "calleRemitente",
+        "calleNroRemitente",
+        "codigoPostalRemitente",
+        "nombreApellidoDestinatario",
+        "codigoPostalDestinatario",
+        "calleDestinatario",
+        "calleNroDestinatario",
+        "telefonoDestinatario",
+        "nroRemito",
+        "localidad",
+        "peso",
+        "valorDeclarado",
+        "modalidadEntrega",
+        "unidadVenta",
+        "esFletePagoDestino",
+        "esRemitoConformado"
+    ];
+
+    for (const campo of camposRequeridos) {
+        const input = document.getElementById(campo);
+        if (!input || !input.value.trim()) {
+            alert(`Por favor complete el campo: ${input.placeholder || input.name}`);
+            return false; // Retorna false si algún campo está vacío
+        }
+    }
+    return true; // Retorna true si todos los campos están completos
+}
+
 function actualizarVolumen() {
     const bultosContainer = document.getElementById('medidasBultosContainer');
     let totalVolumen = 0; // Volumen total en m³
@@ -205,6 +235,11 @@ document.getElementById("telefonoDestinatario").addEventListener("input", actual
 actualizarMensajePersonalizado();
 
 function enviarSolicitud() {
+
+    if (!validarFormulario()) {
+        return; // Si la validación falla, no continua con la solicitud
+    }
+    
     let spinner = document.getElementById("spinner");
     spinner.style.display = "flex";
 
