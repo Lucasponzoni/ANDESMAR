@@ -1020,7 +1020,7 @@ p.card-text:nth-child(6){
     padding: .2rem;
     width: fit-content;
     border-radius: 10px;
-    border: dashed #ffc107 2px;
+    border: dashed palevioletred 2px;
     color: cornflowerblue;
     font-size: 1.3rem;
     font-family: "Oswald", sans-serif;
@@ -1096,48 +1096,20 @@ div.card-body > p > i{
 }
 
 #meli-cards .card {
-    border: none;
-    border-radius: 20px;
-    position: relative; /* Asegura que el pseudo-elemento se posicione correctamente */
-    overflow: hidden; /* Oculta cualquier desbordamiento */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición suave para el tamaño y sombra */
-    margin-bottom: 20px;
+    background-color: #f5f5f7; /* Fondo de la tarjeta */
+    color: rgb(65, 65, 65); 
+    margin-bottom: 20px; 
+    border: none; 
+    border-radius: 8px; 
     box-shadow: 0 0px 10px #00000067; 
+    border: dashed 2px cornflowerblue;
 }
 
-#meli-cards .card:hover {
-    background-color: #ffe9ea;
-    transform: scale(1.05); /* Aumenta el tamaño al pasar el ratón */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Sombra más intensa al pasar el ratón */
-    animation: breathing 1.5s infinite; /* Animación de respiración solo al hacer hover */
-}
-
-#meli-cards .card::before {
-    content: ''; 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    right: 0; 
-    bottom: 0; 
-    border-radius: 20px; /* Mantiene el radio del borde */
-    border: 2px dashed cornflowerblue; /* Borde inicial */
-    transition: all 0.3s ease; /* Transición suave */
-    pointer-events: none; /* Hace que el pseudo-elemento no interfiera con el mouse */
-}
-
-@keyframes breathing {
-    0%, 100% {
-        box-shadow: 0 0 15px rgba(8, 148, 255, 0.1), /* Sombra inicial más clara */
-                    0 0 30px rgba(201, 89, 221, 0.1),
-                    0 0 45px rgba(255, 46, 84, 0.1),
-                    0 0 60px rgba(255, 144, 4, 0.1);
-    }
-    50% {
-        box-shadow: 0 0 25px rgba(8, 148, 255, 0.3), /* Sombra de respiración más intensa */
-                    0 0 50px rgba(201, 89, 221, 0.3),
-                    0 0 75px rgba(255, 46, 84, 0.3),
-                    0 0 100px rgba(255, 144, 4, 0.3);
-    }
+#meli-cards .card:hover{
+    color: rgb(0, 0, 0);
+    background-color: papayawhip;
+    border: dashed 2px palevioletred;
+    box-shadow: 0 0px 25px palevioletred; /* Sombra */
 }
 
 .mt-5{
