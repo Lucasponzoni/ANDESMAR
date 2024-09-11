@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const card = document.createElement("div");
             card.className = "col-md-4"; 
             card.innerHTML = `
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-body">
                         <h5 class="card-title"><i class="fas fa-user"></i> ${item.nombreApellido}</h5>
                         <p class="card-text cpLocalidad"><i class="fas fa-map-marker-alt"></i> ${item.codigoPostal}, ${item.localidad}</p>
@@ -70,12 +70,26 @@ document.addEventListener("DOMContentLoaded", function() {
                             </button>
                         </div>
                         <p class="card-text"><i class="bi bi-bank2"></i> COTIZACIÓN: ${item.cotizacion}</p>
+                        
                         <div class="apiSeguimiento" style="display: flex; justify-content: center; align-items: center; height: 100px;">
-                        <img src="./Img/loading-buffering.gif" alt="Cargando..." style="width: 50px; height: 50px;">
+                            <img src="./Img/loading-buffering.gif" alt="Cargando..." style="width: 50px; height: 50px;">
                         </div>
 
                         <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Realizar seguimiento</a>
                         <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
+                       
+                        <!-- Botón para colapsar observaciones -->
+                        <button class="btn btn-light btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${item.id}" aria-expanded="false" aria-controls="collapseObservaciones-${item.id}">
+                            <i class="bi bi-chevron-down"></i> Observaciones
+                        </button>
+                        <div class="collapse" id="collapseObservaciones-${item.id}">
+                            <div class="mb-3 mt-2 divObs">
+                                <label for="observaciones-${item.id}" class="form-label">Observaciones</label>
+                                <textarea id="observaciones-${item.id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${item.observaciones || ''}</textarea>
+                                <button class="btn btn-primary mt-1 update-observaciones" data-id="${item.id}">Actualizar Observaciones</button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             `;
@@ -90,6 +104,36 @@ document.addEventListener("DOMContentLoaded", function() {
                     }, 2000);
                 }).catch(err => console.error('Error al copiar al portapapeles: ', err));
             });
+
+            // Lógica para actualizar observaciones
+            const updateButton = card.querySelector('.update-observaciones');
+            updateButton.addEventListener('click', () => {
+            const observacionesInput = card.querySelector(`#observaciones-${item.id}`);
+            const observacionesValue = observacionesInput.value;
+
+             // Actualizar en Firebase
+            database.ref(`enviosAndesmar/${item.id}`).update({ observaciones: observacionesValue })
+            .then(() => {
+            // Mostrar mensaje de éxito con SweetAlert2
+            Swal.fire({
+                icon: 'success',
+                title: '¡Actualización exitosa!',
+                text: 'Las observaciones han sido actualizadas correctamente.',
+                confirmButtonText: 'Aceptar'
+            });
+        })
+        .catch((error) => {
+            console.error("Error al actualizar observaciones: ", error);
+            // Mostrar mensaje de error
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudieron actualizar las observaciones. Inténtalo de nuevo.',
+                confirmButtonText: 'Aceptar'
+            });
+        });
+        });
+
 
             // Agregar la tarjeta al contenedor
             cardsContainer.appendChild(card);
