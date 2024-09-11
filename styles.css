@@ -1417,3 +1417,22 @@ div.card-body > p > i{
     justify-content: center;
     font-weight: bold; 
 }
+
+.dimensions-info {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 2px dashed grey;
+}
+.dimensions-info h6 {
+    font-family: "Reddit Sans Condensed", sans-serif;
+    margin: 0 0 10px;
+    color: #614ad9;
+}
+.dimensions-info div {
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: 0.9em;
+    color: grey;
+}
