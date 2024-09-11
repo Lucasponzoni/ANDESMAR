@@ -1117,16 +1117,17 @@ div.card-body > p > i{
     margin-top: 0 !important;
 }
 
-.mt-2{
-    margin-top: 5px !important;
+.card-body > button{
+    margin-top: 0px !important;
+    height: 38px !important;
 }
 
 .form-control-obs{
-    margin-bottom: 5px !important;
+    margin-bottom: 0px !important;
 }
 
 .divObs{
-    margin-bottom: 5px !important;
+    margin-bottom: 0px !important;
 }
 
 .form-label{

@@ -75,13 +75,14 @@ document.addEventListener("DOMContentLoaded", function() {
                             <img src="./Img/loading-buffering.gif" alt="Cargando..." style="width: 50px; height: 50px;">
                         </div>
 
-                        <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Realizar seguimiento</a>
+                        <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Seguir</a>
                         <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
                        
                         <!-- Botón para colapsar observaciones -->
-                        <button class="btn btn-light btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${item.id}" aria-expanded="false" aria-controls="collapseObservaciones-${item.id}">
-                            <i class="bi bi-chevron-down"></i> Observaciones
+                        <button class="btn btn-success btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${item.id}" aria-expanded="false" aria-controls="collapseObservaciones-${item.id}">
+                        <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
                         </button>
+
                         <div class="collapse" id="collapseObservaciones-${item.id}">
                             <div class="mb-3 mt-2 divObs">
                                 <label for="observaciones-${item.id}" class="form-label">Observaciones</label>
