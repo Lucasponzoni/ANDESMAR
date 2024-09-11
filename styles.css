@@ -1336,18 +1336,18 @@ div.card-body > p > i{
 .em-circle {
     font-family: "Reddit Sans Condensed", sans-serif;
     font-size: 1.1rem;
-    position: absolute; /* Posición absoluta para colocar el círculo */
+    position: absolute;
     top: -18px; 
-    right: -10px; /* Distancia desde la derecha */
-    background-color: #343348; /* Color de fondo del círculo */
-    color: white; /* Color del texto */
-    border-radius: 50%; /* Hace que sea un círculo */
-    width: 40px; /* Ancho del círculo */
-    height: 40px; /* Altura del círculo */
-    display: flex; /* Para centrar el texto dentro del círculo */
-    align-items: center; /* Centra verticalmente */
-    justify-content: center; /* Centra horizontalmente */
-    font-weight: bold; /* Hace el texto más grueso */
+    right: -10px; 
+    background-color: #343348; 
+    color: white; 
+    border-radius: 50%; 
+    width: 40px; 
+    height: 40px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: bold; 
 }
 
 .em-circle-isFraud{
