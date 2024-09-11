@@ -850,6 +850,10 @@ footer > a:hover{
     font-size: 1.2rem;
 }
 
+#apiResponse .btn-danger {
+margin-bottom: -1rem;
+}
+
 .surprise{
     width: 35px;
 }
