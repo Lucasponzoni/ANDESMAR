@@ -280,15 +280,24 @@ document.addEventListener("DOMContentLoaded", function() {
     }    
 
     // Buscador
-    searchInput.addEventListener("input", function() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const filteredData = allData.filter(item => {
-            return Object.values(item).some(value => 
-                value.toString().toLowerCase().includes(searchTerm)
-            );
-        });
-        renderCards(filteredData);
+searchInput.addEventListener("input", function() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const filteredData = allData.filter(item => {
+        return Object.values(item).some(value => 
+            value.toString().toLowerCase().includes(searchTerm)
+        );
     });
+
+    renderCards(filteredData);
+    
+    // Mostrar imagen de error si no se encuentran resultados
+    if (filteredData.length === 0) {
+        cardsContainer.innerHTML = `<img src="./Img/error.gif" class="error" alt="No encontrado" style="display: block; margin: auto;">`;
+    } else {
+        // Si hay resultados, renderizar las tarjetas
+        renderCards(filteredData);
+    }
+});
 
     // Filtro de orden
     filterSelect.addEventListener("change", function() {

@@ -854,6 +854,11 @@ footer > a:hover{
 margin-bottom: -1rem;
 }
 
+.error{
+    width: 250px;
+    padding-bottom: 400px;
+}
+
 .surprise{
     width: 35px;
 }
