@@ -321,6 +321,8 @@ button:hover {
     margin-bottom: 5px;
 }
 
+/* RESPUESTA ANDESMAR (SIN USO) */
+
 .contenedorRespuesta{
     margin-top: 1rem;
     background-color: #e1f4e5;
@@ -391,6 +393,9 @@ button:hover {
     font-weight: 600px;
 }
 
+/* FIN RESPUESTA ANDESMAR (SIN USO) */
+
+/* ULTIMAS ETIQUETAS CONTENEDOR */
 #ultimasEtiquetas{
     padding-top: .5rem;
     padding-bottom: .5rem;
@@ -459,6 +464,9 @@ button:hover {
     z-index: 1000;
 }
 
+/* FIN ULTIMAS ETIQUETAS CONTENEDOR */
+
+/* BULTOS */
 #respuesta2{
     display: none;
     background-color: cornflowerblue;
@@ -548,6 +556,8 @@ button:hover {
     margin-bottom: .3rem;
     box-shadow: 0 0px 8px rgba(0, 0, 0, 0.3); /* Ajusta los valores según tus preferencias */
 }
+
+/* FIN BULTOS */
 
 /* NAVBAR */
 
@@ -1042,6 +1052,16 @@ p.card-text:nth-child(7){
     font-family: "Oswald", sans-serif;
     font-weight: 400;
     margin-bottom: 0;
+}
+
+.little-card-meli > p{
+    font-family: "Oswald", sans-serif;
+    font-weight: 300;
+    margin-bottom: .5rem;
+}
+
+.collapps-envio-meli{
+    margin-bottom: .5rem;
 }
 
 .btn-warning{
