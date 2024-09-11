@@ -989,6 +989,14 @@ span > img {
     font-size: 1.3rem;
 }
 
+.card-title-meli {
+    font-family: "Reddit Sans Condensed", sans-serif;
+    text-transform: capitalize;
+    color: #614ad9;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
 p.card-text{
     margin-bottom: 10px;
 }
@@ -1002,6 +1010,33 @@ p.card-text{
     border-radius: 5px;
     padding: 5px;
 }
+
+.cpLocalidad-meli{
+    padding-inline: 10px !important;
+    font-family: "Reddit Sans Condensed", sans-serif !important;
+    font-size: .8rem;
+    font-weight: 600 !important;
+    width: fit-content;
+    background-color: #614ad9;
+    color: white;
+    border-radius: 15px;
+    padding: 5px;
+    margin-bottom: 5px !important;
+}
+
+.correo-andesmar{
+    background-color:#009dff;
+}
+
+.correo-andreani{
+    background-color:red;
+}
+
+.meli-box1{
+    display: flex;
+    gap: 5px;
+}
+
 p.card-text:nth-child(3){
     font-family: "Oswald", sans-serif;
     font-weight: 300;
@@ -1039,11 +1074,11 @@ p.card-text:nth-child(6){
     padding: .2rem;
     width: fit-content;
     border-radius: 10px;
-    border: dashed palevioletred 2px;
-    color: cornflowerblue;
+    border: dashed #614ad9 2px;
+    color: rgb(129, 129, 129);
     font-size: 1.3rem;
-    font-family: "Oswald", sans-serif;
-    font-weight: 600;
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 700;
     margin-bottom: 5px !important;
 }
 
@@ -1055,7 +1090,9 @@ p.card-text:nth-child(7){
 }
 
 .little-card-meli > p{
-    font-family: "Oswald", sans-serif;
+    font-family: "Reddit Sans Condensed", sans-serif;
+    text-transform: capitalize;
+    font-size: .9rem;
     font-weight: 300;
     margin-bottom: .5rem;
 }
@@ -1077,7 +1114,7 @@ div.card-body > p > i{
 }
 
 #spinner {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     color: cornflowerblue;
     display: flex; /* Mostrar el spinner al cargar */
     justify-content: center;
@@ -1125,6 +1162,14 @@ div.card-body > p > i{
     border: dashed 2px orange;
 }
 
+.user-title-meli{
+    color: grey;
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: .9rem;
+    padding-left: 2rem;
+    margin-top: -.5rem;
+}
+
 #meli-cards .card {
     background-color: #f5f5f7; /* Fondo de la tarjeta */
     color: rgb(65, 65, 65); 
@@ -1132,14 +1177,18 @@ div.card-body > p > i{
     border: none; 
     border-radius: 8px; 
     box-shadow: 0 0px 10px #00000067; 
-    border: dashed 2px cornflowerblue;
+    border: dashed 2px #614ad9;
 }
 
 #meli-cards .card:hover{
     color: rgb(0, 0, 0);
-    background-color: papayawhip;
-    border: dashed 2px palevioletred;
-    box-shadow: 0 0px 25px palevioletred; /* Sombra */
+    background-color: #f6f3fc;
+    border: dashed 2px #343348;
+    box-shadow: 0 0px 10px #00000067; 
+}
+
+#meli-cards .card:hover p, h5, h6 {
+/* PENDIENTE */
 }
 
 .mt-5{
@@ -1283,4 +1332,88 @@ div.card-body > p > i{
 }
 
 /* FIN ORDENAR MAS ANTIGUO Y NUEVO */
-      
+
+.em-circle {
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: 1.1rem;
+    position: absolute; /* Posición absoluta para colocar el círculo */
+    top: -18px; 
+    right: -10px; /* Distancia desde la derecha */
+    background-color: #343348; /* Color de fondo del círculo */
+    color: white; /* Color del texto */
+    border-radius: 50%; /* Hace que sea un círculo */
+    width: 40px; /* Ancho del círculo */
+    height: 40px; /* Altura del círculo */
+    display: flex; /* Para centrar el texto dentro del círculo */
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+    font-weight: bold; /* Hace el texto más grueso */
+}
+
+.em-circle-isFraud{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: 1.1rem;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -18px; 
+    right: 35px; 
+    background-color: red; 
+    color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: bold; 
+}
+
+.em-circle-isNotFraud{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: 1.1rem;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -18px; 
+    right: 35px; 
+    background-color: green; 
+    color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: bold; 
+}
+
+.em-circle-state{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: 1.1rem;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -18px; 
+    right: 100px;
+    background-color: orange; 
+    color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-weight: bold; 
+}
+
+.em-circle-state2{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: 1.1rem;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -18px; 
+    right: 100px;
+    background-color: green; 
+    color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-weight: bold; 
+}

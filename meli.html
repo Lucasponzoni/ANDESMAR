@@ -7,6 +7,9 @@
     
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Reddit+Sans+Condensed:wght@200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -40,7 +43,7 @@
             <div class="col-md-6 mb-3">
                 <!-- Buscador -->
                 <div class="input-group">
-                    <input type="text" class="form-control" id="search" placeholder="📦 Buscar por Operacion, Ej: 2000001234567890">
+                    <input type="text" class="form-control" id="search" placeholder="📦 Buscar por Operacion">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button">
                             <i class="fas fa-search"></i>
@@ -63,151 +66,135 @@
     <div class="container mt-5" id="cards-container-meli">
         <div class="spinner-border" role="status" id="spinner">
             <span class="sr-only">Cargando...</span>
-            
         </div>
 
         <span class="loader"></span>
         <div class="row" id="meli-cards">
             
-        <!-- CARDS MUESTRA -->
-        <!-- CARDS MUESTRA -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-user"></i> RUBEN DANIEL AVALOS</h5>
-                    <div class="d-flex align-items-center">
-                        <p class="remitoCardMeli card-text mb-0">2000009265004936</p>
-                        <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                    <p class="card-text cpLocalidad"><i class="fas fa-map-marker-alt"></i> 3000, SANTA FE, SANTA FE</p>
-        
-                    <!-- INICIO DEL COLLAPSE -->
-                    <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
-                        <i class="bi bi-chevron-down"></i> Ver más detalles
-                    </button>
-                    <div class="collapse" id="collapseDetails">
-                        <div class="little-card-meli">
-                            <p><i class="fas fa-home"></i> AGUADO, ALTURA: 2427</p>
-                            <p><i class="fas fa-phone"></i> TELEFONO: 3416292861</p>
-                            <p><i class="bi bi-envelope-at-fill"></i> EMAIL: RUBENDANIELAVALOS@GMAIL.COM</p>
-                            <p><i class="bi bi-sticky-fill"></i> OBSERVACIONES: CASA DE PORTON NEGRO</p>
-                            <p><i class="bi bi-info-circle-fill"></i> RECIBE: MARIA LUISA RAMOS</p>
+            <!-- CARDS MUESTRA 1-->
+            <div class="col-md-4">
+                <div class="card position-relative">
+                    <div class="em-circle">ME1</div>
+                    <div class="em-circle-isFraud">Fraude</div>
+                    <div class="em-circle-state">Envio pendiente</div>
+                    <div class="card-body">
+                        <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> Juan Pérez Ibarrola</h5>
+                        <h6 class="user-title-meli">CATMELI3456789</h6>
+                        <div class="meli-box1"> 
+                            <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> 3000, Santa Fe, Santa Fe</p>
+                            <p class="card-text cpLocalidad-meli correo-andesmar">Andesmar</p>    
                         </div>
-                    </div>
-                    <!-- FIN DEL COLLAPSE -->
+                        <div class="d-flex align-items-center">
+                            <p class="remitoCardMeli card-text mb-0">2000009265004936</p>
+                            <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
         
-                    <a href="" target="_blank" class="btn btn-primary"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andesmar</a>
-                    <a href="" target="_blank" class="btn btn-danger"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andreani</a>
-        
-                </div>
-            </div>
-        </div>
-         
-            <!-- CARDS MUESTRA -->
-<!-- CARDS MUESTRA -->
-<div class="col-md-4">
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title"><i class="fas fa-user"></i> RUBEN DANIEL AVALOS</h5>
-            <div class="d-flex align-items-center">
-                <p class="remitoCardMeli card-text mb-0">2000009265004936</p>
-                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
-                    <i class="bi bi-clipboard"></i>
-                </button>
-            </div>
-            <p class="card-text cpLocalidad"><i class="fas fa-map-marker-alt"></i> 3000, SANTA FE, SANTA FE</p>
-
-            <!-- INICIO DEL COLLAPSE -->
-            <button class="btn btn-outline-secondary w-100" data-bs-toggle="collapse" data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
-                <i class="bi bi-chevron-down"></i> Ver más detalles
-            </button>
-            <div class="collapse" id="collapseDetails">
-                <div class="little-card-meli">
-                    <p><i class="fas fa-home"></i> AGUADO, ALTURA: 2427</p>
-                    <p><i class="fas fa-phone"></i> TELEFONO: 3416292861</p>
-                    <p><i class="bi bi-envelope-at-fill"></i> EMAIL: RUBENDANIELAVALOS@GMAIL.COM</p>
-                    <p><i class="bi bi-sticky-fill"></i> OBSERVACIONES: CASA DE PORTON NEGRO</p>
-                    <p><i class="bi bi-info-circle-fill"></i> RECIBE: MARIA LUISA RAMOS</p>
-                </div>
-            </div>
-            <!-- FIN DEL COLLAPSE -->
-
-            <a href="" target="_blank" class="btn btn-primary"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andesmar</a>
-            <a href="" target="_blank" class="btn btn-danger"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andreani</a>
-
-        </div>
-    </div>
-</div>
-
-
-            
-
-                        <!-- CARDS MUESTRA -->
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title"><i class="fas fa-user"></i> RUBEN DIEGO DANIEL AVALO</h5>
-                                    <div class="d-flex align-items-center">
-                                        <p class="remitoCardMeli card-text mb-0">2000009265004936</p>
-                                        <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
-                                            <i class="bi bi-clipboard"></i>
-                                        </button>
-                                    </div>
-                                    <p class="card-text cpLocalidad"><i class="fas fa-map-marker-alt"></i> 3000, SANTA FE, SANTA FE</p>
-                                    <p class="card-text"><i class="fas fa-home"></i> AGUADO, ALTURA: 2427</p>
-                                    <p class="card-text"><i class="fas fa-phone"></i> TELEFONO: 3416292861</p>
-                                    <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> NÚMERO ANDESMAR: 125678</p>
-                                    <p class="card-text"><i class="bi bi-bank2"></i> COTIZACIÓN: 5000</p>
-                                    <a href="" target="_blank" class="btn btn-primary"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andesmar</a>
-                                    <a href="" target="_blank" class="btn btn-danger"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andreani</a>
-                                </div>
+                        <!-- INICIO DEL COLLAPSE -->
+                        <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails1" aria-expanded="false" aria-controls="collapseDetails1">
+                            <i class="bi bi-chevron-down"></i> Ver más detalles
+                        </button>
+                        <div class="collapse" id="collapseDetails1">
+                            <div class="little-card-meli">
+                                <p><i class="fas fa-home"></i> Aguardo, altura: 2427</p>
+                                <p><i class="fas fa-phone"></i> Telefono: 3416292861</p>
+                                <p><i class="bi bi-envelope-at-fill"></i> Email: juanperez@gmail.com</p>
+                                <p><i class="bi bi-sticky-fill"></i> Observaciones: Casa de portón negro</p>
+                                <p><i class="bi bi-info-circle-fill"></i> Recibe: María Luisa Ramos</p>
                             </div>
                         </div>
-            
+                        <!-- FIN DEL COLLAPSE -->
+        
+                        <a href="" target="_blank" class="btn btn-primary"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andesmar</a>
+                        <a href="" target="_blank" class="btn btn-danger"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andreani</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARDS MUESTRA 2-->
             <div class="col-md-4">
-                <div class="card">
+                <div class="card position-relative">
+                    <div class="em-circle">ME1</div>
+                    <div class="em-circle-isNotFraud">Seguro</div>
+                    <div class="em-circle-state2">Envio preparado</div>
+
                     <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-user"></i> MARTA ALEJANDRA GARCÍA</h5>
+                        <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> Ana Gómez</h5>
+                        <h6 class="user-title-meli">ELOSO23456</h6>
+                        <div class="meli-box1"> 
+                            <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> 4000, Rosario, Santa Fe</p>
+                            <p class="card-text cpLocalidad-meli correo-andreani">Andreani</p>    
+                        </div>
                         <div class="d-flex align-items-center">
                             <p class="remitoCardMeli card-text mb-0">2000009265004937</p>
                             <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
                                 <i class="bi bi-clipboard"></i>
                             </button>
                         </div>
-                        <p class="card-text cpLocalidad"><i class="fas fa-map-marker-alt"></i> 2000, ROSARIO, SANTA FE</p>
-                        <p class="card-text"><i class="fas fa-home"></i> AV. PELLEGRINI, ALTURA: 1234</p>
-                        <p class="card-text"><i class="fas fa-phone"></i> TELEFONO: 3412345678</p>
-                        <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> NÚMERO ANDESMAR: 456789</p>
-                        <p class="card-text"><i class="bi bi-bank2"></i> COTIZACIÓN: 1500</p>
+        
+                        <!-- INICIO DEL COLLAPSE -->
+                        <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails2" aria-expanded="false" aria-controls="collapseDetails2">
+                            <i class="bi bi-chevron-down"></i> Ver más detalles
+                        </button>
+                        <div class="collapse" id="collapseDetails2">
+                            <div class="little-card-meli">
+                                <p><i class="fas fa-home"></i> Calle Falsa, altura: 1234</p>
+                                <p><i class="fas fa-phone"></i> Telefono: 3416292862</p>
+                                <p><i class="bi bi-envelope-at-fill"></i> Email: anagomez@gmail.com</p>
+                                <p><i class="bi bi-sticky-fill"></i> Observaciones: Entregar en la puerta</p>
+                                <p><i class="bi bi-info-circle-fill"></i> Recibe: Pedro Pérez</p>
+                            </div>
+                        </div>
+                        <!-- FIN DEL COLLAPSE -->
+        
                         <a href="" target="_blank" class="btn btn-primary"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andesmar</a>
                         <a href="" target="_blank" class="btn btn-danger"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andreani</a>
                     </div>
                 </div>
             </div>
+
+            <!-- CARDS MUESTRA 3-->
             <div class="col-md-4">
-                <div class="card">
+                <div class="card position-relative">
+                    <div class="em-circle">ME1</div>
+                    <div class="em-circle-isNotFraud">Seguro</div>
+                    <div class="em-circle-state2">Envio preparado</div>
+
                     <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-user"></i> JORGE LUIS FERNÁNDEZ</h5>
+                        <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> Carlos López</h5>
+                        <h6 class="user-title-meli">VEMA4021891</h6>
+                        <div class="meli-box1"> 
+                            <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> 5000, Córdoba, Córdoba</p>
+                            <p class="card-text cpLocalidad-meli correo-andesmar">Andesmar</p>    
+                        </div>
                         <div class="d-flex align-items-center">
                             <p class="remitoCardMeli card-text mb-0">2000009265004938</p>
                             <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
                                 <i class="bi bi-clipboard"></i>
                             </button>
                         </div>
-                        <p class="card-text cpLocalidad"><i class="fas fa-map-marker-alt"></i> 3001, CÓRDOBA, CÓRDOBA</p>
-                        <p class="card-text"><i class="fas fa-home"></i> RIVADAVIA, ALTURA: 5678</p>
-                        <p class="card-text"><i class="fas fa-phone"></i> TELEFONO: 3519876543</p>
-                        <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> NÚMERO ANDESMAR: 987654</p>
-                        <p class="card-text"><i class="bi bi-bank2"></i> COTIZACIÓN: 2000</p>
+        
+                        <!-- INICIO DEL COLLAPSE -->
+                        <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails3" aria-expanded="false" aria-controls="collapseDetails3">
+                            <i class="bi bi-chevron-down"></i> Ver más detalles
+                        </button>
+                        <div class="collapse" id="collapseDetails3">
+                            <div class="little-card-meli">
+                                <p><i class="fas fa-home"></i> Avenida Siempreviva, altura: 456</p>
+                                <p><i class="fas fa-phone"></i> Telefono: 3416292863</p>
+                                <p><i class="bi bi-envelope-at-fill"></i> Email: carloslopez@gmail.com</p>
+                                <p><i class="bi bi-sticky-fill"></i> Observaciones: Llamar al llegar</p>
+                                <p><i class="bi bi-info-circle-fill"></i> Recibe: Laura López</p>
+                            </div>
+                        </div>
+                        <!-- FIN DEL COLLAPSE -->
+        
                         <a href="" target="_blank" class="btn btn-primary"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andesmar</a>
                         <a href="" target="_blank" class="btn btn-danger"><i class="bi bi-file-earmark-arrow-down-fill"></i> Andreani</a>
                     </div>
                 </div>
-            </div>              
-                        <!-- FIN CARDS MUESTRA -->
-            
+            </div>
 
         </div>
         <nav aria-label="Page navigation">
@@ -235,3 +222,4 @@
 
 </body>
 </html>
+
