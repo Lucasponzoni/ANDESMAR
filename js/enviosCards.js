@@ -13,6 +13,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// Función para capitalizar el primer carácter de una cadena
+function capitalizeText(text) {
+    if (!text) return '';
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     const spinner = document.getElementById("spinner");
     const cardsContainer = document.getElementById("envios-cards");
@@ -29,58 +35,76 @@ document.addEventListener("DOMContentLoaded", function() {
     // Mostrar el spinner general
     spinner.style.display = "flex";
 
+    // Función para convertir texto a lowercase
+    function toLowerCaseText(text) {
+        return text ? text.toLowerCase() : '';
+    }
+
     // Obtener los datos de Firebase
     database.ref('enviosAndesmar').once('value', (snapshot) => {
         snapshot.forEach((childSnapshot) => {
-            allData.push({ id: childSnapshot.key, ...childSnapshot.val() });
+            const data = childSnapshot.val();
+            allData.push({ 
+                id: childSnapshot.key, 
+                nombreApellido: toLowerCaseText(data.nombreApellido),
+                localidad: toLowerCaseText(data.localidad),
+                calleDelDestinatario: toLowerCaseText(data.calleDelDestinatario),
+                numeroDeCalle: toLowerCaseText(data.numeroDeCalle),
+                telefono: data.telefono,
+                nroPedido: data.nroPedido,
+                remito: data.remito,
+                cotizacion: data.cotizacion,
+                observaciones: data.observaciones ? toLowerCaseText(data.observaciones) : '',
+                codigoPostal: data.codigoPostal 
+            });
         });
 
-        // Invertir el orden de los datos
         allData.reverse();
-        originalData = [...allData]; // Guardar una copia del arreglo original
-
-        // Renderizar las cards
+        originalData = [...allData];
         renderCards(allData).then(() => {
-            // Ocultar el spinner general después de renderizar las tarjetas
             spinner.style.display = "none";
-            updatePagination(allData.length); // Actualizar la paginación
+            updatePagination(allData.length);
         });
     });
 
     // Función para renderizar las tarjetas
     async function renderCards(data) {
-        cardsContainer.innerHTML = ""; // Limpiar el contenedor
+        cardsContainer.innerHTML = "";
         const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const paginatedData = data.slice(startIndex, endIndex); 
+        const paginatedData = data.slice(startIndex, startIndex + itemsPerPage); 
 
         const promises = paginatedData.map(async (item) => {
             const card = document.createElement("div");
             card.className = "col-md-4"; 
+
+            const etiqueta = item.remito.startsWith("NOV")
+                ? `<div class="em-state-simbel">Etiqueta por <img id="simbel2" src="./Img/simbel.png"></div>`
+                : `<div class="em-state-andesmar">Etiqueta Manual 💪🏻</div>`;
+            
             card.innerHTML = `
                 <div class="card mb-3">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-user"></i> ${item.nombreApellido}</h5>
-                        <p class="card-text cpLocalidad"><i class="fas fa-map-marker-alt"></i> ${item.codigoPostal}, ${item.localidad}</p>
-                        <p class="card-text"><i class="fas fa-home"></i> ${item.calleDelDestinatario}, ALTURA: ${item.numeroDeCalle}</p>
-                        <p class="card-text"><i class="fas fa-phone"></i> TELEFONO: ${item.telefono}</p>
-                        <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> NÚMERO ANDESMAR: ${item.nroPedido}</p>
+                        ${etiqueta}
+                        <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${item.nombreApellido}</h5>
+                        <p class="card-text cpLocalidad">${item.codigoPostal}, ${item.localidad}</p>
+                        <p class="card-text"><i class="fas fa-home"></i> ${item.calleDelDestinatario}, Altura: ${item.numeroDeCalle}</p>
+                        <p class="card-text"><i class="fas fa-phone"></i> Telefono: ${item.telefono}</p>
+                        <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> Número Andesmar: ${item.nroPedido}</p>
+                        <p class="card-text"><i class="bi bi-credit-card-fill"></i> Cotización: ${item.cotizacion}</p>
                         <div class="d-flex align-items-center">
                             <p class="remitoCard card-text mb-0">${item.remito}</p>
                             <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
                                 <i class="bi bi-clipboard"></i>
                             </button>
                         </div>
-                        <p class="card-text"><i class="bi bi-bank2"></i> COTIZACIÓN: ${item.cotizacion}</p>
                         
-                        <div class="apiSeguimiento" style="display: flex; justify-content: center; align-items: center; height: 100px;">
-                            <img src="./Img/loading-buffering.gif" alt="Cargando..." style="width: 50px; height: 50px;">
+                        <div class="apiSeguimiento" style="display: flex; justify-content: center; align-items: center; height: 100px; overflow: hidden; background-color: #f9f9f9;">
+                            <img class="siri" src="./Img/siri.gif" alt="Cargando...">
                         </div>
 
                         <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Seguir</a>
                         <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
                        
-                        <!-- Botón para colapsar observaciones -->
                         <button class="btn btn-success btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${item.id}" aria-expanded="false" aria-controls="collapseObservaciones-${item.id}">
                         <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
                         </button>
@@ -117,7 +141,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Actualizar en Firebase
                 database.ref(`enviosAndesmar/${item.id}`).update({ observaciones: observacionesValue })
                 .then(() => {
-                    // Mostrar mensaje de éxito con SweetAlert2
                     Swal.fire({
                         icon: 'success',
                         title: '¡Actualización exitosa!',
@@ -127,7 +150,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 })
                 .catch((error) => {
                     console.error("Error al actualizar observaciones: ", error);
-                    // Mostrar mensaje de error
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -137,7 +159,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
             });
 
-            // Agregar la tarjeta al contenedor
             cardsContainer.appendChild(card);
 
             // Llamar a la API para obtener el estado actual
@@ -162,25 +183,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 const estadoDiv = document.createElement('div');
                 estadoDiv.className = 'mb-3';
                 
-                const guia = data.NroGuia === "0" ? "PENDIENTE DE INGRESO" : `GUIA: ${data.NroGuia}`;
-                const estadoActual = `ESTADO: ${data.EstadoActual.toUpperCase()}`;
-                const fecha = `FECHA: ${new Date(data.FechaEmision).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+                const guia = data.NroGuia === "0" ? "Pendiente de Ingreso" : `Guia: ${data.NroGuia}`;
+                const estadoActual = `${capitalizeText(data.EstadoActual)}`;
+                const fecha = `Fecha: ${new Date(data.FechaEmision).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
                 
-                // Crear el contenedor para la guía y el botón
                 const guiaContainer = document.createElement('div');
                 guiaContainer.className = 'd-flex align-items-center';
                 
-                // Crear el párrafo para la guía
                 const guiaParagraph = document.createElement('p');
                 guiaParagraph.className = 'card-text mb-0';
                 guiaParagraph.innerHTML = `<i class="bi bi-truck"></i> ${guia}`;
                 
-                // Crear el botón de copiar
                 const copyGuideButton = document.createElement('button');
-                copyGuideButton.className = 'btn btn-link copy-guide-btn ms-2'; // Añadir margen a la izquierda
+                copyGuideButton.className = 'btn btn-link copy-guide-btn ms-2';
                 copyGuideButton.innerHTML = '<i class="bi bi-clipboard"></i>';
                 
-                // Agregar evento al botón de copiar
                 copyGuideButton.addEventListener('click', () => {
                     navigator.clipboard.writeText(data.NroGuia).then(() => {
                         copyGuideButton.innerHTML = 'Copiado';
@@ -190,18 +207,15 @@ document.addEventListener("DOMContentLoaded", function() {
                     }).catch(err => console.error('Error al copiar al portapapeles: ', err));
                 });
                 
-                // Añadir el párrafo y el botón al contenedor
                 guiaContainer.appendChild(guiaParagraph);
                 guiaContainer.appendChild(copyGuideButton);
                 
-                // Agregar los otros párrafos al estadoDiv
                 estadoDiv.innerHTML += `
                     <p class="card-text"><i class="bi bi-info-circle"></i> ${estadoActual}</p>
                     <p class="card-text"><i class="bi bi-calendar"></i> ${fecha}</p>
                 `;
                 
-                // Agregar el contenedor de guía al estadoDiv
-                estadoDiv.insertBefore(guiaContainer, estadoDiv.firstChild); // Insertar al principio
+                estadoDiv.insertBefore(guiaContainer, estadoDiv.firstChild);
                 
                 const apiSeguimientoDiv = card.querySelector('.apiSeguimiento');
                 apiSeguimientoDiv.innerHTML = ''; 
@@ -222,12 +236,12 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!isFiltered) {
             const filteredData = allData.filter(item => item.remito.startsWith("NOV"));
             renderCards(filteredData);
-            filterLabelsButton.innerHTML = 'Volver atrás <i class="bi bi-arrow-left"></i>'; // Cambiar texto y agregar icono
-            isFiltered = true; // Cambiar estado a filtrado
+            filterLabelsButton.innerHTML = 'Volver atrás <i class="bi bi-arrow-left"></i>';
+            isFiltered = true;
         } else {
-            renderCards(allData); // Mostrar datos originales
-            filterLabelsButton.innerHTML = 'Etiquetas <img id="simbel" src="./Img/simbel.png">'; // Restaurar texto original
-            isFiltered = false; // Cambiar estado a no filtrado
+            renderCards(allData);
+            filterLabelsButton.innerHTML = 'Etiquetas <img id="simbel" src="./Img/simbel.png">';
+            isFiltered = false;
         }
     });
 
@@ -237,7 +251,6 @@ document.addEventListener("DOMContentLoaded", function() {
         let startPage = currentPageGroup + 1;
         let endPage = Math.min(currentPageGroup + 6, totalPages);
         
-        // Mostrar las páginas del grupo actual
         for (let i = startPage; i <= endPage; i++) {
             const pageItem = document.createElement("li");
             pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
@@ -246,35 +259,33 @@ document.addEventListener("DOMContentLoaded", function() {
                 e.preventDefault();
                 currentPage = i;
                 renderCards(allData);
-                updatePagination(totalItems); // Actualizar la paginación para reflejar el estado actual
+                updatePagination(totalItems);
             });
             paginationContainer.appendChild(pageItem);
         }
     
-        // Botón "Cargar más"
         if (endPage < totalPages) {
             const loadMoreItem = document.createElement("li");
             loadMoreItem.className = "page-item";
             loadMoreItem.innerHTML = `<a class="page-link" href="#">Más</a>`;
             loadMoreItem.addEventListener("click", (e) => {
                 e.preventDefault();
-                currentPageGroup += 6; // Avanzar al siguiente grupo
-                renderCards(allData); // Renderizar las tarjetas
-                updatePagination(allData.length); // Actualizar la paginación
+                currentPageGroup += 6;
+                renderCards(allData);
+                updatePagination(allData.length);
             });
             paginationContainer.appendChild(loadMoreItem);
         }
     
-        // Botón "Volver atrás"
         if (currentPageGroup > 0) {
             const backItem = document.createElement("li");
             backItem.className = "page-item";
             backItem.innerHTML = `<a class="page-link" href="#">Atrás</a>`;
             backItem.addEventListener("click", (e) => {
                 e.preventDefault();
-                currentPageGroup -= 6; // Retroceder al grupo anterior
-                renderCards(allData); // Renderizar las tarjetas
-                updatePagination(allData.length); // Actualizar la paginación
+                currentPageGroup -= 6;
+                renderCards(allData);
+                updatePagination(allData.length);
             });
             paginationContainer.appendChild(backItem);
         }
@@ -291,19 +302,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
         renderCards(filteredData);
         
-        // Mostrar imagen de error si no se encuentran resultados
         if (filteredData.length === 0) {
             cardsContainer.innerHTML = `<img src="./Img/error.gif" class="error" alt="No encontrado" style="display: block; margin: auto;">`;
-        } else {
-            // Si hay resultados, renderizar las tarjetas
-            renderCards(filteredData);
         }
     });
 
     // Filtro de orden
     filterSelect.addEventListener("change", function() {
         if (filterSelect.value === "nuevo") {
-            allData = [...originalData]; // Restaurar el orden original
+            allData = [...originalData];
         } else if (filterSelect.value === "antiguo") {
             allData.sort((a, b) => a.id.localeCompare(b.id));
         }
