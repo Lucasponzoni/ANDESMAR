@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentPage = 1;
     const itemsPerPage = 12;
     let allData = [];
+    let originalData = []; // Copia del arreglo original
     let isFiltered = false;
     let currentPageGroup = 0; // Grupo de páginas actual
 
@@ -34,8 +35,9 @@ document.addEventListener("DOMContentLoaded", function() {
             allData.push({ id: childSnapshot.key, ...childSnapshot.val() });
         });
 
-        // Ordenar los datos por ID, de más nuevo a más viejo por defecto
-        allData.sort((a, b) => b.id.localeCompare(a.id));
+        // Invertir el orden de los datos
+        allData.reverse();
+        originalData = [...allData]; // Guardar una copia del arreglo original
 
         // Renderizar las cards
         renderCards(allData).then(() => {
@@ -109,32 +111,31 @@ document.addEventListener("DOMContentLoaded", function() {
             // Lógica para actualizar observaciones
             const updateButton = card.querySelector('.update-observaciones');
             updateButton.addEventListener('click', () => {
-            const observacionesInput = card.querySelector(`#observaciones-${item.id}`);
-            const observacionesValue = observacionesInput.value;
+                const observacionesInput = card.querySelector(`#observaciones-${item.id}`);
+                const observacionesValue = observacionesInput.value;
 
-             // Actualizar en Firebase
-            database.ref(`enviosAndesmar/${item.id}`).update({ observaciones: observacionesValue })
-            .then(() => {
-            // Mostrar mensaje de éxito con SweetAlert2
-            Swal.fire({
-                icon: 'success',
-                title: '¡Actualización exitosa!',
-                text: 'Las observaciones han sido actualizadas correctamente.',
-                confirmButtonText: 'Aceptar'
+                // Actualizar en Firebase
+                database.ref(`enviosAndesmar/${item.id}`).update({ observaciones: observacionesValue })
+                .then(() => {
+                    // Mostrar mensaje de éxito con SweetAlert2
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Actualización exitosa!',
+                        text: 'Las observaciones han sido actualizadas correctamente.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error al actualizar observaciones: ", error);
+                    // Mostrar mensaje de error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudieron actualizar las observaciones. Inténtalo de nuevo.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                });
             });
-        })
-        .catch((error) => {
-            console.error("Error al actualizar observaciones: ", error);
-            // Mostrar mensaje de error
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No se pudieron actualizar las observaciones. Inténtalo de nuevo.',
-                confirmButtonText: 'Aceptar'
-            });
-        });
-        });
-
 
             // Agregar la tarjeta al contenedor
             cardsContainer.appendChild(card);
@@ -145,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-cors-api-key': 'temp_02193751c5190a008c46c2c6dfa7b919'
+                        'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
                     },
                     body: JSON.stringify({
                         "logueo": {
@@ -234,7 +235,7 @@ document.addEventListener("DOMContentLoaded", function() {
         paginationContainer.innerHTML = "";
         const totalPages = Math.ceil(totalItems / itemsPerPage);
         let startPage = currentPageGroup + 1;
-        let endPage = Math.min(currentPageGroup + 4, totalPages);
+        let endPage = Math.min(currentPageGroup + 6, totalPages);
         
         // Mostrar las páginas del grupo actual
         for (let i = startPage; i <= endPage; i++) {
@@ -254,10 +255,10 @@ document.addEventListener("DOMContentLoaded", function() {
         if (endPage < totalPages) {
             const loadMoreItem = document.createElement("li");
             loadMoreItem.className = "page-item";
-            loadMoreItem.innerHTML = `<a class="page-link" href="#">Cargar más</a>`;
+            loadMoreItem.innerHTML = `<a class="page-link" href="#">Más</a>`;
             loadMoreItem.addEventListener("click", (e) => {
                 e.preventDefault();
-                currentPageGroup += 4; // Avanzar al siguiente grupo
+                currentPageGroup += 6; // Avanzar al siguiente grupo
                 renderCards(allData); // Renderizar las tarjetas
                 updatePagination(allData.length); // Actualizar la paginación
             });
@@ -268,10 +269,10 @@ document.addEventListener("DOMContentLoaded", function() {
         if (currentPageGroup > 0) {
             const backItem = document.createElement("li");
             backItem.className = "page-item";
-            backItem.innerHTML = `<a class="page-link" href="#">Volver atrás</a>`;
+            backItem.innerHTML = `<a class="page-link" href="#">Atrás</a>`;
             backItem.addEventListener("click", (e) => {
                 e.preventDefault();
-                currentPageGroup -= 4; // Retroceder al grupo anterior
+                currentPageGroup -= 6; // Retroceder al grupo anterior
                 renderCards(allData); // Renderizar las tarjetas
                 updatePagination(allData.length); // Actualizar la paginación
             });
@@ -280,29 +281,29 @@ document.addEventListener("DOMContentLoaded", function() {
     }    
 
     // Buscador
-searchInput.addEventListener("input", function() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const filteredData = allData.filter(item => {
-        return Object.values(item).some(value => 
-            value.toString().toLowerCase().includes(searchTerm)
-        );
-    });
+    searchInput.addEventListener("input", function() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filteredData = allData.filter(item => {
+            return Object.values(item).some(value => 
+                value.toString().toLowerCase().includes(searchTerm)
+            );
+        });
 
-    renderCards(filteredData);
-    
-    // Mostrar imagen de error si no se encuentran resultados
-    if (filteredData.length === 0) {
-        cardsContainer.innerHTML = `<img src="./Img/error.gif" class="error" alt="No encontrado" style="display: block; margin: auto;">`;
-    } else {
-        // Si hay resultados, renderizar las tarjetas
         renderCards(filteredData);
-    }
-});
+        
+        // Mostrar imagen de error si no se encuentran resultados
+        if (filteredData.length === 0) {
+            cardsContainer.innerHTML = `<img src="./Img/error.gif" class="error" alt="No encontrado" style="display: block; margin: auto;">`;
+        } else {
+            // Si hay resultados, renderizar las tarjetas
+            renderCards(filteredData);
+        }
+    });
 
     // Filtro de orden
     filterSelect.addEventListener("change", function() {
         if (filterSelect.value === "nuevo") {
-            allData.sort((a, b) => b.id.localeCompare(a.id)); 
+            allData = [...originalData]; // Restaurar el orden original
         } else if (filterSelect.value === "antiguo") {
             allData.sort((a, b) => a.id.localeCompare(b.id));
         }

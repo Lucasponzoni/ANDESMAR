@@ -154,7 +154,7 @@ async function enviarSolicitudAndreani() {
         const response = await fetch(apiUrlLabel, {
             method: 'POST',
             headers: {
-                'x-cors-api-key': 'temp_6203d50441dece922f0cec16ae47ac6e',
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
                 'x-authorization-token': token, 
                 'Content-Type': 'application/json'
             },
@@ -196,7 +196,7 @@ async function enviarSolicitudAndreani() {
         fetch(url, {
             method: "GET",
             headers: {
-                'x-cors-api-key': 'temp_59cc785af1ab888d5ab7fa06b979f4cd',
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
                 "x-authorization-token": token,
                 "Accept": "application/pdf"
             }
