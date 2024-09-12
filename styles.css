@@ -1436,3 +1436,10 @@ div.card-body > p > i{
     font-size: 0.9em;
     color: grey;
 }
+
+#scrollToTop {
+    position: fixed;
+    right: 20px; 
+    bottom: 20px; 
+    z-index: 1000; 
+}
