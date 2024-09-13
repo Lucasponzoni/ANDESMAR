@@ -996,7 +996,7 @@ span > img {
 .card-title-meli {
     font-family: "Reddit Sans Condensed", sans-serif;
     text-transform: capitalize;
-    color: #614ad9;
+    color: rgb(32, 32, 32);
     font-weight: 600;
     font-size: 1.5rem;
 }
