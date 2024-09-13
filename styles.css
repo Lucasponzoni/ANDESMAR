@@ -1011,7 +1011,7 @@ p.card-text{
     font-size: .8rem;
     font-weight: 300;
     width: fit-content;
-    background-color: coral;
+    background-color: orange;
     color: white;
     border-radius: 8px;
     padding: 5px;
@@ -1496,7 +1496,7 @@ div.card-body > p > i{
     z-index: 1000; 
 }
 
-.siri{
-    width: 220px;
+.blueSpinner{
+    width: 50px;
     overflow: hidden;
 }

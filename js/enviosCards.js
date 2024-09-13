@@ -98,8 +98,8 @@ document.addEventListener("DOMContentLoaded", function() {
                             </button>
                         </div>
                         
-                        <div class="apiSeguimiento" style="display: flex; justify-content: center; align-items: center; height: 100px; overflow: hidden; background-color: #f9f9f9;">
-                            <img class="siri" src="./Img/siri.gif" alt="Cargando...">
+                        <div class="apiSeguimiento" style="display: flex; justify-content: center; align-items: center; height: 100px">
+                            <img class="blueSpinner" src="./Img/spinner.gif" alt="Cargando...">
                         </div>
 
                         <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Seguir</a>
