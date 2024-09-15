@@ -977,7 +977,6 @@ span > img {
     transition: transform 0.2s;
     cursor: pointer;
     margin-bottom: 25px !important;
-    border-radius: 5% !important;
 }
 
 .card:hover {
@@ -1206,6 +1205,10 @@ div.card-body > p > i{
 
 .mt-5{
     margin-top: 0 !important;
+}
+
+.card-body-meli{
+    padding: 1rem 1rem 0 1rem;
 }
 
 .card-body > button{
@@ -1499,4 +1502,32 @@ div.card-body > p > i{
 .blueSpinner{
     width: 50px;
     overflow: hidden;
+}
+
+.btnAndesmarMeli{
+    margin-bottom: 5px !important;
+}
+
+.btnAndreaniMeli{
+    margin-bottom: 0px !important;
+}
+
+.errorMeli{
+    font-family: "Chakra Petch", sans-serif;
+    text-transform: uppercase;
+    color: green;
+    margin-top: 5px;
+    font-size: small;
+    text-align: justify;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.trio-de-botones{
+    display: flex;
+    gap: 5px;
+}
+
+.editarDatos{
+    margin-bottom: 5px !important;
 }

@@ -10,9 +10,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Reddit+Sans+Condensed:wght@200..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <!-- SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="./Img/caja.png">
     <link href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300..700&display=swap" rel="stylesheet">  
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
@@ -54,11 +56,15 @@
             <div class="col-md-3 mb-3 d-flex align-items-center">
                 <!-- Filtro -->
                 <select class="custom-select" id="filter" style="flex: 1; margin-right: 10px;">
-                    <option value="nuevo" selected><i class="fas fa-sort-amount-down-alt"></i> Más nuevos</option>
-                    <option value="antiguo"><i class="fas fa-sort-amount-up-alt"></i> Más antiguos</option>
+                    <option value="nuevo" selected>Más nuevos</option>
+                    <option value="antiguo">Más antiguos</option>
                 </select>
-                <button class="btn btn-secondary mercado-btn" id="filter-meli">ME1</button>
-                <button class="btn btn-secondary simbel" id="filter-labels">Etiquetas <img id="simbel" src="./Img/simbel.png"></button>
+                <div class="trio-de-botones">
+                    <button class="btn btn-danger">Andreani</button>
+                    <button class="btn btn-primary">Andesmar</button>
+                    <button class="btn btn-secondary">Pendientes</button>
+                </div>
+                
             </div>
         </div>
     </div>
@@ -91,6 +97,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+    <!-- SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Scripts Bootstrap-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>

@@ -23,17 +23,48 @@ function cargarDatos() {
 
     database.ref('envios').once('value')
         .then(snapshot => {
+            const allData = [];
             snapshot.forEach(childSnapshot => {
                 const data = childSnapshot.val();
+                allData.push({ 
+                    id: childSnapshot.key, 
+                    Altura: data.Altura,
+                    Calle: data.Calle,
+                    Cantidad: data.Cantidad,
+                    Correosugerido: data.Correosugerido,
+                    Cp: data.Cp,
+                    Email: data.Email,
+                    NombreyApellido: data.NombreyApellido,
+                    Observaciones: data.Observaciones,
+                    Peso: data.Peso,
+                    Producto: data.Producto,
+                    Provincia: data.Provincia,
+                    Recibe: data.Recibe,
+                    SKU: data.SKU,
+                    Telefono: data.Telefono,
+                    'Volumen CM³': data['Volumen CM³'],
+                    'Volumen M³': data['Volumen M³'],
+                    idOperacion: data.idOperacion, // Cambiado aquí
+                    localidad: data.localidad,
+                    medidas: data.medidas,
+                    nombreDeUsuario: data.nombreDeUsuario
+                });
+            });
+
+            // Invertir datos si es necesario
+            allData.reverse();
+
+            // Renderizar tarjetas
+            allData.forEach(data => {
                 const card = crearCard(data);
                 cardsContainer.appendChild(card);
             });
+
+            // Ocultar el spinner
+            spinner.style.display = 'none';
         })
         .catch(error => {
             console.error("Error al cargar los datos: ", error);
-        })
-        .finally(() => {
-            spinner.style.display = 'none';
         });
 }
 
@@ -46,8 +77,8 @@ function crearCard(data) {
         <div class="card position-relative">
             <div class="em-circle">ME1</div>
             <div class="em-circle-isFraud">Fraude</div>
-            <div id="estadoEnvio${data.idOperacion}ME1" class="em-circle-state">Envio pendiente</div>
-            <div class="card-body">
+            <div id="estadoEnvio${data.id}" class="em-circle-state">Envio pendiente</div>
+            <div class="card-body-meli">
                 <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> ${data.NombreyApellido}</h5>
                 <h6 class="user-title-meli">${data.nombreDeUsuario}</h6>
                 <div class="meli-box1"> 
@@ -60,37 +91,119 @@ function crearCard(data) {
                         <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
-                <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails${data.idOperacion}" aria-expanded="false" aria-controls="collapseDetails${data.idOperacion}">
+                <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails${data.id}" aria-expanded="false" aria-controls="collapseDetails${data.id}">
                     <i class="bi bi-chevron-down"></i> Ver más detalles
                 </button>
-                <div class="collapse" id="collapseDetails${data.idOperacion}">
+                <div class="collapse" id="collapseDetails${data.id}">
                     <div class="little-card-meli">
-                        <p><i class="fas fa-home"></i> Calle: ${data.Calle}</p>
-                        <p><i class="bi bi-123"></i> Altura: ${data.Altura}</p>
-                        <p><i class="fas fa-phone"></i> Telefono: ${data.Telefono}</p>
-                        <p><i class="bi bi-envelope-at-fill"></i> Email: ${data.Email}</p>
-                        <p><i class="bi bi-sticky-fill"></i> Observaciones: ${data.Observaciones}</p>
+                        <p><i class="fas fa-home"></i> Calle: <span id="calle-${data.id}">${data.Calle}</span></p>
+                        <p><i class="bi bi-123"></i> Altura: <span id="altura-${data.id}">${data.Altura}</span></p>
+                        <p><i class="fas fa-phone"></i> Telefono: <span id="telefono-${data.id}">${data.Telefono}</span></p>
+                        <p><i class="bi bi-envelope-at-fill"></i> Email: <span id="email-${data.id}">${data.Email}</span></p>
+                        <p><i class="bi bi-sticky-fill"></i> Observaciones: <span id="observaciones-${data.id}">${data.Observaciones}</span></p>
                     </div>
                     <div class="dimensions-info">
                         <h6>Dimensiones</h6>
-                        <div><i class="bi bi-bag-fill"></i> Producto: ${data.Producto}</div>
-                        <div><i class="bi bi-code-square"></i> SKU: ${data.SKU} </div>
-                        <div><i class="bi bi-arrows-angle-expand"></i> Medidas: ${data.medidas}</div>
-                        <div><i class="bi bi-box-arrow-in-down"></i> Peso: ${data.Peso} kg</div>
-                        <div><i class="bi bi-box"></i> Volumen M³: ${data['Volumen M³']} m³</div>
-                        <div><i class="bi bi-box"></i> Volumen CM³: ${data['Volumen CM³']} cm³</div>
-                        <div><i class="bi bi-boxes"></i> Cantidad: ${data.Cantidad}</div>
+                        <div><i class="bi bi-bag-fill"></i> Producto: <span id="producto-${data.id}">${data.Producto}</span></div>
+                        <div><i class="bi bi-code-square"></i> SKU: <span id="sku-${data.id}">${data.SKU}</span></div>
+                        <div><i class="bi bi-arrows-angle-expand"></i> Medidas: <span id="medidas-${data.id}">${data.medidas}</span></div>
+                        <div><i class="bi bi-box-arrow-in-down"></i> Peso: <span id="peso-${data.id}">${data.Peso}</span> kg</div>
+                        <div><i class="bi bi-box"></i> Volumen M³: <span id="volumenM3-${data.id}">${data['Volumen M³']}</span> m³</div>
+                        <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.id}">${data['Volumen CM³']}</span> cm³</div>
+                        <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.id}">${data.Cantidad}</span></div>
                     </div>
+                    <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.id}" onclick="editarDatos('${data.id}')">Editar datos</button>
                 </div>
-                <button class="btn btn-primary" id="andesmarButton${data.idOperacion}ME1" onclick="enviarDatos('${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${data.Peso}, ${data['Volumen M³']}, ${data.Cantidad}, '${data.medidas}')">
-                    <span id="andesmarText${data.idOperacion}ME1"><i class="bi bi-file-text"></i> Etiqueta Andesmar</span>
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinner${data.idOperacion}ME1"></span>
+                <!-- Spinner Button Andesmar -->
+                <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.id}" onclick="enviarDatosAndesmar('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${data.Peso}, ${data['Volumen M³']}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
+                    <span id="andesmarText${data.id}"><i class="bi bi-file-text"></i> Etiqueta Andesmar</span>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.id}"></span>
                 </button>
-                <div id="resultado${data.idOperacion}ME1" class="mt-2"></div>
+                <!-- Spinner Button Andreani -->
+                <button class="btn btn-danger btnAndreaniMeli" id="andreaniButton${data.id}" onclick="enviarDatosAndreani('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${data.Peso}, ${data['Volumen CM³']}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
+                    <span id="andreaniText${data.id}"><i class="bi bi-file-text"></i> Etiqueta Andreani</span>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.id}" style="display:none;"></span>
+                </button>
+                <div id="resultado${data.id}" class="mt-2 errorMeli"></div>
             </div>
         </div>
     `;
     return cardDiv;
+}
+
+// Función para habilitar la edición de los campos
+function habilitarEdicion(id) {
+    const camposEditables = [
+        'calle', 'altura', 'telefono', 'email', 'observaciones',
+        'producto', 'sku', 'medidas', 'peso', 'volumenM3', 'volumenCM3', 'cantidad'
+    ];
+
+    camposEditables.forEach(campo => {
+        const span = document.getElementById(`${campo}-${id}`);
+        const valorActual = span.textContent;
+        span.innerHTML = `<input type="text" class="form-control" value="${valorActual}" id="input-${campo}-${id}">`;
+    });
+}
+
+// Función para guardar los cambios y actualizar en Firebase
+function guardarCambios(id) {
+    const camposEditables = [
+        'calle', 'altura', 'telefono', 'email', 'observaciones',
+        'producto', 'sku', 'medidas', 'peso', 'volumenM3', 'volumenCM3', 'cantidad'
+    ];
+
+    // Obtener los valores actualizados de los inputs
+    let datosActualizados = {};
+    camposEditables.forEach(campo => {
+        const input = document.getElementById(`input-${campo}-${id}`);
+        datosActualizados[campo.charAt(0).toUpperCase() + campo.slice(1)] = input.value;
+    });
+
+    // Actualizar los datos en Firebase
+    const ref = database.ref(`envios/${id}`);
+    ref.update(datosActualizados)
+        .then(() => {
+            // Mostrar alerta de éxito con SweetAlert
+            Swal.fire({
+                icon: 'success',
+                title: 'Datos actualizados',
+                text: 'Los datos han sido actualizados correctamente.',
+            });
+
+            // Actualizar el DOM con los nuevos datos
+            camposEditables.forEach(campo => {
+                const span = document.getElementById(`${campo}-${id}`);
+                span.innerHTML = datosActualizados[campo.charAt(0).toUpperCase() + campo.slice(1)];
+            });
+        })
+        .catch(error => {
+            // Mostrar alerta de error con SweetAlert
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un problema al actualizar los datos.',
+            });
+            console.error("Error al actualizar los datos: ", error);
+        });
+}
+
+// Función para alternar entre editar y guardar
+function editarDatos(id) {
+    const editButton = document.getElementById(`editButton-${id}`);
+
+    if (editButton.textContent === 'Editar datos') {
+        // Habilitar edición
+        habilitarEdicion(id);
+        editButton.textContent = 'Guardar cambios';
+        editButton.classList.remove('btn-warning');
+        editButton.classList.add('btn-success');
+    } else {
+        // Guardar cambios
+        guardarCambios(id);
+        editButton.textContent = 'Editar datos';
+        editButton.classList.remove('btn-success');
+        editButton.classList.add('btn-secondary');
+    }
 }
 
 const usuario = "BOM6765";
@@ -98,18 +211,16 @@ const clave = "BOM6765";
 const codigoCliente = "6765";
 
 // Función para enviar datos a la API de Andesmar
-function enviarDatos(NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas) {
-    const button = document.getElementById(`andesmarButton${idOperacion}`);
-    const spinner = document.getElementById(`spinner${idOperacion}`);
-    const text = document.getElementById(`andesmarText${idOperacion}`);
-    const resultadoDiv = document.getElementById(`resultado${idOperacion}`);
-    const envioState = document.getElementById(`estadoEnvio${idOperacion}`);
-
-    console.log(envioState); // Verificar si el elemento existe
+function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, Producto) {
+    const button = document.getElementById(`andesmarButton${id}`);
+    const spinner = document.getElementById(`spinnerAndesmar${id}`);
+    const text = document.getElementById(`andesmarText${id}`);
+    const resultadoDiv = document.getElementById(`resultado${id}`);
+    const envioState = document.getElementById(`estadoEnvio${id}`);
 
     // Mostrar spinner y cambiar texto
     spinner.style.display = 'inline-block';
-    text.innerText = 'Generando...';
+    text.innerText = 'Generando Etiqueta...';
 
     // Dividir medidas para obtener alto, ancho y largo
     const [largo, ancho, alto] = medidas.split('x').map(Number);
@@ -127,17 +238,17 @@ function enviarDatos(NombreyApellido, Cp, idOperacion, calleDestinatario, altura
         NroRemito: idOperacion,
         Bultos: cantidad,
         Peso: peso,
-        ValorDeclarado: 100, // Reemplaza con el valor correcto
+        ValorDeclarado: 100, // Se Reemplazara cuando Leo envie este dato
         M3: volumenM3,
-        Alto: Array(cantidad).fill(alto), // Crear un array con el alto repetido
-        Ancho: Array(cantidad).fill(ancho), // Crear un array con el ancho repetido
-        Largo: Array(cantidad).fill(largo), // Crear un array con el largo repetido
+        Alto: Array(cantidad).fill(alto), 
+        Ancho: Array(cantidad).fill(ancho), 
+        Largo: Array(cantidad).fill(largo), 
         Observaciones: observaciones,
-        ModalidadEntrega: "Puerta-Puerta", // Reemplaza con el valor correcto
-        UnidadVenta: "cargas remito conformado", // Reemplaza con el valor correcto
+        ModalidadEntrega: "Puerta-Puerta", 
+        UnidadVenta: "cargas remito conformado", 
         servicio: {
-            EsFletePagoDestino: false, // Reemplaza con el valor correcto
-            EsRemitoconformado: true // Reemplaza con el valor correcto
+            EsFletePagoDestino: false, 
+            EsRemitoconformado: true 
         },
         logueo: {
             Usuario: usuario,
@@ -149,7 +260,8 @@ function enviarDatos(NombreyApellido, Cp, idOperacion, calleDestinatario, altura
     const proxyUrl = "https://proxy.cors.sh/";
     const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
 
-    console.log("Request a la API:", requestObj); // Mostrar request en consola
+
+    console.log(`Datos enviados a API Andesmar (ME1 ${idOperacion}):`, requestObj); // Mostrar request en consola
 
     fetch(proxyUrl + apiUrl, {
         method: "POST",
@@ -160,14 +272,14 @@ function enviarDatos(NombreyApellido, Cp, idOperacion, calleDestinatario, altura
         body: JSON.stringify(requestObj),
     })
     .then(response => {
-        console.log("Response de la API:", response); // Mostrar response en consola
+        console.log(`Datos Respuesta API Andesmar (ME1 ${idOperacion}):`, response); // Mostrar response en consola
         return response.json();
     })
     .then(data => {
         if (data.NroPedido) {
             const link = `https://andesmarcargas.com//ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
             // Cambiar el texto del botón a "Descargar + NroPedido"
-            text.innerHTML = `<i class="bi bi-file-earmark-arrow-down"></i> Descargar ${data.NroPedido}`;
+            text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
             button.classList.remove('btn-primary');
             button.classList.add('btn-success');
             button.onclick = () => window.open(link, '_blank'); // Cambiar la acción del botón para abrir el enlace
@@ -177,12 +289,12 @@ function enviarDatos(NombreyApellido, Cp, idOperacion, calleDestinatario, altura
                 envioState.className = 'em-circle-state2';
                 envioState.innerHTML = `Envio Preparado <i class="bi bi-check2-circle"></i>`;
             } else {
-                console.error(`El elemento con id estadoEnvio${idOperacion} no se encontró.`);
+                console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
             }
         } else {
             text.innerHTML = `No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
             button.classList.remove('btn-primary');
-            button.classList.add('btn-warning');
+            button.classList.add('btn-warning', 'btnAndesmarMeli');
         }
     })
     .catch(error => {
@@ -195,5 +307,229 @@ function enviarDatos(NombreyApellido, Cp, idOperacion, calleDestinatario, altura
     });
 }
 
+// Función para enviar datos a la API de Andreani
+const apiUrlLogin = 'https://apis.andreani.com/login';
+const apiUrlLabel = 'https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio';
+const username = 'novogar_gla';
+const password = 'JoBOraCDJZC';
+
+// Mapeo de provincias a códigos de región
+const regionMap = {
+    "Salta": "AR-A",
+    "buenos aires": "AR-B",
+    "capital federal": "AR-C",
+    "san luis": "AR-D",
+    "entre rios": "AR-E",
+    "la rioja": "AR-F",
+    "santiago del estero": "AR-G",
+    "chaco": "AR-H",
+    "san juan": "AR-J",
+    "catamarca": "AR-K",
+    "la pampa": "AR-L",
+    "mendoza": "AR-M",
+    "misiones": "AR-N",
+    "formosa": "AR-P",
+    "neuquen": "AR-Q",
+    "rio negro": "AR-R",
+    "santa fe": "AR-S",
+    "tucuman": "AR-T",
+    "chubut": "AR-U",
+    "tierra del Fuego": "AR-V",
+    "corrientes": "AR-W",
+    "cordoba": "AR-X",
+    "jujuy": "AR-Y",
+    "santa cruz": "AR-Z"
+};
+
+async function getAuthToken() {
+    try {
+        const response = await fetch(apiUrlLogin, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Basic ${btoa(`${username}:${password}`)}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Token de autenticación:', data.token);
+            return data.token; 
+        } else {
+            throw new Error('No se pudo obtener el token');
+        }
+    } catch (error) {
+        console.error('Error al obtener el token de autenticación:', error);
+    }
+}
+
+async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, Email, observaciones, peso, volumenCM3, cantidad, medidas, Producto) {
+    const buttonAndr = document.getElementById(`andreaniButton${id}`);
+    const spinnerAndr = document.getElementById(`spinnerAndreani${id}`);
+    const textAndr = document.getElementById(`andreaniText${id}`);
+    const resultadoDivAndr = document.getElementById(`resultado${id}`);
+    const envioStateAndr = document.getElementById(`estadoEnvio${id}`);
+
+    // Mostrar spinner y cambiar texto
+    spinnerAndr.style.display = 'inline-block';
+    textAndr.innerText = 'Generando Etiqueta...';
+
+    // Dividir medidas para obtener alto, ancho y largo
+    const [largo, ancho, alto] = medidas.split('x').map(Number);
+
+    const token = await getAuthToken();
+
+    // Obtener el nombre de la provincia y convertirlo a minúsculas
+    const provinciaNombre = Provincia.toLowerCase();
+    const regionCodigo = regionMap[provinciaNombre] || ""; // Obtener el código de región
+
+    // Inicializar el array de bultos
+    const bultos = [];
+    const pesoTotal = peso || 0; // Obtener peso total
+    const volumenTotal = volumenCM3 || 0; // Obtener volumen total
+
+    for (let i = 0; i < cantidad; i++) {
+        bultos.push({
+            "kilos": pesoTotal / cantidad,
+            "largoCm": null,
+            "altoCm": null,
+            "anchoCm": null,
+            "volumenCm": volumenTotal / cantidad,
+            "valorDeclaradoSinImpuestos": 99999 * 0.21,
+            "valorDeclaradoConImpuestos": 99999,
+            "referencias": [
+                { "meta": "detalle", "contenido": Producto },
+                { "meta": "idCliente", "contenido": (idOperacion + "-MELI").toUpperCase() },
+                { "meta": "observaciones", contenido: observaciones }
+            ]
+        });
+    }
+
+    const requestData = {
+        "contrato": volumenCM3 > 100000 ? "351002753" : "400017259",
+        "idPedido": (idOperacion + "-MELI").toUpperCase(),
+        "origen": {
+            "postal": {
+                "codigoPostal": "2126",
+                "calle": "R. Prov. 21 Km",
+                "numero": "4,9",
+                "localidad": "ALVEAR",
+                "region": "AR-S",
+                "pais": "Argentina"
+            }
+        },
+        "destino": {
+            "postal": {
+                "codigoPostal": Cp,
+                "calle": calleDestinatario,
+                "numero": alturaDestinatario,
+                "localidad": localidad,
+                "region": regionCodigo,
+                "pais": "Argentina"
+            }
+        },
+        "remitente": {
+            "nombreCompleto": "NOVOGAR.COM.AR",
+            "email": "posventa@novogar.com.ar",
+            "documentoTipo": "CUIT",
+            "documentoNumero": "30685437011",
+            "telefonos": [{ "tipo": 1, "numero": "3416680658" }]
+        },
+        "destinatario": [{
+            "nombreCompleto": NombreyApellido,
+            "email": Email,
+            "documentoTipo": "CUIT",
+            "documentoNumero": "30685437011",
+            "telefonos": [{ "tipo": 1, "numero": telefonoDestinatario }]
+        }],
+        "remito": {
+            "numeroRemito": (idOperacion + "-MELI").toUpperCase(),
+        },
+        "bultos": bultos
+    };
+
+    console.log(`Datos enviados a API ANDREANI (ME1 ${idOperacion}):`, requestData);
+
+    try {
+        const response = await fetch(apiUrlLabel, {
+            method: 'POST',
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                'x-authorization-token': token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const numeroDeEnvio = data.bultos[0].numeroDeEnvio;
+
+            console.log(`Datos Respuesta API ANDREANI (ME1 ${idOperacion}):`, response);
+            // Mostrar el número de envío
+            resultadoDivAndr.textContent = `Número de envío: ${numeroDeEnvio}`;
+
+            // Configurar el botón de descarga inicial
+            textAndr.innerHTML = `Orden ${numeroDeEnvio}`;
+            buttonAndr.classList.remove('btn-danger');
+            buttonAndr.classList.add('btn-secondary');
+        
+
+            // Cambiar el estado del envío
+            if (envioStateAndr) {
+                envioStateAndr.className = 'em-circle-state2';
+                envioStateAndr.innerHTML = `Envio Preparado <i class="bi bi-check2-circle"></i>`;
+            }
+
+            // Llamar a la API para obtener la etiqueta
+            await obtenerEtiqueta(numeroDeEnvio, token, buttonAndr);
+        } else {
+            console.error('Error al generar la etiqueta:', response.statusText);
+            buttonAndr.innerText = "Error ⚠️"; 
+            resultadoDivAndr.innerText = `Error: ${error.message}`; 
+            buttonAndr.disabled = true;
+        }
+    } catch (error) {
+        console.error('Error al generar la etiqueta:', error);
+        buttonAndr.innerText = "Error Andreani ⚠️"; 
+        buttonAndr.disabled = true;
+        resultadoDivAndr.innerText = `Error Andreani: (Puede No existir el CP o Localidad en Andreani) ${error.message}`; 
+    }
+}
+
+async function obtenerEtiqueta(numeroDeEnvio, token, buttonAndr) {
+    const url = `https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
+
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                "x-authorization-token": token,
+                "Accept": "application/pdf"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error HTTP! Status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const pdfUrl = URL.createObjectURL(blob);
+
+        buttonAndr.href = pdfUrl; // Establecer el href del botón
+        buttonAndr.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${numeroDeEnvio}`;
+        buttonAndr.classList.remove('btn-warning');
+        buttonAndr.classList.add('btn-success');
+        buttonAndr.onclick = () => window.open(pdfUrl, '_blank');
+    } catch (error) {
+        console.error('Error al obtener la etiqueta:', error);
+        buttonAndr.innerText = "Error en Etiquetado ⚠️"; // Cambiar texto en caso de error
+        resultadoDivAndr.innerText = `Error: ${error.message}`; // Mostrar error debajo
+        buttonAndr.disabled = true;
+    }
+}
+
 // Llama a cargarDatos para iniciar el proceso
 cargarDatos();
+
+
