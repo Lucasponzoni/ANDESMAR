@@ -77,8 +77,8 @@ function crearCard(data) {
         <div class="card position-relative">
 
         <!-- <div class="em-circle">ME1</div> CSS -->
-            <div class="em-circle-isFraud">Fraude</div>
-            <div id="estadoEnvio${data.id}" class="em-circle-state">Envio pendiente</div>
+            <div class="em-circle-isFraud">Fraude <i class="bi bi-exclamation-triangle-fill"></i></div>
+            <div id="estadoEnvio${data.id}" class="em-circle-state">Envio pendiente <i class="bi bi-stopwatch-fill"></i></i></div>
             <div class="card-body-meli">
                 <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> ${data.NombreyApellido}</h5>
                 <h6 class="user-title-meli">${data.nombreDeUsuario}</h6>

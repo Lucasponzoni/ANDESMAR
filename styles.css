@@ -1373,10 +1373,11 @@ div.card-body > p > i{
 
 .em-circle-isFraud{
     font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: 1.1rem;
+    font-size: .8rem;
+    text-transform: uppercase;
     padding-inline: 5px;
     padding: 5px;
-    border-radius: 10px;
+    border-radius: 5px;
     position: absolute;
     top: -18px; 
     right: 140px; 
@@ -1385,58 +1386,57 @@ div.card-body > p > i{
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    font-weight: bold; 
 }
 
 .em-circle-isNotFraud{
     font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: 1.1rem;
+    font-size: .8rem;
+    text-transform: uppercase;
     padding-inline: 5px;
     padding: 5px;
-    border-radius: 10px;
+    border-radius: 5px;
     position: absolute;
     top: -18px; 
-    right: 140px;
+    right: 120px; 
     background-color: green; 
     color: white;
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    font-weight: bold; 
 }
 
 .em-circle-state{
     font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: 1.1rem;
+    font-size: .8rem;
     padding-inline: 5px;
     padding: 5px;
-    border-radius: 10px;
+    border-radius: 5px;
     position: absolute;
     top: -18px; 
     right: 10px;
-    background-color: orange; 
+    background-color: rgb(70, 70, 70); 
+    text-transform: uppercase;
     color: white;
     display: flex; 
     align-items: center; 
     justify-content: center;
-    font-weight: bold; 
 }
 
 .em-circle-state2{
     font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: 1.1rem;
+    font-size: .8rem;
     padding-inline: 5px;
     padding: 5px;
-    border-radius: 10px;
+    border-radius: 5px;
     position: absolute;
     top: -18px; 
-    right: 100px;
+    right: 10px;
     background-color: green; 
+    text-transform: uppercase;
     color: white;
     display: flex; 
     align-items: center; 
     justify-content: center;
-    font-weight: bold; 
 }
 
 .em-state-andesmar{
