@@ -1379,7 +1379,7 @@ div.card-body > p > i{
     border-radius: 10px;
     position: absolute;
     top: -18px; 
-    right: 35px; 
+    right: 140px; 
     background-color: red; 
     color: white;
     display: flex; 
@@ -1396,7 +1396,7 @@ div.card-body > p > i{
     border-radius: 10px;
     position: absolute;
     top: -18px; 
-    right: 35px; 
+    right: 140px;
     background-color: green; 
     color: white;
     display: flex; 
@@ -1413,7 +1413,7 @@ div.card-body > p > i{
     border-radius: 10px;
     position: absolute;
     top: -18px; 
-    right: 100px;
+    right: 10px;
     background-color: orange; 
     color: white;
     display: flex; 

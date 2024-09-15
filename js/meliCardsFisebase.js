@@ -75,7 +75,8 @@ function crearCard(data) {
 
     cardDiv.innerHTML = `
         <div class="card position-relative">
-            <div class="em-circle">ME1</div>
+
+        <!-- <div class="em-circle">ME1</div> CSS -->
             <div class="em-circle-isFraud">Fraude</div>
             <div id="estadoEnvio${data.id}" class="em-circle-state">Envio pendiente</div>
             <div class="card-body-meli">
@@ -100,6 +101,7 @@ function crearCard(data) {
                         <p><i class="bi bi-123"></i> Altura: <span id="altura-${data.id}">${data.Altura}</span></p>
                         <p><i class="fas fa-phone"></i> Telefono: <span id="telefono-${data.id}">${data.Telefono}</span></p>
                         <p><i class="bi bi-envelope-at-fill"></i> Email: <span id="email-${data.id}">${data.Email}</span></p>
+                        <p><i class="bi bi-info-circle-fill"></i> Autorizado: <span id="autorizado-${data.id}">${data.Recibe}</span></p>
                         <p><i class="bi bi-sticky-fill"></i> Observaciones: <span id="observaciones-${data.id}">${data.Observaciones}</span></p>
                     </div>
                     <div class="dimensions-info">
@@ -128,6 +130,20 @@ function crearCard(data) {
             </div>
         </div>
     `;
+
+        // Lógica del botón de copiar al portapapeles
+        const copyButton = cardDiv.querySelector('.copy-btn');
+        copyButton.addEventListener('click', () => {
+            navigator.clipboard.writeText(data.idOperacion).then(() => {
+                copyButton.innerHTML = 'Copiado';
+                setTimeout(() => {
+                    copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+                }, 2000);
+            }).catch(err => {
+                console.error('Error al copiar al portapapeles: ', err);
+            });
+        });
+    
     return cardDiv;
 }
 
@@ -135,7 +151,7 @@ function crearCard(data) {
 function habilitarEdicion(id) {
     const camposEditables = [
         'calle', 'altura', 'telefono', 'email', 'observaciones',
-        'producto', 'sku', 'medidas', 'peso', 'volumenM3', 'volumenCM3', 'cantidad'
+        'producto', 'sku', 'medidas', 'peso', 'volumenM3', 'volumenCM3', 'cantidad', 'autorizado', 
     ];
 
     camposEditables.forEach(campo => {
@@ -149,7 +165,7 @@ function habilitarEdicion(id) {
 function guardarCambios(id) {
     const camposEditables = [
         'calle', 'altura', 'telefono', 'email', 'observaciones',
-        'producto', 'sku', 'medidas', 'peso', 'volumenM3', 'volumenCM3', 'cantidad'
+        'producto', 'sku', 'medidas', 'peso', 'volumenM3', 'volumenCM3', 'cantidad', 'autorizado',
     ];
 
     let datosActualizados = {};
