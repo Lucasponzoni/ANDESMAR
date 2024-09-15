@@ -112,7 +112,7 @@ function crearCard(data) {
                         <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.id}">${data['Volumen CM³']}</span> cm³</div>
                         <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.id}">${data.Cantidad}</span></div>
                     </div>
-                    <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.id}" onclick="editarDatos('${data.id}')">Editar datos</button>
+                    <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.id}" onclick="editarDatos('${data.id}')">Editar datos <i class="bi bi-pencil-square"></i></button>
                 </div>
                 <!-- Spinner Button Andesmar -->
                 <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.id}" onclick="enviarDatosAndesmar('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${data.Peso}, ${data['Volumen M³']}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
