@@ -236,10 +236,13 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
     const text = document.getElementById(`andesmarText${id}`);
     const resultadoDiv = document.getElementById(`resultado${id}`);
     const envioState = document.getElementById(`estadoEnvio${id}`);
+    const buttonAndr = document.getElementById(`andreaniButton${id}`);
 
     // Mostrar spinner y cambiar texto
     spinner.style.display = 'inline-block';
     text.innerText = 'Generando Etiqueta...';
+
+    buttonAndr.disabled = true;
 
     // Dividir medidas para obtener alto, ancho y largo
     const [largo, ancho, alto] = medidas.split('x').map(Number);
@@ -314,12 +317,14 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
             text.innerHTML = `No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
             button.classList.remove('btn-primary');
             button.classList.add('btn-warning', 'btnAndesmarMeli');
+            buttonAndr.disabled = false;
         }
     })
     .catch(error => {
         console.error("Error:", error);
         text.innerText = "No Disponible ⚠️"; // Cambiar texto en caso de error
         resultadoDiv.innerText = `Error: ${error.message}`; // Mostrar error debajo
+        buttonAndr.disabled = false;
     })
     .finally(() => {
         spinner.style.display = 'none'; // Asegúrate de ocultar el spinner en caso de error
@@ -387,10 +392,13 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
     const textAndr = document.getElementById(`andreaniText${id}`);
     const resultadoDivAndr = document.getElementById(`resultado${id}`);
     const envioStateAndr = document.getElementById(`estadoEnvio${id}`);
+    const button = document.getElementById(`andesmarButton${id}`);
 
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
     textAndr.innerText = 'Generando Etiqueta...';
+
+    button.disabled = true;
 
     // Dividir medidas para obtener alto, ancho y largo
     const [largo, ancho, alto] = medidas.split('x').map(Number);
@@ -505,12 +513,12 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
             console.error('Error al generar la etiqueta:', response.statusText);
             buttonAndr.innerText = "Error ⚠️"; 
             resultadoDivAndr.innerText = `Error: ${error.message}`; 
-            buttonAndr.disabled = true;
+            button.disabled = false;
         }
     } catch (error) {
         console.error('Error al generar la etiqueta:', error);
         buttonAndr.innerText = "Error Andreani ⚠️"; 
-        buttonAndr.disabled = true;
+        button.disabled = false;
         resultadoDivAndr.innerText = `Error Andreani: (Puede No existir el CP o Localidad en Andreani) ${error.message}`; 
     }
 }
