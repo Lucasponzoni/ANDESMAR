@@ -425,11 +425,11 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
 
     for (let i = 0; i < cantidad; i++) {
         bultos.push({
-            "kilos": pesoTotal / cantidad,
+            "kilos": pesoTotal,
             "largoCm": null,
             "altoCm": null,
             "anchoCm": null,
-            "volumenCm": volumenTotal / cantidad,
+            "volumenCm": volumenTotal,
             "valorDeclaradoSinImpuestos": 99999 * 0.21,
             "valorDeclaradoConImpuestos": 99999,
             "referencias": [
