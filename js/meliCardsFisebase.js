@@ -314,7 +314,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
                 console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
             }
         } else {
-            text.innerHTML = `No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
+            text.innerHTML = `Envio No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
             button.classList.remove('btn-primary');
             button.classList.add('btn-warning', 'btnAndesmarMeli');
             buttonAndr.disabled = false;
@@ -322,7 +322,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
     })
     .catch(error => {
         console.error("Error:", error);
-        text.innerText = "No Disponible ⚠️"; // Cambiar texto en caso de error
+        text.innerText = "Envio No Disponible ⚠️"; // Cambiar texto en caso de error
         resultadoDiv.innerText = `Error: ${error.message}`; // Mostrar error debajo
         buttonAndr.disabled = false;
     })
