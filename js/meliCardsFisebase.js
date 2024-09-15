@@ -112,7 +112,7 @@ function crearCard(data) {
                         <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.id}">${data['Volumen CM³']}</span> cm³</div>
                         <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.id}">${data.Cantidad}</span></div>
                     </div>
-                    <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.id}" onclick="editarDatos('${data.id}')">Editar datos <i class="bi bi-pencil-square"></i></button>
+                    <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.id}" onclick="editarDatos('${data.id}')">Editar datos</button>
                 </div>
                 <!-- Spinner Button Andesmar -->
                 <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.id}" onclick="enviarDatosAndesmar('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${data.Peso}, ${data['Volumen M³']}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
@@ -152,32 +152,29 @@ function guardarCambios(id) {
         'producto', 'sku', 'medidas', 'peso', 'volumenM3', 'volumenCM3', 'cantidad'
     ];
 
-    // Obtener los valores actualizados de los inputs
     let datosActualizados = {};
     camposEditables.forEach(campo => {
         const input = document.getElementById(`input-${campo}-${id}`);
-        datosActualizados[campo.charAt(0).toUpperCase() + campo.slice(1)] = input.value;
+        if (input) {
+            datosActualizados[campo.charAt(0).toUpperCase() + campo.slice(1)] = input.value;
+        }
     });
 
-    // Actualizar los datos en Firebase
     const ref = database.ref(`envios/${id}`);
     ref.update(datosActualizados)
         .then(() => {
-            // Mostrar alerta de éxito con SweetAlert
             Swal.fire({
                 icon: 'success',
                 title: 'Datos actualizados',
                 text: 'Los datos han sido actualizados correctamente.',
             });
 
-            // Actualizar el DOM con los nuevos datos
             camposEditables.forEach(campo => {
                 const span = document.getElementById(`${campo}-${id}`);
-                span.innerHTML = datosActualizados[campo.charAt(0).toUpperCase() + campo.slice(1)];
+                span.textContent = datosActualizados[campo.charAt(0).toUpperCase() + campo.slice(1)];
             });
         })
         .catch(error => {
-            // Mostrar alerta de error con SweetAlert
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -191,20 +188,26 @@ function guardarCambios(id) {
 function editarDatos(id) {
     const editButton = document.getElementById(`editButton-${id}`);
 
-    if (editButton.textContent === 'Editar datos') {
-        // Habilitar edición
+    if (editButton.textContent.trim() === 'Editar datos') {
         habilitarEdicion(id);
         editButton.textContent = 'Guardar cambios';
         editButton.classList.remove('btn-warning');
         editButton.classList.add('btn-success');
     } else {
-        // Guardar cambios
         guardarCambios(id);
         editButton.textContent = 'Editar datos';
         editButton.classList.remove('btn-success');
         editButton.classList.add('btn-secondary');
     }
 }
+
+// Usar addEventListener para manejar el evento de clic
+document.querySelectorAll('.editarDatos').forEach(button => {
+    button.addEventListener('click', function() {
+        const id = this.id.split('-')[1]; // Extraer el ID del botón
+        editarDatos(id);
+    });
+});
 
 const usuario = "BOM6765";
 const clave = "BOM6765";
