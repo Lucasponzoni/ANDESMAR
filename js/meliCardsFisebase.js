@@ -283,7 +283,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
     const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
 
 
-    console.log(`Datos enviados a API Andesmar (ME1 ${idOperacion}):`, requestObj); // Mostrar request en consola
+    console.log(`Datos enviados a API Andesmar (MELI ${idOperacion}):`, requestObj); // Mostrar request en consola
 
     fetch(proxyUrl + apiUrl, {
         method: "POST",
@@ -294,7 +294,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
         body: JSON.stringify(requestObj),
     })
     .then(response => {
-        console.log(`Datos Respuesta API Andesmar (ME1 ${idOperacion}):`, response); // Mostrar response en consola
+        console.log(`Datos Respuesta API Andesmar (MELI ${idOperacion}):`, response); // Mostrar response en consola
         return response.json();
     })
     .then(data => {
@@ -474,7 +474,7 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
         "bultos": bultos
     };
 
-    console.log(`Datos enviados a API ANDREANI (ME1 ${idOperacion}):`, requestData);
+    console.log(`Datos enviados a API ANDREANI (MELI ${idOperacion}):`, requestData);
 
     try {
         const response = await fetch(apiUrlLabel, {
@@ -491,7 +491,7 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
             const data = await response.json();
             const numeroDeEnvio = data.bultos[0].numeroDeEnvio;
 
-            console.log(`Datos Respuesta API ANDREANI (ME1 ${idOperacion}):`, response);
+            console.log(`Datos Respuesta API ANDREANI (MELI ${idOperacion}):`, response);
             // Mostrar el número de envío
             resultadoDivAndr.textContent = `Número de envío: ${numeroDeEnvio}`;
 
