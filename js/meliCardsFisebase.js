@@ -40,13 +40,13 @@ function cargarDatos() {
                     Producto: data.Producto,
                     Provincia: data.Provincia,
                     Recibe: data.Recibe,
-                    SKU: data.SKU,
+                    SKU: data.Sku,
                     Telefono: data.Telefono,
-                    'Volumen CM³': data['Volumen CM³'],
-                    'Volumen M³': data['Volumen M³'],
-                    idOperacion: data.idOperacion, // Cambiado aquí
+                    VolumenCM3: data.VolumenCM3,
+                    VolumenM3: data.VolumenM3,
+                    idOperacion: data.idOperacion,
                     localidad: data.localidad,
-                    medidas: data.medidas,
+                    medidas: data.Medidas,
                     nombreDeUsuario: data.nombreDeUsuario
                 });
             });
@@ -75,10 +75,8 @@ function crearCard(data) {
 
     cardDiv.innerHTML = `
         <div class="card position-relative">
-
-        <!-- <div class="em-circle">ME1</div> CSS -->
             <div class="em-circle-isFraud">Fraude <i class="bi bi-exclamation-triangle-fill"></i></div>
-            <div id="estadoEnvio${data.id}" class="em-circle-state">Envio pendiente <i class="bi bi-stopwatch-fill"></i></i></div>
+            <div id="estadoEnvio${data.id}" class="em-circle-state">Envio pendiente <i class="bi bi-stopwatch-fill"></i></div>
             <div class="card-body-meli">
                 <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> ${data.NombreyApellido}</h5>
                 <h6 class="user-title-meli">${data.nombreDeUsuario}</h6>
@@ -97,6 +95,19 @@ function crearCard(data) {
                 </button>
                 <div class="collapse" id="collapseDetails${data.id}">
                     <div class="little-card-meli">
+                        <p>
+                            <i class="fas fa-map-marker-alt"></i> Envio: 
+                            <span id="localidadDeEnvio-${data.id}">${data.Cp}, ${data.localidad}, ${data.Provincia}</span>
+                            <button class="btn btn-link btn-sm" onclick="editarLocalidad('${data.id}')"><i class="bi bi-pencil-square"></i></button>
+                            <button id="btnBorrar-${data.id}" class="btn btn-outline-danger btn-sm" style="display: none;" onclick="borrarLocalidad('${data.id}')">Borrar localidad <i class="bi bi-x-circle"></i></button>
+                        </p>
+                        <div id="inputLocalidad-${data.id}" style="display:none;">
+                            <input type="text" id="localidadInput-${data.id}" 
+                                   placeholder="Buscar localidad" 
+                                   oninput="buscarLocalidades('${data.id}', this.value)" 
+                                   class="form-control"/>
+                            <div id="sugerencias-${data.id}" class="sugerencias" style="display: none;"></div>
+                        </div>
                         <p><i class="fas fa-home"></i> Calle: <span id="calle-${data.id}">${data.Calle}</span></p>
                         <p><i class="bi bi-123"></i> Altura: <span id="altura-${data.id}">${data.Altura}</span></p>
                         <p><i class="fas fa-phone"></i> Telefono: <span id="telefono-${data.id}">${data.Telefono}</span></p>
@@ -110,19 +121,17 @@ function crearCard(data) {
                         <div><i class="bi bi-code-square"></i> SKU: <span id="sku-${data.id}">${data.SKU}</span></div>
                         <div><i class="bi bi-arrows-angle-expand"></i> Medidas: <span id="medidas-${data.id}">${data.medidas}</span></div>
                         <div><i class="bi bi-box-arrow-in-down"></i> Peso: <span id="peso-${data.id}">${data.Peso}</span> kg</div>
-                        <div><i class="bi bi-box"></i> Volumen M³: <span id="volumenM3-${data.id}">${data['Volumen M³']}</span> m³</div>
-                        <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.id}">${data['Volumen CM³']}</span> cm³</div>
+                        <div><i class="bi bi-box"></i> Volumen M³: <span id="volumenM3-${data.id}">${data.VolumenM3}</span> m³</div>
+                        <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.id}">${data.VolumenCM3}</span> cm³</div>
                         <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.id}">${data.Cantidad}</span></div>
                     </div>
                     <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.id}" onclick="editarDatos('${data.id}')">Editar datos</button>
                 </div>
-                <!-- Spinner Button Andesmar -->
-                <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.id}" onclick="enviarDatosAndesmar('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${data.Peso}, ${data['Volumen M³']}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
+                <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.id}" onclick="enviarDatosAndesmar('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${data.Peso}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
                     <span id="andesmarText${data.id}"><i class="bi bi-file-text"></i> Etiqueta Andesmar</span>
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.id}"></span>
                 </button>
-                <!-- Spinner Button Andreani -->
-                <button class="btn btn-danger btnAndreaniMeli" id="andreaniButton${data.id}" onclick="enviarDatosAndreani('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${data.Peso}, ${data['Volumen CM³']}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
+                <button class="btn btn-danger btnAndreaniMeli" id="andreaniButton${data.id}" onclick="enviarDatosAndreani('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${data.Peso}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
                     <span id="andreaniText${data.id}"><i class="bi bi-file-text"></i> Etiqueta Andreani</span>
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.id}" style="display:none;"></span>
                 </button>
@@ -131,19 +140,19 @@ function crearCard(data) {
         </div>
     `;
 
-        // Lógica del botón de copiar al portapapeles
-        const copyButton = cardDiv.querySelector('.copy-btn');
-        copyButton.addEventListener('click', () => {
-            navigator.clipboard.writeText(data.idOperacion).then(() => {
-                copyButton.innerHTML = 'Copiado';
-                setTimeout(() => {
-                    copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
-                }, 2000);
-            }).catch(err => {
-                console.error('Error al copiar al portapapeles: ', err);
-            });
+    // Lógica del botón de copiar al portapapeles
+    const copyButton = cardDiv.querySelector('.copy-btn');
+    copyButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(data.idOperacion).then(() => {
+            copyButton.innerHTML = 'Copiado';
+            setTimeout(() => {
+                copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+            }, 2000);
+        }).catch(err => {
+            console.error('Error al copiar al portapapeles: ', err);
         });
-    
+    });
+
     return cardDiv;
 }
 
@@ -230,7 +239,7 @@ const clave = "BOM6765";
 const codigoCliente = "6765";
 
 // Función para enviar datos a la API de Andesmar
-function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, Producto) {
+function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto) {
     const button = document.getElementById(`andesmarButton${id}`);
     const spinner = document.getElementById(`spinnerAndesmar${id}`);
     const text = document.getElementById(`andesmarText${id}`);
@@ -245,7 +254,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
     buttonAndr.disabled = true;
 
     // Dividir medidas para obtener alto, ancho y largo
-    const [largo, ancho, alto] = medidas.split('x').map(Number);
+    const [largo, ancho, alto] = Medidas.split('x').map(Number);
 
     // Aquí debes definir los datos que se enviarán a la API
     const requestObj = {
@@ -265,7 +274,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
         Alto: Array(cantidad).fill(alto), 
         Ancho: Array(cantidad).fill(ancho), 
         Largo: Array(cantidad).fill(largo), 
-        Observaciones: observaciones,
+        Observaciones: observaciones + Producto,
         ModalidadEntrega: "Puerta-Puerta", 
         UnidadVenta: "cargas remito conformado", 
         servicio: {

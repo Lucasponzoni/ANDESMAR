@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Datos a Firebase</title>
+     <!-- Scripts Firebase-->
+     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>>
+    <script>
+        // Inicializa Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMu2vPvNzhv0cM3b4RItmqZybRhhR_HJM",
+            authDomain: "despachos-meli-novogar.firebaseapp.com",
+            projectId: "despachos-meli-novogar",
+            storageBucket: "despachos-meli-novogar.appspot.com",
+            messagingSenderId: "774252628334",
+            appId: "1:774252628334:web:623aa84bc3b1cebd3f997f",
+            measurementId: "G-E0E9K4TEDW"
+        };
+
+        // Inicializa Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database(app);
+
+        // Función para generar un idOperacion válido
+        function generarIdOperacion() {
+            const randomPart = Math.floor(Math.random() * 1000000000000).toString().padStart(13, '0'); // Genera un número aleatorio de 13 dígitos
+            return `200000${randomPart}`;
+        }
+
+        // Función para enviar datos a Firebase
+        const datosEnvio = {
+    Altura: "2800", // Altura de la calle
+    Calle: "Calle Mendoza",
+    Cantidad: 4,
+    Correosugerido: "Correo Argentino",
+    Cp: "1200",
+    Email: "sofia@correo.com",
+    NombreyApellido: "Sofía Gómez",
+    Observaciones: "Llamar al llegar",
+    Peso: 50, // Peso de la caja de libros
+    Producto: "Caja de libros de texto",
+    Provincia: "Buenos Aires",
+    Recibe: "Sofía Gómez",
+    Sku: "LIBROS2023", // SKU del producto
+    Telefono: "1166778899",
+    VolumenM3: 0.1, // 100,000 cm³ = 0.1 m³
+    VolumenCM3: 100000, // Asegurarse de que sea mayor a 100,000 cm³
+    idOperacion: generarIdOperacion(),
+    localidad: "La Plata",
+    Medidas: "40x30x25", // Medidas de la caja
+    nombreDeUsuario: "sofiag"
+};
+
+
+            // Pushea los datos a Firebase
+            database.ref('envios').push(datosEnvio)
+                .then(() => {
+                    alert("Datos enviados correctamente.");
+                })
+                .catch((error) => {
+                    console.error("Error al enviar los datos: ", error);
+                });
+        
+    </script>
+</head>
+<body>
+    <h1>Enviar Datos a Firebase</h1>
+    <button onclick="enviarDatos()">Enviar Datos</button>
+</body>
+</html>

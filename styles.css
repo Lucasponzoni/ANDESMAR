@@ -1531,3 +1531,25 @@ div.card-body > p > i{
 .editarDatos{
     margin-bottom: 5px !important;
 }
+
+.sugerencias {
+    width: 91%;
+    font-family: "Chakra Petch", sans-serif;
+    font-size: .8rem;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    background: white;
+    z-index: 1000;
+}
+
+.sugerencia {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.sugerencia:hover {
+    background-color: cornflowerblue;
+    color: white;
+}
