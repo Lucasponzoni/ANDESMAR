@@ -1553,3 +1553,13 @@ div.card-body > p > i{
     background-color: cornflowerblue;
     color: white;
 }
+
+.numeroDeEnvioGenerado{
+    margin-bottom: 5px !important;
+    text-align: center;
+    color: red;
+    border: dashed 2px red;
+    font-weight: 800 !important;
+    padding: .2rem;
+    border-radius: 5px;
+}

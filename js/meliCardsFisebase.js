@@ -90,10 +90,12 @@ function crearCard(data) {
                         <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
+                
                 <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails${data.id}" aria-expanded="false" aria-controls="collapseDetails${data.id}">
                     <i class="bi bi-chevron-down"></i> Ver más detalles
                 </button>
                 <div class="collapse" id="collapseDetails${data.id}">
+                    <p class="numeroDeEnvioGenerado" id="numeroDeEnvioGenerado${data.id}">Número de Envío Pendiente</p>
                     <div class="little-card-meli">
                         <p>
                             <i class="fas fa-map-marker-alt"></i> Envio: 
@@ -246,6 +248,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
     const resultadoDiv = document.getElementById(`resultado${id}`);
     const envioState = document.getElementById(`estadoEnvio${id}`);
     const buttonAndr = document.getElementById(`andreaniButton${id}`);
+    const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
 
     // Mostrar spinner y cambiar texto
     spinner.style.display = 'inline-block';
@@ -309,13 +312,12 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
     .then(data => {
         if (data.NroPedido) {
             const link = `https://andesmarcargas.com//ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
-            // Cambiar el texto del botón a "Descargar + NroPedido"
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
             button.classList.remove('btn-primary');
             button.classList.add('btn-success');
-            button.onclick = () => window.open(link, '_blank'); // Cambiar la acción del botón para abrir el enlace
+            button.onclick = () => window.open(link, '_blank'); 
+            NroEnvio.innerHTML = `<a href="https://andesmarcargas.com/seguimiento.html?numero=${idOperacion}&tipo=remito&cod=" target="_blank">Andesmar: ${idOperacion} <i class="bi bi-box-arrow-up-right"></i></a>`;
             
-            // Cambiar el estado del envío
             if (envioState) {
                 envioState.className = 'em-circle-state2';
                 envioState.innerHTML = `Envio Preparado <i class="bi bi-check2-circle"></i>`;
@@ -402,6 +404,7 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
     const resultadoDivAndr = document.getElementById(`resultado${id}`);
     const envioStateAndr = document.getElementById(`estadoEnvio${id}`);
     const button = document.getElementById(`andesmarButton${id}`);
+    const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
 
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
@@ -502,7 +505,7 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
 
             console.log(`Datos Respuesta API ANDREANI (MELI ${idOperacion}):`, response);
             // Mostrar el número de envío
-            resultadoDivAndr.textContent = `Número de envío: ${numeroDeEnvio}`;
+            NroEnvio.innerHTML = `<a href="https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}" target="_blank">Andreani: ${numeroDeEnvio} <i class="bi bi-box-arrow-up-right"></i></a>`;
 
             // Configurar el botón de descarga inicial
             textAndr.innerHTML = `Orden ${numeroDeEnvio}`;
