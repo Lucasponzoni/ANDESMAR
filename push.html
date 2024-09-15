@@ -26,7 +26,7 @@
 
         // Función para generar un idOperacion válido
         function generarIdOperacion() {
-            const randomPart = Math.floor(Math.random() * 1000000000000).toString().padStart(13, '0'); // Genera un número aleatorio de 13 dígitos
+            const randomPart = Math.floor(Math.random() * 1000000000).toString().padStart(13, '0'); // Genera un número aleatorio de 10 dígitos
             return `200000${randomPart}`;
         }
 
