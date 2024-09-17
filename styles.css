@@ -1564,7 +1564,7 @@ div.card-body > p > i{
     border-radius: 5px;
 }
 
-
+/* MODAL ANDESMAR */
 /* Contenedor principal de la línea de tiempo */
 .timeline-container {
     display: flex;
@@ -1745,4 +1745,6 @@ div.card-body > p > i{
     justify-content: center;
     align-items: center;
 }
+
+/* FIN MODAL ANDESMAR */
 
