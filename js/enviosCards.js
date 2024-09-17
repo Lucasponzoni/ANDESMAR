@@ -292,20 +292,24 @@ document.addEventListener("DOMContentLoaded", function() {
     }    
 
     // Buscador
-    searchInput.addEventListener("input", function() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const filteredData = allData.filter(item => {
-            return Object.values(item).some(value => 
-                value.toString().toLowerCase().includes(searchTerm)
-            );
-        });
+searchInput.addEventListener("input", function() {
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    // Restablecer la paginación a la primera página
+    currentPage = 1;
+    currentPageGroup = 0;  // También restablecemos el grupo de páginas
 
-        renderCards(filteredData);
-        
-        if (filteredData.length === 0) {
-            cardsContainer.innerHTML = `<img src="./Img/error.gif" class="error" alt="No encontrado" style="display: block; margin: auto;">`;
-        }
+    // Filtrar los datos
+    const filteredData = allData.filter(item => {
+        return Object.values(item).some(value => 
+            value.toString().toLowerCase().includes(searchTerm)
+        );
     });
+    
+    // Renderizar las tarjetas y actualizar la paginación con los datos filtrados
+    renderCards(filteredData);
+    updatePagination(filteredData.length);
+});
 
     // Filtro de orden
     filterSelect.addEventListener("change", function() {
