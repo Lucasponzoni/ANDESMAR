@@ -1674,6 +1674,17 @@ div.card-body > p > i{
     padding-inline: 5px;
 }
 
+
+@media (max-width: 780px) {
+    .timeline-content h6 {
+        padding-left: 30px;
+    }
+    
+    .timeline-content p {
+        padding-left: 30px;
+    }
+}
+
 /* Contenido de la línea de tiempo */
 .timeline-content {
     margin-left: 60px;
