@@ -385,7 +385,7 @@ function createTimeline(data, clienteAndesmar) {
             </div>
             <h5>Número de Guía: ${data.NroGuia}</h5>
             <p>Destinatario: ${clienteAndesmar.toUpperCase()}</p>
-            <p>Descripción de Unidad de Venta: ${data.UnidadVentaDescrip}</p>
+            <p>Metodo de Entrega: ${data.UnidadVentaDescrip}</p>
             <p>Modalidad de Entrega: ${data.ModalidadEntregaDescrip}</p>
             <p>Estado Actual: ${data.EstadoActual}</p>
             <p>Número de Remito del Cliente: ${data.NroRemitoCliente}</p>
