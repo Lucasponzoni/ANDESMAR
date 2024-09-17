@@ -1565,62 +1565,173 @@ div.card-body > p > i{
 }
 
 
+/* Contenedor principal de la línea de tiempo */
 .timeline-container {
     display: flex;
-    flex-direction: row;
-    align-items: flex-start;
+    flex-direction: column;
     margin: 20px 0;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    border: 1px solid #ebebeb;
 }
 
+/* Contenedor de información superior (detalles de la guía, estado, etc.) */
+.info-container {
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.215);
+}
+
+.info-container h5 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: cornflowerblue; /* Azul estilo iOS */
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+.info-container p {
+    font-size: 0.95rem;
+    color: #333;
+    margin: 5px 0;
+    line-height: 1.6;
+}
+
+/* Estilo de títulos secundarios */
+.info-container h6 {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #555;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid cornflowerblue;
+    padding-bottom: 5px;
+}
+
+/* Estilo para la línea de tiempo */
 .timeline {
     position: relative;
-    width: 100%;
     padding-left: 20px;
-    margin-left: 20px;
     list-style: none;
+    margin: 20px 0;
+    width: 100%;
 }
 
+/* Línea vertical */
 .timeline::before {
     content: '';
     position: absolute;
-    left: 0;
-    top: 0;
+    left: 20px;
+    top: -20px;
     bottom: 0;
     width: 2px;
-    background: #007bff;
+    background: cornflowerblue; /* Azul estilo iOS */
 }
 
+/* Elementos de la línea de tiempo */
 .timeline-item {
     position: relative;
-    margin: 10px 0;
-    padding-left: 30px;
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    width: 100%;
 }
 
-.timeline-item h6 {
-    font-size: 0.9rem;
+.timeline-item:last-child {
+    background-color: #fbf7bd;
+    border: 2px dotted cornflowerblue; /* Azul estilo iOS */
+    padding: 0.3rem;
+    border-radius: 0 10px 10px 0;
+}
+
+/* Círculo numerado */
+.timeline-circle {
+    position: absolute;
+    left: -15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: orange; /* Rojo estilo iOS */
+    color: #fff;
+    border-radius: 10%;
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.timeline-circle.last{
+    position: absolute;
+    left: -30px;
+    background-color:orangered;
+    width: fit-content;
+    padding-inline: 5px;
+}
+
+/* Contenido de la línea de tiempo */
+.timeline-content {
+    margin-left: 60px;
+    padding-left: 10px;
+    width: calc(100% - 40px); /* Restar el espacio ocupado por el círculo */
+    border-left: 2px solid transparent;
+}
+
+.timeline-content h6 {
+    font-size: 1rem;
     font-weight: bold;
     margin: 0;
-    color: #333;
+    color: #000;
 }
 
-.timeline-item p {
-    font-size: 0.8rem;
+.timeline-content p {
+    font-size: 0.9rem;
     margin: 5px 0;
     color: #666;
 }
 
-.info {
-    flex: 1;
-    padding-left: 20px;
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .timeline-item {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%; /* Asegurarse de que mantenga el ancho completo en móviles */
+    }
+
+    .timeline-circle {
+        margin-bottom: 10px;
+    }
+
+    .timeline-content {
+        margin-left: 0;
+        padding-left: 0;
+        width: 100%;
+    }
 }
 
-.info h5 {
-    font-size: 1rem;
-    font-weight: bold;
-    color: #007bff;
+.historialAndesmar{
+    text-transform: uppercase;
+    font-family: "Chakra Petch", sans-serif;
+    width: fit-content;
+    background-color: orangered;
+    padding: .3rem;
+    border-radius: 10px;
+    color: white;
 }
 
-.info p {
-    font-size: 0.8rem;
-    color: #444;
+.Andesmar-track{
+    border: 2px dashed #6394ed;
+    border-radius: 10px;
+    padding: .3rem;
+    overflow: hidden;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+

@@ -102,14 +102,15 @@ document.addEventListener("DOMContentLoaded", function() {
                             <img class="blueSpinner" src="./Img/spinner.gif" alt="Cargando...">
                         </div>
 
-                        <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Seguir</a>
-                        <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
-
                         <!-- Botón para abrir el modal -->
-                        <button class="btn btn-info mt-1 open-tracking" data-nropedido="${item.nroPedido}" data-bs-toggle="modal" data-bs-target="#trackingModal">
+                        <button class="btn btn-info mt-1 open-tracking" data-nropedido="${item.nroPedido}" data-clienteAndesmar="${item.nombreApellido}" data-bs-toggle="modal" data-bs-target="#trackingModal">
                         <i class="bi bi-eye"></i>Track 
                         </button>
-                       
+
+                        <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
+
+                        <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-secondary"><i class="bi bi-box-arrow-up-right"></i></a>
+
                         <button class="btn btn-success btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${item.id}" aria-expanded="false" aria-controls="collapseObservaciones-${item.id}">
                         <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
                         </button>
@@ -327,11 +328,11 @@ searchInput.addEventListener("input", function() {
     });
 });
 
-
 document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("click", function(event) {
         if (event.target.classList.contains("open-tracking")) {
             const nroPedido = event.target.getAttribute("data-nropedido");
+            const clienteAndesmar = event.target.getAttribute("data-clienteAndesmar");
             const trackingContent = document.getElementById("trackingContent");
 
             // Mostrar cargando
@@ -361,13 +362,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 return response.json();
             })
             .then(data => {
-                const timelineHTML = createTimeline(data);
-                trackingContent.innerHTML = timelineHTML;
+                const timelineHTML = createTimeline(data, clienteAndesmar);
+                trackingContent.innerHTML = timelineHTML + createDownloadButton(); // Agregar botón de descarga
             })
             .catch(error => {
                 console.error('Error al obtener el seguimiento:', error);
                 if (trackingContent) {
-                    trackingContent.innerHTML = 'Error al cargar los datos.';
+                    trackingContent.innerHTML = 'Error al cargar los datos. Pedido pendiente de ingreso en sistema.';
                 } else {
                     console.error('Elemento trackingContent no encontrado.');
                 }
@@ -376,29 +377,87 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-function createTimeline(data) {
+function createTimeline(data, clienteAndesmar) {
     let timelineHTML = `
-        <h5>Número de Guía: ${data.NroGuia}</h5>
-        <p>Descripción de Unidad de Venta: ${data.UnidadVentaDescrip}</p>
-        <p>Modalidad de Entrega: ${data.ModalidadEntregaDescrip}</p>
-        <p>Estado Actual: ${data.EstadoActual}</p>
-        <p>Número de Remito del Cliente: ${data.NroRemitoCliente}</p>
-        <p>Fecha de Emisión: ${new Date(data.FechaEmision).toLocaleString()}</p>
-        <p>Origen: ${data.Origen}</p>
-        <p>Número de Pedido: ${data.NroPedido}</p>
-        <p>Destino: ${data.Destino}</p>
-        <h6>Historial de Estados:</h6>
+        <div class="info-container">
+            <div class="Andesmar-track">
+                <img src="./Img/marca-andesmar.png" alt="Andesmar Cargas">
+            </div>
+            <h5>Número de Guía: ${data.NroGuia}</h5>
+            <p>Destinatario: ${clienteAndesmar.toUpperCase()}</p>
+            <p>Descripción de Unidad de Venta: ${data.UnidadVentaDescrip}</p>
+            <p>Modalidad de Entrega: ${data.ModalidadEntregaDescrip}</p>
+            <p>Estado Actual: ${data.EstadoActual}</p>
+            <p>Número de Remito del Cliente: ${data.NroRemitoCliente}</p>
+            <p>Fecha de Emisión: ${new Date(data.FechaEmision).toLocaleString()}</p>
+            <p>Origen: ${data.Origen}</p>
+            <p>Número de Pedido: ${data.NroPedido}</p>
+            <p>Destino: ${data.Destino}</p>
+        </div>
+        <h6 class="historialAndesmar">Historial de Estados:</h6>
         <ul class="timeline">`;
 
-    data.ListaEstadosHistorico.forEach(estado => {
+    data.ListaEstadosHistorico.forEach((estado, index) => {
+        const isLast = index === data.ListaEstadosHistorico.length - 1;
+        const itemNumber = isLast ? "Último" : index + 1;
+        const circleClass = isLast ? "timeline-circle last" : "timeline-circle";
+        
+        const fecha = new Date(estado.FechaHis);
+        const dia = String(fecha.getDate()).padStart(2, '0');
+        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+        const año = fecha.getFullYear();
+        const horas = String(fecha.getHours() % 12 || 12).padStart(2, '0');
+        const minutos = String(fecha.getMinutes()).padStart(2, '0');
+        const ampm = fecha.getHours() >= 12 ? 'PM' : 'AM';
+        
+        const fechaFormateada = `Día: ${dia}/${mes}/${año} - Horario: ${horas}:${minutos}, ${ampm}`;
+
         timelineHTML += `
             <li class="timeline-item">
-                <h6>${estado.FechaHis}</h6>
-                <p>${estado.Estado} en ${estado.LocalidadDescrip}</p>
+                <span class="${circleClass}">${itemNumber}</span>
+                <div class="timeline-content">
+                    <h6>${fechaFormateada}</h6>
+                    <p>${estado.Estado} en ${estado.LocalidadDescrip}</p>
+                </div>
             </li>`;
     });
 
-    timelineHTML += `</ul>`;
-    
+    timelineHTML += `</ul></div>`;
     return timelineHTML;
 }
+
+function createDownloadButton() {
+    return `
+        <button id="downloadPdf" class="btn btn-danger" style="margin-top: 20px;">
+            <i class="fas fa-download"></i> Descargar en PDF
+        </button>`;
+}
+
+// Evento para manejar la descarga del PDF
+document.addEventListener("click", function(event) {
+    if (event.target.id === "downloadPdf") {
+        generatePDF(); // Descargar PDF directamente
+    }
+});
+
+// Función para generar el PDF con nombre personalizado
+function generatePDF() {
+    const trackingContent = document.getElementById("trackingContent");
+
+    // Obtener el nombre del destinatario y el número de guía
+    const destinatario = document.querySelector('[data-clienteAndesmar]').getAttribute('data-clienteAndesmar');
+    const nroGuia = trackingContent.querySelector('h5').textContent.replace('Número de Guía: ', '');
+
+    // Configuración de html2pdf con el nombre del archivo dinámico
+    const opt = {
+        margin:       1,
+        filename: `Seguimiento_${destinatario.toUpperCase()}_${nroGuia}.pdf`,  // Nombre del archivo PDF personalizado
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    // Generar y descargar el PDF
+    html2pdf().from(trackingContent).set(opt).save();
+}
+
