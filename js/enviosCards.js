@@ -436,22 +436,18 @@ function createDownloadButton() {
 // Evento para manejar la descarga del PDF
 document.addEventListener("click", function(event) {
     if (event.target.id === "downloadPdf") {
-        generatePDF(); // Descargar PDF directamente
+        generatePDF();
     }
 });
 
 // Función para generar el PDF con nombre personalizado
 function generatePDF() {
     const trackingContent = document.getElementById("trackingContent");
-
-    // Obtener el nombre del destinatario y el número de guía
     const destinatario = document.querySelector('[data-clienteAndesmar]').getAttribute('data-clienteAndesmar');
     const nroGuia = trackingContent.querySelector('h5').textContent.replace('Número de Guía: ', '');
-
-    // Configuración de html2pdf con el nombre del archivo dinámico
     const opt = {
         margin:       1,
-        filename: `Seguimiento_${destinatario.toUpperCase()}_${nroGuia}.pdf`,  // Nombre del archivo PDF personalizado
+        filename: `Seguimiento_${destinatario.toUpperCase()}_${nroGuia}.pdf`, 
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
