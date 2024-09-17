@@ -1563,3 +1563,64 @@ div.card-body > p > i{
     padding: .2rem;
     border-radius: 5px;
 }
+
+
+.timeline-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin: 20px 0;
+}
+
+.timeline {
+    position: relative;
+    width: 100%;
+    padding-left: 20px;
+    margin-left: 20px;
+    list-style: none;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #007bff;
+}
+
+.timeline-item {
+    position: relative;
+    margin: 10px 0;
+    padding-left: 30px;
+}
+
+.timeline-item h6 {
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+
+.timeline-item p {
+    font-size: 0.8rem;
+    margin: 5px 0;
+    color: #666;
+}
+
+.info {
+    flex: 1;
+    padding-left: 20px;
+}
+
+.info h5 {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.info p {
+    font-size: 0.8rem;
+    color: #444;
+}

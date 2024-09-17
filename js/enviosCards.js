@@ -104,6 +104,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
                         <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-primary">Seguir</a>
                         <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
+
+                        <!-- Botón para abrir el modal -->
+                        <button class="btn btn-info mt-1 open-tracking" data-nropedido="${item.nroPedido}" data-bs-toggle="modal" data-bs-target="#trackingModal">
+                        <i class="bi bi-eye"></i>Track 
+                        </button>
                        
                         <button class="btn btn-success btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${item.id}" aria-expanded="false" aria-controls="collapseObservaciones-${item.id}">
                         <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
@@ -321,3 +326,79 @@ searchInput.addEventListener("input", function() {
         renderCards(allData);
     });
 });
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("click", function(event) {
+        if (event.target.classList.contains("open-tracking")) {
+            const nroPedido = event.target.getAttribute("data-nropedido");
+            const trackingContent = document.getElementById("trackingContent");
+
+            // Mostrar cargando
+            trackingContent.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden"></span></div>';
+
+            const requestBody = {
+                "logueo": {
+                    "Usuario": "BOM6765",
+                    "Clave": "BOM6765",
+                    "CodigoCliente": "6765"
+                },
+                "NroPedido": nroPedido
+            };
+
+            fetch('https://proxy.cors.sh/https://apitest.andesmarcargas.com/api/EstadosHistoricos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+                },
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta de la API');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const timelineHTML = createTimeline(data);
+                trackingContent.innerHTML = timelineHTML;
+            })
+            .catch(error => {
+                console.error('Error al obtener el seguimiento:', error);
+                if (trackingContent) {
+                    trackingContent.innerHTML = 'Error al cargar los datos.';
+                } else {
+                    console.error('Elemento trackingContent no encontrado.');
+                }
+            });
+        }
+    });
+});
+
+function createTimeline(data) {
+    let timelineHTML = `
+        <h5>Número de Guía: ${data.NroGuia}</h5>
+        <p>Descripción de Unidad de Venta: ${data.UnidadVentaDescrip}</p>
+        <p>Modalidad de Entrega: ${data.ModalidadEntregaDescrip}</p>
+        <p>Estado Actual: ${data.EstadoActual}</p>
+        <p>Número de Remito del Cliente: ${data.NroRemitoCliente}</p>
+        <p>Fecha de Emisión: ${new Date(data.FechaEmision).toLocaleString()}</p>
+        <p>Origen: ${data.Origen}</p>
+        <p>Número de Pedido: ${data.NroPedido}</p>
+        <p>Destino: ${data.Destino}</p>
+        <h6>Historial de Estados:</h6>
+        <ul class="timeline">`;
+
+    data.ListaEstadosHistorico.forEach(estado => {
+        timelineHTML += `
+            <li class="timeline-item">
+                <h6>${estado.FechaHis}</h6>
+                <p>${estado.Estado} en ${estado.LocalidadDescrip}</p>
+            </li>`;
+    });
+
+    timelineHTML += `</ul>`;
+    
+    return timelineHTML;
+}
