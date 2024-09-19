@@ -287,6 +287,20 @@ function rellenarMedidas() {
             peso = 3; 
             valor = 30000;
             break;
+        case "termotanque255":
+            alto = 158; 
+            ancho = 67; 
+            largo = 67; 
+            peso = 81; 
+            valor = 1474499;
+            break;
+        case "termotanque300":
+            alto = 189; 
+            ancho = 66; 
+            largo = 66; 
+            peso = 132; 
+            valor = 3274999;
+            break;
         case "bulto50":
             alto = 50; 
             ancho = 50; 
