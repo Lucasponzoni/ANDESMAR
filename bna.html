@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envios</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="shortcut icon" href="./Img/caja.png">
+    <link href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300..700&display=swap" rel="stylesheet">  
+</head>
+<body class="envios-body">
+    
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="./Img/Novogar N.png" alt="Logo" class="navbar-logo"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a href="./index.html" class="nav-link">Generación de etiqueta</a></li>
+                    <li class="nav-item"><a href="./envios.html" class="nav-link active">Seguimiento de Envios</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-between align-items-center search-filter-container">
+            <div class="col-md-6 mb-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="search" placeholder="Buscar por nombre, dirección, remito...">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 d-flex align-items-center">
+                <select class="custom-select" id="filter" style="flex: 1; margin-right: 10px;">
+                    <option value="nuevo" selected>Más nuevos</option>
+                    <option value="antiguo">Más antiguos</option>
+                </select>
+                <button class="btn btn-secondary simbel" id="filter-labels">Etiquetas <img id="simbel" src="./Img/simbel.png"></button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container mt-5" id="cards-container">
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <input type="file" id="fileInput" accept=".txt" class="form-control mb-2">
+                <button id="importButton" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Importar Archivo
+                </button>
+            </div>
+        </div>
+        
+        <div class="row mt-4" id="envios-cards">
+            <!-- Aquí se agregarán las tarjetas -->
+        </div>
+    </div>
+
+    <footer class="text-center mt-5">
+        <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
+        <a class="www" href="https://novogar.com.ar/" target="_blank">NOVOGAR</a>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById('importButton').addEventListener('click', function() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result.trim();
+                    const lines = content.split('\n');
+                    const cardsContainer = document.getElementById('envios-cards');
+                    cardsContainer.innerHTML = '';
+
+                    lines.forEach(line => {
+                        const fields = line.split('|;|').map(field => field.trim());
+                        
+                        // Limpiar los campos
+                        const name = `${fields[0]} ${fields[1]}`.replace(/^\\|/, '').replace(/\\|$/, '');
+                        const cp = fields[2].replace(/^\\|/, '').replace(/\\|$/, '');
+                        const localidad = fields[3].replace(/^\\|/, '').replace(/\\|$/, '');
+                        const calle = fields[4].replace(/^\\|/, '').replace(/\\|$/, '');
+                        const numero = fields[5].replace(/^\\|/, '').replace(/\\|$/, '');
+                        const telefono = fields[6].replace(/^\\|/, '').replace(/\\|$/, '');
+                        const email = fields[7].replace(/^\\|/, '').replace(/\\|$/, '');
+                        const remito = fields[8].replace(/^\\|/, '').replace(/\\|$/, '');
+                        const observaciones = fields[9].replace(/^\\|/, '').replace(/\\|$/, '');
+
+                        // Validar que no se cree una tarjeta genérica
+                        if (fields.length === 10 && name !== 'NOMBRE APELLIDO' && cp !== 'CP' && localidad !== 'LOCALIDAD' && calle !== 'CALLE' && numero !== 'NUMERO' && telefono !== 'TELEFONO' && email !== 'EMAIL' && remito !== 'REMITO' && observaciones !== 'OBSERVACIONES') {
+                            const card = document.createElement('div');
+                            card.className = 'col-md-4 mb-3';
+                            card.innerHTML = `
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${name}</h5>
+                                    <p class="card-text">
+                                        <strong>CP:</strong> ${cp}<br>
+                                        <strong>Localidad:</strong> ${localidad}<br>
+                                        <strong>Calle:</strong> ${calle}<br>
+                                        <strong>Número:</strong> ${numero}<br>
+                                        <strong>Teléfono:</strong> ${telefono}<br>
+                                        <strong>Email:</strong> ${email}<br>
+                                        <strong>Remito:</strong> ${remito}<br>
+                                        <strong>Observaciones:</strong> ${observaciones}
+                                    </p>
+                                </div>
+                            </div>
+                            `;
+                            cardsContainer.appendChild(card);
+                        }
+                    });
+                };
+                reader.readAsText(file);
+            } else {
+                alert('Por favor, selecciona un archivo.');
+            }
+        });
+    </script>
+</body>
+</html>
