@@ -1126,6 +1126,7 @@ div.card-body > p > i{
 }
 
 #spinner {
+    margin-top: 1rem;
     margin-bottom: 1.5rem;
     color: cornflowerblue;
     display: flex; /* Mostrar el spinner al cargar */
@@ -1274,6 +1275,10 @@ div.card-body > p > i{
 .input-group .form-control {
     border: none;
     box-shadow: none;
+}
+
+.form-control{
+    height: auto !important;
 }
 
 .input-group .input-group-append .btn {
@@ -1471,6 +1476,29 @@ div.card-body > p > i{
     align-items: center; 
     justify-content: center;
     font-weight: bold; 
+}
+
+.em-state-bna{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: 1rem;
+    height: 30px;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -15px; 
+    right: 10px;
+    border: dashed 2px orangered;
+    background-color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-weight: bold; 
+    overflow: hidden;
+}
+
+.em-state-bna > img{
+    width:120px;
 }
 
 .dimensions-info {
@@ -1747,4 +1775,10 @@ div.card-body > p > i{
 }
 
 /* FIN MODAL ANDESMAR */
+
+.import-container{
+    padding: 1rem;
+    border: cornflowerblue 2px dashed;
+    border-radius: 15px;
+}
 
