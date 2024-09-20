@@ -176,7 +176,14 @@ function renderCards(data) {
             <p class="card-text"><i class="bi bi-house"></i> Calle: ${data[i].calle}, Altura: ${data[i].numero}</p>
             <p class="card-text"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
             <p class="card-text"><i class="bi bi-envelope"></i> ${data[i].email}</p>
-            <p class="card-text"><i class="bi bi-file-earmark-text"></i> Remito: ${data[i].remito}</p>
+
+            <div class="d-flex align-items-center">
+            <p class="card-text remitoCard">${data[i].remito}</p>
+            <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
+                                <i class="bi bi-clipboard"></i>
+            </button>
+            </div>
+
             <button class="btn btn-primary btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
                 <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
             </button>
@@ -190,6 +197,18 @@ function renderCards(data) {
         </div>
     </div>
 `;
+
+// Lógica del botón de copiar al portapapeles
+const copyButton = card.querySelector('.copy-btn');
+copyButton.addEventListener('click', () => {
+    navigator.clipboard.writeText(data[i].remito).then(() => {
+        copyButton.innerHTML = 'Copiado';
+        setTimeout(() => {
+            copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+        }, 2000);
+    }).catch(err => console.error('Error al copiar al portapapeles: ', err));
+});
+
 cardsContainer.appendChild(card);
 
     }
