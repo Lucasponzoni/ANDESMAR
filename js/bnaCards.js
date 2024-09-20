@@ -118,8 +118,7 @@ function capitalizeWords(str) {
 }
 
 function lowercaseWords(str) {
-    return str
-        .toLowerCase(); // Convertir toda la cadena a minúsculas
+    return str.toLowerCase(); // Convertir toda la cadena a minúsculas
 }
 
 // Función para cargar los datos de Firebase y renderizar las tarjetas
@@ -169,25 +168,65 @@ function renderCards(data) {
         card.className = 'col-md-4 mb-3';
 
         card.innerHTML = `
-            <div class="card">
-                <div class="card-body">
-                <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
-                    <h5 class="card-title">${data[i].nombre}</h5>
-                    <p class="card-text">
-                        <strong>CP:</strong> ${data[i].cp}<br>
-                        <strong>Localidad:</strong> ${data[i].localidad}<br>
-                        <strong>Calle:</strong> ${data[i].calle}<br>
-                        <strong>Número:</strong> ${data[i].numero}<br>
-                        <strong>Teléfono:</strong> ${data[i].telefono}<br>
-                        <strong>Email:</strong> ${data[i].email}<br>
-                        <strong>Remito:</strong> ${data[i].remito}<br>
-                        <strong>Observaciones:</strong> ${data[i].observaciones}
-                    </p>
+    <div class="card">
+        <div class="card-body">
+            <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
+            <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
+            <p class="card-text cpLocalidad"><i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}</p>
+            <p class="card-text"><i class="bi bi-house"></i> Calle: ${data[i].calle}, Altura: ${data[i].numero}</p>
+            <p class="card-text"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
+            <p class="card-text"><i class="bi bi-envelope"></i> ${data[i].email}</p>
+            <p class="card-text"><i class="bi bi-file-earmark-text"></i> Remito: ${data[i].remito}</p>
+            <button class="btn btn-primary btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
+                <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
+            </button>
+            <div class="collapse" id="collapseObservaciones-${data[i].id}">
+                <div class="mb-3 mt-2 divObs">
+                    <label for="observaciones-${data[i].id}" class="form-label">Observaciones</label>
+                    <textarea id="observaciones-${data[i].id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${data[i].observaciones || ''}</textarea>
+                    <button class="btn btn-primary mt-1 update-observaciones" data-id="${data[i].id}">Actualizar Observaciones</button>
                 </div>
             </div>
-        `;
-        cardsContainer.appendChild(card);
+        </div>
+    </div>
+`;
+cardsContainer.appendChild(card);
+
     }
+
+    // Agregar el evento para actualizar observaciones
+    addUpdateObservacionesEvent();
+}
+
+function addUpdateObservacionesEvent() {
+    const updateButtons = document.querySelectorAll('.update-observaciones');
+
+    updateButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const textarea = document.getElementById(`observaciones-${id}`);
+            const newObservaciones = textarea.value;
+
+            // Actualizar en Firebase
+            firebase.database().ref(`enviosBNA/${id}`).update({
+                observaciones: newObservaciones
+            }).then(() => {
+                // Mostrar mensaje de éxito con SweetAlert
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Actualizado!',
+                    text: 'Las observaciones se han actualizado correctamente.',
+                });
+            }).catch((error) => {
+                console.error('Error al actualizar las observaciones:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: '¡Error!',
+                    text: 'No se pudo actualizar las observaciones.',
+                });
+            });
+        });
+    });
 }
 
 function updatePagination(totalItems) {
@@ -235,7 +274,6 @@ function updatePagination(totalItems) {
         paginationContainer.appendChild(backItem);
     }
 }
-
 
 // Llamar a la función cuando se carga la página
 window.onload = loadEnviosFromFirebase;
