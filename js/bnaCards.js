@@ -76,37 +76,44 @@ document.getElementById('importButton').addEventListener('click', function() {
             });
 
             // Cuando todas las promesas de Firebase se completen
-            Promise.all(promises)
-                .then(() => {
-                    // Ocultar el spinner
-                    spinner.remove();
+Promise.all(promises)
+.then(() => {
+    // Ocultar el spinner
+    spinner.remove();
 
-                    // Mostrar SweetAlert con la cantidad importada
-                    Swal.fire({
-                        title: 'Importación completada',
-                        text: `Se han importado ${importedCount} ventas a la base de datos`,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        // Recargar la página después de hacer clic en OK
-                        location.reload();
-                    });
-                })
-                .catch(error => {
-                    spinner.remove();
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Ocurrió un error al importar los datos',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                });
-        };
-        reader.readAsText(file);
-    } else {
-        spinner.remove();
-        alert('Por favor, selecciona un archivo.');
-    }
+    // Mostrar SweetAlert con la cantidad importada
+    Swal.fire({
+        title: 'Importación completada',
+        text: `Se han importado ${importedCount} ventas a la base de datos`,
+        icon: 'success',
+        confirmButtonText: 'OK'
+    }).then(() => {
+        // Recargar la página después de hacer clic en OK
+        location.reload();
+    });
+})
+.catch(error => {
+    spinner.remove();
+    Swal.fire({
+        title: 'Error',
+        text: 'Ocurrió un error al importar los datos',
+        icon: 'error',
+        confirmButtonText: 'OK'
+    });
+});
+};
+
+reader.readAsText(file);
+} else {
+spinner.remove();
+// Mostrar SweetAlert en lugar de un alert del navegador
+Swal.fire({
+    icon: 'warning',
+    title: 'Error',
+    text: 'Por favor, seleccione un archivo para importar.',
+});
+}
+
 });
 
 function capitalizeWords(str) {
@@ -183,6 +190,7 @@ function renderCards(data) {
         card.innerHTML = `
             <div class="card">
                 <div class="card-body">
+                    <div id="estadoEnvio${data[i].id}" class="em-circle-state3">Pendiente <i class="bi bi-stopwatch-fill"></i></div>
                     <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
                     <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
                     <p class="card-text cpLocalidad"><i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}</p>
@@ -248,7 +256,7 @@ function renderCards(data) {
 
                     <div class="medidas"></div> <!-- Div para las medidas -->
 
-                    <button class="btn btn-success btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
+                    <button class="btn btn-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
                         <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
                     </button>
                     <div class="collapse" id="collapseObservaciones-${data[i].id}">
@@ -264,6 +272,8 @@ function renderCards(data) {
                         <span id="andesmarText${data[i].id}"><i class="bi bi-file-text"></i> Etiqueta Andesmar</span>
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
                 </button>
+
+                <div id="resultado${data[i].id}" class="mt-2 errorMeli"></div>
 
                 </div>
             </div>
@@ -295,14 +305,40 @@ function renderCards(data) {
     addUpdateObservacionesEvent();
 }
 
+const usuario = "BOM6765";
+const clave = "BOM6765";
+const codigoCliente = "6765";
+
 function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, telefono, email) {
-    // Obtén los valores de la tarjeta específica usando el ID
-    const volumenCm3Texto = document.getElementById(`medidas-cm3-${id}`).textContent;
-    const volumenM3Texto = document.getElementById(`medidas-m3-${id}`).textContent;
+    // Obtener los elementos de volumen
+    const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
+    const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
+
+    // Comprobar si los elementos existen
+    if (!volumenCm3Elemento || !volumenM3Elemento) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'Debe seleccionar un producto del listado.',
+            confirmButtonText: 'OK'
+        });
+        return; // Salir de la función si no se seleccionó un producto
+    }
+
+    // Obtener los valores de texto
+    const volumenCm3Texto = volumenCm3Elemento.textContent;
+    const volumenM3Texto = volumenM3Elemento.textContent;
+
     const alto = document.getElementById(`alto-${id}`).value;
     const ancho = document.getElementById(`ancho-${id}`).value;
     const largo = document.getElementById(`largo-${id}`).value;
     const cantidad = document.getElementById(`cantidad-${id}`).value;
+
+    const button = document.getElementById(`andesmarButton${id}`);
+    const spinner = document.getElementById(`spinnerAndesmar${id}`);
+    const text = document.getElementById(`andesmarText${id}`);
+    const resultadoDiv = document.getElementById(`resultado${id}`);
+    const envioState = document.getElementById(`estadoEnvio${id}`);
 
     // Comprobar si los elementos existen y asignar null si no existen
     const altoInterior = document.getElementById(`altoInterior-${id}`) ? document.getElementById(`altoInterior-${id}`).value : null;
@@ -316,13 +352,105 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
     const volumenCm3 = parseInt(volumenCm3Texto.replace(' cm³', ''));
     const volumenM3 = parseFloat(volumenM3Texto.replace(' m³', ''));
 
+    // Verificar si los volúmenes son nulos o no válidos
+    if (isNaN(volumenCm3) || isNaN(volumenM3)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'Debe seleccionar un producto del listado.',
+            confirmButtonText: 'OK'
+        });
+        return; // Salir de la función si no se seleccionó un producto
+    }
+
     console.log(`Enviando datos a Andesmar:
         Volumen en m³: ${volumenM3}, Alto: ${alto}, Ancho: ${ancho}, Largo: ${largo}, Cantidad: ${cantidad}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
         ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, 
         Calle: ${calle}, Número: ${numero}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${tipoElectrodomestico}
     `);
 
-    // Api Andesmar
+    // Mostrar spinner y cambiar texto
+    spinner.style.display = 'inline-block';
+    text.innerText = 'Generando Etiqueta...';
+
+    // Aquí debes definir los datos que se enviarán a la API
+    const requestObj = {
+        CalleRemitente: "Mendoza", // Reemplaza con el valor correcto
+        CalleNroRemitente: "2799", // Reemplaza con el valor correcto
+        CodigoPostalRemitente: "2000", // Reemplaza con el valor correcto
+        NombreApellidoDestinatario: nombre,
+        CodigoPostalDestinatario: cp,
+        CalleDestinatario: calle,
+        CalleNroDestinatario: numero,
+        TelefonoDestinatario: telefono,
+        NroRemito: remito,
+        Bultos: cantidad,
+        Peso: 35,
+        ValorDeclarado: 100, // Se Reemplazara cuando Leo envie este dato
+        M3: volumenM3,
+        Alto: Array(cantidad).fill(alto), 
+        Ancho: Array(cantidad).fill(ancho), 
+        Largo: Array(cantidad).fill(largo), 
+        Observaciones: observaciones + tipoElectrodomestico,
+        ModalidadEntrega: "Puerta-Puerta", 
+        UnidadVenta: "cargas remito conformado", 
+        servicio: {
+            EsFletePagoDestino: false, 
+            EsRemitoconformado: true 
+        },
+        logueo: {
+            Usuario: usuario,
+            Clave: clave,
+            CodigoCliente: codigoCliente
+        }
+    };
+
+    const proxyUrl = "https://proxy.cors.sh/";
+    const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
+
+    console.log(`Datos enviados a API Andesmar (BNA+ ${remito}):`, requestObj); // Mostrar request en consola
+
+    fetch(proxyUrl + apiUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd",
+        },
+        body: JSON.stringify(requestObj),
+    })
+    .then(response => {
+        console.log(`Datos Respuesta API Andesmar (BNA+ ${remito}):`, response); // Mostrar response en consola
+        return response.json();
+    })
+    .then(data => {
+        if (data.NroPedido) {
+
+            const link = `https://andesmarcargas.com//ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
+            text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
+            button.classList.remove('btn-primary');
+            button.classList.add('btn-success');
+            button.onclick = () => window.open(link, '_blank'); 
+            
+            if (envioState) {
+                envioState.className = 'em-circle-state4';
+                envioState.innerHTML = `Preparado <i class="bi bi-check2-circle"></i>`;
+            } else {
+                console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
+            }
+        } else {
+            text.innerHTML = `Envio No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
+            button.classList.remove('btn-primary');
+            button.classList.add('btn-warning', 'btnAndesmarMeli');
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        text.innerText = "Envio No Disponible ⚠️"; // Cambiar texto en caso de error
+        resultadoDiv.innerText = `Error: ${error.message}`; // Mostrar error debajo
+    })
+    .finally(() => {
+        spinner.style.display = 'none'; // Asegúrate de ocultar el spinner en caso de error
+    });
 }
 
 function addUpdateObservacionesEvent() {

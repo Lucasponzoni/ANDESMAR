@@ -548,9 +548,12 @@ button:hover {
 }
 
 .tipoElectrodomesticoBna{
-    color: cornflowerblue;
-    border: 2px dashed cornflowerblue;
-    font-weight: 800;
+    color: grey;
+    border: 1px solid grey;
+    border-radius: 10px;
+    font-weight: 800;box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
+    margin-bottom: 5px;
+    box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
 }
 
 .mb-2{
@@ -1492,6 +1495,44 @@ div.card-body > p > i{
     display: flex; 
     align-items: center; 
     justify-content: center;
+}
+
+.em-circle-state3{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: .8rem;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -15px; 
+    right: 150px;
+    background-color: rgb(254, 235, 235);
+    border: dashed 2PX red; 
+    text-transform: uppercase;
+    color: red;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    height: 30px;
+}
+
+.em-circle-state4{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: .8rem;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -15px; 
+    right: 150px;
+    background-color: rgb(226, 250, 216);
+    border: dashed 2PX green; 
+    text-transform: uppercase;
+    color: green;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    height: 30px;
 }
 
 .em-state-andesmar{
