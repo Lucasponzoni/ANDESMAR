@@ -130,6 +130,9 @@ function loadEnviosFromFirebase() {
     spinner.style.display = 'block'; 
 
     firebase.database().ref('enviosBNA').once('value', function(snapshot) {
+        allData = []; // Asegúrate de reiniciar allData
+        let sinPrepararCount = 0; // Contador para las tarjetas sin preparar
+
         snapshot.forEach(function(childSnapshot) {
             const data = childSnapshot.val();
             allData.push({ 
@@ -140,19 +143,28 @@ function loadEnviosFromFirebase() {
                 calle: capitalizeWords(data.calle), 
                 numero: capitalizeWords(data.numero), 
                 telefono: capitalizeWords(data.telefono),
-                email: lowercaseWords(data.email), // Aplicar lowercaseWords aquí
+                email: lowercaseWords(data.email), 
                 remito: capitalizeWords(data.remito),
                 observaciones: capitalizeWords(data.observaciones),
                 tipoElectrodomesticoBna: (data.tipoElectrodomesticoBna),
             });
+
+            // Incrementar el contador si tipoElectrodomesticoBna está vacío
+            if (!data.tipoElectrodomesticoBna) {
+                sinPrepararCount++;
+            }
         });
-    
+
         // Invertir el array para mostrar la última tarjeta arriba
         allData.reverse();
 
         // Renderizar las tarjetas y la paginación
         renderCards(allData);
         updatePagination(allData.length);
+        
+        // Actualizar el contador en el botón
+        document.getElementById('contadorCards').innerText = sinPrepararCount;
+
         spinner.remove(); // Ocultar spinner después de cargar los datos
     });
 }
@@ -189,7 +201,7 @@ function renderCards(data) {
                         Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
                     </div>
 
-                    <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${i}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
+                    <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
                         <option value="">Seleccione un producto</option>
                         <option value="heladera">Heladera</option>
                         <option value="cocina">Cocina</option>
@@ -236,22 +248,29 @@ function renderCards(data) {
 
                     <div class="medidas"></div> <!-- Div para las medidas -->
 
-                    <button class="btn btn-primary btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
+                    <button class="btn btn-success btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
                         <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
                     </button>
                     <div class="collapse" id="collapseObservaciones-${data[i].id}">
                         <div class="mb-3 mt-2 divObs">
                             <label for="observaciones-${data[i].id}" class="form-label">Observaciones</label>
                             <textarea id="observaciones-${data[i].id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${data[i].observaciones || ''}</textarea>
-                            <button class="btn btn-primary mt-1 update-observaciones" data-id="${data[i].id}">Actualizar Observaciones</button>
+                            <button class="btn btn-secondary mt-1 update-observaciones mb-1" data-id="${data[i].id}">Actualizar Observaciones</button>
                         </div>
                     </div>
+
+                     <!-- Botón Andesmar -->
+                    <button class="btn btn-primary mt-2" id="andesmarButton${data[i].id}" onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}')">
+                        <span id="andesmarText${data[i].id}"><i class="bi bi-file-text"></i> Etiqueta Andesmar</span>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
+                </button>
+
                 </div>
             </div>
         `;
 
         // Lógica para cargar el tipoElectrodomesticoBna si existe
-        const tipoElectrodomesticoBnaSelect = card.querySelector(`#tipoElectrodomesticoBna-${i}`);
+        const tipoElectrodomesticoBnaSelect = card.querySelector(`#tipoElectrodomesticoBna-${data[i].id}`);
         if (data[i].tipoElectrodomesticoBna) {
             tipoElectrodomesticoBnaSelect.value = data[i].tipoElectrodomesticoBna;
             // Llamar a la función para rellenar medidas con el valor seleccionado, indicando que es una carga inicial
@@ -274,6 +293,36 @@ function renderCards(data) {
 
     // Agregar el evento para actualizar observaciones
     addUpdateObservacionesEvent();
+}
+
+function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, telefono, email) {
+    // Obtén los valores de la tarjeta específica usando el ID
+    const volumenCm3Texto = document.getElementById(`medidas-cm3-${id}`).textContent;
+    const volumenM3Texto = document.getElementById(`medidas-m3-${id}`).textContent;
+    const alto = document.getElementById(`alto-${id}`).value;
+    const ancho = document.getElementById(`ancho-${id}`).value;
+    const largo = document.getElementById(`largo-${id}`).value;
+    const cantidad = document.getElementById(`cantidad-${id}`).value;
+
+    // Comprobar si los elementos existen y asignar null si no existen
+    const altoInterior = document.getElementById(`altoInterior-${id}`) ? document.getElementById(`altoInterior-${id}`).value : null;
+    const anchoInterior = document.getElementById(`anchoInterior-${id}`) ? document.getElementById(`anchoInterior-${id}`).value : null;
+    const largoInterior = document.getElementById(`largoInterior-${id}`) ? document.getElementById(`largoInterior-${id}`).value : null;
+
+    const observaciones = document.getElementById(`observaciones-${id}`).value; // Obtiene el valor del campo de observaciones
+    const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; // Cambiar `${i}` por `${id}`
+
+    // Extraer los números de los textos (eliminar 'cm³' y 'm³')
+    const volumenCm3 = parseInt(volumenCm3Texto.replace(' cm³', ''));
+    const volumenM3 = parseFloat(volumenM3Texto.replace(' m³', ''));
+
+    console.log(`Enviando datos a Andesmar:
+        Volumen en m³: ${volumenM3}, Alto: ${alto}, Ancho: ${ancho}, Largo: ${largo}, Cantidad: ${cantidad}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
+        ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, 
+        Calle: ${calle}, Número: ${numero}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${tipoElectrodomestico}
+    `);
+
+    // Api Andesmar
 }
 
 function addUpdateObservacionesEvent() {
@@ -410,23 +459,35 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
             return; // Si no hay selección válida, salir
     }
 
-    // Crear el div con las medidas en cm³ y m³ como una card
-    const medidasTextoDiv = document.createElement('div');
-    medidasTextoDiv.className = 'medidas-texto'; // Clase añadida para facilitar el acceso
-    medidasTextoDiv.innerHTML = `
-        <div class="card-body-medidas">
-            <h5 class="card-title"><i class="bi bi-rulers"></i> Medidas</h5>
-            <div class="row">
-                <div class="col-6 text-center">
-                    <i class="bi bi-box"></i> <strong id="medidas-cm3-${selectElement.id}">${alto * ancho * largo} cm³</strong>
-                </div>
-                <div class="col-6 text-center">
-                    <i class="bi bi-arrows-fullscreen"></i> <strong id="medidas-m3-${selectElement.id}">${((alto * ancho * largo) / 1000000).toFixed(2)} m³</strong>
-                </div>
+// Calcular el volumen en cm³ y m³
+const volumenCm3 = alto * ancho * largo; // Volumen en cm³
+const volumenM3 = (volumenCm3 / 1000000).toFixed(2); // Volumen en m³, con dos decimales
+
+// Crear el div con las medidas en cm³ y m³ como una card
+const medidasTextoDiv = document.createElement('div');
+medidasTextoDiv.className = 'medidas-texto'; // Clase añadida para facilitar el acceso
+
+// Insertar el contenido HTML y usar las variables volumenCm3 y volumenM3
+medidasTextoDiv.innerHTML = `
+    <div class="card-body-medidas">
+        <h5 class="card-title"><i class="bi bi-rulers"></i> Medidas</h5>
+        <div class="row">
+            <div class="col-6 text-center">
+                <i class="bi bi-box"></i> <strong id="medidas-cm3-${id}">${volumenCm3} cm³</strong>
+            </div>
+            <div class="col-6 text-center">
+                <i class="bi bi-arrows-fullscreen"></i> <strong id="medidas-m3-${id}">${volumenM3} m³</strong>
             </div>
         </div>
-    `;
-    medidasDiv.appendChild(medidasTextoDiv);
+    </div>
+`;
+
+// Agregar el nuevo div al contenedor de medidas
+medidasDiv.appendChild(medidasTextoDiv);
+
+// Aquí podrías reutilizar las variables volumenCm3 y volumenM3 donde las necesites
+console.log(`Volumen en cm³: ${volumenCm3}`);
+console.log(`Volumen en m³: ${volumenM3}`);
 
     // Crear el div con los inputs para las medidas exteriores
     const bultoDiv = document.createElement('div');
@@ -435,34 +496,34 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
     bultoDiv.innerHTML = `
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
-            <input type="number" id="alto-${selectElement.id}" name="Alto" class="form-control-medidas" step="1" value="${alto}" required>
+            <input type="number" id="alto-${id}" name="Alto" class="form-control-medidas" step="1" value="${alto}" required disabled>
         </div>
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
-            <input type="number" id="ancho-${selectElement.id}" name="Ancho" class="form-control-medidas" step="1" value="${ancho}" required>
+            <input type="number" id="ancho-${id}" name="Ancho" class="form-control-medidas" step="1" value="${ancho}" required disabled>
         </div>
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
-            <input type="number" id="largo-${selectElement.id}" name="Largo" class="form-control-medidas" step="1" value="${largo}" required>
+            <input type="number" id="largo-${id}" name="Largo" class="form-control-medidas" step="1" value="${largo}" required disabled>
         </div>
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-            <input type="number" id="cantidad-${selectElement.id}" name="Cantidad" class="form-control-medidas" step="1" value="1" min="1" required>
+            <input type="number" id="cantidad-${id}" name="Cantidad" class="form-control-medidas" step="1" value="1" min="1" required>
         </div>
     `;
 
     medidasDiv.appendChild(bultoDiv);
 
     // Actualizar medidas automáticamente al cambiar la cantidad
-    const cantidadInput = bultoDiv.querySelector(`#cantidad-${selectElement.id}`);
+    const cantidadInput = bultoDiv.querySelector(`#cantidad-${id}`);
     cantidadInput.addEventListener('input', () => {
         const cantidad = parseInt(cantidadInput.value) || 1; // Obtener la cantidad, por defecto 1
         const volumenCm3 = alto * ancho * largo * cantidad;
         const volumenM3 = volumenCm3 / 1000000;
 
         // Actualizar los textos de medidas
-        document.getElementById(`medidas-cm3-${selectElement.id}`).textContent = `${volumenCm3} cm³`;
-        document.getElementById(`medidas-m3-${selectElement.id}`).textContent = `${volumenM3.toFixed(2)} m³`;
+        document.getElementById(`medidas-cm3-${id}`).textContent = `${volumenCm3} cm³`;
+        document.getElementById(`medidas-m3-${id}`).textContent = `${volumenM3.toFixed(2)} m³`;
     });
 
     // Crear el div con los inputs para las medidas interiores, si aplica
@@ -479,26 +540,26 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
             <div class="d-flex mb-2">
                 <div class="input-group me-2">
                     <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
-                    <input type="number" id="altoInterior-${selectElement.id}" name="AltoInterior" class="form-control-medidas" step="1" value="${altoInterior}" required>
+                    <input type="number" id="altoInterior-${id}" name="AltoInterior" class="form-control-medidas" step="1" value="${altoInterior}" required disabled>
                 </div>
                 <div class="input-group me-2">
                     <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
-                    <input type="number" id="anchoInterior-${selectElement.id}" name="AnchoInterior" class="form-control-medidas" step="1" value="${anchoInterior}" required>
+                    <input type="number" id="anchoInterior-${id}" name="AnchoInterior" class="form-control-medidas" step="1" value="${anchoInterior}" required disabled>
                 </div>
                 <div class="input-group me-2">
                     <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
-                    <input type="number" id="largoInterior-${selectElement.id}" name="LargoInterior" class="form-control-medidas" step="1" value="${largoInterior}" required>
+                    <input type="number" id="largoInterior-${id}" name="LargoInterior" class="form-control-medidas" step="1" value="${largoInterior}" required disabled>
                 </div>
                 <div class="input-group me-2">
                     <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-                    <input type="number" id="cantidadInterior-${selectElement.id}" name="CantidadInterior" class="form-control-medidas" step="1" value="1" min="1" required disabled>
+                    <input type="number" id="cantidadInterior-${id}" name="CantidadInterior" class="form-control-medidas" step="1" value="1" min="1" required disabled>
                 </div>
             </div>
         `;
         medidasDiv.appendChild(bultoInteriorDiv);
 
         // Vincular la cantidad del interior con la cantidad del exterior
-        const cantidadInteriorInput = bultoInteriorDiv.querySelector(`#cantidadInterior-${selectElement.id}`);
+        const cantidadInteriorInput = bultoInteriorDiv.querySelector(`#cantidadInterior-${id}`);
 
         cantidadInput.addEventListener('input', () => {
             cantidadInteriorInput.value = cantidadInput.value;
@@ -559,6 +620,20 @@ function updatePagination(totalItems) {
 }
 
 // FIN PAGINATION
+
+// SIN PREPARAR BOTON
+document.getElementById('btnPreparar').addEventListener('click', () => {
+    const sinPrepararCards = allData.filter(item => !item.tipoElectrodomesticoBna);
+    
+    // Limpiar el contenedor de tarjetas
+    const cardsContainer = document.getElementById('envios-cards');
+    cardsContainer.innerHTML = '';
+
+    // Renderizar solo las tarjetas sin preparar
+    renderCards(sinPrepararCards);
+});
+
+// FIN SIN PREPARAR BOTON
 
 // Llamar a la función cuando se carga la página
 window.onload = loadEnviosFromFirebase;

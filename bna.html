@@ -53,10 +53,18 @@
                     <option value="nuevo" selected>Más nuevos</option>
                     <option value="antiguo">Más antiguos</option>
                 </select>
-                <button class="btn btn-secondary simbel" id="filter-labels">Etiquetas <img id="simbel" src="./Img/simbel.png"></button>
+                
+                <button id="btnPreparar" type="button" class="btn btn-primary position-relative" style="white-space: nowrap; min-width: 140px;">
+                    Para Preparar
+                    <span id="contadorCards" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        Contando
+                        <span class="visually-hidden"></span>
+                    </span>
+                </button>
+                
             </div>
         </div>
-    </div>
+    </div>    
     
     <div class="container mt-5" id="cards-container">
 
