@@ -143,6 +143,7 @@ function loadEnviosFromFirebase() {
                 email: lowercaseWords(data.email), // Aplicar lowercaseWords aquí
                 remito: capitalizeWords(data.remito),
                 observaciones: capitalizeWords(data.observaciones),
+                tipoElectrodomesticoBna: (data.tipoElectrodomesticoBna),
             });
         });
     
@@ -184,7 +185,11 @@ function renderCards(data) {
                         </button>
                     </div>
 
-                    <select class= "tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${i}" name="TipoElectrodomestico" onchange="rellenarMedidas(this)">
+                    <div class="alert alert-success d-none" id="alert-${data[i].id}" role="alert">
+                        Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
+                    </div>
+
+                    <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${i}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
                         <option value="">Seleccione un producto</option>
                         <option value="heladera">Heladera</option>
                         <option value="cocina">Cocina</option>
@@ -245,6 +250,14 @@ function renderCards(data) {
             </div>
         `;
 
+        // Lógica para cargar el tipoElectrodomesticoBna si existe
+        const tipoElectrodomesticoBnaSelect = card.querySelector(`#tipoElectrodomesticoBna-${i}`);
+        if (data[i].tipoElectrodomesticoBna) {
+            tipoElectrodomesticoBnaSelect.value = data[i].tipoElectrodomesticoBna;
+            // Llamar a la función para rellenar medidas con el valor seleccionado, indicando que es una carga inicial
+            rellenarMedidas(tipoElectrodomesticoBnaSelect, data[i].id, true);
+        }        
+
         // Lógica del botón de copiar al portapapeles
         const copyButton = card.querySelector('.copy-btn');
         copyButton.addEventListener('click', () => {
@@ -294,6 +307,211 @@ function addUpdateObservacionesEvent() {
     });
 }
 
+function rellenarMedidas(selectElement, id, isInitialLoad = false) {
+    const selectedValue = selectElement.value;
+    const card = selectElement.closest('.card'); // Obtener la tarjeta más cercana
+    const medidasDiv = card.querySelector('.medidas'); // Div donde se agregarán las medidas
+
+    // Limpiar el div de medidas antes de agregar nuevos campos
+    medidasDiv.innerHTML = '';
+
+    // Si no es una carga inicial, mostrar el alert y actualizar Firebase
+    if (!isInitialLoad) {
+        const alertDiv = card.querySelector(`#alert-${id}`);
+        alertDiv.classList.remove('d-none');
+        setTimeout(() => {
+            alertDiv.classList.add('d-none');
+        }, 3000);
+
+        // Actualizar en Firebase
+        firebase.database().ref(`enviosBNA/${id}`).update({
+            tipoElectrodomesticoBna: selectedValue
+        }).then(() => {
+            console.log('Tipo de electrodoméstico actualizado en Firebase.');
+        }).catch((error) => {
+            console.error('Error al actualizar tipo de electrodoméstico:', error);
+        });
+    }
+
+    let alto, ancho, largo, peso, valor;
+    let altoInterior, anchoInterior, largoInterior;
+
+    switch (selectedValue) {
+        case "heladera":
+            alto = 165; 
+            ancho = 60; 
+            largo = 60; 
+            peso = 60; 
+            valor = 700000;
+            break;
+        case "cocina":
+            alto = 85; 
+            ancho = 60; 
+            largo = 60; 
+            peso = 50; 
+            valor = 600000;
+            break;
+        case "hornoEmpotrable":
+            alto = 60; 
+            ancho = 60; 
+            largo = 55; 
+            peso = 25; 
+            valor = 500000;
+            break;
+        case "split2700":
+            alto = 50; 
+            ancho = 72; 
+            largo = 27; 
+            peso = 40; 
+            valor = 600000; // Medidas de la unidad exterior
+            altoInterior = 30; anchoInterior = 73; largoInterior = 19;
+            break;
+        case "split3300":
+            alto = 50; 
+            ancho = 72; 
+            largo = 27; 
+            peso = 50; 
+            valor = 700000; // Medidas de la unidad exterior
+            altoInterior = 32; anchoInterior = 101; largoInterior = 22;
+            break;
+        case "split4500":
+            alto = 30; 
+            ancho = 82; 
+            largo = 61; 
+            peso = 60; 
+            valor = 800000; // Medidas de la unidad exterior
+            altoInterior = 35; anchoInterior = 102; largoInterior = 23;
+            break;
+        case "split5500":
+            alto = 36; 
+            ancho = 90; 
+            largo = 38; 
+            peso = 80; 
+            valor = 900000; // Medidas de la unidad exterior
+            altoInterior = 38; anchoInterior = 109; largoInterior = 34;
+            break;
+        case "split6000":
+            alto = 110; 
+            ancho = 101; 
+            largo = 43; 
+            peso = 99; 
+            valor = 1100000; // Medidas de la unidad exterior
+            altoInterior = 40; anchoInterior = 110; largoInterior = 38;
+            break;
+        case "splitPisoTecho18000":
+            alto = 139; 
+            ancho = 95; 
+            largo = 40; 
+            peso = 135; 
+            valor = 1500000; // Medidas de la unidad exterior
+            altoInterior = 158; anchoInterior = 68; largoInterior = 35;
+            break;
+        default:
+            return; // Si no hay selección válida, salir
+    }
+
+    // Crear el div con las medidas en cm³ y m³ como una card
+    const medidasTextoDiv = document.createElement('div');
+    medidasTextoDiv.className = 'medidas-texto'; // Clase añadida para facilitar el acceso
+    medidasTextoDiv.innerHTML = `
+        <div class="card-body-medidas">
+            <h5 class="card-title"><i class="bi bi-rulers"></i> Medidas</h5>
+            <div class="row">
+                <div class="col-6 text-center">
+                    <i class="bi bi-box"></i> <strong id="medidas-cm3-${selectElement.id}">${alto * ancho * largo} cm³</strong>
+                </div>
+                <div class="col-6 text-center">
+                    <i class="bi bi-arrows-fullscreen"></i> <strong id="medidas-m3-${selectElement.id}">${((alto * ancho * largo) / 1000000).toFixed(2)} m³</strong>
+                </div>
+            </div>
+        </div>
+    `;
+    medidasDiv.appendChild(medidasTextoDiv);
+
+    // Crear el div con los inputs para las medidas exteriores
+    const bultoDiv = document.createElement('div');
+    bultoDiv.className = 'bultoImput mb-3'; // Añadido margen inferior
+
+    bultoDiv.innerHTML = `
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
+            <input type="number" id="alto-${selectElement.id}" name="Alto" class="form-control-medidas" step="1" value="${alto}" required>
+        </div>
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
+            <input type="number" id="ancho-${selectElement.id}" name="Ancho" class="form-control-medidas" step="1" value="${ancho}" required>
+        </div>
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
+            <input type="number" id="largo-${selectElement.id}" name="Largo" class="form-control-medidas" step="1" value="${largo}" required>
+        </div>
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
+            <input type="number" id="cantidad-${selectElement.id}" name="Cantidad" class="form-control-medidas" step="1" value="1" min="1" required>
+        </div>
+    `;
+
+    medidasDiv.appendChild(bultoDiv);
+
+    // Actualizar medidas automáticamente al cambiar la cantidad
+    const cantidadInput = bultoDiv.querySelector(`#cantidad-${selectElement.id}`);
+    cantidadInput.addEventListener('input', () => {
+        const cantidad = parseInt(cantidadInput.value) || 1; // Obtener la cantidad, por defecto 1
+        const volumenCm3 = alto * ancho * largo * cantidad;
+        const volumenM3 = volumenCm3 / 1000000;
+
+        // Actualizar los textos de medidas
+        document.getElementById(`medidas-cm3-${selectElement.id}`).textContent = `${volumenCm3} cm³`;
+        document.getElementById(`medidas-m3-${selectElement.id}`).textContent = `${volumenM3.toFixed(2)} m³`;
+    });
+
+    // Crear el div con los inputs para las medidas interiores, si aplica
+    if (selectedValue.startsWith("split")) {
+        const interiorLabel = document.createElement('p');
+        interiorLabel.innerHTML = '<i class="bi bi-fan"></i> Unidad Interior';
+        interiorLabel.className = "card-title"; // Clase añadida
+        medidasDiv.appendChild(interiorLabel);
+
+        const bultoInteriorDiv = document.createElement('div');
+        bultoInteriorDiv.className = 'bultoImput mb-3'; // Añadido margen inferior
+
+        bultoInteriorDiv.innerHTML = `
+            <div class="d-flex mb-2">
+                <div class="input-group me-2">
+                    <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
+                    <input type="number" id="altoInterior-${selectElement.id}" name="AltoInterior" class="form-control-medidas" step="1" value="${altoInterior}" required>
+                </div>
+                <div class="input-group me-2">
+                    <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
+                    <input type="number" id="anchoInterior-${selectElement.id}" name="AnchoInterior" class="form-control-medidas" step="1" value="${anchoInterior}" required>
+                </div>
+                <div class="input-group me-2">
+                    <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
+                    <input type="number" id="largoInterior-${selectElement.id}" name="LargoInterior" class="form-control-medidas" step="1" value="${largoInterior}" required>
+                </div>
+                <div class="input-group me-2">
+                    <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
+                    <input type="number" id="cantidadInterior-${selectElement.id}" name="CantidadInterior" class="form-control-medidas" step="1" value="1" min="1" required disabled>
+                </div>
+            </div>
+        `;
+        medidasDiv.appendChild(bultoInteriorDiv);
+
+        // Vincular la cantidad del interior con la cantidad del exterior
+        const cantidadInteriorInput = bultoInteriorDiv.querySelector(`#cantidadInterior-${selectElement.id}`);
+
+        cantidadInput.addEventListener('input', () => {
+            cantidadInteriorInput.value = cantidadInput.value;
+        });
+
+        cantidadInteriorInput.addEventListener('input', () => {
+            cantidadInput.value = cantidadInteriorInput.value;
+        });
+    }
+}
+
+// INICIO PAGINATION
+
 function updatePagination(totalItems) {
     paginationContainer.innerHTML = "";
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -340,180 +558,7 @@ function updatePagination(totalItems) {
     }
 }
 
-function rellenarMedidas(selectElement) {
-    const selectedValue = selectElement.value;
-    const card = selectElement.closest('.card'); // Obtener la tarjeta más cercana
-    const medidasDiv = card.querySelector('.medidas'); // Div donde se agregarán las medidas
-
-    // Limpiar el div de medidas antes de agregar nuevos campos
-    medidasDiv.innerHTML = '';
-
-    let alto, ancho, largo, peso, valor;
-    let altoInterior, anchoInterior, largoInterior;
-
-    switch (selectedValue) {
-        case "heladera":
-            alto = 165; 
-            ancho = 60; 
-            largo = 60; 
-            peso = 60; 
-            valor = 700000;
-            break;
-        case "cocina":
-            alto = 85; 
-            ancho = 60; 
-            largo = 60; 
-            peso = 50; 
-            valor = 600000;
-            break;
-        case "hornoEmpotrable":
-            alto = 60; 
-            ancho = 60; 
-            largo = 55; 
-            peso = 25; 
-            valor = 500000;
-            break;
-        case "split2700":
-            alto = 49.5; 
-            ancho = 72; 
-            largo = 27; 
-            peso = 40; 
-            valor = 600000; // Medidas de la unidad exterior
-            altoInterior = 30; anchoInterior = 73; largoInterior = 19;
-            break;
-        case "split3300":
-            alto = 49.5; 
-            ancho = 72; 
-            largo = 27; 
-            peso = 50; 
-            valor = 700000; // Medidas de la unidad exterior
-            altoInterior = 32; anchoInterior = 101; largoInterior = 22;
-            break;
-        case "split4500":
-            alto = 30; 
-            ancho = 82; 
-            largo = 60.5; 
-            peso = 60; 
-            valor = 800000; // Medidas de la unidad exterior
-            altoInterior = 35; anchoInterior = 102; largoInterior = 23;
-            break;
-        case "split5500":
-            alto = 36; 
-            ancho = 90; 
-            largo = 38; 
-            peso = 80; 
-            valor = 900000; // Medidas de la unidad exterior
-            altoInterior = 38; anchoInterior = 109; largoInterior = 34;
-            break;
-        case "split6000":
-            alto = 110; 
-            ancho = 100.7; 
-            largo = 42.4; 
-            peso = 99; 
-            valor = 1100000; // Medidas de la unidad exterior
-            altoInterior = 40; anchoInterior = 110; largoInterior = 38;
-            break;
-        case "splitPisoTecho18000":
-            alto = 139; 
-            ancho = 95; 
-            largo = 40; 
-            peso = 135; 
-            valor = 1500000; // Medidas de la unidad exterior
-            altoInterior = 158; anchoInterior = 68; largoInterior = 35;
-            break;
-        default:
-            return; // Si no hay selección válida, salir
-    }
-
-    // Crear el div con las medidas en cm³ y m³ como una card
-const medidasTextoDiv = document.createElement('div');
-medidasTextoDiv.innerHTML = `
-    <div class="card-body-medidas">
-        <h5 class="card-title"><i class="bi bi-rulers"></i> Medidas</h5>
-        <div class="row">
-            <div class="col-6 text-center">
-                <i class="bi bi-box"></i> <strong>${alto * ancho * largo} cm³</strong>
-            </div>
-            <div class="col-6 text-center">
-                <i class="bi bi-arrows-fullscreen"></i> <strong>${((alto * ancho * largo) / 1000000).toFixed(2)} m³</strong>
-            </div>
-        </div>
-    </div>
-`;
-medidasDiv.appendChild(medidasTextoDiv);
-
-    // Crear el div con los inputs para las medidas exteriores
-    const bultoDiv = document.createElement('div');
-    bultoDiv.className = 'bultoImput mb-3'; // Añadido margen inferior
-
-    bultoDiv.innerHTML = `
-        <div class="input-group mb-2">
-            <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
-            <input type="number" id="alto0" name="Alto0" class="form-control" step="1" value="${alto}" required>
-        </div>
-        <div class="input-group mb-2">
-            <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
-            <input type="number" id="ancho0" name="Ancho0" class="form-control" step="1" value="${ancho}" required>
-        </div>
-        <div class="input-group mb-2">
-            <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
-            <input type="number" id="largo0" name="Largo0" class="form-control" step="1" value="${largo}" required>
-        </div>
-        <div class="input-group mb-2">
-            <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-            <input type="number" id="cantidad0" name="Cantidad0" class="form-control" step="1" value="1" min="1" required>
-        </div>
-    `;
-
-    medidasDiv.appendChild(bultoDiv);
-
-    // Crear el div con los inputs para las medidas interiores, si aplica
-    if (selectedValue.startsWith("split")) {
-        const interiorLabel = document.createElement('p');
-        interiorLabel.innerHTML = '<i class="bi bi-fan"></i> Unidad Interior';
-        interiorLabel.className = "card-title"; // Clase añadida
-        medidasDiv.appendChild(interiorLabel);
-
-        const bultoInteriorDiv = document.createElement('div');
-        bultoInteriorDiv.className = 'bultoImput mb-3'; // Añadido margen inferior
-
-        bultoInteriorDiv.innerHTML = `
-            <div class="d-flex mb-2">
-                <div class="input-group me-2">
-                    <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
-                    <input type="number" id="altoInterior0" name="AltoInterior0" class="form-control" step="1" value="${altoInterior}" required>
-                </div>
-                <div class="input-group me-2">
-                    <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
-                    <input type="number" id="anchoInterior0" name="AnchoInterior0" class="form-control" step="1" value="${anchoInterior}" required>
-                </div>
-                <div class="input-group me-2">
-                    <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
-                    <input type="number" id="largoInterior0" name="LargoInterior0" class="form-control" step="1" value="${largoInterior}" required>
-                </div>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-                    <input type="number" id="cantidadInterior0" name="CantidadInterior0" class="form-control" step="1" value="1" min="1" required>
-                </div>
-            </div>
-        `;
-
-        medidasDiv.appendChild(bultoInteriorDiv);
-        
-
-        // Vincular la cantidad del interior con la cantidad del exterior
-        const cantidadExterior = bultoDiv.querySelector('#cantidad0');
-        const cantidadInterior = bultoInteriorDiv.querySelector('#cantidadInterior0');
-
-        cantidadExterior.addEventListener('input', () => {
-            cantidadInterior.value = cantidadExterior.value;
-        });
-
-        cantidadInterior.addEventListener('input', () => {
-            cantidadExterior.value = cantidadInterior.value;
-        });
-    }
-}
+// FIN PAGINATION
 
 // Llamar a la función cuando se carga la página
 window.onload = loadEnviosFromFirebase;

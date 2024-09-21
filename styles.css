@@ -568,6 +568,7 @@ button:hover {
 }
 
 .input-group-text{
+    border-radius: 6px 6px 0 0;
     width: 100%;
     background-color: cornflowerblue;
     color: white;
@@ -589,8 +590,19 @@ button:hover {
     margin-bottom: 5px;
 }
 
+.form-control-medidas{
+    color: cornflowerblue;
+    border: none;
+    margin-bottom: 0;
+    border-radius: 0;
+}
+
 .bultoImput{
     margin-bottom: 0 !important;
+}
+
+.alert-success{
+    margin-bottom: 5px;
 }
 
 /* FIN BULTOS */
