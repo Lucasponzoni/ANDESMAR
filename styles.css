@@ -547,6 +547,12 @@ button:hover {
     font-weight: 800;
 }
 
+#tipoElectrodomesticoBna{
+    color: cornflowerblue;
+    border: 2px dashed cornflowerblue;
+    font-weight: 800;
+}
+
 .mostrarMasButton {
     border-radius: 20px;
     color: white;

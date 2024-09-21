@@ -184,6 +184,51 @@ function renderCards(data) {
             </button>
             </div>
 
+        <select id="tipoElectrodomesticoBna" name="TipoElectrodomestico" onchange="rellenarMedidas()">
+            <option value="">Seleccione un producto</option>
+            <option value="heladera">Heladera</option>
+            <option value="cocina">Cocina</option>
+            <option value="hornoEmpotrable">Horno Empotrable</option>
+            <option value="lavavajillas">Lavavajillas</option>
+            <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
+            <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
+            <option value="split2700">Split 2700W</option>
+            <option value="split3300">Split 3300W</option>
+            <option value="split4500">Split 4500W</option>
+            <option value="split5500">Split 5500W</option>
+            <option value="split6000">Split 6000W</option>
+            <option value="pisoTecho18000">Piso Techo 18000 Frigorías</option>
+            <option value="aireportatil">Aire Portatil</option>
+            <option value="ventiladordepared">Ventilador de Pared</option>
+            <option value="colchon80cm">Colchon 80cm</option>
+            <option value="colchon100cm">Colchon 100cm</option>
+            <option value="colchon140cm">Colchon 140cm</option>
+            <option value="colchon160cm">Colchon 160cm</option>
+            <option value="colchon200cm">Colchon 200cm</option>
+            <option value="termotanque50">Termotanque 50L</option>
+            <option value="termotanque80">Termotanque 80L</option>
+            <option value="termotanque110">Termotanque 110L</option>
+            <option value="termotanque150">Termotanque 150L</option>
+            <option value="termotanque180">Termotanque 180L</option>
+            <option value="termotanque255">Termotanque 255L COM255</option>
+            <option value="termotanque300">Termotanque 300L RHCTP300N</option>
+            <option value="smartTV32">Smart TV 32"</option>
+            <option value="smartTV40">Smart TV 40"</option>
+            <option value="smartTV43">Smart TV 43"</option>
+            <option value="smartTV50">Smart TV 50"</option>
+            <option value="smartTV58">Smart TV 58"</option>
+            <option value="smartTV65">Smart TV 65"</option>
+            <option value="smartTV70">Smart TV 70"</option>
+            <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
+            <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
+            <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
+            <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
+            <option value="bulto20">Bulto Pequeño 20x20</option>
+            <option value="bulto30">Bulto Pequeño 30x30</option>
+            <option value="bulto40">Bulto Pequeño 40x40</option>
+            <option value="bulto50">Bulto Pequeño 50x50</option>
+        </select>   
+
             <button class="btn btn-primary btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
                 <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
             </button>
