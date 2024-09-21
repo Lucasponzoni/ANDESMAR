@@ -374,7 +374,7 @@ function rellenarMedidas(selectElement) {
             valor = 500000;
             break;
         case "split2700":
-            alto = 50; 
+            alto = 49.5; 
             ancho = 72; 
             largo = 27; 
             peso = 40; 
@@ -382,7 +382,7 @@ function rellenarMedidas(selectElement) {
             altoInterior = 30; anchoInterior = 73; largoInterior = 19;
             break;
         case "split3300":
-            alto = 50; 
+            alto = 49.5; 
             ancho = 72; 
             largo = 27; 
             peso = 50; 
@@ -392,7 +392,7 @@ function rellenarMedidas(selectElement) {
         case "split4500":
             alto = 30; 
             ancho = 82; 
-            largo = 61; 
+            largo = 60.5; 
             peso = 60; 
             valor = 800000; // Medidas de la unidad exterior
             altoInterior = 35; anchoInterior = 102; largoInterior = 23;
@@ -408,7 +408,7 @@ function rellenarMedidas(selectElement) {
         case "split6000":
             alto = 110; 
             ancho = 100.7; 
-            largo = 43; 
+            largo = 42.4; 
             peso = 99; 
             valor = 1100000; // Medidas de la unidad exterior
             altoInterior = 40; anchoInterior = 110; largoInterior = 38;
@@ -425,12 +425,28 @@ function rellenarMedidas(selectElement) {
             return; // Si no hay selección válida, salir
     }
 
+    // Crear el div con las medidas en cm³ y m³ como una card
+const medidasTextoDiv = document.createElement('div');
+medidasTextoDiv.innerHTML = `
+    <div class="card-body-medidas">
+        <h5 class="card-title"><i class="bi bi-rulers"></i> Medidas</h5>
+        <div class="row">
+            <div class="col-6 text-center">
+                <i class="bi bi-box"></i> <strong>${alto * ancho * largo} cm³</strong>
+            </div>
+            <div class="col-6 text-center">
+                <i class="bi bi-arrows-fullscreen"></i> <strong>${((alto * ancho * largo) / 1000000).toFixed(2)} m³</strong>
+            </div>
+        </div>
+    </div>
+`;
+medidasDiv.appendChild(medidasTextoDiv);
+
     // Crear el div con los inputs para las medidas exteriores
     const bultoDiv = document.createElement('div');
     bultoDiv.className = 'bultoImput mb-3'; // Añadido margen inferior
 
     bultoDiv.innerHTML = `
-
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
             <input type="number" id="alto0" name="Alto0" class="form-control" step="1" value="${alto}" required>
@@ -453,32 +469,49 @@ function rellenarMedidas(selectElement) {
 
     // Crear el div con los inputs para las medidas interiores, si aplica
     if (selectedValue.startsWith("split")) {
+        const interiorLabel = document.createElement('p');
+        interiorLabel.innerHTML = '<i class="bi bi-fan"></i> Unidad Interior';
+        interiorLabel.className = "card-title"; // Clase añadida
+        medidasDiv.appendChild(interiorLabel);
+
         const bultoInteriorDiv = document.createElement('div');
         bultoInteriorDiv.className = 'bultoImput mb-3'; // Añadido margen inferior
 
         bultoInteriorDiv.innerHTML = `
-<div class="d-flex mb-2">
-    <div class="input-group me-2">
-        <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
-        <input type="number" id="altoInterior0" name="AltoInterior0" class="form-control" step="1" value="${altoInterior}" required>
-    </div>
-    <div class="input-group me-2">
-        <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
-        <input type="number" id="anchoInterior0" name="AnchoInterior0" class="form-control" step="1" value="${anchoInterior}" required>
-    </div>
-    <div class="input-group me-2">
-        <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
-        <input type="number" id="largoInterior0" name="LargoInterior0" class="form-control" step="1" value="${largoInterior}" required>
-    </div>
-    <div class="input-group">
-        <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-        <input type="number" id="cantidadInterior0" name="CantidadInterior0" class="form-control" step="1" value="1" min="1" required>
-    </div>
-</div>
-
-`;
+            <div class="d-flex mb-2">
+                <div class="input-group me-2">
+                    <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
+                    <input type="number" id="altoInterior0" name="AltoInterior0" class="form-control" step="1" value="${altoInterior}" required>
+                </div>
+                <div class="input-group me-2">
+                    <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
+                    <input type="number" id="anchoInterior0" name="AnchoInterior0" class="form-control" step="1" value="${anchoInterior}" required>
+                </div>
+                <div class="input-group me-2">
+                    <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
+                    <input type="number" id="largoInterior0" name="LargoInterior0" class="form-control" step="1" value="${largoInterior}" required>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
+                    <input type="number" id="cantidadInterior0" name="CantidadInterior0" class="form-control" step="1" value="1" min="1" required>
+                </div>
+            </div>
+        `;
 
         medidasDiv.appendChild(bultoInteriorDiv);
+        
+
+        // Vincular la cantidad del interior con la cantidad del exterior
+        const cantidadExterior = bultoDiv.querySelector('#cantidad0');
+        const cantidadInterior = bultoInteriorDiv.querySelector('#cantidadInterior0');
+
+        cantidadExterior.addEventListener('input', () => {
+            cantidadInterior.value = cantidadExterior.value;
+        });
+
+        cantidadInterior.addEventListener('input', () => {
+            cantidadExterior.value = cantidadInterior.value;
+        });
     }
 }
 
