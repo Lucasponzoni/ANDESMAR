@@ -297,7 +297,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }    
 
-    // Buscador
+// BUSCADOR
 searchInput.addEventListener("input", function() {
     const searchTerm = searchInput.value.toLowerCase();
     
@@ -308,14 +308,25 @@ searchInput.addEventListener("input", function() {
     // Filtrar los datos
     const filteredData = allData.filter(item => {
         return Object.values(item).some(value => 
-            value.toString().toLowerCase().includes(searchTerm)
+            value !== undefined && value !== null && value.toString().toLowerCase().includes(searchTerm)
         );
     });
     
-    // Renderizar las tarjetas y actualizar la paginación con los datos filtrados
-    renderCards(filteredData);
-    updatePagination(filteredData.length);
+    // Si no se encuentra ningún resultado, mostrar una imagen de error
+    if (filteredData.length === 0) {
+        document.getElementById("envios-cards").innerHTML = `
+            <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
+                <p class="errorp">No se encontraron resultados para "${searchTerm}"</p>
+                <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
+            </div>
+        `;
+    } else {
+        // Renderizar las tarjetas y actualizar la paginación con los datos filtrados
+        renderCards(filteredData);
+        updatePagination(filteredData.length);
+    }
 });
+// FIN BUSCADOR
 
     // Filtro de orden
     filterSelect.addEventListener("change", function() {

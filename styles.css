@@ -924,6 +924,12 @@ margin-bottom: -1rem;
     padding-bottom: 400px;
 }
 
+.errorp{
+    color: red;
+    font-weight: 900;
+    font-size: 1.2rem;
+}
+
 .surprise{
     width: 35px;
 }
@@ -1681,6 +1687,16 @@ div.card-body > p > i{
     font-weight: 800 !important;
     padding: .2rem;
     border-radius: 5px;
+}
+
+.numeroDeEnvioGeneradoBNA{
+    margin-bottom: 5px !important;
+    text-align: center;
+    color: grey;
+    border: dashed 2px #ffc107;
+    font-weight: 800 !important;
+    padding: .2rem;
+    border-radius: 10px;
 }
 
 /* MODAL ANDESMAR */

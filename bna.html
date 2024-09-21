@@ -39,7 +39,7 @@
             <div class="col-md-6 mb-3">
                 <!-- Buscador -->
                 <div class="input-group">
-                    <input type="text" class="form-control" id="search" placeholder="Buscar por nombre, dirección, remito...">
+                    <input type="text" class="form-control" id="searchBna" placeholder="Buscar por nombre, dirección, remito...">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button">
                             <i class="fas fa-search"></i>
@@ -48,19 +48,22 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3 d-flex align-items-center">
-                <!-- Filtro -->
-                <select class="custom-select" id="filter" style="flex: 1; margin-right: 10px;">
-                    <option value="nuevo" selected>Más nuevos</option>
-                    <option value="antiguo">Más antiguos</option>
-                </select>
-                
-                <button id="btnPreparar" type="button" class="btn btn-primary position-relative" style="white-space: nowrap; min-width: 140px;">
-                    Para Preparar
-                    <span id="contadorCards" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        Contando
-                        <span class="visually-hidden"></span>
-                    </span>
-                </button>
+                <!-- Botones -->
+                 <div class="trio-de-botones">
+
+                    <button class="btn btn-danger"><i class="bi bi-box-seam-fill"></i></button>
+                    <button class="btn btn-primary"><i class="bi bi-box-seam-fill"></i></button>
+                    
+                    <button id="btnPreparar" type="button" class="btn btn-secondary position-relative" style="white-space: nowrap; min-width: 140px;">
+                        Para Preparar
+                        <span id="contadorCards" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            Contando
+                            <span class="visually-hidden"></span>
+                        </span>
+                    </button>
+
+                 </div>
+
                 
             </div>
         </div>

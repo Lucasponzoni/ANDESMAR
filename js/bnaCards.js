@@ -18,6 +18,8 @@ let currentPage = 1;
 let itemsPerPage = 12; // Número de elementos por página
 let currentPageGroup = 0;
 const paginationContainer = document.getElementById('pagination');
+const searchInput = document.getElementById("searchBna");
+const filterSelect = document.getElementById("filter");
 
 document.getElementById('importButton').addEventListener('click', function() {
     const fileInput = document.getElementById('fileInput');
@@ -154,6 +156,9 @@ function loadEnviosFromFirebase() {
                 remito: capitalizeWords(data.remito),
                 observaciones: capitalizeWords(data.observaciones),
                 tipoElectrodomesticoBna: (data.tipoElectrodomesticoBna),
+                trackingLink: (data.trackingLink),
+                transportCompany: (data.transportCompany),
+                transportCompanyNumber: (data.transportCompanyNumber),
             });
 
             // Incrementar el contador si tipoElectrodomesticoBna está vacío
@@ -177,39 +182,48 @@ function loadEnviosFromFirebase() {
 }
 
 function renderCards(data) {
-    const cardsContainer = document.getElementById('envios-cards');
-    cardsContainer.innerHTML = ''; // Limpiar contenedor de tarjetas
-
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, data.length);
-
-    for (let i = startIndex; i < endIndex; i++) {
-        const card = document.createElement('div');
-        card.className = 'col-md-4 mb-3';
-
-        card.innerHTML = `
-            <div class="card">
-                <div class="card-body">
-                    <div id="estadoEnvio${data[i].id}" class="em-circle-state3">Pendiente <i class="bi bi-stopwatch-fill"></i></div>
-                    <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
-                    <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
-                    <p class="card-text cpLocalidad"><i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}</p>
-                    <p class="card-text"><i class="bi bi-house"></i> Calle: ${data[i].calle}, Altura: ${data[i].numero}</p>
-                    <p class="card-text"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
-                    <p class="card-text"><i class="bi bi-envelope"></i> ${data[i].email}</p>
-
-                    <div class="d-flex align-items-center">
-                        <p class="card-text remitoCard">${data[i].remito}</p>
-                        <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-
-                    <div class="alert alert-success d-none" id="alert-${data[i].id}" role="alert">
-                        Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
-                    </div>
-
-                    <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
+            const cardsContainer = document.getElementById('envios-cards');
+            cardsContainer.innerHTML = ''; // Limpiar contenedor de tarjetas
+        
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, data.length);
+        
+            for (let i = startIndex; i < endIndex; i++) {
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-3';
+        
+                // Verificar si transportCompany es "Andesmar"
+                const isAndesmar = data[i].transportCompany === "Andesmar";
+        
+                card.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="estadoEnvio${data[i].id}" class="${isAndesmar ? 'em-circle-state4' : 'em-circle-state3'}">
+                                ${isAndesmar ? 'Preparado' : 'Pendiente'} <i class="bi bi-stopwatch-fill"></i>
+                            </div>
+                            <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
+                            <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
+                            <p class="card-text cpLocalidad"><i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}</p>
+                            <p class="card-text"><i class="bi bi-house"></i> Calle: ${data[i].calle}, Altura: ${data[i].numero}</p>
+                            <p class="card-text"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
+                            <p class="card-text"><i class="bi bi-envelope"></i> ${data[i].email}</p>
+        
+                            <div class="d-flex align-items-center contenedorRemito">
+                                <p class="card-text remitoCard">${data[i].remito}</p>
+                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
+        
+                            <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
+                                ${isAndesmar ? `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 'Número de Envío Pendiente'}
+                            </p>
+        
+                            <div class="alert alert-success d-none" id="alert-${data[i].id}" role="alert">
+                                Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
+                            </div>
+        
+                            <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
                         <option value="">Seleccione un producto</option>
                         <option value="heladera">Heladera</option>
                         <option value="cocina">Cocina</option>
@@ -252,32 +266,35 @@ function renderCards(data) {
                         <option value="bulto30">Bulto Pequeño 30x30</option>
                         <option value="bulto40">Bulto Pequeño 40x40</option>
                         <option value="bulto50">Bulto Pequeño 50x50</option>
-                    </select>   
+                    </select>     
+        
+                            <div class="medidas"></div> <!-- Div para las medidas -->
+        
+                            <button class="btn btn-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
+                                <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
+                            </button>
+                            <div class="collapse" id="collapseObservaciones-${data[i].id}">
+                                <div class="mb-3 mt-2 divObs">
+                                    <label for="observaciones-${data[i].id}" class="form-label">Observaciones</label>
+                                    <textarea id="observaciones-${data[i].id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${data[i].observaciones || ''}</textarea>
+                                    <button class="btn btn-secondary mt-1 update-observaciones mb-1" data-id="${data[i].id}">Actualizar Observaciones</button>
+                                </div>
+                            </div>
+        
+                            <!-- Botón Andesmar -->
+                            <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} mt-2" 
+                                    id="andesmarButton${data[i].id}" 
+                                    ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}')"`}>
+                                <span id="andesmarText${data[i].id}">
+                                    ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andesmar`}
+                                </span>
+                                                           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
+                            </button>
 
-                    <div class="medidas"></div> <!-- Div para las medidas -->
-
-                    <button class="btn btn-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
-                        <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
-                    </button>
-                    <div class="collapse" id="collapseObservaciones-${data[i].id}">
-                        <div class="mb-3 mt-2 divObs">
-                            <label for="observaciones-${data[i].id}" class="form-label">Observaciones</label>
-                            <textarea id="observaciones-${data[i].id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${data[i].observaciones || ''}</textarea>
-                            <button class="btn btn-secondary mt-1 update-observaciones mb-1" data-id="${data[i].id}">Actualizar Observaciones</button>
+                            <div id="resultado${data[i].id}" class="mt-2 errorMeli"></div>
                         </div>
                     </div>
-
-                     <!-- Botón Andesmar -->
-                    <button class="btn btn-primary mt-2" id="andesmarButton${data[i].id}" onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}')">
-                        <span id="andesmarText${data[i].id}"><i class="bi bi-file-text"></i> Etiqueta Andesmar</span>
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
-                </button>
-
-                <div id="resultado${data[i].id}" class="mt-2 errorMeli"></div>
-
-                </div>
-            </div>
-        `;
+                `;
 
         // Lógica para cargar el tipoElectrodomesticoBna si existe
         const tipoElectrodomesticoBnaSelect = card.querySelector(`#tipoElectrodomesticoBna-${data[i].id}`);
@@ -333,12 +350,14 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
     const ancho = document.getElementById(`ancho-${id}`).value;
     const largo = document.getElementById(`largo-${id}`).value;
     const cantidad = document.getElementById(`cantidad-${id}`).value;
+    const peso = document.getElementById(`peso-${id}`).value;
 
     const button = document.getElementById(`andesmarButton${id}`);
     const spinner = document.getElementById(`spinnerAndesmar${id}`);
     const text = document.getElementById(`andesmarText${id}`);
     const resultadoDiv = document.getElementById(`resultado${id}`);
     const envioState = document.getElementById(`estadoEnvio${id}`);
+    const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
 
     // Comprobar si los elementos existen y asignar null si no existen
     const altoInterior = document.getElementById(`altoInterior-${id}`) ? document.getElementById(`altoInterior-${id}`).value : null;
@@ -364,7 +383,7 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
     }
 
     console.log(`Enviando datos a Andesmar:
-        Volumen en m³: ${volumenM3}, Alto: ${alto}, Ancho: ${ancho}, Largo: ${largo}, Cantidad: ${cantidad}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
+        Volumen en m³: ${volumenM3}, Alto: ${alto}, Ancho: ${ancho}, Largo: ${largo}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
         ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, 
         Calle: ${calle}, Número: ${numero}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${tipoElectrodomestico}
     `);
@@ -385,7 +404,7 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
         TelefonoDestinatario: telefono,
         NroRemito: remito,
         Bultos: cantidad,
-        Peso: 35,
+        Peso: peso * cantidad,
         ValorDeclarado: 100, // Se Reemplazara cuando Leo envie este dato
         M3: volumenM3,
         Alto: Array(cantidad).fill(alto), 
@@ -416,7 +435,7 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
             "Content-Type": "application/json",
             "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd",
         },
-        body: JSON.stringify(requestObj),
+        body: JSON.stringify(requestObj)
     })
     .then(response => {
         console.log(`Datos Respuesta API Andesmar (BNA+ ${remito}):`, response); // Mostrar response en consola
@@ -424,13 +443,33 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
     })
     .then(data => {
         if (data.NroPedido) {
-
-            const link = `https://andesmarcargas.com//ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
+            const linkEtiqueta = `https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
+            const linkSeguimiento = `https://andesmarcargas.com/seguimiento.html?numero=${remito}&tipo=remito&cod=`;
+            
+            // Actualizar el texto del botón
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
             button.classList.remove('btn-primary');
             button.classList.add('btn-success');
-            button.onclick = () => window.open(link, '_blank'); 
+            button.onclick = () => window.open(linkEtiqueta, '_blank');
+            NroEnvio.innerHTML = `<a href="${linkSeguimiento}" target="_blank">Andesmar: ${data.NroPedido} <i class="bi bi-box-arrow-up-right"></i></a>`;
+    
+            // Pushear datos a Firebase
+            const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
+            const transportData = {
+                transportCompany: "Andesmar",
+                trackingLink: linkSeguimiento,
+                transportCompanyNumber: data.NroPedido
+            };
             
+              db.ref(`enviosBNA/${id}`).update(transportData)
+                .then(() => {
+                    console.log("Datos actualizados en Firebase:", transportData);
+                })
+                .catch((error) => {
+                                console.error("Error al actualizar datos en Firebase:", error);
+                });
+    
+            // Actualizar estado de envío
             if (envioState) {
                 envioState.className = 'em-circle-state4';
                 envioState.innerHTML = `Preparado <i class="bi bi-check2-circle"></i>`;
@@ -442,7 +481,7 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
             button.classList.remove('btn-primary');
             button.classList.add('btn-warning', 'btnAndesmarMeli');
         }
-    })
+    })    
     .catch(error => {
         console.error("Error:", error);
         text.innerText = "Envio No Disponible ⚠️"; // Cambiar texto en caso de error
@@ -451,7 +490,7 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
     .finally(() => {
         spinner.style.display = 'none'; // Asegúrate de ocultar el spinner en caso de error
     });
-}
+}    
 
 function addUpdateObservacionesEvent() {
     const updateButtons = document.querySelectorAll('.update-observaciones');
@@ -613,10 +652,6 @@ medidasTextoDiv.innerHTML = `
 // Agregar el nuevo div al contenedor de medidas
 medidasDiv.appendChild(medidasTextoDiv);
 
-// Aquí podrías reutilizar las variables volumenCm3 y volumenM3 donde las necesites
-console.log(`Volumen en cm³: ${volumenCm3}`);
-console.log(`Volumen en m³: ${volumenM3}`);
-
     // Crear el div con los inputs para las medidas exteriores
     const bultoDiv = document.createElement('div');
     bultoDiv.className = 'bultoImput mb-3'; // Añadido margen inferior
@@ -633,6 +668,10 @@ console.log(`Volumen en m³: ${volumenM3}`);
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
             <input type="number" id="largo-${id}" name="Largo" class="form-control-medidas" step="1" value="${largo}" required disabled>
+        </div>
+        <div class="input-group mb-2" style="display: none;">
+            <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
+            <input type="number" id="peso-${id}" name="peso" class="form-control-medidas" step="1" value="${peso}" min="1" required disabled>
         </div>
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
@@ -762,6 +801,37 @@ document.getElementById('btnPreparar').addEventListener('click', () => {
 });
 
 // FIN SIN PREPARAR BOTON
+
+// BUSCADOR
+searchInput.addEventListener("input", function() {
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    // Restablecer la paginación a la primera página
+    currentPage = 1;
+    currentPageGroup = 0;  // También restablecemos el grupo de páginas
+
+    // Filtrar los datos
+    const filteredData = allData.filter(item => {
+        return Object.values(item).some(value => 
+            value !== undefined && value !== null && value.toString().toLowerCase().includes(searchTerm)
+        );
+    });
+    
+    // Si no se encuentra ningún resultado, mostrar una imagen de error
+    if (filteredData.length === 0) {
+        document.getElementById("envios-cards").innerHTML = `
+            <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
+                <p class="errorp">No se encontraron resultados para "${searchTerm}"</p>
+                <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
+            </div>
+        `;
+    } else {
+        // Renderizar las tarjetas y actualizar la paginación con los datos filtrados
+        renderCards(filteredData);
+        updatePagination(filteredData.length);
+    }
+});
+// FIN BUSCADOR
 
 // Llamar a la función cuando se carga la página
 window.onload = loadEnviosFromFirebase;
