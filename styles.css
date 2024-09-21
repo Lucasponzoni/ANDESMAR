@@ -547,7 +547,7 @@ button:hover {
     font-weight: 800;
 }
 
-#tipoElectrodomesticoBna{
+.tipoElectrodomesticoBna{
     color: cornflowerblue;
     border: 2px dashed cornflowerblue;
     font-weight: 800;
@@ -561,6 +561,19 @@ button:hover {
     padding: 10px;
     margin-bottom: .3rem;
     box-shadow: 0 0px 8px rgba(0, 0, 0, 0.3); /* Ajusta los valores según tus preferencias */
+}
+
+.input-group-text{
+    width: 100%;
+    border-radius: 5px 5px 0 0;
+    background-color: cornflowerblue;
+    color: white;
+    justify-content: center;
+    text-align: center;
+}
+
+.input-group-text > i{
+    font-size: 1rem;
 }
 
 /* FIN BULTOS */

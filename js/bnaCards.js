@@ -168,94 +168,95 @@ function renderCards(data) {
         card.className = 'col-md-4 mb-3';
 
         card.innerHTML = `
-    <div class="card">
-        <div class="card-body">
-            <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
-            <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
-            <p class="card-text cpLocalidad"><i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}</p>
-            <p class="card-text"><i class="bi bi-house"></i> Calle: ${data[i].calle}, Altura: ${data[i].numero}</p>
-            <p class="card-text"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
-            <p class="card-text"><i class="bi bi-envelope"></i> ${data[i].email}</p>
+            <div class="card">
+                <div class="card-body">
+                    <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
+                    <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
+                    <p class="card-text cpLocalidad"><i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}</p>
+                    <p class="card-text"><i class="bi bi-house"></i> Calle: ${data[i].calle}, Altura: ${data[i].numero}</p>
+                    <p class="card-text"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
+                    <p class="card-text"><i class="bi bi-envelope"></i> ${data[i].email}</p>
 
-            <div class="d-flex align-items-center">
-            <p class="card-text remitoCard">${data[i].remito}</p>
-            <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
-                                <i class="bi bi-clipboard"></i>
-            </button>
-            </div>
+                    <div class="d-flex align-items-center">
+                        <p class="card-text remitoCard">${data[i].remito}</p>
+                        <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
 
-        <select id="tipoElectrodomesticoBna" name="TipoElectrodomestico" onchange="rellenarMedidas()">
-            <option value="">Seleccione un producto</option>
-            <option value="heladera">Heladera</option>
-            <option value="cocina">Cocina</option>
-            <option value="hornoEmpotrable">Horno Empotrable</option>
-            <option value="lavavajillas">Lavavajillas</option>
-            <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
-            <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
-            <option value="split2700">Split 2700W</option>
-            <option value="split3300">Split 3300W</option>
-            <option value="split4500">Split 4500W</option>
-            <option value="split5500">Split 5500W</option>
-            <option value="split6000">Split 6000W</option>
-            <option value="pisoTecho18000">Piso Techo 18000 Frigorías</option>
-            <option value="aireportatil">Aire Portatil</option>
-            <option value="ventiladordepared">Ventilador de Pared</option>
-            <option value="colchon80cm">Colchon 80cm</option>
-            <option value="colchon100cm">Colchon 100cm</option>
-            <option value="colchon140cm">Colchon 140cm</option>
-            <option value="colchon160cm">Colchon 160cm</option>
-            <option value="colchon200cm">Colchon 200cm</option>
-            <option value="termotanque50">Termotanque 50L</option>
-            <option value="termotanque80">Termotanque 80L</option>
-            <option value="termotanque110">Termotanque 110L</option>
-            <option value="termotanque150">Termotanque 150L</option>
-            <option value="termotanque180">Termotanque 180L</option>
-            <option value="termotanque255">Termotanque 255L COM255</option>
-            <option value="termotanque300">Termotanque 300L RHCTP300N</option>
-            <option value="smartTV32">Smart TV 32"</option>
-            <option value="smartTV40">Smart TV 40"</option>
-            <option value="smartTV43">Smart TV 43"</option>
-            <option value="smartTV50">Smart TV 50"</option>
-            <option value="smartTV58">Smart TV 58"</option>
-            <option value="smartTV65">Smart TV 65"</option>
-            <option value="smartTV70">Smart TV 70"</option>
-            <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
-            <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
-            <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
-            <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
-            <option value="bulto20">Bulto Pequeño 20x20</option>
-            <option value="bulto30">Bulto Pequeño 30x30</option>
-            <option value="bulto40">Bulto Pequeño 40x40</option>
-            <option value="bulto50">Bulto Pequeño 50x50</option>
-        </select>   
+                    <select class= "tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${i}" name="TipoElectrodomestico" onchange="rellenarMedidas(this)">
+                        <option value="">Seleccione un producto</option>
+                        <option value="heladera">Heladera</option>
+                        <option value="cocina">Cocina</option>
+                        <option value="hornoEmpotrable">Horno Empotrable</option>
+                        <option value="lavavajillas">Lavavajillas</option>
+                        <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
+                        <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
+                        <option value="split2700">Split 2700W</option>
+                        <option value="split3300">Split 3300W</option>
+                        <option value="split4500">Split 4500W</option>
+                        <option value="split5500">Split 5500W</option>
+                        <option value="split6000">Split 6000W</option>
+                        <option value="splitPisoTecho18000">Piso Techo 18000 Frigorías</option>
+                        <option value="aireportatil">Aire Portatil</option>
+                        <option value="ventiladordepared">Ventilador de Pared</option>
+                        <option value="colchon80cm">Colchon 80cm</option>
+                        <option value="colchon100cm">Colchon 100cm</option>
+                        <option value="colchon140cm">Colchon 140cm</option>
+                        <option value="colchon160cm">Colchon 160cm</option>
+                        <option value="colchon200cm">Colchon 200cm</option>
+                        <option value="termotanque50">Termotanque 50L</option>
+                        <option value="termotanque80">Termotanque 80L</option>
+                        <option value="termotanque110">Termotanque 110L</option>
+                        <option value="termotanque150">Termotanque 150L</option>
+                        <option value="termotanque180">Termotanque 180L</option>
+                        <option value="termotanque255">Termotanque 255L COM255</option>
+                        <option value="termotanque300">Termotanque 300L RHCTP300N</option>
+                        <option value="smartTV32">Smart TV 32"</option>
+                        <option value="smartTV40">Smart TV 40"</option>
+                        <option value="smartTV43">Smart TV 43"</option>
+                        <option value="smartTV50">Smart TV 50"</option>
+                        <option value="smartTV58">Smart TV 58"</option>
+                        <option value="smartTV65">Smart TV 65"</option>
+                        <option value="smartTV70">Smart TV 70"</option>
+                        <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
+                        <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
+                        <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
+                        <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
+                        <option value="bulto20">Bulto Pequeño 20x20</option>
+                        <option value="bulto30">Bulto Pequeño 30x30</option>
+                        <option value="bulto40">Bulto Pequeño 40x40</option>
+                        <option value="bulto50">Bulto Pequeño 50x50</option>
+                    </select>   
 
-            <button class="btn btn-primary btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
-                <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
-            </button>
-            <div class="collapse" id="collapseObservaciones-${data[i].id}">
-                <div class="mb-3 mt-2 divObs">
-                    <label for="observaciones-${data[i].id}" class="form-label">Observaciones</label>
-                    <textarea id="observaciones-${data[i].id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${data[i].observaciones || ''}</textarea>
-                    <button class="btn btn-primary mt-1 update-observaciones" data-id="${data[i].id}">Actualizar Observaciones</button>
+                    <div class="medidas"></div> <!-- Div para las medidas -->
+
+                    <button class="btn btn-primary btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
+                        <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
+                    </button>
+                    <div class="collapse" id="collapseObservaciones-${data[i].id}">
+                        <div class="mb-3 mt-2 divObs">
+                            <label for="observaciones-${data[i].id}" class="form-label">Observaciones</label>
+                            <textarea id="observaciones-${data[i].id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${data[i].observaciones || ''}</textarea>
+                            <button class="btn btn-primary mt-1 update-observaciones" data-id="${data[i].id}">Actualizar Observaciones</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-`;
+        `;
 
-// Lógica del botón de copiar al portapapeles
-const copyButton = card.querySelector('.copy-btn');
-copyButton.addEventListener('click', () => {
-    navigator.clipboard.writeText(data[i].remito).then(() => {
-        copyButton.innerHTML = 'Copiado';
-        setTimeout(() => {
-            copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
-        }, 2000);
-    }).catch(err => console.error('Error al copiar al portapapeles: ', err));
-});
+        // Lógica del botón de copiar al portapapeles
+        const copyButton = card.querySelector('.copy-btn');
+        copyButton.addEventListener('click', () => {
+            navigator.clipboard.writeText(data[i].remito).then(() => {
+                copyButton.innerHTML = 'Copiado';
+                setTimeout(() => {
+                    copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+                }, 2000);
+            }).catch(err => console.error('Error al copiar al portapapeles: ', err));
+        });
 
-cardsContainer.appendChild(card);
-
+        cardsContainer.appendChild(card);
     }
 
     // Agregar el evento para actualizar observaciones
@@ -336,6 +337,148 @@ function updatePagination(totalItems) {
             renderCards(allData);
         });
         paginationContainer.appendChild(backItem);
+    }
+}
+
+function rellenarMedidas(selectElement) {
+    const selectedValue = selectElement.value;
+    const card = selectElement.closest('.card'); // Obtener la tarjeta más cercana
+    const medidasDiv = card.querySelector('.medidas'); // Div donde se agregarán las medidas
+
+    // Limpiar el div de medidas antes de agregar nuevos campos
+    medidasDiv.innerHTML = '';
+
+    let alto, ancho, largo, peso, valor;
+    let altoInterior, anchoInterior, largoInterior;
+
+    switch (selectedValue) {
+        case "heladera":
+            alto = 165; 
+            ancho = 60; 
+            largo = 60; 
+            peso = 60; 
+            valor = 700000;
+            break;
+        case "cocina":
+            alto = 85; 
+            ancho = 60; 
+            largo = 60; 
+            peso = 50; 
+            valor = 600000;
+            break;
+        case "hornoEmpotrable":
+            alto = 60; 
+            ancho = 60; 
+            largo = 55; 
+            peso = 25; 
+            valor = 500000;
+            break;
+        case "split2700":
+            alto = 50; 
+            ancho = 72; 
+            largo = 27; 
+            peso = 40; 
+            valor = 600000; // Medidas de la unidad exterior
+            altoInterior = 30; anchoInterior = 73; largoInterior = 19;
+            break;
+        case "split3300":
+            alto = 50; 
+            ancho = 72; 
+            largo = 27; 
+            peso = 50; 
+            valor = 700000; // Medidas de la unidad exterior
+            altoInterior = 32; anchoInterior = 101; largoInterior = 22;
+            break;
+        case "split4500":
+            alto = 30; 
+            ancho = 82; 
+            largo = 61; 
+            peso = 60; 
+            valor = 800000; // Medidas de la unidad exterior
+            altoInterior = 35; anchoInterior = 102; largoInterior = 23;
+            break;
+        case "split5500":
+            alto = 36; 
+            ancho = 90; 
+            largo = 38; 
+            peso = 80; 
+            valor = 900000; // Medidas de la unidad exterior
+            altoInterior = 38; anchoInterior = 109; largoInterior = 34;
+            break;
+        case "split6000":
+            alto = 110; 
+            ancho = 100.7; 
+            largo = 43; 
+            peso = 99; 
+            valor = 1100000; // Medidas de la unidad exterior
+            altoInterior = 40; anchoInterior = 110; largoInterior = 38;
+            break;
+        case "splitPisoTecho18000":
+            alto = 139; 
+            ancho = 95; 
+            largo = 40; 
+            peso = 135; 
+            valor = 1500000; // Medidas de la unidad exterior
+            altoInterior = 158; anchoInterior = 68; largoInterior = 35;
+            break;
+        default:
+            return; // Si no hay selección válida, salir
+    }
+
+    // Crear el div con los inputs para las medidas exteriores
+    const bultoDiv = document.createElement('div');
+    bultoDiv.className = 'bultoImput mb-3'; // Añadido margen inferior
+
+    bultoDiv.innerHTML = `
+
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
+            <input type="number" id="alto0" name="Alto0" class="form-control" step="1" value="${alto}" required>
+        </div>
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
+            <input type="number" id="ancho0" name="Ancho0" class="form-control" step="1" value="${ancho}" required>
+        </div>
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
+            <input type="number" id="largo0" name="Largo0" class="form-control" step="1" value="${largo}" required>
+        </div>
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
+            <input type="number" id="cantidad0" name="Cantidad0" class="form-control" step="1" value="1" min="1" required>
+        </div>
+    `;
+
+    medidasDiv.appendChild(bultoDiv);
+
+    // Crear el div con los inputs para las medidas interiores, si aplica
+    if (selectedValue.startsWith("split")) {
+        const bultoInteriorDiv = document.createElement('div');
+        bultoInteriorDiv.className = 'bultoImput mb-3'; // Añadido margen inferior
+
+        bultoInteriorDiv.innerHTML = `
+<div class="d-flex mb-2">
+    <div class="input-group me-2">
+        <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
+        <input type="number" id="altoInterior0" name="AltoInterior0" class="form-control" step="1" value="${altoInterior}" required>
+    </div>
+    <div class="input-group me-2">
+        <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
+        <input type="number" id="anchoInterior0" name="AnchoInterior0" class="form-control" step="1" value="${anchoInterior}" required>
+    </div>
+    <div class="input-group me-2">
+        <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
+        <input type="number" id="largoInterior0" name="LargoInterior0" class="form-control" step="1" value="${largoInterior}" required>
+    </div>
+    <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
+        <input type="number" id="cantidadInterior0" name="CantidadInterior0" class="form-control" step="1" value="1" min="1" required>
+    </div>
+</div>
+
+`;
+
+        medidasDiv.appendChild(bultoInteriorDiv);
     }
 }
 
