@@ -13,17 +13,23 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+let allData = []; // Arreglo global para almacenar todos los datos
+let currentPage = 1;
+const itemsPerPage = 12;
+let currentPageGroup = 0; // Grupo de páginas actual
+
 // Función para cargar datos de Firebase
 function cargarDatos() {
     const spinner = document.getElementById('spinner');
     const cardsContainer = document.getElementById('meli-cards');
+    const paginationContainer = document.getElementById("pagination");
 
     spinner.style.display = 'block'; 
     cardsContainer.innerHTML = ''; // Limpia el contenedor de cards
 
     database.ref('envios').once('value')
         .then(snapshot => {
-            const allData = [];
+            allData = []; // Reiniciar el arreglo de datos
             snapshot.forEach(childSnapshot => {
                 const data = childSnapshot.val();
                 allData.push({ 
@@ -55,17 +61,30 @@ function cargarDatos() {
             allData.reverse();
 
             // Renderizar tarjetas
-            allData.forEach(data => {
-                const card = crearCard(data);
-                cardsContainer.appendChild(card);
-            });
+            renderCards(allData);
 
             // Ocultar el spinner
             spinner.style.display = 'none';
+            updatePagination(allData.length);
         })
         .catch(error => {
             console.error("Error al cargar los datos: ", error);
         });
+}
+
+// Función para renderizar las tarjetas según la página actual
+function renderCards(data) {
+    const cardsContainer = document.getElementById('meli-cards');
+    cardsContainer.innerHTML = ''; // Limpia el contenedor de cards
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedData = data.slice(startIndex, endIndex);
+
+    paginatedData.forEach(item => {
+        const card = crearCard(item);
+        cardsContainer.appendChild(card);
+    });
 }
 
 // Función para crear una card
@@ -294,7 +313,6 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
     const proxyUrl = "https://proxy.cors.sh/";
     const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
 
-
     console.log(`Datos enviados a API Andesmar (MELI ${idOperacion}):`, requestObj); // Mostrar request en consola
 
     fetch(proxyUrl + apiUrl, {
@@ -311,6 +329,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
     })
     .then(data => {
         if (data.NroPedido) {
+
             const link = `https://andesmarcargas.com//ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
             button.classList.remove('btn-primary');
@@ -565,6 +584,56 @@ async function obtenerEtiqueta(numeroDeEnvio, token, buttonAndr) {
         buttonAndr.innerText = "Error en Etiquetado ⚠️"; // Cambiar texto en caso de error
         resultadoDivAndr.innerText = `Error: ${error.message}`; // Mostrar error debajo
         buttonAndr.disabled = true;
+    }
+}
+
+// Función para actualizar la paginación
+function updatePagination(totalItems) {
+    const paginationContainer = document.getElementById("pagination");
+    paginationContainer.innerHTML = "";
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    let startPage = currentPageGroup + 1;
+    let endPage = Math.min(currentPageGroup + 6, totalPages);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageItem = document.createElement("li");
+        pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        pageItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPage = i;
+            renderCards(allData);
+            updatePagination(totalItems);
+        });
+        paginationContainer.appendChild(pageItem);
+    }
+
+    // Mostrar "Más" si hay más páginas
+    if (endPage < totalPages) {
+        const loadMoreItem = document.createElement("li");
+        loadMoreItem.className = "page-item";
+        loadMoreItem.innerHTML = `<a class="page-link" href="#">Más</a>`;
+        loadMoreItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPageGroup += 6;
+            renderCards(allData);
+            updatePagination(allData.length);
+        });
+        paginationContainer.appendChild(loadMoreItem);
+    }
+
+    // Mostrar "Atrás" si no estamos en el primer grupo
+    if (currentPageGroup > 0) {
+        const backItem = document.createElement("li");
+        backItem.className = "page-item";
+        backItem.innerHTML = `<a class="page-link" href="#">Atrás</a>`;
+        backItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPageGroup -= 6;
+            renderCards(allData);
+            updatePagination(allData.length);
+        });
+        paginationContainer.appendChild(backItem);
     }
 }
 
