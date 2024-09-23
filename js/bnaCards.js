@@ -37,85 +37,132 @@ document.getElementById('importButton').addEventListener('click', function() {
         const reader = new FileReader();
         reader.onload = function(e) {
             const content = e.target.result.trim();
-            const lines = content.split('\n');
+            
+            // Divide las filas por líneas y usa una expresión regular para manejar las comas dentro de las comillas correctamente
+            const data = content.split(/\r?\n/).map(row => {
+                return row.match(/(".*?"|[^,\r\n]+)(?=\s*,|\s*$)/g) || [];
+            });
+    
+            const headers = data[0]; // Cabeceras (primera fila)
+            const dataRows = data.slice(1); // Filas de datos
             let importedCount = 0; // Contador para SweetAlert
             const promises = []; // Array para controlar las promesas de Firebase
-
-            lines.forEach(line => {
-                const fields = line.split('|;|').map(field => field.replace(/^\|/, '').replace(/\|$/, '').trim());
-
-                // Asignación de campos
-                const name = `${fields[0]} ${fields[1]}`;
-                const cp = fields[2];
-                const localidad = fields[3];
-                const calle = fields[4];
-                const numero = fields[5];
-                const telefono = fields[6];
-                const email = fields[7];
-                const remito = fields[8];
-                const observaciones = fields[9];
-
-                // Validación para evitar tarjetas genéricas
-                if (fields.length === 10 && name !== 'NOMBRE APELLIDO') {
-                    // Crear el objeto a enviar a Firebase
+    
+            dataRows.forEach(row => {
+                if (row.length > 0) { // Verifica que la fila no esté vacía
+                    // Estructura de datos a guardar en Firebase
                     const envioData = {
-                        nombre: name,
-                        cp: cp,
-                        localidad: localidad,
-                        calle: calle,
-                        numero: numero,
-                        telefono: telefono,
-                        email: email,
-                        remito: remito,
-                        observaciones: observaciones
+                        fecha_creacion_orden: row[0] || null,
+                        fecha_pago: row[1] || null,
+                        orden_: row[2] || null,
+                        orden_publica_: row[3] || null,
+                        suborden_: row[4] || null,
+                        fabricante: row[5] || null,
+                        cantidad: row[6] || null,
+                        gp_sku: row[7] || null,
+                        sku_externo: row[8] || null,
+                        producto_nombre: row[9] || null,
+                        variantes: row[10] || null,
+                        apellido: row[11] || null,
+                        nombre: row[12] || null,
+                        email: row[13] || null,
+                        dni: row[14] || null,
+                        direccion: row[15] || null,
+                        codigo_postal: row[16] || null,
+                        telefono: row[17] || null,
+                        ciudad: row[18] || null,
+                        provincia: row[19] || null,
+                        razon_social: row[20] || null,
+                        cuit: row[21] || null,
+                        email_facturacion: row[22] || null,
+                        direccion_facturacion: row[23] || null,
+                        codigo_postal_facturacion: row[24] || null,
+                        telefono_facturacion: row[25] || null,
+                        ciudad_facturacion: row[26] || null,
+                        provincia_facturacion: row[27] || null,
+                        suborden_total: row[28] || null,
+                        precio_producto: row[29] || null,
+                        precio_venta: row[30] || null,
+                        cupon_nombre: null,
+                        cupon_descuento: null,
+                        nombre_completo_envio: row[32] || null,
+                        medio_de_envio: row[33] || null,
+                        numero_de_seguimiento: row[34] || null,
+                        monto_cobrado: row[35] || null,
+                        tipo_del_envio: row[36] || null,
+                        estado_fecha_actualizacion_tipo_de_envio: row[37] || null,
+                        estado_del_envio: row[38] || null,
+                        estado_fecha_actualizacion_envio: row[39] || null,
+                        estado_del_producto: row[40] || null,
+                        estado_fecha_actualizacion_producto: row[41] || null,
+                        liquidado: row[42] || null,
+                        id_cobis: row[43] || null,
+                        total_puntos: row[44] || null,
+                        total_dinero: row[45] || null,
+                        total_con_tasas_1: row[46] || null,
+                        total_con_tasas_2: row[47] || null,
+                        cuotas: row[48] || null,
+                        relacion_de_puntos: row[49] || null,
+                        equivalencia_puntos_pesos: row[50] || null,
+                        iva: row[51] || null,
+                        relacion_de_puntos_sin_iva: row[52] || null,
+                        equivalencia_puntos_sin_iva_pesos: row[53] || null,
+                        brand_name: row[54] || null,
+                        tipo_doc_pago: row[55] || null,
+                        doc_pago: row[56] || null,
+                        nombre_y_apellido_tarjeta: row[57] || null,
+                        numeros_tarjeta: row[58] || null,
+                        bin_tarjeta: row[59] || null,
+                        cupon: row[60] || null,
+                        cod_aut: row[61] || null,
+                        tipo_doc_pago_2: row[62] || null,
+                        doc_pago_2: row[63] || null,
+                        nombre_y_apellido_tarjeta_2: row[64] || null,
+                        numeros_tarjeta_2: row[65] || null,
+                        bin_tarjeta_2: row[66] || null,
+                        cupon_2: row[67] || null,
+                        cod_aut_2: row[68] || null,
+                        decidir_distributed: row[69] || null,
+                        modo_distributed: row[70] || null                        
                     };
-
+    
                     // Guardar en Firebase
                     const envioRef = firebase.database().ref('enviosBNA').push();
                     promises.push(envioRef.set(envioData));
                     importedCount++;
                 }
             });
-
+    
             // Cuando todas las promesas de Firebase se completen
-Promise.all(promises)
-.then(() => {
-    // Ocultar el spinner
-    spinner.remove();
-
-    // Mostrar SweetAlert con la cantidad importada
-    Swal.fire({
-        title: 'Importación completada',
-        text: `Se han importado ${importedCount} ventas a la base de datos`,
-        icon: 'success',
-        confirmButtonText: 'OK'
-    }).then(() => {
-        // Recargar la página después de hacer clic en OK
-        location.reload();
-    });
-})
-.catch(error => {
-    spinner.remove();
-    Swal.fire({
-        title: 'Error',
-        text: 'Ocurrió un error al importar los datos',
-        icon: 'error',
-        confirmButtonText: 'OK'
-    });
-});
-};
-
-reader.readAsText(file);
-} else {
-spinner.remove();
-// Mostrar SweetAlert en lugar de un alert del navegador
-Swal.fire({
-    icon: 'warning',
-    title: 'Error',
-    text: 'Por favor, seleccione un archivo para importar.',
-});
-}
-
+            Promise.all(promises)
+            .then(() => {
+                // Ocultar el spinner
+                spinner.remove();
+    
+                // Mostrar SweetAlert con la cantidad importada
+                Swal.fire({
+                    title: 'Importación completada',
+                    text: `Se han importado ${importedCount} ventas a la base de datos`,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    // Recargar la página después de hacer clic en OK
+                    location.reload();
+                });
+            })
+            .catch(error => {
+                spinner.remove();
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Ocurrió un error al importar los datos',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        };
+    
+        reader.readAsText(file);
+    }     
 });
 
 function capitalizeWords(str) {
@@ -146,15 +193,24 @@ function loadEnviosFromFirebase() {
             const data = childSnapshot.val();
             allData.push({ 
                 id: childSnapshot.key, 
-                nombre: capitalizeWords(data.nombre), 
-                cp: capitalizeWords(data.cp), 
-                localidad: capitalizeWords(data.localidad),
-                calle: capitalizeWords(data.calle), 
-                numero: capitalizeWords(data.numero), 
+                nombre: capitalizeWords(data.nombre_completo_envio), 
+                cp: capitalizeWords(data.codigo_postal), 
+                localidad: capitalizeWords(data.ciudad),
+                provincia: capitalizeWords(data.provincia),
+                calle: capitalizeWords(data.direccion.replace(/"/g, '')), 
                 telefono: capitalizeWords(data.telefono),
                 email: lowercaseWords(data.email), 
-                remito: capitalizeWords(data.remito),
-                observaciones: capitalizeWords(data.observaciones),
+                remito: capitalizeWords(data.orden_),
+                observaciones: (data.observaciones),
+                orden_publica_: (data.orden_publica_),
+                brand_name: capitalizeWords(data.brand_name),
+                cuotas: (data.cuotas),
+                precio_venta: (data.precio_venta),
+                suborden_total: (data.suborden_total),
+                numeros_tarjeta: (data.numeros_tarjeta),
+                sku: (data.sku_externo),
+                cantidad: capitalizeWords(data.cantidad),
+                producto_nombre: capitalizeWords(data.producto_nombre),
                 tipoElectrodomesticoBna: (data.tipoElectrodomesticoBna),
                 trackingLink: (data.trackingLink),
                 transportCompany: (data.transportCompany),
@@ -203,16 +259,20 @@ function renderCards(data) {
                             </div>
                             <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
                             <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
-                            <p class="card-text cpLocalidad"><i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}</p>
-                            <p class="card-text"><i class="bi bi-house"></i> Calle: ${data[i].calle}, Altura: ${data[i].numero}</p>
+                            <p class="card-text cpLocalidad"><i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}</p>
+                            <p class="card-text"><i class="bi bi-house"></i> Calle: ${data[i].calle}</p>
                             <p class="card-text"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
                             <p class="card-text"><i class="bi bi-envelope"></i> ${data[i].email}</p>
-        
+
                             <div class="d-flex align-items-center contenedorRemito">
                                 <p class="card-text remitoCard">${data[i].remito}</p>
                                 <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
+                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;" onclick="window.open('https://api.avenida.com/manage/shops/2941/orders/${data[i].orden_publica_}', '_blank');">
+                                    <i class="bi bi-bag-check"></i>
+                                </button>
+
                             </div>
         
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
@@ -269,8 +329,38 @@ function renderCards(data) {
                     </select>     
         
                             <div class="medidas"></div> <!-- Div para las medidas -->
+
+                            <!-- Botón para mostrar/ocultar el detalle del producto -->
+                            <button class="btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleProducto-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleProducto-${data[i].id}">
+                                                           <i class="bi bi-chevron-down"></i> Detalle de Producto <i class="bi bi-cart-check"></i>
+                            </button>
+
+                            <!-- Contenido del colapso -->
+                            <div class="collapse" id="collapseDetalleProducto-${data[i].id}">
+                             <div class="pago descripcion-div p-2 mt-2"">
+                                <p class="card-text-pago"><i class="bi bi-box-seam"></i> <strong>SKU:</strong> <strong>${data[i].sku}</strong>, Cantidad: ${data[i].cantidad}</p>
+                                <p class="card-text-pago"><i class="bi bi-card-text"></i> <strong>Descripción:</strong> ${data[i].producto_nombre}</p>
+                             </div>
+                            </div>
+
+                            <!-- Botón para mostrar/ocultar el detalle del Pago -->
+                            <button class="btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetallePago-${data[i].id}" aria-expanded="false" aria-controls="collapseDetallePago-${data[i].id}">
+                                <i class="bi bi-chevron-down"></i> Detalle de Pago <i class="bi bi-credit-card"></i>
+                            </button>
+
+                            <!-- Contenido del colapso -->
+                            <div class="collapse" id="collapseDetallePago-${data[i].id}">
+                                <div class="pago p-2 mt-2"">
+                                    <p class="card-text-pago"><strong>Entidad: ${data[i].brand_name || 'N/A'}</p>
+                                    <p class="card-text-pago"><strong>Cuotas:</strong> ${data[i].cuotas || 'N/A'}</p>
+                                    <p class="card-text-pago"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
+                                    <p class="card-text-pago"><strong>Precio de Venta:</strong> $ ${data[i].precio_venta}</p>
+                                    <p class="card-text-pago"><strong>Costo de Envío:</strong> $ ${(data[i].suborden_total - data[i].precio_venta)}</p>
+                                    <p class="card-text-pago"><strong>Suborden Total:</strong> $ ${data[i].suborden_total}</p>
+                                </div>
+                            </div>
         
-                            <button class="btn btn-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
+                            <button class="btn btn-secondary btn-sm w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
                                 <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
                             </button>
                             <div class="collapse" id="collapseObservaciones-${data[i].id}">
@@ -385,7 +475,7 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
     console.log(`Enviando datos a Andesmar:
         Volumen en m³: ${volumenM3}, Alto: ${alto}, Ancho: ${ancho}, Largo: ${largo}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
         ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, 
-        Calle: ${calle}, Número: ${numero}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${tipoElectrodomestico}
+        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${tipoElectrodomestico}
     `);
 
     // Mostrar spinner y cambiar texto
@@ -400,7 +490,7 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
         NombreApellidoDestinatario: nombre,
         CodigoPostalDestinatario: cp,
         CalleDestinatario: calle,
-        CalleNroDestinatario: numero,
+        CalleNroDestinatario: "S/N",
         TelefonoDestinatario: telefono,
         NroRemito: remito,
         Bultos: cantidad,
@@ -410,7 +500,7 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
         Alto: Array(cantidad).fill(alto), 
         Ancho: Array(cantidad).fill(ancho), 
         Largo: Array(cantidad).fill(largo), 
-        Observaciones: observaciones + tipoElectrodomestico,
+        Observaciones: calle + ",Telefono" + telefono + tipoElectrodomestico,
         ModalidadEntrega: "Puerta-Puerta", 
         UnidadVenta: "cargas remito conformado", 
         servicio: {

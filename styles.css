@@ -1134,6 +1134,43 @@ p.card-text:nth-child(7){
     margin-bottom: 0;
 }
 
+p.card-text:nth-child(8){
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
+p.card-text:nth-child(9){
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
+.pago{
+    border-radius: 10px;
+    border: dashed 2px cornflowerblue;
+    padding: .5rem;
+}
+
+.pago p:nth-child(5){
+    color: white;
+    font-weight: 800;
+    background-color: red;
+    width: fit-content;
+    border-radius:5px;
+    padding: .2rem;
+}
+
+.card-text-pago{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
+.descripcion-div{
+    margin-bottom: 8px;
+}
+
 .remitoCard{
     margin-bottom: 5px !important;
     text-align: center;
