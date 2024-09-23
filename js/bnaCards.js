@@ -223,9 +223,6 @@ function loadEnviosFromFirebase() {
             }
         });
 
-        // Invertir el array para mostrar la última tarjeta arriba
-        allData.reverse();
-
         // Renderizar las tarjetas y la paginación
         renderCards(allData);
         updatePagination(allData.length);
