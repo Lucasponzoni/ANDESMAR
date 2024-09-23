@@ -1523,6 +1523,23 @@ div.card-body > p > i{
     justify-content: center;
 }
 
+.em-circle-state-time{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: .8rem;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    position: absolute;
+    bottom: -15px;
+    right: 10px;
+    background-color: cornflowerblue; 
+    text-transform: uppercase;
+    color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
 .em-circle-state2{
     font-family: "Reddit Sans Condensed", sans-serif;
     font-size: .8rem;

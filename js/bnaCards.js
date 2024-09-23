@@ -177,7 +177,6 @@ function lowercaseWords(str) {
     return str.toLowerCase(); // Convertir toda la cadena a minúsculas
 }
 
-// Función para cargar los datos de Firebase y renderizar las tarjetas
 function loadEnviosFromFirebase() {
     const cardsContainer = document.getElementById('envios-cards');
     const spinner = document.getElementById('spinner');
@@ -239,20 +238,52 @@ function loadEnviosFromFirebase() {
 }
 
 function renderCards(data) {
-            const cardsContainer = document.getElementById('envios-cards');
-            cardsContainer.innerHTML = ''; // Limpiar contenedor de tarjetas
+    const cardsContainer = document.getElementById('envios-cards');
+    cardsContainer.innerHTML = ''; // Limpiar contenedor de tarjetas
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, data.length);
+
+    // Obtener la hora actual en Argentina
+    const ahora = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" });
+    const fechaActual = new Date(ahora);
+
+    for (let i = startIndex; i < endIndex; i++) {
+        const card = document.createElement('div');
+        card.className = 'col-md-4 mb-3';
+
+        // Verificar si transportCompany es "Andesmar"
+        const isAndesmar = data[i].transportCompany === "Andesmar";
+
+        // Lógica para calcular el estado de facturación
+        const fechaDeCreacion = data[i].fechaDeCreacion; // "21-09-2024 19:30:18"
+        const [fecha, hora] = fechaDeCreacion.split(' ');
+        const [dia, mes, anio] = fecha.split('-');
+        const [horas, minutos, segundos] = hora.split(':');
+        const fechaCreacion = new Date(anio, mes - 1, dia, horas, minutos, segundos);
         
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, data.length);
-        
-            for (let i = startIndex; i < endIndex; i++) {
-                const card = document.createElement('div');
-                card.className = 'col-md-4 mb-3';
-        
-                // Verificar si transportCompany es "Andesmar"
-                const isAndesmar = data[i].transportCompany === "Andesmar";
-        
-                card.innerHTML = `
+        // Calcular la fecha límite sumando 96 horas
+        const fechaLimite = new Date(fechaCreacion.getTime() + 48 * 60 * 60 * 1000);
+
+        let mensajeFactura;
+        if (fechaActual >= fechaLimite) {
+            mensajeFactura = "Seguro para facturar";
+        } else {
+            const tiempoRestante = fechaLimite - fechaActual;
+            const horasRestantes = Math.floor((tiempoRestante / (1000 * 60 * 60)) % 24);
+            const minutosRestantes = Math.floor((tiempoRestante / (1000 * 60)) % 60);
+            mensajeFactura = `Falta ${horasRestantes} horas y ${minutosRestantes} minutos`;
+        }
+
+        // Agregar el mensaje a la tarjeta
+        const mensajeElement = document.createElement('p');
+        mensajeElement.textContent = mensajeFactura;
+        card.appendChild(mensajeElement);
+
+        // Agregar la tarjeta al contenedor
+        cardsContainer.appendChild(card);
+
+        card.innerHTML = `
                     <div class="card">
                         <div class="card-body">
                             <div id="estadoEnvio${data[i].id}" class="${isAndesmar ? 'em-circle-state4' : 'em-circle-state3'}">
@@ -386,6 +417,9 @@ function renderCards(data) {
                                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
                             </button>
 
+                            <div class="factura-status em-circle-state-time" id="factura-status-${data[i].id}">${mensajeFactura}</div>
+
+
                             <div id="resultado${data[i].id}" class="mt-2 errorMeli"></div>
                         </div>
                     </div>
@@ -411,6 +445,7 @@ function renderCards(data) {
         });
 
         cardsContainer.appendChild(card);
+        
     }
 
     // Agregar el evento para actualizar observaciones
