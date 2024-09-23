@@ -210,6 +210,7 @@ function loadEnviosFromFirebase() {
                 numeros_tarjeta: (data.numeros_tarjeta),
                 sku: (data.sku_externo),
                 cantidad: (data.cantidad),
+                fechaDeCreacion: (data.fecha_creacion_orden),    
                 producto_nombre: capitalizeWords(data.producto_nombre),
                 tipoElectrodomesticoBna: (data.tipoElectrodomesticoBna),
                 trackingLink: (data.trackingLink),
@@ -350,13 +351,17 @@ function renderCards(data) {
 
                             <!-- Contenido del colapso -->
                             <div class="collapse" id="collapseDetallePago-${data[i].id}">
-                                <div class="pago p-2 mt-2"">
+                                <div class="pago p-2 mt-2 mb-2"">
                                     <p class="card-text-pago"><strong>Entidad: ${data[i].brand_name || 'N/A'}</p>
                                     <p class="card-text-pago"><strong>Cuotas:</strong> ${data[i].cuotas || 'N/A'}</p>
                                     <p class="card-text-pago"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
                                     <p class="card-text-pago"><strong>Precio de Venta:</strong> $ ${data[i].precio_venta}</p>
                                     <p class="card-text-pago"><strong>Costo de Envío:</strong> $ ${(data[i].suborden_total - data[i].precio_venta)}</p>
-                                    <p class="card-text-pago"><strong>Suborden Total:</strong> $ ${data[i].suborden_total}</p>
+                                    <p class="card-text-pago"><strong>Total:</strong> $ ${data[i].suborden_total}</p>
+                                    <button id="marcar-facturado-${data[i].id}" type="button" class="btn btn-danger w-100">
+                                    Marcar Facturado <i class="bi bi-lock-fill icono"></i>
+                                    </button>
+
                                 </div>
                             </div>
         

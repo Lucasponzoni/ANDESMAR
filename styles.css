@@ -1926,3 +1926,18 @@ div.card-body > p > i{
     border-radius: 15px;
 }
 
+/* BOTON MARCAR FACTURADO */
+.btn-danger:hover .icono {
+    content: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover .icono::before {
+    content: "\F5FF"; 
+    font-family: "Bootstrap Icons";
+}
+
+/* FIN BOTON MARCAR FACTURADO */
+
+
