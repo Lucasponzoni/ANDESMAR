@@ -663,8 +663,9 @@ function marcarFacturado(id) {
 
     const facturaStatusDiv = document.getElementById(`factura-status-${id}`);
     Swal.fire({
-        title: 'Ingrese la clave de facturación',
+        title: 'Clave de facturación 🔒',
         input: 'password',
+        inputLabel: 'Contraseña de facturacion (Solicitela al gerente)',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
         cancelButtonText: 'Cancelar',
