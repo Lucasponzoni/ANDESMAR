@@ -464,7 +464,7 @@ function renderCards(data) {
                                 </div>
                             </div>
         
-                                        <!-- Botón Andesmar -->
+                            <!-- Botón Andesmar -->          
                             <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'}" 
                             id="andesmarButton${data[i].id}" 
                             ${isAndreani ? 'disabled' : ''} 
@@ -475,16 +475,16 @@ function renderCards(data) {
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
                             </button>
 
-
-                        <button class="mt-1 btn btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'}"
-        id="andreaniButton${data[i].id}" 
-        ${isAndesmar ? 'disabled' : ''} 
-        onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')`}" >
-     <span id="andreaniText${data[i].id}">
-        ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
-        </span>
-    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
-</button>
+                            <!-- Botón Andreani --> 
+                            <button class="mt-1 btn btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'}"
+                            id="andreaniButton${data[i].id}" 
+                            ${isAndesmar ? 'disabled' : ''} 
+                            onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')`}" >
+                            <span id="andreaniText${data[i].id}">
+                            ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
+                            </span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
+                            </button>
 
                             <div class="factura-status em-circle-state-time" id="factura-status-${data[i].id}">${mensajeFactura}</div>
 
