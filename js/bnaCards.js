@@ -466,7 +466,9 @@ function renderCards(data) {
         id="andreaniButton${data[i].id}" 
         ${isAndesmar ? 'disabled' : ''} 
         onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')`}" >
-    ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
+     <span id="andreaniText${data[i].id}">
+        ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
+        </span>
     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
 </button>
 
@@ -533,6 +535,7 @@ async function handleButtonClick(numeroDeEnvio, id) {
 
 async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
     const url = `https://proxy.cors.sh/https://apisqa.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
+    
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -550,13 +553,13 @@ async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
         const blob = await response.blob();
         const pdfUrl = URL.createObjectURL(blob);
 
-        // Abrir el PDF en una nueva pestaña
-        const newTab = window.open();
-        if (newTab) {
-            newTab.location.href = pdfUrl; // Cambiar la ubicación de la nueva pestaña al PDF
-        } else {
-            console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes esté desactivado.');
-        }
+        // Crear un enlace temporal para la descarga
+        const a = document.createElement('a');
+        a.href = pdfUrl;
+        a.download = `Etiqueta_BNA_${numeroDeEnvio}.pdf`; // Nombre del archivo
+        document.body.appendChild(a);
+        a.click(); // Simular clic en el enlace
+        document.body.removeChild(a); // Eliminar el enlace del DOM
     } catch (error) {
         console.error('Error al obtener la etiqueta:', error);
     }
