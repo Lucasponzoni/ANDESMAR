@@ -1084,6 +1084,18 @@ p.card-text{
     padding: 5px;
 }
 
+.cpLocalidadBna{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    text-transform: capitalize;
+    font-size: .8rem;
+    font-weight: 400;
+    width: fit-content;
+    background-color: grey;
+    color: white;
+    border-radius: 8px;
+    padding: 5px;
+}
+
 .cpLocalidad-meli{
     padding-inline: 10px !important;
     font-family: "Reddit Sans Condensed", sans-serif !important;
@@ -1142,6 +1154,19 @@ p.card-text:nth-child(7){
 }
 
 p.card-text:nth-child(8){
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
+p.card-text-bna{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
+p.card-text-bna2{
+    color: green;
     font-family: "Reddit Sans Condensed", sans-serif;
     font-weight: 300;
     margin-bottom: 5px;
@@ -1587,6 +1612,7 @@ div.card-body > p > i{
 
 .em-circle-state3{
     font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 900;
     font-size: .8rem;
     padding-inline: 5px;
     padding: 5px;
@@ -1594,10 +1620,9 @@ div.card-body > p > i{
     position: absolute;
     top: -15px; 
     right: 150px;
-    background-color: rgb(254, 235, 235);
-    border: dashed 2PX red; 
+    background-color: orangered;
     text-transform: uppercase;
-    color: red;
+    color: white;
     display: flex; 
     align-items: center; 
     justify-content: center;
@@ -1605,6 +1630,7 @@ div.card-body > p > i{
 }
 
 .em-circle-state4{
+    font-weight: 900;
     font-family: "Reddit Sans Condensed", sans-serif;
     font-size: .8rem;
     padding-inline: 5px;
@@ -1613,10 +1639,9 @@ div.card-body > p > i{
     position: absolute;
     top: -15px; 
     right: 150px;
-    background-color: rgb(226, 250, 216);
-    border: dashed 2PX green; 
+    background-color: green;
     text-transform: uppercase;
-    color: green;
+    color: white;
     display: flex; 
     align-items: center; 
     justify-content: center;
@@ -1667,7 +1692,7 @@ div.card-body > p > i{
     position: absolute;
     top: -15px; 
     right: 10px;
-    border: dashed 2px orangered;
+    border: solid 2px cornflowerblue;
     background-color: white;
     display: flex; 
     align-items: center; 
@@ -1986,4 +2011,26 @@ div.card-body > p > i{
 
 /* FIN BOTON MARCAR FACTURADO */
 
+/* SUGERENCIAS BNA */
+.suggestions-container {
+    font-size: small;
+    max-height: 150px; 
+    overflow-y: auto;  
+    border: none; 
+    border-radius: 5px; 
+    background-color: white; 
+    z-index: 1000; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+}
+
+.list-group-item {
+    cursor: pointer; 
+}
+
+.list-group-item:hover {
+    background-color: cornflowerblue;
+    color: white;
+}
+
+/* FIN SUGERENCIAS BNA */
 

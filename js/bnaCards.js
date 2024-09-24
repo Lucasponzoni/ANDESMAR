@@ -310,15 +310,31 @@ function renderCards(data) {
                     <div class="card">
                         <div class="card-body">
                             <div id="estadoEnvio${data[i].id}" class="${isAndreani || isAndesmar ? 'em-circle-state4' : 'em-circle-state3'}">
-                            ${isAndreani || isAndesmar ? 'Preparado' : 'Pendiente'} <i class="bi bi-stopwatch-fill"></i>
+                            ${isAndreani || isAndesmar ? 'Preparado' : 'Pendiente'}
                             </div>
 
                             <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
                             <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
-                            <p class="card-text cpLocalidad"><i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}</p>
-                            <p class="card-text"><i class="bi bi-house"></i> Calle: ${data[i].calle}</p>
-                            <p class="card-text"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
-                            <p class="card-text"><i class="bi bi-envelope"></i> ${data[i].email}</p>
+                                                <div class="d-flex align-items-center">
+                            
+                            <p class="card-text cpLocalidadBna mb-0 me-2">
+                            <i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}
+                            </p>
+    
+                            <button class="btn btn-sm btn-" style="color: #007bff;" id="edit-localidad-${data[i].id}">
+                            <i class="bi bi-pencil-square"></i>
+                            </button>
+                    </div>
+
+                    <div id="edit-input-${data[i].id}" style="display: none;">
+                        <input type="text" id="localidad-input-${data[i].id}" placeholder="Buscar localidad" class="form-control" autocomplete="off">
+                        <ul id="suggestions-${data[i].id}" class="suggestions-container list-group"></ul>
+                    </div>
+
+
+                            <p class="card-text-bna"><i class="bi bi-house"></i> Calle: ${data[i].calle}</p>
+                            <p class="card-text-bna"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
+                            <p class="card-text-bna2"><i class="bi bi-envelope"></i> ${data[i].email}</p>
                             <div class="d-flex align-items-center contenedorRemito">
                                 <p class="card-text remitoCard">${data[i].remito}</p>
                                 <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
@@ -494,6 +510,69 @@ function renderCards(data) {
                     </div>
                 `;
 
+                document.getElementById(`edit-localidad-${data[i].id}`).addEventListener('click', function() {
+                    const editDiv = document.getElementById(`edit-input-${data[i].id}`);
+                    editDiv.style.display = editDiv.style.display === 'none' ? 'block' : 'none';
+                });
+                
+                document.getElementById(`localidad-input-${data[i].id}`).addEventListener('input', function() {
+                    const query = this.value.toLowerCase();
+                    const suggestions = localidades.filter(loc => 
+                        loc.localidad.toLowerCase().includes(query) || 
+                        loc.provincia.toLowerCase().includes(query) || 
+                        loc.codigosPostales.some(cp => cp.includes(query))
+                    ).slice(0, 5); 
+                    
+                    const suggestionsList = document.getElementById(`suggestions-${data[i].id}`);
+                    suggestionsList.innerHTML = '';
+                    
+                    suggestions.forEach(suggestion => {
+                        const li = document.createElement('li');
+                        li.classList.add('list-group-item');
+                
+                        const cp = suggestion.codigosPostales[0];
+                        const localidad = capitalize(suggestion.localidad.trim());
+                        const provincia = capitalize(suggestion.provincia.trim());
+                
+                        li.textContent = `${cp}, ${localidad}, ${provincia}`;
+                        
+                        li.addEventListener('click', function() {
+                            // Actualizar y guardar en Firebase
+                            data[i].cp = cp;
+                            data[i].localidad = localidad;
+                            data[i].provincia = provincia;
+                
+                            // Guardar en Firebase
+                            firebase.database().ref('enviosBNA/' + data[i].id).update({
+                                codigo_postal: cp,
+                                ciudad: localidad,
+                                provincia: provincia
+                            }).then(() => {
+                                const cpLocalidadElement = document.querySelector(`.card[data-id='${data[i].id}'] .cpLocalidad`);
+                                if (cpLocalidadElement) {
+                                    cpLocalidadElement.innerHTML = `<i class="bi bi-geo-alt"></i> ${cp}, ${localidad}, ${provincia}`;
+                                }
+                                document.getElementById(`edit-input-${data[i].id}`).style.display = 'none';
+                
+                                // Mostrar SweetAlert
+                                Swal.fire({
+                                    title: 'Éxito',
+                                    text: 'Localidad actualizada',
+                                    icon: 'success',
+                                    confirmButtonText: 'Aceptar'
+                                }).then(() => {
+                                    // Recargar la página
+                                    location.reload();
+                                });
+                            }).catch(error => {
+                                console.error("Error al actualizar la localidad: ", error);
+                            });
+                        });
+                
+                        suggestionsList.appendChild(li);
+                    });
+                });                             
+
                 // Lógica para determinar el mensaje estado de Facturacion
                 const facturaStatusDiv = document.getElementById(`factura-status-${data[i].id}`);
                 if (hasDatoFacturacion) {
@@ -530,6 +609,7 @@ function renderCards(data) {
 
     // Agregar el evento para actualizar observaciones
     addUpdateObservacionesEvent();
+
 }
 
 async function handleButtonClick(numeroDeEnvio, id) {
@@ -863,7 +943,7 @@ if (isSplit) {
             // Actualizar estado de envío
             if (envioState) {
                 envioState.className = 'em-circle-state4';
-                envioState.innerHTML = `Preparado <i class="bi bi-check2-circle"></i>`;
+                envioState.innerHTML = `Preparado`;
             } else {
                 console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
             }
@@ -1179,7 +1259,7 @@ for (let i = 0; i < cantidadBultos; i++) {
             // Cambiar el estado del envío
             if (envioState) {
                 envioState.className = 'em-circle-state4';
-                envioState.innerHTML = `Preparado <i class="bi bi-check2-circle"></i>`;
+                envioState.innerHTML = `Preparado`;
             }
 
             // Llamar a la API para obtener la etiqueta
