@@ -52,6 +52,13 @@ form {
     margin-bottom: .5rem;
 }
 
+.badge-large {
+    font-size: 1rem;
+    top: -10px !important;
+    min-width: 25px !important;
+    z-index: 1000 !important;
+}
+
 .CpyLocalidad, .PisoyDepto{
     padding: .5rem;
     border: dashed 2px cornflowerblue;

@@ -193,6 +193,7 @@ function loadEnviosFromFirebase() {
     firebase.database().ref('enviosBNA').once('value', function(snapshot) {
         allData = []; // Asegúrate de reiniciar allData
         let sinPrepararCount = 0; // Contador para las tarjetas sin preparar
+        let sinFacturarCount = 0;
 
         snapshot.forEach(function(childSnapshot) {
             const data = childSnapshot.val();
@@ -220,6 +221,7 @@ function loadEnviosFromFirebase() {
                 datoFacturacion: (data.datoFacturacion),
                 producto_nombre: capitalizeWords(data.producto_nombre),
                 tipoElectrodomesticoBna: (data.tipoElectrodomesticoBna),
+                datoFacturacion: (data.datoFacturacion),
                 trackingLink: (data.trackingLink),
                 transportCompany: (data.transportCompany),
                 transportCompanyNumber: (data.transportCompanyNumber),
@@ -228,6 +230,11 @@ function loadEnviosFromFirebase() {
             // Incrementar el contador si tipoElectrodomesticoBna está vacío
             if (!data.tipoElectrodomesticoBna) {
                 sinPrepararCount++;
+            }
+
+            // Incrementar el contador si tipoElectrodomesticoBna está vacío
+            if (!data.datoFacturacion) {
+                sinFacturarCount++;
             }
         });
 
@@ -238,6 +245,8 @@ function loadEnviosFromFirebase() {
         
         // Actualizar el contador en el botón
         document.getElementById('contadorCards').innerText = sinPrepararCount;
+        // Actualizar el contador en el botón
+        document.getElementById('contadorCardsFacturar').innerText = sinFacturarCount;
 
         spinner.remove(); // Ocultar spinner después de cargar los datos
     });
@@ -722,9 +731,8 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, num
     const altoInterior = document.getElementById(`altoInterior-${id}`) ? document.getElementById(`altoInterior-${id}`).value : null;
     const anchoInterior = document.getElementById(`anchoInterior-${id}`) ? document.getElementById(`anchoInterior-${id}`).value : null;
     const largoInterior = document.getElementById(`largoInterior-${id}`) ? document.getElementById(`largoInterior-${id}`).value : null;
-
     const observaciones = document.getElementById(`observaciones-${id}`).value; // Obtiene el valor del campo de observaciones
-    const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; // Cambiar `${i}` por `${id}`
+    const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; 
 
     // Extraer los números de los textos (eliminar 'cm³' y 'm³')
     const volumenCm3 = parseInt(volumenCm3Texto.replace(' cm³', ''));
@@ -1041,10 +1049,6 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
         Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
     `);
 
-    // Verificar si el tipo de electrodoméstico es uno de los splits
-const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
-const isSplit = splitTypes.includes(tipoElectrodomestico);
-
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
     textAndr.innerText = 'Generando Etiqueta...';
@@ -1056,26 +1060,34 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
     const provinciaNombre = provincia.toLowerCase();
     const regionCodigo = regionMap[provinciaNombre] || ""; // Obtener el código de región
 
-    // Inicializar el array de bultos
-    const bultos = [];
-    const volumenTotal = volumenCm3 / cantidad; // Obtener volumen total
+// Inicializar el array de bultos
+const bultos = [];
 
-    for (let i = 0; i < cantidad; i++) {
-        bultos.push({
-            "kilos": peso / cantidad,
-            "largoCm": null,
-            "altoCm": null,
-            "anchoCm": null,
-            "volumenCm": volumenTotal,
-            "valorDeclaradoSinImpuestos": precioSinIVA,
-            "valorDeclaradoConImpuestos": precioVentaRedondeado,
-            "referencias": [
-                { "meta": "detalle", "contenido": producto_nombre },
-                { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
-                { "meta": "observaciones", "contenido": calle + ",Telefono: " + telefono + " " + "Electrodomestico: " + producto_nombre, }
-            ]
-        });
-    }
+// Verificar si el tipo de electrodoméstico es uno de los splits
+const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; 
+const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
+const isSplit = splitTypes.includes(tipoElectrodomestico);
+
+// Ajustar la cantidad de bultos
+const cantidadBultos = isSplit ? cantidad * 2 : cantidad;
+const VolumenTotalFinal = isSplit ? volumenCm3 / 2 : volumenCm3 / cantidad;
+
+for (let i = 0; i < cantidadBultos; i++) {
+    bultos.push({
+        "kilos": peso / cantidadBultos,
+        "largoCm": null,
+        "altoCm": null,
+        "anchoCm": null,
+        "volumenCm": VolumenTotalFinal,
+        "valorDeclaradoSinImpuestos": precioSinIVA,
+        "valorDeclaradoConImpuestos": precioVentaRedondeado,
+        "referencias": [
+            { "meta": "detalle", "contenido": producto_nombre },
+            { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
+            { "meta": "observaciones", "contenido": calle + ",Telefono: " + telefono + " " + "Electrodomestico: " + producto_nombre }
+        ]
+    });
+}
 
     const requestData = {
         "contrato": volumenCm3 > 100000 ? "351002753" : "400017259",
@@ -1499,6 +1511,20 @@ document.getElementById('btnPreparar').addEventListener('click', () => {
 });
 
 // FIN SIN PREPARAR BOTON
+
+// SIN FACTURAR BOTON
+document.getElementById('btnFacturar').addEventListener('click', () => {
+    const sinFacturarCards = allData.filter(item => !item.datoFacturacion);
+    
+    // Limpiar el contenedor de tarjetas
+    const cardsContainer = document.getElementById('envios-cards');
+    cardsContainer.innerHTML = '';
+
+    // Renderizar solo las tarjetas sin preparar
+    renderCards(sinFacturarCards);
+});
+
+// FIN FACTURAR BOTON
 
 // BUSCADOR
 searchInput.addEventListener("input", function() {

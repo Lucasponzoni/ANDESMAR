@@ -51,13 +51,18 @@
                 <!-- Botones -->
                  <div class="trio-de-botones">
 
-                    <button class="btn btn-danger"><i class="bi bi-box-seam-fill"></i></button>
-                    <button class="btn btn-primary"><i class="bi bi-box-seam-fill"></i></button>
+                    <button id="btnFacturar" type="button" class="btn btn-primary position-relative" style="white-space: nowrap; min-width: 140px;">
+                        Para Facturar <i class="bi bi-cart-check-fill"></i>
+                        <span id="contadorCardsFacturar" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-large">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            <span class="visually-hidden"></span>
+                        </span>
+                    </button>
                     
                     <button id="btnPreparar" type="button" class="btn btn-secondary position-relative" style="white-space: nowrap; min-width: 140px;">
-                        Para Preparar
-                        <span id="contadorCards" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            Contando
+                        Para Preparar <i class="bi bi-box2"></i>
+                        <span id="contadorCards" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-large">
+                            <i class="bi bi-arrow-clockwise"></i>
                             <span class="visually-hidden"></span>
                         </span>
                     </button>
