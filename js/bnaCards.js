@@ -208,6 +208,7 @@ function loadEnviosFromFirebase() {
                 precio_venta: (data.precio_venta),
                 suborden_total: (data.suborden_total),
                 numeros_tarjeta: (data.numeros_tarjeta),
+                orden_publica: (data.orden_publica_),
                 sku: (data.sku_externo),
                 cantidad: (data.cantidad),
                 fechaDeCreacion: (data.fecha_creacion_orden),    
@@ -283,6 +284,10 @@ function renderCards(data) {
         mensajeElement.textContent = mensajeFactura;
         card.appendChild(mensajeElement);
 
+        const ordenPublica = data[i].orden_publica.replace(/-/g, '');
+        const cupon = ordenPublica.substring(0, 13); 
+        const autorizacion = ordenPublica.substring(ordenPublica.length - 4); 
+        
         // Agregar la tarjeta al contenedor
         cardsContainer.appendChild(card);
 
@@ -298,7 +303,6 @@ function renderCards(data) {
                             <p class="card-text"><i class="bi bi-house"></i> Calle: ${data[i].calle}</p>
                             <p class="card-text"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
                             <p class="card-text"><i class="bi bi-envelope"></i> ${data[i].email}</p>
-
                             <div class="d-flex align-items-center contenedorRemito">
                                 <p class="card-text remitoCard">${data[i].remito}</p>
                                 <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
@@ -392,6 +396,35 @@ function renderCards(data) {
                                     <p class="card-text-pago"><strong>Precio de Venta:</strong> $ ${data[i].precio_venta}</p>
                                     <p class="card-text-pago"><strong>Costo de Envío:</strong> $ ${(data[i].suborden_total - data[i].precio_venta)}</p>
                                     <p class="card-text-pago"><strong>Total:</strong> $ ${data[i].suborden_total}</p>
+
+                            <!-- Contenedor gris con CUPON y AUTORIZACION -->
+                            <div class="bg-light p-3 mb-2 rounded" style="border: solid 1px #dc3545;">
+                            <div class="mb-3 text-center">
+                            <strong class="text-primary">CUPON:</strong>
+                            <div class="d-flex justify-content-center align-items-center">
+                            <span class="me-2">${cupon}</span>
+                            
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${cupon}')">
+                            <i class="bi bi-clipboard"></i>
+                            </button>
+
+                            </div>
+                            </div>
+
+                            <div class="text-center">
+                            <strong class="text-primary">AUTORIZACION:</strong>
+                            <div class="d-flex justify-content-center align-items-center">
+                            <span class="me-2">${autorizacion}</span>
+                            
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${autorizacion}')">
+                            <i class="bi bi-clipboard"></i>
+                            </button>
+
+                            </div>
+                            </div>
+                            </div>
+                                    
+                                    
                                     <button id="marcar-facturado-${data[i].id}" type="button" class="btn ${hasDatoFacturacion ? 'btn-success' : 'btn-danger'} w-100" ${hasDatoFacturacion ? 'disabled' : ''} onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}')`}">${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
                                         <i class="bi bi-lock-fill icono"></i>
                                     </button>
@@ -420,9 +453,9 @@ function renderCards(data) {
                                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
                             </button>
 
-                            <button class="btn btn-danger btnAndreaniMeli mt-1" id="andreaniButton${data.id}" onclick="enviarDatosAndreani('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${data.Peso}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
-                            <span id="andreaniText${data.id}"><i class="bi bi-file-text"></i> Etiqueta Andreani</span>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.id}" style="display:none;"></span>
+                            <button class="btn btn-danger btnAndreaniMeli mt-1" id="andreaniButton${data[i].id}" onclick="enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')">
+                            <span id="andreaniText${data[i].id}"><i class="bi bi-file-text"></i> Etiqueta Andreani</span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
                             </button>
 
                             <div class="factura-status em-circle-state-time" id="factura-status-${data[i].id}">${mensajeFactura}</div>
@@ -475,8 +508,10 @@ function renderCards(data) {
 
 
 function marcarFacturado(id) {
+
+    const facturaStatusDiv = document.getElementById(`factura-status-${id}`);
     Swal.fire({
-        title: 'Ingrese la clave',
+        title: 'Ingrese la clave de facturación',
         input: 'password',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
@@ -502,18 +537,26 @@ function marcarFacturado(id) {
             // Mensaje para el contenido del botón
             let mensajeFactura = '';
 
-            if (clave === '1234') {
+            if (clave === '1110') {
                 contenidoBoton = `Facturado Brisa ${horaFormateada} ${fechaFormateada}`;
                 mensajeFactura = 'Facturado ✅';
-            } else if (clave === '2345') {
+                facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+                facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
+            } else if (clave === '1111') {
                 contenidoBoton = `Facturado Leo ${horaFormateada} ${fechaFormateada}`;
                 mensajeFactura = 'Facturado ✅';
-            } else if (clave === '3456') {
+                facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+                facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
+            } else if (clave === '1112') {
                 contenidoBoton = `Facturado Julian ${horaFormateada} ${fechaFormateada}`;
                 mensajeFactura = 'Facturado ✅';
-            } else if (clave === '5678') {
+                facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+                facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
+            } else if (clave === '1113') {
                 contenidoBoton = `Facturado Mauricio ${horaFormateada} ${fechaFormateada}`;
                 mensajeFactura = 'Facturado ✅';
+                facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+                facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
             } else {
                 Swal.fire('Clave incorrecta', '', 'error');
                 return; // Salir si la clave es incorrecta
@@ -548,6 +591,7 @@ const clave = "BOM6765";
 const codigoCliente = "6765";
 
 function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
+
     // Obtener los elementos de volumen
     const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
     const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
@@ -767,6 +811,288 @@ function addUpdateObservacionesEvent() {
         });
     });
 }
+
+// Función para enviar datos a la API de Andreani
+const apiUrlLogin = 'https://apisqa.andreani.com/login';
+const apiUrlLabel = 'https://proxy.cors.sh/https://apisqa.andreani.com/v2/ordenes-de-envio';
+const username = 'novogar_gla';
+const password = 'JoBOraCDJZC';
+
+// Mapeo de provincias a códigos de región
+const regionMap = {
+    "Salta": "AR-A",
+    "buenos aires": "AR-B",
+    "capital federal": "AR-C",
+    "san luis": "AR-D",
+    "entre rios": "AR-E",
+    "la rioja": "AR-F",
+    "santiago del estero": "AR-G",
+    "chaco": "AR-H",
+    "san juan": "AR-J",
+    "catamarca": "AR-K",
+    "la pampa": "AR-L",
+    "mendoza": "AR-M",
+    "misiones": "AR-N",
+    "formosa": "AR-P",
+    "neuquen": "AR-Q",
+    "rio negro": "AR-R",
+    "santa fe": "AR-S",
+    "tucuman": "AR-T",
+    "chubut": "AR-U",
+    "tierra del fuego": "AR-V",
+    "corrientes": "AR-W",
+    "cordoba": "AR-X",
+    "jujuy": "AR-Y",
+    "santa cruz": "AR-Z"
+};
+
+async function getAuthToken() {
+    try {
+        const response = await fetch(apiUrlLogin, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Basic ${btoa(`${username}:${password}`)}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Token de autenticación:', data.token);
+            return data.token; 
+        } else {
+            throw new Error('No se pudo obtener el token');
+        }
+    } catch (error) {
+        console.error('Error al obtener el token de autenticación:', error);
+    }
+}
+
+async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
+    
+    // Redondear el precio_venta y convertirlo a un entero
+    const precioVentaRedondeado = Math.round(precio_venta);
+
+    // Calcular el precio sin IVA (suponiendo un IVA del 21%)
+    const tasaIVA = 0.21;
+    const precioSinIVA = parseFloat((precioVentaRedondeado / (1 + tasaIVA)).toFixed(2)); 
+
+    console.log(`Precio con IVA: ${precioVentaRedondeado}, Precio sin IVA: ${precioSinIVA}`);
+
+    // Obtener los elementos de volumen
+    const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
+    const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
+
+    // Comprobar si los elementos existen
+    if (!volumenCm3Elemento || !volumenM3Elemento) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'Debe seleccionar un producto del listado.',
+            confirmButtonText: 'OK'
+        });
+        return; // Salir de la función si no se seleccionó un producto
+    }
+
+    // Obtener los valores de texto
+    const volumenCm3Texto = volumenCm3Elemento.textContent;
+    const volumenM3Texto = volumenM3Elemento.textContent;
+
+    const altoA = document.getElementById(`alto-${id}`).value;
+    const anchoA = document.getElementById(`ancho-${id}`).value;
+    const largoA = document.getElementById(`largo-${id}`).value;
+    const cantidad = document.getElementById(`cantidad-${id}`).value;
+    const peso = document.getElementById(`peso-${id}`).value;
+
+    // Comprobar si los elementos existen y asignar null si no existen
+    const altoInterior = document.getElementById(`altoInterior-${id}`) ? document.getElementById(`altoInterior-${id}`).value : null;
+    const anchoInterior = document.getElementById(`anchoInterior-${id}`) ? document.getElementById(`anchoInterior-${id}`).value : null;
+    const largoInterior = document.getElementById(`largoInterior-${id}`) ? document.getElementById(`largoInterior-${id}`).value : null;
+
+    const observaciones = document.getElementById(`observaciones-${id}`).value;
+
+    // Extraer los números de los textos (eliminar 'cm³' y 'm³')
+    const volumenCm3 = parseInt(volumenCm3Texto.replace(' cm³', ''));
+    const volumenM3 = parseFloat(volumenM3Texto.replace(' m³', ''));
+
+    const buttonAndr = document.getElementById(`andreaniButton${id}`);
+    const spinnerAndr = document.getElementById(`spinnerAndreani${id}`);
+    const textAndr = document.getElementById(`andreaniText${id}`);
+    const resultadoDiv = document.getElementById(`resultado${id}`);
+    const envioState = document.getElementById(`estadoEnvio${id}`);
+    const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
+
+    // Verificar si los volúmenes son nulos o no válidos
+    if (isNaN(volumenCm3) || isNaN(volumenM3)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'Debe seleccionar un producto del listado.',
+            confirmButtonText: 'OK'
+        });
+        return; // Salir de la función si no se seleccionó un producto
+    }
+
+    console.log(`Enviando datos a Andesmar:
+        Volumen en m³: ${volumenM3}, Alto: ${altoA}, Ancho: ${anchoA}, Largo: ${largoA}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
+        ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
+        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
+    `);
+
+    // Mostrar spinner y cambiar texto
+    spinnerAndr.style.display = 'inline-block';
+    textAndr.innerText = 'Generando Etiqueta...';
+
+    const token = await getAuthToken();
+
+    // Obtener el nombre de la provincia y convertirlo a minúsculas
+    const provinciaNombre = provincia.toLowerCase();
+    const regionCodigo = regionMap[provinciaNombre] || ""; // Obtener el código de región
+
+    // Inicializar el array de bultos
+    const bultos = [];
+    const volumenTotal = volumenCm3 / cantidad; // Obtener volumen total
+
+    for (let i = 0; i < cantidad; i++) {
+        bultos.push({
+            "kilos": peso / cantidad,
+            "largoCm": null,
+            "altoCm": null,
+            "anchoCm": null,
+            "volumenCm": volumenTotal,
+            "valorDeclaradoSinImpuestos": precioSinIVA,
+            "valorDeclaradoConImpuestos": precioVentaRedondeado,
+            "referencias": [
+                { "meta": "detalle", "contenido": producto_nombre },
+                { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
+                { "meta": "observaciones", "contenido": calle + ",Telefono" + telefono + " " + "Electrodomestico: " + producto_nombre, }
+            ]
+        });
+    }
+
+    const requestData = {
+        "contrato": volumenCm3 > 100000 ? "351002753" : "400017259",
+        "idPedido": `${remito}-BNA`.toUpperCase(),
+        "origen": {
+            "postal": {
+                "codigoPostal": "2126",
+                "calle": "R. Prov. 21 Km",
+                "numero": "4,9",
+                "localidad": "ALVEAR",
+                "region": "AR-S",
+                "pais": "Argentina"
+            }
+        },
+        "destino": {
+            "postal": {
+                "codigoPostal": cp,
+                "calle": calle,
+                "numero": "S/N",
+                "localidad": localidad,
+                "region": regionCodigo,
+                "pais": "Argentina"
+            }
+        },
+        "remitente": {
+            "nombreCompleto": "NOVOGAR.COM.AR",
+            "email": "posventa@novogar.com.ar",
+            "documentoTipo": "CUIT",
+            "documentoNumero": "30685437011",
+            "telefonos": [{ "tipo": 1, "numero": "3416680658" }]
+        },
+        "destinatario": [{
+            "nombreCompleto": nombre,
+            "email": email,
+            "documentoTipo": "CUIT",
+            "documentoNumero": "30685437011",
+            "telefonos": [{ "tipo": 1, "numero": telefono}]
+        }],
+        "remito": {
+            "numeroRemito": `${remito}-BNA`.toUpperCase(),
+        },
+        "bultos": bultos
+    };
+
+    console.log(`Datos enviados a API ANDREANI (BNA+ ${remito}):`, requestData);
+
+    try {
+        const response = await fetch(apiUrlLabel, {
+            method: 'POST',
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                'x-authorization-token': token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const numeroDeEnvio = data.bultos[0].numeroDeEnvio;
+
+            console.log(`Datos Respuesta API ANDREANI (BNA+ ${remito}):`, response);
+
+            const linkSeguimiento = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
+
+            // Configurar el botón de descarga inicial  
+            buttonAndr.disabled = true;
+            textAndr.innerHTML = `Orden ${numeroDeEnvio}`;
+            buttonAndr.classList.remove('btn-danger');
+            buttonAndr.classList.add('btn-secondary');
+            NroEnvio.innerHTML = `<a href="${linkSeguimiento}" target="_blank">Andreani: ${numeroDeEnvio} <i class="bi bi-box-arrow-up-right"></i></a>`;
+        
+            // Cambiar el estado del envío
+            if (envioState) {
+                envioState.className = 'em-circle-state4';
+                envioState.innerHTML = `Preparado <i class="bi bi-check2-circle"></i>`;
+            }
+
+            // Llamar a la API para obtener la etiqueta
+            await obtenerEtiqueta(numeroDeEnvio, token, buttonAndr);
+        } else {
+            console.error('Error al generar la etiqueta:', response.statusText);
+            buttonAndr.innerText = "Error Andreani ⚠️"; 
+            resultadoDiv.innerText = `Error Andreani: (Puede no existir el CP o Localidad en Andreani) ${response.statusText}`; 
+            buttonAndr.disabled = true;
+        }
+    } catch (error) {
+        console.error('Error al generar la etiqueta:', error);
+
+        button.innerText = "Error Andreani ⚠️"; 
+        resultadoDiv.innerText = `Error Andreani: (Puede no existir el CP o Localidad en Andreani) ${error.message}`; 
+        buttonAndr.disabled = true;
+    }
+}
+
+async function obtenerEtiqueta(numeroDeEnvio, token, buttonAndr) {
+    const url = `https://proxy.cors.sh/https://apisqa.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                "x-authorization-token": token,
+                "Accept": "application/pdf"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error HTTP! Status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const pdfUrl = URL.createObjectURL(blob);
+
+        buttonAndr.disabled = false;
+        buttonAndr.href = pdfUrl; // Establecer el href del botón
+        buttonAndr.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${numeroDeEnvio}`;
+        buttonAndr.classList.remove('btn-secondary');
+        buttonAndr.classList.add('btn-success');
+        buttonAndr.onclick = () => window.open(pdfUrl, '_blank');
+    } catch (error) {
+        console.error('Error al obtener la etiqueta:', error);
+    }
+}
+
 
 function rellenarMedidas(selectElement, id, isInitialLoad = false) {
     const selectedValue = selectElement.value;
