@@ -254,6 +254,7 @@ function renderCards(data) {
 
         // Verificar si transportCompany es "Andesmar"
         const isAndesmar = data[i].transportCompany === "Andesmar";
+        const isAndreani = data[i].transportCompany === "Andreani";
 
         // Verificar si datoFacturacion existe
         const hasDatoFacturacion = data[i].datoFacturacion !== undefined && data[i].datoFacturacion !== null;
@@ -294,9 +295,10 @@ function renderCards(data) {
         card.innerHTML = `
                     <div class="card">
                         <div class="card-body">
-                            <div id="estadoEnvio${data[i].id}" class="${isAndesmar ? 'em-circle-state4' : 'em-circle-state3'}">
-                                ${isAndesmar ? 'Preparado' : 'Pendiente'} <i class="bi bi-stopwatch-fill"></i>
+                            <div id="estadoEnvio${data[i].id}" class="${isAndreani || isAndesmar ? 'em-circle-state4' : 'em-circle-state3'}">
+                            ${isAndreani || isAndesmar ? 'Preparado' : 'Pendiente'} <i class="bi bi-stopwatch-fill"></i>
                             </div>
+
                             <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
                             <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
                             <p class="card-text cpLocalidad"><i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}</p>
@@ -315,8 +317,13 @@ function renderCards(data) {
                             </div>
         
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
-                                ${isAndesmar ? `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 'Número de Envío Pendiente'}
+                            ${isAndreani ? 
+                            `<a href="${data[i].trackingLink}" target="_blank">Andreani: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                            (isAndesmar ? 
+                            `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                            'Número de Envío Pendiente')}
                             </p>
+
         
                             <div class="alert alert-success d-none" id="alert-${data[i].id}" role="alert">
                                 Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
@@ -443,20 +450,25 @@ function renderCards(data) {
                                 </div>
                             </div>
         
-                            <!-- Botón Andesmar -->
+                                        <!-- Botón Andesmar -->
                             <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'}" 
-                                    id="andesmarButton${data[i].id}" 
-                                    ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')"`}>
-                                <span id="andesmarText${data[i].id}">
-                                    ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andesmar`}
-                                </span>
-                                                           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
+                            id="andesmarButton${data[i].id}" 
+                            ${isAndreani ? 'disabled' : ''} 
+                            ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')"`}>
+                            <span id="andesmarText${data[i].id}">
+                            ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andesmar`}
+                            </span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
                             </button>
 
-                            <button class="btn btn-danger btnAndreaniMeli mt-1" id="andreaniButton${data[i].id}" onclick="enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')">
-                            <span id="andreaniText${data[i].id}"><i class="bi bi-file-text"></i> Etiqueta Andreani</span>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
-                            </button>
+
+                        <button class="mt-1 btn btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'}"
+        id="andreaniButton${data[i].id}" 
+        ${isAndesmar ? 'disabled' : ''} 
+        onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')`}" >
+    ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
+</button>
 
                             <div class="factura-status em-circle-state-time" id="factura-status-${data[i].id}">${mensajeFactura}</div>
 
@@ -477,8 +489,6 @@ function renderCards(data) {
                     facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
                     facturaStatusDiv.classList.add('em-circle-state-time'); 
                 }
-
-
         // Lógica para cargar el tipoElectrodomesticoBna si existe
         const tipoElectrodomesticoBnaSelect = card.querySelector(`#tipoElectrodomesticoBna-${data[i].id}`);
         if (data[i].tipoElectrodomesticoBna) {
@@ -506,6 +516,51 @@ function renderCards(data) {
     addUpdateObservacionesEvent();
 }
 
+async function handleButtonClick(numeroDeEnvio, id) {
+    // Mostrar spinner
+    document.getElementById(`spinnerAndreani${id}`).style.display = 'inline-block';
+    
+    // Obtener el token de autenticación
+    const token = await getAuthToken();
+    if (token) {
+        // Obtener la etiqueta
+        await obtenerEtiqueta2(numeroDeEnvio, token, id);
+    }
+
+    // Ocultar spinner
+    document.getElementById(`spinnerAndreani${id}`).style.display = 'none';
+}
+
+async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
+    const url = `https://proxy.cors.sh/https://apisqa.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                "x-authorization-token": token,
+                "Accept": "application/pdf"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error HTTP! Status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const pdfUrl = URL.createObjectURL(blob);
+
+        // Abrir el PDF en una nueva pestaña
+        const newTab = window.open();
+        if (newTab) {
+            newTab.location.href = pdfUrl; // Cambiar la ubicación de la nueva pestaña al PDF
+        } else {
+            console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes esté desactivado.');
+        }
+    } catch (error) {
+        console.error('Error al obtener la etiqueta:', error);
+    }
+}
 
 function marcarFacturado(id) {
 
@@ -623,6 +678,7 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
     const resultadoDiv = document.getElementById(`resultado${id}`);
     const envioState = document.getElementById(`estadoEnvio${id}`);
     const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
+    const buttonAndr = document.getElementById(`andreaniButton${id}`);
 
     // Comprobar si los elementos existen y asignar null si no existen
     const altoInterior = document.getElementById(`altoInterior-${id}`) ? document.getElementById(`altoInterior-${id}`).value : null;
@@ -665,6 +721,7 @@ if (isSplit) {
 
 spinner.style.display = 'inline-block';
 text.innerText = 'Generando Etiqueta...';
+buttonAndr.disabled = true;
 
 const requestObj = {
     CalleRemitente: "Mendoza", 
@@ -683,7 +740,7 @@ const requestObj = {
     Alto: [],
     Ancho: [],
     Largo: [],
-    Observaciones: calle + ",Telefono" + telefono + " " + "Electrodomestico: " + producto_nombre,
+    Observaciones: calle + ",Telefono: " + telefono + " " + "Electrodomestico: " + producto_nombre,
     ModalidadEntrega: "Puerta-Puerta", 
     UnidadVenta: "cargas remito conformado", 
     servicio: {
@@ -755,7 +812,7 @@ if (isSplit) {
                     console.log("Datos actualizados en Firebase:", transportData);
                 })
                 .catch((error) => {
-                                console.error("Error al actualizar datos en Firebase:", error);
+                                console.error("Error al actualizar datos en Firebase como Andesmar:", error);
                 });
     
             // Actualizar estado de envío
@@ -766,12 +823,14 @@ if (isSplit) {
                 console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
             }
         } else {
+            buttonAndr.disabled = false;
             text.innerHTML = `Envio No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
             button.classList.remove('btn-primary');
             button.classList.add('btn-warning', 'btnAndesmarMeli');
         }
     })    
     .catch(error => {
+        buttonAndr.disabled = false;
         console.error("Error:", error);
         text.innerText = "Envio No Disponible ⚠️"; // Cambiar texto en caso de error
         resultadoDiv.innerText = `Error: ${error.message}`; // Mostrar error debajo
@@ -914,6 +973,7 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
     const volumenCm3 = parseInt(volumenCm3Texto.replace(' cm³', ''));
     const volumenM3 = parseFloat(volumenM3Texto.replace(' m³', ''));
 
+    const button = document.getElementById(`andesmarButton${id}`);
     const buttonAndr = document.getElementById(`andreaniButton${id}`);
     const spinnerAndr = document.getElementById(`spinnerAndreani${id}`);
     const textAndr = document.getElementById(`andreaniText${id}`);
@@ -941,6 +1001,7 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
     textAndr.innerText = 'Generando Etiqueta...';
+    button.disabled = true
 
     const token = await getAuthToken();
 
@@ -964,7 +1025,7 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
             "referencias": [
                 { "meta": "detalle", "contenido": producto_nombre },
                 { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
-                { "meta": "observaciones", "contenido": calle + ",Telefono" + telefono + " " + "Electrodomestico: " + producto_nombre, }
+                { "meta": "observaciones", "contenido": calle + ",Telefono: " + telefono + " " + "Electrodomestico: " + producto_nombre, }
             ]
         });
     }
@@ -1040,6 +1101,23 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
             buttonAndr.classList.add('btn-secondary');
             NroEnvio.innerHTML = `<a href="${linkSeguimiento}" target="_blank">Andreani: ${numeroDeEnvio} <i class="bi bi-box-arrow-up-right"></i></a>`;
         
+            // Pushear datos a Firebase
+            const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
+            const transportData = {
+                transportCompany: "Andreani",
+                trackingLink: linkSeguimiento,
+                transportCompanyNumber: numeroDeEnvio,
+            };
+            
+              db.ref(`enviosBNA/${id}`).update(transportData)
+                .then(() => {
+                    console.log("Datos actualizados en Firebase como Andreani:", transportData);
+                })
+                .catch((error) => {
+                                console.error("Error al actualizar datos en Firebase:", error);
+                });
+
+
             // Cambiar el estado del envío
             if (envioState) {
                 envioState.className = 'em-circle-state4';
@@ -1053,6 +1131,7 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
             buttonAndr.innerText = "Error Andreani ⚠️"; 
             resultadoDiv.innerText = `Error Andreani: (Puede no existir el CP o Localidad en Andreani) ${response.statusText}`; 
             buttonAndr.disabled = true;
+            button.disabled = false
         }
     } catch (error) {
         console.error('Error al generar la etiqueta:', error);
@@ -1060,6 +1139,7 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
         button.innerText = "Error Andreani ⚠️"; 
         resultadoDiv.innerText = `Error Andreani: (Puede no existir el CP o Localidad en Andreani) ${error.message}`; 
         buttonAndr.disabled = true;
+        button.disabled = false
     }
 }
 
