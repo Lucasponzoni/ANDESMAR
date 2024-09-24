@@ -37,116 +37,120 @@ document.getElementById('importButton').addEventListener('click', function() {
         const reader = new FileReader();
         reader.onload = function(e) {
             const content = e.target.result.trim();
-            
-            // Divide las filas por líneas y usa una expresión regular para manejar las comas dentro de las comillas correctamente
             const data = content.split(/\r?\n/).map(row => {
                 return row.match(/(".*?"|[^,\r\n]+)(?=\s*,|\s*$)/g) || [];
             });
     
-            const headers = data[0]; // Cabeceras (primera fila)
-            const dataRows = data.slice(1); // Filas de datos
-            let importedCount = 0; // Contador para SweetAlert
-            const promises = []; // Array para controlar las promesas de Firebase
+            const headers = data[0];
+            const dataRows = data.slice(1);
+            let importedCount = 0;
+            let existingCount = 0; // Contador para registros existentes
+            const promises = [];
     
             dataRows.forEach(row => {
-                if (row.length > 0) { // Verifica que la fila no esté vacía
-                    // Estructura de datos a guardar en Firebase
-                    const envioData = {
-                        fecha_creacion_orden: row[0] || null,
-                        fecha_pago: row[1] || null,
-                        orden_: row[2] || null,
-                        orden_publica_: row[3] || null,
-                        suborden_: row[4] || null,
-                        fabricante: row[5] || null,
-                        cantidad: row[6] || null,
-                        gp_sku: row[7] || null,
-                        sku_externo: row[8] || null,
-                        producto_nombre: row[9] || null,
-                        variantes: row[10] || null,
-                        apellido: row[11] || null,
-                        nombre: row[12] || null,
-                        email: row[13] || null,
-                        dni: row[14] || null,
-                        direccion: row[15] || null,
-                        codigo_postal: row[16] || null,
-                        telefono: row[17] || null,
-                        ciudad: row[18] || null,
-                        provincia: row[19] || null,
-                        razon_social: row[20] || null,
-                        cuit: row[21] || null,
-                        email_facturacion: row[22] || null,
-                        direccion_facturacion: row[23] || null,
-                        codigo_postal_facturacion: row[24] || null,
-                        telefono_facturacion: row[25] || null,
-                        ciudad_facturacion: row[26] || null,
-                        provincia_facturacion: row[27] || null,
-                        suborden_total: row[28] || null,
-                        precio_producto: row[29] || null,
-                        precio_venta: row[30] || null,
-                        cupon_nombre: null,
-                        cupon_descuento: null,
-                        nombre_completo_envio: row[32] || null,
-                        medio_de_envio: row[33] || null,
-                        numero_de_seguimiento: row[34] || null,
-                        monto_cobrado: row[35] || null,
-                        tipo_del_envio: row[36] || null,
-                        estado_fecha_actualizacion_tipo_de_envio: row[37] || null,
-                        estado_del_envio: row[38] || null,
-                        estado_fecha_actualizacion_envio: row[39] || null,
-                        estado_del_producto: row[40] || null,
-                        estado_fecha_actualizacion_producto: row[41] || null,
-                        liquidado: row[42] || null,
-                        id_cobis: row[43] || null,
-                        total_puntos: row[44] || null,
-                        total_dinero: row[45] || null,
-                        total_con_tasas_1: row[46] || null,
-                        total_con_tasas_2: row[47] || null,
-                        cuotas: row[48] || null,
-                        relacion_de_puntos: row[49] || null,
-                        equivalencia_puntos_pesos: row[50] || null,
-                        iva: row[51] || null,
-                        relacion_de_puntos_sin_iva: row[52] || null,
-                        equivalencia_puntos_sin_iva_pesos: row[53] || null,
-                        brand_name: row[54] || null,
-                        tipo_doc_pago: row[55] || null,
-                        doc_pago: row[56] || null,
-                        nombre_y_apellido_tarjeta: row[57] || null,
-                        numeros_tarjeta: row[58] || null,
-                        bin_tarjeta: row[59] || null,
-                        cupon: row[60] || null,
-                        cod_aut: row[61] || null,
-                        tipo_doc_pago_2: row[62] || null,
-                        doc_pago_2: row[63] || null,
-                        nombre_y_apellido_tarjeta_2: row[64] || null,
-                        numeros_tarjeta_2: row[65] || null,
-                        bin_tarjeta_2: row[66] || null,
-                        cupon_2: row[67] || null,
-                        cod_aut_2: row[68] || null,
-                        decidir_distributed: row[69] || null,
-                        modo_distributed: row[70] || null                        
-                    };
+                if (row.length > 0) {
+                    const orden = row[2] || null;
     
-                    // Guardar en Firebase
-                    const envioRef = firebase.database().ref('enviosBNA').push();
-                    promises.push(envioRef.set(envioData));
-                    importedCount++;
+                    // Verificar si ya existe en Firebase
+                    const envioRef = firebase.database().ref('enviosBNA');
+                    promises.push(
+                        envioRef.orderByChild('orden_').equalTo(orden).once('value').then(snapshot => {
+                            if (!snapshot.exists()) {
+                                const envioData = {
+                                    fecha_creacion_orden: row[0] || null,
+                                    fecha_pago: row[1] || null,
+                                    orden_: orden,
+                                    orden_publica_: row[3] || null,
+                                    suborden_: row[4] || null,
+                                    fabricante: row[5] || null,
+                                    cantidad: row[6] || null,
+                                    gp_sku: row[7] || null,
+                                    sku_externo: row[8] || null,
+                                    producto_nombre: row[9] || null,
+                                    variantes: row[10] || null,
+                                    apellido: row[11] || null,
+                                    nombre: row[12] || null,
+                                    email: row[13] || null,
+                                    dni: row[14] || null,
+                                    direccion: row[15] || null,
+                                    codigo_postal: row[16] || null,
+                                    telefono: row[17] || null,
+                                    ciudad: row[18] || null,
+                                    provincia: row[19] || null,
+                                    razon_social: row[20] || null,
+                                    cuit: row[21] || null,
+                                    email_facturacion: row[22] || null,
+                                    direccion_facturacion: row[23] || null,
+                                    codigo_postal_facturacion: row[24] || null,
+                                    telefono_facturacion: row[25] || null,
+                                    ciudad_facturacion: row[26] || null,
+                                    provincia_facturacion: row[27] || null,
+                                    suborden_total: row[28] || null,
+                                    precio_producto: row[29] || null,
+                                    precio_venta: row[30] || null,
+                                    cupon_nombre: null,
+                                    cupon_descuento: null,
+                                    nombre_completo_envio: row[32] || null,
+                                    medio_de_envio: row[33] || null,
+                                    numero_de_seguimiento: row[34] || null,
+                                    monto_cobrado: row[35] || null,
+                                    tipo_del_envio: row[36] || null,
+                                    estado_fecha_actualizacion_tipo_de_envio: row[37] || null,
+                                    estado_del_envio: row[38] || null,
+                                    estado_fecha_actualizacion_envio: row[39] || null,
+                                    estado_del_producto: row[40] || null,
+                                    estado_fecha_actualizacion_producto: row[41] || null,
+                                    liquidado: row[42] || null,
+                                    id_cobis: row[43] || null,
+                                    total_puntos: row[44] || null,
+                                    total_dinero: row[45] || null,
+                                    total_con_tasas_1: row[46] || null,
+                                    total_con_tasas_2: row[47] || null,
+                                    cuotas: row[48] || null,
+                                    relacion_de_puntos: row[49] || null,
+                                    equivalencia_puntos_pesos: row[50] || null,
+                                    iva: row[51] || null,
+                                    relacion_de_puntos_sin_iva: row[52] || null,
+                                    equivalencia_puntos_sin_iva_pesos: row[53] || null,
+                                    brand_name: row[54] || null,
+                                    tipo_doc_pago: row[55] || null,
+                                    doc_pago: row[56] || null,
+                                    nombre_y_apellido_tarjeta: row[57] || null,
+                                    numeros_tarjeta: row[58] || null,
+                                    bin_tarjeta: row[59] || null,
+                                    cupon: row[60] || null,
+                                    cod_aut: row[61] || null,
+                                    tipo_doc_pago_2: row[62] || null,
+                                    doc_pago_2: row[63] || null,
+                                    nombre_y_apellido_tarjeta_2: row[64] || null,
+                                    numeros_tarjeta_2: row[65] || null,
+                                    bin_tarjeta_2: row[66] || null,
+                                    cupon_2: row[67] || null,
+                                    cod_aut_2: row[68] || null,
+                                    decidir_distributed: row[69] || null,
+                                    modo_distributed: row[70] || null                        
+                                };
+    
+                                return envioRef.push().set(envioData).then(() => {
+                                    importedCount++;
+                                });
+                            } else {
+                                existingCount++;
+                            }
+                        })
+                    );
                 }
             });
     
-            // Cuando todas las promesas de Firebase se completen
             Promise.all(promises)
             .then(() => {
-                // Ocultar el spinner
                 spinner.remove();
-    
-                // Mostrar SweetAlert con la cantidad importada
                 Swal.fire({
                     title: 'Importación completada',
-                    text: `Se han importado ${importedCount} ventas a la base de datos`,
+                    text: `Se han importado ${importedCount} ventas a la base de datos, ${existingCount} ya se encontraban en planilla`,
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    // Recargar la página después de hacer clic en OK
                     location.reload();
                 });
             })
@@ -162,7 +166,8 @@ document.getElementById('importButton').addEventListener('click', function() {
         };
     
         reader.readAsText(file);
-    }     
+    }
+    
 });
 
 function capitalizeWords(str) {
@@ -227,6 +232,7 @@ function loadEnviosFromFirebase() {
         });
 
         // Renderizar las tarjetas y la paginación
+        allData.reverse();
         renderCards(allData);
         updatePagination(allData.length);
         
@@ -931,6 +937,28 @@ async function getAuthToken() {
 
 async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
     
+        // Solicitar contraseña
+        const { value: password } = await Swal.fire({
+            title: 'Ingrese la contraseña 🔒',
+            input: 'password',
+            inputLabel: 'Contraseña de logistica (Solicitela al adminsitrador)',
+            inputPlaceholder: 'Ingrese la contraseña',
+            showCancelButton: true,
+            confirmButtonText: 'Enviar',
+            cancelButtonText: 'Cancelar'
+        });
+    
+        // Verificar si la contraseña es correcta
+        if (password !== '6572') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Contraseña incorrecta',
+                text: 'La contraseña ingresada es incorrecta. Intente nuevamente.',
+                confirmButtonText: 'OK'
+            });
+            return; // Salir de la función si la contraseña es incorrecta
+        }
+
     // Redondear el precio_venta y convertirlo a un entero
     const precioVentaRedondeado = Math.round(precio_venta);
 
