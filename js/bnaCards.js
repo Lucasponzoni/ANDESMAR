@@ -203,7 +203,7 @@ function loadEnviosFromFirebase() {
                 remito: (data.orden_),
                 observaciones: (data.observaciones),
                 orden_publica_: (data.orden_publica_),
-                brand_name: (data.brand_name),
+                brand_name: capitalizeWords(data.brand_name),
                 cuotas: (data.cuotas),
                 precio_venta: (data.precio_venta),
                 suborden_total: (data.suborden_total),
@@ -413,7 +413,7 @@ function renderCards(data) {
                             <!-- Botón Andesmar -->
                             <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} mt-2" 
                                     id="andesmarButton${data[i].id}" 
-                                    ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}')"`}>
+                                    ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')"`}>
                                 <span id="andesmarText${data[i].id}">
                                     ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andesmar`}
                                 </span>
@@ -547,7 +547,7 @@ const usuario = "BOM6765";
 const clave = "BOM6765";
 const codigoCliente = "6765";
 
-function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, telefono, email) {
+function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
     // Obtener los elementos de volumen
     const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
     const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
@@ -605,45 +605,69 @@ function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, t
 
     console.log(`Enviando datos a Andesmar:
         Volumen en m³: ${volumenM3}, Alto: ${alto}, Ancho: ${ancho}, Largo: ${largo}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
-        ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, 
-        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${tipoElectrodomestico}
+        ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
+        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
     `);
 
-    // Mostrar spinner y cambiar texto
-    spinner.style.display = 'inline-block';
-    text.innerText = 'Generando Etiqueta...';
+// Verificar si el tipo de electrodoméstico es uno de los splits
+const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
+const isSplit = splitTypes.includes(tipoElectrodomestico);
 
-    // Aquí debes definir los datos que se enviarán a la API
-    const requestObj = {
-        CalleRemitente: "Mendoza", // Reemplaza con el valor correcto
-        CalleNroRemitente: "2799", // Reemplaza con el valor correcto
-        CodigoPostalRemitente: "2000", // Reemplaza con el valor correcto
-        NombreApellidoDestinatario: nombre,
-        CodigoPostalDestinatario: cp,
-        CalleDestinatario: calle,
-        CalleNroDestinatario: "S/N",
-        TelefonoDestinatario: telefono,
-        NroRemito: remito,
-        Bultos: cantidad,
-        Peso: peso * cantidad,
-        ValorDeclarado: 100, // Se Reemplazara cuando Leo envie este dato
-        M3: volumenM3,
-        Alto: Array(cantidad).fill(alto), 
-        Ancho: Array(cantidad).fill(ancho), 
-        Largo: Array(cantidad).fill(largo), 
-        Observaciones: calle + ",Telefono" + telefono + tipoElectrodomestico,
-        ModalidadEntrega: "Puerta-Puerta", 
-        UnidadVenta: "cargas remito conformado", 
-        servicio: {
-            EsFletePagoDestino: false, 
-            EsRemitoconformado: true 
-        },
-        logueo: {
-            Usuario: usuario,
-            Clave: clave,
-            CodigoCliente: codigoCliente
-        }
-    };
+// Calcular la cantidad de bultos
+let bultos = cantidad;
+if (isSplit) {
+    bultos *= 2; // Duplicar bultos si es un split
+}
+
+spinner.style.display = 'inline-block';
+text.innerText = 'Generando Etiqueta...';
+
+const requestObj = {
+    CalleRemitente: "Mendoza", 
+    CalleNroRemitente: "2799",
+    CodigoPostalRemitente: "2000", 
+    NombreApellidoDestinatario: nombre,
+    CodigoPostalDestinatario: cp,
+    CalleDestinatario: calle,
+    CalleNroDestinatario: "S/N",
+    TelefonoDestinatario: telefono,
+    NroRemito: remito,
+    Bultos: bultos, 
+    Peso: peso * cantidad, 
+    ValorDeclarado: precio_venta * cantidad, 
+    M3: volumenM3,
+    Alto: [],
+    Ancho: [],
+    Largo: [],
+    Observaciones: calle + ",Telefono" + telefono + " " + "Electrodomestico: " + producto_nombre,
+    ModalidadEntrega: "Puerta-Puerta", 
+    UnidadVenta: "cargas remito conformado", 
+    servicio: {
+        EsFletePagoDestino: false, 
+        EsRemitoconformado: true 
+    },
+    logueo: {
+        Usuario: usuario,
+        Clave: clave,
+        CodigoCliente: codigoCliente
+    }
+};
+
+// Llenar las medidas de acuerdo a la cantidad de bultos
+for (let i = 0; i < cantidad; i++) {
+    requestObj.Alto.push(alto);
+    requestObj.Ancho.push(ancho);
+    requestObj.Largo.push(largo);
+}
+
+// Si es un split, agregar las medidas de la unidad interior
+if (isSplit) {
+    for (let i = 0; i < cantidad; i++) {
+        requestObj.Alto.push(altoInterior);
+        requestObj.Ancho.push(anchoInterior);
+        requestObj.Largo.push(largoInterior);
+    }
+}
 
     const proxyUrl = "https://proxy.cors.sh/";
     const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
