@@ -177,6 +177,7 @@ function lowercaseWords(str) {
     return str.toLowerCase(); // Convertir toda la cadena a minúsculas
 }
 
+// CARGAR DATOS DE FIREBASE
 function loadEnviosFromFirebase() {
     const cardsContainer = document.getElementById('envios-cards');
     const spinner = document.getElementById('spinner');
@@ -210,6 +211,7 @@ function loadEnviosFromFirebase() {
                 sku: (data.sku_externo),
                 cantidad: (data.cantidad),
                 fechaDeCreacion: (data.fecha_creacion_orden),    
+                datoFacturacion: (data.datoFacturacion),
                 producto_nombre: capitalizeWords(data.producto_nombre),
                 tipoElectrodomesticoBna: (data.tipoElectrodomesticoBna),
                 trackingLink: (data.trackingLink),
@@ -251,6 +253,10 @@ function renderCards(data) {
 
         // Verificar si transportCompany es "Andesmar"
         const isAndesmar = data[i].transportCompany === "Andesmar";
+
+        // Verificar si datoFacturacion existe
+        const hasDatoFacturacion = data[i].datoFacturacion !== undefined && data[i].datoFacturacion !== null;
+
 
         // Lógica para calcular el estado de facturación
         const fechaDeCreacion = data[i].fechaDeCreacion; // "21-09-2024 19:30:18"
@@ -386,8 +392,8 @@ function renderCards(data) {
                                     <p class="card-text-pago"><strong>Precio de Venta:</strong> $ ${data[i].precio_venta}</p>
                                     <p class="card-text-pago"><strong>Costo de Envío:</strong> $ ${(data[i].suborden_total - data[i].precio_venta)}</p>
                                     <p class="card-text-pago"><strong>Total:</strong> $ ${data[i].suborden_total}</p>
-                                    <button id="marcar-facturado-${data[i].id}" type="button" class="btn btn-danger w-100">
-                                    Marcar Facturado <i class="bi bi-lock-fill icono"></i>
+                                    <button id="marcar-facturado-${data[i].id}" type="button" class="btn ${hasDatoFacturacion ? 'btn-success' : 'btn-danger'} w-100" ${hasDatoFacturacion ? 'disabled' : ''} onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}')`}">${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
+                                        <i class="bi bi-lock-fill icono"></i>
                                     </button>
 
                                 </div>
@@ -414,6 +420,11 @@ function renderCards(data) {
                                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
                             </button>
 
+                            <button class="btn btn-danger btnAndreaniMeli mt-1" id="andreaniButton${data.id}" onclick="enviarDatosAndreani('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${data.Peso}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
+                            <span id="andreaniText${data.id}"><i class="bi bi-file-text"></i> Etiqueta Andreani</span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.id}" style="display:none;"></span>
+                            </button>
+
                             <div class="factura-status em-circle-state-time" id="factura-status-${data[i].id}">${mensajeFactura}</div>
 
 
@@ -421,6 +432,19 @@ function renderCards(data) {
                         </div>
                     </div>
                 `;
+
+                // Lógica para determinar el mensaje estado de Facturacion
+                const facturaStatusDiv = document.getElementById(`factura-status-${data[i].id}`);
+                if (hasDatoFacturacion) {
+                    facturaStatusDiv.innerHTML = 'Facturado ✅'; 
+                    facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+                    facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
+                } else {
+                    facturaStatusDiv.textContent = mensajeFactura;
+                    facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+                    facturaStatusDiv.classList.add('em-circle-state-time'); 
+                }
+
 
         // Lógica para cargar el tipoElectrodomesticoBna si existe
         const tipoElectrodomesticoBnaSelect = card.querySelector(`#tipoElectrodomesticoBna-${data[i].id}`);
@@ -447,6 +471,76 @@ function renderCards(data) {
 
     // Agregar el evento para actualizar observaciones
     addUpdateObservacionesEvent();
+}
+
+
+function marcarFacturado(id) {
+    Swal.fire({
+        title: 'Ingrese la clave',
+        input: 'password',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar',
+        inputAttributes: {
+            maxlength: 4
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const clave = result.value;
+
+            // Comprobación de la clave y formateo de la fecha y hora
+            let contenidoBoton;
+            const fechaActual = new Date();
+            
+            // Formateo de la hora
+            const horaFormateada = fechaActual.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+            
+            // Formateo de la fecha
+            const opcionesFecha = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            const fechaFormateada = fechaActual.toLocaleDateString('es-AR', opcionesFecha);
+            
+            // Mensaje para el contenido del botón
+            let mensajeFactura = '';
+
+            if (clave === '1234') {
+                contenidoBoton = `Facturado Brisa ${horaFormateada} ${fechaFormateada}`;
+                mensajeFactura = 'Facturado ✅';
+            } else if (clave === '2345') {
+                contenidoBoton = `Facturado Leo ${horaFormateada} ${fechaFormateada}`;
+                mensajeFactura = 'Facturado ✅';
+            } else if (clave === '3456') {
+                contenidoBoton = `Facturado Julian ${horaFormateada} ${fechaFormateada}`;
+                mensajeFactura = 'Facturado ✅';
+            } else if (clave === '5678') {
+                contenidoBoton = `Facturado Mauricio ${horaFormateada} ${fechaFormateada}`;
+                mensajeFactura = 'Facturado ✅';
+            } else {
+                Swal.fire('Clave incorrecta', '', 'error');
+                return; // Salir si la clave es incorrecta
+            }
+
+            // Cambiar el contenido del botón y deshabilitarlo
+            const boton = document.getElementById(`marcar-facturado-${id}`);
+            boton.textContent = contenidoBoton;
+            boton.classList.remove('btn-danger');
+            boton.classList.add('btn-success');
+            boton.disabled = true;
+
+            // Cambiar el contenido y clase del div de estado de factura
+            const estadoFacturaDiv = document.getElementById(`factura-status-${id}`);
+            estadoFacturaDiv.textContent = mensajeFactura;
+            estadoFacturaDiv.classList.add('facturado-bna'); // Agregar la clase
+
+            // Pushear en Firebase
+            const ref = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
+            ref.set(contenidoBoton).then(() => {
+                Swal.fire('Datos guardados correctamente', '', 'success');
+            }).catch((error) => {
+                console.error('Error al guardar en Firebase:', error);
+                Swal.fire('Error al guardar datos', '', 'error');
+            });
+        }
+    });
 }
 
 const usuario = "BOM6765";

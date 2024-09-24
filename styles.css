@@ -1152,6 +1152,10 @@ p.card-text:nth-child(9){
     padding: .5rem;
 }
 
+.pago p{
+    font-family: "Reddit Sans Condensed", sans-serif;
+}
+
 .pago p:nth-child(5){
     color: white;
     font-weight: 800;
@@ -1540,6 +1544,23 @@ div.card-body > p > i{
     justify-content: center;
 }
 
+.em-circle-state-time-facturado{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: .8rem;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    position: absolute;
+    bottom: -15px;
+    right: 10px;
+    background-color: green; 
+    text-transform: uppercase;
+    color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
 .em-circle-state2{
     font-family: "Reddit Sans Condensed", sans-serif;
     font-size: .8rem;
@@ -1744,6 +1765,7 @@ div.card-body > p > i{
 }
 
 .numeroDeEnvioGeneradoBNA{
+    font-family: "Chakra Petch", sans-serif !important;
     margin-bottom: 5px !important;
     text-align: center;
     color: grey;
