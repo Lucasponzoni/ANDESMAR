@@ -411,7 +411,7 @@ function renderCards(data) {
                             </div>
         
                             <!-- Botón Andesmar -->
-                            <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} mt-2" 
+                            <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'}" 
                                     id="andesmarButton${data[i].id}" 
                                     ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')"`}>
                                 <span id="andesmarText${data[i].id}">
