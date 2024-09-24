@@ -239,7 +239,6 @@ function loadEnviosFromFirebase() {
         });
 
         // Renderizar las tarjetas y la paginación
-        allData.reverse();
         renderCards(allData);
         updatePagination(allData.length);
         
@@ -1263,27 +1262,6 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
     let altoInterior, anchoInterior, largoInterior;
 
     switch (selectedValue) {
-        case "heladera":
-            alto = 165; 
-            ancho = 60; 
-            largo = 60; 
-            peso = 60; 
-            valor = 700000;
-            break;
-        case "cocina":
-            alto = 85; 
-            ancho = 60; 
-            largo = 60; 
-            peso = 50; 
-            valor = 600000;
-            break;
-        case "hornoEmpotrable":
-            alto = 60; 
-            ancho = 60; 
-            largo = 55; 
-            peso = 25; 
-            valor = 500000;
-            break;
         case "split2700":
             alto = 50; 
             ancho = 72; 
@@ -1331,6 +1309,251 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
             peso = 135; 
             valor = 1500000; // Medidas de la unidad exterior
             altoInterior = 158; anchoInterior = 68; largoInterior = 35;
+            break;
+            case "heladera":
+            alto = 165; 
+            ancho = 60; 
+            largo = 60; 
+            peso = 60; 
+            valor = 700000;
+            break;
+        case "cocina":
+            alto = 85; 
+            ancho = 60; 
+            largo = 60; 
+            peso = 50; 
+            valor = 600000;
+            break;
+        case "hornoEmpotrable":
+            alto = 60; 
+            ancho = 60; 
+            largo = 55; 
+            peso = 25; 
+            valor = 500000;
+            break;
+        case "lavavajillas":
+            alto = 85; 
+            ancho = 60; 
+            largo = 60; 
+            peso = 45; 
+            valor = 600000;
+            break;
+        case "aireportatil":
+            alto = 75; 
+            ancho = 40; 
+            largo = 40; 
+            peso = 25; 
+            valor = 150000;
+            break;
+        case "ventiladordepared":
+            alto = 55; 
+            ancho = 50; 
+            largo = 20; 
+            peso = 4; 
+            valor = 90000;
+            break;
+        case "colchon80cm":
+            alto = 20; 
+            ancho = 80; 
+            largo = 180; 
+            peso = 15; 
+            valor = 200000;
+            break;
+        case "colchon100cm":
+            alto = 20; 
+            ancho = 100; 
+            largo = 180; 
+            peso = 18; 
+            valor = 250000;
+            break;
+        case "colchon140cm":
+            alto = 20; 
+            ancho = 140; 
+            largo = 180; 
+            peso = 25; 
+            valor = 350000;
+            break;
+        case "colchon160cm":
+            alto = 20; 
+            ancho = 160; 
+            largo = 180; 
+            peso = 30; 
+            valor = 400000;
+            break;
+        case "colchon200cm":
+            alto = 20; 
+            ancho = 200; 
+            largo = 200; 
+            peso = 35; 
+            valor = 500000;
+            break;                        
+        case "lavarropasCargaFrontal":
+            alto = 85; 
+            ancho = 60; 
+            largo = 60; 
+            peso = 70; 
+            valor = 800000;
+            break;
+        case "lavarropasCargaSuperior":
+            alto = 100; 
+            ancho = 60; 
+            largo = 60; 
+            peso = 65; 
+            valor = 600000;
+            break;
+        case "termotanque50":
+            alto = 60; 
+            ancho = 40; 
+            largo = 40; 
+            peso = 20; 
+            valor = 250000;
+            break;
+        case "termotanque80":
+            alto = 80; 
+            ancho = 40; 
+            largo = 40; 
+            peso = 25; 
+            valor = 250000;
+            break;
+        case "termotanque110":
+            alto = 100; 
+            ancho = 40; 
+            largo = 40; 
+            peso = 30; 
+            valor = 250000;
+            break;
+        case "termotanque150":
+            alto = 150; 
+            ancho = 40; 
+            largo = 40; 
+            peso = 35; 
+            valor = 250000;
+            break;
+        case "termotanque180":
+            alto = 180; 
+            ancho = 50; 
+            largo = 50; 
+            peso = 40; 
+            valor = 300000;
+            break;
+        case "smartTV32":
+            alto = 45; 
+            ancho = 73; 
+            largo = 20; 
+            peso = 6; 
+            valor = 250000;
+            break;
+        case "smartTV40":
+            alto = 55; 
+            ancho = 91; 
+            largo = 25; 
+            peso = 8; 
+            valor = 350000;
+            break;
+        case "smartTV43":
+            alto = 58; 
+            ancho = 97; 
+            largo = 25; 
+            peso = 9; 
+            valor = 400000;
+            break;
+        case "smartTV50":
+            alto = 65; 
+            ancho = 112; 
+            largo = 28; 
+            peso = 11; 
+            valor = 550000;
+            break;
+        case "smartTV58":
+            alto = 73; 
+            ancho = 130; 
+            largo = 32; 
+            peso = 14; 
+            valor = 600000;
+            break;
+        case "smartTV65":
+            alto = 81; 
+            ancho = 145; 
+            largo = 35; 
+            peso = 17; 
+            valor = 750000;
+            break;
+        case "smartTV70":
+            alto = 90; 
+            ancho = 157; 
+            largo = 38; 
+            peso = 20; 
+            valor = 850000;
+            break;
+        case "calefactor2000":
+            alto = 60; 
+            ancho = 70; 
+            largo = 30; 
+            peso = 15; 
+            valor = 150000;
+            break;
+        case "calefactor3000":
+            alto = 70; 
+            ancho = 80; 
+            largo = 30; 
+            peso = 18; 
+            valor = 250000;
+            break;
+        case "calefactor5000":
+            alto = 80; 
+            ancho = 100; 
+            largo = 30; 
+            peso = 22; 
+            valor = 350000;
+            break;
+        case "calefactor8000":
+            alto = 90; 
+            ancho = 100; 
+            largo = 30; 
+            peso = 25; 
+            valor = 450000;
+            break;
+        case "bulto20":
+            alto = 20; 
+            ancho = 20; 
+            largo = 20; 
+            peso = 1; 
+            valor = 10000;
+            break;
+        case "bulto30":
+            alto = 30; 
+            ancho = 30; 
+            largo = 30; 
+            peso = 2; 
+            valor = 20000;
+            break;
+        case "bulto40":
+            alto = 40; 
+            ancho = 40; 
+            largo = 40; 
+            peso = 3; 
+            valor = 30000;
+            break;
+        case "termotanque255":
+            alto = 158; 
+            ancho = 67; 
+            largo = 67; 
+            peso = 81; 
+            valor = 1474499;
+            break;
+        case "termotanque300":
+            alto = 189; 
+            ancho = 66; 
+            largo = 66; 
+            peso = 132; 
+            valor = 3274999;
+            break;
+        case "bulto50":
+            alto = 50; 
+            ancho = 50; 
+            largo = 50; 
+            peso = 4; 
+            valor = 40000;
             break;
         default:
             return; // Si no hay selección válida, salir
@@ -1508,6 +1731,11 @@ document.getElementById('btnPreparar').addEventListener('click', () => {
 
     // Renderizar solo las tarjetas sin preparar
     renderCards(sinPrepararCards);
+
+    // Crear botón de volver
+    createBackButton(() => {
+        renderCards(allData); // Regresar a todas las tarjetas
+    });
 });
 
 // FIN SIN PREPARAR BOTON
@@ -1522,9 +1750,37 @@ document.getElementById('btnFacturar').addEventListener('click', () => {
 
     // Renderizar solo las tarjetas sin preparar
     renderCards(sinFacturarCards);
+
+    // Crear botón de volver
+    createBackButton(() => {
+        renderCards(allData); // Regresar a todas las tarjetas
+    });
 });
 
 // FIN FACTURAR BOTON
+
+// VOLVER ATRAS
+function createBackButton(onBack) {
+    // Verificar si ya existe el botón de volver
+    if (document.getElementById('btnVolver')) return;
+
+    const backButton = document.createElement('button');
+    backButton.id = 'btnVolver';
+    backButton.type = 'button';
+    backButton.className = 'btn btn-dark';
+    backButton.innerHTML = '<i class="bi bi-arrow-return-left"></i>';
+
+    // Agregar evento al botón de volver
+    backButton.addEventListener('click', () => {
+        onBack(); // Llamar a la función pasada
+        backButton.remove(); // Eliminar el botón de volver
+    });
+
+    // Agregar el botón al principio del contenedor de botones
+    const container = document.querySelector('.trio-de-botones');
+    container.insertBefore(backButton, container.firstChild);
+}
+// FINVOLVER ATRAS
 
 // BUSCADOR
 searchInput.addEventListener("input", function() {
