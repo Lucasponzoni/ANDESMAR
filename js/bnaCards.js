@@ -650,11 +650,40 @@ function marcarFacturado(id) {
     });
 }
 
+async function pedirContraseña() {
+    const { value: password } = await Swal.fire({
+        title: 'Ingrese la contraseña 🔒',
+        input: 'password',
+        inputLabel: 'Contraseña de logística (Solicitela al administrador)',
+        inputPlaceholder: 'Ingrese la contraseña',
+        showCancelButton: true,
+        confirmButtonText: 'Enviar',
+        cancelButtonText: 'Cancelar'
+    });
+
+    // Verificar si la contraseña es correcta
+    if (password !== '6572') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Contraseña incorrecta',
+            text: 'La contraseña ingresada es incorrecta. Intente nuevamente.',
+            confirmButtonText: 'OK'
+        });
+        return false; // Retornar false si la contraseña es incorrecta
+    }
+    return true; // Retornar true si la contraseña es correcta
+}
+
 const usuario = "BOM6765";
 const clave = "BOM6765";
 const codigoCliente = "6765";
 
-function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
+async function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
+
+    const contraseñaCorrecta = await pedirContraseña();
+    if (!contraseñaCorrecta) {
+        return; // Salir de la función si la contraseña es incorrecta
+    }
 
     // Obtener los elementos de volumen
     const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
@@ -937,27 +966,10 @@ async function getAuthToken() {
 
 async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
     
-        // Solicitar contraseña
-        const { value: password } = await Swal.fire({
-            title: 'Ingrese la contraseña 🔒',
-            input: 'password',
-            inputLabel: 'Contraseña de logistica (Solicitela al adminsitrador)',
-            inputPlaceholder: 'Ingrese la contraseña',
-            showCancelButton: true,
-            confirmButtonText: 'Enviar',
-            cancelButtonText: 'Cancelar'
-        });
-    
-        // Verificar si la contraseña es correcta
-        if (password !== '6572') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Contraseña incorrecta',
-                text: 'La contraseña ingresada es incorrecta. Intente nuevamente.',
-                confirmButtonText: 'OK'
-            });
-            return; // Salir de la función si la contraseña es incorrecta
-        }
+    const contraseñaCorrecta = await pedirContraseña();
+    if (!contraseñaCorrecta) {
+        return; // Salir de la función si la contraseña es incorrecta
+    }
 
     // Redondear el precio_venta y convertirlo a un entero
     const precioVentaRedondeado = Math.round(precio_venta);
@@ -1028,6 +1040,10 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
         ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
         Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
     `);
+
+    // Verificar si el tipo de electrodoméstico es uno de los splits
+const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
+const isSplit = splitTypes.includes(tipoElectrodomestico);
 
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
