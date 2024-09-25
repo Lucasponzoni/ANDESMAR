@@ -407,6 +407,7 @@ function createTimeline(data, clienteAndesmar) {
             <p>Origen: ${data.Origen}</p>
             <p>Número de Pedido: ${data.NroPedido}</p>
             <p>Destino: ${data.Destino}</p>
+
         </div>
         <h6 class="historialAndesmar">Historial de Estados:</h6>
         <ul class="timeline">`;
