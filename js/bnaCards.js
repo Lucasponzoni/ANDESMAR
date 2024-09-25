@@ -244,6 +244,7 @@ function loadEnviosFromFirebase() {
         });
 
         // Renderizar las tarjetas y la paginación
+        allData.reverse();
         renderCards(allData);
         updatePagination(allData.length);
         
