@@ -46,10 +46,17 @@ form {
 }
 
 .six{
-    background-color: cornflowerblue;
+    background-color: dashed;
     border-radius: 10px;
     padding: .3rem;
     margin-bottom: .5rem;
+}
+
+.badge-large {
+    font-size: 1rem;
+    top: -10px !important;
+    min-width: 25px !important;
+    z-index: 1000 !important;
 }
 
 .CpyLocalidad, .PisoyDepto{
@@ -550,10 +557,9 @@ button:hover {
 .tipoElectrodomesticoBna{
     color: grey;
     border: 1px solid grey;
-    border-radius: 10px;
-    font-weight: 800;box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    font-weight: 800;
     margin-bottom: 5px;
-    box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
 }
 
 .mb-2{
@@ -1049,9 +1055,12 @@ span > img {
     font-family: "Reddit Sans Condensed", sans-serif;
     text-transform: capitalize;
     color: rgb(55, 119, 238);
-    font-weight: 300 !important;
+    font-weight: 400 !important;
     font-size: 1.3rem;
     margin-bottom: 5px;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .card-title-meli {
@@ -1073,6 +1082,18 @@ p.card-text{
     font-weight: 300;
     width: fit-content;
     background-color: orange;
+    color: white;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.cpLocalidadBna{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    text-transform: capitalize;
+    font-size: .8rem;
+    font-weight: 400;
+    width: fit-content;
+    background-color: grey;
     color: white;
     border-radius: 8px;
     padding: 5px;
@@ -1141,6 +1162,19 @@ p.card-text:nth-child(8){
     margin-bottom: 5px;
 }
 
+p.card-text-bna{
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
+p.card-text-bna2{
+    color: green;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
 p.card-text:nth-child(9){
     font-family: "Reddit Sans Condensed", sans-serif;
     font-weight: 300;
@@ -1151,6 +1185,25 @@ p.card-text:nth-child(9){
     border-radius: 10px;
     border: dashed 2px cornflowerblue;
     padding: .5rem;
+}
+
+.facturacion{
+    border-radius: 10px;
+    border: dashed 2px cornflowerblue;
+    padding: .5rem;
+}
+
+.facturacion p:nth-child(1){
+    color: white;
+    font-weight: 800;
+    background-color: red;
+    width: fit-content;
+    border-radius:5px;
+    padding: .2rem;
+}
+
+.pago p{
+    font-family: "Reddit Sans Condensed", sans-serif;
 }
 
 .pago p:nth-child(5){
@@ -1168,8 +1221,33 @@ p.card-text:nth-child(9){
     margin-bottom: 5px;
 }
 
+.card-text-facturacion{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
 .descripcion-div{
     margin-bottom: 8px;
+}
+
+.orden{
+    font-family: "Chakra Petch", sans-serif !important;
+    font-size: x-large;
+    font-weight: 800;
+    margin: 0;
+}
+
+.contenedorRemito{
+    font-family: "Chakra Petch", sans-serif !important;
+    margin-bottom: 10px !important;
+    text-align: center;
+    color: #333; 
+    background-color: #ffffff; 
+    border: 1px solid #dcdcdc; 
+    font-weight: 500 !important;
+    padding: 10px 15px; 
+    border-radius: 15px;  
 }
 
 .remitoCard{
@@ -1443,6 +1521,12 @@ div.card-body > p > i{
     padding-left: 5px;
 }
 
+#bna2 {
+    width: 70px;
+    padding-left: 5px;
+    filter: brightness(0) invert(1);
+}
+
 .simbel{
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -1524,6 +1608,38 @@ div.card-body > p > i{
     justify-content: center;
 }
 
+.em-circle-state-time {
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 800;
+    font-size: .9rem;
+    padding: 8px 10px;
+    border-radius: 5px; 
+    position: relative; 
+    background-color: #007AFF; 
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
+.em-circle-state-time-facturado {
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 800;
+    font-size: .9rem;
+    margin-bottom: 5px;
+    padding: 8px 10px; 
+    border-radius: 5px; 
+    position: relative; 
+    background-color: #34C759; 
+    text-transform: uppercase;
+    color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
 .em-circle-state2{
     font-family: "Reddit Sans Condensed", sans-serif;
     font-size: .8rem;
@@ -1543,17 +1659,17 @@ div.card-body > p > i{
 
 .em-circle-state3{
     font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 900;
     font-size: .8rem;
     padding-inline: 5px;
     padding: 5px;
     border-radius: 10px;
     position: absolute;
     top: -15px; 
-    right: 150px;
-    background-color: rgb(254, 235, 235);
-    border: dashed 2PX red; 
+    right: 90px;
+    background-color: orangered;
     text-transform: uppercase;
-    color: red;
+    color: white;
     display: flex; 
     align-items: center; 
     justify-content: center;
@@ -1561,6 +1677,7 @@ div.card-body > p > i{
 }
 
 .em-circle-state4{
+    font-weight: 900;
     font-family: "Reddit Sans Condensed", sans-serif;
     font-size: .8rem;
     padding-inline: 5px;
@@ -1568,11 +1685,10 @@ div.card-body > p > i{
     border-radius: 10px;
     position: absolute;
     top: -15px; 
-    right: 150px;
-    background-color: rgb(226, 250, 216);
-    border: dashed 2PX green; 
+    right: 90px;
+    background-color: green;
     text-transform: uppercase;
-    color: green;
+    color: white;
     display: flex; 
     align-items: center; 
     justify-content: center;
@@ -1623,7 +1739,7 @@ div.card-body > p > i{
     position: absolute;
     top: -15px; 
     right: 10px;
-    border: dashed 2px orangered;
+    border: solid 1px grey;
     background-color: white;
     display: flex; 
     align-items: center; 
@@ -1633,7 +1749,26 @@ div.card-body > p > i{
 }
 
 .em-state-bna > img{
-    width:120px;
+    width:60px;
+}
+
+.em-state-bna2{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: 1rem;
+    height: 30px;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -15px; 
+    right: 10px;
+    color: white;
+    background-color: cornflowerblue;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-weight: bold; 
+    overflow: hidden;
 }
 
 .dimensions-info {
@@ -1727,14 +1862,29 @@ div.card-body > p > i{
     border-radius: 5px;
 }
 
-.numeroDeEnvioGeneradoBNA{
+.numeroDeEnvioGeneradoBNA {
+    font-family: "Chakra Petch", sans-serif !important;
     margin-bottom: 5px !important;
     text-align: center;
-    color: grey;
-    border: dashed 2px #ffc107;
-    font-weight: 800 !important;
-    padding: .2rem;
-    border-radius: 10px;
+    color: #2c3e50; 
+    background-color: #ecf0f1; 
+    border: 1px solid #bdc3c7; 
+    font-weight: 900 !important;
+    padding: 12px 16px; 
+    border-radius: 12px; 
+    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.1); 
+    transition: background-color 0.3s, box-shadow 0.3s; 
+}
+
+.numeroDeEnvioGeneradoBNA a {
+    color: inherit; 
+    text-decoration: none; 
+    font-weight: bold; 
+}
+
+.numeroDeEnvioGeneradoBNA a:hover {
+    text-decoration: underline;
+    color: #2980b9; 
 }
 
 /* MODAL ANDESMAR */
@@ -1925,5 +2075,77 @@ div.card-body > p > i{
     padding: 1rem;
     border: cornflowerblue 2px dashed;
     border-radius: 15px;
+}
+
+/* BOTON MARCAR FACTURADO */
+.btn-danger:hover .icono {
+    content: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover .icono::before {
+    content: "\F5FF"; 
+    font-family: "Bootstrap Icons";
+}
+
+/* FIN BOTON MARCAR FACTURADO */
+
+/* SUGERENCIAS BNA */
+.suggestions-container {
+    font-size: small;
+    max-height: 150px; 
+    overflow-y: auto;  
+    border: none; 
+    border-radius: 5px; 
+    background-color: white; 
+    z-index: 1000; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+}
+
+.list-group-item {
+    cursor: pointer; 
+}
+
+.list-group-item:hover {
+    background-color: cornflowerblue;
+    color: white;
+}
+
+/* FIN SUGERENCIAS BNA */
+
+.ios-card-text {
+    font-size: 16px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.ios-icon {
+    font-size: 20px;
+    color: #007aff;
+    margin-right: 10px;
+}
+
+.ios-icon2 {
+    font-size: 20px;
+    color: grey;
+}
+
+#direccion-bna .ios-icon.bi-house {
+    content: "\f015";
+}
+
+#direccion-bna .ios-icon.bi-telephone {
+    content: "\f879";
+}
+
+#direccion-bna .ios-icon.bi-envelope {
+    content: "\f0e0";
+}
+
+.ios-card {
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
