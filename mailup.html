@@ -18,12 +18,11 @@
                 })
             });
 
-            // Verifica si la respuesta es válida y maneja errores
             if (response.ok) {
                 const data = await response.json();
-                return data.access_token; // Devuelve el token de acceso
+                return data.access_token;
             } else {
-                const errorText = await response.text(); // Obtener texto de la respuesta
+                const errorText = await response.text();
                 console.error('Error al obtener el token:', errorText);
                 throw new Error('Error al obtener el token de acceso');
             }
@@ -47,11 +46,10 @@
                     })
                 });
 
-                // Verifica si la respuesta es válida y maneja errores
                 if (response.ok) {
                     alert('Email enviado con éxito!');
                 } else {
-                    const errorData = await response.text(); // Obtener texto de la respuesta
+                    const errorData = await response.text();
                     console.error('Error al enviar el email:', errorData);
                     alert('Error al enviar el email: ' + errorData);
                 }
