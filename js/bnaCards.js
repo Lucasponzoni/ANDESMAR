@@ -225,6 +225,11 @@ function loadEnviosFromFirebase() {
                 trackingLink: (data.trackingLink),
                 transportCompany: (data.transportCompany),
                 transportCompanyNumber: (data.transportCompanyNumber),
+                razon_social: capitalizeWords(data.razon_social),
+                cuit: (data.cuit),
+                direccion_facturacion: capitalizeWords(data.direccion_facturacion),
+                ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
+                codigo_postal_facturacion: (data.codigo_postal_facturacion),
             });
 
             // Incrementar el contador si tipoElectrodomesticoBna está vacío
@@ -294,6 +299,10 @@ function renderCards(data) {
             mensajeFactura = `Falta ${horasRestantes} horas y ${minutosRestantes} minutos`;
         }
 
+        // Determinar el tipo de factura
+        const cuit = data[i].cuit;
+        const tipoFactura = (cuit.length === 7 || cuit.length === 8) ? 'FACTURA B' : 'FACTURA A';
+
         // Agregar el mensaje a la tarjeta
         const mensajeElement = document.createElement('p');
         mensajeElement.textContent = mensajeFactura;
@@ -313,16 +322,16 @@ function renderCards(data) {
                             ${isAndreani || isAndesmar ? 'Preparado' : 'Pendiente'}
                             </div>
 
-                            <div class="em-state-bna"><img id="Tienda BNA" src="./Img/tienda-bna.jpg"></div>
+                            <div class="em-state-bna"><img id="TiendaBNA" src="./Img/bna-logo.png"></div>
                             <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
                                                 <div class="d-flex align-items-center">
                             
                             <p class="card-text cpLocalidadBna mb-0 me-2">
-                            <i class="bi bi-geo-alt"></i> ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}
+                            ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}
                             </p>
     
                             <button class="btn btn-sm btn-" style="color: #007bff;" id="edit-localidad-${data[i].id}">
-                            <i class="bi bi-pencil-square"></i>
+                            <i class="bi bi-pencil-square ios-icon2"></i>
                             </button>
                     </div>
 
@@ -331,16 +340,25 @@ function renderCards(data) {
                         <ul id="suggestions-${data[i].id}" class="suggestions-container list-group"></ul>
                     </div>
 
+                            <div id="direccion-bna" class="ios-card">
+                            <p class="ios-card-text">
+                            <i class="bi bi-house ios-icon"></i> Calle: ${data[i].calle}
+                            </p>
+                            <p class="ios-card-text">
+                            <i class="bi bi-telephone ios-icon"></i> Teléfono: ${data[i].telefono}
+                            </p>
+                            <p class="ios-card-text">
+                            <i class="bi bi-envelope ios-icon"></i> ${data[i].email}
+                            </p>
+                            </div>
 
-                            <p class="card-text-bna"><i class="bi bi-house"></i> Calle: ${data[i].calle}</p>
-                            <p class="card-text-bna"><i class="bi bi-telephone"></i> Teléfono: ${data[i].telefono}</p>
-                            <p class="card-text-bna2"><i class="bi bi-envelope"></i> ${data[i].email}</p>
+                            
                             <div class="d-flex align-items-center contenedorRemito">
-                                <p class="card-text remitoCard">${data[i].remito}</p>
-                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
+                                <p class="orden">${data[i].remito}</p>
+                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
-                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;" onclick="window.open('https://api.avenida.com/manage/shops/2941/orders/${data[i].orden_publica_}', '_blank');">
+                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2" onclick="window.open('https://api.avenida.com/manage/shops/2941/orders/${data[i].orden_publica_}', '_blank');">
                                     <i class="bi bi-bag-check"></i>
                                 </button>
 
@@ -354,57 +372,7 @@ function renderCards(data) {
                             'Número de Envío Pendiente')}
                             </p>
 
-        
-                            <div class="alert alert-success d-none" id="alert-${data[i].id}" role="alert">
-                                Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
-                            </div>
-        
-                            <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
-                        <option value="">Seleccione un producto</option>
-                        <option value="heladera">Heladera</option>
-                        <option value="cocina">Cocina</option>
-                        <option value="hornoEmpotrable">Horno Empotrable</option>
-                        <option value="lavavajillas">Lavavajillas</option>
-                        <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
-                        <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
-                        <option value="split2700">Split 2700W</option>
-                        <option value="split3300">Split 3300W</option>
-                        <option value="split4500">Split 4500W</option>
-                        <option value="split5500">Split 5500W</option>
-                        <option value="split6000">Split 6000W</option>
-                        <option value="splitPisoTecho18000">Piso Techo 18000 Frigorías</option>
-                        <option value="aireportatil">Aire Portatil</option>
-                        <option value="ventiladordepared">Ventilador de Pared</option>
-                        <option value="colchon80cm">Colchon 80cm</option>
-                        <option value="colchon100cm">Colchon 100cm</option>
-                        <option value="colchon140cm">Colchon 140cm</option>
-                        <option value="colchon160cm">Colchon 160cm</option>
-                        <option value="colchon200cm">Colchon 200cm</option>
-                        <option value="termotanque50">Termotanque 50L</option>
-                        <option value="termotanque80">Termotanque 80L</option>
-                        <option value="termotanque110">Termotanque 110L</option>
-                        <option value="termotanque150">Termotanque 150L</option>
-                        <option value="termotanque180">Termotanque 180L</option>
-                        <option value="termotanque255">Termotanque 255L COM255</option>
-                        <option value="termotanque300">Termotanque 300L RHCTP300N</option>
-                        <option value="smartTV32">Smart TV 32"</option>
-                        <option value="smartTV40">Smart TV 40"</option>
-                        <option value="smartTV43">Smart TV 43"</option>
-                        <option value="smartTV50">Smart TV 50"</option>
-                        <option value="smartTV58">Smart TV 58"</option>
-                        <option value="smartTV65">Smart TV 65"</option>
-                        <option value="smartTV70">Smart TV 70"</option>
-                        <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
-                        <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
-                        <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
-                        <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
-                        <option value="bulto20">Bulto Pequeño 20x20</option>
-                        <option value="bulto30">Bulto Pequeño 30x30</option>
-                        <option value="bulto40">Bulto Pequeño 40x40</option>
-                        <option value="bulto50">Bulto Pequeño 50x50</option>
-                    </select>     
-        
-                            <div class="medidas"></div> <!-- Div para las medidas -->
+                            <div class="factura-status em-circle-state-time" id="factura-status-${data[i].id}">${mensajeFactura}</div>
 
                             <!-- Botón para mostrar/ocultar el detalle del producto -->
                             <button class="btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleProducto-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleProducto-${data[i].id}">
@@ -424,6 +392,53 @@ function renderCards(data) {
                             </p>
 
                                 <p class="card-text-pago"><i class="bi bi-card-text"></i> <strong>Descripción:</strong> ${data[i].producto_nombre}</p>
+                             </div>
+                            </div>
+
+                            <!-- Botón para mostrar/ocultar el detalle de Facturacion -->
+                            <button class="btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleFacturacion-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleFacturacion-${data[i].id}">
+                                                           <i class="bi bi-chevron-down"></i> Detalle de Facturacion <i class="bi bi-receipt"></i>
+                            </button>
+
+                            <!-- Contenido del colapso -->
+                            <div class="collapse" id="collapseDetalleFacturacion-${data[i].id}">
+                             <div class="facturacion descripcion-div p-2 mt-2"">
+
+                            <p class="card-text-facturacion">
+                            <strong>Tipo:</strong> ${tipoFactura}
+                            </p>
+
+                            <p class="card-text-facturacion">
+                                <strong>Nombre / Razon social:</strong> ${data[i].razon_social}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].razon_social}')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </p>
+                            <p class="card-text-facturacion">
+                                <strong>D.N.I. / CUIT:</strong> ${data[i].cuit}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].cuit}')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </p>
+                            <p class="card-text-facturacion">
+                                <strong>Direccion:</strong> ${data[i].direccion_facturacion}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].direccion_facturacion}')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </p>
+                            <p class="card-text-facturacion">
+                                <strong>Localidad:</strong> ${data[i].ciudad_facturacion}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].ciudad_facturacion}')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </p>
+                            <p class="card-text-facturacion">
+                                <strong>CP:</strong> ${data[i].codigo_postal_facturacion}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].codigo_postal_facturacion}')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </p>
+
                              </div>
                             </div>
 
@@ -502,6 +517,57 @@ function renderCards(data) {
                                     <button class="btn btn-secondary mt-1 update-observaciones mb-1" data-id="${data[i].id}">Actualizar Observaciones</button>
                                 </div>
                             </div>
+
+                            <div class="alert alert-danger d-none" id="alert-${data[i].id}" role="alert">
+                                Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
+                            </div>
+
+                                <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
+                        <option value="">Seleccione un producto</option>
+                        <option value="heladera">Heladera</option>
+                        <option value="cocina">Cocina</option>
+                        <option value="hornoEmpotrable">Horno Empotrable</option>
+                        <option value="lavavajillas">Lavavajillas</option>
+                        <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
+                        <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
+                        <option value="split2700">Split 2700W</option>
+                        <option value="split3300">Split 3300W</option>
+                        <option value="split4500">Split 4500W</option>
+                        <option value="split5500">Split 5500W</option>
+                        <option value="split6000">Split 6000W</option>
+                        <option value="splitPisoTecho18000">Piso Techo 18000 Frigorías</option>
+                        <option value="aireportatil">Aire Portatil</option>
+                        <option value="ventiladordepared">Ventilador de Pared</option>
+                        <option value="colchon80cm">Colchon 80cm</option>
+                        <option value="colchon100cm">Colchon 100cm</option>
+                        <option value="colchon140cm">Colchon 140cm</option>
+                        <option value="colchon160cm">Colchon 160cm</option>
+                        <option value="colchon200cm">Colchon 200cm</option>
+                        <option value="termotanque50">Termotanque 50L</option>
+                        <option value="termotanque80">Termotanque 80L</option>
+                        <option value="termotanque110">Termotanque 110L</option>
+                        <option value="termotanque150">Termotanque 150L</option>
+                        <option value="termotanque180">Termotanque 180L</option>
+                        <option value="termotanque255">Termotanque 255L COM255</option>
+                        <option value="termotanque300">Termotanque 300L RHCTP300N</option>
+                        <option value="smartTV32">Smart TV 32"</option>
+                        <option value="smartTV40">Smart TV 40"</option>
+                        <option value="smartTV43">Smart TV 43"</option>
+                        <option value="smartTV50">Smart TV 50"</option>
+                        <option value="smartTV58">Smart TV 58"</option>
+                        <option value="smartTV65">Smart TV 65"</option>
+                        <option value="smartTV70">Smart TV 70"</option>
+                        <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
+                        <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
+                        <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
+                        <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
+                        <option value="bulto20">Bulto Pequeño 20x20</option>
+                        <option value="bulto30">Bulto Pequeño 30x30</option>
+                        <option value="bulto40">Bulto Pequeño 40x40</option>
+                        <option value="bulto50">Bulto Pequeño 50x50</option>
+                    </select>     
+        
+                            <div class="medidas"></div> <!-- Div para las medidas -->
         
                             <!-- Botón Andesmar -->          
                             <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'}" 
@@ -524,9 +590,6 @@ function renderCards(data) {
                             </span>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
                             </button>
-
-                            <div class="factura-status em-circle-state-time" id="factura-status-${data[i].id}">${mensajeFactura}</div>
-
 
                             <div id="resultado${data[i].id}" class="mt-2 errorMeli"></div>
                         </div>
@@ -599,7 +662,7 @@ function renderCards(data) {
                 // Lógica para determinar el mensaje estado de Facturacion
                 const facturaStatusDiv = document.getElementById(`factura-status-${data[i].id}`);
                 if (hasDatoFacturacion) {
-                    facturaStatusDiv.innerHTML = 'Facturado ✅'; 
+                    facturaStatusDiv.innerHTML = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado'; 
                     facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
                     facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
                 } else {

@@ -1054,9 +1054,12 @@ span > img {
     font-family: "Reddit Sans Condensed", sans-serif;
     text-transform: capitalize;
     color: rgb(55, 119, 238);
-    font-weight: 300 !important;
+    font-weight: 400 !important;
     font-size: 1.3rem;
     margin-bottom: 5px;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .card-title-meli {
@@ -1159,14 +1162,14 @@ p.card-text:nth-child(8){
 }
 
 p.card-text-bna{
-    font-family: "Reddit Sans Condensed", sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-weight: 300;
     margin-bottom: 5px;
 }
 
 p.card-text-bna2{
     color: green;
-    font-family: "Reddit Sans Condensed", sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-weight: 300;
     margin-bottom: 5px;
 }
@@ -1181,6 +1184,21 @@ p.card-text:nth-child(9){
     border-radius: 10px;
     border: dashed 2px cornflowerblue;
     padding: .5rem;
+}
+
+.facturacion{
+    border-radius: 10px;
+    border: dashed 2px cornflowerblue;
+    padding: .5rem;
+}
+
+.facturacion p:nth-child(1){
+    color: white;
+    font-weight: 800;
+    background-color: red;
+    width: fit-content;
+    border-radius:5px;
+    padding: .2rem;
 }
 
 .pago p{
@@ -1202,8 +1220,33 @@ p.card-text:nth-child(9){
     margin-bottom: 5px;
 }
 
+.card-text-facturacion{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
 .descripcion-div{
     margin-bottom: 8px;
+}
+
+.orden{
+    font-family: "Chakra Petch", sans-serif !important;
+    font-size: x-large;
+    font-weight: 800;
+    margin: 0;
+}
+
+.contenedorRemito{
+    font-family: "Chakra Petch", sans-serif !important;
+    margin-bottom: 10px !important;
+    text-align: center;
+    color: #333; 
+    background-color: #ffffff; 
+    border: 1px solid #dcdcdc; 
+    font-weight: 500 !important;
+    padding: 10px 15px; 
+    border-radius: 15px;  
 }
 
 .remitoCard{
@@ -1564,16 +1607,15 @@ div.card-body > p > i{
     justify-content: center;
 }
 
-.em-circle-state-time{
+.em-circle-state-time {
     font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: .8rem;
-    padding-inline: 5px;
-    padding: 5px;
-    border-radius: 5px;
-    position: absolute;
-    bottom: -15px;
-    right: 10px;
-    background-color: cornflowerblue; 
+    font-weight: 800;
+    font-size: .9rem;
+    padding: 8px 10px;
+    border-radius: 5px; 
+    position: relative; 
+    background-color: #007AFF; 
+    margin-bottom: 5px;
     text-transform: uppercase;
     color: white;
     display: flex; 
@@ -1581,16 +1623,15 @@ div.card-body > p > i{
     justify-content: center;
 }
 
-.em-circle-state-time-facturado{
+.em-circle-state-time-facturado {
     font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: .8rem;
-    padding-inline: 5px;
-    padding: 5px;
-    border-radius: 5px;
-    position: absolute;
-    bottom: -15px;
-    right: 10px;
-    background-color: green; 
+    font-weight: 800;
+    font-size: .9rem;
+    margin-bottom: 5px;
+    padding: 8px 10px; 
+    border-radius: 5px; 
+    position: relative; 
+    background-color: #34C759; 
     text-transform: uppercase;
     color: white;
     display: flex; 
@@ -1624,7 +1665,7 @@ div.card-body > p > i{
     border-radius: 10px;
     position: absolute;
     top: -15px; 
-    right: 150px;
+    right: 90px;
     background-color: orangered;
     text-transform: uppercase;
     color: white;
@@ -1643,7 +1684,7 @@ div.card-body > p > i{
     border-radius: 10px;
     position: absolute;
     top: -15px; 
-    right: 150px;
+    right: 90px;
     background-color: green;
     text-transform: uppercase;
     color: white;
@@ -1697,13 +1738,17 @@ div.card-body > p > i{
     position: absolute;
     top: -15px; 
     right: 10px;
-    border: solid 2px cornflowerblue;
+    border: solid 1px grey;
     background-color: white;
     display: flex; 
     align-items: center; 
     justify-content: center;
     font-weight: bold; 
     overflow: hidden;
+}
+
+.em-state-bna > img{
+    width:60px;
 }
 
 .em-state-bna2{
@@ -1723,10 +1768,6 @@ div.card-body > p > i{
     justify-content: center;
     font-weight: bold; 
     overflow: hidden;
-}
-
-.em-state-bna > img{
-    width:120px;
 }
 
 .dimensions-info {
@@ -1820,15 +1861,29 @@ div.card-body > p > i{
     border-radius: 5px;
 }
 
-.numeroDeEnvioGeneradoBNA{
+.numeroDeEnvioGeneradoBNA {
     font-family: "Chakra Petch", sans-serif !important;
     margin-bottom: 5px !important;
     text-align: center;
-    color: grey;
-    border: dashed 2px #ffc107;
-    font-weight: 800 !important;
-    padding: .2rem;
-    border-radius: 10px;
+    color: #2c3e50; 
+    background-color: #ecf0f1; 
+    border: 1px solid #bdc3c7; 
+    font-weight: 900 !important;
+    padding: 12px 16px; 
+    border-radius: 12px; 
+    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.1); 
+    transition: background-color 0.3s, box-shadow 0.3s; 
+}
+
+.numeroDeEnvioGeneradoBNA a {
+    color: inherit; 
+    text-decoration: none; 
+    font-weight: bold; 
+}
+
+.numeroDeEnvioGeneradoBNA a:hover {
+    text-decoration: underline;
+    color: #2980b9; 
 }
 
 /* MODAL ANDESMAR */
@@ -2057,4 +2112,39 @@ div.card-body > p > i{
 }
 
 /* FIN SUGERENCIAS BNA */
+
+.ios-card-text {
+    font-size: 16px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.ios-icon {
+    font-size: 20px;
+    color: #007aff;
+    margin-right: 10px;
+}
+
+.ios-icon2 {
+    font-size: 20px;
+    color: grey;
+}
+
+#direccion-bna .ios-icon.bi-house {
+    content: "\f015";
+}
+
+#direccion-bna .ios-icon.bi-telephone {
+    content: "\f879";
+}
+
+#direccion-bna .ios-icon.bi-envelope {
+    content: "\f0e0";
+}
+
+.ios-card {
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
 
