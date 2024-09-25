@@ -1003,7 +1003,7 @@ if (isSplit) {
     .then(data => {
         if (data.NroPedido) {
             const linkEtiqueta = `https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
-            const linkSeguimiento = `https://andesmarcargas.com/seguimiento.html?numero=${remito}&tipo=remito&cod=`;
+            const linkSeguimiento = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}&tipo=remito&cod=`;
             
             // Actualizar el texto del botón
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
