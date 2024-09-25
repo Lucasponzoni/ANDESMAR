@@ -557,10 +557,9 @@ button:hover {
 .tipoElectrodomesticoBna{
     color: grey;
     border: 1px solid grey;
-    border-radius: 10px;
-    font-weight: 800;box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    font-weight: 800;
     margin-bottom: 5px;
-    box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
 }
 
 .mb-2{

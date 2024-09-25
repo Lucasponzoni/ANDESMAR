@@ -628,7 +628,7 @@ async function handleButtonClick(numeroDeEnvio, id) {
 }
 
 async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
-    const url = `https://proxy.cors.sh/https://apisqa.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
+    const url = `https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
     
     try {
         const response = await fetch(url, {
@@ -1019,8 +1019,8 @@ function addUpdateObservacionesEvent() {
 }
 
 // Función para enviar datos a la API de Andreani
-const apiUrlLogin = 'https://apisqa.andreani.com/login';
-const apiUrlLabel = 'https://proxy.cors.sh/https://apisqa.andreani.com/v2/ordenes-de-envio';
+const apiUrlLogin = 'https://apis.andreani.com/login';
+const apiUrlLabel = 'https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio';
 const username = 'novogar_gla';
 const password = 'JoBOraCDJZC';
 
@@ -1304,7 +1304,7 @@ for (let i = 0; i < cantidadBultos; i++) {
 }
 
 async function obtenerEtiqueta(numeroDeEnvio, token, buttonAndr) {
-    const url = `https://proxy.cors.sh/https://apisqa.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
+    const url = `https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
     try {
         const response = await fetch(url, {
             method: "GET",
