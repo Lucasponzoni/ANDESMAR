@@ -484,7 +484,7 @@ function renderCards(data) {
                             <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'}" 
                             id="andesmarButton${data[i].id}" 
                             ${isAndreani ? 'disabled' : ''} 
-                            ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')"`}>
+                            ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${data[i].producto_nombre}')"`}>
                             <span id="andesmarText${data[i].id}">
                             ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andesmar`}
                             </span>
@@ -767,7 +767,7 @@ const usuario = "BOM6765";
 const clave = "BOM6765";
 const codigoCliente = "6765";
 
-async function enviarDatosAndesmar(id, nombre, cp, localidad, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
+async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, suborden_total, precio_venta, producto_nombre) {
 
     const contraseñaCorrecta = await pedirContraseña();
     if (!contraseñaCorrecta) {
@@ -858,7 +858,7 @@ const requestObj = {
     CalleDestinatario: calle,
     CalleNroDestinatario: "S/N",
     TelefonoDestinatario: telefono,
-    NroRemito: remito,
+    NroRemito: "BNA" + remito,
     Bultos: bultos, 
     Peso: peso * cantidad, 
     ValorDeclarado: precio_venta * cantidad, 
@@ -924,7 +924,7 @@ if (isSplit) {
             button.classList.add('btn-success');
             button.onclick = () => window.open(linkEtiqueta, '_blank');
             NroEnvio.innerHTML = `<a href="${linkSeguimiento}" target="_blank">Andesmar: ${data.NroPedido} <i class="bi bi-box-arrow-up-right"></i></a>`;
-    
+            
             // Pushear datos a Firebase
             const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
             const transportData = {
@@ -933,13 +933,33 @@ if (isSplit) {
                 transportCompanyNumber: data.NroPedido
             };
             
-              db.ref(`enviosBNA/${id}`).update(transportData)
+            db.ref(`enviosBNA/${id}`).update(transportData)
                 .then(() => {
                     console.log("Datos actualizados en Firebase:", transportData);
                 })
                 .catch((error) => {
-                                console.error("Error al actualizar datos en Firebase como Andesmar:", error);
+                    console.error("Error al actualizar datos en Firebase como Andesmar:", error);
                 });
+    
+            // Nueva entrada en Firebase
+            const nuevaEntradaRef = db.ref('enviosAndesmar').push(); // RUTA FIREBASE
+            nuevaEntradaRef.set({
+                nombreApellido: nombre,
+                nroPedido: data.NroPedido, 
+                codigoPostal: cp,
+                localidad: `${localidad}, ${provincia}`, 
+                calleDelDestinatario: calle,
+                numeroDeCalle: "S/N",
+                telefono: telefono,
+                remito: `BNA${remito}`, 
+                cotizacion: `$${precio_venta - suborden_total}` 
+            })
+            .then(() => {
+                console.log("Nueva entrada agregada a Firebase:", { nombre, nroPedido: data.NroPedido, cp, localidad, calle, telefono });
+            })
+            .catch((error) => {
+                console.error("Error al agregar nueva entrada a Firebase:", error);
+            });
     
             // Actualizar estado de envío
             if (envioState) {
@@ -964,7 +984,8 @@ if (isSplit) {
     .finally(() => {
         spinner.style.display = 'none'; // Asegúrate de ocultar el spinner en caso de error
     });
-}    
+}
+    
 
 function addUpdateObservacionesEvent() {
     const updateButtons = document.querySelectorAll('.update-observaciones');

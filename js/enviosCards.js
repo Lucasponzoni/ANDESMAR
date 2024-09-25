@@ -77,9 +77,12 @@ document.addEventListener("DOMContentLoaded", function() {
             const card = document.createElement("div");
             card.className = "col-md-4"; 
 
-            const etiqueta = item.remito.startsWith("NOV")
-                ? `<div class="em-state-simbel">Etiqueta por <img id="simbel2" src="./Img/simbel.png"></div>`
-                : `<div class="em-state-andesmar">Etiqueta Manual 💪🏻</div>`;
+            const etiqueta = item.remito.startsWith("BNA")
+            ? `<div class="em-state-bna2">Etiqueta <img id="bna2" src="./Img/bna-logo.png"></div>`
+            : item.remito.startsWith("NOV")
+            ? `<div class="em-state-simbel">Etiqueta por <img id="simbel2" src="./Img/simbel.png"></div>`
+            : `<div class="em-state-andesmar">Etiqueta Manual 💪🏻</div>`;
+
             
             card.innerHTML = `
                 <div class="card mb-3">
