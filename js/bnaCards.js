@@ -414,7 +414,15 @@ function renderCards(data) {
                             <!-- Contenido del colapso -->
                             <div class="collapse" id="collapseDetalleProducto-${data[i].id}">
                              <div class="pago descripcion-div p-2 mt-2"">
-                                <p class="card-text-pago"><i class="bi bi-box-seam"></i> <strong>SKU:</strong> <strong>${data[i].sku}</strong>, Cantidad: ${data[i].cantidad}</p>
+                                <p class="card-text-pago">
+
+                            <i class="bi bi-box-seam"></i> 
+                            <strong>SKU:</strong> <strong>${data[i].sku}</strong>, Cantidad: ${data[i].cantidad}
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].sku}')">
+                            <i class="bi bi-clipboard"></i>
+                            </button>
+                            </p>
+
                                 <p class="card-text-pago"><i class="bi bi-card-text"></i> <strong>Descripción:</strong> ${data[i].producto_nombre}</p>
                              </div>
                             </div>
@@ -430,8 +438,23 @@ function renderCards(data) {
                                     <p class="card-text-pago"><strong>Entidad: ${data[i].brand_name || 'N/A'}</p>
                                     <p class="card-text-pago"><strong>Cuotas:</strong> ${data[i].cuotas || 'N/A'}</p>
                                     <p class="card-text-pago"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
-                                    <p class="card-text-pago"><strong>Precio de Venta:</strong> $ ${data[i].precio_venta}</p>
-                                    <p class="card-text-pago"><strong>Costo de Envío:</strong> $ ${(data[i].suborden_total - data[i].precio_venta)}</p>
+                                    
+
+                                <p class="card-text-pago">
+                                    <strong>Precio de Venta:</strong> $ ${data[i].precio_venta}
+                                    <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta}')">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </p>
+
+                                <p class="card-text-pago">
+                                    <strong>Costo de Envío:</strong> $ ${(data[i].suborden_total - data[i].precio_venta)}
+                                    <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].suborden_total - data[i].precio_venta)}')">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </p>
+
+
                                     <p class="card-text-pago"><strong>Total:</strong> $ ${data[i].suborden_total}</p>
 
                             <!-- Contenedor gris con CUPON y AUTORIZACION -->
