@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Email de Prueba</title>
+    <script>
+        async function obtenerToken() {
+            const response = await fetch('https://proxy.cors.sh/https://api.mailup.com/API/v1.1/Authentication/AccessToken', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+                },
+                body: JSON.stringify({
+                    "ClientId": "168ac4cb-e699-465d-8808-24e215307ebe",
+                    "ClientSecret": "437fcac2-58f7-43c4-b6e7-cdd7ad2ad26a"
+                })
+            });
+
+            // Verifica si la respuesta es válida y maneja errores
+            if (response.ok) {
+                const data = await response.json();
+                return data.access_token; // Devuelve el token de acceso
+            } else {
+                const errorText = await response.text(); // Obtener texto de la respuesta
+                console.error('Error al obtener el token:', errorText);
+                throw new Error('Error al obtener el token de acceso');
+            }
+        }
+
+        async function enviarEmail() {
+            try {
+                const token = await obtenerToken();
+                const response = await fetch('https://proxy.cors.sh/https://api.mailup.com/API/v1.1/SendEmail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                        'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+                    },
+                    body: JSON.stringify({
+                        "From": "posventa@novogar.com.ar",
+                        "To": ["lucasponzoni@gmail.com"],
+                        "Subject": "Email de Prueba",
+                        "Body": "Este es un correo de prueba enviado desde MailUp."
+                    })
+                });
+
+                // Verifica si la respuesta es válida y maneja errores
+                if (response.ok) {
+                    alert('Email enviado con éxito!');
+                } else {
+                    const errorData = await response.text(); // Obtener texto de la respuesta
+                    console.error('Error al enviar el email:', errorData);
+                    alert('Error al enviar el email: ' + errorData);
+                }
+            } catch (error) {
+                console.error('Error:', error.message);
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Enviar Email de Prueba</h1>
+    <button onclick="enviarEmail()">Enviar Email</button>
+</body>
+</html>
