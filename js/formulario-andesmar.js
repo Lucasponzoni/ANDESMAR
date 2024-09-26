@@ -32,6 +32,7 @@ function validarFormulario() {
         "calleDestinatario",
         "calleNroDestinatario",
         "telefonoDestinatario",
+        "emailDestinatario",
         "nroRemito",
         "localidad",
         "peso",
@@ -42,14 +43,22 @@ function validarFormulario() {
         "esRemitoConformado"
     ];
 
+    // Verifica si alguno de los campos está vacío
     for (const campo of camposRequeridos) {
         const input = document.getElementById(campo);
         if (!input || !input.value.trim()) {
-            alert(`Por favor complete el campo: ${input.placeholder || input.name}`);
-            return false; // Retorna false si algún campo está vacío
+            // Si algún campo está vacío, se lanza un SweetAlert indicando el error
+            Swal.fire({
+                icon: 'error',
+                title: 'Campo obligatorio',
+                text: `Por favor complete el campo: ${input.placeholder || input.name || campo}.`,
+                confirmButtonText: 'OK'
+            });
+            return false; // Detener el envío del formulario
         }
     }
-    return true; // Retorna true si todos los campos están completos
+
+return true; // Si todo está completo, permitir el envío sin mostrar nada
 }
 
 function actualizarVolumen() {
@@ -259,6 +268,7 @@ function enviarSolicitud() {
     const unidadVenta = document.getElementById("unidadVenta").value;
     const esFletePagoDestino = document.getElementById("esFletePagoDestino").selectedOptions[0].value === "true";
     const esRemitoConformado = document.getElementById("esRemitoConformado").selectedOptions[0].value === "true";
+    const email = document.getElementById('emailDestinatario').value;
 
     const usuario = "BOM6765";
     const clave = "BOM6765";
@@ -305,6 +315,7 @@ function enviarSolicitud() {
         CalleDestinatario: calleDestinatario,
         CalleNroDestinatario: calleNroDestinatario,
         TelefonoDestinatario: telefonoDestinatario,
+        MailDestinatario: email,
         NroRemito: nroRemito,
         Bultos: totalBultos, // Cantidad total de bultos
         Peso: parseFloat(peso),

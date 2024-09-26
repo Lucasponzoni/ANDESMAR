@@ -3,6 +3,45 @@ const apiUrlLabel = 'https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-
 const username = 'novogar_gla';
 const password = 'JoBOraCDJZC';
 
+function validarFormulario() {
+    const camposRequeridos = [
+        "calleRemitente",
+        "calleNroRemitente",
+        "codigoPostalRemitente",
+        "nombreApellidoDestinatario",
+        "codigoPostalDestinatario",
+        "calleDestinatario",
+        "calleNroDestinatario",
+        "telefonoDestinatario",
+        "emailDestinatario",
+        "nroRemito",
+        "localidad",
+        "peso",
+        "valorDeclarado",
+        "modalidadEntrega",
+        "unidadVenta",
+        "esFletePagoDestino",
+        "esRemitoConformado"
+    ];
+
+    // Verifica si alguno de los campos está vacío
+    for (const campo of camposRequeridos) {
+        const input = document.getElementById(campo);
+        if (!input || !input.value.trim()) {
+            // Si algún campo está vacío, se lanza un SweetAlert indicando el error
+            Swal.fire({
+                icon: 'error',
+                title: 'Campo obligatorio',
+                text: `Por favor complete el campo: ${input.placeholder || input.name || campo}.`,
+                confirmButtonText: 'OK'
+            });
+            return false; // Detener el envío del formulario
+        }
+    }
+
+return true; // Si todo está completo, permitir el envío sin mostrar nada
+}
+
 // Mapeo de provincias a códigos de región
 const regionMap = {"Salta": "AR-A",
 "buenos aires": "AR-B",
@@ -52,6 +91,11 @@ async function getAuthToken() {
 }
 
 async function enviarSolicitudAndreani() {
+
+    if (!validarFormulario()) {
+        return; // Si la validación falla, no continua con la solicitud
+    }
+
     document.getElementById('descargaAndreani').style.display = 'block'; // Mostrar contenedor
     const apiResponseContainer = document.getElementById('apiResponse');
     apiResponseContainer.innerHTML = `

@@ -967,6 +967,7 @@ const requestObj = {
     CalleDestinatario: calle,
     CalleNroDestinatario: "S/N",
     TelefonoDestinatario: telefono,
+    MailDestinatario: email,
     NroRemito: "BNA" + remito,
     Bultos: bultos, 
     Peso: peso * cantidad, 
