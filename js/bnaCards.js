@@ -227,6 +227,7 @@ function loadEnviosFromFirebase() {
                 transportCompanyNumber: (data.transportCompanyNumber),
                 razon_social: capitalizeWords(data.razon_social),
                 cuit: (data.cuit),
+                marcaEntregado: (data.marcaEntregado),
                 direccion_facturacion: capitalizeWords(data.direccion_facturacion),
                 ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
                 codigo_postal_facturacion: (data.codigo_postal_facturacion),
@@ -362,8 +363,14 @@ function renderCards(data) {
                                 <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2" onclick="window.open('https://api.avenida.com/manage/shops/2941/orders/${data[i].orden_publica_}', '_blank');">
                                     <i class="bi bi-bag-check"></i>
                                 </button>
-
+                                
+                                <div class="form-check form-switch ms-2 text-center"> <!-- Añadir texto centrado -->
+                                    <input class="form-check-input" type="checkbox" id="entregado-${data[i].id}" ${data[i].marcaEntregado === 'Si' ? 'checked' : ''}>
+                                    <label class="form-check-label" for="entregado-${data[i].id}">Entregado</label>
+                                </div>
                             </div>
+
+
         
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
                             ${isAndreani ? 
@@ -596,6 +603,21 @@ function renderCards(data) {
                         </div>
                     </div>
                 `;
+
+                // Evento para manejar el cambio del switch
+                document.getElementById(`entregado-${data[i].id}`).addEventListener('change', function() {
+                const nuevoEstado = this.checked ? 'Si' : 'No';
+
+                // Actualizar en Firebase
+                firebase.database().ref('enviosBNA/' + data[i].id).update({
+                marcaEntregado: nuevoEstado
+                }).then(() => {
+                console.log(`Estado de entrega actualizado a: ${nuevoEstado}`);
+                }).catch(error => {
+                console.error("Error al actualizar el estado de entrega: ", error);
+                });
+                });
+
 
                 document.getElementById(`edit-localidad-${data[i].id}`).addEventListener('click', function() {
                     const editDiv = document.getElementById(`edit-input-${data[i].id}`);
@@ -1781,19 +1803,19 @@ medidasDiv.appendChild(medidasTextoDiv);
     bultoDiv.innerHTML = `
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
-            <input type="number" id="alto-${id}" name="Alto" class="form-control-medidas" step="1" value="${alto}" required disabled>
+            <input type="number" id="alto-${id}" name="Alto" class="form-control-medidas" step="1" value="${alto}" required>
         </div>
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
-            <input type="number" id="ancho-${id}" name="Ancho" class="form-control-medidas" step="1" value="${ancho}" required disabled>
+            <input type="number" id="ancho-${id}" name="Ancho" class="form-control-medidas" step="1" value="${ancho}" required>
         </div>
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
-            <input type="number" id="largo-${id}" name="Largo" class="form-control-medidas" step="1" value="${largo}" required disabled>
+            <input type="number" id="largo-${id}" name="Largo" class="form-control-medidas" step="1" value="${largo}" required>
         </div>
         <div class="input-group mb-2" style="display: none;">
             <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
-            <input type="number" id="peso-${id}" name="peso" class="form-control-medidas" step="1" value="${peso}" min="1" required disabled>
+            <input type="number" id="peso-${id}" name="peso" class="form-control-medidas" step="1" value="${peso}" min="1" required>
         </div>
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
@@ -1829,15 +1851,15 @@ medidasDiv.appendChild(medidasTextoDiv);
             <div class="d-flex mb-2">
                 <div class="input-group me-2">
                     <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
-                    <input type="number" id="altoInterior-${id}" name="AltoInterior" class="form-control-medidas" step="1" value="${altoInterior}" required disabled>
+                    <input type="number" id="altoInterior-${id}" name="AltoInterior" class="form-control-medidas" step="1" value="${altoInterior}" required>
                 </div>
                 <div class="input-group me-2">
                     <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
-                    <input type="number" id="anchoInterior-${id}" name="AnchoInterior" class="form-control-medidas" step="1" value="${anchoInterior}" required disabled>
+                    <input type="number" id="anchoInterior-${id}" name="AnchoInterior" class="form-control-medidas" step="1" value="${anchoInterior}" required>
                 </div>
                 <div class="input-group me-2">
                     <span class="input-group-text"><i class="bi bi-arrows-angle-expand"></i></span>
-                    <input type="number" id="largoInterior-${id}" name="LargoInterior" class="form-control-medidas" step="1" value="${largoInterior}" required disabled>
+                    <input type="number" id="largoInterior-${id}" name="LargoInterior" class="form-control-medidas" step="1" value="${largoInterior}" required>
                 </div>
                 <div class="input-group me-2">
                     <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>

@@ -2149,3 +2149,65 @@ div.card-body > p > i{
 .ios-card {
     transition: background-color 0.3s, box-shadow 0.3s;
 }
+
+.contenedorRemito {
+    display: flex;
+    align-items: center; /* Alinear verticalmente */
+    justify-content: flex-start; /* Alinear horizontalmente al inicio */
+}
+
+.contenedorRemito {
+    display: flex;
+    align-items: center; /* Alinear verticalmente */
+    justify-content: flex-start; /* Alinear horizontalmente al inicio */
+}
+
+/* SWITCH ENTREGADO */
+.form-check {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    margin-left: 10px;
+}
+
+.form-check-input {
+    width: 50px; /* Aumentar el ancho */
+    height: 30px; /* Aumentar la altura */
+    background-color: #e0e0e0;
+    border-radius: 50px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    transition: background-color 0.3s;
+}
+
+.form-check-input:checked {
+    background-color: #4caf50; /* Color verde cuando está activo */
+}
+
+.form-check-input:checked::before {
+    transform: translateX(20px);
+}
+
+.form-check-input::before {
+    content: '';
+    position: absolute;
+    width: 30px; 
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+    top: 0;
+    left: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+}
+
+.form-check-label {
+    margin-top: 35px;
+    margin-left: -18px; 
+    font-size: 14px; 
+    color: #333; 
+    cursor: pointer;
+}
+/* FIN SWITCH ENTREGADO */
