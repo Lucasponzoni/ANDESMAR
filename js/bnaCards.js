@@ -1432,7 +1432,7 @@ async function obtenerEtiqueta(numeroDeEnvio, token, buttonAndr) {
         const pdfUrl = URL.createObjectURL(blob);
 
         buttonAndr.disabled = false;
-        buttonAndr.href = pdfUrl; // Establecer el href del botón
+        buttonAndr.href = pdfUrl; 
         buttonAndr.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${numeroDeEnvio}`;
         buttonAndr.classList.remove('btn-secondary');
         buttonAndr.classList.add('btn-success');
@@ -1837,6 +1837,26 @@ medidasDiv.appendChild(medidasTextoDiv);
         document.getElementById(`medidas-m3-${id}`).textContent = `${volumenM3.toFixed(2)} m³`;
     });
 
+    // Función para actualizar el volumen
+    function actualizarVolumen() {
+    const alto = parseFloat(document.getElementById(`alto-${id}`).value) || 0;
+    const ancho = parseFloat(document.getElementById(`ancho-${id}`).value) || 0;
+    const largo = parseFloat(document.getElementById(`largo-${id}`).value) || 0;
+    const cantidad = parseInt(document.getElementById(`cantidad-${id}`).value) || 1;
+
+    const volumenCm3 = alto * ancho * largo * cantidad; // Volumen en cm³
+    const volumenM3 = (volumenCm3 / 1000000).toFixed(2); // Volumen en m³
+
+    document.getElementById(`medidas-cm3-${id}`).textContent = `${volumenCm3} cm³`;
+    document.getElementById(`medidas-m3-${id}`).textContent = `${volumenM3} m³`;
+}
+
+    // Agregar event listeners a los inputs de alto, ancho, largo y cantidad
+    document.getElementById(`alto-${id}`).addEventListener('input', actualizarVolumen);
+    document.getElementById(`ancho-${id}`).addEventListener('input', actualizarVolumen);
+    document.getElementById(`largo-${id}`).addEventListener('input', actualizarVolumen);
+    document.getElementById(`cantidad-${id}`).addEventListener('input', actualizarVolumen);
+
     // Crear el div con los inputs para las medidas interiores, si aplica
     if (selectedValue.startsWith("split")) {
         const interiorLabel = document.createElement('p');
@@ -1879,6 +1899,7 @@ medidasDiv.appendChild(medidasTextoDiv);
         cantidadInteriorInput.addEventListener('input', () => {
             cantidadInput.value = cantidadInteriorInput.value;
         });
+
     }
 }
 
