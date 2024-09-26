@@ -1065,11 +1065,15 @@ span > img {
 }
 
 .card-title-meli {
-    font-family: "Reddit Sans Condensed", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     text-transform: capitalize;
-    color: rgb(32, 32, 32);
-    font-weight: 600;
+    color: rgb(55, 119, 238);
+    font-weight: 400 !important;
     font-size: 1.5rem;
+    margin-bottom: 5px;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 p.card-text{
@@ -1100,25 +1104,32 @@ p.card-text{
     padding: 5px;
 }
 
-.cpLocalidad-meli{
-    padding-inline: 10px !important;
-    font-family: "Reddit Sans Condensed", sans-serif !important;
-    font-size: .8rem;
+.cpLocalidad-meli {
+    padding: 6px 12px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-size: 0.85rem;
     font-weight: 600 !important;
     width: fit-content;
-    background-color: #614ad9;
+    background-color: whitesmoke;
+    border: solid 1px #007aff;
+    color: #007aff;
+    border-radius: 18px;
+    margin-bottom: 8px !important;
+    overflow: hidden;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+.correo-andesmar {
+    background-color: #007aff;
     color: white;
-    border-radius: 15px;
-    padding: 5px;
-    margin-bottom: 5px !important;
+    border: solid 1px #007aff;
 }
 
-.correo-andesmar{
-    background-color:#009dff;
-}
-
-.correo-andreani{
-    background-color:red;
+.correo-andreani {
+    background-color: #ff3b30;
+    color: white;
+    border: solid 1px #ff3b30;
 }
 
 .meli-box1{
@@ -1264,17 +1275,20 @@ p.card-text:nth-child(9){
     font-weight: 800 !important;
 }
 
-.remitoCardMeli{
+.remitoCardMeli {
     text-align: center;
-    padding: .2rem;
+    padding: 0.4rem 1rem;
     width: fit-content;
-    border-radius: 10px;
-    border: dashed #614ad9 2px;
-    color: rgb(129, 129, 129);
+    border-radius: 12px;
+    border: solid 1px #d1d5d6;
+    background: linear-gradient(145deg, #ffffff, #f0f0f5);
+    color: #333333;
     font-size: 1.3rem;
     font-family: "Reddit Sans Condensed", sans-serif;
-    font-weight: 700;
-    margin-bottom: 5px !important;
+    font-weight: 600;
+    margin-bottom: 10px !important;
+    box-shadow: 0 0px 12px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .little-card-meli > p{
@@ -1353,27 +1367,28 @@ div.card-body > p > i{
 
 .user-title-meli{
     color: grey;
-    font-family: "Reddit Sans Condensed", sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: .9rem;
-    padding-left: 2rem;
+    padding-left: 30px;
     margin-top: -.5rem;
 }
 
 #meli-cards .card {
-    background-color: #f5f5f7; /* Fondo de la tarjeta */
-    color: rgb(65, 65, 65); 
-    margin-bottom: 20px; 
-    border: none; 
-    border-radius: 8px; 
-    box-shadow: 0 0px 10px #00000067; 
-    border: dashed 2px #614ad9;
+    background: linear-gradient(145deg, #ffffff, #f0f0f5);
+    color: #1a1a1a;
+    margin-bottom: 24px;
+    border: solid 1px #d1d1d6;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-#meli-cards .card:hover{
-    color: rgb(0, 0, 0);
-    background-color: #f6f3fc;
-    border: dashed 2px #343348;
-    box-shadow: 0 0px 10px #00000067; 
+#meli-cards .card:hover {
+    background: linear-gradient(145deg, #f9f9fb, #e6e6ed);
+    color: #000000;
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    border: solid 1px #007aff;
 }
 
 #meli-cards .card:hover p, h5, h6 {
@@ -1558,56 +1573,75 @@ div.card-body > p > i{
     font-weight: bold; 
 }
 
-.em-circle-isFraud{
-    font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: .8rem;
+.em-circle-isFraud {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    padding-inline: 5px;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 6px 12px;
+    border-radius: 50px;
     position: absolute;
-    top: -18px; 
-    right: 140px; 
-    background-color: red; 
+    top: -18px;
+    right: 170px;
+    background-color: #ff3b30; 
     color: white;
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.em-circle-isFraud::before {
+    content: '\f071'; 
+    font-family: "Font Awesome 5 Free"; 
+    font-weight: 900;
+    margin-right: 3px;
 }
 
 .em-circle-isNotFraud{
-    font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: .8rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    padding-inline: 5px;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 6px 12px;
+    border-radius: 50px;
     position: absolute;
-    top: -18px; 
-    right: 120px; 
-    background-color: green; 
+    top: -18px;
+    right: 170px;
+    background-color: #34C759; 
     color: white;
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-}
-
-.em-circle-state{
-    font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: .8rem;
-    padding-inline: 5px;
-    padding: 5px;
-    border-radius: 5px;
-    position: absolute;
-    top: -18px; 
-    right: 10px;
-    background-color: rgb(70, 70, 70); 
-    text-transform: uppercase;
-    color: white;
-    display: flex; 
-    align-items: center; 
+    display: flex;
+    align-items: center;
     justify-content: center;
 }
+
+.em-circle-isNotFraud::before {
+    content: '\f071'; 
+    font-family: "Font Awesome 5 Free"; 
+    font-weight: 900;
+    margin-right: 3px;
+}
+
+.em-circle-state {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    text-transform: uppercase;
+    position: absolute;
+    font-size: 0.75rem;
+    top: -18px;
+    right: 10px;
+    border-radius: 50px;
+    padding: 6px 12px;
+    background-color: grey;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.em-circle-state::before {
+    content: '\f017'; 
+    font-family: "Font Awesome 5 Free"; 
+    font-weight: 900;
+    margin-right: 3px;
+}
+
 
 .em-circle-state-time {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -1642,20 +1676,27 @@ div.card-body > p > i{
 }
 
 .em-circle-state2{
-    font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: .8rem;
-    padding-inline: 5px;
-    padding: 5px;
-    border-radius: 5px;
-    position: absolute;
-    top: -18px; 
-    right: 10px;
-    background-color: green; 
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     text-transform: uppercase;
+    position: absolute;
+    font-size: 0.75rem;
+    top: -18px;
+    right: 10px;
+    border-radius: 50px;
+    padding: 6px 12px;
+    background-color: grey;
     color: white;
-    display: flex; 
-    align-items: center; 
+    display: flex;
+    align-items: center;
     justify-content: center;
+    background-color: #34C759;
+}
+
+.em-circle-state2::before {
+    content: '\f00c'; 
+    font-family: "Font Awesome 5 Free";  
+    font-weight: 900;
+    margin-right: 3px;
 }
 
 .em-circle-state3{
@@ -1773,22 +1814,26 @@ div.card-body > p > i{
 }
 
 .dimensions-info {
-    background-color: #ffffff;
-    border-radius: 10px;
-    padding: 10px;
+    background: linear-gradient(145deg, #ffffff, #f7f7f7);
+    border-radius: 12px;
+    padding: 15px;
     margin-top: 10px;
     margin-bottom: 10px;
-    border: 2px dashed grey;
+    border: 2px solid #d1d1d6;
+    box-shadow: 0 0px 12px rgba(0, 0, 0, 0.1);
 }
+
 .dimensions-info h6 {
-    font-family: "Reddit Sans Condensed", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     margin: 0 0 10px;
-    color: #614ad9;
+    color: #007aff;
+    font-weight: 600;
 }
+
 .dimensions-info div {
-    font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: 0.9em;
-    color: grey;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-size: 0.95em;
+    color: #4a4a4a;
 }
 
 #scrollToTop {
@@ -1853,14 +1898,26 @@ div.card-body > p > i{
     color: white;
 }
 
-.numeroDeEnvioGenerado{
+.numeroDeEnvioGenerado {
     margin-bottom: 5px !important;
     text-align: center;
-    color: red;
-    border: dashed 2px red;
-    font-weight: 800 !important;
-    padding: .2rem;
-    border-radius: 5px;
+    color: #ffffff; 
+    border: solid 1px #007aff; 
+    font-weight: 700 !important;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #007aff, #0051cb); /* Gradiente azul */
+    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.15);
+    transition: background 0.3s ease;
+}
+
+.numeroDeEnvioGenerado a {
+    color: inherit; 
+    text-decoration: none; 
+}
+
+.numeroDeEnvioGenerado a:hover {
+    text-decoration: underline; 
 }
 
 .numeroDeEnvioGeneradoBNA {

@@ -94,8 +94,8 @@ function crearCard(data) {
 
     cardDiv.innerHTML = `
         <div class="card position-relative">
-            <div class="em-circle-isFraud">Fraude <i class="bi bi-exclamation-triangle-fill"></i></div>
-            <div id="estadoEnvio${data.id}" class="em-circle-state">Envio pendiente <i class="bi bi-stopwatch-fill"></i></div>
+            <div class="em-circle-isFraud">Fraude</div>
+            <div id="estadoEnvio${data.id}" class="em-circle-state">Envio pendiente</div>
             <div class="card-body-meli">
                 <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> ${data.NombreyApellido}</h5>
                 <h6 class="user-title-meli">${data.nombreDeUsuario}</h6>
@@ -106,7 +106,7 @@ function crearCard(data) {
                 <div class="d-flex align-items-center">
                     <p class="remitoCardMeli card-text mb-0">${data.idOperacion}</p>
                     <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
-                        <i class="bi bi-clipboard"></i>
+                        <i class="bi bi-clipboard ios-icon"></i>
                     </button>
                 </div>
                 
@@ -117,9 +117,9 @@ function crearCard(data) {
                     <p class="numeroDeEnvioGenerado" id="numeroDeEnvioGenerado${data.id}">Número de Envío Pendiente</p>
                     <div class="little-card-meli">
                         <p>
-                            <i class="fas fa-map-marker-alt"></i> Envio: 
+                            <i class="fas fa-map-marker-alt ios-icon"></i> Envio: 
                             <span id="localidadDeEnvio-${data.id}">${data.Cp}, ${data.localidad}, ${data.Provincia}</span>
-                            <button class="btn btn-link btn-sm" onclick="editarLocalidad('${data.id}')"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-link btn-sm" onclick="editarLocalidad('${data.id}')"><i class="bi bi-pencil-square ios-icon"></i></button>
                             <button id="btnBorrar-${data.id}" class="btn btn-outline-danger btn-sm" style="display: none;" onclick="borrarLocalidad('${data.id}')">Borrar localidad <i class="bi bi-x-circle"></i></button>
                         </p>
                         <div id="inputLocalidad-${data.id}" style="display:none;">
@@ -129,12 +129,12 @@ function crearCard(data) {
                                    class="form-control"/>
                             <div id="sugerencias-${data.id}" class="sugerencias" style="display: none;"></div>
                         </div>
-                        <p><i class="fas fa-home"></i> Calle: <span id="calle-${data.id}">${data.Calle}</span></p>
-                        <p><i class="bi bi-123"></i> Altura: <span id="altura-${data.id}">${data.Altura}</span></p>
-                        <p><i class="fas fa-phone"></i> Telefono: <span id="telefono-${data.id}">${data.Telefono}</span></p>
-                        <p><i class="bi bi-envelope-at-fill"></i> Email: <span id="email-${data.id}">${data.Email}</span></p>
-                        <p><i class="bi bi-info-circle-fill"></i> Autorizado: <span id="autorizado-${data.id}">${data.Recibe}</span></p>
-                        <p><i class="bi bi-sticky-fill"></i> Observaciones: <span id="observaciones-${data.id}">${data.Observaciones}</span></p>
+                        <p><i class="fas fa-home ios-icon"></i> Calle: <span id="calle-${data.id}">${data.Calle}</span></p>
+                        <p><i class="bi bi-123 ios-icon"></i> Altura: <span id="altura-${data.id}">${data.Altura}</span></p>
+                        <p><i class="fas fa-phone ios-icon"></i> Telefono: <span id="telefono-${data.id}">${data.Telefono}</span></p>
+                        <p><i class="bi bi-envelope-at-fill ios-icon"></i> Email: <span id="email-${data.id}">${data.Email}</span></p>
+                        <p><i class="bi bi-info-circle-fill ios-icon"></i> Autorizado: <span id="autorizado-${data.id}">${data.Recibe}</span></p>
+                        <p><i class="bi bi-sticky-fill ios-icon"></i> Observaciones: <span id="observaciones-${data.id}">${data.Observaciones}</span></p>
                     </div>
                     <div class="dimensions-info">
                         <h6>Dimensiones</h6>
@@ -167,7 +167,7 @@ function crearCard(data) {
         navigator.clipboard.writeText(data.idOperacion).then(() => {
             copyButton.innerHTML = 'Copiado';
             setTimeout(() => {
-                copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+                copyButton.innerHTML = '<i class="bi bi-clipboard ios-icon"></i>';
             }, 2000);
         }).catch(err => {
             console.error('Error al copiar al portapapeles: ', err);
@@ -339,7 +339,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
             
             if (envioState) {
                 envioState.className = 'em-circle-state2';
-                envioState.innerHTML = `Envio Preparado <i class="bi bi-check2-circle"></i>`;
+                envioState.innerHTML = `Envio Preparado`;
             } else {
                 console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
             }
@@ -535,7 +535,7 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
             // Cambiar el estado del envío
             if (envioStateAndr) {
                 envioStateAndr.className = 'em-circle-state2';
-                envioStateAndr.innerHTML = `Envio Preparado <i class="bi bi-check2-circle"></i>`;
+                envioStateAndr.innerHTML = `Envio Preparado`;
             }
 
             // Llamar a la API para obtener la etiqueta
