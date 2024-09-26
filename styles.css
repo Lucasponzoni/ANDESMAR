@@ -1384,11 +1384,11 @@ div.card-body > p > i{
 }
 
 #meli-cards .card:hover {
-    background: linear-gradient(145deg, #f9f9fb, #e6e6ed);
     color: #000000;
-    transform: translateY(-10px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05) translateY(-5px); /* Aumenta el tamaño con un efecto de escala */
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
     border: solid 1px #007aff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Añade transición suave */
 }
 
 #meli-cards .card:hover p, h5, h6 {
