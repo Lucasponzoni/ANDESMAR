@@ -117,7 +117,7 @@ function crearCard(data) {
                     <p class="numeroDeEnvioGenerado" id="numeroDeEnvioGenerado${data.id}">Número de Envío Pendiente</p>
                     <div class="little-card-meli">
                         <p>
-                            <i class="fas fa-map-marker-alt ios-icon"></i> Envio: 
+                            <i class="fas fa-map-marker-alt ios-icon"></i> 
                             <span id="localidadDeEnvio-${data.id}">${data.Cp}, ${data.localidad}, ${data.Provincia}</span>
                             <button class="btn btn-link btn-sm" onclick="editarLocalidad('${data.id}')"><i class="bi bi-pencil-square ios-icon"></i></button>
                             <button id="btnBorrar-${data.id}" class="btn btn-outline-danger btn-sm" style="display: none;" onclick="borrarLocalidad('${data.id}')">Borrar localidad <i class="bi bi-x-circle"></i></button>

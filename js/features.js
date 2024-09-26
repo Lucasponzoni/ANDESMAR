@@ -78,10 +78,16 @@ const scrollToTopButton = document.getElementById("scrollToTop");
     
     function editarLocalidad(id) {
         const inputDiv = document.getElementById(`inputLocalidad-${id}`);
-        inputDiv.style.display = 'block'; // Muestra el input para editar
         const btnBorrar = document.getElementById(`btnBorrar-${id}`);
-        btnBorrar.style.display = 'inline-block'; // Muestra el botón "Borrar localidad"
-    }
+    
+        if (inputDiv.style.display === 'block') {
+            inputDiv.style.display = 'none'; // Oculta el input si ya está visible
+            btnBorrar.style.display = 'none'; // Oculta el botón "Borrar localidad"
+        } else {
+            inputDiv.style.display = 'block'; // Muestra el input para editar
+            btnBorrar.style.display = 'inline-block'; // Muestra el botón "Borrar localidad"
+        }
+    }    
     
     function borrarLocalidad(id) {
         const input = document.getElementById(`localidadInput-${id}`);
