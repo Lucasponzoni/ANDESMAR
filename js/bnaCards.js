@@ -1970,6 +1970,24 @@ document.getElementById('btnFacturar').addEventListener('click', () => {
 
 // FIN FACTURAR BOTON
 
+// SWITCH BOTÓN
+document.getElementById('btnSwitch').addEventListener('click', () => {
+    const sinEntregarCards = allData.filter(item => item.marcaEntregado === 'No'); // Filtrar los que no están entregados
+    
+    // Limpiar el contenedor de tarjetas
+    const cardsContainer = document.getElementById('envios-cards');
+    cardsContainer.innerHTML = '';
+
+    // Renderizar solo las tarjetas sin entregar
+    renderCards(sinEntregarCards);
+
+    // Crear botón de volver
+    createBackButton(() => {
+        renderCards(allData); // Regresar a todas las tarjetas
+    });
+});
+// FIN SWITCH BOTÓN
+
 // VOLVER ATRAS
 function createBackButton(onBack) {
     // Verificar si ya existe el botón de volver
