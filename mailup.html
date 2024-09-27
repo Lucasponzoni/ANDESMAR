@@ -1,84 +1,115 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enviar Email con MailUp</title>
-</head>
-<body>
-    <h1>Enviar Email</h1>
-    <button id="sendEmailButton">Enviar Email</button>
-
+    <link rel="shortcut icon" href="./Img/caja.png">
+    <title>Enviar Email de Prueba</title>
     <script>
-        document.getElementById('sendEmailButton').addEventListener('click', async () => {
-            try {
-                // Obtener el token
-                const tokenResponse = await fetch('https://services.mailup.com/Authorization/OAuth/Token', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Basic ' + btoa('168ac4cb-e699-465d-8808-24e215307ebe:437fcac2-58f7-43c4-b6e7-cdd7ad2ad26a'),
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams({
-                        'grant_type': 'password',
-                        'username': 'm154745',
-                        'password': '2799Mendoza'
-                    })
-                });
+        async function sendEmail() {
+            // Datos de usuario y autenticación SMTP+
+            const smtpUsername = 's154745_3';
+            const smtpPassword = 'QbikuGyHqJ';
 
-                if (!tokenResponse.ok) {
-                    throw new Error('Error al obtener el token: ' + tokenResponse.statusText);
-                }
-
-                const tokenData = await tokenResponse.json();
-                const accessToken = tokenData.access_token;
-
-                // Mostrar el token en consola
-                console.log('Token de acceso:', accessToken);
-
-                // Crear el mensaje
-                const createMessageResponse = await fetch(`https://services.mailup.com/API/v1.1/Rest/ConsoleService.svc/Console/List/C4BCD75F-1EC5-4AF1-9449-6E077892E424/Email`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + accessToken,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        "Subject": "Asunto del Email",
-                        "Body": "Este es el contenido del email.",
-                        "SenderName": "NOVOGAR TEST",
-                        "SenderAddress": "info@novogar.com.ar",
-                        "ListId": "4C3720A1-FF8C-4D51-BDFE-75ACEADFC719" // Reemplaza con tu GUID
-                    })
-                });
-
-                if (!createMessageResponse.ok) {
-                    throw new Error('Error al crear el mensaje: ' + createMessageResponse.statusText);
-                }
-
-                const messageData = await createMessageResponse.json();
-                const messageId = messageData.idMessage; // Asegúrate de usar el campo correcto
-
-                // Enviar el email
-                const emailResponse = await fetch(`https://services.mailup.com/API/v1.1/Rest/ConsoleService.svc/Console/List/C4BCD75F-1EC5-4AF1-9449-6E077892E424/Email/${messageId}/Send`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + accessToken,
-                        'Content-Type': 'application/json'
+            // Cuerpo del email
+            const emailData = {
+                "Html": {
+                    "DocType": null,
+                    "Head": null,
+                    "Body": `
+                        <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                            <div style="background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                                <div style="text-align: center;">
+                                    <img src="./Img/Novogar N.png" alt="Logo de Novogar" style="width: 150px;">
+                                    <h1>¡Tu compra ha sido despachada!</h1>
+                                </div>
+                                <div style="margin: 20px 0;">
+                                    <p>Estimado/a [Nombre del Cliente],</p>
+                                    <p>Nos complace informarte que tu compra ha sido despachada con éxito. A continuación, encontrarás los detalles de tu pedido:</p>
+                                    <ul>
+                                        <li><strong>Pedido N°:</strong> [Número de Pedido]</li>
+                                        <li><strong>Fecha de Despacho:</strong> [Fecha]</li>
+                                        <li><strong>Transportista:</strong> [Nombre del Transportista]</li>
+                                        <li><strong>Seguimiento:</strong> [Número de Seguimiento]</li>
+                                    </ul>
+                                    <p>Para más información, puedes visitar nuestro sitio web o ponerte en contacto con nuestro servicio al cliente.</p>
+                                    <a href="[URL de seguimiento]" style="display: inline-block; background-color: #28a745; color: #ffffff; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">Rastrear mi pedido</a>
+                                </div>
+                                <div style="text-align: center; font-size: 12px; color: #777;">
+                                    <p>Gracias por elegir Novogar.</p>
+                                    <p>&copy; 2024 Novogar. Todos los derechos reservados.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    "BodyTag": "<body>"
+                },
+                "Text": "Tu compra ha sido despachada. Consulta el email HTML para más detalles.",
+                "Subject": "Confirmación de Despacho",
+                "From": {
+                    "Name": "NOVOGAR TEST",
+                    "Email": "info@novogar.com.ar"
+                },
+                "To": [
+                    {
+                        "Name": "Lucas Ponzoni",
+                        "Email": "lucasponzoninovogar@gmail.com"
                     }
+                ],
+                "Cc": [],
+                "Bcc": [],
+                "ReplyTo": null,
+                "CharSet": "utf-8",
+                "ExtendedHeaders": null,
+                "Attachments": null,
+                "EmbeddedImages": [],
+                "XSmtpAPI": {
+                    "CampaignName": "Test Campaign",
+                    "CampaignCode": "1001",
+                    "Header": false,
+                    "Footer": true,
+                    "ClickTracking": null,
+                    "ViewTracking": null,
+                    "Priority": null,
+                    "Schedule": null,
+                    "DynamicFields": [],
+                    "CampaignReport": null,
+                    "SkipDynamicFields": null
+                },
+                "User": {
+                    "Username": smtpUsername,
+                    "Secret": smtpPassword
+                }
+            };
+
+            try {
+                const response = await fetch('https://proxy.cors.sh/https://send.mailup.com/API/v2.0/messages/sendmessage', {
+                    method: 'POST',
+                    headers: {
+                        'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(emailData)
                 });
 
-                if (emailResponse.ok) {
-                    alert('Email enviado exitosamente');
+                const result = await response.json();
+                if (result.Status === 'done') {
+                    console.log('Email enviado exitosamente');
                 } else {
-                    const errorData = await emailResponse.json();
-                    alert('Error al enviar el email: ' + errorData.message);
+                    console.log(`Error al enviar el email: ${result.Message}`);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Ocurrió un error al enviar el email: ' + error.message);
+                console.log('Error al enviar el email.');
             }
-        });
+        }
     </script>
+</head>
+<body>
+
+    <h2>Enviar Email de Prueba</h2>
+    <button onclick="sendEmail()">Enviar Email</button>
+
 </body>
 </html>
+
