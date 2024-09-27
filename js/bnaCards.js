@@ -1475,24 +1475,24 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
 
     switch (selectedValue) {
         case "split2700":
-            alto = 50; 
-            ancho = 72; 
-            largo = 27; 
+            alto = 55; 
+            ancho = 80; 
+            largo = 30; 
             peso = 40; 
             valor = 600000; // Medidas de la unidad exterior
             altoInterior = 30; anchoInterior = 73; largoInterior = 19;
             break;
         case "split3300":
-            alto = 50; 
-            ancho = 72; 
-            largo = 27; 
+            alto = 58; 
+            ancho =82; 
+            largo = 30; 
             peso = 50; 
             valor = 700000; // Medidas de la unidad exterior
             altoInterior = 32; anchoInterior = 101; largoInterior = 22;
             break;
         case "split4500":
             alto = 30; 
-            ancho = 82; 
+            ancho = 85; 
             largo = 61; 
             peso = 60; 
             valor = 800000; // Medidas de la unidad exterior
