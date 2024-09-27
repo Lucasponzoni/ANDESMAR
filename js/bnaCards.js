@@ -342,19 +342,27 @@ function renderCards(data) {
                         <ul id="suggestions-${data[i].id}" class="suggestions-container list-group"></ul>
                     </div>
 
-                            <div id="direccion-bna" class="ios-card">
-                            <p class="ios-card-text">
-                            <i class="bi bi-house ios-icon"></i> Calle: ${data[i].calle}
-                            </p>
-                            <p class="ios-card-text">
-                            <i class="bi bi-telephone ios-icon"></i> Teléfono: ${data[i].telefono}
-                            </p>
-                            <p class="ios-card-text">
-                            <i class="bi bi-envelope ios-icon"></i> ${data[i].email}
-                            </p>
-                            </div>
+                <div id="direccion-bna" class="ios-card">
+                    <p class="ios-card-text">
+                                       <i class="bi bi-house ios-icon"></i> Calle: ${data[i].calle}
+                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].calle}')">
+                            <i class="bi bi-clipboard icon-gray"></i>
+                        </button>
+                    </p>
+                    <p class="ios-card-text">
+                        <i class="bi bi-telephone ios-icon"></i> Teléfono: ${data[i].telefono}
+                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].telefono}')">
+                            <i class="bi bi-clipboard icon-gray"></i>
+                        </button>
+                    </p>
+                    <p class="ios-card-text">
+                        <i class="bi bi-envelope ios-icon"></i> ${data[i].email}
+                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].email}')">
+                            <i class="bi bi-clipboard icon-gray"></i>
+                        </button>
+                    </p>
+                </div>
 
-                            
                             <div class="d-flex align-items-center contenedorRemito">
                                 <p class="orden">${data[i].remito}</p>
                                 <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2">

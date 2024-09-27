@@ -2135,6 +2135,10 @@ div.card-body > p > i{
     border-radius: 15px;
 }
 
+.icon-gray {
+    color: gray; 
+}
+
 /* BOTON MARCAR FACTURADO */
 .btn-danger:hover .icono {
     content: none;
