@@ -1316,7 +1316,6 @@ div.card-body > p > i{
 }
 
 #spinner {
-    margin-top: 1rem;
     margin-bottom: 1.5rem;
     color: cornflowerblue;
     display: flex; /* Mostrar el spinner al cargar */
@@ -2130,6 +2129,7 @@ div.card-body > p > i{
 /* FIN MODAL ANDESMAR */
 
 .import-container{
+    margin-bottom: 1rem;
     padding: 1rem;
     border: cornflowerblue 2px dashed;
     border-radius: 15px;
