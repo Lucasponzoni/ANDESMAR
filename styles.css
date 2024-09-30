@@ -1277,18 +1277,17 @@ p.card-text:nth-child(9){
 
 .remitoCardMeli {
     text-align: center;
-    padding: 0.4rem 1rem;
+    padding: 0.5rem;
     width: fit-content;
-    border-radius: 12px;
-    border: solid 1px #d1d5d6;
-    background: linear-gradient(145deg, #ffffff, #f0f0f5);
-    color: #333333;
-    font-size: 1.3rem;
-    font-family: "Reddit Sans Condensed", sans-serif;
+    border-radius: 20px;
+    border: solid 1px rgb(145, 182, 250); /* Borde transparente inicialmente */
+    color: black; /* Texto en un verde oscuro */
+    font-size: 1.4rem;
+    font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-weight: 600;
-    margin-bottom: 10px !important;
-    box-shadow: 0 0px 12px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 14px !important;
+    box-shadow: 0 0px 14px rgba(100, 148, 237, 0.471), inset 0 1px 1px rgba(255, 255, 255, 0.4), inset 0 -1px 1px rgba(0, 0, 0, 0.02);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 .little-card-meli > p{
@@ -2272,3 +2271,75 @@ div.card-body > p > i{
     cursor: pointer;
 }
 /* FIN SWITCH ENTREGADO */
+
+/* Estilo para el alert */
+.alert {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #28a745; 
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: none; 
+    z-index: 1000;
+    transition: transform 0.3s ease, opacity 0.3s ease; 
+    transform: translateY(20px); 
+    opacity: 0; 
+}
+
+.alert.show {
+    display: block; 
+    transform: translateY(0); 
+    opacity: 1; 
+}
+
+.alert .close {
+    cursor: pointer;
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    color: white;
+    transition: color 0.3s; 
+}
+
+.alert .close:hover {
+    color: #ffcc00; 
+}
+
+/* Estilo para el alert Error */
+.alertError {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: red; 
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: none; 
+    z-index: 1000;
+    transition: transform 0.3s ease, opacity 0.3s ease; 
+    transform: translateY(20px); 
+    opacity: 0; 
+}
+
+.alertError.show {
+    display: block; 
+    transform: translateY(0); 
+    opacity: 1; 
+}
+
+.alertError .close {
+    cursor: pointer;
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    color: white;
+    transition: color 0.3s; 
+}
+
+.alertError .close:hover {
+    color: #ffcc00; 
+}

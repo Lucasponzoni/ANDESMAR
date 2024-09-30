@@ -885,7 +885,6 @@ const clave = "BOM6765";
 const codigoCliente = "6765";
 
 async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, suborden_total, precio_venta, producto_nombre) {
-
     const contraseñaCorrecta = await pedirContraseña();
     if (!contraseñaCorrecta) {
         return; // Salir de la función si la contraseña es incorrecta
@@ -952,89 +951,95 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
     `);
 
-// Verificar si el tipo de electrodoméstico es uno de los splits
-const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
-const isSplit = splitTypes.includes(tipoElectrodomestico);
+    // Verificar si el tipo de electrodoméstico es uno de los splits
+    const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
+    const isSplit = splitTypes.includes(tipoElectrodomestico);
 
-// Calcular la cantidad de bultos
-let bultos = cantidad;
-if (isSplit) {
-    bultos *= 2; // Duplicar bultos si es un split
-}
-
-spinner.style.display = 'inline-block';
-text.innerText = 'Generando Etiqueta...';
-buttonAndr.disabled = true;
-
-const requestObj = {
-    CalleRemitente: "Mendoza", 
-    CalleNroRemitente: "2799",
-    CodigoPostalRemitente: "2000", 
-    NombreApellidoDestinatario: nombre,
-    CodigoPostalDestinatario: cp,
-    CalleDestinatario: calle,
-    CalleNroDestinatario: "S/N",
-    TelefonoDestinatario: telefono,
-    MailDestinatario: email,
-    NroRemito: "BNA" + remito,
-    Bultos: bultos, 
-    Peso: peso * cantidad, 
-    ValorDeclarado: precio_venta * cantidad, 
-    M3: volumenM3,
-    Alto: [],
-    Ancho: [],
-    Largo: [],
-    Observaciones: calle + ",Telefono: " + telefono + " " + "Electrodomestico: " + producto_nombre,
-    ModalidadEntrega: "Puerta-Puerta", 
-    UnidadVenta: "cargas remito conformado", 
-    servicio: {
-        EsFletePagoDestino: false, 
-        EsRemitoconformado: true 
-    },
-    logueo: {
-        Usuario: usuario,
-        Clave: clave,
-        CodigoCliente: codigoCliente
+    // Calcular la cantidad de bultos
+    let bultos = cantidad;
+    if (isSplit) {
+        bultos *= 2; // Duplicar bultos si es un split
     }
-};
 
-// Llenar las medidas de acuerdo a la cantidad de bultos
-for (let i = 0; i < cantidad; i++) {
-    requestObj.Alto.push(alto);
-    requestObj.Ancho.push(ancho);
-    requestObj.Largo.push(largo);
-}
+    spinner.style.display = 'inline-block';
+    text.innerText = 'Generando Etiqueta...';
+    buttonAndr.disabled = true;
 
-// Si es un split, agregar las medidas de la unidad interior
-if (isSplit) {
+    const requestObj = {
+        CalleRemitente: "Mendoza", 
+        CalleNroRemitente: "2799",
+        CodigoPostalRemitente: "2000", 
+        NombreApellidoDestinatario: nombre,
+        CodigoPostalDestinatario: cp,
+        CalleDestinatario: calle,
+        CalleNroDestinatario: "S/N",
+        TelefonoDestinatario: telefono,
+        MailDestinatario: email,
+        NroRemito: "BNA" + remito,
+        Bultos: bultos, 
+        Peso: peso * cantidad, 
+        ValorDeclarado: precio_venta * cantidad, 
+        M3: volumenM3,
+        Alto: [],
+        Ancho: [],
+        Largo: [],
+        Observaciones: `${calle}, Telefono: ${telefono}, Electrodomestico: ${producto_nombre}`,
+        ModalidadEntrega: "Puerta-Puerta", 
+        UnidadVenta: "cargas remito conformado", 
+        servicio: {
+            EsFletePagoDestino: false, 
+            EsRemitoconformado: true 
+        },
+        logueo: {
+            Usuario: usuario,
+            Clave: clave,
+            CodigoCliente: codigoCliente
+        }
+    };
+
+    // Llenar las medidas de acuerdo a la cantidad de bultos
     for (let i = 0; i < cantidad; i++) {
-        requestObj.Alto.push(altoInterior);
-        requestObj.Ancho.push(anchoInterior);
-        requestObj.Largo.push(largoInterior);
+        requestObj.Alto.push(alto);
+        requestObj.Ancho.push(ancho);
+        requestObj.Largo.push(largo);
     }
-}
+
+    // Si es un split, agregar las medidas de la unidad interior
+    if (isSplit) {
+        for (let i = 0; i < cantidad; i++) {
+            requestObj.Alto.push(altoInterior);
+            requestObj.Ancho.push(anchoInterior);
+            requestObj.Largo.push(largoInterior);
+        }
+    }
 
     const proxyUrl = "https://proxy.cors.sh/";
     const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
 
     console.log(`Datos enviados a API Andesmar (BNA+ ${remito}):`, requestObj); // Mostrar request en consola
 
-    fetch(proxyUrl + apiUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd",
-        },
-        body: JSON.stringify(requestObj)
-    })
-    .then(response => {
-        console.log(`Datos Respuesta API Andesmar (BNA+ ${remito}):`, response); // Mostrar response en consola
-        return response.json();
-    })
-    .then(data => {
+    try {
+        const response = await fetch(proxyUrl + apiUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd",
+            },
+            body: JSON.stringify(requestObj)
+        });
+
+        const data = await response.json();
+        console.log(`Datos Respuesta API Andesmar (BNA+ ${remito}):`, data); // Mostrar response en consola
+
         if (data.NroPedido) {
+            const Name = `Confirmación de Envio BNA`;
+            const Subject = `Tu compra BNA+ ${remito} ya fue preparada para despacho`;
+            const template = "emailTemplateAndesmar";
+            const transporte = "Andesmar Cargas";
             const linkEtiqueta = `https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
             const linkSeguimiento = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}&tipo=remito&cod=`;
+            const linkSeguimiento2 = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}&tipo=remito&cod=`;
+
             
             // Actualizar el texto del botón
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
@@ -1051,17 +1056,12 @@ if (isSplit) {
                 transportCompanyNumber: data.NroPedido
             };
             
-            db.ref(`enviosBNA/${id}`).update(transportData)
-                .then(() => {
-                    console.log("Datos actualizados en Firebase:", transportData);
-                })
-                .catch((error) => {
-                    console.error("Error al actualizar datos en Firebase como Andesmar:", error);
-                });
+            await db.ref(`enviosBNA/${id}`).update(transportData);
+            console.log("Datos actualizados en Firebase:", transportData);
     
             // Nueva entrada en Firebase
             const nuevaEntradaRef = db.ref('enviosAndesmar').push(); // RUTA FIREBASE
-            nuevaEntradaRef.set({
+            await nuevaEntradaRef.set({
                 nombreApellido: nombre,
                 nroPedido: data.NroPedido, 
                 codigoPostal: cp,
@@ -1071,13 +1071,8 @@ if (isSplit) {
                 telefono: telefono,
                 remito: `BNA${remito}`, 
                 cotizacion: `$${precio_venta - suborden_total}` 
-            })
-            .then(() => {
-                console.log("Nueva entrada agregada a Firebase:", { nombre, nroPedido: data.NroPedido, cp, localidad, calle, telefono });
-            })
-            .catch((error) => {
-                console.error("Error al agregar nueva entrada a Firebase:", error);
             });
+            console.log("Nueva entrada agregada a Firebase:", { nombre, nroPedido: data.NroPedido, cp, localidad, calle, telefono });
     
             // Actualizar estado de envío
             if (envioState) {
@@ -1086,24 +1081,24 @@ if (isSplit) {
             } else {
                 console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
             }
+
+            // Enviar el email después de procesar el envío
+            await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte);
         } else {
             buttonAndr.disabled = false;
             text.innerHTML = `Envio No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
             button.classList.remove('btn-primary');
             button.classList.add('btn-warning', 'btnAndesmarMeli');
         }
-    })    
-    .catch(error => {
+    } catch (error) {
         buttonAndr.disabled = false;
         console.error("Error:", error);
         text.innerText = "Envio No Disponible ⚠️"; // Cambiar texto en caso de error
         resultadoDiv.innerText = `Error: ${error.message}`; // Mostrar error debajo
-    })
-    .finally(() => {
+    } finally {
         spinner.style.display = 'none'; // Asegúrate de ocultar el spinner en caso de error
-    });
+    }
 }
-    
 
 function addUpdateObservacionesEvent() {
     const updateButtons = document.querySelectorAll('.update-observaciones');
@@ -1370,6 +1365,11 @@ for (let i = 0; i < cantidadBultos; i++) {
 
             console.log(`Datos Respuesta API ANDREANI (BNA+ ${remito}):`, response);
 
+            const Name = `Confirmación de Envio BNA`;
+            const Subject = `Tu compra BNA+ ${remito} ya fue preparada para despacho`;
+            const template = "emailTemplateAndreani";
+            const transporte = "Correo Andreani";
+            const linkSeguimiento2 = `https://andreani.com/#!/informacionEnvio/${numeroDeEnvio}`;
             const linkSeguimiento = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
 
             // Configurar el botón de descarga inicial  
@@ -1401,7 +1401,8 @@ for (let i = 0; i < cantidadBultos; i++) {
                 envioState.className = 'em-circle-state4';
                 envioState.innerHTML = `Preparado`;
             }
-
+            // Enviar el email después de procesar el envío
+            await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
             // Llamar a la API para obtener la etiqueta
             await obtenerEtiqueta(numeroDeEnvio, token, buttonAndr);
         } else {
