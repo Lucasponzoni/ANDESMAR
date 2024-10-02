@@ -189,7 +189,7 @@ function verificarCP() {
     }
 
     // Ocultar el elemento de respuesta por defecto
-    respuestaElement.style.display = "none"; // Ocultar inicialmente
+    respuestaElement.style.display = "none";
 
     // Verificar si el código postal tiene 4 caracteres
     if (codigoPostal.length === 4) {
