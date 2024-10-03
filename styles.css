@@ -2181,6 +2181,8 @@ div.card-body > p > i{
     display: flex;
     align-items: center;
     margin-bottom: 2px;
+    text-wrap: nowrap !important;
+    text-overflow: ellipsis !important;
 }
 
 .ios-icon {
