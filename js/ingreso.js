@@ -13,6 +13,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+let allData = [];
+let currentPage = 1;
+let itemsPerPage = 50; // Número de elementos por página
+let currentPageGroup = 0;
+const paginationContainer = document.getElementById('pagination');
+
 // Al abrir el modal, establecer el foco en el primer input
 $('#ingresoModal').on('shown.bs.modal', function () {
     $('#remito').focus();
@@ -126,22 +132,23 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
 // Cargar datos desde Firebase
 function cargarDatos() {
     db.ref('DespachosLogisticos').once('value').then(snapshot => {
+        allData = []; // Limpiar allData
         const tableBody = document.querySelector('#data-table tbody');
         tableBody.innerHTML = ''; // Limpiar tabla
 
         snapshot.forEach(childSnapshot => {
             const data = childSnapshot.val();
-            const row = `<tr>
-                            <td>${data.fechaHora}</td>
-                            <td>${data.estado}</td>
-                            <td>${data.cliente}</td>
-                            <td>${data.remito}</td>
-                            <td>${data.valorDeclarado}</td>
-                            <td>${data.operadorLogistico}</td>
-                        </tr>`;
-            tableBody.insertAdjacentHTML('afterbegin', row); // Agregar nuevo registro en la parte superior
+            allData.push(data); // Almacenar datos en allData
         });
 
+        // Invertir el orden de allData
+        allData.reverse();
+
+        // Renderizar la primera página de datos
+        renderCards(allData);
+        // Actualizar la paginación
+        updatePagination(allData.length);
+        
         // Ocultar el spinner al cargar los datos
         document.getElementById('spinner').style.display = 'none';
     }).catch(error => {
@@ -152,6 +159,78 @@ function cargarDatos() {
         });
     });
 }
+
+function renderCards(data) {
+    const tableBody = document.querySelector('#data-table tbody');
+    tableBody.innerHTML = ''; // Limpiar tabla
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, data.length);
+
+    for (let i = startIndex; i < endIndex; i++) {
+        const item = data[i];
+        const estadoClass = item.estado === "Pendiente de despacho" ? "pendiente-despacho" : ""; // Clase condicional
+        const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : ''; // Ícono de alerta
+
+        const row = `<tr>
+                        <td>${item.fechaHora}</td>
+                        <td class="${estadoClass}">${alertIcon} ${item.estado}</td>
+                        <td>${item.cliente}</td>
+                        <td>${item.remito}</td>
+                        <td>${item.valorDeclarado}</td>
+                        <td>${item.operadorLogistico}</td>
+                    </tr>`;
+        tableBody.insertAdjacentHTML('beforeend', row); // Agregar nuevo registro
+    }
+}
+
+// INICIO PAGINATION
+function updatePagination(totalItems) {
+    paginationContainer.innerHTML = "";
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    let startPage = currentPageGroup + 1;
+    let endPage = Math.min(currentPageGroup + 6, totalPages);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageItem = document.createElement("li");
+        pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        pageItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPage = i;
+            renderCards(allData);
+            updatePagination(totalItems);
+        });
+        paginationContainer.appendChild(pageItem);
+    }
+
+    if (endPage < totalPages) {
+        const loadMoreItem = document.createElement("li");
+        loadMoreItem.className = "page-item";
+        loadMoreItem.innerHTML = `<a class="page-link" href="#">Más</a>`;
+        loadMoreItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPageGroup += 6;
+            updatePagination(totalItems);
+            renderCards(allData);
+        });
+        paginationContainer.appendChild(loadMoreItem);
+    }
+
+    if (currentPageGroup > 0) {
+        const backItem = document.createElement("li");
+        backItem.className = "page-item";
+        backItem.innerHTML = `<a class="page-link" href="#">Atrás</a>`;
+        backItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPageGroup -= 6;
+            updatePagination(totalItems);
+            renderCards(allData);
+        });
+        paginationContainer.appendChild(backItem);
+    }
+}
+// FIN PAGINATION
 
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;

@@ -2402,21 +2402,38 @@ div.card-body > p > i{
 
 
 .modal-content {
-    border-radius: 12px;
-    box-shadow: 0 0px 20px rgba(0, 0, 0, 0.396);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    background-color: #ffffff;
+    overflow: hidden;
 }
 
 .modal-header {
     border-bottom: none; 
+    padding: 16px;
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
 }
 
 .modal-body {
     padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .form-control {
-    border-radius: 8px;
-    border: 2px dashed cornflowerblue;
+    border-radius: 10px;
+    border: 1px solid #007aff; /* Color azul iOS */
+    padding: 12px;
+    font-size: 16px;
+    transition: border-color 0.3s;
 }
 
 .btn-outline-secondary {
@@ -2450,6 +2467,10 @@ div.card-body > p > i{
     gap: 5px;
 }
 
+.table td, .table th{
+    border-top: none !important;
+}
+
 /* Responsividad para dispositivos móviles */
 @media (max-width: 768px) {
     .table th, .table td {
@@ -2465,4 +2486,15 @@ div.card-body > p > i{
         font-size: 14px; /* Ajuste de tamaño del título en móviles */
     }
 }
+
+/* FIN TABLA DE ENVIOS */
+
+/* ESTILOS DE TABLAS */
+
+.pendiente-despacho {
+    color: red !important;
+    font-weight: bold;
+}
+
+
 
