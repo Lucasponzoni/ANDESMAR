@@ -2343,3 +2343,124 @@ div.card-body > p > i{
 .alertError .close:hover {
     color: #ffcc00; 
 }
+
+/* TABLA DE ENVIOS */
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.table th, .table td {
+    padding: 16px; 
+    text-align: center; 
+    vertical-align: middle; 
+    border-bottom: 1px solid #e1e1e1; 
+}
+
+.table th {
+    background-color: #007aff; 
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    white-space: nowrap; 
+}
+
+.table tbody tr {
+    transition: background-color 0.3s, color 0.3s; /* Transición para el efecto hover */
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9; /* Color de fondo para filas impares */
+}
+
+.table tbody tr:nth-child(odd):hover {
+    background-color: rgba(0, 122, 255, 0.2); /* Azul claro al pasar el ratón en filas impares */
+    cursor: pointer;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #ffffff; /* Color de fondo para filas pares */
+}
+
+.table tbody tr:nth-child(even):hover {
+    background-color: rgba(255, 165, 0, 0.3); /* Naranja claro al pasar el ratón en filas pares */
+    cursor: pointer;
+}
+
+/* Estilo de las celdas */
+.table td {
+    color: #333; /* Color del texto */
+    font-size: 14px; /* Tamaño de la fuente */
+}
+
+
+.modal-content {
+    border-radius: 12px;
+    box-shadow: 0 0px 20px rgba(0, 0, 0, 0.396);
+}
+
+.modal-header {
+    border-bottom: none; 
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 2px dashed cornflowerblue;
+}
+
+.btn-outline-secondary {
+    color: #007bff; /* Color de texto */
+    border-color: #007bff; /* Color del borde */
+}
+
+.btn-outline-secondary:hover {
+    border-color: orangered; /* Color del borde */
+    background-color: white;
+    color: orangered;
+}
+
+.btn-success {
+    background-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #006215; /* Efecto hover */
+}
+
+#ingresoForm {
+    margin: 0;
+    background-color: #ffffff; /* Color de fondo blanco */
+    border-radius: 12px; /* Bordes redondeados */
+    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.132); /* Sombra suave */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Tipografía de iOS */
+}
+
+.ingreso-egreso{
+    gap: 5px;
+}
+
+/* Responsividad para dispositivos móviles */
+@media (max-width: 768px) {
+    .table th, .table td {
+        padding: 8px; /* Espacio en celdas en móviles */
+        font-size: 12px;
+    }
+
+    .modal-header {
+        padding: 10px; /* Ajuste de espacio en el encabezado */
+    }
+
+    .modal-title {
+        font-size: 14px; /* Ajuste de tamaño del título en móviles */
+    }
+}
+

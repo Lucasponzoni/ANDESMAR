@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envios</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="./Img/caja.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+</head>
+<body class="envios-body">
+    
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="./Img/Novogar N.png" alt="Logo" class="navbar-logo"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a href="./index.html" class="nav-link">Generación de etiqueta</a></li>
+                    <li class="nav-item"><a href="./envios.html" class="nav-link">Envios Andesmar</a></li>
+                    <li class="nav-item"><a href="./meliAr.html" class="nav-link active"><img id="meli-logo" src="./Img/meli.png">Envios Mercado Libre</a></li>
+                    <li class="nav-item"><a href="./bna.html" class="nav-link">Envios <img id="meli-logo" src="./Img/bna-logo.png" alt="BNA Logo" /></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-between align-items-center search-filter-container">
+            <div class="col-md-6 mb-3">
+                <!-- Buscador -->
+                <div class="input-group">
+                    <input type="text" class="form-control" id="search" placeholder="📦 Buscar remito o cliente">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 d-flex justify-content-end ingreso-egreso">
+                <button class="btn btn-primary" id="ingresoBtn" data-toggle="modal" data-target="#ingresoModal">
+                    <i class="bi bi-box-arrow-in-down"></i> Ingreso
+                </button>
+    
+                <button class="btn btn-danger" id="egresoBtn" data-toggle="modal" data-target="#egresoModal">
+                    <i class="bi bi-box-arrow-in-up"></i> Egreso
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container mt-5" id="cards-container">
+        <div class="spinner-border" role="status" id="spinner">
+            <span class="sr-only">Cargando...</span>
+        </div>
+
+        <div class="table-responsive">
+            <table id="data-table" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-calendar"></i> Fecha</th>
+                        <th><i class="bi bi-flag"></i> Estado</th>
+                        <th><i class="bi bi-person"></i> Cliente</th>
+                        <th><i class="bi bi-file-earmark-text"></i> Remito</th>
+                        <th><i class="bi bi-cash"></i> Valor</th>
+                        <th><i class="bi bi-truck"></i> Operador</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los datos se llenarán aquí dinámicamente -->
+                </tbody>
+            </table>            
+        </div>
+    </div>
+
+    <div class="modal fade" id="ingresoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Ingreso de Datos Logísticos</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="ingresoForm">
+                        <div class="form-group">
+                            <label for="remito">Número de Remito</label>
+                            <input type="text" class="form-control" id="remito" maxlength="11" placeholder="Ingrese el número de remito" autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label for="cliente">Número de Cliente</label>
+                            <input type="text" class="form-control" id="cliente" maxlength="8" placeholder="Ingrese el número de cliente">
+                        </div>
+                        <div class="form-group">
+                            <label for="valorDeclarado">Valor Declarado</label>
+                            <input type="text" class="form-control" id="valorDeclarado" placeholder="Ingrese el valor declarado">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" id="submitIngreso">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>      
+
+    <footer class="center">
+        <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
+        <a class="www" href="https://novogar.com.ar/" target="_blank">NOVOGAR</a>
+        <a href="https://novogar.com.ar/info/empresa" target="_blank">Quienes somos</a>
+        <a href="https://novogar.com.ar/info/Sucursales" target="_blank">Sucursales</a>
+        <a href="https://novogar.com.ar/info/ventaTelefonica" target="_blank">Atención al cliente</a>
+    </footer>
+
+    <!-- Scripts Firebase-->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+    <!-- Scripts Bootstrap-->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    
+    <!-- SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./js/ingreso.js"></script>
+</body>
+</html>
