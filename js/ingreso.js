@@ -233,9 +233,9 @@ document.getElementById('andesmarPorcentaje').innerHTML = `
 document.getElementById('SinDespacharPorcentaje').innerHTML = `
 <div class="d-flex align-items-center flex-wrap">
     <i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i>
-    <span class="ml-1" style="font-weight: bold;">Pendientes de despacho: ${pendientesPorcentaje}%</span>
+    <span class="ml-1" style="font-weight: bold;">Pendientes: ${pendientesPorcentaje}%</span>
     <span class="badge badge-danger mx-2" style="font-size: 0.9em; border-radius: 8px; padding: 12px 0.5em;">
-        ${countPendientes} remitos en preparación <i class="bi bi-asterisk"></i>
+        ${countPendientes} en preparación <i class="bi bi-asterisk"></i>
     </span>
 </div>
 `;
