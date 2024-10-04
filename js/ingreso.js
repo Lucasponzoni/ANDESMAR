@@ -204,6 +204,8 @@ function renderCards(data) {
     const endIndex = Math.min(startIndex + itemsPerPage, data.length);
     let totalTiempo = 0; // Variable para acumular el tiempo total
     let count = 0; // Contador de elementos con tiempo transcurrido
+    let countAndreani = 0; // Contador de envíos Andreani
+    let countAndesmar = 0; // Contador de envíos Andesmar
 
     for (let i = startIndex; i < endIndex; i++) {
         const item = data[i];
@@ -233,16 +235,18 @@ function renderCards(data) {
             let link, imgSrc;
 
             // Verificar el formato del número de envío
-if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
-(numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) {
-link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
-imgSrc = 'img/andreani-mini.png'; // Ruta de la imagen
-operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
-} else {
-link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=Orden`;
-imgSrc = 'img/Andesmar-mini.png'; // Ruta de la imagen
-operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
-}
+            if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
+                (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) {
+                link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
+                imgSrc = 'img/andreani-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
+                countAndreani++; // Incrementar contador de Andreani
+            } else {
+                link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=Orden`;
+                imgSrc = 'img/Andesmar-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
+                countAndesmar++; // Incrementar contador de Andesmar
+            }
         } else {
             operadorLogistico = item.operadorLogistico; // Si no hay número de envío, mostrar el operador logístico original
         }
@@ -263,7 +267,16 @@ operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesm
         const promedioTexto = formatearTiempoPromedio(totalTiempo / count, count);
         document.getElementById('promedioBtn').innerHTML = `<i class="bi bi-alarm-fill"></i> Promedio: ${promedioTexto}`;
     } else {
-        document.getElementById('promedioBtn').innerText = 'Promedio Despacho: N/A';
+        document.getElementById('promedioBtn').innerHTML = `<i class="bi bi-alarm-fill"></i> Promedio: -`;
+    }
+
+    // Calcular porcentajes
+    const totalEnvios = countAndreani + countAndesmar;
+    if (totalEnvios > 0) {
+        const andreaniPorcentaje = ((countAndreani / totalEnvios) * 100).toFixed(2);
+        const andesmarPorcentaje = ((countAndesmar / totalEnvios) * 100).toFixed(2);
+        document.getElementById('andreaniPorcentaje').innerHTML = `<i class="bi bi-truck-front-fill"></i> Andreani: ${andreaniPorcentaje}%`;
+        document.getElementById('andesmarPorcentaje').innerHTML = `<i class="bi bi-truck-front-fill"></i> Andesmar: ${andesmarPorcentaje}%`;
     }
 }
 

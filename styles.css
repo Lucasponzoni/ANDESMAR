@@ -2592,5 +2592,34 @@ div.card-body > p > i{
 
 /* FIN TRANSPORTE EN TABLAS */
 
+#porcentajes {
+    background: #ffffff; 
+    padding: 5px; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
+    transition: box-shadow 0.3s, transform 0.3s; 
+}
+
+.percentage-card {
+    font-weight: 700; 
+    padding: 5px 10px; 
+    border-radius: 8px; 
+    display: flex; 
+    align-items: center; 
+    transition: background-color 0.3s; 
+    font-size: 0.9em;
+}
+
+.percentage-card:hover {
+    background-color: rgba(0, 0, 0, 0.05); 
+    cursor: pointer;
+}
+
+#andreaniPorcentaje {
+    color: #e74c3c; 
+}
+
+#andesmarPorcentaje {
+    color: #3498db;
+}
 
 
