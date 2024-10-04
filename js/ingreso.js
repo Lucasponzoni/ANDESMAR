@@ -238,12 +238,12 @@ function renderCards(data) {
             if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
                 (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) {
                 link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
-                imgSrc = 'Img/andreani-mini.png'; // Ruta de la imagen
+                imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
                 countAndreani++; // Incrementar contador de Andreani
             } else {
                 link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=Orden`;
-                imgSrc = 'Img/Andesmar-mini.png'; // Ruta de la imagen
+                imgSrc = './Img/andesmar-mini.png'; // Ruta de la imagen
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
                 countAndesmar++; // Incrementar contador de Andesmar
             }
