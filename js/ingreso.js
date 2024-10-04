@@ -176,8 +176,8 @@ function renderCards(data) {
                         <td>${item.fechaHora}</td>
                         <td class="${estadoClass}">${alertIcon} ${item.estado}</td>
                         <td>${item.cliente}</td>
-                        <td>${item.remito}</td>
-                        <td>${item.valorDeclarado}</td>
+                        <td class="remito-columna">${item.remito}</td>
+                        <td class="valor-columna">${item.valorDeclarado}</td>
                         <td>${item.operadorLogistico}</td>
                     </tr>`;
         tableBody.insertAdjacentHTML('beforeend', row); // Agregar nuevo registro
