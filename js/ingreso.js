@@ -82,19 +82,16 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
             const valorDeclaradoValue = activeElement.value;
             const fechaHora = new Date().toLocaleString(); // Obtener la fecha y hora actual
 
-            function formatearFechaHora(fecha) {
-                const options = {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false,
-                };
-                
-                return new Intl.DateTimeFormat('es-ES', options).format(new Date(fecha)).replace(',', '');
-            }
-            
+// Formatear fecha y hora en formato 24 horas
+function formatearFechaHora(fechaHora) {
+    const [date, time] = fechaHora.split(', ');
+    const [day, month, year] = date.split('/');
+    const [hours, minutes, seconds] = time.split(':');
+
+    // Formato 24 horas ya está en el formato original, solo aseguramos que lo guardamos así
+    return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`;
+}
+
 // Push a Firebase solo si todos los campos están llenos
 if (valorDeclaradoValue) {
     const fechaHoraFormateada = formatearFechaHora(fechaHora); // Formatear a 24 horas
