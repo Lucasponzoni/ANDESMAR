@@ -172,6 +172,17 @@ function cargarDatos() {
     });
 }
 
+function calcularTiempoTranscurrido(fechaHora) {
+    const fechaCarga = new Date(fechaHora);
+    const ahora = new Date();
+    const diferencia = ahora - fechaCarga; // Diferencia en milisegundos
+
+    const horas = Math.floor((diferencia % 86400000) / 3600000);
+    const minutos = Math.round(((diferencia % 86400000) % 3600000) / 60000);
+    
+    return `${horas}h ${minutos}m`;
+}
+
 function renderCards(data) {
     const tableBody = document.querySelector('#data-table tbody');
     tableBody.innerHTML = ''; // Limpiar tabla
@@ -183,25 +194,20 @@ function renderCards(data) {
         const item = data[i];
         const estadoClass = item.estado === "Pendiente de despacho" ? "pendiente-despacho" : 
                             item.estado === "Despachado" ? "estado-despachado" : ""; // Clase condicional
-        const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="icon-despacho bi bi-exclamation-triangle-fill text-warning"></i>' : 
-                          item.estado === "Despachado" ? '<i class="icon-despacho bi bi-check-circle-fill text-success"></i>' : ''; // Ícono de alerta
+        const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : 
+                          item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success"></i>' : ''; // Ícono de alerta
 
-        // Usar remitoVBA si remito no existe
         const remito = item.remito ? item.remito : item.remitoVBA;
 
         // Formatear fecha y hora
-        const [date, time] = item.fechaHora.split(', ');
-        const [day, month, year] = date.split('/');
-        const [hours, minutes, seconds] = time.split(':');
-        const hour = parseInt(hours, 10);
-        const ampm = hour >= 12 ? 'P.M.' : 'A.M.';
-        const formattedHour = hour % 12 || 12; // Convertir a formato 12 horas
+        const formattedDateTime = item.fechaHora; // Usa el formato que ya tienes
 
-        const formattedDateTime = `${day}/${month}/${year}, ${formattedHour}:${minutes}:${seconds} ${ampm}`;
+        // Calcular tiempo transcurrido
+        const tiempoTranscurrido = item.estado === "Pendiente de despacho" ? calcularTiempoTranscurrido(item.fechaHora) : '';
 
         const row = `<tr>
                         <td>${formattedDateTime}</td>
-                        <td class="${estadoClass}">${alertIcon} ${item.estado}</td>
+                        <td class="${estadoClass}">${alertIcon} ${item.estado} ${tiempoTranscurrido}</td>
                         <td>${item.cliente}</td>
                         <td class="remito-columna">${remito}</td>
                         <td class="valor-columna">${item.valorDeclarado}</td>

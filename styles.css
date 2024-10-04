@@ -2516,3 +2516,28 @@ div.card-body > p > i{
     font-size: 1.1rem;
     text-align: center;
 }
+
+.pendiente-despacho {
+    position: relative;
+}
+
+.pendiente-despacho::before {
+    content: '⏰'; 
+    position: absolute;
+    left: -175px; 
+    font-size: 20px; 
+    top: 12px;
+    animation: pulse 1.5s infinite; 
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
