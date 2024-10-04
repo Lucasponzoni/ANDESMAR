@@ -80,42 +80,45 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
             const remitoValue = $('#remito').val();
             const clienteValue = $('#cliente').val();
             const valorDeclaradoValue = activeElement.value;
-            const fechaHora = new Date().toLocaleString(); // Obtener la fecha y hora actual
+            const fechaHora = new Date(); // Obtener la fecha y hora actual
 
-// Formatear fecha y hora en formato 24 horas
-function formatearFechaHora(fechaHora) {
-    const [date, time] = fechaHora.split(', ');
-    const [day, month, year] = date.split('/');
-    const [hours, minutes, seconds] = time.split(':');
+            function formatearFechaHora(fechaHora) {
+                const dia = fechaHora.getDate();
+                const mes = fechaHora.getMonth() + 1; // Los meses son 0-11
+                const año = fechaHora.getFullYear();
+                const horas = fechaHora.getHours();
+                const minutos = fechaHora.getMinutes();
+                const segundos = fechaHora.getSeconds();
 
-    // Formato 24 horas ya está en el formato original, solo aseguramos que lo guardamos así
-    return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`;
-}
+                // Formatear con ceros a la izquierda
+                return `${dia}/${mes}/${año}, ${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+            }
 
-// Push a Firebase solo si todos los campos están llenos
-if (valorDeclaradoValue) {
-    const fechaHoraFormateada = formatearFechaHora(fechaHora); // Formatear a 24 horas
-    firebase.database().ref('DespachosLogisticos').push({
-        cliente: clienteValue,
-        estado: "Pendiente de despacho",
-        fechaHora: fechaHoraFormateada,
-        operadorLogistico: "Pendiente",
-        remito: remitoValue,
-        remitoVBA: remitoValue,
-        valorDeclarado: formatearValor(valorDeclaradoValue) // Formatear el valor antes de guardar
-    })
-    .then(() => {
-        // Agregar el nuevo registro a la tabla
-        const newRow = `<tr>
-                            <td>${fechaHoraFormateada}</td>
-                            <td>Pendiente de despacho</td>
-                            <td>${clienteValue}</td>
-                            <td>${remitoValue}</td>
-                            <td>${formatearValor(valorDeclaradoValue)}</td>
-                            <td>Pendiente</td>
-                        </tr>`;
-        const tableBody = document.querySelector('#data-table tbody');
-        tableBody.insertAdjacentHTML('afterbegin', newRow); // Agregar nuevo registro en la parte superior
+            // Push a Firebase solo si todos los campos están llenos
+            if (valorDeclaradoValue) {
+                const fechaHoraFormateada = formatearFechaHora(fechaHora); // Formatear a 24 horas
+                firebase.database().ref('DespachosLogisticos').push({
+                    cliente: clienteValue,
+                    estado: "Pendiente de despacho",
+                    fechaHora: fechaHoraFormateada,
+                    operadorLogistico: "Pendiente",
+                    remito: remitoValue,
+                    remitoVBA: remitoValue,
+                    valorDeclarado: formatearValor(valorDeclaradoValue) // Formatear el valor antes de guardar
+                })
+                .then(() => {
+                    // Agregar el nuevo registro a la tabla
+                    const newRow = `<tr>
+                                        <td>${fechaHoraFormateada}</td>
+                                        <td>Pendiente de despacho</td>
+                                        <td>${clienteValue}</td>
+                                        <td>${remitoValue}</td>
+                                        <td>${formatearValor(valorDeclaradoValue)}</td>
+                                        <td>Pendiente</td>
+                                        <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
+                                    </tr>`;
+                    const tableBody = document.querySelector('#data-table tbody');
+                    tableBody.insertAdjacentHTML('afterbegin', newRow); // Agregar nuevo registro en la parte superior
 
                     // Limpiar los inputs después de guardar
                     $('#remito').val('');
@@ -141,7 +144,6 @@ if (valorDeclaradoValue) {
     }
 });
 
-// Cargar datos desde Firebase
 function cargarDatos() {
     db.ref('DespachosLogisticos').once('value').then(snapshot => {
         allData = []; // Limpiar allData
@@ -150,6 +152,7 @@ function cargarDatos() {
 
         snapshot.forEach(childSnapshot => {
             const data = childSnapshot.val();
+            // Ajustar la fecha y hora aquí
             allData.push(data); // Almacenar datos en allData
         });
 
@@ -161,6 +164,9 @@ function cargarDatos() {
         // Actualizar la paginación
         updatePagination(allData.length);
         
+        // Calcular porcentajes de Andesmar y Andreani en base a todos los datos
+        calcularPorcentajes(allData);
+        
         // Ocultar el spinner al cargar los datos
         document.getElementById('spinner').style.display = 'none';
     }).catch(error => {
@@ -169,6 +175,94 @@ function cargarDatos() {
             title: 'Error al cargar datos',
             text: error.message,
         });
+    });
+}
+
+function calcularPorcentajes(data) {
+    const totalEnvios = data.length;
+    let countAndreani = 0;
+    let countAndesmar = 0;
+    let countPendientes = 0;
+
+    data.forEach(item => {
+        if (item.numeroDeEnvio) {
+            const numeroDeEnvio = item.numeroDeEnvio;
+            if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
+                (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) {
+                countAndreani++;
+            } else {
+                countAndesmar++;
+            }
+        }
+
+        // Contar los pendientes de despacho
+        if (item.estado === "Pendiente de despacho") {
+            countPendientes++;
+        }
+    });
+
+    // Calcular porcentajes
+    const andreaniPorcentaje = totalEnvios > 0 ? ((countAndreani / totalEnvios) * 100).toFixed(2) : 0;
+    const andesmarPorcentaje = totalEnvios > 0 ? ((countAndesmar / totalEnvios) * 100).toFixed(2) : 0;
+    const pendientesPorcentaje = totalEnvios > 0 ? ((countPendientes / totalEnvios) * 100).toFixed(2) : 0;
+
+// Actualizar el HTML
+document.getElementById('andreaniPorcentaje').innerHTML = `
+<div class="d-flex align-items-center flex-wrap">
+    <i class="bi bi-truck-front-fill icono-tiempo"></i>
+    <span class="ml-1" style="font-weight: bold;">Andreani: ${andreaniPorcentaje}%</span>
+</div>
+`;
+
+document.getElementById('andesmarPorcentaje').innerHTML = `
+<div class="d-flex align-items-center flex-wrap">
+    <i class="bi bi-truck-front-fill icono-tiempo"></i>
+    <span class="ml-1" style="font-weight: bold;">Andesmar: ${andesmarPorcentaje}%</span>
+</div>
+`;
+
+document.getElementById('SinDespacharPorcentaje').innerHTML = `
+<div class="d-flex align-items-center flex-wrap">
+    <i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i>
+    <span class="ml-1" style="font-weight: bold;">Pendientes de despacho: ${pendientesPorcentaje}%</span>
+    <span class="badge badge-danger mx-2" style="font-size: 0.9em; border-radius: 8px; padding: 12px 0.5em;">
+        ${countPendientes} remitos en preparación <i class="bi bi-asterisk"></i>
+    </span>
+</div>
+`;
+}
+
+function eliminarFila(button) {
+    const row = button.closest('tr');
+    
+    Swal.fire({
+        title: 'Ingrese la contraseña 🔒',
+        input: 'password',
+        inputLabel: 'Contraseña de Eliminacion (Solicitela a Lucas)',
+        showCancelButton: true,
+        confirmButtonText: 'Eliminar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: (password) => {
+            if (password !== '6572') {
+                Swal.showValidationMessage('Contraseña incorrecta');
+            }
+            return password;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const remitoValue = row.cells[3].innerText; // Asumiendo que el remito está en la 4ta celda
+            // Eliminar de Firebase
+            db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remitoValue).once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    childSnapshot.ref.remove().then(() => {
+                        row.remove(); // Eliminar la fila de la tabla
+                        Swal.fire('Eliminado!', 'La fila ha sido eliminada.', 'success');
+                    }).catch((error) => {
+                        Swal.fire('Error!', 'No se pudo eliminar la fila.', 'error');
+                    });
+                });
+            });
+        }
     });
 }
 
@@ -204,15 +298,13 @@ function renderCards(data) {
     const endIndex = Math.min(startIndex + itemsPerPage, data.length);
     let totalTiempo = 0; // Variable para acumular el tiempo total
     let count = 0; // Contador de elementos con tiempo transcurrido
-    let countAndreani = 0; // Contador de envíos Andreani
-    let countAndesmar = 0; // Contador de envíos Andesmar
 
     for (let i = startIndex; i < endIndex; i++) {
         const item = data[i];
         const estadoClass = item.estado === "Pendiente de despacho" ? "pendiente-despacho" : 
                             item.estado === "Despachado" ? "estado-despachado" : "";
-        const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : 
-                          item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success"></i>' : '';
+        const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning icon-state-ios"></i>' : 
+                          item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success icon-state-ios"></i>' : '';
 
         const remito = item.remito ? item.remito : item.remitoVBA;
         const formattedDateTime = formatDateTime(item.fechaHora);
@@ -240,12 +332,10 @@ function renderCards(data) {
                 link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
                 imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
-                countAndreani++; // Incrementar contador de Andreani
             } else {
                 link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=Orden`;
                 imgSrc = './Img/andesmar-mini.png'; // Ruta de la imagen
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
-                countAndesmar++; // Incrementar contador de Andesmar
             }
         } else {
             operadorLogistico = item.operadorLogistico; // Si no hay número de envío, mostrar el operador logístico original
@@ -258,6 +348,7 @@ function renderCards(data) {
                         <td class="remito-columna">${remito}</td>
                         <td class="valor-columna">${item.valorDeclarado}</td>
                         <td>${operadorLogistico}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
                     </tr>`;
         tableBody.insertAdjacentHTML('beforeend', row);
     }
@@ -269,29 +360,18 @@ function renderCards(data) {
     } else {
         document.getElementById('promedioBtn').innerHTML = `<i class="bi bi-alarm-fill"></i> Promedio: -`;
     }
-
-    // Calcular porcentajes
-    const totalEnvios = countAndreani + countAndesmar;
-    if (totalEnvios > 0) {
-        const andreaniPorcentaje = ((countAndreani / totalEnvios) * 100).toFixed(2);
-        const andesmarPorcentaje = ((countAndesmar / totalEnvios) * 100).toFixed(2);
-        document.getElementById('andreaniPorcentaje').innerHTML = `<i class="bi bi-truck-front-fill icono-tiempo"></i> Andreani: ${andreaniPorcentaje}%`;
-        document.getElementById('andesmarPorcentaje').innerHTML = `<i class="bi bi-truck-front-fill icono-tiempo"></i> Andesmar: ${andesmarPorcentaje}%`;
-    }
 }
 
+// Función para formatear la fecha y hora
 function formatDateTime(fechaHora) {
     const [fecha, hora] = fechaHora.split(', ');
     const [dia, mes, año] = fecha.split('/').map(Number);
     const [horas, minutos, segundos] = hora.split(':').map(Number);
     
     const date = new Date(año, mes - 1, dia, horas, minutos, segundos);
-    const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true };
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false };
     
-    const formattedDate = date.toLocaleString('es-AR', options);
-    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
-
-    return `${formattedDate} ${ampm}`; // Agregar AM/PM al final
+    return date.toLocaleString('es-AR', options); // Usar formato de 24 horas
 }
 
 // INICIO PAGINATION
@@ -344,3 +424,4 @@ function updatePagination(totalItems) {
 
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;
+
