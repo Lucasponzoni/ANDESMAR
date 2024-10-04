@@ -82,29 +82,40 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
             const valorDeclaradoValue = activeElement.value;
             const fechaHora = new Date().toLocaleString(); // Obtener la fecha y hora actual
 
-            // Push a Firebase solo si todos los campos están llenos
-            if (valorDeclaradoValue) {
-                firebase.database().ref('DespachosLogisticos').push({
-                    cliente: clienteValue,
-                    estado: "Pendiente de despacho",
-                    fechaHora: fechaHora,
-                    operadorLogistico: "Pendiente",
-                    remito: remitoValue,
-                    remitoVBA: remitoValue,
-                    valorDeclarado: formatearValor(valorDeclaradoValue) // Formatear el valor antes de guardar
-                })
-                .then(() => {
-                    // Agregar el nuevo registro a la tabla
-                    const newRow = `<tr>
-                                        <td>${fechaHora}</td>
-                                        <td>Pendiente de despacho</td>
-                                        <td>${clienteValue}</td>
-                                        <td>${remitoValue}</td>
-                                        <td>${formatearValor(valorDeclaradoValue)}</td>
-                                        <td>Pendiente</td>
-                                    </tr>`;
-                    const tableBody = document.querySelector('#data-table tbody');
-                    tableBody.insertAdjacentHTML('afterbegin', newRow); // Agregar nuevo registro en la parte superior
+// Formatear fecha y hora en formato 24 horas
+function formatearFechaHora(fechaHora) {
+    const [date, time] = fechaHora.split(', ');
+    const [day, month, year] = date.split('/');
+    const [hours, minutes, seconds] = time.split(':');
+
+    // Formato 24 horas ya está en el formato original, solo aseguramos que lo guardamos así
+    return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`;
+}
+
+// Push a Firebase solo si todos los campos están llenos
+if (valorDeclaradoValue) {
+    const fechaHoraFormateada = formatearFechaHora(fechaHora); // Formatear a 24 horas
+    firebase.database().ref('DespachosLogisticos').push({
+        cliente: clienteValue,
+        estado: "Pendiente de despacho",
+        fechaHora: fechaHoraFormateada,
+        operadorLogistico: "Pendiente",
+        remito: remitoValue,
+        remitoVBA: remitoValue,
+        valorDeclarado: formatearValor(valorDeclaradoValue) // Formatear el valor antes de guardar
+    })
+    .then(() => {
+        // Agregar el nuevo registro a la tabla
+        const newRow = `<tr>
+                            <td>${fechaHoraFormateada}</td>
+                            <td>Pendiente de despacho</td>
+                            <td>${clienteValue}</td>
+                            <td>${remitoValue}</td>
+                            <td>${formatearValor(valorDeclaradoValue)}</td>
+                            <td>Pendiente</td>
+                        </tr>`;
+        const tableBody = document.querySelector('#data-table tbody');
+        tableBody.insertAdjacentHTML('afterbegin', newRow); // Agregar nuevo registro en la parte superior
 
                     // Limpiar los inputs después de guardar
                     $('#remito').val('');
@@ -170,14 +181,26 @@ function renderCards(data) {
 
     for (let i = startIndex; i < endIndex; i++) {
         const item = data[i];
-        const estadoClass = item.estado === "Pendiente de despacho" ? "pendiente-despacho" : ""; // Clase condicional
-        const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : ''; // Ícono de alerta
+        const estadoClass = item.estado === "Pendiente de despacho" ? "pendiente-despacho" : 
+                            item.estado === "Despachado" ? "estado-despachado" : ""; // Clase condicional
+        const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : 
+                          item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success"></i>' : ''; // Ícono de alerta
 
         // Usar remitoVBA si remito no existe
         const remito = item.remito ? item.remito : item.remitoVBA;
 
+        // Formatear fecha y hora
+        const [date, time] = item.fechaHora.split(', ');
+        const [day, month, year] = date.split('/');
+        const [hours, minutes, seconds] = time.split(':');
+        const hour = parseInt(hours, 10);
+        const ampm = hour >= 12 ? 'P.M.' : 'A.M.';
+        const formattedHour = hour % 12 || 12; // Convertir a formato 12 horas
+
+        const formattedDateTime = `${day}/${month}/${year}, ${formattedHour}:${minutes}:${seconds} ${ampm}`;
+
         const row = `<tr>
-                        <td>${item.fechaHora}</td>
+                        <td>${formattedDateTime}</td>
                         <td class="${estadoClass}">${alertIcon} ${item.estado}</td>
                         <td>${item.cliente}</td>
                         <td class="remito-columna">${remito}</td>

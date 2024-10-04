@@ -2181,7 +2181,7 @@ div.card-body > p > i{
     display: flex;
     align-items: center;
     margin-bottom: 2px;
-    text-wrap: nowrap !important;
+    text-wrap: wrap !important;
     text-overflow: ellipsis !important;
 }
 
@@ -2386,20 +2386,19 @@ div.card-body > p > i{
 }
 
 .table tbody tr:nth-child(even) {
-    background-color: #ffffff; /* Color de fondo para filas pares */
+    background-color: #ffffff; 
 }
 
 .table tbody tr:nth-child(even):hover {
-    background-color: rgba(255, 165, 0, 0.3); /* Naranja claro al pasar el ratón en filas pares */
+    background-color: rgba(255, 165, 0, 0.3); 
     cursor: pointer;
 }
 
 /* Estilo de las celdas */
 .table td {
-    color: #333; /* Color del texto */
-    font-size: 14px; /* Tamaño de la fuente */
+    color: #333; 
+    font-size: 14px; 
 }
-
 
 .modal-content {
     border-radius: 16px;
@@ -2494,6 +2493,13 @@ div.card-body > p > i{
 .pendiente-despacho {
     color: red !important;
     font-weight: bold;
+    background-color: rgba(255, 200, 47, 0.255);
+}
+
+.estado-despachado{
+    color: green !important;
+    font-weight: bold;
+    background-color: rgba(172, 255, 47, 0.255);
 }
 
 .valor-columna {
