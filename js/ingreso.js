@@ -90,6 +90,7 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
                     fechaHora: fechaHora,
                     operadorLogistico: "Pendiente",
                     remito: remitoValue,
+                    remitoVBA: remitoValue,
                     valorDeclarado: formatearValor(valorDeclaradoValue) // Formatear el valor antes de guardar
                 })
                 .then(() => {
@@ -172,11 +173,14 @@ function renderCards(data) {
         const estadoClass = item.estado === "Pendiente de despacho" ? "pendiente-despacho" : ""; // Clase condicional
         const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : ''; // Ícono de alerta
 
+        // Usar remitoVBA si remito no existe
+        const remito = item.remito ? item.remito : item.remitoVBA;
+
         const row = `<tr>
                         <td>${item.fechaHora}</td>
                         <td class="${estadoClass}">${alertIcon} ${item.estado}</td>
                         <td>${item.cliente}</td>
-                        <td class="remito-columna">${item.remito}</td>
+                        <td class="remito-columna">${remito}</td>
                         <td class="valor-columna">${item.valorDeclarado}</td>
                         <td>${item.operadorLogistico}</td>
                     </tr>`;
