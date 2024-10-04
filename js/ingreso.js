@@ -349,7 +349,7 @@ function renderCards(data) {
         } else {
             // Si el operador logístico es "Logística Novogar"
             if (item.operadorLogistico === "Logística Novogar") {
-                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)">Etiqueta</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><i class="bi bi-pin-map-fill"></i> Etiqueta</button>`;
             } else {
                 operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
             }
@@ -381,6 +381,9 @@ function renderCards(data) {
 }
 
 async function generarPDF(remito, cliente, fechaEntrega, button) {
+
+    let spinner = document.getElementById("spinner2");
+    spinner.style.display = "flex";
     // Cambiar el contenido del botón a un spinner
     button.innerHTML = '<i class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></i> Generando...';
     button.disabled = true; // Desactivar el botón
@@ -406,13 +409,12 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
         <style>
             body {
-                margin: 0;
-                padding: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            place-items: center; /* Centra el contenido en ambos ejes */
+            height: 100vh;
+            background-color: #f0f0f0;
             }
             .etiqueta {
                 width: 10cm;
@@ -537,15 +539,17 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
 
         // Esperar 2 segundos antes de abrir el PDF
         setTimeout(() => {
+            spinner.style.display = "none";
             window.open(pdfUrl, '_blank');
-            button.innerHTML = 'Etiqueta'; // Restaurar el texto del botón
+            button.innerHTML = '<i class="bi bi-pin-map-fill"></i> Etiqueta'; // Restaurar el texto del botón
             button.disabled = false; // Reactivar el botón
         }, 2000); // Retraso de 2000 ms (2 segundos)
 
         document.body.removeChild(tempDiv); // Eliminar el elemento temporal
     }).catch(error => {
+        spinner.style.display = "none";
         console.error("Error al generar el PDF:", error);
-        button.innerHTML = 'Etiqueta'; // Restaurar el texto del botón en caso de error
+        button.innerHTML = '<i class="bi bi-pin-map-fill"></i> Etiqueta'; // Restaurar el texto del botón en caso de error
         button.disabled = false; // Reactivar el botón
     });
 }
