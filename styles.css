@@ -2593,33 +2593,42 @@ div.card-body > p > i{
 /* FIN TRANSPORTE EN TABLAS */
 
 #porcentajes {
-    background: #ffffff; 
-    padding: 5px; 
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
+    background: #f9f9f9; 
+    padding: 10px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
     transition: box-shadow 0.3s, transform 0.3s; 
 }
 
 .percentage-card {
-    font-weight: 700; 
-    padding: 5px 10px; 
-    border-radius: 8px; 
+    font-weight: 600; 
+    padding: 10px 15px; 
+    border-radius: 10px; 
     display: flex; 
     align-items: center; 
-    transition: background-color 0.3s; 
-    font-size: 0.9em;
+    transition: background-color 0.3s, transform 0.3s; 
+    font-size: 0.95em; 
+    margin: 5px 0; 
 }
 
 .percentage-card:hover {
-    background-color: rgba(0, 0, 0, 0.05); 
+    background-color: rgba(0, 0, 0, 0.08); 
     cursor: pointer;
+    transform: translateY(-2px); 
 }
 
 #andreaniPorcentaje {
     color: #e74c3c; 
+    font-weight: 700;
 }
 
 #andesmarPorcentaje {
-    color: #3498db;
+    color: #3498db; 
+    font-weight: 700; 
+}
+
+#porcentajes:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 

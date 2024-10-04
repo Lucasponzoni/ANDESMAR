@@ -275,8 +275,8 @@ function renderCards(data) {
     if (totalEnvios > 0) {
         const andreaniPorcentaje = ((countAndreani / totalEnvios) * 100).toFixed(2);
         const andesmarPorcentaje = ((countAndesmar / totalEnvios) * 100).toFixed(2);
-        document.getElementById('andreaniPorcentaje').innerHTML = `<i class="bi bi-truck-front-fill"></i> Andreani: ${andreaniPorcentaje}%`;
-        document.getElementById('andesmarPorcentaje').innerHTML = `<i class="bi bi-truck-front-fill"></i> Andesmar: ${andesmarPorcentaje}%`;
+        document.getElementById('andreaniPorcentaje').innerHTML = `<i class="bi bi-truck-front-fill icono-tiempo"></i> Andreani: ${andreaniPorcentaje}%`;
+        document.getElementById('andesmarPorcentaje').innerHTML = `<i class="bi bi-truck-front-fill icono-tiempo"></i> Andesmar: ${andesmarPorcentaje}%`;
     }
 }
 
