@@ -2502,6 +2502,13 @@ div.card-body > p > i{
     background-color: rgba(172, 255, 47, 0.255);
 }
 
+.estado-entrega {
+    color: cornflowerblue !important;
+    font-weight: bold !important;
+    background-color: #edf8fb !important;
+    background-color: rgba(253, 208, 140, 0.255);
+}
+
 .valor-columna {
     color: green !important;
     font-weight: bold; 
@@ -2593,11 +2600,10 @@ div.card-body > p > i{
 /* FIN TRANSPORTE EN TABLAS */
 
 #porcentajes {
+    border: dashed 2px cornflowerblue;
     background: #f9f9f9; 
     padding: 10px; 
     border-radius: 12px; 
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
-    transition: box-shadow 0.3s, transform 0.3s; 
 }
 
 .percentage-card {

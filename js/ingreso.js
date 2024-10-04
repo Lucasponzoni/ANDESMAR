@@ -19,6 +19,15 @@ let itemsPerPage = 50; // Número de elementos por página
 let currentPageGroup = 0;
 const paginationContainer = document.getElementById('pagination');
 
+// Recargar la página al cerrar los modales
+$('#ingresoModal').on('hidden.bs.modal', function () {
+    location.reload();
+});
+
+$('#logisticaModal').on('hidden.bs.modal', function () {
+    location.reload();
+});
+
 // Al abrir el modal, establecer el foco en el primer input
 $('#ingresoModal').on('shown.bs.modal', function () {
     $('#remito').focus();
@@ -341,9 +350,13 @@ function renderCards(data) {
             operadorLogistico = item.operadorLogistico; // Si no hay número de envío, mostrar el operador logístico original
         }
 
+        // Agregar estilo e ícono si el estado inicia con "(se entrega entre"
+        const entregaEntreClass = item.estado.startsWith("(se entrega entre") ? "estado-entrega" : "";
+        const entregaEntreIcon = item.estado.startsWith("(se entrega entre") ? '<i class="bi bi-check-circle-fill icon-state-ios"></i>' : '';
+
         const row = `<tr>
                         <td>${formattedDateTime}</td>
-                        <td class="${estadoClass}">${alertIcon} ${item.estado} ${tiempoTexto}</td>
+                        <td class="${estadoClass} ${entregaEntreClass}">${alertIcon} ${entregaEntreIcon} ${item.estado} ${tiempoTexto}</td>
                         <td>${item.cliente}</td>
                         <td class="remito-columna">${remito}</td>
                         <td class="valor-columna">${item.valorDeclarado}</td>
@@ -372,6 +385,97 @@ function formatDateTime(fechaHora) {
     const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false };
     
     return date.toLocaleString('es-AR', options); // Usar formato de 24 horas
+}
+
+// Evento al abrir el modal para enfocar el input
+$('#logisticaModal').on('shown.bs.modal', function () {
+    $('#remitoLogistica').focus();
+});
+
+// Evento para manejar el escaneo al presionar "Enter"
+document.getElementById('remitoLogistica').addEventListener('keypress', function (event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Evitar el comportamiento por defecto
+        const remitoValue = this.value;
+
+        // Verificar si el remito es válido
+        if (/^23[0-9]\d{8}$/.test(remitoValue)) {
+            // Buscar en Firebase
+            db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remitoValue).once('value', snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const data = childSnapshot.val();
+                        const fechaEntrega = new Date();
+                        const fechaEntregaStr = `${fechaEntrega.getDate()}/${fechaEntrega.getMonth() + 1}/${fechaEntrega.getFullYear()}`;
+                        const horaEntregaStr = `${fechaEntrega.getHours()}:${fechaEntrega.getMinutes()}:${fechaEntrega.getSeconds()}`;
+                        const fechaEntregaFinal = `${fechaEntrega.getDate()}/${fechaEntrega.getMonth() + 1}/${fechaEntrega.getFullYear()}, ${horaEntregaStr}`;
+
+                        // Sumar 3 días a la fecha de entrega, omitiendo domingos
+                        let diasSumados = 0;
+                        while (diasSumados < 3) {
+                            fechaEntrega.setDate(fechaEntrega.getDate() + 1);
+                            if (fechaEntrega.getDay() !== 0) { // 0 es domingo
+                                diasSumados++;
+                            }
+                        }
+
+                        const fechaEntregaFinalStr = `${fechaEntrega.getDate()}/${fechaEntrega.getMonth() + 1}/${fechaEntrega.getFullYear()}`;
+
+                        // Actualizar el estado en Firebase
+                        childSnapshot.ref.update({
+                            estado: `(se entrega entre ${fechaEntregaStr} & ${fechaEntregaFinalStr})`,
+                            operadorLogistico: "Logística Novogar" // Agregar operador logístico
+                        }).then(() => {
+                            // Agregar el nuevo estado a la tabla
+                            const newRow = `<tr>
+                                                <td>${fechaEntregaStr}</td>
+                                                <td>(se entrega entre ${fechaEntregaStr} & ${fechaEntregaFinalStr})</td>
+                                                <td>${data.cliente}</td>
+                                                <td>${remitoValue}</td>
+                                                <td>${data.valorDeclarado}</td>
+                                                <td>Logística Novogar</td> <!-- Mostrar operador logístico -->
+                                                <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
+                                            </tr>`;
+                            const tableBody = document.querySelector('#data-table tbody');
+                            tableBody.insertAdjacentHTML('afterbegin', newRow); // Agregar nuevo registro en la parte superior
+
+                            // Mostrar alerta
+                            mostrarAlerta('Estado actualizado a Logística Propia.', 'success');
+
+                            // Limpiar el input y volver a enfocar
+                            $('#remitoLogistica').val('');
+                            $('#remitoLogistica').focus();
+                        }).catch(error => {
+                            mostrarAlerta('Error al actualizar el estado: ' + error.message, 'error');
+                        });
+                    });
+                } else {
+                    mostrarAlerta('Remito no encontrado.', 'error');
+                }
+            });
+        } else {
+            mostrarAlerta('Número de remito inválido. Debe comenzar con 230 o 238 y tener 11 dígitos.', 'error');
+        }
+    }
+});
+
+function mostrarAlerta(mensaje, tipo) {
+    const alerta = document.createElement('div');
+    alerta.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
+    alerta.style.top = '10px'; 
+    alerta.style.zIndex = '1050'; 
+    alerta.style.height = '55px'; 
+    alerta.style.margin = '0 15px'; 
+    alerta.role = 'alert';
+    alerta.innerHTML = mensaje; // Sin botón de cerrar
+    document.body.insertBefore(alerta, document.body.firstChild);
+
+    // Ocultar la alerta después de 5 segundos
+    setTimeout(() => {
+        alerta.classList.remove('show');
+        alerta.classList.add('fade');
+        setTimeout(() => alerta.remove(), 500);
+    }, 5000);
 }
 
 // INICIO PAGINATION
@@ -421,6 +525,39 @@ function updatePagination(totalItems) {
     }
 }
 // FIN PAGINATION
+
+const searchInput = document.getElementById("searchDespachos");
+
+// BUSCADOR
+searchInput.addEventListener("input", function() {
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    // Restablecer la paginación a la primera página
+    currentPage = 1;
+    currentPageGroup = 0;  // También restablecemos el grupo de páginas
+
+    // Filtrar los datos
+    const filteredData = allData.filter(item => {
+        return Object.values(item).some(value => 
+            value !== undefined && value !== null && value.toString().toLowerCase().includes(searchTerm)
+        );
+    });
+    
+    // Si no se encuentra ningún resultado, mostrar una imagen de error
+    if (filteredData.length === 0) {
+        document.getElementById("envios-cards").innerHTML = `
+            <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
+                <p class="errorp">No se encontraron resultados para "${searchTerm}"</p>
+                <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
+            </div>
+        `;
+    } else {
+        // Renderizar las tarjetas y actualizar la paginación con los datos filtrados
+        renderCards(filteredData);
+        updatePagination(filteredData.length);
+    }
+});
+// FIN BUSCADOR
 
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;

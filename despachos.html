@@ -39,7 +39,7 @@
     <div class="row justify-content-between align-items-center search-filter-container">
         <div class="col-md-6 mb-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="search" placeholder="📦 Buscar remito o cliente">
+                <input type="text" class="form-control" id="searchDespachos" placeholder="Buscar por cliente o Remito...">
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="button">
                         <i class="fas fa-search"></i>
@@ -47,10 +47,15 @@
                 </div>
             </div>
         </div>
+        
         <div class="col-md-3 mb-3 d-flex justify-content-end ingreso-egreso">
             <button class="btn btn-primary" id="ingresoBtn" data-toggle="modal" data-target="#ingresoModal">
                 <i class="bi bi-box-arrow-in-down"></i>
             </button>
+            <!-- Botón de Logística Propia -->
+            <button class="btn btn-secondary ml-2" id="logisticaPropiaBtn" data-toggle="modal" data-target="#logisticaModal">
+            <i class="bi bi-truck"></i>
+            </button>           
             <button class="btn btn-secondary ml-2" id="promedioBtn" title="Promedio Despacho: Xd Yh Zm">
                 <i class="bi bi-calculator"></i> Calculando Promedio...
             </button>
@@ -132,12 +137,38 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-success" id="submitIngreso">Guardar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
-    </div>    
+    </div>   
+    
+    
+<!-- Modal para Logística Propia -->
+<div class="modal fade" id="logisticaModal" tabindex="-1" aria-labelledby="logisticaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title" id="logisticaModalLabel">Logística Propia - Escanear Remito</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="logisticaForm">
+                    <div class="form-group">
+                        <label for="remitoLogistica">Número de Remito</label>
+                        <input type="text" class="form-control" id="remitoLogistica" maxlength="11" placeholder="Ingrese el número de remito" autofocus>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-warning" id="confirmLogisticaBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Botón de flecha hacia arriba -->
     <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
