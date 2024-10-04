@@ -95,7 +95,6 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
                 return new Intl.DateTimeFormat('es-ES', options).format(new Date(fecha)).replace(',', '');
             }
             
-
 // Push a Firebase solo si todos los campos están llenos
 if (valorDeclaradoValue) {
     const fechaHoraFormateada = formatearFechaHora(fechaHora); // Formatear a 24 horas
