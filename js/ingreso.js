@@ -185,7 +185,15 @@ function calcularTiempoTranscurrido(fechaHora) {
     const horasRestantes = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutosRestantes = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
     
-    return `${dias}d ${horasRestantes}h ${minutosRestantes}m`;
+    return { dias, horas: horasRestantes, minutos: minutosRestantes, totalMs: diferencia };
+}
+
+function formatearTiempoPromedio(totalMs, count) {
+    const totalDias = Math.floor(totalMs / (1000 * 60 * 60 * 24));
+    const totalHoras = Math.floor((totalMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const totalMinutos = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${totalDias}d ${totalHoras}h ${totalMinutos}m`;
 }
 
 function renderCards(data) {
@@ -194,6 +202,8 @@ function renderCards(data) {
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, data.length);
+    let totalTiempo = 0; // Variable para acumular el tiempo total
+    let count = 0; // Contador de elementos con tiempo transcurrido
 
     for (let i = startIndex; i < endIndex; i++) {
         const item = data[i];
@@ -205,17 +215,55 @@ function renderCards(data) {
         const remito = item.remito ? item.remito : item.remitoVBA;
         const formattedDateTime = formatDateTime(item.fechaHora);
         const tiempoTranscurrido = item.estado === "Pendiente de despacho" ? 
-        `<span class="tiempo-transcurrido"><i class="bi bi-clock icono-tiempo"></i>${calcularTiempoTranscurrido(item.fechaHora)}</span>` : '';    
-        
+        calcularTiempoTranscurrido(item.fechaHora) : null;    
+
+        // Sumar el tiempo si está pendiente de despacho
+        if (tiempoTranscurrido) {
+            totalTiempo += tiempoTranscurrido.totalMs;
+            count++;
+        }
+
+        const tiempoTexto = tiempoTranscurrido ? 
+            `<span class="tiempo-transcurrido"><i class="bi bi-clock icono-tiempo"></i>${tiempoTranscurrido.dias}d ${tiempoTranscurrido.horas}h ${tiempoTranscurrido.minutos}m</span>` : '';
+
+        let operadorLogistico = '';
+
+        if (item.numeroDeEnvio) {
+            const numeroDeEnvio = item.numeroDeEnvio;
+            let link, imgSrc;
+
+            // Verificar el formato del número de envío
+if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
+(numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) {
+link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
+imgSrc = 'img/andreani-mini.png'; // Ruta de la imagen
+operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
+} else {
+link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=Orden`;
+imgSrc = 'img/Andesmar-mini.png'; // Ruta de la imagen
+operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
+}
+        } else {
+            operadorLogistico = item.operadorLogistico; // Si no hay número de envío, mostrar el operador logístico original
+        }
+
         const row = `<tr>
                         <td>${formattedDateTime}</td>
-                        <td class="${estadoClass}">${alertIcon} ${item.estado} ${tiempoTranscurrido}</td>
+                        <td class="${estadoClass}">${alertIcon} ${item.estado} ${tiempoTexto}</td>
                         <td>${item.cliente}</td>
                         <td class="remito-columna">${remito}</td>
                         <td class="valor-columna">${item.valorDeclarado}</td>
-                        <td>${item.operadorLogistico}</td>
+                        <td>${operadorLogistico}</td>
                     </tr>`;
         tableBody.insertAdjacentHTML('beforeend', row);
+    }
+
+    // Calcular el promedio si hay tiempos
+    if (count > 0) {
+        const promedioTexto = formatearTiempoPromedio(totalTiempo / count, count);
+        document.getElementById('promedioBtn').innerHTML = `<i class="bi bi-alarm-fill"></i> Promedio: ${promedioTexto}`;
+    } else {
+        document.getElementById('promedioBtn').innerText = 'Promedio Despacho: N/A';
     }
 }
 

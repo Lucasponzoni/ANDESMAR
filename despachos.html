@@ -26,7 +26,7 @@
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item"><a href="./index.html" class="nav-link">Generación de etiqueta</a></li>
                     <li class="nav-item"><a href="./envios.html" class="nav-link">Envios Andesmar</a></li>
-                    <li class="nav-item"><a href="./meliAr.html" class="nav-link active"><img id="meli-logo" src="./Img/meli.png" alt="Mercado Libre Logo"> Envios Mercado Libre</a></li>
+                    <li class="nav-item"><a href="./despachos.html" class="nav-link active">Despachos</a></li>
                     <li class="nav-item"><a href="./bna.html" class="nav-link">Envios <img id="meli-logo" src="./Img/bna-logo.png" alt="BNA Logo" /></a></li>
                 </ul>
             </div>
@@ -36,7 +36,6 @@
     <div class="container mt-4">
         <div class="row justify-content-between align-items-center search-filter-container">
             <div class="col-md-6 mb-3">
-                <!-- Buscador -->
                 <div class="input-group">
                     <input type="text" class="form-control" id="search" placeholder="📦 Buscar remito o cliente">
                     <div class="input-group-append">
@@ -48,12 +47,15 @@
             </div>
             <div class="col-md-3 mb-3 d-flex justify-content-end ingreso-egreso">
                 <button class="btn btn-primary" id="ingresoBtn" data-toggle="modal" data-target="#ingresoModal">
-                    <i class="bi bi-box-arrow-in-down"></i> Ingreso
+                    <i class="bi bi-box-arrow-in-down"></i>
                 </button>
+                <button class="btn btn-secondary ml-2" id="promedioBtn" title="Promedio Despacho: Xd Yh Zm">
+                    <i class="bi bi-calculator"></i> Calculando Promedio...
+                </button>                
             </div>
         </div>
     </div>
-    
+        
     <div class="container mt-5" id="cards-container">
         <div class="spinner-border" role="status" id="spinner">
             <span class="sr-only">Cargando...</span>

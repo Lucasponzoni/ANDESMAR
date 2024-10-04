@@ -2545,3 +2545,52 @@ div.card-body > p > i{
 .icono-tiempo {
     margin-right: 5px;
 }
+
+#promedioBtn {
+    background-color: #f9f9f9;
+    color: #2c3e50; 
+    border: 1px solid #bdc3c7; 
+    border-radius: 15px; 
+    padding: 0.4rem 0.8rem; 
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
+    white-space: nowrap; 
+}
+
+/* TRANSPORTE EN TABLAS */
+.img-transporte{
+    width: 120px;
+}
+
+.btn-ios {
+    display: inline-block;
+    border-radius: 5px; 
+    overflow: hidden; 
+    transition: transform 0.2s ease, box-shadow 0.2s ease; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+.btn-andreani {
+    background: linear-gradient(135deg, #ff4d4d, #ff1a1a); 
+    color: white; 
+}
+
+.btn-andesmar {
+    background: linear-gradient(135deg, #007bff, #0056b3); 
+    color: white; 
+}
+
+.btn-ios:hover {
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); 
+}
+
+.img-transporte {
+    width: 100px; 
+    height: auto; 
+    display: block; 
+}
+
+/* FIN TRANSPORTE EN TABLAS */
+
+
+
