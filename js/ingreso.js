@@ -173,19 +173,24 @@ function cargarDatos() {
 }
 
 function calcularTiempoTranscurrido(fechaHora) {
-    const fechaCarga = new Date(fechaHora);
-    const ahora = new Date();
-    const diferencia = ahora - fechaCarga; // Diferencia en milisegundos
-
-    const horas = Math.floor((diferencia % 86400000) / 3600000);
-    const minutos = Math.round(((diferencia % 86400000) % 3600000) / 60000);
+    const [fecha, hora] = fechaHora.split(', ');
+    const [dia, mes, año] = fecha.split('/').map(Number);
+    const [horas, minutos, segundos] = hora.split(':').map(Number);
     
-    return `${horas}h ${minutos}m`;
+    const fechaCarga = new Date(año, mes - 1, dia, horas, minutos, segundos);
+    const ahora = new Date();
+    const diferencia = ahora - fechaCarga;
+
+    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+    const horasRestantes = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutosRestantes = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${dias}d ${horasRestantes}h ${minutosRestantes}m`;
 }
 
 function renderCards(data) {
     const tableBody = document.querySelector('#data-table tbody');
-    tableBody.innerHTML = ''; // Limpiar tabla
+    tableBody.innerHTML = '';
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, data.length);
@@ -193,18 +198,15 @@ function renderCards(data) {
     for (let i = startIndex; i < endIndex; i++) {
         const item = data[i];
         const estadoClass = item.estado === "Pendiente de despacho" ? "pendiente-despacho" : 
-                            item.estado === "Despachado" ? "estado-despachado" : ""; // Clase condicional
+                            item.estado === "Despachado" ? "estado-despachado" : "";
         const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : 
-                          item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success"></i>' : ''; // Ícono de alerta
+                          item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success"></i>' : '';
 
         const remito = item.remito ? item.remito : item.remitoVBA;
-
-        // Formatear fecha y hora
-        const formattedDateTime = item.fechaHora; // Usa el formato que ya tienes
-
-        // Calcular tiempo transcurrido
-        const tiempoTranscurrido = item.estado === "Pendiente de despacho" ? calcularTiempoTranscurrido(item.fechaHora) : '';
-
+        const formattedDateTime = formatDateTime(item.fechaHora);
+        const tiempoTranscurrido = item.estado === "Pendiente de despacho" ? 
+        `<span class="tiempo-transcurrido"><i class="bi bi-clock icono-tiempo"></i>${calcularTiempoTranscurrido(item.fechaHora)}</span>` : '';    
+        
         const row = `<tr>
                         <td>${formattedDateTime}</td>
                         <td class="${estadoClass}">${alertIcon} ${item.estado} ${tiempoTranscurrido}</td>
@@ -213,8 +215,22 @@ function renderCards(data) {
                         <td class="valor-columna">${item.valorDeclarado}</td>
                         <td>${item.operadorLogistico}</td>
                     </tr>`;
-        tableBody.insertAdjacentHTML('beforeend', row); // Agregar nuevo registro
+        tableBody.insertAdjacentHTML('beforeend', row);
     }
+}
+
+function formatDateTime(fechaHora) {
+    const [fecha, hora] = fechaHora.split(', ');
+    const [dia, mes, año] = fecha.split('/').map(Number);
+    const [horas, minutos, segundos] = hora.split(':').map(Number);
+    
+    const date = new Date(año, mes - 1, dia, horas, minutos, segundos);
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true };
+    
+    const formattedDate = date.toLocaleString('es-AR', options);
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+
+    return `${formattedDate} ${ampm}`; // Agregar AM/PM al final
 }
 
 // INICIO PAGINATION
