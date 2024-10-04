@@ -2524,7 +2524,7 @@ div.card-body > p > i{
 .pendiente-despacho::before {
     content: '⏰'; 
     position: absolute;
-    left: -175px; 
+    left: -185px; 
     font-size: 20px; 
     top: 12px;
     animation: pulse 1.5s infinite; 
