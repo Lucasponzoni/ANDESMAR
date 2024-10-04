@@ -2505,7 +2505,7 @@ div.card-body > p > i{
 .estado-entrega {
     color: cornflowerblue !important;
     font-weight: bold !important;
-    background-color: #edf8fb !important;
+    background-color: #fbf9ed !important;
     background-color: rgba(253, 208, 140, 0.255);
 }
 
@@ -2583,6 +2583,11 @@ div.card-body > p > i{
 
 .btn-andesmar {
     background: linear-gradient(135deg, #007bff, #0056b3); 
+    color: white; 
+}
+
+.btn-novogar {
+    background: linear-gradient(135deg, #717171, #323232); 
     color: white; 
 }
 
