@@ -2511,3 +2511,8 @@ div.card-body > p > i{
 .remito-columna{
     font-weight: bold; 
 }
+
+.icon-despacho{
+    font-size: 1.1rem;
+    text-align: center;
+}

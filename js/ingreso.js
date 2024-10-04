@@ -183,8 +183,8 @@ function renderCards(data) {
         const item = data[i];
         const estadoClass = item.estado === "Pendiente de despacho" ? "pendiente-despacho" : 
                             item.estado === "Despachado" ? "estado-despachado" : ""; // Clase condicional
-        const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : 
-                          item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success"></i>' : ''; // Ícono de alerta
+        const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="icon-despacho bi bi-exclamation-triangle-fill text-warning"></i>' : 
+                          item.estado === "Despachado" ? '<i class="icon-despacho bi bi-check-circle-fill text-success"></i>' : ''; // Ícono de alerta
 
         // Usar remitoVBA si remito no existe
         const remito = item.remito ? item.remito : item.remitoVBA;
