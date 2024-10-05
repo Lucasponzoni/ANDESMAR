@@ -722,9 +722,14 @@ searchInput.addEventListener("input", function() {
         );
     });
     
-    // Si no se encuentra ningún resultado, mostrar una imagen de error
-    if (filteredData.length === 0) {
-        document.getElementById("envios-cards").innerHTML = `
+    // Si el término de búsqueda está vacío, mostrar la tabla completa
+    if (searchTerm === "") {
+        document.getElementById("search-despachos").innerHTML = ""; // Limpiar el mensaje de error
+        renderCards(allData); // Renderiza todos los datos
+        updatePagination(allData.length); // Actualiza la paginación con todos los datos
+    } else if (filteredData.length === 0) {
+        // Si no se encuentra ningún resultado, mostrar una imagen de error
+        document.getElementById("search-despachos").innerHTML = `
             <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
                 <p class="errorp">No se encontraron resultados para "${searchTerm}"</p>
                 <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
@@ -732,6 +737,7 @@ searchInput.addEventListener("input", function() {
         `;
     } else {
         // Renderizar las tarjetas y actualizar la paginación con los datos filtrados
+        document.getElementById("search-despachos").innerHTML = ""; // Limpiar el mensaje de error si hay resultados
         renderCards(filteredData);
         updatePagination(filteredData.length);
     }
