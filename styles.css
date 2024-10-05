@@ -2358,7 +2358,6 @@ div.card-body > p > i{
 }
 
 .table th, .table td {
-    padding: 16px; 
     text-align: center; 
     vertical-align: middle; 
     border-bottom: 1px solid #e1e1e1; 
