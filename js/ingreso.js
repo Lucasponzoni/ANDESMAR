@@ -409,7 +409,7 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
         <style>
             body {
-            margin: 0;
+            margin: 10px;
             padding: 0;
             display: grid;
             place-items: center; /* Centra el contenido en ambos ejes */
@@ -418,9 +418,10 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
             }
             .etiqueta {
                 width: 10cm;
+                margin: 5px;
                 height: auto; /* Ajuste automático para el contenido */
                 max-height: 15cm; /* Limitar la altura máxima */
-                border: 1px solid #000;
+                border: 2px dashed #000;
                 border-radius: 10px;
                 padding: 1cm; /* Ajustado para más espacio */
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -435,7 +436,7 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
                 margin-bottom: 15px; /* Ajustado */
             }
             .logo img {
-                max-width: 125px; /* Ajustado */
+                max-width: 75px; /* Ajustado */
                 height: auto;
                 display: block; /* Asegura que la imagen sea un bloque */
                 margin: 0 auto; /* Centra la imagen */
@@ -444,7 +445,7 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
                 border-radius: 10px;
                 display: flex;
                 align-items: center;
-                margin-bottom: 10px; /* Ajustado */
+                margin-bottom: 6px; /* Ajustado */
                 padding: 8px; /* Ajustado */
                 border: 2px solid #ccc;
                 background-color: #f9f9f9;
@@ -479,7 +480,7 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
             .campo-extra {
                 border-radius: 8px;
                 margin-top: 10px; /* Ajustado */
-                border: 1px dashed #ccc;
+                border: 2px dashed #ccc;
                 padding: 5px; /* Ajustado */
                 text-align: center;
                 font-size: 0.9em; /* Ajustado */
@@ -504,6 +505,10 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
                 <i class="bi bi-calendar-check"></i>
                 <span>Fecha de Entrega Máxima: ${fechaEntrega}</span>
             </div>
+          <div class="campo">
+                <i class="bi bi-telephone-outbound-fill"></i>
+                <span>Telefono: </span>
+            </div>
             <div class="campo-extra">
                 <p>Firma: ________________________</p>
             </div>
@@ -515,14 +520,12 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
             </div>
             <div class="contacto">
                 <p>Ante cualquier inconveniente, contáctese con posventa:</p>
-                <p><strong>Teléfono:</strong> (0341) 156680658 (Solo WhatsApp)</p>
-                <p><strong>Email:</strong> posventa@novogar.com.ar</p>
-                <p><strong>Horario:</strong> Lun a Vie de 8.30 a 17Hs, Sáb de 9 a 13hs</p>
+                <p><strong><i class="bi bi-chat-dots-fill"></i></strong> (0341) 6680658 (Solo WhatsApp)</p>
+                <p><i class="bi bi-envelope-check-fill"></i> posventa@novogar.com.ar</p>
             </div>
         </div>
     </body>
     </html>`;
-
     // Crear un elemento temporal para renderizar el HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = contenido;

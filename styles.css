@@ -2410,7 +2410,7 @@ div.card-body > p > i{
 .modal-header {
     border-bottom: none; 
     padding: 16px;
-    background-color: #f8f8f8;
+    background-color: #007aff;
     display: flex;
     justify-content: space-between;
     align-items: center;
