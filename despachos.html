@@ -48,18 +48,26 @@
             </div>
         </div>
         
-        <div class="col-md-3 mb-3 d-flex justify-content-end ingreso-egreso">
+        <div class="col-md-3 mb-3 d-flex justify-content-end ingreso-egreso trio-de-botones">
+            <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
+               <i class="bi bi-arrow-return-left"></i>
+            </button>
             <button class="btn btn-primary" id="ingresoBtn" data-toggle="modal" data-target="#ingresoModal">
                 <i class="bi bi-box-arrow-in-down"></i>
             </button>
             <!-- Botón de Logística Propia -->
             <button class="btn btn-secondary ml-2" id="logisticaPropiaBtn" data-toggle="modal" data-target="#logisticaModal">
-            <i class="bi bi-truck"></i>
-            </button>           
+                <i class="bi bi-truck"></i>
+            </button> 
+            <!-- Botón para filtrar por antigüedad -->
+            <button class="btn btn-danger ml-2" id="filterOldestBtn" title="Filtrar por antigüedad">
+                <i class="bi bi-clock"></i>
+            </button>          
             <button class="btn btn-secondary ml-2" id="promedioBtn" title="Promedio Despacho: Xd Yh Zm">
                 <i class="bi bi-calculator"></i> Calculando Promedio...
             </button>
         </div>
+                               
     </div>
 </div>
 

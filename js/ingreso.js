@@ -19,6 +19,36 @@ let itemsPerPage = 50; // Número de elementos por página
 let currentPageGroup = 0;
 const paginationContainer = document.getElementById('pagination');
 
+let isFiltered = false; // Variable para controlar si los datos están filtrados
+
+// FILTRAR PENDIENTES
+document.getElementById('filterOldestBtn').addEventListener('click', function() {
+    const filteredData = allData.filter(item => item.estado === "Pendiente de despacho");
+    filteredData.sort((a, b) => new Date(a.fechaHora) - new Date(b.fechaHora)); // Ordenar de más antiguo a más nuevo
+
+    // Renderizar los datos filtrados
+    renderCards(filteredData);
+    updatePagination(filteredData.length);
+    
+    // Mostrar el botón de volver atrás
+    const backButton = document.getElementById('btnVolverAtras');
+    backButton.style.display = 'block'; // Hacer visible el botón
+    isFiltered = true; // Indicar que los datos están filtrados
+});
+
+// Lógica para el botón de volver atrás
+document.getElementById('btnVolverAtras').addEventListener('click', function() {
+    if (isFiltered) {
+        // Volver a la vista original
+        renderCards(allData);
+        updatePagination(allData.length);
+
+        // Ocultar el botón de volver atrás
+        this.style.display = 'none';
+        isFiltered = false; // Restablecer el estado de filtrado
+    }
+});
+
 // Recargar la página al cerrar los modales
 $('#ingresoModal').on('hidden.bs.modal', function () {
     location.reload();
