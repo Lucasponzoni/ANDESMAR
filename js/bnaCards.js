@@ -40,17 +40,25 @@ document.getElementById('importButton').addEventListener('click', function() {
             const data = content.split(/\r?\n/).map(row => {
                 return row.match(/(".*?"|[^,\r\n]+)(?=\s*,|\s*$)/g) || [];
             });
-    
+
             const headers = data[0];
             const dataRows = data.slice(1);
             let importedCount = 0;
             let existingCount = 0; // Contador para registros existentes
+            let skippedCount = 0; // Contador para registros omitidos por manipulación
             const promises = [];
-    
+
             dataRows.forEach(row => {
                 if (row.length > 0) {
                     const orden = row[2] || null;
-    
+                    const nombreCompletoEnvio = row[32] || null;
+
+                    // Verificar si el campo nombre_completo_envio contiene números
+                    if (/\d/.test(nombreCompletoEnvio)) {
+                        skippedCount++; // Incrementar contador de registros omitidos
+                        return; // Saltar este registro y continuar con el siguiente
+                    }
+
                     // Verificar si ya existe en Firebase
                     const envioRef = firebase.database().ref('enviosBNA');
                     promises.push(
@@ -90,7 +98,7 @@ document.getElementById('importButton').addEventListener('click', function() {
                                     precio_venta: row[30] || null,
                                     cupon_nombre: null,
                                     cupon_descuento: null,
-                                    nombre_completo_envio: row[32] || null,
+                                    nombre_completo_envio: nombreCompletoEnvio,
                                     medio_de_envio: row[33] || null,
                                     numero_de_seguimiento: row[34] || null,
                                     monto_cobrado: row[35] || null,
@@ -130,7 +138,7 @@ document.getElementById('importButton').addEventListener('click', function() {
                                     decidir_distributed: row[69] || null,
                                     modo_distributed: row[70] || null                        
                                 };
-    
+
                                 return envioRef.push().set(envioData).then(() => {
                                     importedCount++;
                                 });
@@ -141,13 +149,13 @@ document.getElementById('importButton').addEventListener('click', function() {
                     );
                 }
             });
-    
+
             Promise.all(promises)
             .then(() => {
                 spinner.remove();
                 Swal.fire({
                     title: 'Importación completada',
-                    text: `Se han importado ${importedCount} ventas a la base de datos, ${existingCount} ya se encontraban en planilla`,
+                    text: `Se han importado ${importedCount} ventas a la base de datos, ${existingCount} ya se encontraban en planilla, ${skippedCount} registros fueron omitidos por contener datos no válidos.`,
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(() => {
@@ -164,10 +172,9 @@ document.getElementById('importButton').addEventListener('click', function() {
                 });
             });
         };
-    
+
         reader.readAsText(file);
     }
-    
 });
 
 function capitalizeWords(str) {
