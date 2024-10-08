@@ -218,7 +218,6 @@ function cargarDatos() {
 }
 
 function calcularPorcentajes(data) {
-    const totalEnvios = data.length;
     let countAndreani = 0;
     let countAndesmar = 0;
     let countPendientes = 0;
@@ -226,6 +225,7 @@ function calcularPorcentajes(data) {
     data.forEach(item => {
         if (item.numeroDeEnvio) {
             const numeroDeEnvio = item.numeroDeEnvio;
+            // Contar envíos de Andreani
             if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
                 (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) {
                 countAndreani++;
@@ -240,35 +240,36 @@ function calcularPorcentajes(data) {
         }
     });
 
+    const totalEnvios = countAndreani + countAndesmar;
+
     // Calcular porcentajes
     const andreaniPorcentaje = totalEnvios > 0 ? ((countAndreani / totalEnvios) * 100).toFixed(2) : 0;
     const andesmarPorcentaje = totalEnvios > 0 ? ((countAndesmar / totalEnvios) * 100).toFixed(2) : 0;
-    const pendientesPorcentaje = totalEnvios > 0 ? ((countPendientes / totalEnvios) * 100).toFixed(2) : 0;
 
-// Actualizar el HTML
-document.getElementById('andreaniPorcentaje').innerHTML = `
-<div class="d-flex align-items-center flex-wrap">
-    <i class="bi bi-truck-front-fill icono-tiempo"></i>
-    <span class="ml-1" style="font-weight: bold;">Andreani: ${andreaniPorcentaje}%</span>
-</div>
-`;
+    // Actualizar el HTML
+    document.getElementById('andreaniPorcentaje').innerHTML = `
+    <div class="d-flex align-items-center flex-wrap">
+        <i class="bi bi-truck-front-fill icono-tiempo"></i>
+        <span class="ml-1" style="font-weight: bold;">Andreani: ${andreaniPorcentaje}%</span>
+    </div>
+    `;
 
-document.getElementById('andesmarPorcentaje').innerHTML = `
-<div class="d-flex align-items-center flex-wrap">
-    <i class="bi bi-truck-front-fill icono-tiempo"></i>
-    <span class="ml-1" style="font-weight: bold;">Andesmar: ${andesmarPorcentaje}%</span>
-</div>
-`;
+    document.getElementById('andesmarPorcentaje').innerHTML = `
+    <div class="d-flex align-items-center flex-wrap">
+        <i class="bi bi-truck-front-fill icono-tiempo"></i>
+        <span class="ml-1" style="font-weight: bold;">Andesmar: ${andesmarPorcentaje}%</span>
+    </div>
+    `;
 
-document.getElementById('SinDespacharPorcentaje').innerHTML = `
-<div class="d-flex align-items-center flex-wrap">
-    <i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i>
-    <span class="ml-1" style="font-weight: bold;">Pendientes: ${pendientesPorcentaje}%</span>
-    <span class="badge badge-danger mx-2" style="font-size: 0.9em; border-radius: 8px; padding: 12px 0.5em;">
-        ${countPendientes} en preparación <i class="bi bi-asterisk"></i>
-    </span>
-</div>
-`;
+    document.getElementById('SinDespacharPorcentaje').innerHTML = `
+    <div class="d-flex align-items-center flex-wrap">
+        <i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i>
+        <span class="ml-1" style="font-weight: bold;">Pendientes:</span>
+        <span class="badge badge-danger mx-2" style="font-size: 0.9em; border-radius: 8px; padding: 12px 0.5em;">
+            ${countPendientes} en preparación <i class="bi bi-asterisk"></i>
+        </span>
+    </div>
+    `;
 }
 
 function eliminarFila(button) {
