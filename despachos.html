@@ -108,6 +108,7 @@
                         <th><i class="bi bi-currency-dollar"></i> Valor</th>
                         <th><i class="bi bi-truck-front-fill"></i> Operador</th>
                         <th><i class="bi bi-trash-fill"></i></th>
+                        <th><i class="bi bi-chat-dots-fill"></i></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -183,6 +184,28 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Comentario -->
+<div class="modal fade" id="comentarioModal" tabindex="-1" aria-labelledby="comentarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="comentarioModalLabel">Actualizar Comentario</h5>
+                <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="comentarioInput" class="form-control" placeholder="Escribe tu comentario aquí..." rows="3" style="resize: none;"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="guardarComentarioBtn">Guardar Comentario</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin Modal Comentario -->
 
     <!-- Botón de flecha hacia arriba -->
     <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">

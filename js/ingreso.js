@@ -391,14 +391,15 @@ function renderCards(data) {
         const entregaEntreIcon = item.estado.startsWith("(se entrega entre") ? '<i class="bi bi-check-circle-fill icon-state-ios"></i>' : '';
 
         const row = `<tr>
-                        <td>${formattedDateTime}</td>
-                        <td class="${estadoClass} ${entregaEntreClass}">${alertIcon} ${entregaEntreIcon} ${item.estado} ${tiempoTexto}</td>
-                        <td>${item.cliente}</td>
-                        <td class="remito-columna">${remito}</td>
-                        <td class="valor-columna">${item.valorDeclarado}</td>
-                        <td>${operadorLogistico}</td>
-                        <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
-                    </tr>`;
+                <td>${formattedDateTime}</td>
+                <td class="${estadoClass} ${entregaEntreClass}">${alertIcon} ${entregaEntreIcon} ${item.estado} ${tiempoTexto}</td>
+                <td>${item.cliente}</td>
+                <td class="remito-columna">${remito}</td>
+                <td class="valor-columna">${item.valorDeclarado}</td>
+                <td>${operadorLogistico}</td>
+                <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
+                <td><button class="btn btn-info btn-sm" onclick="abrirModalComentario('${remito}')"><i class="bi bi-pencil-fill"></i></button></td> <!-- Botón de comentario -->
+            </tr>`;
         tableBody.insertAdjacentHTML('beforeend', row);
     }
 
@@ -777,6 +778,48 @@ searchInput.addEventListener("input", function() {
     }
 });
 // FIN BUSCADOR
+
+// MODAL COMENTARIO
+function abrirModalComentario(remito) {
+    // Obtener el comentario de Firebase
+    db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remito).once('value', snapshot => {
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const data = childSnapshot.val();
+                document.getElementById('comentarioInput').value = data.comentario || ''; // Cargar comentario existente
+            });
+        }
+    });
+
+    // Mostrar el modal
+    $('#comentarioModal').modal('show');
+
+    // Manejar el clic en el botón para guardar el comentario
+    document.getElementById('guardarComentarioBtn').onclick = function() {
+        const comentario = document.getElementById('comentarioInput').value;
+
+        // Actualizar el comentario en Firebase
+        db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remito).once('value', snapshot => {
+            snapshot.forEach(childSnapshot => {
+                childSnapshot.ref.update({ comentario: comentario }).then(() => {
+                    Swal.fire('¡Éxito!', 'Comentario actualizado correctamente.', 'success');
+                    $('#comentarioModal').modal('hide'); // Cerrar modal
+                }).catch(error => {
+                    Swal.fire('Error', 'No se pudo actualizar el comentario: ' + error.message, 'error');
+                });
+            });
+        });
+    };
+}
+
+const comentarioInput = document.getElementById('comentarioInput');
+
+comentarioInput.addEventListener('input', () => {
+    comentarioInput.style.height = 'auto'; // Resetea la altura
+    comentarioInput.style.height = `${comentarioInput.scrollHeight}px`; // Ajusta a la altura del contenido
+});
+
+// FINMODAL COMENTARIO
 
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;
