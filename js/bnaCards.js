@@ -2010,8 +2010,8 @@ document.getElementById('btnFacturar').addEventListener('click', () => {
 
 // SWITCH BOTÓN
 document.getElementById('btnSwitch').addEventListener('click', () => {
-    const sinEntregarCards = allData.filter(item => item.marcaEntregado === 'No'); // Filtrar los que no están entregados
-    
+    const sinEntregarCards = allData.filter(item => item.marcaEntregado === 'No' || item.marcaEntregado === undefined);
+
     // Limpiar el contenedor de tarjetas
     const cardsContainer = document.getElementById('envios-cards');
     cardsContainer.innerHTML = '';
