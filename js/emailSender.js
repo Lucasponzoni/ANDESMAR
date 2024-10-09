@@ -20,7 +20,7 @@ async function sendEmail(Name, Subject, templateName, nombre, email, remito, lin
         return;
     }
 
-    // Generar el cuerpo del email usando la plantilla
+    // Generar el cuerpo del email usando la plantilla.
     const emailBody = templateFunc(Name, Subject, templateName, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio); 
 
     const emailData = {
