@@ -594,11 +594,11 @@ function renderCards(data) {
                             <div class="medidas"></div> <!-- Div para las medidas -->
 
                             <!-- Botón Logística Propia --> 
-                            <button class="mt-1 btn btn-secondary btnLogPropiaMeli"
+                            <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
                                 id="LogPropiaMeliButton${data[i].id}" 
                                 onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')">
                                 <span>
-                                    <i class="bi bi-file-text"></i> Etiqueta Novogar
+                                    ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<i class="bi bi-file-text"></i> Etiqueta Novogar`}
                                 </span>
                                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
                             </button>
