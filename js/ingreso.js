@@ -380,7 +380,7 @@ function renderCards(data) {
         } else {
             // Si el operador logístico es "Logística Novogar"
             if (item.operadorLogistico === "Logística Novogar") {
-                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><i class="bi bi-pin-map-fill"></i> Logistica Novogar</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><i class="bi bi-pin-map-fill"></i> Novogar</button>`;
             } else {
                 operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
             }
@@ -576,7 +576,7 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
         setTimeout(() => {
             spinner.style.display = "none";
             window.open(pdfUrl, '_blank');
-            button.innerHTML = '<i class="bi bi-pin-map-fill"></i> Logistica Novogar'; // Restaurar el texto del botón
+            button.innerHTML = '<i class="bi bi-pin-map-fill"></i> Novogar'; // Restaurar el texto del botón
             button.disabled = false; // Reactivar el botón
         }, 2000); // Retraso de 2000 ms (2 segundos)
 
@@ -584,7 +584,7 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
     }).catch(error => {
         spinner.style.display = "none";
         console.error("Error al generar el PDF:", error);
-        button.innerHTML = '<i class="bi bi-pin-map-fill"></i> Logistica Novogar'; // Restaurar el texto del botón en caso de error
+        button.innerHTML = '<i class="bi bi-pin-map-fill"></i> Novogar'; // Restaurar el texto del botón en caso de error
         button.disabled = false; // Reactivar el botón
     });
 }
