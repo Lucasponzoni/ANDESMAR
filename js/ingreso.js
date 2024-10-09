@@ -542,13 +542,13 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
                 <span>Telefono: </span>
             </div>
             <div class="campo-extra">
-                <p>Firma: ________________________</p>
+                <p><strong>Firma:</strong> ________________________</p>
             </div>
             <div class="campo-extra">
-                <p>Aclaración: ________________________</p>
+                <p><strong>Aclaración:</strong> ________________________</p>
             </div>
             <div class="campo-extra">
-                <p>DNI: ________________________</p>
+                <p><strong>DNI:</strong> ________________________</p>
             </div>
             <div class="contacto">
                 <p>Ante cualquier inconveniente, contáctese con posventa:</p>

@@ -2227,13 +2227,13 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
                 <span>Teléfono: ${telefono}</span>
             </div>
             <div class="campo-extra">
-                <p>Firma: ________________________</p>
+                <p><strong>Firma:</strong>  ________________________</p>
             </div>
             <div class="campo-extra">
-                <p>Aclaración: ________________________</p>
+                <p><strong>Aclaración:</strong>  ________________________</p>
             </div>
             <div class="campo-extra">
-                <p>DNI: ________________________</p>
+                <p><strong>DNI:</strong>  ________________________</p>
             </div>
             <div class="contacto">
                 <p>Ante cualquier inconveniente, contáctese con posventa:</p>
