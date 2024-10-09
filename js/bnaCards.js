@@ -598,7 +598,7 @@ function renderCards(data) {
                                 id="LogPropiaMeliButton${data[i].id}" 
                                 onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].producto_nombre}')">
                                 <span>
-                                    <i class="bi bi-file-text"></i> Descargar Etiqueta Novogar
+                                    <i class="bi bi-file-text"></i> Etiqueta Novogar
                                 </span>
                                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
                             </button>
@@ -2288,7 +2288,7 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
             // Ocultar el spinner y restaurar el botón
             spinner.style.display = "none";
             window.open(pdfUrl, '_blank');
-            button.innerHTML = '<i class="bi bi-file-text"></i> Descargar Etiqueta Novogar';
+            button.innerHTML = '<i class="bi bi-file-text"></i> Etiqueta Novogar';
             button.disabled = false;
         }, 2000);
 
