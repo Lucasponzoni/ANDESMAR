@@ -8,6 +8,7 @@ async function sendEmail(Name, Subject, templateName, nombre, email, remito, lin
     const templates = {
         "emailTemplateAndesmar": emailTemplateAndesmar,
         "emailTemplateAndreani": emailTemplateAndreani,
+        "emailTemplateLogPropia": emailTemplateLogPropia,
     };
 
     // Obtener la función de plantilla basada en el nombre

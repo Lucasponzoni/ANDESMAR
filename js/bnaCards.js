@@ -1389,7 +1389,7 @@ for (let i = 0; i < cantidadBultos; i++) {
             const transporte = "Correo Andreani";
             const linkSeguimiento2 = `https://andreani.com/#!/informacionEnvio/${numeroDeEnvio}`;
             const linkSeguimiento = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
-
+            
             // Configurar el botón de descarga inicial  
             buttonAndr.disabled = true;
             textAndr.innerHTML = `Orden ${numeroDeEnvio}`;
@@ -2097,6 +2097,10 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
     let spinner = document.getElementById(`spinnerLogPropia${id}`);
 
     let spinner2 = document.getElementById("spinner2");
+
+    const Name = `Confirmación de Envio BNA`;
+    const Subject = `Tu compra BNA+ ${remito} ya fue preparada para despacho`;
+    const template = "emailTemplateLogPropia";
     
     // Mostrar spinner y cambiar texto del botón
     spinner.style.display = "inline-block"; // Usar inline-block en lugar de flex para el spinner
@@ -2290,6 +2294,8 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
 
         document.body.removeChild(tempDiv);
     });
+
+    await sendEmail(Name, Subject, template, nombre, email, remito,);
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
 
