@@ -304,7 +304,7 @@ function renderCards(data) {
             mensajeFactura = "Seguro para facturar";
         } else {
             const tiempoRestante = fechaLimite - fechaActual;
-            const horasRestantes = Math.floor((tiempoRestante / (1000 * 60 * 60)) % 24);
+            const horasRestantes = Math.floor((tiempoRestante / (1000 * 60 * 60)) % 48);
             const minutosRestantes = Math.floor((tiempoRestante / (1000 * 60)) % 60);
             mensajeFactura = `Falta ${horasRestantes} horas y ${minutosRestantes} minutos`;
         }
