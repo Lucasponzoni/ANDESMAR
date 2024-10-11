@@ -2643,3 +2643,11 @@ div.card-body > p > i{
 .icon-state-ios{
     font-size: large;
 }
+
+#data-table th:nth-child(5),
+#data-table td:nth-child(5) { 
+    max-width: 130px; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    white-space: nowrap;
+}
