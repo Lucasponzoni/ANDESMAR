@@ -1106,7 +1106,6 @@ p.card-text{
 
 .cpLocalidad-meli {
     padding: 6px 12px !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     font-size: 0.85rem;
     font-weight: 600 !important;
     width: fit-content;
@@ -1118,6 +1117,18 @@ p.card-text{
     overflow: hidden;
     text-wrap: nowrap;
     text-overflow: ellipsis;
+}
+
+.correo-meli{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px !important;
+    font-size: 0.85rem;
+    width: fit-content;
+    border-radius: 25px;
+    margin-bottom: 8px !important;
+    overflow: hidden;
 }
 
 .correo-andesmar {

@@ -101,8 +101,14 @@ function crearCard(data) {
                 <h6 class="user-title-meli">${data.nombreDeUsuario}</h6>
                 <div class="meli-box1"> 
                     <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> ${data.Cp}, ${data.localidad}, ${data.Provincia}</p>
-                    <p class="card-text cpLocalidad-meli ${data.Correosugerido === 'Andesmar' ? 'correo-andesmar' : data.Correosugerido === 'Andreani' ? 'correo-andreani' : ''}">${data.Correosugerido}</p>     
-                </div>
+
+                    <p class="card-text correo-meli ${data.Correosugerido === 'Andesmar' ? 'correo-andesmar' : data.Correosugerido === 'Andreani' ? 'correo-andreani' : ''}">
+    ${data.Correosugerido === 'Andesmar' ? '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
+      data.Correosugerido === 'Andreani' ? '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">' : 
+      data.Correosugerido}
+</p>
+
+                    </div>
                 <div class="d-flex align-items-center">
                     <p class="remitoCardMeli card-text mb-0">${data.idOperacion}</p>
                     <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
