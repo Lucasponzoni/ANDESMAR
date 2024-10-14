@@ -480,19 +480,29 @@ function renderCards(data) {
                                     
 
                                 <p class="card-text-pago">
-                                    <strong>Precio de Venta:</strong> $ ${data[i].precio_venta}
-                                    <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta}')">
-                                        <i class="bi bi-clipboard"></i>
-                                    </button>
-                                </p>
+                           <strong>Precio de Venta:</strong> $ ${(data[i].precio_venta * data[i].cantidad).toFixed(2)}
+                           <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].precio_venta * data[i].cantidad).toFixed(2)}')">
+                                                      <i class="bi bi-clipboard"></i>
+                           </button>
+                               </p>
 
-                                <p class="card-text-pago">
-                                    <strong>Costo de Envío:</strong> $ ${(data[i].suborden_total - data[i].precio_venta)}
-                                    <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].suborden_total - data[i].precio_venta)}')">
-                                        <i class="bi bi-clipboard"></i>
-                                    </button>
-                                </p>
+                       <p class="card-text-pago">
+                           <strong>Cantidad:</strong> ${data[i].cantidad} Unidades
+                       </p>
+                       
+                       <p class="card-text-pago">
+                           <strong>Valor por producto:</strong> $ ${data[i].precio_venta}
+                           <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta}')">
+                               <i class="bi bi-clipboard"></i>
+                           </button>
+                       </p>
 
+                       <p class="card-text-pago">
+                           <strong>Costo de Envío:</strong> $ ${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad))}
+                           <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad)).toFixed(2)}')">
+                               <i class="bi bi-clipboard"></i>
+                           </button>
+                       </p>
 
                                     <p class="card-text-pago"><strong>Total:</strong> $ ${data[i].suborden_total}</p>
 
