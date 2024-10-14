@@ -504,7 +504,9 @@ function renderCards(data) {
                            </button>
                        </p>
 
-                                    <p class="card-text-pago"><strong>Total:</strong> $ ${data[i].suborden_total}</p>
+                    <p class="card-text-pago">
+                    <strong>Total:</strong> $ ${new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(data[i].suborden_total)}
+                    </p>
 
                             <!-- Contenedor gris con CUPON y AUTORIZACION -->
                             <div class="bg-light p-3 mb-2 rounded" style="border: solid 1px #dc3545;">
