@@ -1229,6 +1229,19 @@ p.card-text:nth-child(9){
     font-family: "Reddit Sans Condensed", sans-serif;
 }
 
+.strong-costo{
+    font-weight: 900;
+    color: green;
+    border: dashed 1px green;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.strong-costo2{
+    font-weight: 900;
+    color: green;
+}
+
 .pago p:nth-child(7){
     color: white;
     font-weight: 800;

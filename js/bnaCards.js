@@ -487,18 +487,18 @@ function renderCards(data) {
                                </p>
 
                        <p class="card-text-pago">
-                           <strong>Cantidad:</strong> ${data[i].cantidad} Unidades
+                           <strong>Cantidad:</strong> <strong class="strong-costo2">${data[i].cantidad} Unidades</strong>
                        </p>
                        
                        <p class="card-text-pago">
-                           <strong>Valor por producto:</strong> $ ${data[i].precio_venta}
+                           <strong>Valor por producto:</strong> <strong class="strong-costo">$ ${data[i].precio_venta}</strong>
                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta}')">
                                <i class="bi bi-clipboard"></i>
                            </button>
                        </p>
 
                        <p class="card-text-pago">
-                           <strong>Costo de Envío:</strong> $ ${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad))}
+                           <strong>Costo de Envío:</strong> <strong class="strong-costo">$ ${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad))}</strong>
                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad)).toFixed(2)}')">
                                <i class="bi bi-clipboard"></i>
                            </button>
