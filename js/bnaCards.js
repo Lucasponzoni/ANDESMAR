@@ -487,7 +487,7 @@ function renderCards(data) {
                                </p>
 
                        <p class="card-text-pago">
-                           <strong>Cantidad:</strong> <strong class="strong-costo2">${data[i].cantidad} Unidades</strong>
+                           <strong>Cantidad:</strong> <strong class="strong-costo2">${data[i].cantidad} U.</strong>
                        </p>
                        
                        <p class="card-text-pago">
