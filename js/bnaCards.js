@@ -235,6 +235,7 @@ function loadEnviosFromFirebase() {
                 razon_social: capitalizeWords(data.razon_social),
                 cuit: (data.cuit),
                 marcaEntregado: (data.marcaEntregado),
+                marcaPreparado: (data.marcaPreparado),
                 direccion_facturacion: capitalizeWords(data.direccion_facturacion),
                 ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
                 codigo_postal_facturacion: (data.codigo_postal_facturacion),
@@ -380,10 +381,22 @@ function renderCards(data) {
                                     <i class="bi bi-bag-check"></i>
                                 </button>
                                 
-                                <div class="form-check form-switch ms-2 text-center"> <!-- Añadir texto centrado -->
-                                    <input class="form-check-input" type="checkbox" id="entregado-${data[i].id}" ${data[i].marcaEntregado === 'Si' ? 'checked' : ''}>
-                                    <label class="form-check-label" for="entregado-${data[i].id}">Entregado</label>
-                                </div>
+                            <div class="d-flex flex-column ms-2 text-center"> <!-- Contenedor para apilar los switches -->
+    
+                            <div class="form-check form-switch"> 
+                            <input class="form-check-input" type="checkbox" id="preparacion-${data[i].id}" ${data[i].marcaPreparado === 'Si' ? 'checked' : ''}>
+                            <label class="form-check-label" for="preparacion-${data[i].id}"><strong>1-</strong> Preparación</label>
+                            </div>
+
+                            <div class="form-check form-switch"> 
+                            <input class="form-check-input" type="checkbox" id="entregado-${data[i].id}-1" ${data[i].marcaEntregado === 'Si' ? 'checked' : ''}>
+                            <label class="form-check-label" for="entregado-${data[i].id}-1"><strong>2-</strong> Entregado</label>
+        
+                            </div>
+
+</div>
+
+
                             </div>
 
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
@@ -642,21 +655,55 @@ function renderCards(data) {
                     </div>
                 `;
 
-                // Evento para manejar el cambio del switch
-                document.getElementById(`entregado-${data[i].id}`).addEventListener('change', function() {
-                const nuevoEstado = this.checked ? 'Si' : 'No';
+// Evento para manejar el cambio del switch "Entregado"
+document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function() {
+    const nuevoEstado = this.checked ? 'Si' : 'No';
 
-                // Actualizar en Firebase
-                firebase.database().ref('enviosBNA/' + data[i].id).update({
-                marcaEntregado: nuevoEstado
-                }).then(() => {
-                console.log(`Estado de entrega actualizado a: ${nuevoEstado}`);
-                }).catch(error => {
-                console.error("Error al actualizar el estado de entrega: ", error);
-                });
-                });
+    // Actualizar en Firebase
+    firebase.database().ref('enviosBNA/' + data[i].id).update({
+        marcaEntregado: nuevoEstado
+    }).then(() => {
+        console.log(`Estado de entrega actualizado a: ${nuevoEstado}`);
+    }).catch(error => {
+        console.error("Error al actualizar el estado de entrega: ", error);
+    });
+});
 
+// Evento para manejar el cambio del switch "Preparación"
+document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', function() {
+    const nuevoEstado = this.checked ? 'Si' : 'No';
 
+    // Mostrar el cuadro de diálogo para la contraseña
+    Swal.fire({
+        title: 'Clave de Preparación 🔒',
+        input: 'password',
+        inputLabel: 'Contraseña de facturación (Solicítela a Mauri Villan)',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) {
+                return '¡Necesitas ingresar una contraseña!';
+            } else if (value !== '6572') {
+                return 'Contraseña incorrecta.';
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Si la contraseña es correcta, actualizar en Firebase
+            firebase.database().ref('enviosBNA/' + data[i].id).update({
+                marcaPreparado: nuevoEstado
+            }).then(() => {
+                console.log(`Estado de preparación actualizado a: ${nuevoEstado}`);
+            }).catch(error => {
+                console.error("Error al actualizar el estado de preparación: ", error);
+            });
+        } else {
+            // Revertir el estado del switch si se cancela o la contraseña es incorrecta
+            this.checked = !this.checked;
+        }
+    });
+});
                 document.getElementById(`edit-localidad-${data[i].id}`).addEventListener('click', function() {
                     const editDiv = document.getElementById(`edit-input-${data[i].id}`);
                     editDiv.style.display = editDiv.style.display === 'none' ? 'block' : 'none';
@@ -2031,9 +2078,11 @@ document.getElementById('btnFacturar').addEventListener('click', () => {
 
 // FIN FACTURAR BOTON
 
-// SWITCH BOTÓN
+// SWITCH BOTÓN 2
 document.getElementById('btnSwitch').addEventListener('click', () => {
-    const sinEntregarCards = allData.filter(item => item.marcaEntregado === 'No' || item.marcaEntregado === undefined);
+    const sinEntregarCards = allData
+        .filter(item => item.marcaEntregado === 'No' || item.marcaEntregado === undefined)
+        .reverse(); // Invertir el orden de los elementos filtrados
 
     // Limpiar el contenedor de tarjetas
     const cardsContainer = document.getElementById('envios-cards');
@@ -2041,6 +2090,26 @@ document.getElementById('btnSwitch').addEventListener('click', () => {
 
     // Renderizar solo las tarjetas sin entregar
     renderCards(sinEntregarCards);
+
+    // Crear botón de volver
+    createBackButton(() => {
+        renderCards(allData); // Regresar a todas las tarjetas
+    });
+});
+// FIN SWITCH BOTÓN 2
+
+// SWITCH BOTÓN 1
+document.getElementById('btnSwitch1').addEventListener('click', () => {
+    const sinPrepararCards = allData
+        .filter(item => item.marcaPreparado === 'No' || item.marcaPreparado === undefined)
+        .reverse(); // Invertir el orden de los elementos filtrados
+
+    // Limpiar el contenedor de tarjetas
+    const cardsContainer = document.getElementById('envios-cards');
+    cardsContainer.innerHTML = '';
+
+    // Renderizar solo las tarjetas sin entregar
+    renderCards(sinPrepararCards);
 
     // Crear botón de volver
     createBackButton(() => {
