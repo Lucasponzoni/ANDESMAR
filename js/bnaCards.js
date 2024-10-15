@@ -663,6 +663,7 @@ function renderCards(data) {
                     </div>
                 `;
 
+                // Elimina Comillas en el nombre de los productos
                 function cleanString(value) {
                     return value.replace(/["']/g, "");
                 }
