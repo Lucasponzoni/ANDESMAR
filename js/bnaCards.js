@@ -329,6 +329,11 @@ function renderCards(data) {
         card.innerHTML = `
                     <div class="card">
                         <div class="card-body">
+
+                           <div class="em-circle-state5">
+                            ${data[i].cuotas === "30" ? 'bnapromo2' : data[i].cuotas === "12" ? 'bnapromo1' : '*'}
+                            </div>
+
                             <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
                             ${(isAndreani || isAndesmar || isLogPropia) ? 'Preparado' : 'Pendiente'}
                             </div>
@@ -655,6 +660,7 @@ function renderCards(data) {
                     </div>
                 `;
 
+                console.log("Cuotas para el índice " + i + ": " + data[i].cuotas);
 // Evento para manejar el cambio del switch "Entregado"
 document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function() {
     const nuevoEstado = this.checked ? 'Si' : 'No';

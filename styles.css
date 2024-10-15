@@ -1759,6 +1759,25 @@ div.card-body > p > i{
     height: 30px;
 }
 
+.em-circle-state5{
+    font-weight: 900;
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: .8rem;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -15px; 
+    right: 182px;
+    background-color: cornflowerblue;
+    text-transform: uppercase;
+    color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    height: 30px;
+}
+
 .em-state-andesmar{
     font-family: "Reddit Sans Condensed", sans-serif;
     font-size: 1rem;
