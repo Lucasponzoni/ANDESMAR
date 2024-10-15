@@ -390,16 +390,16 @@ function renderCards(data) {
     
                             <div class="form-check form-switch"> 
                             <input class="form-check-input" type="checkbox" id="preparacion-${data[i].id}" ${data[i].marcaPreparado === 'Si' ? 'checked' : ''}>
-                            <label class="form-check-label" for="preparacion-${data[i].id}"><strong>1-</strong> Preparación</label>
+                            <label class="form-check-label" for="preparacion-${data[i].id}"><strong>1</strong> Preparación</label>
                             </div>
 
                             <div class="form-check form-switch"> 
                             <input class="form-check-input" type="checkbox" id="entregado-${data[i].id}-1" ${data[i].marcaEntregado === 'Si' ? 'checked' : ''}>
-                            <label class="form-check-label" for="entregado-${data[i].id}-1"><strong>2-</strong> Entregado</label>
+                            <label class="form-check-label" for="entregado-${data[i].id}-1"><strong>2</strong> Entregado</label>
         
                             </div>
 
-</div>
+                            </div>
 
 
                             </div>
