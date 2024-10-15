@@ -1768,7 +1768,7 @@ div.card-body > p > i{
     border-radius: 10px;
     position: absolute;
     top: -15px; 
-    right: 182px;
+    left: 10px;
     background-color: cornflowerblue;
     text-transform: uppercase;
     color: white;

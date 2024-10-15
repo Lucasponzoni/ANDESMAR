@@ -15,7 +15,7 @@ const database = firebase.database();
 
 let allData = [];
 let currentPage = 1;
-let itemsPerPage = 12; // Número de elementos por página
+let itemsPerPage = 27; // Número de elementos por página
 let currentPageGroup = 0;
 const paginationContainer = document.getElementById('pagination');
 const searchInput = document.getElementById("searchBna");
@@ -331,7 +331,7 @@ function renderCards(data) {
                         <div class="card-body">
 
                            <div class="em-circle-state5">
-                            ${data[i].cuotas === "30" ? 'bnapromo2' : data[i].cuotas === "12" ? 'bnapromo1' : '*'}
+                            ${data[i].cuotas === "30" ? '⚠️ bnapromo2' : data[i].cuotas === "12" || "6"|| "1" ? '⚠️ bnapromo' : '*'}
                             </div>
 
                             <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
@@ -2067,22 +2067,26 @@ document.getElementById('btnPreparar').addEventListener('click', () => {
 
 // SIN FACTURAR BOTON
 document.getElementById('btnFacturar').addEventListener('click', () => {
-    const sinFacturarCards = allData.filter(item => !item.datoFacturacion);
+    const sinFacturarCards = allData.filter(item => !item.datoFacturacion).reverse(); // Invertir el orden de los elementos filtrados
     
     // Limpiar el contenedor de tarjetas
     const cardsContainer = document.getElementById('envios-cards');
     cardsContainer.innerHTML = '';
+    
+    // Ocultar la paginación
+    paginationContainer.style.display = 'none';
 
-    // Renderizar solo las tarjetas sin preparar
+    // Renderizar solo las tarjetas sin facturar
     renderCards(sinFacturarCards);
 
     // Crear botón de volver
     createBackButton(() => {
+        // Mostrar la paginación nuevamente
+        paginationContainer.style.display = 'block';
         renderCards(allData); // Regresar a todas las tarjetas
     });
 });
-
-// FIN FACTURAR BOTON
+// FIN SIN FACTURAR BOTON
 
 // SWITCH BOTÓN 2
 document.getElementById('btnSwitch').addEventListener('click', () => {
@@ -2093,6 +2097,9 @@ document.getElementById('btnSwitch').addEventListener('click', () => {
     // Limpiar el contenedor de tarjetas
     const cardsContainer = document.getElementById('envios-cards');
     cardsContainer.innerHTML = '';
+
+    // Ocultar la paginación
+    paginationContainer.style.display = 'none';
 
     // Renderizar solo las tarjetas sin entregar
     renderCards(sinEntregarCards);
@@ -2114,6 +2121,9 @@ document.getElementById('btnSwitch1').addEventListener('click', () => {
     const cardsContainer = document.getElementById('envios-cards');
     cardsContainer.innerHTML = '';
 
+    // Ocultar la paginación
+    paginationContainer.style.display = 'none';
+
     // Renderizar solo las tarjetas sin entregar
     renderCards(sinPrepararCards);
 
@@ -2125,7 +2135,7 @@ document.getElementById('btnSwitch1').addEventListener('click', () => {
 // FIN SWITCH BOTÓN
 
 // VOLVER ATRAS
-function createBackButton(onBack) {
+function createBackButton() {
     // Verificar si ya existe el botón de volver
     if (document.getElementById('btnVolver')) return;
 
@@ -2137,15 +2147,14 @@ function createBackButton(onBack) {
 
     // Agregar evento al botón de volver
     backButton.addEventListener('click', () => {
-        onBack(); // Llamar a la función pasada
-        backButton.remove(); // Eliminar el botón de volver
+        location.reload(); // Recargar la página al hacer clic
     });
 
     // Agregar el botón al principio del contenedor de botones
     const container = document.querySelector('.trio-de-botones');
     container.insertBefore(backButton, container.firstChild);
 }
-// FINVOLVER ATRAS
+// FIN VOLVER ATRAS
 
 // BUSCADOR
 searchInput.addEventListener("input", function() {
