@@ -2048,7 +2048,7 @@ function updatePagination(totalItems) {
 
 // SIN PREPARAR BOTON
 document.getElementById('btnPreparar').addEventListener('click', () => {
-    const sinPrepararCards = allData.filter(item => !item.tipoElectrodomesticoBna);
+    const sinPrepararCards = allData.filter(item => !item.tipoElectrodomesticoBna).reverse();
     
     // Limpiar el contenedor de tarjetas
     const cardsContainer = document.getElementById('envios-cards');
