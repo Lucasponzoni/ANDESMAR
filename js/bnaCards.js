@@ -796,7 +796,7 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
         const copyButton = card.querySelector('.copy-btn');
         copyButton.addEventListener('click', () => {
             navigator.clipboard.writeText(data[i].remito).then(() => {
-                copyButton.innerHTML = 'Copiado';
+                copyButton.innerHTML = '<i class="bi bi-clipboard-check-fill"></i>';
                 setTimeout(() => {
                     copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
                 }, 2000);
