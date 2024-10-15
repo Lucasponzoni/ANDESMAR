@@ -378,14 +378,17 @@ function renderCards(data) {
                 </div>
 
                             <div class="d-flex align-items-center contenedorRemito">
-                                <p class="orden">${data[i].remito}</p>
+
+                            <p class="orden">${data[i].remito}</p>
+                            <div class="button-container d-block mt-2">
                                 <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                                 <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2" onclick="window.open('https://api.avenida.com/manage/shops/2941/orders/${data[i].orden_publica_}', '_blank');">
                                     <i class="bi bi-bag-check"></i>
                                 </button>
-                                
+                            </div>
+
                             <div class="d-flex flex-column ms-2 text-center"> <!-- Contenedor para apilar los switches -->
     
                             <div class="form-check form-switch"> 
