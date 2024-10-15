@@ -663,7 +663,6 @@ function renderCards(data) {
                     </div>
                 `;
 
-                console.log("Cuotas para el índice " + i + ": " + data[i].cuotas);
 // Evento para manejar el cambio del switch "Entregado"
 document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function() {
     const nuevoEstado = this.checked ? 'Si' : 'No';
@@ -1617,7 +1616,7 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
             valor = 1500000; // Medidas de la unidad exterior
             altoInterior = 158; anchoInterior = 68; largoInterior = 35;
             break;
-            case "heladera":
+        case "heladera":
             alto = 165; 
             ancho = 60; 
             largo = 60; 
