@@ -1769,7 +1769,7 @@ div.card-body > p > i{
     position: absolute;
     top: -15px; 
     left: 10px;
-    background-color: cornflowerblue;
+    background-color: blueviolet;
     text-transform: uppercase;
     color: white;
     display: flex; 
