@@ -948,6 +948,8 @@ function marcarFacturado(id) {
                 Swal.fire('Error al guardar datos', '', 'error');
             });
         }
+
+        location.reload();
     });
 }
 
