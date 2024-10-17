@@ -1780,7 +1780,7 @@ div.card-body > p > i{
 
 .facturable {
     background-color: red;
-    animation: pulse 2s infinite;
+    animation: pulse 3s infinite;
     position: relative;
 }
 
@@ -1801,8 +1801,8 @@ div.card-body > p > i{
         opacity: 1;
     }
     50% {
-        transform: scale(1.02);
-        opacity: 0.9;
+        transform: scale(1.005);
+        opacity: 0.95;
     }
 }
 
