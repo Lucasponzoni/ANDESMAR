@@ -951,7 +951,7 @@ function marcarFacturado(id) {
 
         setTimeout(() => {
             location.reload();
-        }, 2000);
+        }, 4000);
     });
 }
 
