@@ -310,6 +310,8 @@ function renderCards(data) {
             mensajeFactura = `Falta ${horasRestantes} horas y ${minutosRestantes} minutos`;
         }
 
+        const isParaFacturar =  mensajeFactura === "Seguro para facturar"
+
         // Determinar el tipo de factura
         const cuit = data[i].cuit;
         const tipoFactura = (cuit.length === 7 || cuit.length === 8) ? 'FACTURA B' : 'FACTURA A';
@@ -417,7 +419,9 @@ function renderCards(data) {
                                 'Número de Envío Pendiente'))}
                             </p>
 
-                            <div class="factura-status em-circle-state-time" id="factura-status-${data[i].id}">${mensajeFactura}</div>
+                            <div class="factura-status em-circle-state-time ${isParaFacturar ? 'facturable' : ''}" id="factura-status-${data[i].id}">
+                                ${mensajeFactura}
+                            </div>
 
                             <!-- Botón para mostrar/ocultar el detalle del producto -->
                             <button class="btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleProducto-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleProducto-${data[i].id}">

@@ -1778,6 +1778,34 @@ div.card-body > p > i{
     height: 30px;
 }
 
+.facturable {
+    background-color: red;
+    animation: pulse 2s infinite;
+    position: relative;
+}
+
+.facturable::before {
+    content: "\F101"; 
+    font-family: 'Font Awesome 5 Free'; 
+    position: absolute;
+    left: 10px; 
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    color: white;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.02);
+        opacity: 0.9;
+    }
+}
+
 .em-state-andesmar{
     font-family: "Reddit Sans Condensed", sans-serif;
     font-size: 1rem;
