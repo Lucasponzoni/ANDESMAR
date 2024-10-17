@@ -789,6 +789,7 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
                 if (hasDatoFacturacion) {
                     facturaStatusDiv.innerHTML = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado'; 
                     facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+                    facturaStatusDiv.classList.remove('facturable'); 
                     facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
                 } else {
                     facturaStatusDiv.textContent = mensajeFactura;
