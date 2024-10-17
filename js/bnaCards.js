@@ -242,7 +242,7 @@ function loadEnviosFromFirebase() {
             });
 
             // Incrementar el contador si tipoElectrodomesticoBna está vacío
-            if (!data.tipoElectrodomesticoBna) {
+            if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
                 sinPrepararCount++;
             }
 
@@ -2055,7 +2055,9 @@ function updatePagination(totalItems) {
 
 // SIN PREPARAR BOTON
 document.getElementById('btnPreparar').addEventListener('click', () => {
-    const sinPrepararCards = allData.filter(item => !item.tipoElectrodomesticoBna).reverse();
+    const sinPrepararCards = allData.filter(item => 
+        !item.tipoElectrodomesticoBna && item.datoFacturacion
+    ).reverse();
     
     // Limpiar el contenedor de tarjetas
     const cardsContainer = document.getElementById('envios-cards');
@@ -2069,7 +2071,6 @@ document.getElementById('btnPreparar').addEventListener('click', () => {
         renderCards(allData); // Regresar a todas las tarjetas
     });
 });
-
 // FIN SIN PREPARAR BOTON
 
 // SIN FACTURAR BOTON
