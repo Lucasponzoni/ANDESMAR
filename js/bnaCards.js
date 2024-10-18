@@ -48,7 +48,7 @@ function verificarRemitosDuplicados() {
                         databaseRef.child(childSnapshot.key).update({ carritoCompra2: true });
                     }
                 });
-                console.log(`El remito ${remito} está duplicado ${remitoCount[remito]} veces.`);
+                console.log(`La Orden ${remito} está duplicada ${remitoCount[remito]} veces.`);
             }
         });
     });
