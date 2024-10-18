@@ -168,6 +168,9 @@ function crearCard(data) {
                 </div>
 
                 ${carouselHTML}
+                <div class="macos-style">
+                Producto: X ${data.Cantidad} ${data.SKU}
+                </div>
                 
                 <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails${data.id}" aria-expanded="false" aria-controls="collapseDetails${data.id}">
                     <i class="bi bi-chevron-down"></i> Ver más detalles
