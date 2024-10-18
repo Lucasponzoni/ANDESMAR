@@ -46,13 +46,13 @@ function cargarDatos() {
                     Producto: data.Producto,
                     Provincia: data.Provincia,
                     Recibe: data.Recibe,
-                    SKU: data.Sku,
+                    SKU: data.SKU,
                     Telefono: data.Telefono,
                     VolumenCM3: data.VolumenCM3,
                     VolumenM3: data.VolumenM3,
                     idOperacion: data.idOperacion,
                     localidad: data.localidad,
-                    medidas: data.Medidas,
+                    medidas: data.medidas,
                     nombreDeUsuario: data.nombreDeUsuario
                 });
             });
