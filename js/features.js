@@ -147,6 +147,8 @@ const scrollToTopButton = document.getElementById("scrollToTop");
                     text: 'Los datos han sido actualizados correctamente.',
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    location.reload();
                 });
             })
             .catch((error) => {

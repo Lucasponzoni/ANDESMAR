@@ -2365,6 +2365,8 @@ div.card-body > p > i{
     opacity: 0; 
 }
 
+
+
 .alert.show {
     display: block; 
     transform: translateY(0); 
@@ -2746,6 +2748,22 @@ div.card-body > p > i{
     font-size: 1.5em;
     color: #c62828; 
 }
+
+/* Estilos del carrusel */
+.carousel {
+    border: solid 1px cornflowerblue;
+    background-color: #f8f8f8; 
+    border-radius: 10px; 
+    margin-bottom: 5px; 
+    overflow: hidden;
+}
+
+.carousel-control-next, .carousel-control-prev{
+    color: cornflowerblue !important;
+    background-color: cornflowerblue;
+}
+
+
 
 
 

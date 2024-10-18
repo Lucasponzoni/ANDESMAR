@@ -46,6 +46,7 @@ function cargarDatos() {
                     Producto: data.Producto,
                     Provincia: data.Provincia,
                     Recibe: data.Recibe,
+                    pictures: data.pictures,
                     SKU: data.SKU,
                     Telefono: data.Telefono,
                     VolumenCM3: data.VolumenCM3,
@@ -53,6 +54,7 @@ function cargarDatos() {
                     idOperacion: data.idOperacion,
                     localidad: data.localidad,
                     medidas: data.medidas,
+                    shippingMode: data.shippingMode,
                     nombreDeUsuario: data.nombreDeUsuario
                 });
             });
@@ -92,9 +94,43 @@ function crearCard(data) {
     const cardDiv = document.createElement('div');
     cardDiv.className = 'col-md-4';
 
+    // Verificar si data.pictures existe y es un array
+    const filteredPictures = Array.isArray(data.pictures) ? 
+        data.pictures.filter(picture => 
+            picture.secure_url // Retener imágenes que tengan secure_url
+        ) : [];
+
+    // Crear el carrusel
+    const carouselId = `carousel-${data.id}`;
+    let carouselItems = '';
+
+    filteredPictures.forEach((picture, index) => {
+        carouselItems += `
+            <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                <img src="${picture.secure_url}" class="d-block mx-auto" alt="Imagen ${index + 1}" style="height: 150px; width: auto; max-width: 100%; object-fit: cover;">
+            </div>
+        `;
+    });
+
+    const carouselHTML = `
+        <div id="${carouselId}" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner" style="max-height: 150px; overflow: hidden;">
+                ${carouselItems}
+            </div>
+            <a class="carousel-control-prev" href="#${carouselId}" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Anterior</span>
+            </a>
+            <a class="carousel-control-next" href="#${carouselId}" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Siguiente</span>
+            </a>
+        </div>
+    `;
+
     cardDiv.innerHTML = `
         <div class="card position-relative">
-            <div class="em-circle-isFraud">Fraude</div>
+            <div class="em-circle-isNotFraud">Seguro</div>
             <div id="estadoEnvio${data.id}" class="em-circle-state">Envio pendiente</div>
             <div class="card-body-meli">
                 <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> ${data.NombreyApellido}</h5>
@@ -109,12 +145,15 @@ function crearCard(data) {
 </p>
 
                     </div>
+
                 <div class="d-flex align-items-center">
                     <p class="remitoCardMeli card-text mb-0">${data.idOperacion}</p>
-                    <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
-                        <i class="bi bi-clipboard ios-icon"></i>
+                    <button class="btn btn-link copy-btn p-1 m-0" style="display: inline-flex; align-items: center;">
+                    <i class="bi bi-clipboard ios-icon" style="margin: 0;"></i>
                     </button>
                 </div>
+
+                ${carouselHTML}
                 
                 <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails${data.id}" aria-expanded="false" aria-controls="collapseDetails${data.id}">
                     <i class="bi bi-chevron-down"></i> Ver más detalles
@@ -138,20 +177,25 @@ function crearCard(data) {
                         <p><i class="fas fa-home ios-icon"></i> Calle: <span id="calle-${data.id}">${data.Calle}</span></p>
                         <p><i class="bi bi-123 ios-icon"></i> Altura: <span id="altura-${data.id}">${data.Altura}</span></p>
                         <p><i class="fas fa-phone ios-icon"></i> Telefono: <span id="telefono-${data.id}">${data.Telefono}</span></p>
-                        <p><i class="bi bi-envelope-at-fill ios-icon"></i> Email: <span id="email-${data.id}">${data.Email}</span></p>
+                        <p><i class="bi bi-envelope-at-fill ios-icon"></i> Email: <span id="email-${data.id}" style="text-transform: lowercase;">${data.Email !== undefined ? data.Email : 'webnovogar@gmail.com'}</span></p>
                         <p><i class="bi bi-info-circle-fill ios-icon"></i> Autorizado: <span id="autorizado-${data.id}">${data.Recibe}</span></p>
                         <p><i class="bi bi-sticky-fill ios-icon"></i> Observaciones: <span id="observaciones-${data.id}">${data.Observaciones}</span></p>
                     </div>
                     <div class="dimensions-info">
-                        <h6>Dimensiones</h6>
-                        <div><i class="bi bi-bag-fill"></i> Producto: <span id="producto-${data.id}">${data.Producto}</span></div>
-                        <div><i class="bi bi-code-square"></i> SKU: <span id="sku-${data.id}">${data.SKU}</span></div>
-                        <div><i class="bi bi-arrows-angle-expand"></i> Medidas: <span id="medidas-${data.id}">${data.medidas}</span></div>
-                        <div><i class="bi bi-box-arrow-in-down"></i> Peso: <span id="peso-${data.id}">${data.Peso}</span> kg</div>
-                        <div><i class="bi bi-box"></i> Volumen M³: <span id="volumenM3-${data.id}">${data.VolumenM3}</span> m³</div>
-                        <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.id}">${data.VolumenCM3}</span> cm³</div>
-                        <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.id}">${data.Cantidad}</span></div>
+                    <h6>Dimensiones</h6>
+                    <div style="border-top: 1px solid #ccc; padding-top: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px;">
+                        <i class="bi bi-bag-fill"></i> 
+                        <strong style="color: #007bff;">Producto:</strong> 
+                        <span id="producto-${data.id}">${data.Producto}</span>
                     </div>
+                    <div><i class="bi bi-code-square"></i> <strong>SKU: </strong><span id="sku-${data.id}" style="color: #007bff;">${data.SKU}</span></div>
+                    <div><i class="bi bi-arrows-angle-expand"></i> Medidas: <span id="medidas-${data.id}">${data.medidas}</span></div>
+                    <div><i class="bi bi-box-arrow-in-down"></i> Peso: <span id="peso-${data.id}">${Math.round(data.Peso / 1000)}</span> kg</div>
+                    <div><i class="bi bi-box"></i> Volumen M³: <span id="volumenM3-${data.id}">${data.VolumenM3}</span> m³</div>
+                    <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.id}">${data.VolumenCM3}</span> cm³</div>
+                    <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.id}">${data.Cantidad}</span></div>
+                </div>
+
                     <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.id}" onclick="editarDatos('${data.id}')">Editar datos</button>
                 </div>
                 <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.id}" onclick="enviarDatosAndesmar('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${data.Peso}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
@@ -168,17 +212,20 @@ function crearCard(data) {
     `;
 
     // Lógica del botón de copiar al portapapeles
-    const copyButton = cardDiv.querySelector('.copy-btn');
-    copyButton.addEventListener('click', () => {
-        navigator.clipboard.writeText(data.idOperacion).then(() => {
-            copyButton.innerHTML = 'Copiado';
-            setTimeout(() => {
-                copyButton.innerHTML = '<i class="bi bi-clipboard ios-icon"></i>';
-            }, 2000);
-        }).catch(err => {
-            console.error('Error al copiar al portapapeles: ', err);
-        });
+const copyButton = cardDiv.querySelector('.copy-btn');
+copyButton.addEventListener('click', () => {
+    navigator.clipboard.writeText(data.idOperacion).then(() => {
+        const icon = copyButton.querySelector('i');
+        icon.classList.remove('bi-clipboard'); // Remueve el ícono de clipboard original
+        icon.classList.add('bi-clipboard-check-fill'); // Añade el ícono de clipboard con check
+        setTimeout(() => {
+            icon.classList.remove('bi-clipboard-check-fill'); // Remueve el ícono de check
+            icon.classList.add('bi-clipboard'); // Vuelve a añadir el ícono de clipboard
+        }, 2000);
+    }).catch(err => {
+        console.error('Error al copiar al portapapeles: ', err);
     });
+});
 
     return cardDiv;
 }
@@ -531,6 +578,7 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
             console.log(`Datos Respuesta API ANDREANI (MELI ${idOperacion}):`, response);
             // Mostrar el número de envío
             NroEnvio.innerHTML = `<a href="https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}" target="_blank">Andreani: ${numeroDeEnvio} <i class="bi bi-box-arrow-up-right"></i></a>`;
+            const trackingLink = `andreani.com/#!/informacionEnvio/${numeroDeEnvio}`
 
             // Configurar el botón de descarga inicial
             textAndr.innerHTML = `Orden ${numeroDeEnvio}`;
@@ -543,6 +591,29 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
                 envioStateAndr.className = 'em-circle-state2';
                 envioStateAndr.innerHTML = `Envio Preparado`;
             }
+
+            // Guardar en Firebase
+    const trackingMessage = `¡Hola ${NombreyApellido}! 🎉
+
+    ¡Buenas noticias! Tu producto ya está listo para ser enviado por Correo Andreani. Recuerda que la fecha de entrega es estimativa, así que podrías recibirlo un poco antes o después. Mantente atento a tu teléfono por si te contactan.
+    
+    Si notas algún daño en el paquete, recházalo para que podamos reenviarlo.
+    
+    Tu número de seguimiento es: ${trackingLink}.
+    
+    ¡Saludos!`;
+
+        const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
+    
+        firebase.database().ref('envios/' + idOperacionSinME1).update({
+            trackingNumber: numeroDeEnvio,
+            trackingLink: trackingLink,
+            trackingMessage: trackingMessage
+        }).then(() => {
+            console.log(`Datos actualizados en Firebase para la operación: ${idOperacion}`);
+        }).catch(error => {
+            console.error('Error al actualizar en Firebase:', error);
+        });    
 
             // Llamar a la API para obtener la etiqueta
             await obtenerEtiqueta(numeroDeEnvio, token, buttonAndr);
