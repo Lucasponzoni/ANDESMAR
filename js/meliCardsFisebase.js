@@ -138,14 +138,12 @@ function crearCard(data) {
                 <div class="meli-box1"> 
                     <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> ${data.Cp}, ${data.localidad}, ${data.Provincia}</p>
 
-                    <p class="card-text correo-meli ${cpsAndesmar.includes(data.Cp) ? 'correo-andesmar' : 'correo-andreani'}">
-                    ${cpsAndesmar.includes(data.Cp) ? 
-                    '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
-                    '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
+                    <p class="card-text correo-meli ${cpsAndesmar.includes(Number(data.Cp)) ? 'correo-andesmar' : 'correo-andreani'}">
+                    ${cpsAndesmar.includes(Number(data.Cp)) ? 
+                      '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
+                      '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
                     }
                     </p>
-
-
                     </div>
 
                 <div class="d-flex align-items-center">
