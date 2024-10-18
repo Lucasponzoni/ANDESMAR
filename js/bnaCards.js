@@ -13,6 +13,51 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// VERIFICA ORDENES DUPLICADAS
+// Referencia a la base de datos
+const databaseRef = firebase.database().ref('enviosBNA');
+
+// Función para verificar duplicados en 'remito' (data.orden_)
+function verificarRemitosDuplicados() {
+    let remitoCount = {};
+    let remitosDuplicados = [];
+
+    // Obtener todos los datos de 'enviosBNA'
+    databaseRef.once('value', (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+            const remito = data.orden_;
+
+            if (remito) {
+                // Contar cada remito
+                if (remitoCount[remito]) {
+                    remitoCount[remito]++;
+                    remitosDuplicados.push(remito); // Guardar el remito duplicado
+                } else {
+                    remitoCount[remito] = 1;
+                }
+            }
+        });
+
+        // Actualizar todos los nodos que tienen el remito duplicado
+        Object.keys(remitoCount).forEach((remito) => {
+            if (remitoCount[remito] > 1) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    if (data.orden_ === remito) {
+                        databaseRef.child(childSnapshot.key).update({ carritoCompra2: true });
+                    }
+                });
+                console.log(`El remito ${remito} está duplicado ${remitoCount[remito]} veces.`);
+            }
+        });
+    });
+}
+
+// Llamada a la función para iniciar la verificación
+verificarRemitosDuplicados();
+// FIN VERIFICA ORDENES DUPLICADAS
+
 let allData = [];
 let currentPage = 1;
 let itemsPerPage = 27; // Número de elementos por página
@@ -214,6 +259,7 @@ function loadEnviosFromFirebase() {
                 telefono: (data.telefono),
                 email: lowercaseWords(data.email), 
                 remito: (data.orden_),
+                carrito:(data.carritoCompra2),
                 observaciones: (data.observaciones),
                 orden_publica_: (data.orden_publica_),
                 brand_name: capitalizeWords(data.brand_name),
@@ -324,6 +370,13 @@ function renderCards(data) {
         const ordenPublica = data[i].orden_publica.replace(/-/g, '');
         const cupon = ordenPublica.substring(0, 13); 
         const autorizacion = ordenPublica.substring(ordenPublica.length - 4); 
+
+        // Agregar la tarjeta al contenedor
+        const carritoContenido = data[i].carrito ? `
+        <p class="carrito">
+        <i class="bi bi-cart-fill carrito-icon"></i>
+        COMPRA EN CARRITO
+        </p>` : '';
         
         // Agregar la tarjeta al contenedor
         cardsContainer.appendChild(card);
@@ -378,17 +431,28 @@ function renderCards(data) {
                         </button>
                     </p>
                 </div>
-
+                            
+                            ${carritoContenido}
                             <div class="d-flex align-items-center contenedorRemito">
 
                             <p class="orden">${data[i].remito}</p>
+
                             <div class="button-container d-block mt-2">
                                 <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
-                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2" onclick="window.open('https://api.avenida.com/manage/shops/2941/orders/${data[i].orden_publica_}', '_blank');">
-                                    <i class="bi bi-bag-check"></i>
+
+                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2" 
+                                    onclick="window.open(
+                                        ${data[i].cuotas === '30' 
+                                            ? `'https://api.avenida.com/manage/shops/2943/orders/${data[i].orden_publica_}'` 
+                                            : (data[i].cuotas === '12' || data[i].cuotas === '6' || data[i].cuotas === '1') 
+                                                ? `'https://api.avenida.com/manage/shops/2941/orders/${data[i].orden_publica_}'` 
+                                                : `'#' // URL por defecto`
+                                        }, '_blank');">
+                                                                   <i class="bi bi-bag-check"></i>
                                 </button>
+
                             </div>
 
                             <div class="d-flex flex-column ms-2 text-center"> <!-- Contenedor para apilar los switches -->
