@@ -1313,6 +1313,11 @@ p.card-text:nth-child(9){
     margin-bottom: 14px !important;
     box-shadow: 0 0px 14px rgba(100, 148, 237, 0.471), inset 0 1px 1px rgba(255, 255, 255, 0.4), inset 0 -1px 1px rgba(0, 0, 0, 0.02);
     transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    transition: .5s;
+}
+
+.remitoCardMeli:hover{
+    color: cornflowerblue;
 }
 
 .little-card-meli > p{
@@ -2752,7 +2757,7 @@ div.card-body > p > i{
 /* Estilos del carrusel */
 .carousel {
     border: solid 1px cornflowerblue;
-    background-color: #f8f8f8; 
+    background-color: white; 
     border-radius: 10px; 
     margin-bottom: 5px; 
     overflow: hidden;

@@ -54,6 +54,7 @@ function cargarDatos() {
                     idOperacion: data.idOperacion,
                     localidad: data.localidad,
                     medidas: data.medidas,
+                    permalink: data.permalink,
                     shippingMode: data.shippingMode,
                     nombreDeUsuario: data.nombreDeUsuario
                 });
@@ -147,10 +148,22 @@ function crearCard(data) {
                     </div>
 
                 <div class="d-flex align-items-center">
-                    <p class="remitoCardMeli card-text mb-0">${data.idOperacion}</p>
-                    <button class="btn btn-link copy-btn p-1 m-0" style="display: inline-flex; align-items: center;">
+
+                <p class="remitoCardMeli card-text mb-0">
+                <a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank" style="text-decoration: none; color: inherit;">
+                    ${data.idOperacion}
+                </a>
+
+                <button class="btn btn-link copy-btn p-1 m-0" style="display: inline-flex; align-items: center;">
                     <i class="bi bi-clipboard ios-icon" style="margin: 0;"></i>
                     </button>
+
+                    <button class="btn btn-link p-1 m-0" style="display: inline-flex; align-items: center;" onclick="window.open('${data.permalink}', '_blank');">
+                    <i class="bi bi-shop ios-icon" style="margin: 0;"></i>
+                    </button>
+
+                </p>
+            
                 </div>
 
                 ${carouselHTML}
