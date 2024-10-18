@@ -150,7 +150,7 @@ function crearCard(data) {
 
                 <div class="d-flex align-items-center">
 
-                <p class="remitoCardMeli card-text mb-0">
+                <p class="remitoCardMeli w-100 card-text mb-0">
                 <a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank" style="text-decoration: none; color: inherit;">
                     ${data.idOperacion}
                 </a>
