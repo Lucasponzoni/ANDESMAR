@@ -24,7 +24,9 @@ let isFiltered = false; // Variable para controlar si los datos están filtrados
 // FILTRAR PENDIENTES
 document.getElementById('filterOldestBtn').addEventListener('click', function() {
     const filteredData = allData.filter(item => item.estado === "Pendiente de despacho");
-    filteredData.sort((a, b) => new Date(a.fechaHora) - new Date(b.fechaHora)); // Ordenar de más antiguo a más nuevo
+    
+    // Hacer reverse en los datos filtrados
+    filteredData.reverse(); // Invertir el orden de los elementos
 
     // Renderizar los datos filtrados
     renderCards(filteredData);
