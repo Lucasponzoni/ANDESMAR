@@ -1308,7 +1308,7 @@ p.card-text:nth-child(9){
     border: solid 1px rgb(145, 182, 250); /* Borde transparente inicialmente */
     color: black; /* Texto en un verde oscuro */
     font-size: 1.4rem;
-    font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Roboto", sans-serif !important;
     font-weight: 600;
     margin-bottom: 14px !important;
     box-shadow: 0 0px 14px rgba(100, 148, 237, 0.471), inset 0 1px 1px rgba(255, 255, 255, 0.4), inset 0 -1px 1px rgba(0, 0, 0, 0.02);
@@ -1318,6 +1318,7 @@ p.card-text:nth-child(9){
 
 .remitoCardMeli:hover{
     color: cornflowerblue;
+    font-family: "Roboto", sans-serif !important;
 }
 
 .little-card-meli > p{
