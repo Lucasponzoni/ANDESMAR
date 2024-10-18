@@ -1410,6 +1410,7 @@ div.card-body > p > i{
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1000;
 }
 
 #meli-cards .card:hover {
@@ -1418,6 +1419,7 @@ div.card-body > p > i{
     box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
     border: solid 1px #007aff;
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Añade transición suave */
+    z-index: 1000;
 }
 
 #meli-cards .card:hover p, h5, h6 {
@@ -1635,6 +1637,38 @@ div.card-body > p > i{
     top: -18px;
     right: 170px;
     background-color: #34C759; 
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.em-circle-ME1{
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 50px;
+    position: absolute;
+    top: -18px;
+    left: 10px;
+    background-color: orange; 
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.em-circle-ME2{
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 50px;
+    position: absolute;
+    top: -18px;
+    left: 10px;
+    background-color: cornflowerblue; 
     color: white;
     display: flex;
     align-items: center;

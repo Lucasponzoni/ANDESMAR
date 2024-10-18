@@ -132,6 +132,7 @@ function crearCard(data) {
     cardDiv.innerHTML = `
         <div class="card position-relative">
             <div class="em-circle-isNotFraud">Seguro</div>
+            <div class="em-circle-${data.shippingMode.toLowerCase() === 'me1' ? 'ME1' : 'ME2'}">${data.shippingMode.toUpperCase()}</div>
             <div id="estadoEnvio${data.id}" class="em-circle-state">Envio pendiente</div>
             <div class="card-body-meli">
                 <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> ${data.NombreyApellido}</h5>
@@ -211,11 +212,11 @@ function crearCard(data) {
 
                     <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.id}" onclick="editarDatos('${data.id}')">Editar datos</button>
                 </div>
-                <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.id}" onclick="enviarDatosAndesmar('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${data.Peso}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
+                <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.id}" onclick="enviarDatosAndesmar('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
                     <span id="andesmarText${data.id}"><i class="bi bi-file-text"></i> Etiqueta Andesmar</span>
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.id}"></span>
                 </button>
-                <button class="btn btn-danger btnAndreaniMeli" id="andreaniButton${data.id}" onclick="enviarDatosAndreani('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${data.Peso}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
+                <button class="btn btn-danger btnAndreaniMeli" id="andreaniButton${data.id}" onclick="enviarDatosAndreani('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
                     <span id="andreaniText${data.id}"><i class="bi bi-file-text"></i> Etiqueta Andreani</span>
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.id}" style="display:none;"></span>
                 </button>
@@ -268,7 +269,12 @@ function guardarCambios(id) {
     camposEditables.forEach(campo => {
         const input = document.getElementById(`input-${campo}-${id}`);
         if (input) {
-            datosActualizados[campo.charAt(0).toUpperCase() + campo.slice(1)] = input.value;
+            let valor = input.value;
+            // Multiplicar el peso por 1000 si el campo es 'peso'
+            if (campo === 'peso') {
+                valor = Number(valor) * 1000; // Asegúrate de convertir a número
+            }
+            datosActualizados[campo.charAt(0).toUpperCase() + campo.slice(1)] = valor;
         }
     });
 
@@ -279,6 +285,8 @@ function guardarCambios(id) {
                 icon: 'success',
                 title: 'Datos actualizados',
                 text: 'Los datos han sido actualizados correctamente.',
+            }).then(() => {
+                location.reload();
             });
 
             camposEditables.forEach(campo => {
