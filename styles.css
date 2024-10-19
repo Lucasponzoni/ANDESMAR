@@ -1108,11 +1108,11 @@ p.card-text{
     font-family: "Roboto Condensed", sans-serif;
     padding: 6px 12px !important;
     font-size: 0.85rem;
-    font-weight: 500 !important;
+    font-weight: 400 !important;
     width: fit-content;
-    background-color: whitesmoke;
+    background-color: cornflowerblue;
     border: solid 1px #007aff;
-    color: #007aff;
+    color: white;
     border-radius: 18px;
     margin-bottom: 8px !important;
     overflow: hidden;
