@@ -1316,6 +1316,14 @@ p.card-text:nth-child(9){
     margin-bottom: -5px !important;
 }
 
+.lock-btn{
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}
+
+
+
 .remitoCardMeli:hover{
     color: cornflowerblue;
     font-family: "Roboto", sans-serif !important;
