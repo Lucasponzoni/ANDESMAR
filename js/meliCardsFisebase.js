@@ -538,6 +538,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
             button.classList.remove('btn-primary');
             button.classList.add('btn-warning', 'btnAndesmarMeli');
             buttonAndr.disabled = false;
+            spinner.style.display = 'none';
         }
     })
     .catch(error => {
