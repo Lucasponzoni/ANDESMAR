@@ -1572,7 +1572,13 @@ div.card-body > p > i{
 }
 
 #simbel2{
-    width: 70px;
+    width: 75px;
+    padding-left: 5px;
+}
+
+#img-meli{
+    overflow: visible;
+    width: 35px;
     padding-left: 5px;
 }
 
@@ -1827,6 +1833,31 @@ div.card-body > p > i{
     height: 30px;
 }
 
+.em-circle-state-cliente{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: 1rem;
+    height: 30px;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -15px; 
+    left: 10px;
+    color: #9e28b5;
+    border: 1px solid #9e28b5;
+    background-color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-weight: bold; 
+    overflow: hidden;
+}
+
+#presea{
+    width: 25px;
+    margin-right: 5px;
+}
+
 .facturable {
     background-color: red;
     animation: pulse 3s infinite;
@@ -1875,6 +1906,7 @@ div.card-body > p > i{
 .em-state-simbel{
     font-family: "Reddit Sans Condensed", sans-serif;
     font-size: 1rem;
+    height: 30px !important;
     padding-inline: 5px;
     padding: 5px;
     border-radius: 10px;
@@ -1883,6 +1915,23 @@ div.card-body > p > i{
     right: 10px;
     background-color:#ec0043; 
     color: white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-weight: bold; 
+}
+
+.em-state-meli{
+    font-family: "Reddit Sans Condensed", sans-serif;
+    font-size: 1rem;
+    padding-inline: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    position: absolute;
+    top: -18px; 
+    right: 10px;
+    background-color: rgb(37, 37, 142);
+    color: yellow;
     display: flex; 
     align-items: center; 
     justify-content: center;
@@ -1909,7 +1958,7 @@ div.card-body > p > i{
 }
 
 .em-state-bna > img{
-    width:60px;
+    width:50px;
 }
 
 .em-state-bna2{
@@ -2256,6 +2305,10 @@ div.card-body > p > i{
 
 .icon-gray {
     color: gray; 
+}
+
+.icon-indigo {
+    color: indigo; 
 }
 
 /* BOTON MARCAR FACTURADO */

@@ -15,7 +15,7 @@ const database = firebase.database();
 
 let allData = []; // Arreglo global para almacenar todos los datos
 let currentPage = 1;
-const itemsPerPage = 12;
+const itemsPerPage = 30;
 let currentPageGroup = 0; // Grupo de páginas actual
 
 // Función para cargar datos de Firebase
@@ -40,7 +40,7 @@ function cargarDatos() {
                     Correosugerido: data.Correosugerido,
                     Cp: data.Cp,
                     Email: data.Email,
-                    NombreyApellido: data.NombreyApellido,
+                    NombreyApellido: data.NombreyApellido.toLowerCase(),
                     Observaciones: data.Observaciones,
                     Peso: data.Peso,
                     Producto: data.Producto,
@@ -341,22 +341,6 @@ const usuario = "BOM6765";
 const clave = "BOM6765";
 const codigoCliente = "6765";
 
-// Configuración del segundo proyecto de Firebase
-const firebaseConfig2 = {
-    apiKey: "AIzaSyBIXlgOct2UzkrZbZYbyHu6_NbLDzTqqig",
-    authDomain: "despachos-novogar.firebaseapp.com",
-    databaseURL: "https://despachos-novogar-default-rtdb.firebaseio.com",
-    projectId: "despachos-novogar",
-    storageBucket: "despachos-novogar.appspot.com",
-    messagingSenderId: "346020771441",
-    appId: "1:346020771441:web:c4a29c0db4200352080dd0",
-    measurementId: "G-64DDP7D6Q2"
-};
-
-// Inicializa el segundo proyecto
-const app2 = firebase.initializeApp(firebaseConfig2, "app2");
-const database2 = app2.database();
-
 // Función para enviar datos a la API de Andesmar
 async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto, localidad, provincia) {
     const button = document.getElementById(`andesmarButton${id}`);
@@ -367,6 +351,9 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     const buttonAndr = document.getElementById(`andreaniButton${id}`);
     const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
 
+    // Eliminar el prefijo "200000" del idOperacion
+    const idOperacionFinal = idOperacion.replace(/^200000/, '');
+
     // Mostrar spinner y cambiar texto
     spinner.style.display = 'inline-block';
     text.innerText = 'Generando Etiqueta...';
@@ -375,11 +362,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
 
     // Dividir medidas para obtener alto, ancho y largo
     const [largo, ancho, alto] = Medidas.split('x').map(Number);
-
-    // Convertir Producto a minúsculas para la verificación
     const productoLowerCase = Producto.toLowerCase();
-
-    // Verificar si Producto incluye un split
     const cantidadFinal = productoLowerCase.includes("split") ? cantidad * 2 : cantidad;
 
     // Definir los datos que se enviarán a la API
@@ -392,7 +375,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         CalleDestinatario: calleDestinatario,
         CalleNroDestinatario: alturaDestinatario,
         TelefonoDestinatario: telefonoDestinatario,
-        NroRemito: idOperacion,
+        NroRemito: idOperacionFinal,
         Bultos: cantidadFinal,
         Peso: peso,
         ValorDeclarado: 100,
@@ -429,27 +412,17 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     })
     .then(async response => {
         const data = await response.json();
-        console.log(`Datos Respuesta API Andesmar (MELI ${idOperacion}):`, data);
+        console.log(`Datos Respuesta API Andesmar (MELI ${idOperacionFinal}):`, data);
         
         if (data.NroPedido) {
+            const trackingLinkAndesmar = `https://andesmarcargas.com/seguimiento.html?numero=${idOperacionFinal}&tipo=remito&cod=`;
 
-            const trackingLinkAndesmar = `https://andesmarcargas.com/seguimiento.html?numero=${idOperacion}&tipo=remito&cod=`; // Corregido aquí
+            const trackingMessage = `¡Hola ${NombreyApellido}! 🎉\n\n¡Buenas noticias! Tu producto ya está listo para ser enviado por Andesmar Cargas. Recuerda que la fecha de entrega es estimativa, así que podrías recibirlo un poco antes o después. Mantente atento a tu teléfono por si te contactan.\n\nSi notas algún daño en el paquete, recházalo para que podamos reenviarlo.\n\nTu número de seguimiento es: ${trackingLinkAndesmar}.\n\n¡Saludos!`;
 
-            // Guardar en Firebase
-            const trackingMessage = `¡Hola ${NombreyApellido}! 🎉
-            
-            ¡Buenas noticias! Tu producto ya está listo para ser enviado por Andesmar Cargas. Recuerda que la fecha de entrega es estimativa, así que podrías recibirlo un poco antes o después. Mantente atento a tu teléfono por si te contactan.
-            
-            Si notas algún daño en el paquete, recházalo para que podamos reenviarlo.
-            
-            Tu número de seguimiento es: ${trackingLinkAndesmar}.
-            
-            ¡Saludos!`;
-            
             const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
             
             firebase.database().ref('envios/' + idOperacionSinME1).update({
-                trackingNumber: idOperacion,
+                trackingNumber: idOperacionFinal,
                 trackingLink: trackingLinkAndesmar,
                 trackingMessage: trackingMessage
             }).then(() => {
@@ -457,7 +430,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
             }).catch(error => {
                 console.error('Error al actualizar en Firebase:', error);
             });
-            
+
             // Usar la base de datos del segundo proyecto
             const nuevaEntradaRef = database2.ref('enviosAndesmar').push();
 
@@ -484,42 +457,54 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
                 CodigoAgrupacion: 12
             };
 
-            const cotizacionResponse = await fetch(proxyUrl + "https://apitest.andesmarcargas.com/api/CalcularMonto", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd",
-                },
-                body: JSON.stringify(cotizacionRequest),
-            });
+            // Intentar obtener la cotización
+            let importeTotalFormateado;
+            try {
+                const cotizacionResponse = await fetch(proxyUrl + "https://apitest.andesmarcargas.com/api/CalcularMonto", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd",
+                    },
+                    body: JSON.stringify(cotizacionRequest),
+                });
 
-            const cotizacionData = await cotizacionResponse.json();
-
-            // Formatear el importe total
-            const importeTotalFormateado = new Intl.NumberFormat('es-AR', {         
-                style: 'currency',
-                currency: 'ARS',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(cotizacionData.ImporteTotal);
+                const cotizacionData = await cotizacionResponse.json();
+                // Formatear el importe total
+                importeTotalFormateado = new Intl.NumberFormat('es-AR', {         
+                    style: 'currency',
+                    currency: 'ARS',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(cotizacionData.ImporteTotal);
+            } catch (error) {
+                console.error("Error en la cotización, usando costo predeterminado:", error);
+                importeTotalFormateado = new Intl.NumberFormat('es-AR', {         
+                    style: 'currency',
+                    currency: 'ARS',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(10000); // Costo predeterminado de $10.000
+            }
 
             // Almacenar en Firebase
             await nuevaEntradaRef.set({         
-            nombreApellido: NombreyApellido,
-            nroPedido: data.NroPedido,
-            codigoPostal: Cp,
-            localidad: `${localidad}, ${provincia}`,
-            calleDelDestinatario: calleDestinatario,
-            numeroDeCalle: alturaDestinatario,
-            telefono: telefonoDestinatario,
-            remito: idOperacion,
-            cotizacion: importeTotalFormateado // Usar el importe formateado
+                nombreApellido: NombreyApellido,
+                nroPedido: data.NroPedido,
+                codigoPostal: Cp,
+                localidad: `${localidad}, ${provincia}`,
+                calleDelDestinatario: calleDestinatario,
+                numeroDeCalle: alturaDestinatario,
+                telefono: telefonoDestinatario,
+                remito: idOperacionFinal,
+                cotizacion: importeTotalFormateado // Usar el importe formateado
             }).then(() => {         
                 console.log("Entrada agregada correctamente.");
             }).catch((error) => {
                 console.error("Error al agregar entrada a Firebase:", error);
             });
 
+            // Mostrar el botón de descarga
             const link = `https://andesmarcargas.com//ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
             button.classList.remove('btn-primary');
@@ -614,6 +599,9 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
     const button = document.getElementById(`andesmarButton${id}`);
     const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
 
+    // Eliminar el prefijo "200000" del idOperacion
+    const idOperacionFinalAndreani = idOperacion.replace(/^200000/, '');
+
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
     textAndr.innerText = 'Generando Etiqueta...';
@@ -651,7 +639,7 @@ for (let i = 0; i < cantidadFinal; i++) {
         "valorDeclaradoConImpuestos": 99999,
         "referencias": [
             { "meta": "detalle", "contenido": Producto },
-            { "meta": "idCliente", "contenido": (idOperacion + "-MELI").toUpperCase() },
+            { "meta": "idCliente", "contenido": (idOperacionFinalAndreani + "-MELI").toUpperCase() },
             { "meta": "observaciones", contenido: observaciones }
         ]
     });
@@ -659,7 +647,7 @@ for (let i = 0; i < cantidadFinal; i++) {
 
     const requestData = {
         "contrato": volumenCM3 > 100000 ? "351002753" : "400017259",
-        "idPedido": (idOperacion + "-MELI").toUpperCase(),
+        "idPedido": (idOperacionFinalAndreani + "-MELI").toUpperCase(),
         "origen": {
             "postal": {
                 "codigoPostal": "2126",
@@ -695,12 +683,12 @@ for (let i = 0; i < cantidadFinal; i++) {
             "telefonos": [{ "tipo": 1, "numero": telefonoDestinatario }]
         }],
         "remito": {
-            "numeroRemito": (idOperacion + "-MELI").toUpperCase(),
+            "numeroRemito": (idOperacionFinalAndreani + "-MELI").toUpperCase(),
         },
         "bultos": bultos
     };
 
-    console.log(`Datos enviados a API ANDREANI (MELI ${idOperacion}):`, requestData);
+    console.log(`Datos enviados a API ANDREANI (MELI ${idOperacionFinalAndreani}):`, requestData);
 
     try {
         const response = await fetch(apiUrlLabel, {
@@ -717,7 +705,7 @@ for (let i = 0; i < cantidadFinal; i++) {
             const data = await response.json();
             const numeroDeEnvio = data.bultos[0].numeroDeEnvio;
 
-            console.log(`Datos Respuesta API ANDREANI (MELI ${idOperacion}):`, response);
+            console.log(`Datos Respuesta API ANDREANI (MELI ${idOperacionFinalAndreani}):`, response);
             // Mostrar el número de envío
             NroEnvio.innerHTML = `<a href="https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}" target="_blank">Andreani: ${numeroDeEnvio} <i class="bi bi-box-arrow-up-right"></i></a>`;
             const trackingLink = `andreani.com/#!/informacionEnvio/${numeroDeEnvio}`
@@ -752,7 +740,7 @@ for (let i = 0; i < cantidadFinal; i++) {
             trackingLink: trackingLink,
             trackingMessage: trackingMessage
         }).then(() => {
-            console.log(`Datos actualizados en Firebase para la operación: ${idOperacion}`);
+            console.log(`Datos actualizados en Firebase para la operación: ${idOperacionFinalAndreani}`);
         }).catch(error => {
             console.error('Error al actualizar en Firebase:', error);
         });    
@@ -894,7 +882,7 @@ const cpsAndesmar = [
     9400, 4000, 4101, 4103, 4105, 4107,
     4109, 4111, 4117, 4128, 4129, 4132,
     4142, 4144, 4152, 4153, 4158, 4166,
-    4168, 4178
+    4168, 4178, 2000
 ];
 
 // Llama a cargarDatos para iniciar el proceso

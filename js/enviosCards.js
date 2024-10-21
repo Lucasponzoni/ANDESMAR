@@ -10,6 +10,21 @@ const firebaseConfig = {
     measurementId: "G-64DDP7D6Q2"
 };
 
+// Configuración del segundo proyecto de Firebase
+const firebaseConfig2 = {
+    apiKey: "AIzaSyCMu2vPvNzhv0cM3b4RItmqZybRhhR_HJM",
+    authDomain: "despachos-meli-novogar.firebaseapp.com",
+    projectId: "despachos-meli-novogar",
+    storageBucket: "despachos-meli-novogar.appspot.com",
+    messagingSenderId: "774252628334",
+    appId: "1:774252628334:web:623aa84bc3b1cebd3f997f",
+    measurementId: "G-E0E9K4TEDW"
+};
+
+// Inicializa el segundo proyecto
+const app2 = firebase.initializeApp(firebaseConfig2, "app2");
+const database2 = app2.database();
+
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
@@ -40,133 +55,154 @@ document.addEventListener("DOMContentLoaded", function() {
         return text ? text.toLowerCase() : '';
     }
 
-    // Obtener los datos de Firebase
-    database.ref('enviosAndesmar').once('value', (snapshot) => {
-        snapshot.forEach((childSnapshot) => {
-            const data = childSnapshot.val();
-            allData.push({ 
-                id: childSnapshot.key, 
-                nombreApellido: toLowerCaseText(data.nombreApellido),
-                localidad: toLowerCaseText(data.localidad),
-                calleDelDestinatario: toLowerCaseText(data.calleDelDestinatario),
-                numeroDeCalle: toLowerCaseText(data.numeroDeCalle),
-                telefono: data.telefono,
-                nroPedido: data.nroPedido,
-                remito: data.remito,
-                cotizacion: data.cotizacion,
-                observaciones: data.observaciones ? toLowerCaseText(data.observaciones) : '',
-                codigoPostal: data.codigoPostal 
-            });
-        });
 
-        allData.reverse();
-        originalData = [...allData];
-        renderCards(allData).then(() => {
-            spinner.style.display = "none";
-            updatePagination(allData.length);
+// Obtener los datos de Firebase del primer proyecto
+database.ref('enviosAndesmar').once('value', (snapshot) => {
+    snapshot.forEach((childSnapshot) => {
+        const data = childSnapshot.val();
+        allData.push({ 
+            id: childSnapshot.key, 
+            nombreApellido: toLowerCaseText(data.nombreApellido),
+            localidad: toLowerCaseText(data.localidad),
+            calleDelDestinatario: toLowerCaseText(data.calleDelDestinatario),
+            numeroDeCalle: toLowerCaseText(data.numeroDeCalle),
+            telefono: data.telefono,
+            nroPedido: data.nroPedido,
+            remito: data.remito,
+            cotizacion: data.cotizacion,
+            observaciones: data.observaciones ? toLowerCaseText(data.observaciones) : '',
+            codigoPostal: data.codigoPostal 
         });
     });
 
-    // Función para renderizar las tarjetas
-    async function renderCards(data) {
-        cardsContainer.innerHTML = "";
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const paginatedData = data.slice(startIndex, startIndex + itemsPerPage); 
+    allData.reverse();
+    originalData = [...allData];
+    renderCards(allData).then(() => {
+        spinner.style.display = "none";
+        updatePagination(allData.length);
+    });
+});
 
-        const promises = paginatedData.map(async (item) => {
-            const card = document.createElement("div");
-            card.className = "col-md-4"; 
+// Función para renderizar las tarjetas
+async function renderCards(data) {
+    cardsContainer.innerHTML = "";
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedData = data.slice(startIndex, startIndex + itemsPerPage); 
 
-            const etiqueta = item.remito.startsWith("BNA")
-            ? `<div class="em-state-bna2">Etiqueta <img id="bna2" src="./Img/bna-logo.png"></div>`
-            : item.remito.startsWith("NOV")
-            ? `<div class="em-state-simbel">Etiqueta por <img id="simbel2" src="./Img/simbel.png"></div>`
-            : `<div class="em-state-andesmar">Etiqueta Manual 💪🏻</div>`;
+    const promises = paginatedData.map(async (item) => {
+        const card = document.createElement("div");
+        card.className = "col-md-4"; 
 
-            
-            card.innerHTML = `
-                <div class="card mb-3">
-                    <div class="card-body">
-                        ${etiqueta}
-                        <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${item.nombreApellido}</h5>
-                        <p class="card-text cpLocalidad">${item.codigoPostal}, ${item.localidad}</p>
-                        <p class="card-text"><i class="fas fa-home"></i> ${item.calleDelDestinatario}, Altura: ${item.numeroDeCalle}</p>
-                        <p class="card-text"><i class="fas fa-phone"></i> Telefono: ${item.telefono}</p>
-                        <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> Número Andesmar: ${item.nroPedido}</p>
-                        <p class="card-text"><i class="bi bi-credit-card-fill"></i> Cotización: ${item.cotizacion}</p>
-                        <div class="d-flex align-items-center">
-                            <p class="remitoCard card-text mb-0">${item.remito}</p>
-                            <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
-                                <i class="bi bi-clipboard"></i>
-                            </button>
-                        </div>
-                        
-                        <div class="apiSeguimiento" style="display: flex; justify-content: center; align-items: center; height: 100px">
-                            <img class="blueSpinner" src="./Img/spinner.gif" alt="Cargando...">
-                        </div>
+        // Búsqueda en la segunda base de datos utilizando remito
+        let clienteLabel = ``; // Valor por defecto
 
-                        <!-- Botón para abrir el modal -->
-                        <button class="btn btn-info mt-1 open-tracking" data-nropedido="${item.nroPedido}" data-clienteAndesmar="${item.nombreApellido}" data-bs-toggle="modal" data-bs-target="#trackingModal">
-                        <i class="bi bi-eye"></i>Track 
+        await database2.ref('DespachosLogisticos').orderByChild('numeroDeEnvio').equalTo(item.remito).once('value', (snapshot) => {
+            if (snapshot.exists()) {
+                const despachosData = snapshot.val();
+                const despachosKey = Object.keys(despachosData)[0]; // Obtiene la primera coincidencia
+                const cliente = despachosData[despachosKey].cliente;
+                clienteLabel = `<div class="em-circle-state-cliente"><img id="presea" src="./Img/logo-presea.png">${capitalizeText(cliente)} <button class="btn btn-link" onclick="navigator.clipboard.writeText('${capitalizeText(cliente)}')">
+                            <i class="bi bi-clipboard icon-indigo"></i>
+                        </button></div>`;
+            }
+        }).catch(error => {
+            console.error("Error fetching data from Firebase Config 2: ", error);
+        });
+
+        const etiqueta = item.remito.startsWith("BNA")
+        ? `<div class="em-state-bna2"><img id="bna2" src="./Img/bna-logo.png"></div>`
+        : item.remito.startsWith("NOV")
+        ? `<div class="em-state-simbel"><img id="simbel2" src="./Img/simbel.png"></div>`
+        : item.remito.endsWith("ME1")
+        ? `<div class="em-state-meli">Mercado Libre<img id="img-meli" src="./Img/meli.png"></div>`
+        : `<div class="em-state-andesmar">Manual 💪🏻</div>`;
+
+        card.innerHTML = `
+            <div class="card mb-3">
+                <div class="card-body">
+                    ${clienteLabel} <!-- Aquí se inserta el valor de cliente obtenido -->
+                    ${etiqueta}
+                    <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${item.nombreApellido}</h5>
+                    <p class="card-text cpLocalidad">${item.codigoPostal}, ${item.localidad}</p>
+                    <p class="card-text"><i class="fas fa-home"></i> ${item.calleDelDestinatario}, Altura: ${item.numeroDeCalle}</p>
+                    <p class="card-text"><i class="fas fa-phone"></i> Telefono: ${item.telefono}</p>
+                    <p class="card-text"><i class="bi bi-file-earmark-code-fill"></i> Número Andesmar: ${item.nroPedido}</p>
+                    <p class="card-text"><i class="bi bi-credit-card-fill"></i> Cotización: ${item.cotizacion}</p>
+                    <div class="d-flex align-items-center">
+                        <p class="remitoCard card-text mb-0">${item.remito}</p>
+                        <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2" style="color: #007bff;">
+                            <i class="bi bi-clipboard"></i>
                         </button>
+                    </div>
 
-                        <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
+                    <div class="apiSeguimiento" style="display: flex; justify-content: center; align-items: center; height: 100px">
+                        <img class="blueSpinner" src="./Img/spinner.gif" alt="Cargando...">
+                    </div>
 
-                        <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-secondary"><i class="bi bi-box-arrow-up-right"></i></a>
+                    <!-- Botón para abrir el modal -->
+                    <button class="btn btn-info mt-1 open-tracking" data-nropedido="${item.nroPedido}" data-clienteAndesmar="${item.nombreApellido}" data-bs-toggle="modal" data-bs-target="#trackingModal">
+                    <i class="bi bi-eye"></i>Track 
+                    </button>
 
-                        <button class="btn btn-success btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${item.id}" aria-expanded="false" aria-controls="collapseObservaciones-${item.id}">
-                        <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
-                        </button>
+                    <a href="https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${item.nroPedido}" target="_blank" class="btn btn-warning"><i class="bi bi-file-earmark-arrow-down-fill"></i></a>
 
-                        <div class="collapse" id="collapseObservaciones-${item.id}">
-                            <div class="mb-3 mt-2 divObs">
-                                <label for="observaciones-${item.id}" class="form-label">Observaciones</label>
-                                <textarea id="observaciones-${item.id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${item.observaciones || ''}</textarea>
-                                <button class="btn btn-primary mt-1 update-observaciones" data-id="${item.id}">Actualizar Observaciones</button>
-                            </div>
+                    <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-secondary"><i class="bi bi-box-arrow-up-right"></i></a>
+
+                    <button class="btn btn-success btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${item.id}" aria-expanded="false" aria-controls="collapseObservaciones-${item.id}">
+                    <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
+                    </button>
+
+                    <div class="collapse" id="collapseObservaciones-${item.id}">
+                        <div class="mb-3 mt-2 divObs">
+                            <label for="observaciones-${item.id}" class="form-label">Observaciones</label>
+                            <textarea id="observaciones-${item.id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${item.observaciones || ''}</textarea>
+                            <button class="btn btn-primary mt-1 update-observaciones" data-id="${item.id}">Actualizar Observaciones</button>
                         </div>
-
                     </div>
                 </div>
-            `;
+            </div>
+        `;
 
-            // Lógica del botón de copiar al portapapeles
-            const copyButton = card.querySelector('.copy-btn');
-            copyButton.addEventListener('click', () => {
-                navigator.clipboard.writeText(item.remito).then(() => {
-                    copyButton.innerHTML = 'Copiado';
-                    setTimeout(() => {
-                        copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
-                    }, 2000);
-                }).catch(err => console.error('Error al copiar al portapapeles: ', err));
-            });
+        cardsContainer.appendChild(card);
 
-            // Lógica para actualizar observaciones
-            const updateButton = card.querySelector('.update-observaciones');
-            updateButton.addEventListener('click', () => {
-                const observacionesInput = card.querySelector(`#observaciones-${item.id}`);
-                const observacionesValue = observacionesInput.value;
+        // Lógica del botón de copiar al portapapeles
+        const copyButton = card.querySelector('.copy-btn');
+        copyButton.addEventListener('click', () => {
+            navigator.clipboard.writeText(item.remito).then(() => {
+                copyButton.innerHTML = 'Copiado';
+                setTimeout(() => {
+                    copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+                }, 2000);
+            }).catch(err => console.error('Error al copiar al portapapeles: ', err));
+        });
 
-                // Actualizar en Firebase
-                database.ref(`enviosAndesmar/${item.id}`).update({ observaciones: observacionesValue })
-                .then(() => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Actualización exitosa!',
-                        text: 'Las observaciones han sido actualizadas correctamente.',
-                        confirmButtonText: 'Aceptar'
-                    });
-                })
-                .catch((error) => {
-                    console.error("Error al actualizar observaciones: ", error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'No se pudieron actualizar las observaciones. Inténtalo de nuevo.',
-                        confirmButtonText: 'Aceptar'
-                    });
+        // Lógica para actualizar observaciones
+        const updateButton = card.querySelector('.update-observaciones');
+        updateButton.addEventListener('click', () => {
+            const observacionesInput = card.querySelector(`#observaciones-${item.id}`);
+            const observacionesValue = observacionesInput.value;
+
+            // Actualizar en Firebase
+            database.ref(`enviosAndesmar/${item.id}`).update({ observaciones: observacionesValue })
+            .then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Actualización exitosa!',
+                    text: 'Las observaciones han sido actualizadas correctamente.',
+                    confirmButtonText: 'Aceptar'
+                });
+            })
+            .catch((error) => {
+                console.error("Error al actualizar observaciones: ", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudieron actualizar las observaciones. Inténtalo de nuevo.',
+                    confirmButtonText: 'Aceptar'
                 });
             });
+        });
+
 
             cardsContainer.appendChild(card);
 
