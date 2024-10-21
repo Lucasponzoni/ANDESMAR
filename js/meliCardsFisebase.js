@@ -215,7 +215,7 @@ function crearCard(data) {
 
                     <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.id}" onclick="editarDatos('${data.id}')">Editar datos</button>
                 </div>
-                <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.id}" onclick="enviarDatosAndesmar('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
+                <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.id}" onclick="enviarDatosAndesmar('${data.id}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
                     <span id="andesmarText${data.id}"><i class="bi bi-file-text"></i> Etiqueta Andesmar</span>
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.id}"></span>
                 </button>
@@ -341,8 +341,24 @@ const usuario = "BOM6765";
 const clave = "BOM6765";
 const codigoCliente = "6765";
 
+// Configuración del segundo proyecto de Firebase
+const firebaseConfig2 = {
+    apiKey: "AIzaSyBIXlgOct2UzkrZbZYbyHu6_NbLDzTqqig",
+    authDomain: "despachos-novogar.firebaseapp.com",
+    databaseURL: "https://despachos-novogar-default-rtdb.firebaseio.com",
+    projectId: "despachos-novogar",
+    storageBucket: "despachos-novogar.appspot.com",
+    messagingSenderId: "346020771441",
+    appId: "1:346020771441:web:c4a29c0db4200352080dd0",
+    measurementId: "G-64DDP7D6Q2"
+};
+
+// Inicializa el segundo proyecto
+const app2 = firebase.initializeApp(firebaseConfig2, "app2");
+const database2 = app2.database();
+
 // Función para enviar datos a la API de Andesmar
-function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto) {
+async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto, localidad, provincia) {
     const button = document.getElementById(`andesmarButton${id}`);
     const spinner = document.getElementById(`spinnerAndesmar${id}`);
     const text = document.getElementById(`andesmarText${id}`);
@@ -360,7 +376,13 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
     // Dividir medidas para obtener alto, ancho y largo
     const [largo, ancho, alto] = Medidas.split('x').map(Number);
 
-    // Aquí debes definir los datos que se enviarán a la API
+    // Convertir Producto a minúsculas para la verificación
+    const productoLowerCase = Producto.toLowerCase();
+
+    // Verificar si Producto incluye un split
+    const cantidadFinal = productoLowerCase.includes("split") ? cantidad * 2 : cantidad;
+
+    // Definir los datos que se enviarán a la API
     const requestObj = {
         CalleRemitente: "Mendoza", // Reemplaza con el valor correcto
         CalleNroRemitente: "2799", // Reemplaza con el valor correcto
@@ -371,19 +393,19 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
         CalleNroDestinatario: alturaDestinatario,
         TelefonoDestinatario: telefonoDestinatario,
         NroRemito: idOperacion,
-        Bultos: cantidad,
+        Bultos: cantidadFinal,
         Peso: peso,
-        ValorDeclarado: 100, // Se Reemplazara cuando Leo envie este dato
+        ValorDeclarado: 100,
         M3: volumenM3,
-        Alto: Array(cantidad).fill(alto), 
-        Ancho: Array(cantidad).fill(ancho), 
-        Largo: Array(cantidad).fill(largo), 
+        Alto: Array(cantidadFinal).fill(alto),
+        Ancho: Array(cantidadFinal).fill(ancho),
+        Largo: Array(cantidadFinal).fill(largo),
         Observaciones: observaciones + Producto,
-        ModalidadEntrega: "Puerta-Puerta", 
-        UnidadVenta: "cargas remito conformado", 
+        ModalidadEntrega: "Puerta-Puerta",
+        UnidadVenta: "cargas remito conformado",
         servicio: {
-            EsFletePagoDestino: false, 
-            EsRemitoconformado: true 
+            EsFletePagoDestino: false,
+            EsRemitoconformado: true
         },
         logueo: {
             Usuario: usuario,
@@ -395,7 +417,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
     const proxyUrl = "https://proxy.cors.sh/";
     const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
 
-    console.log(`Datos enviados a API Andesmar (MELI ${idOperacion}):`, requestObj); // Mostrar request en consola
+    console.log(`Datos enviados a API Andesmar (MELI ${idOperacion}):`, requestObj);
 
     fetch(proxyUrl + apiUrl, {
         method: "POST",
@@ -405,12 +427,98 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
         },
         body: JSON.stringify(requestObj),
     })
-    .then(response => {
-        console.log(`Datos Respuesta API Andesmar (MELI ${idOperacion}):`, response); // Mostrar response en consola
-        return response.json();
-    })
-    .then(data => {
+    .then(async response => {
+        const data = await response.json();
+        console.log(`Datos Respuesta API Andesmar (MELI ${idOperacion}):`, data);
+        
         if (data.NroPedido) {
+
+            const trackingLinkAndesmar = `https://andesmarcargas.com/seguimiento.html?numero=${idOperacion}&tipo=remito&cod=`; // Corregido aquí
+
+            // Guardar en Firebase
+            const trackingMessage = `¡Hola ${NombreyApellido}! 🎉
+            
+            ¡Buenas noticias! Tu producto ya está listo para ser enviado por Andesmar Cargas. Recuerda que la fecha de entrega es estimativa, así que podrías recibirlo un poco antes o después. Mantente atento a tu teléfono por si te contactan.
+            
+            Si notas algún daño en el paquete, recházalo para que podamos reenviarlo.
+            
+            Tu número de seguimiento es: ${trackingLinkAndesmar}.
+            
+            ¡Saludos!`;
+            
+            const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
+            
+            firebase.database().ref('envios/' + idOperacionSinME1).update({
+                trackingNumber: idOperacion,
+                trackingLink: trackingLinkAndesmar,
+                trackingMessage: trackingMessage
+            }).then(() => {
+                console.log(`Datos actualizados en Firebase para la operación: ${idOperacion}`);
+            }).catch(error => {
+                console.error('Error al actualizar en Firebase:', error);
+            });
+            
+            // Usar la base de datos del segundo proyecto
+            const nuevaEntradaRef = database2.ref('enviosAndesmar').push();
+
+            const cotizacionRequest = {
+                CodigoPostalRemitente: "2000",
+                CodigoPostalDestinatario: Cp,
+                Bultos: cantidadFinal,
+                Peso: peso,
+                ValorDeclarado: 100,
+                M3: volumenM3,
+                Alto: Array(cantidadFinal).fill(alto),
+                Ancho: Array(cantidadFinal).fill(ancho),
+                Largo: Array(cantidadFinal).fill(largo),
+                ModalidadEntregaID: 2,
+                servicio: {
+                    EsFletePagoDestino: false,
+                    EsRemitoconformado: true
+                },
+                logueo: {
+                    Usuario: usuario,
+                    Clave: clave,
+                    CodigoCliente: codigoCliente
+                },
+                CodigoAgrupacion: 12
+            };
+
+            const cotizacionResponse = await fetch(proxyUrl + "https://apitest.andesmarcargas.com/api/CalcularMonto", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd",
+                },
+                body: JSON.stringify(cotizacionRequest),
+            });
+
+            const cotizacionData = await cotizacionResponse.json();
+
+            // Formatear el importe total
+            const importeTotalFormateado = new Intl.NumberFormat('es-AR', {         
+                style: 'currency',
+                currency: 'ARS',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(cotizacionData.ImporteTotal);
+
+            // Almacenar en Firebase
+            await nuevaEntradaRef.set({         
+            nombreApellido: NombreyApellido,
+            nroPedido: data.NroPedido,
+            codigoPostal: Cp,
+            localidad: `${localidad}, ${provincia}`,
+            calleDelDestinatario: calleDestinatario,
+            numeroDeCalle: alturaDestinatario,
+            telefono: telefonoDestinatario,
+            remito: idOperacion,
+            cotizacion: importeTotalFormateado // Usar el importe formateado
+            }).then(() => {         
+                console.log("Entrada agregada correctamente.");
+            }).catch((error) => {
+                console.error("Error al agregar entrada a Firebase:", error);
+            });
 
             const link = `https://andesmarcargas.com//ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
@@ -418,7 +526,7 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
             button.classList.add('btn-success');
             button.onclick = () => window.open(link, '_blank'); 
             NroEnvio.innerHTML = `<a href="https://andesmarcargas.com/seguimiento.html?numero=${idOperacion}&tipo=remito&cod=" target="_blank">Andesmar: ${idOperacion} <i class="bi bi-box-arrow-up-right"></i></a>`;
-            
+            spinner.style.display = 'none';
             if (envioState) {
                 envioState.className = 'em-circle-state2';
                 envioState.innerHTML = `Envio Preparado`;
@@ -426,20 +534,18 @@ function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinat
                 console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
             }
         } else {
-            text.innerHTML = `Envio No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
+            text.innerHTML = `Envio No Disponible <i class="bi bi-exclamation-circle-fill"></i>`;
             button.classList.remove('btn-primary');
             button.classList.add('btn-warning', 'btnAndesmarMeli');
             buttonAndr.disabled = false;
         }
     })
     .catch(error => {
-        console.error("Error:", error);
-        text.innerText = "Envio No Disponible ⚠️"; // Cambiar texto en caso de error
-        resultadoDiv.innerText = `Error: ${error.message}`; // Mostrar error debajo
+        console.error("Error en la solicitud:", error);
+        text.innerHTML = `Error en el envío <i class="bi bi-exclamation-circle-fill"></i>`;
+        button.classList.remove('btn-primary');
+        button.classList.add('btn-danger');
         buttonAndr.disabled = false;
-    })
-    .finally(() => {
-        spinner.style.display = 'none'; // Asegúrate de ocultar el spinner en caso de error
     });
 }
 
@@ -522,27 +628,33 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
     const provinciaNombre = Provincia.toLowerCase();
     const regionCodigo = regionMap[provinciaNombre] || ""; // Obtener el código de región
 
-    // Inicializar el array de bultos
-    const bultos = [];
-    const pesoTotal = peso || 0; // Obtener peso total
-    const volumenTotal = volumenCM3 || 0; // Obtener volumen total
+// Inicializar el array de bultos
+const bultos = [];
+const pesoTotal = peso || 0; // Obtener peso total
+const volumenTotal = volumenCM3 || 0; // Obtener volumen total
 
-    for (let i = 0; i < cantidad; i++) {
-        bultos.push({
-            "kilos": pesoTotal,
-            "largoCm": null,
-            "altoCm": null,
-            "anchoCm": null,
-            "volumenCm": volumenTotal,
-            "valorDeclaradoSinImpuestos": 99999 * 0.21,
-            "valorDeclaradoConImpuestos": 99999,
-            "referencias": [
-                { "meta": "detalle", "contenido": Producto },
-                { "meta": "idCliente", "contenido": (idOperacion + "-MELI").toUpperCase() },
-                { "meta": "observaciones", contenido: observaciones }
-            ]
-        });
-    }
+// Convertir Producto a minúsculas para la verificación
+const productoLowerCase = Producto.toLowerCase();
+
+// Determinar la cantidad a usar
+const cantidadFinal = productoLowerCase.includes("split") ? cantidad * 2 : cantidad;
+
+for (let i = 0; i < cantidadFinal; i++) {
+    bultos.push({
+        "kilos": pesoTotal,
+        "largoCm": null,
+        "altoCm": null,
+        "anchoCm": null,
+        "volumenCm": volumenTotal,
+        "valorDeclaradoSinImpuestos": 99999 * 0.21,
+        "valorDeclaradoConImpuestos": 99999,
+        "referencias": [
+            { "meta": "detalle", "contenido": Producto },
+            { "meta": "idCliente", "contenido": (idOperacion + "-MELI").toUpperCase() },
+            { "meta": "observaciones", contenido: observaciones }
+        ]
+    });
+}
 
     const requestData = {
         "contrato": volumenCM3 > 100000 ? "351002753" : "400017259",
