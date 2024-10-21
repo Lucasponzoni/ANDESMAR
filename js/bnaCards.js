@@ -240,6 +240,10 @@ function loadEnviosFromFirebase() {
     const spinner = document.getElementById('spinner');
     cardsContainer.innerHTML = '';
 
+    // Deshabilitar el buscador al inicio
+    searchInput.disabled = true;
+    searchInput.value = "Aguardando que cargue la web ⏳";
+
     spinner.style.display = 'block'; 
 
     firebase.database().ref('enviosBNA').once('value', function(snapshot) {
@@ -302,6 +306,10 @@ function loadEnviosFromFirebase() {
         allData.reverse();
         renderCards(allData);
         updatePagination(allData.length);
+
+        // Deshabilitar el buscador al inicio
+        searchInput.disabled = false;
+        searchInput.value = "";
         
         // Actualizar el contador en el botón
         document.getElementById('contadorCards').innerText = sinPrepararCount;

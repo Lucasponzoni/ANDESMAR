@@ -333,6 +333,7 @@ function formatearTiempoPromedio(totalMs, count) {
 }
 
 function renderCards(data) {
+
     const tableBody = document.querySelector('#data-table tbody');
     tableBody.innerHTML = '';
 
@@ -412,6 +413,10 @@ function renderCards(data) {
     } else {
         document.getElementById('promedioBtn').innerHTML = `<i class="bi bi-alarm-fill"></i> Promedio: -`;
     }
+
+    // Deshabilitar el buscador al inicio
+    searchInput.disabled = false;
+    searchInput.value = "";
 }
 
 async function generarPDF(remito, cliente, fechaEntrega, button) {

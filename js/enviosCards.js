@@ -55,6 +55,9 @@ document.addEventListener("DOMContentLoaded", function() {
         return text ? text.toLowerCase() : '';
     }
 
+// Deshabilitar el buscador al inicio
+searchInput.disabled = true;
+searchInput.value = "Aguardando que cargue la web ⏳";
 
 // Obtener los datos de Firebase del primer proyecto
 database.ref('enviosAndesmar').once('value', (snapshot) => {
@@ -80,6 +83,10 @@ database.ref('enviosAndesmar').once('value', (snapshot) => {
     renderCards(allData).then(() => {
         spinner.style.display = "none";
         updatePagination(allData.length);
+
+        // Habilitar el buscador después de cargar los datos
+        searchInput.disabled = false;
+        searchInput.value = "";
     });
 });
 
