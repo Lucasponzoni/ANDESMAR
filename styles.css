@@ -852,6 +852,10 @@ footer > a:hover{
     width: 120px;
 }
 
+#real-trends{
+    width: 30px;
+}
+
 .www{
     font-family: 'Modica Oft';
     font-size: larger;
@@ -2880,6 +2884,35 @@ div.card-body > p > i{
     font-size: 16px; 
 }
 
+.payment-cell {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #f7f7f8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.payment-cell:hover {
+    background-color: #f0f0f5; 
+    transform: scale(1.02); 
+}
+
+.payment-cell img {
+    width: 50px !important; 
+    height: auto;
+    margin-right: 3px; 
+}
+
+.payment-details {
+    font-size: 14px;
+    color: #333;
+}
+
+strong {
+    color: black; 
+}
 
 
 
