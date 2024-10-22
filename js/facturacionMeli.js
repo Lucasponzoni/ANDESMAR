@@ -89,19 +89,85 @@ function loadTable() {
 
     paginatedData.forEach(operation => {
         const row = document.createElement('tr');
-
+    
         // Estado
         const stateCell = document.createElement('td');
-        stateCell.innerHTML = `
-            <select style="width: 130%;">
-                <option value="pendiente" selected>Pendiente ⏳</option>
-                <option value="facturado">Facturado ✅</option>
-                <option value="cancelado">Cancelado ❌</option>
-                <option value="pasado_a_web">Pasado a Web</option>
-                <option value="analizar_pasado_a_web">Pasar a Web</option>
-            </select>
+        const selectElement = document.createElement('select');
+        selectElement.style.width = '130%';
+        selectElement.innerHTML = `
+            <option value="pendiente">Pendiente ⏳</option>
+            <option value="facturado">Facturado ✅</option>
+            <option value="cancelado">Cancelado ❌</option>
+            <option value="Bloqueado">Bloqueado 🔒</option>
+            <option value="pasado_a_web">Pasado a Web</option>
+            <option value="analizar_pasado_a_web">Pasar a Web</option>
         `;
+        stateCell.appendChild(selectElement);
         row.appendChild(stateCell);
+
+        // Establecer el estado inicial desde Firebase
+        const currentState = operation.estadoFacturacion || 'pendiente'; // Valor por defecto 'pendiente'
+        selectElement.value = currentState;
+
+        // Cambiar el color de fondo de la fila según el estado
+        switch (currentState) {
+            case 'pendiente':
+                row.style.backgroundColor = 'white';
+                break;
+            case 'facturado':
+                row.style.backgroundColor = 'lightgreen';
+                break;
+            case 'Bloqueado':
+                row.style.backgroundColor = 'wheat';
+                break;
+            case 'cancelado':
+                row.style.backgroundColor = 'pink';
+                break;
+            case 'pasado_a_web':
+                row.style.backgroundColor = 'lightblue';
+                break;
+            case 'analizar_pasado_a_web':
+                row.style.backgroundColor = 'lightyellow';
+                break;
+            default:
+                row.style.backgroundColor = 'white';
+        }
+
+        // Cambiar el color de fondo de la fila al cambiar el valor del select
+        selectElement.addEventListener('change', function() {
+            switch (selectElement.value) {
+                case 'pendiente':
+                row.style.backgroundColor = 'white';
+                break;
+            case 'facturado':
+                row.style.backgroundColor = 'lightgreen';
+                break;
+            case 'Bloqueado':
+                row.style.backgroundColor = 'wheat';
+                break;
+            case 'cancelado':
+                row.style.backgroundColor = 'pink';
+                break;
+            case 'pasado_a_web':
+                row.style.backgroundColor = 'lightblue';
+                break;
+            case 'analizar_pasado_a_web':
+                row.style.backgroundColor = 'lightyellow';
+                break;
+            default:
+                row.style.backgroundColor = 'white';
+            }
+    
+            // Actualizar el estado en Firebase
+            const operationId = operation.idOperacion; // Usa el ID único de la operación
+            db.ref('envios/' + operationId).update({ estadoFacturacion: selectElement.value })
+                .then(() => {
+                    console.log(`Estado de facturación actualizado a ${selectElement.value} para la operación ${operationId}`);
+                })
+                .catch(error => {
+                    console.error("Error al actualizar el estado de facturación:", error);
+                });
+        });
 
         // Fecha y hora
         const dateCell = document.createElement('td');
@@ -137,7 +203,7 @@ function loadTable() {
         const shippingCost = operation.payments[0]?.shipping_cost || 0;
         shippingCell.style.whiteSpace = 'nowrap';
         shippingCell.innerHTML = shippingCost === 0 
-            ? `<strong style="color: orangered;">GRATUITO</strong>` 
+            ? `<strong class="grauito" style="color: orangered;">GRATUITO</strong>` 
             : `<strong style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
         row.appendChild(shippingCell);
 
@@ -509,3 +575,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 // FIN BUSCADOR
+
+let lastCheckTimestamp = Date.now();
+const checkInterval = 5 * 60 * 1000; // 5 minutos en milisegundos
+
+function checkForNewSales() {
+  db.ref('envios').orderByChild('shippingMode').equalTo('me1').once('value')
+    .then(snapshot => {
+      const data = snapshot.val();
+      const newSales = Object.values(data).filter(operation => new Date(operation.dateCreated).getTime() > lastCheckTimestamp);
+
+      if (newSales.length > 0) {
+        document.getElementById('notificationMessage').textContent = `Ingresaron ${newSales.length} ventas ME1 nuevas que no están en planilla`;
+        document.getElementById('newSalesNotification').style.display = 'block';
+        lastCheckTimestamp = Date.now();
+      }
+    })
+    .catch(error => {
+      console.error("Error al verificar nuevas ventas: ", error);
+    });
+}
+
+function closeNotification() {
+  document.getElementById('newSalesNotification').style.display = 'none';
+}
+
+// Iniciar la verificación cada 5 minutos
+setInterval(checkForNewSales, checkInterval);
+
+// Verificar una vez al cargar la página
+checkForNewSales();

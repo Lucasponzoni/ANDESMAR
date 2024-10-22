@@ -2858,6 +2858,29 @@ div.card-body > p > i{
     color: #c62828; 
 }
 
+.grauito{
+    background-color: red;
+    color: white !important;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 1000;
+  }
+  .notification .close {
+    cursor: pointer;
+  }
+
 /* Estilos del carrusel */
 .carousel {
     border: solid 1px cornflowerblue;
