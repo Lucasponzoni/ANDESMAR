@@ -78,6 +78,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 });
 
+// Obtener el valor de PasarAWebMonto antes de cargar las filas
+let pasarAWebMonto = 0;
+db.ref('PasarAWebMonto').once('value')
+    .then(snapshot => {
+        pasarAWebMonto = snapshot.val() || 0;
+    })
+    .catch(error => {
+        console.error("Error al obtener PasarAWebMonto: ", error);
+    });
+
 // Función para cargar la tabla con paginación
 function loadTable() {
     const start = (currentPage - 1) * itemsPerPage;
@@ -99,8 +109,10 @@ function loadTable() {
             <option value="facturado">Facturado ✅</option>
             <option value="cancelado">Cancelado ❌</option>
             <option value="Bloqueado">Bloqueado 🔒</option>
+            <option value="analizar_pasado_a_web">Web ⚠️</option>
+            <option value="pendiente_no_pasa_web">No Pasa ⏳</option>
             <option value="pasado_a_web">Pasado a Web</option>
-            <option value="analizar_pasado_a_web">Pasar a Web</option>
+            
         `;
         stateCell.appendChild(selectElement);
         row.appendChild(stateCell);
@@ -191,12 +203,67 @@ function loadTable() {
         `;
         row.appendChild(imageCell);
 
+            // Valor
+const valueCell = document.createElement('td');
+const transactionAmount = operation.payments[0]?.transaction_amount || 0;
+valueCell.innerHTML = `<strong style="color: green;">${formatCurrency(transactionAmount)}</strong>`;
+row.appendChild(valueCell);
 
-        // Valor
-        const valueCell = document.createElement('td');
-        const transactionAmount = operation.payments[0]?.transaction_amount || 0;
-        valueCell.innerHTML = `<strong style="color: green;">${formatCurrency(transactionAmount)}</strong>`;
-        row.appendChild(valueCell);
+// Verificar y actualizar el estado si el monto es mayor o igual a PasarAWebMonto
+if (transactionAmount >= pasarAWebMonto && (currentState === 'pendiente' || currentState === 'analizar_pasado_a_web' || currentState === undefined)) {
+    selectElement.value = 'analizar_pasado_a_web';
+    db.ref('envios/' + operation.idOperacion).update({ estadoFacturacion: 'analizar_pasado_a_web' })
+        .then(() => {
+            console.log(`Estado actualizado a analizar_pasado_a_web para la operación ${operation.idOperacion}`);
+            updateRowColor(); // Llamar a updateRowColor después de actualizar el estado
+        })
+        .catch(error => {
+            console.error("Error al actualizar el estado de facturación:", error);
+        });
+} else if (transactionAmount < pasarAWebMonto && currentState === 'analizar_pasado_a_web') {
+    selectElement.value = 'pendiente';
+    db.ref('envios/' + operation.idOperacion).update({ estadoFacturacion: 'pendiente' })
+        .then(() => {
+            console.log(`Estado revertido a pendiente para la operación ${operation.idOperacion}`);
+            updateRowColor(); // Llamar a updateRowColor después de actualizar el estado
+        })
+        .catch(error => {
+            console.error("Error al revertir el estado de facturación:", error);
+        });
+}
+
+// Cambiar el color de fondo de la fila según el estado
+const updateRowColor = () => {
+    switch (selectElement.value) {
+        case 'pendiente':
+            row.style.backgroundColor = 'white';
+            break;
+        case 'facturado':
+            row.style.backgroundColor = 'lightgreen';
+            break;
+        case 'bloqueado':
+            row.style.backgroundColor = 'wheat';
+            break;
+        case 'cancelado':
+            row.style.backgroundColor = 'pink';
+            break;
+        case 'pasado_a_web':
+            row.style.backgroundColor = 'lightblue';
+            break;
+        case 'analizar_pasado_a_web':
+            row.style.backgroundColor = 'lightyellow';
+            break;
+        default:
+            row.style.backgroundColor = 'white';
+    }
+};
+updateRowColor();
+
+// Escuchar cambios en el select para actualizar el color
+selectElement.addEventListener('change', () => {
+    updateRowColor();
+});
+
 
         // Envío
         const shippingCell = document.createElement('td');
@@ -605,3 +672,61 @@ setInterval(checkForNewSales, checkInterval);
 
 // Verificar una vez al cargar la página
 checkForNewSales();
+
+// CONFIRGURAR MONTO PARA PASAR A WEB
+$(document).ready(function() {
+    $('#inputModal').on('show.bs.modal', function () {
+      // Cargar el valor desde Firebase cuando se abre el modal
+      const dbRef = firebase.database().ref('PasarAWebMonto');
+      dbRef.once('value').then(snapshot => {
+        const value = snapshot.val();
+        if (value !== null) {
+          document.getElementById('numericInput').value = value;
+        } else {
+          document.getElementById('numericInput').value = '';
+        }
+      }).catch(error => {
+        console.error("Error al cargar el valor: ", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al cargar el valor.',
+        });
+      });
+    });
+  });
+
+  function saveValue() {
+    const inputValue = document.getElementById('numericInput').value;
+
+    if (inputValue === '') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Por favor, ingresa un valor numérico.',
+      });
+      return;
+    }
+
+    // Pushear el valor a Firebase
+    const dbRef = firebase.database().ref('PasarAWebMonto');
+    dbRef.set(Number(inputValue))
+      .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Guardado',
+          text: 'El valor ha sido guardado exitosamente.',
+        });
+        $('#inputModal').modal('hide'); // Cerrar el modal después de guardar
+        location.reload();
+      })
+      .catch(error => {
+        console.error("Error al guardar el valor: ", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al guardar el valor.',
+        });
+      });
+  }
+  // FIN CONFIRGURAR MONTO PARA PASAR A WEB

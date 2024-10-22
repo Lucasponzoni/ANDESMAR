@@ -3012,6 +3012,21 @@ strong {
 }
 /* FIN MODAL COMENTARIOS EN FACTURACION */
 
+.open-modal-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .open-modal-button:hover {
+    background-color: #0056b3;
+  }
+  
+
 
 
 

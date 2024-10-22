@@ -62,6 +62,12 @@
                 <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
                    <i class="bi bi-arrow-return-left"></i>
                 </button>
+
+                <button class="open-modal-button" data-toggle="modal" data-target="#inputModal">
+                    <i class="bi bi-shop"></i>
+                  </button>
+                
+            </div>
             </div>
                                    
         </div>
@@ -169,6 +175,27 @@
     <button class="btn btn-primary mt-2" onclick="location.reload()">Recargar Página</button>
   </div>
 <!-- Fin Alert Nuevas Ventas -->
+
+<!-- Modal -->
+<div class="modal fade" id="inputModal" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="inputModalLabel">Ingresar Monto</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="number" id="numericInput" class="form-control" placeholder="Ingresa un monto" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary" onclick="saveValue()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
     
         <!-- Botón de flecha hacia arriba -->
         <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
