@@ -87,7 +87,7 @@
                 <tr>
                     <th><i class="bi bi-geo-alt-fill"></i> Estado</th>
                     <th style="white-space: nowrap;"><i class="bi bi-calendar-check-fill"></i> Fecha</th>
-                    <th><i class="bi bi-person-badge-fill"></i> Operación</th>
+                    <th><i class="bi bi-person-badge-fill"></i> Id</th>
                     <th><i class="bi bi-file-earmark-text-fill"></i> Rt</th>
                     <th style="white-space: nowrap;"><i class="bi bi-currency-dollar"></i> Valor</th>
                     <th style="white-space: nowrap;"><i class="bi bi-currency-dollar"></i> Envío</th>
@@ -115,27 +115,46 @@
             <div class="spinner"></div>
         </div>
         
-    <!-- Modal Comentario -->
-    <div class="modal fade" id="comentarioModal" tabindex="-1" aria-labelledby="comentarioModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="comentarioModalLabel">Actualizar Comentario</h5>
-                    <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
+<!-- Modal Comentario -->
+<div class="modal fade" id="comentarioModal" tabindex="-1" aria-labelledby="comentarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="comentarioModalLabel">Actualizar Comentario</h5>
+                <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="comentarioInput" class="form-control" placeholder="Escribe tu comentario aquí..." rows="3" style="resize: none;"></textarea>
+                
+                <!-- Input de Email -->
+                <div class="input-group mt-3">
+                    <span class="input-group-text"><i class="ios-fact bi bi-envelope-fill"></i></span>
+                    <input type="email" class="form-control" placeholder="Actualizar email" aria-label="Email">
+                    <button id="guardarEmailBtn" class="btn btn-primary-2" type="button">Guardar</button>
                 </div>
-                <div class="modal-body">
-                    <textarea id="comentarioInput" class="form-control" placeholder="Escribe tu comentario aquí..." rows="3" style="resize: none;"></textarea>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="guardarComentarioBtn">Guardar Comentario</button>
-                </div>
+
+                <!-- Input de Teléfono -->
+    <div class="input-group mt-3">
+    <span class="input-group-text"><i class="ios-fact bi bi-telephone-fill"></i></span>
+    <input type="tel" class="form-control" placeholder="Actualizar teléfono" aria-label="Teléfono">
+    <button id="guardarTelefonoBtn" class="btn btn-primary-2" type="button">Guardar</button> <!-- Corregido -->
+    </div>
+
+    <!-- Contenedor de Alerta -->
+    <div id="alertContainerFacturacion" class="mt-3"></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="guardarComentarioBtn">Guardar Comentario</button>
             </div>
         </div>
     </div>
-    <!-- Fin Modal Comentario -->
+
+</div>
+<!-- Fin Modal Comentario -->
     
         <!-- Botón de flecha hacia arriba -->
         <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">

@@ -93,10 +93,10 @@ function loadTable() {
         // Estado
         const stateCell = document.createElement('td');
         stateCell.innerHTML = `
-            <select style="width: 100%;">
-                <option value="pendiente" selected>Pendiente</option>
-                <option value="facturado">Facturado</option>
-                <option value="cancelado">Cancelado</option>
+            <select style="width: 130%;">
+                <option value="pendiente" selected>Pendiente ⏳</option>
+                <option value="facturado">Facturado ✅</option>
+                <option value="cancelado">Cancelado ❌</option>
                 <option value="pasado_a_web">Pasado a Web</option>
                 <option value="analizar_pasado_a_web">Pasar a Web</option>
             </select>
@@ -112,14 +112,19 @@ function loadTable() {
         const operationCell = document.createElement('td');
         const operationId = operation.idOperacion.toString().replace('200000', '');
         operationCell.innerHTML = `
-            <a href="https://www.mercadolibre.com.ar/ventas/${operation.idOperacion}/detalle" target="_blank">${operationId}</a>
+            <a href="https://www.mercadolibre.com.ar/ventas/${operation.idOperacion}/detalle" target="_blank"><img id="Meli-trends" src="./Img/meli-trends.png" alt="Meli Trends"></a>
         `;
         row.appendChild(operationCell);
 
         // Imagen
         const imageCell = document.createElement('td');
-        imageCell.innerHTML = `<img id="real-trends" src="./Img/real-trends.png" alt="Real Trends">`;
+        imageCell.innerHTML = `
+        <a href="https://app.real-trends.com/orders/sale_detail/?order_id=200000${operationId}" target="_blank">
+        <img id="real-trends" src="./Img/real-trends.png" alt="Real Trends">
+        </a>
+        `;
         row.appendChild(imageCell);
+
 
         // Valor
         const valueCell = document.createElement('td');
@@ -138,71 +143,73 @@ function loadTable() {
 
         // Producto
         const productCell = document.createElement('td');
-        productCell.innerHTML = `X${operation.Cantidad} - ${operation.SKU}`;
+        productCell.className = 'product-cell'; // Añadir clase para estilo iOS
+        productCell.innerHTML = `Cantidad: <strong>X${operation.Cantidad}</strong> <br> SKU: <strong>${operation.SKU}</strong>`;
         row.appendChild(productCell);
 
-        // Medio de pago
-        const paymentCell = document.createElement('td');
-        const payment = operation.payments[0];
 
-        let paymentMethodImage = '';
-        let paymentDetails = '';
+// Medio de pago
+const paymentCell = document.createElement('td');
+const payment = operation.payments[0];
 
-        switch (payment.payment_method_id) {
-            case 'consumer_credits':
-                paymentMethodImage = './Img/mercadocredito.png';
-                paymentDetails = 'Credito sin tarjeta';
-                break;
-            case 'account_money':
-                paymentMethodImage = './Img/mercadopago.png';
-                paymentDetails = 'Dinero en Cuenta';
-                break;
-            case 'visa':
-            case 'debvisa':
-                paymentMethodImage = './Img/visa.png';
-                break;
-            case 'master':
-            case 'debmaster':
-                paymentMethodImage = './Img/master.png';
-                break;
-            case 'amex':
-                paymentMethodImage = './Img/amex.png';
-                break;
-            case 'naranja':
-                paymentMethodImage = './Img/naranja.png';
-                break;
-            case 'cabal':
-            case 'debcabal':
-                paymentMethodImage = './Img/cabal.png';
-                break;
-            case 'pagofacil':
-                paymentMethodImage = './Img/pagofacil.png';
-                paymentDetails = 'PagoFacil Ticket';
-                break;
-            case 'rapipago':
-                paymentMethodImage = './Img/rapipago.png';
-                paymentDetails = 'RapiPago Ticket';
-                break;
-        }
+let paymentMethodImage = '';
+let paymentDetails = '';
 
-        if (payment.payment_method_id !== 'consumer_credits' && payment.payment_method_id !== 'account_money' && payment.payment_method_id !== 'pagofacil' && payment.payment_method_id !== 'rapipago') {
-            const paymentType = payment.payment_type === 'credit_card' ? '<strong>Credito</strong>' : payment.payment_type === 'debit_card' ? '<strong>Debito</strong>' : payment.payment_type;
-            paymentDetails = `${paymentType} en ${payment.installments} cuota/s de ${formatCurrency(payment.installment_amount)}`;
-        }
+switch (payment.payment_method_id) {
+    case 'consumer_credits':
+        paymentMethodImage = './Img/mercadocredito.png';
+        paymentDetails = '<strong>Crédito sin tarjeta</strong>';
+        break;
+    case 'account_money':
+        paymentMethodImage = './Img/mercadopago.png';
+        paymentDetails = '<strong>Dinero en Cuenta</strong>';
+        break;
+    case 'visa':
+    case 'debvisa':
+        paymentMethodImage = './Img/visa.png';
+        break;
+    case 'master':
+    case 'debmaster':
+        paymentMethodImage = './Img/master.png';
+        break;
+    case 'amex':
+        paymentMethodImage = './Img/amex.png';
+        break;
+    case 'naranja':
+        paymentMethodImage = './Img/naranja.png';
+        break;
+    case 'cabal':
+    case 'debcabal':
+        paymentMethodImage = './Img/cabal.png';
+        break;
+    case 'pagofacil':
+        paymentMethodImage = './Img/pagofacil.png';
+        paymentDetails = '<strong>PagoFacil Ticket</strong>';
+        break;
+    case 'rapipago':
+        paymentMethodImage = './Img/rapipago.png';
+        paymentDetails = '<strong>RapiPago Ticket</strong>';
+        break;
+}
 
-        paymentCell.innerHTML = `
-            <div class="payment-cell">
-                <img src="${paymentMethodImage}" alt="${payment.payment_method_id}">
-                <span class="payment-details">${paymentDetails}</span>
-            </div>
-        `;
-        row.appendChild(paymentCell);
+if (payment.payment_method_id !== 'consumer_credits' && payment.payment_method_id !== 'account_money' && payment.payment_method_id !== 'pagofacil' && payment.payment_method_id !== 'rapipago') {
+    const paymentType = payment.payment_type === 'credit_card' ? '<strong>Crédito</strong>' : payment.payment_type === 'debit_card' ? '<strong>Débito</strong>' : payment.payment_type;
+    paymentDetails = `${paymentType} en ${payment.installments} cuota/s de ${formatCurrency(payment.installment_amount)}`;
+}
+
+paymentCell.innerHTML = `
+    <div class="payment-cell">
+        <img src="${paymentMethodImage}" alt="${payment.payment_method_id}">
+        <span class="payment-details">${paymentDetails}</span>
+    </div>
+`;
+row.appendChild(paymentCell);
 
 // Botón para eliminar
 const deleteCell = document.createElement('td');
 const deleteButton = document.createElement('button');
-deleteButton.innerHTML = '<i class="bi bi-trash-fill"></i>';
-deleteButton.className = 'btn btn-danger';
+deleteButton.innerHTML = 'X';
+deleteButton.className = 'btn btn-sm btn-danger';
 deleteButton.onclick = () => {
     const row = deleteButton.closest('tr'); // Obtener la fila más cercana
 
@@ -239,7 +246,7 @@ row.appendChild(deleteCell);
 // Botón de comentario
 const commentCell = document.createElement('td');
 const commentButton = document.createElement('button');
-commentButton.className = 'btn ' + (operation.comentario ? 'btn-success' : 'btn-secondary');
+commentButton.className = 'btn btn-sm ' + (operation.comentario ? 'btn-success' : 'btn-secondary');
 commentButton.innerHTML = '<i class="bi bi-pencil"></i>';
 commentCell.appendChild(commentButton);
 row.appendChild(commentCell);
@@ -256,13 +263,17 @@ commentButton.onclick = () => {
         return;
     }
 
-    // Cargar el comentario existente desde Firebase
+    // Cargar el comentario, email y teléfono existentes desde Firebase
     db.ref('envios').child(operation.idOperacion).once('value', snapshot => {
         if (snapshot.exists()) {
             const data = snapshot.val();
             document.getElementById('comentarioInput').value = data.comentario || ''; // Cargar comentario existente
+            document.querySelector('input[type="email"]').value = data.email || ''; // Cargar email existente
+            document.querySelector('input[type="tel"]').value = data.Telefono || ''; // Cargar teléfono existente
         } else {
-            document.getElementById('comentarioInput').value = ''; // Si no existe, limpiar el input
+            document.getElementById('comentarioInput').value = ''; // Limpiar el input
+            document.querySelector('input[type="email"]').value = ''; // Limpiar el input de email
+            document.querySelector('input[type="tel"]').value = ''; // Limpiar el input de teléfono
         }
     });
 
@@ -288,7 +299,50 @@ commentButton.onclick = () => {
                 Swal.fire('Error', 'No se pudo actualizar el comentario: ' + error.message, 'error');
             });
     };
+
+    // Manejar el clic en el botón para guardar el email
+    document.getElementById('guardarEmailBtn').onclick = function() {
+        const email = document.querySelector('input[type="email"]').value;
+
+        // Actualizar el email en Firebase
+        db.ref('envios').child(operation.idOperacion).update({ email: email })
+            .then(() => {
+                mostrarAlertaExito('Email actualizado correctamente.');
+            })
+            .catch(error => {
+                Swal.fire('Error', 'No se pudo actualizar el email: ' + error.message, 'error');
+            });
+    };
+
+    // Manejar el clic en el botón para guardar el teléfono
+    document.getElementById('guardarTelefonoBtn').onclick = function() {
+        const telefono = document.querySelector('input[type="tel"]').value;
+
+        // Actualizar el teléfono en Firebase
+        db.ref('envios').child(operation.idOperacion).update({ Telefono: telefono })
+            .then(() => {
+                mostrarAlertaExito('Teléfono actualizado correctamente.');
+            })
+            .catch(error => {
+                Swal.fire('Error', 'No se pudo actualizar el teléfono: ' + error.message, 'error');
+            });
+    };
 };
+
+function mostrarAlertaExito(mensaje) {
+    console.log('Mostrando alerta de éxito:', mensaje); // Verifica que la función se llama
+    const alertContainer = document.getElementById('alertContainerFacturacion');
+    if (alertContainer) {
+        console.log('Contenedor de alertas encontrado:', alertContainer); // Verifica que el contenedor se encuentra
+        alertContainer.innerText = `${mensaje} ✅`;
+        setTimeout(() => {
+            alertContainer.innerText = ''; // Limpiar la alerta después de 3 segundos
+        }, 3000);
+    } else {
+        console.error('Contenedor de alertas no encontrado.');
+    }
+}
+
     });
 
     // Paginación
@@ -341,6 +395,63 @@ function updatePagination() {
         paginationContainer.appendChild(backItem);
     }
 }
+
+// BUSCADOR
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchFacturacion');
+    const tableBody = document.querySelector('#data-table tbody');
+    const pagination = document.getElementById('pagination');
+    const errorContainer = document.querySelector('.error-message');
+    const searchTermDisplay = document.getElementById('search-term'); // Añade esta línea
+
+    searchInput.addEventListener('input', () => {
+        const filter = searchInput.value.toLowerCase();
+        const rows = tableBody.getElementsByTagName('tr');
+        let hasVisibleRows = false;
+
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            let rowVisible = false;
+
+            for (let j = 0; j < cells.length; j++) {
+                const cell = cells[j];
+                if (cell) {
+                    const cellText = cell.textContent || cell.innerText;
+                    if (cellText.toLowerCase().includes(filter)) {
+                        rowVisible = true;
+                        break;
+                    }
+                }
+            }
+
+            if (rowVisible) {
+                rows[i].style.display = ""; // Muestra la fila
+                hasVisibleRows = true;
+            } else {
+                rows[i].style.display = "none"; // Oculta la fila
+            }
+        }
+
+        // Manejo de la paginación
+        pagination.style.display = filter ? "none" : "";
+
+        // Manejo del mensaje de error
+        if (filter) {
+            if (!hasVisibleRows) {
+                searchTermDisplay.textContent = filter; // Actualiza el contenido del input en el mensaje de error
+                errorContainer.style.display = ''; // Mostrar mensaje de error
+                tableBody.parentElement.style.display = 'none'; // Ocultar la tabla
+            } else {
+                errorContainer.style.display = 'none'; // Ocultar mensaje de error
+                tableBody.parentElement.style.display = ''; // Mostrar la tabla
+            }
+        } else {
+            errorContainer.style.display = 'none'; // Ocultar mensaje de error si el input está vacío
+            tableBody.parentElement.style.display = ''; // Mostrar la tabla
+        }
+    });
+});
+// FIN BUSCADOR
 
 // BUSCADOR
 document.addEventListener('DOMContentLoaded', () => {

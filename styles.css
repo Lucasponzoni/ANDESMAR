@@ -853,7 +853,11 @@ footer > a:hover{
 }
 
 #real-trends{
-    width: 30px;
+    width: 40px;
+}
+
+#Meli-trends{
+    width: 40px;
 }
 
 .www{
@@ -2900,7 +2904,7 @@ div.card-body > p > i{
 }
 
 .payment-cell img {
-    width: 50px !important; 
+    width: 55px !important; 
     height: auto;
     margin-right: 3px; 
 }
@@ -2913,6 +2917,77 @@ div.card-body > p > i{
 strong {
     color: black; 
 }
+
+/* Nuevo estilo iOS para la columna Producto */
+.product-cell {
+    padding: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #444; 
+    text-align: left;
+    font-size: 12px !important; 
+    font-weight: 500; 
+    line-height: 1.6;
+    transition: background-color 0.3s ease, transform 0.2s ease; 
+}
+
+/* MODAL COMENTARIOS EN FACTURACION */
+.input-group .form-control {
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-group .form-control:focus {
+    border-color: #007aff; /* Azul iOS */
+    box-shadow: 0 0 8px rgba(0, 122, 255, 0.5);
+    outline: none;
+}
+
+.input-group-text {
+    background-color: #f8f8f8;
+    border: none;
+    border-radius: 10px 0 0 10px;
+    padding: 2px;
+    font-size: 18px;
+    color: #007aff; /* Azul iOS */
+}
+
+.ios-fact{
+    font-size: 25px !important;
+}
+
+#alertContainerFacturacion {
+    display: block !important;
+}
+
+.btn-primary-2 {
+    color: white;
+    font-weight: 400;
+    background-color: grey; /* Azul iOS */
+    border: none;
+    border-radius: 0px;
+    padding: 10px 20px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    transition: .5s;
+}
+
+.btn-primary-2:hover {
+    color: white;
+    font-weight: 400;
+    background-color: #005bb5; 
+}
+
+#alertContainerFacturacion{
+    color: green;
+    font-weight: 600;
+    text-align: center;
+    padding: 10px;
+}
+/* FIN MODAL COMENTARIOS EN FACTURACION */
 
 
 
