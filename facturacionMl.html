@@ -60,14 +60,35 @@
             
             <div class="col-md-3 mb-3 d-flex justify-content-end ingreso-egreso trio-de-botones">
                 <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
-                   <i class="bi bi-arrow-return-left"></i>
+                    <i class="bi bi-arrow-return-left"></i>
                 </button>
-
-                <button class="open-modal-button" data-toggle="modal" data-target="#inputModal">
-                    <i class="bi bi-shop"></i>
-                  </button>
+            
+                <div class="contenedorSelect">
+                    <select id="estadoFilter">
+                        <option value="">Todos</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="facturado">Facturado</option>
+                        <option value="cancelado">Cancelado</option>
+                        <option value="bloqueado">Bloqueado</option>
+                        <option value="analizar_pasado_a_web">Analizar Pasado a Web</option>
+                        <option value="pasado_a_web">Pasado a Web</option>
+                    </select>
+                </div>   
                 
+                <button class="btn btn-primary" data-toggle="modal" data-target="#inputModal">
+                    <i class="bi bi-shop"></i>
+                </button>
+            
+                <div id="btnNotificaciones" class="position-relative d-flex justify-content-center align-items-center bg-info text-white p-2 rounded" style="white-space: nowrap;">
+                    Pendientes <i class="bi bi-bell"></i>
+                    <span id="contadorNotificaciones" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-large">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <span class="visually-hidden"></span>
+                    </span>
+                </div>                               
+            
             </div>
+            
             </div>
                                    
         </div>
