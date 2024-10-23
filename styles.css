@@ -1214,12 +1214,14 @@ p.card-text:nth-child(9){
 }
 
 .pago{
+    background-color: white;
     border-radius: 10px;
     border: dashed 2px cornflowerblue;
     padding: .5rem;
 }
 
 .facturacion{
+    background-color: white;
     border-radius: 10px;
     border: dashed 2px cornflowerblue;
     padding: .5rem;
@@ -2937,10 +2939,6 @@ div.card-body > p > i{
     color: #333;
 }
 
-strong {
-    color: black; 
-}
-
 /* Nuevo estilo iOS para la columna Producto */
 .product-cell {
     padding: 15px;
@@ -2967,15 +2965,6 @@ strong {
     border-color: #007aff; /* Azul iOS */
     box-shadow: 0 0 8px rgba(0, 122, 255, 0.5);
     outline: none;
-}
-
-.input-group-text {
-    background-color: #f8f8f8;
-    border: none;
-    border-radius: 10px 0 0 10px;
-    padding: 2px;
-    font-size: 18px;
-    color: #007aff; /* Azul iOS */
 }
 
 .ios-fact{
