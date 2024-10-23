@@ -88,98 +88,112 @@ db.ref('PasarAWebMonto').once('value')
         console.error("Error al obtener PasarAWebMonto: ", error);
     });
 
-// Función para cargar la tabla con paginación
-function loadTable() {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    const paginatedData = allData.slice(start, end);
-    const tableBody = document.querySelector('#data-table tbody');
-
-    tableBody.innerHTML = ''; // Limpiar tabla antes de cargar nuevos datos
-
-    paginatedData.forEach(operation => {
-        const row = document.createElement('tr');
+    function loadTable() {
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedData = allData.slice(start, end);
+        const tableBody = document.querySelector('#data-table tbody');
     
-        // Estado
-        const stateCell = document.createElement('td');
-        const selectElement = document.createElement('select');
-        selectElement.style.width = '130%';
-        selectElement.innerHTML = `
-            <option value="pendiente">Pendiente ⏳</option>
-            <option value="facturado">Facturado ✅</option>
-            <option value="cancelado">Cancelado ❌</option>
-            <option value="Bloqueado">Bloqueado 🔒</option>
-            <option value="analizar_pasado_a_web">Web ⚠️</option>
-            <option value="pendiente_no_pasa_web">No Pasa ⏳</option>
-            <option value="pasado_a_web">Pasado a Web</option>
-            
-        `;
-        stateCell.appendChild(selectElement);
-        row.appendChild(stateCell);
-
-        // Establecer el estado inicial desde Firebase
-        const currentState = operation.estadoFacturacion || 'pendiente'; // Valor por defecto 'pendiente'
-        selectElement.value = currentState;
-
-        // Cambiar el color de fondo de la fila según el estado
-        switch (currentState) {
-            case 'pendiente':
-                row.style.backgroundColor = 'white';
-                break;
-            case 'facturado':
-                row.style.backgroundColor = 'lightgreen';
-                break;
-            case 'Bloqueado':
-                row.style.backgroundColor = 'wheat';
-                break;
-            case 'cancelado':
-                row.style.backgroundColor = 'pink';
-                break;
-            case 'pasado_a_web':
-                row.style.backgroundColor = 'lightblue';
-                break;
-            case 'analizar_pasado_a_web':
-                row.style.backgroundColor = 'lightyellow';
-                break;
-            default:
-                row.style.backgroundColor = 'white';
-        }
-
-        // Cambiar el color de fondo de la fila al cambiar el valor del select
-        selectElement.addEventListener('change', function() {
-            switch (selectElement.value) {
+        tableBody.innerHTML = ''; // Limpiar tabla antes de cargar nuevos datos
+    
+        paginatedData.forEach(operation => {
+            const row = document.createElement('tr');
+    
+            // Estado
+            const stateCell = document.createElement('td');
+    
+            // Contenedor para el idOperacion y el select
+            const container = document.createElement('div');
+            container.className = 'ios-style-id-container';
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column'; // Alinea elementos en columna
+    
+            // Elemento para el ID de operación
+        const idElement = document.createElement('span');
+        idElement.textContent = `${operation.idOperacion}`;
+        idElement.classList.add('ios-style-id'); // Añadir clase para estilo iOS
+        container.appendChild(idElement);
+    
+            const selectElement = document.createElement('select');
+            selectElement.style.width = '100%';
+            selectElement.innerHTML = `
+                <option value="pendiente">Pendiente ⏳</option>
+                <option value="facturado">Facturado ✅</option>
+                <option value="cancelado">Cancelado ❌</option>
+                <option value="bloqueado">Bloqueado 🔒</option>
+                <option value="analizar_pasado_a_web">Web ⚠️</option>
+                <option value="pendiente_no_pasa_web">No Pasa ⏳</option>
+                <option value="pasado_a_web">Pasado a Web</option>
+            `;
+            container.appendChild(selectElement);
+    
+            // Asegúrate de añadir el contenedor completo al stateCell
+            stateCell.appendChild(container);
+            row.appendChild(stateCell);
+    
+            // Establecer el estado inicial desde Firebase
+            const currentState = operation.estadoFacturacion || 'pendiente'; // Valor por defecto 'pendiente'
+            selectElement.value = currentState;
+    
+            // Cambiar el color de fondo de la fila según el estado
+            switch (currentState) {
                 case 'pendiente':
-                row.style.backgroundColor = 'white';
-                break;
-            case 'facturado':
-                row.style.backgroundColor = 'lightgreen';
-                break;
-            case 'Bloqueado':
-                row.style.backgroundColor = 'wheat';
-                break;
-            case 'cancelado':
-                row.style.backgroundColor = 'pink';
-                break;
-            case 'pasado_a_web':
-                row.style.backgroundColor = 'lightblue';
-                break;
-            case 'analizar_pasado_a_web':
-                row.style.backgroundColor = 'lightyellow';
-                break;
-            default:
-                row.style.backgroundColor = 'white';
+                    row.style.backgroundColor = 'white';
+                    break;
+                case 'facturado':
+                    row.style.backgroundColor = 'lightgreen';
+                    break;
+                case 'bloqueado':
+                    row.style.backgroundColor = 'grey';
+                    break;
+                case 'cancelado':
+                    row.style.backgroundColor = 'pink';
+                    break;
+                case 'pasado_a_web':
+                    row.style.backgroundColor = 'lightblue';
+                    break;
+                case 'analizar_pasado_a_web':
+                    row.style.backgroundColor = 'lightyellow';
+                    break;
+                default:
+                    row.style.backgroundColor = 'white';
             }
     
-            // Actualizar el estado en Firebase
-            const operationId = operation.idOperacion; // Usa el ID único de la operación
-            db.ref('envios/' + operationId).update({ estadoFacturacion: selectElement.value })
-                .then(() => {
-                    console.log(`Estado de facturación actualizado a ${selectElement.value} para la operación ${operationId}`);
-                })
-                .catch(error => {
-                    console.error("Error al actualizar el estado de facturación:", error);
-                });
-        });
+            // Cambiar el color de fondo de la fila al cambiar el valor del select
+            selectElement.addEventListener('change', function() {
+                switch (selectElement.value) {
+                    case 'pendiente':
+                        row.style.backgroundColor = 'white';
+                        break;
+                    case 'facturado':
+                        row.style.backgroundColor = 'lightgreen';
+                        break;
+                    case 'bloqueado':
+                        row.style.backgroundColor = 'grey';
+                        break;
+                    case 'cancelado':
+                        row.style.backgroundColor = 'pink';
+                        break;
+                    case 'pasado_a_web':
+                        row.style.backgroundColor = 'lightblue';
+                        break;
+                    case 'analizar_pasado_a_web':
+                        row.style.backgroundColor = 'lightyellow';
+                        break;
+                    default:
+                        row.style.backgroundColor = 'white';
+                }
+    
+                // Actualizar el estado en Firebase
+                const operationId = operation.idOperacion; // Usa el ID único de la operación
+                db.ref('envios/' + operationId).update({ estadoFacturacion: selectElement.value })
+                    .then(() => {
+                        console.log(`Estado de facturación actualizado a ${selectElement.value} para la operación ${operationId}`);
+                    })
+                    .catch(error => {
+                        console.error("Error al actualizar el estado de facturación:", error);
+                    });
+            });
 
         // Fecha y hora
         const dateCell = document.createElement('td');
@@ -390,41 +404,42 @@ tableBody.appendChild(row);
 commentButton.onclick = () => {
     console.log('ID de operación:', operation ? operation.idOperacion : 'undefined');
 
-    // Verificar si operation y operation.idOperacion están definidos
     if (!operation || !operation.idOperacion) {
         Swal.fire('Error', 'No se puede cargar el comentario: operación no válida.', 'error');
         return;
     }
 
-    // Cargar el comentario, email y teléfono existentes desde Firebase
+    // Cargar los datos existentes desde Firebase
     db.ref('envios').child(operation.idOperacion).once('value', snapshot => {
         if (snapshot.exists()) {
             const data = snapshot.val();
-            document.getElementById('comentarioInput').value = data.comentario || ''; // Cargar comentario existente
-            document.querySelector('input[type="email"]').value = data.email || ''; // Cargar email existente
-            document.querySelector('input[type="tel"]').value = data.Telefono || ''; // Cargar teléfono existente
+            document.getElementById('comentarioInput').value = data.comentario || '';
+            document.querySelector('input[type="email"]').value = data.email || '';
+            document.querySelector('input[type="tel"]').value = data.Telefono || '';
+
+            // Verificar si existe el trackingNumber
+            if (data.trackingNumber) {
+                actualizarEstadoDespacho(true);
+            } else {
+                actualizarEstadoDespacho(false);
+            }
         } else {
-            document.getElementById('comentarioInput').value = ''; // Limpiar el input
-            document.querySelector('input[type="email"]').value = ''; // Limpiar el input de email
-            document.querySelector('input[type="tel"]').value = ''; // Limpiar el input de teléfono
+            document.getElementById('comentarioInput').value = '';
+            document.querySelector('input[type="email"]').value = '';
+            document.querySelector('input[type="tel"]').value = '';
+            actualizarEstadoDespacho(false);
         }
     });
 
-    // Mostrar el modal
     $('#comentarioModal').modal('show');
 
-    // Manejar el clic en el botón para guardar el comentario
     document.getElementById('guardarComentarioBtn').onclick = function() {
         const comentario = document.getElementById('comentarioInput').value;
-
-        // Actualizar el comentario en Firebase
         db.ref('envios').child(operation.idOperacion).update({ comentario: comentario })
             .then(() => {
                 Swal.fire('¡Éxito!', 'Comentario actualizado correctamente.', 'success');
-                $('#comentarioModal').modal('hide'); // Cerrar modal
-                loadTable(); // Recargar la tabla
-
-                // Cambiar el botón a success
+                $('#comentarioModal').modal('hide');
+                loadTable();
                 commentButton.classList.remove('btn-secondary'); 
                 commentButton.classList.add('btn-success'); 
             })
@@ -433,11 +448,8 @@ commentButton.onclick = () => {
             });
     };
 
-    // Manejar el clic en el botón para guardar el email
     document.getElementById('guardarEmailBtn').onclick = function() {
         const email = document.querySelector('input[type="email"]').value;
-
-        // Actualizar el email en Firebase
         db.ref('envios').child(operation.idOperacion).update({ email: email })
             .then(() => {
                 mostrarAlertaExito('Email actualizado correctamente.');
@@ -447,11 +459,8 @@ commentButton.onclick = () => {
             });
     };
 
-    // Manejar el clic en el botón para guardar el teléfono
     document.getElementById('guardarTelefonoBtn').onclick = function() {
         const telefono = document.querySelector('input[type="tel"]').value;
-
-        // Actualizar el teléfono en Firebase
         db.ref('envios').child(operation.idOperacion).update({ Telefono: telefono })
             .then(() => {
                 mostrarAlertaExito('Teléfono actualizado correctamente.');
@@ -461,6 +470,19 @@ commentButton.onclick = () => {
             });
     };
 };
+
+function actualizarEstadoDespacho(isDespachado) {
+    const estadoDespacho = document.getElementById('estadoDespacho');
+    if (isDespachado) {
+        estadoDespacho.innerHTML = '<i class="bi bi-check-circle-fill"></i> Etiqueta de envío generada';
+        estadoDespacho.style.backgroundColor = '#d4edda';
+        estadoDespacho.style.color = '#155724';
+    } else {
+        estadoDespacho.innerHTML = '<i class="bi bi-x-circle-fill"></i> Etiqueta de envío sin generar';
+        estadoDespacho.style.backgroundColor = '#f8d7da';
+        estadoDespacho.style.color = '#721c24';
+    }
+}
 
 function mostrarAlertaExito(mensaje) {
     console.log('Mostrando alerta de éxito:', mensaje); // Verifica que la función se llama
@@ -643,6 +665,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 // FIN BUSCADOR
 
+// NOTIFICACION DE VENTAS
 let lastCheckTimestamp = Date.now();
 const checkInterval = 5 * 60 * 1000; // 5 minutos en milisegundos
 
@@ -653,7 +676,7 @@ function checkForNewSales() {
       const newSales = Object.values(data).filter(operation => new Date(operation.dateCreated).getTime() > lastCheckTimestamp);
 
       if (newSales.length > 0) {
-        document.getElementById('notificationMessage').textContent = `Ingresaron ${newSales.length} ventas ME1 nuevas que no están en planilla`;
+        document.getElementById('notificationMessage').textContent = `Ingresaron ${newSales.length} ventas nuevas que no están en planilla`;
         document.getElementById('newSalesNotification').style.display = 'block';
         lastCheckTimestamp = Date.now();
       }
@@ -672,6 +695,7 @@ setInterval(checkForNewSales, checkInterval);
 
 // Verificar una vez al cargar la página
 checkForNewSales();
+// FIN NOTIFICACION DE VENTAS
 
 // CONFIRGURAR MONTO PARA PASAR A WEB
 $(document).ready(function() {

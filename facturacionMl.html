@@ -142,14 +142,17 @@
                 </div>
 
                 <!-- Input de Teléfono -->
-    <div class="input-group mt-3">
-    <span class="input-group-text"><i class="ios-fact bi bi-telephone-fill"></i></span>
-    <input type="tel" class="form-control" placeholder="Actualizar teléfono" aria-label="Teléfono">
-    <button id="guardarTelefonoBtn" class="btn btn-primary-2" type="button">Guardar</button> <!-- Corregido -->
-    </div>
+                <div class="input-group mt-3">
+                    <span class="input-group-text"><i class="ios-fact bi bi-telephone-fill"></i></span>
+                    <input type="tel" class="form-control" placeholder="Actualizar teléfono" aria-label="Teléfono">
+                    <button id="guardarTelefonoBtn" class="btn btn-primary-2" type="button">Guardar</button>
+                </div>
 
-    <!-- Contenedor de Alerta -->
-    <div id="alertContainerFacturacion" class="mt-3"></div>
+                <!-- Estado de Despacho -->
+                <div id="estadoDespacho" class="mt-3 p-2 text-center rounded" style="font-weight: bold;"></div>
+
+                <!-- Contenedor de Alerta -->
+                <div id="alertContainerFacturacion" class="mt-3"></div>
 
             </div>
             <div class="modal-footer">
@@ -158,25 +161,27 @@
             </div>
         </div>
     </div>
-
 </div>
 <!-- Fin Modal Comentario -->
 
 <!-- Alert Nuevas Ventas -->
 <div class="notification" id="newSalesNotification">
     <div class="d-flex justify-content-between align-items-center">
-      <div>
-        <span id="notificationMessage"></span>
-      </div>
-      <button type="button" class="close ml-2" aria-label="Close" onclick="closeNotification()">
-        <span aria-hidden="true">&times;</span>
-      </button>
+        <div>
+            <i class="bi bi-info-circle-fill icon-info"></i>
+            <span id="notificationMessage">¡Tienes nuevas ventas!</span>
+        </div>
+        <button type="button" class="close" aria-label="Close" onclick="closeNotification()">
+            <i class="bi bi-x-circle"></i>
+        </button>
     </div>
-    <button class="btn btn-primary mt-2" onclick="location.reload()">Recargar Página</button>
-  </div>
+    <button class="btn mt-2" onclick="location.reload()">
+        <i class="bi bi-arrow-clockwise icon"></i>Recargar Página
+    </button>
+</div>
 <!-- Fin Alert Nuevas Ventas -->
 
-<!-- Modal -->
+<!-- Modal Actualizar Precio -->
 <div class="modal fade" id="inputModal" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -196,6 +201,7 @@
       </div>
     </div>
   </div>
+  <!-- Fin Modal Actualizar Precio -->
     
         <!-- Botón de flecha hacia arriba -->
         <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
