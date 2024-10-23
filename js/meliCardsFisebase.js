@@ -13,6 +13,101 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// Configuración del segundo proyecto de Firebase
+const firebaseConfig2 = {
+    apiKey: "AIzaSyBIXlgOct2UzkrZbZYbyHu6_NbLDzTqqig",
+    authDomain: "despachos-novogar.firebaseapp.com",
+    databaseURL: "https://despachos-novogar-default-rtdb.firebaseio.com",
+    projectId: "despachos-novogar",
+    storageBucket: "despachos-novogar.appspot.com",
+    messagingSenderId: "346020771441",
+    appId: "1:346020771441:web:c4a29c0db4200352080dd0",
+    measurementId: "G-64DDP7D6Q2"
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchMercadoLibre');
+    const spinner = document.getElementById('spinner');
+    const cardsContainer = document.getElementById('meli-cards');
+    const pagination = document.getElementById('pagination'); // Suponiendo que este es el ID del elemento de paginación
+
+    // Guarda el contenido inicial de cardsContainer en localStorage
+    if (!localStorage.getItem('initialContent')) {
+        localStorage.setItem('initialContent', cardsContainer.innerHTML);
+    }
+
+    // Evento para borrar el contenido al hacer clic y restaurar el contenido
+    searchInput.addEventListener('click', function() {
+        searchInput.value = ''; // Borra el contenido del input
+
+        // Restaura el contenido inicial desde localStorage
+        const initialContent = localStorage.getItem('initialContent');
+        if (initialContent) {
+            cardsContainer.innerHTML = initialContent;
+            pagination.style.display = 'block'; // Muestra la paginación
+        }
+    });
+
+    searchInput.addEventListener('input', function() {
+        const query = searchInput.value.trim();
+
+        if (query.length === 0) {
+            // Restaura el contenido inicial y muestra la paginación si el input está vacío
+            const initialContent = localStorage.getItem('initialContent');
+            if (initialContent) {
+                cardsContainer.innerHTML = initialContent;
+                pagination.style.display = 'block'; // Muestra la paginación
+            }
+            return;
+        }
+
+        if (query.length >= 16) {
+            const queryNumber = Number(query);
+
+            spinner.style.display = 'block';
+            cardsContainer.innerHTML = '';
+            pagination.style.display = 'none'; // Oculta la paginación durante la búsqueda
+
+            if (!isNaN(queryNumber)) {
+                database.ref('envios')
+                    .orderByChild('idOperacion')
+                    .equalTo(queryNumber)
+                    .once('value')
+                    .then(snapshot => {
+                        const allData = snapshot.val(); // Obtiene todo el JSON del nodo
+
+                        if (allData) {
+                            // Mostrar los datos en la consola
+                            console.log("Datos completos del nodo:", allData);
+
+                            // Aquí puedes procesar los datos como necesites
+                            renderCards(Object.values(allData));
+                        } else {
+                            console.log("No se encontraron datos para la consulta.");
+                            const initialContent = localStorage.getItem('initialContent');
+                            if (initialContent) {
+                                cardsContainer.innerHTML = initialContent; // Restaurar contenido inicial si no hay datos
+                            }
+                        }
+
+                        spinner.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error("Error al buscar los datos: ", error);
+                        spinner.style.display = 'none';
+                    });
+            } else {
+                console.error("La entrada no es un número válido.");
+                spinner.style.display = 'none';
+            }
+        }
+    });
+});
+
+// Inicializa el segundo proyecto
+const app2 = firebase.initializeApp(firebaseConfig2, "app2");
+const database2 = app2.database();
+
 let allData = []; // Arreglo global para almacenar todos los datos
 let currentPage = 1;
 const itemsPerPage = 30;
@@ -27,7 +122,10 @@ function cargarDatos() {
     spinner.style.display = 'block'; 
     cardsContainer.innerHTML = ''; // Limpia el contenedor de cards
 
-    database.ref('envios').once('value')
+    database.ref('envios')
+        .orderByKey()
+        .limitToLast(itemsPerPage)
+        .once('value')
         .then(snapshot => {
             allData = []; // Reiniciar el arreglo de datos
             snapshot.forEach(childSnapshot => {
@@ -67,6 +165,7 @@ function cargarDatos() {
             renderCards(allData);
 
             // Ocultar el spinner
+            pagination.style.display = 'none'; 
             spinner.style.display = 'none';
             updatePagination(allData.length);
         })
@@ -417,7 +516,15 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         if (data.NroPedido) {
             const trackingLinkAndesmar = `https://andesmarcargas.com/seguimiento.html?numero=${idOperacionFinal}&tipo=remito&cod=`;
 
-            const trackingMessage = `¡Hola ${NombreyApellido}! 🎉\n\n¡Buenas noticias! Tu producto ya está listo para ser enviado por Andesmar Cargas. Recuerda que la fecha de entrega es estimativa, así que podrías recibirlo un poco antes o después. Mantente atento a tu teléfono por si te contactan.\n\nSi notas algún daño en el paquete, recházalo para que podamos reenviarlo.\n\nTu número de seguimiento es: ${trackingLinkAndesmar}.\n\n¡Saludos!`;
+            const trackingMessage = `¡Hola ${NombreyApellido}! 🎉
+
+            ¡Buenas noticias! Tu producto ya está listo para ser enviado por Andesmar Cargas. Recuerda que la fecha de entrega es estimativa, así que podrías recibirlo un poco antes o después. Mantente atento a tu teléfono por si te contactan.
+            
+            Si notas algún daño en el paquete, recházalo para que podamos reenviarlo.
+            
+            Tu número de seguimiento es: ${trackingLinkAndesmar}.
+            
+            ¡Saludos!`;
 
             const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
             
@@ -434,61 +541,8 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
             // Usar la base de datos del segundo proyecto
             const nuevaEntradaRef = database2.ref('enviosAndesmar').push();
 
-            const cotizacionRequest = {
-                CodigoPostalRemitente: "2000",
-                CodigoPostalDestinatario: Cp,
-                Bultos: cantidadFinal,
-                Peso: peso,
-                ValorDeclarado: 100,
-                M3: volumenM3,
-                Alto: Array(cantidadFinal).fill(alto),
-                Ancho: Array(cantidadFinal).fill(ancho),
-                Largo: Array(cantidadFinal).fill(largo),
-                ModalidadEntregaID: 2,
-                servicio: {
-                    EsFletePagoDestino: false,
-                    EsRemitoconformado: true
-                },
-                logueo: {
-                    Usuario: usuario,
-                    Clave: clave,
-                    CodigoCliente: codigoCliente
-                },
-                CodigoAgrupacion: 12
-            };
-
-            // Intentar obtener la cotización
-            let importeTotalFormateado;
-            try {
-                const cotizacionResponse = await fetch(proxyUrl + "https://apitest.andesmarcargas.com/api/CalcularMonto", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd",
-                    },
-                    body: JSON.stringify(cotizacionRequest),
-                });
-
-                const cotizacionData = await cotizacionResponse.json();
-                // Formatear el importe total
-                importeTotalFormateado = new Intl.NumberFormat('es-AR', {         
-                    style: 'currency',
-                    currency: 'ARS',
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }).format(cotizacionData.ImporteTotal);
-            } catch (error) {
-                console.error("Error en la cotización, usando costo predeterminado:", error);
-                importeTotalFormateado = new Intl.NumberFormat('es-AR', {         
-                    style: 'currency',
-                    currency: 'ARS',
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }).format(10000); // Costo predeterminado de $10.000
-            }
-
             // Almacenar en Firebase
-            await nuevaEntradaRef.set({         
+            nuevaEntradaRef.set({         
                 nombreApellido: NombreyApellido,
                 nroPedido: data.NroPedido,
                 codigoPostal: Cp,
@@ -497,7 +551,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
                 numeroDeCalle: alturaDestinatario,
                 telefono: telefonoDestinatario,
                 remito: idOperacionFinal,
-                cotizacion: importeTotalFormateado // Usar el importe formateado
+                cotizacion: "$ 10.000"
             }).then(() => {         
                 console.log("Entrada agregada correctamente.");
             }).catch((error) => {
