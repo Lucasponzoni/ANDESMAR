@@ -279,14 +279,23 @@ selectElement.addEventListener('change', () => {
 });
 
 
-        // Envío
-        const shippingCell = document.createElement('td');
-        const shippingCost = operation.payments[0]?.shipping_cost || 0;
-        shippingCell.style.whiteSpace = 'nowrap';
-        shippingCell.innerHTML = shippingCost === 0 
-            ? `<strong class="grauito" style="color: orangered;">GRATUITO</strong>` 
-            : `<strong style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
-        row.appendChild(shippingCell);
+// Envío
+const shippingCell = document.createElement('td');
+const shippingCost = operation.payments[0]?.shipping_cost || 0;
+shippingCell.style.whiteSpace = 'nowrap';
+
+// Verifica el estado
+const stateName = operation.client.billing_info.additional_info.find(info => info.type === "STATE_NAME")?.value;
+
+if (stateName === "Jujuy") {
+    shippingCell.innerHTML = `<strong class="alerta">⚠️ JUJUY</strong>`;
+} else {
+    shippingCell.innerHTML = shippingCost === 0 
+        ? `<strong class="grauito" style="color: orangered;">GRATUITO</strong>` 
+        : `<strong style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
+}
+
+row.appendChild(shippingCell);
 
         // Producto
         const productCell = document.createElement('td');

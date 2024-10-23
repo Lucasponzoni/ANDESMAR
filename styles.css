@@ -2859,7 +2859,7 @@ div.card-body > p > i{
 }
 
 .grauito{
-    background-color: red;
+    background-color: orange;
     color: white !important;
     padding: 5px;
     border-radius: 5px;
@@ -3113,6 +3113,31 @@ strong {
     margin-bottom: 0 !important;
     border-radius: 0 0 10px 10px !important;
 }
+
+.alerta {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    background-color: #ff3b30; /* Color inicial del fondo */
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+    text-align: center;
+    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.2);
+    animation: backgroundBlink 1s ease-in-out infinite alternate;
+    transition: transform 0.2s;
+}
+
+.alerta:hover {
+    transform: scale(1.05);
+}
+
+@keyframes backgroundBlink {
+    0% { background-color: #ff3b30; } /* Rojo típico de alerta */
+    100% { background-color: #a32100; } /* Naranja vibrante */
+}
+
+
 
 
 
