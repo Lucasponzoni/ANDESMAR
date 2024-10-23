@@ -39,7 +39,7 @@ function cargarDatos() {
                     Cantidad: data.Cantidad,
                     Correosugerido: data.Correosugerido,
                     Cp: data.Cp,
-                    Email: data.Email,
+                    Email: data.email,
                     NombreyApellido: data.NombreyApellido.toLowerCase(),
                     Observaciones: data.Observaciones,
                     Peso: data.Peso,
