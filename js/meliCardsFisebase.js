@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const initialContent = localStorage.getItem('initialContent');
         if (initialContent) {
             cardsContainer.innerHTML = initialContent;
-            pagination.style.display = 'block'; // Muestra la paginación
+            pagination.style.display = 'none'; // Muestra la paginación
         }
     });
 
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const initialContent = localStorage.getItem('initialContent');
             if (initialContent) {
                 cardsContainer.innerHTML = initialContent;
-                pagination.style.display = 'block'; // Muestra la paginación
+                pagination.style.display = 'none'; 
             }
             return;
         }
@@ -326,7 +326,7 @@ function crearCard(data) {
             </div>
 
             <button class="btn btn-link lock-btn p-1 m-0" style="display: inline-flex; align-items: center;">
-            <span class="material-symbols-outlined">lock_open</span>
+            <i class="bi bi-shield-lock-fill"></i>
             </button>
             
         </div>
