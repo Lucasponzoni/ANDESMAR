@@ -16,7 +16,7 @@ const db = firebase.database();
 
 let allData = [];
 let currentPage = 1;
-let itemsPerPage = 10; // Número de elementos por página
+let itemsPerPage = 50; // Número de elementos por página
 let currentPageGroup = 0; // Grupo de páginas actuales
 const paginationContainer = document.getElementById('pagination');
 const searchInput = document.getElementById('searchDespachos');
