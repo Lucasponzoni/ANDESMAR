@@ -3159,7 +3159,7 @@ div.card-body > p > i{
 .card-body {
     padding: 20px; /* Padding más amplio */
 }
-.btn {
+.btn-timer {
     padding: 10px;
     margin-inline-end: 5px; /* Espaciado entre botones */
     border-radius: 5px; /* Bordes redondeados en botones */
