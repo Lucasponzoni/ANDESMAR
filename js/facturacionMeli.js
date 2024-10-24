@@ -715,7 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // NOTIFICACION DE VENTAS
 let lastCheckTimestamp = Date.now();
-const checkInterval = 5 * 60 * 1000; // 5 minutos en milisegundos
+const checkInterval = 30 * 60 * 1000; // 30 minutos en milisegundos
 
 function checkForNewSales() {
   db.ref('envios').orderByChild('shippingMode').equalTo('me1').once('value')
