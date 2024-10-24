@@ -286,6 +286,7 @@ db.ref('PasarAWebMonto').once('value')
                     }
                 };
                 updateRowColor();
+                updateNotificationCount();
     
                 // Envío
                 const shippingCell = document.createElement('td');
@@ -998,6 +999,7 @@ function loadTable2() {
             }
         };
         updateRowColor();
+        updateNotificationCount();
 
         // Escuchar cambios en el select para actualizar el color
         selectElement.addEventListener('change', () => {
