@@ -56,42 +56,37 @@ function formatCurrency(amount) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchFacturacion');
-    const spinner = document.getElementById('spinner'); // Asegúrate de que el spinner tenga este ID
+    const spinner = document.getElementById('spinner');
 
     // Mostrar mensaje de carga en el buscador
     searchInput.value = "Aguardando que cargue la web ⏳";
     searchInput.disabled = true; // Deshabilitar el input mientras carga
     spinner.style.display = 'block'; // Mostrar spinner
 
-    // Cargar datos desde Firebase
-    db.ref('envios').once('value')
-        .then(snapshot => {
-            const data = snapshot.val();
-            const tableBody = document.querySelector('#data-table tbody');
+    // Cargar datos desde Firebase y escuchar cambios en tiempo real
+    const enviosRef = db.ref('envios');
+    enviosRef.on('value', snapshot => {
+        const data = snapshot.val();
+        allData = Object.values(data)
+            .filter(operation => operation.shippingMode === 'me1')
+            .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
 
-            // Limpiar la tabla antes de cargar nuevos datos
-            tableBody.innerHTML = '';
+        // Almacenar en caché
+        localStorage.setItem('enviosData', JSON.stringify(allData));
 
-            // Convertir a array y filtrar por shippingMode 'me1'
-            allData = Object.values(data)
-                .filter(operation => operation.shippingMode === 'me1') // Filtrar por shippingMode
-                .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
+        // Mostrar datos en la tabla
+        loadTable();
 
-            // Mostrar datos en la tabla
-            loadTable();
-
-            // Habilitar buscador y limpiar mensaje
-            searchInput.disabled = false;
-            searchInput.value = ""; // Limpiar el mensaje al finalizar la carga
-            spinner.style.display = 'none'; // Ocultar spinner
-        })
-        .catch(error => {
-            console.error("Error al cargar datos: ", error);
-            searchInput.value = "Error al cargar datos"; // Mensaje de error
-            searchInput.disabled = false; // Habilitar el input en caso de error
-            spinner.style.display = 'none'; // Ocultar spinner en caso de error
-        });
-
+        // Habilitar buscador y limpiar mensaje
+        searchInput.disabled = false;
+        searchInput.value = ""; // Limpiar el mensaje al finalizar la carga
+        spinner.style.display = 'none'; // Ocultar spinner
+    }, error => {
+        console.error("Error al cargar datos: ", error);
+        searchInput.value = "Error al cargar datos"; // Mensaje de error
+        searchInput.disabled = false; // Habilitar el input en caso de error
+        spinner.style.display = 'none'; // Ocultar spinner en caso de error
+    });
 });
 
 // Obtener el valor de PasarAWebMonto antes de cargar las filas
@@ -791,6 +786,8 @@ $(document).ready(function() {
         operation.estadoFacturacion === 'web' || 
         operation.estadoFacturacion === 'pendiente' || 
         operation.estadoFacturacion === 'no pasa'
+        || 
+        operation.estadoFacturacion === undefined
     ).length;
 
     document.getElementById('contadorNotificaciones').textContent = count;

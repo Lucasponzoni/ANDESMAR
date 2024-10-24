@@ -84,10 +84,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             renderCards(Object.values(allData));
                         } else {
                             console.log("No se encontraron datos para la consulta.");
-                            const initialContent = localStorage.getItem('initialContent');
-                            if (initialContent) {
-                                cardsContainer.innerHTML = initialContent; // Restaurar contenido inicial si no hay datos
-                            }
+                            cardsContainer.innerHTML = `
+                                <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
+                                    <p class="errorp">No se encontraron resultados para "${query}" en el servidor</p>
+                                    <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
+                                </div>
+                            `; // Muestra el mensaje en lugar de restaurar el contenido inicial
                         }
 
                         spinner.style.display = 'none';
