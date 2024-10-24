@@ -970,16 +970,6 @@ function loadTable2() {
                 .catch(error => {
                     console.error("Error al actualizar el estado de facturación:", error);
                 });
-        } else if (transactionAmount < pasarAWebMonto && currentState === 'analizar_pasado_a_web') {
-            selectElement.value = 'pendiente';
-            db.ref('envios/' + operation.idOperacion).update({ estadoFacturacion: 'pendiente' })
-                .then(() => {
-                    console.log(`Estado revertido a pendiente para la operación ${operation.idOperacion}`);
-                    updateRowColor(); // Llamar a updateRowColor después de actualizar el estado
-                })
-                .catch(error => {
-                    console.error("Error al revertir el estado de facturación:", error);
-                });
         }
 
         // Cambiar el color de fondo de la fila según el estado
@@ -1341,7 +1331,7 @@ document.addEventListener("DOMContentLoaded", function() {
             clearInterval(timerInterval);
             statusCard.style.display = 'none';
         }
-    }, 1000);
+    }, 2000);
 
     // Cerrar la card al hacer clic en el botón
     closeCardButton.onclick = function() {
