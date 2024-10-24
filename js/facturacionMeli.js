@@ -22,21 +22,6 @@ const paginationContainer = document.getElementById('pagination');
 const searchInput = document.getElementById('searchDespachos');
 const spinner = document.getElementById('spinner');
 
-document.getElementById('estadoFilter').addEventListener('change', function() {
-    loadTable2(); // Recargar la tabla cada vez que cambie el filtro
-});
-
-// Manejador para el botón "Pendientes"
-document.getElementById('btnNotificaciones').addEventListener('click', function() {
-    loadTable2(); // Recargar la tabla cada vez que cambie el filtro
-});
-
-// Listener para cambiar el estado y recargar la tabla
-document.getElementById('estadoFilter').addEventListener('change', function() {
-    const selectedValue = this.getAttribute('data-selected-value') || '';
-    loadTable2(selectedValue); // Pasamos el valor seleccionado como argumento
-});
-
 // Función para formatear la fecha
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -55,37 +40,55 @@ function formatCurrency(amount) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadTable(currentPage);
     const searchInput = document.getElementById('searchFacturacion');
     const spinner = document.getElementById('spinner');
 
-    // Mostrar mensaje de carga en el buscador
+    // Mensaje inicial
     searchInput.value = "Aguardando que cargue la web ⏳";
-    searchInput.disabled = true; // Deshabilitar el input mientras carga
-    spinner.style.display = 'block'; // Mostrar spinner
+    searchInput.disabled = true;
+    spinner.style.display = 'block';
 
-    // Cargar datos desde Firebase y escuchar cambios en tiempo real
-    const enviosRef = db.ref('envios');
-    enviosRef.on('value', snapshot => {
+    const filterDate = new Date('2024-10-20T00:00:00.000-04:00');
+
+    // Cargar solo los datos que tengan shippingMode 'me1' desde Firebase
+    db.ref('envios').orderByChild('shippingMode').equalTo('me1').once('value')
+    .then(snapshot => {
         const data = snapshot.val();
-        allData = Object.values(data)
-            .filter(operation => operation.shippingMode === 'me1')
-            .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
 
-        // Almacenar en caché
-        localStorage.setItem('enviosData', JSON.stringify(allData));
+        if (!data) {
+            console.log('No se encontraron datos con shippingMode "me1"');
+            searchInput.value = "No se encontraron datos";
+            spinner.style.display = 'none';
+            return;
+        }
 
-        // Mostrar datos en la tabla
-        loadTable();
+        // Filtrar solo los datos que cumplen con la fecha
+        const filteredData = Object.values(data).filter(item => {
+            const itemDate = new Date(item.dateCreated);
+            return itemDate >= filterDate;
+        });
+
+        // Invertir el orden de los datos
+        filteredData.reverse();
+
+        // Contar la cantidad de datos filtrados
+        const count = filteredData.length;
+
+        // Mostrar datos filtrados y la cantidad en la consola
+        // console.log('Datos filtrados:', filteredData);
+        console.log(`Cantidad de datos recibidos: ${count}`);
+
+        // Cargar los datos en la tabla
+        loadTable(filteredData);
 
         // Habilitar buscador y limpiar mensaje
         searchInput.disabled = false;
-        searchInput.value = ""; // Limpiar el mensaje al finalizar la carga
-        spinner.style.display = 'none'; // Ocultar spinner
-    }, error => {
-        console.error("Error al cargar datos: ", error);
-        searchInput.value = "Error al cargar datos"; // Mensaje de error
-        searchInput.disabled = false; // Habilitar el input en caso de error
-        spinner.style.display = 'none'; // Ocultar spinner en caso de error
+        searchInput.value = "";
+        spinner.style.display = 'none';
+    })
+    .catch(error => {
+        console.error('Error al cargar los datos:', error);
     });
 });
 
@@ -99,80 +102,64 @@ db.ref('PasarAWebMonto').once('value')
         console.error("Error al obtener PasarAWebMonto: ", error);
     });
 
-    function loadTable() {
-        const start = (currentPage - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const paginatedData = allData.slice(start, end);
-        const tableBody = document.querySelector('#data-table tbody');
-    
-        tableBody.innerHTML = ''; // Limpiar tabla antes de cargar nuevos datos
-    
-        paginatedData.forEach(operation => {
-            const row = document.createElement('tr');
-    
-            // Estado
-            const stateCell = document.createElement('td');
-    
-            // Contenedor para el idOperacion y el select
-            const container = document.createElement('div');
-            container.className = 'ios-style-id-container';
-            container.style.display = 'flex';
-            container.style.flexDirection = 'column'; // Alinea elementos en columna
-    
-            // Elemento para el ID de operación
-        const idElement = document.createElement('span');
-        idElement.textContent = `${operation.idOperacion}`;
-        idElement.classList.add('ios-style-id'); // Añadir clase para estilo iOS
-        container.appendChild(idElement);
-    
-            const selectElement = document.createElement('select');
-            selectElement.style.width = '100%';
-            selectElement.innerHTML = `
-                <option value="pendiente">Pendiente ⏳</option>
-                <option value="facturado">Facturado ✅</option>
-                <option value="cancelado">Cancelado ❌</option>
-                <option value="bloqueado">Bloqueado 🔒</option>
-                <option value="analizar_pasado_a_web">Web ⚠️</option>
-                <option value="pendiente_no_pasa_web">No Pasa ⏳</option>
-                <option value="pasado_a_web">Pasado a Web</option>
-            `;
-            container.appendChild(selectElement);
-    
-            // Asegúrate de añadir el contenedor completo al stateCell
-            stateCell.appendChild(container);
-            row.appendChild(stateCell);
-    
-            // Establecer el estado inicial desde Firebase
-            const currentState = operation.estadoFacturacion || 'pendiente'; // Valor por defecto 'pendiente'
-            selectElement.value = currentState;
-    
-            // Cambiar el color de fondo de la fila según el estado
-            switch (currentState) {
-                case 'pendiente':
-                    row.style.backgroundColor = 'white';
-                    break;
-                case 'facturado':
-                    row.style.backgroundColor = 'lightgreen';
-                    break;
-                case 'bloqueado':
-                    row.style.backgroundColor = 'grey';
-                    break;
-                case 'cancelado':
-                    row.style.backgroundColor = 'pink';
-                    break;
-                case 'pasado_a_web':
-                    row.style.backgroundColor = 'lightblue';
-                    break;
-                case 'analizar_pasado_a_web':
-                    row.style.backgroundColor = 'lightyellow';
-                    break;
-                default:
-                    row.style.backgroundColor = 'white';
+    function loadTable(data) {
+        try {
+            // Verificar si hay datos para cargar
+            if (!data || data.length === 0) {
+                console.error('No hay datos para mostrar en la tabla.');
+                return;
             }
     
-            // Cambiar el color de fondo de la fila al cambiar el valor del select
-            selectElement.addEventListener('change', function() {
-                switch (selectElement.value) {
+        allData = data;
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedData = data.slice(start, end);
+        const tableBody = document.querySelector('#data-table tbody');
+
+        tableBody.innerHTML = ''; // Limpiar tabla antes de cargar nuevos datos
+
+        paginatedData.forEach(operation =>{
+                if (!operation) {
+                    console.warn('Operación no válida:', operation);
+                    return;
+                }
+    
+                const row = document.createElement('tr');
+    
+                // Estado
+                const stateCell = document.createElement('td');
+                const container = document.createElement('div');
+                container.className = 'ios-style-id-container';
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+    
+                const idElement = document.createElement('span');
+                idElement.textContent = `${operation.idOperacion}`;
+                idElement.classList.add('ios-style-id');
+                container.appendChild(idElement);
+    
+                const selectElement = document.createElement('select');
+                selectElement.style.width = '100%';
+                selectElement.innerHTML = `
+                    <option value="pendiente">Pendiente ⏳</option>
+                    <option value="facturado">Facturado ✅</option>
+                    <option value="cancelado">Cancelado ❌</option>
+                    <option value="bloqueado">Bloqueado 🔒</option>
+                    <option value="analizar_pasado_a_web">Web ⚠️</option>
+                    <option value="pendiente_no_pasa_web">No Pasa ⏳</option>
+                    <option value="pasado_a_web">Pasado a Web</option>
+                `;
+                container.appendChild(selectElement);
+    
+                stateCell.appendChild(container);
+                row.appendChild(stateCell);
+    
+                // Establecer el estado inicial
+                const currentState = operation.estadoFacturacion || 'pendiente';
+                selectElement.value = currentState;
+    
+                // Cambiar el color de fondo de la fila según el estado
+                switch (currentState) {
                     case 'pendiente':
                         row.style.backgroundColor = 'white';
                         break;
@@ -195,349 +182,366 @@ db.ref('PasarAWebMonto').once('value')
                         row.style.backgroundColor = 'white';
                 }
     
-                // Actualizar el estado en Firebase
-                const operationId = operation.idOperacion; // Usa el ID único de la operación
-                db.ref('envios/' + operationId).update({ estadoFacturacion: selectElement.value })
-                    .then(() => {
-                        console.log(`Estado de facturación actualizado a ${selectElement.value} para la operación ${operationId}`);
-                    })
-                    .catch(error => {
-                        console.error("Error al actualizar el estado de facturación:", error);
-                    });
-            });
-
-        // Fecha y hora
-        const dateCell = document.createElement('td');
-        dateCell.innerHTML = `<strong>${formatDate(operation.dateCreated)}</strong>, ${formatTime(operation.dateCreated)}`;
-        row.appendChild(dateCell);
-
-        // Operación
-        const operationCell = document.createElement('td');
-        const operationId = operation.idOperacion.toString().replace('200000', '');
-        operationCell.innerHTML = `
-            <a href="https://www.mercadolibre.com.ar/ventas/${operation.idOperacion}/detalle" target="_blank"><img id="Meli-trends" src="./Img/meli-trends.png" alt="Meli Trends"></a>
-        `;
-        row.appendChild(operationCell);
-
-        // Imagen
-        const imageCell = document.createElement('td');
-        imageCell.innerHTML = `
-        <a href="https://app.real-trends.com/orders/sale_detail/?order_id=200000${operationId}" target="_blank">
-        <img id="real-trends" src="./Img/real-trends.png" alt="Real Trends">
-        </a>
-        `;
-        row.appendChild(imageCell);
-
-            // Valor
-const valueCell = document.createElement('td');
-const transactionAmount = operation.payments[0]?.transaction_amount || 0;
-valueCell.innerHTML = `<strong style="color: green;">${formatCurrency(transactionAmount)}</strong>`;
-row.appendChild(valueCell);
-
-// Verificar y actualizar el estado si el monto es mayor o igual a PasarAWebMonto
-if (transactionAmount >= pasarAWebMonto && (currentState === 'pendiente' || currentState === 'analizar_pasado_a_web' || currentState === undefined)) {
-    selectElement.value = 'analizar_pasado_a_web';
-    db.ref('envios/' + operation.idOperacion).update({ estadoFacturacion: 'analizar_pasado_a_web' })
-        .then(() => {
-            console.log(`Estado actualizado a analizar_pasado_a_web para la operación ${operation.idOperacion}`);
-            updateRowColor(); // Llamar a updateRowColor después de actualizar el estado
-        })
-        .catch(error => {
-            console.error("Error al actualizar el estado de facturación:", error);
-        });
-} else if (transactionAmount < pasarAWebMonto && currentState === 'analizar_pasado_a_web') {
-    selectElement.value = 'pendiente';
-    db.ref('envios/' + operation.idOperacion).update({ estadoFacturacion: 'pendiente' })
-        .then(() => {
-            console.log(`Estado revertido a pendiente para la operación ${operation.idOperacion}`);
-            updateRowColor(); // Llamar a updateRowColor después de actualizar el estado
-        })
-        .catch(error => {
-            console.error("Error al revertir el estado de facturación:", error);
-        });
-}
-
-// Cambiar el color de fondo de la fila según el estado
-const updateRowColor = () => {
-    switch (selectElement.value) {
-        case 'pendiente':
-            row.style.backgroundColor = 'white';
-            break;
-        case 'facturado':
-            row.style.backgroundColor = 'lightgreen';
-            break;
-        case 'bloqueado':
-            row.style.backgroundColor = 'wheat';
-            break;
-        case 'cancelado':
-            row.style.backgroundColor = 'pink';
-            break;
-        case 'pasado_a_web':
-            row.style.backgroundColor = 'lightblue';
-            break;
-        case 'analizar_pasado_a_web':
-            row.style.backgroundColor = 'lightyellow';
-            break;
-        default:
-            row.style.backgroundColor = 'white';
-    }
-};
-updateRowColor();
-
-// Escuchar cambios en el select para actualizar el color
-selectElement.addEventListener('change', () => {
-    updateRowColor();
-});
-
-
-// Envío
-const shippingCell = document.createElement('td');
-const shippingCost = operation.payments[0]?.shipping_cost || 0;
-shippingCell.style.whiteSpace = 'nowrap';
-
-// Verifica el estado de manera segura
-if (operation.client && operation.client.billing_info && Array.isArray(operation.client.billing_info.additional_info)) {
-    const stateName = operation.client.billing_info.additional_info.find(info => info.type === "STATE_NAME")?.value;
-
-    if (stateName === "Jujuy") {
-        shippingCell.innerHTML = `<strong class="alerta">⚠️ JUJUY</strong>`;
-    } else {
-        shippingCell.innerHTML = shippingCost === 0 
-            ? `<strong class="grauito" style="color: orangered;">GRATUITO</strong>` 
-            : `<strong style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
-    }
-} else {
-    console.warn("Información de facturación no disponible para la operación:", operation.idOperacion);
-    shippingCell.innerHTML = `<strong style="color: red;">X</strong>`;
-}
-
-row.appendChild(shippingCell);
-
-        // Producto
-        const productCell = document.createElement('td');
-        productCell.className = 'product-cell'; // Añadir clase para estilo iOS
-        productCell.innerHTML = `Cantidad: <strong>X${operation.Cantidad}</strong> <br> SKU: <strong>${operation.SKU}</strong>`;
-        row.appendChild(productCell);
-
-
-// Medio de pago
-const paymentCell = document.createElement('td');
-const payment = operation.payments[0];
-
-let paymentMethodImage = '';
-let paymentDetails = '';
-
-switch (payment.payment_method_id) {
-    case 'consumer_credits':
-        paymentMethodImage = './Img/mercadocredito.png';
-        paymentDetails = '<strong>Crédito sin tarjeta</strong>';
-        break;
-    case 'account_money':
-        paymentMethodImage = './Img/mercadopago.png';
-        paymentDetails = '<strong>Dinero en Cuenta</strong>';
-        break;
-    case 'visa':
-    case 'debvisa':
-        paymentMethodImage = './Img/visa.png';
-        break;
-    case 'master':
-    case 'debmaster':
-        paymentMethodImage = './Img/master.png';
-        break;
-    case 'amex':
-        paymentMethodImage = './Img/amex.png';
-        break;
-    case 'naranja':
-        paymentMethodImage = './Img/naranja.png';
-        break;
-    case 'cabal':
-    case 'debcabal':
-        paymentMethodImage = './Img/cabal.png';
-        break;
-    case 'pagofacil':
-        paymentMethodImage = './Img/pagofacil.png';
-        paymentDetails = '<strong>PagoFacil Ticket</strong>';
-        break;
-    case 'rapipago':
-        paymentMethodImage = './Img/rapipago.png';
-        paymentDetails = '<strong>RapiPago Ticket</strong>';
-        break;
-}
-
-if (payment.payment_method_id !== 'consumer_credits' && payment.payment_method_id !== 'account_money' && payment.payment_method_id !== 'pagofacil' && payment.payment_method_id !== 'rapipago') {
-    const paymentType = payment.payment_type === 'credit_card' ? '<strong>Crédito</strong>' : payment.payment_type === 'debit_card' ? '<strong>Débito</strong>' : payment.payment_type;
-    paymentDetails = `${paymentType} en ${payment.installments} cuota/s de ${formatCurrency(payment.installment_amount)}`;
-}
-
-paymentCell.innerHTML = `
-    <div class="payment-cell">
-        <img src="${paymentMethodImage}" alt="${payment.payment_method_id}">
-        <span class="payment-details">${paymentDetails}</span>
-    </div>
-`;
-row.appendChild(paymentCell);
-
-// Botón para eliminar
-const deleteCell = document.createElement('td');
-const deleteButton = document.createElement('button');
-deleteButton.innerHTML = 'X';
-deleteButton.className = 'btn btn-sm btn-danger';
-deleteButton.onclick = () => {
-    const row = deleteButton.closest('tr'); // Obtener la fila más cercana
-
-    Swal.fire({
-        title: 'Ingrese la contraseña 🔒',
-        input: 'password',
-        inputLabel: 'Contraseña de Eliminación (Solicítela a Lucas)',
-        showCancelButton: true,
-        confirmButtonText: 'Eliminar',
-        cancelButtonText: 'Cancelar',
-        inputValidator: (value) => {
-            if (value !== '6572') {
-                return 'Contraseña incorrecta!';
-            }
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Eliminar el nodo en Firebase
-            db.ref('envios/' + operation.idOperacion).remove()
-                .then(() => {
-                    row.remove(); // Eliminar la fila del DOM
-                    Swal.fire('¡Eliminado!', 'La fila ha sido eliminada.', 'success');
-                })
-                .catch(error => {
-                    Swal.fire('Error', 'No se pudo eliminar la fila. ' + error.message, 'error');
+                // Actualizar estado en Firebase
+                selectElement.addEventListener('change', function() {
+                    updateRowColor();
+                    const operationId = operation.idOperacion;
+                    db.ref('envios/' + operationId).update({ estadoFacturacion: selectElement.value })
+                        .then(() => {
+                            console.log(`Estado de facturación actualizado a ${selectElement.value} para la operación ${operationId}`);
+                            updateNotificationCount();
+                        })
+                        .catch(error => {
+                            console.error("Error al actualizar el estado de facturación:", error);
+                            // Mostrar mensaje de error usando SweetAlert
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'No se pudo actualizar el estado de facturación. Verifica tu conexión.',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        });
                 });
+    
+                // Fecha y hora
+                const dateCell = document.createElement('td');
+                dateCell.innerHTML = `<strong>${formatDate(operation.dateCreated)}</strong>, ${formatTime(operation.dateCreated)}`;
+                row.appendChild(dateCell);
+    
+                // Operación
+                const operationCell = document.createElement('td');
+                const operationId = operation.idOperacion.toString().replace('200000', '');
+                operationCell.innerHTML = `
+                    <a href="https://www.mercadolibre.com.ar/ventas/${operation.idOperacion}/detalle" target="_blank"><img id="Meli-trends" src="./Img/meli-trends.png" alt="Meli Trends"></a>
+                `;
+                row.appendChild(operationCell);
+    
+                // Imagen
+                const imageCell = document.createElement('td');
+                imageCell.innerHTML = `
+                <a href="https://app.real-trends.com/orders/sale_detail/?order_id=200000${operationId}" target="_blank">
+                <img id="real-trends" src="./Img/real-trends.png" alt="Real Trends">
+                </a>
+                `;
+                row.appendChild(imageCell);
+    
+                // Valor
+                const valueCell = document.createElement('td');
+                const transactionAmount = operation.payments[0]?.transaction_amount || 0;
+                valueCell.innerHTML = `<strong style="color: green;">${formatCurrency(transactionAmount)}</strong>`;
+                row.appendChild(valueCell);
+    
+                // Verificar y actualizar el estado
+                if (transactionAmount >= pasarAWebMonto && (currentState === 'pendiente' || currentState === 'analizar_pasado_a_web' || currentState === undefined)) {
+                    selectElement.value = 'analizar_pasado_a_web';
+                    db.ref('envios/' + operation.idOperacion).update({ estadoFacturacion: 'analizar_pasado_a_web' })
+                        .then(() => {
+                            console.log(`Estado actualizado a analizar_pasado_a_web para la operación ${operation.idOperacion}`);
+                            updateRowColor();
+                        })
+                        .catch(error => {
+                            console.error("Error al actualizar el estado de facturación:", error);
+                        });
+                } else if (transactionAmount < pasarAWebMonto && currentState === 'analizar_pasado_a_web') {
+                    selectElement.value = 'pendiente';
+                    db.ref('envios/' + operation.idOperacion).update({ estadoFacturacion: 'pendiente' })
+                        .then(() => {
+                            console.log(`Estado revertido a pendiente para la operación ${operation.idOperacion}`);
+                            updateRowColor();
+                            updateNotificationCount();
+                        })
+                        .catch(error => {
+                            console.error("Error al revertir el estado de facturación:", error);
+                        });
+                }
+    
+                // Cambiar el color de fondo de la fila según el estado
+                const updateRowColor = () => {
+                    switch (selectElement.value) {
+                        case 'pendiente':
+                            row.style.backgroundColor = 'white';
+                            break;
+                        case 'facturado':
+                            row.style.backgroundColor = 'lightgreen';
+                            break;
+                        case 'bloqueado':
+                            row.style.backgroundColor = 'wheat';
+                            break;
+                        case 'cancelado':
+                            row.style.backgroundColor = 'pink';
+                            break;
+                        case 'pasado_a_web':
+                            row.style.backgroundColor = 'lightblue';
+                            break;
+                        case 'analizar_pasado_a_web':
+                            row.style.backgroundColor = 'lightyellow';
+                            break;
+                        default:
+                            row.style.backgroundColor = 'white';
+                    }
+                };
+                updateRowColor();
+    
+                // Envío
+                const shippingCell = document.createElement('td');
+                const shippingCost = operation.payments[0]?.shipping_cost || 0;
+                shippingCell.style.whiteSpace = 'nowrap';
+    
+                if (operation.client && operation.client.billing_info && Array.isArray(operation.client.billing_info.additional_info)) {
+                    const stateName = operation.client.billing_info.additional_info.find(info => info.type === "STATE_NAME")?.value;
+    
+                    if (stateName === "Jujuy") {
+                        shippingCell.innerHTML = `<strong class="alerta">⚠️ JUJUY</strong>`;
+                    } else {
+                        shippingCell.innerHTML = shippingCost === 0 
+                            ? `<strong class="grauito" style="color: orangered;">GRATUITO</strong>` 
+                            : `<strong style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
+                    }
+                } else {
+                    console.warn("Información de facturación no disponible para la operación:", operation.idOperacion);
+                    shippingCell.innerHTML = `<strong style="color: red;">X</strong>`;
+                }
+    
+                row.appendChild(shippingCell);
+    
+                // Producto
+                const productCell = document.createElement('td');
+                productCell.className = 'product-cell';
+                productCell.innerHTML = `Cantidad: <strong>X${operation.Cantidad}</strong> <br> SKU: <strong>${operation.SKU}</strong>`;
+                row.appendChild(productCell);
+    
+                // Medio de pago
+                const paymentCell = document.createElement('td');
+                const payment = operation.payments[0];
+    
+                let paymentMethodImage = '';
+                let paymentDetails = '';
+    
+                switch (payment.payment_method_id) {
+                    case 'consumer_credits':
+                        paymentMethodImage = './Img/mercadocredito.png';
+                        paymentDetails = '<strong>Crédito sin tarjeta</strong>';
+                        break;
+                    case 'account_money':
+                        paymentMethodImage = './Img/mercadopago.png';
+                        paymentDetails = '<strong>Dinero en Cuenta</strong>';
+                        break;
+                    case 'visa':
+                    case 'debvisa':
+                        paymentMethodImage = './Img/visa.png';
+                        break;
+                    case 'master':
+                    case 'debmaster':
+                        paymentMethodImage = './Img/master.png';
+                        break;
+                    case 'amex':
+                        paymentMethodImage = './Img/amex.png';
+                        break;
+                    case 'naranja':
+                        paymentMethodImage = './Img/naranja.png';
+                        break;
+                    case 'cabal':
+                    case 'debcabal':
+                        paymentMethodImage = './Img/cabal.png';
+                        break;
+                    case 'pagofacil':
+                        paymentMethodImage = './Img/pagofacil.png';
+                        paymentDetails = '<strong>PagoFacil Ticket</strong>';
+                        break;
+                    case 'rapipago':
+                        paymentMethodImage = './Img/rapipago.png';
+                        paymentDetails = '<strong>RapiPago Ticket</strong>';
+                        break;
+                }
+    
+                if (payment.payment_method_id !== 'consumer_credits' && payment.payment_method_id !== 'account_money' && payment.payment_method_id !== 'pagofacil' && payment.payment_method_id !== 'rapipago') {
+                    const paymentType = payment.payment_type === 'credit_card' ? '<strong>Crédito</strong>' : payment.payment_type === 'debit_card' ? '<strong>Débito</strong>' : payment.payment_type;
+                    paymentDetails = `${paymentType} en ${payment.installments} cuota/s de ${formatCurrency(payment.installment_amount)}`;
+                }
+    
+                paymentCell.innerHTML = `
+                    <div class="payment-cell">
+                        <img src="${paymentMethodImage}" alt="${payment.payment_method_id}">
+                        <span class="payment-details">${paymentDetails}</span>
+                    </div>
+                `;
+                row.appendChild(paymentCell);
+    
+                // Botón para eliminar
+                const deleteCell = document.createElement('td');
+                const deleteButton = document.createElement('button');
+                deleteButton.innerHTML = 'X';
+                deleteButton.className = 'btn btn-sm btn-danger';
+                deleteButton.onclick = () => {
+                    const row = deleteButton.closest('tr');
+    
+                    Swal.fire({
+                        title: 'Ingrese la contraseña 🔒',
+                        input: 'password',
+                        inputLabel: 'Contraseña de Eliminación (Solicítela a Lucas)',
+                        showCancelButton: true,
+                        confirmButtonText: 'Eliminar',
+                        cancelButtonText: 'Cancelar',
+                        inputValidator: (value) => {
+                            if (value !== '6572') {
+                                return 'Contraseña incorrecta!';
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            db.ref('envios/' + operation.idOperacion).remove()
+                                .then(() => {
+                                    row.remove();
+                                    Swal.fire('¡Eliminado!', 'La fila ha sido eliminada.', 'success');
+                                })
+                                .catch(error => {
+                                    Swal.fire('Error', 'No se pudo eliminar la fila. ' + error.message, 'error');
+                                });
+                        }
+                    });
+                };
+    
+                deleteCell.appendChild(deleteButton);
+                row.appendChild(deleteCell);
+    
+                // Botón de comentario
+                const commentCell = document.createElement('td');
+                const commentButton = document.createElement('button');
+                commentButton.className = 'btn btn-sm ' + (operation.comentario ? 'btn-success' : 'btn-secondary');
+                commentButton.innerHTML = '<i class="bi bi-pencil"></i>';
+                commentCell.appendChild(commentButton);
+                row.appendChild(commentCell);
+    
+                // Agregar la fila a la tabla
+                tableBody.appendChild(row);
+    
+                commentButton.onclick = () => {
+                    console.log('ID de operación:', operation ? operation.idOperacion : 'undefined');
+    
+                    if (!operation || !operation.idOperacion) {
+                        Swal.fire('Error', 'No se puede cargar el comentario: operación no válida.', 'error');
+                        return;
+                    }
+    
+                    db.ref('envios').child(operation.idOperacion).once('value', snapshot => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById('comentarioInput').value = data.comentario || '';
+                            document.querySelector('input[type="email"]').value = data.email || '';
+                            document.querySelector('input[type="tel"]').value = data.Telefono || '';
+    
+                            if (data.trackingNumber) {
+                                actualizarEstadoDespacho(true);
+                            } else {
+                                actualizarEstadoDespacho(false);
+                            }
+                        } else {
+                            document.getElementById('comentarioInput').value = '';
+                            document.querySelector('input[type="email"]').value = '';
+                            document.querySelector('input[type="tel"]').value = '';
+                            actualizarEstadoDespacho(false);
+                        }
+                    });
+    
+                    $('#comentarioModal').modal('show');
+    
+                    document.getElementById('guardarComentarioBtn').onclick = function() {
+                        const comentario = document.getElementById('comentarioInput').value;
+                        db.ref('envios').child(operation.idOperacion).update({ comentario: comentario })
+                            .then(() => {
+                                Swal.fire('¡Éxito!', 'Comentario actualizado correctamente.', 'success');
+                                $('#comentarioModal').modal('hide');
+                                loadTable(data); // Asegúrate de pasar los datos correctos aquí.
+                                commentButton.classList.remove('btn-secondary'); 
+                                commentButton.classList.add('btn-success'); 
+                            })
+                            .catch(error => {
+                                Swal.fire('Error', 'No se pudo actualizar el comentario: ' + error.message, 'error');
+                            });
+                    };
+    
+                    document.getElementById('guardarEmailBtn').onclick = function() {
+                        const email = document.querySelector('input[type="email"]').value;
+                        db.ref('envios').child(operation.idOperacion).update({ email: email })
+                            .then(() => {
+                                mostrarAlertaExito('Email actualizado correctamente.');
+                            })
+                            .catch(error => {
+                                Swal.fire('Error', 'No se pudo actualizar el email: ' + error.message, 'error');
+                            });
+                    };
+    
+                    document.getElementById('guardarTelefonoBtn').onclick = function() {
+                        const telefono = document.querySelector('input[type="tel"]').value;
+                        db.ref('envios').child(operation.idOperacion).update({ Telefono: telefono })
+                            .then(() => {
+                                mostrarAlertaExito('Teléfono actualizado correctamente.');
+                            })
+                            .catch(error => {
+                                Swal.fire('Error', 'No se pudo actualizar el teléfono: ' + error.message, 'error');
+                            });
+                    };
+                };
+            });
+    
+            // Paginación y actualización de notificaciones
+            updatePagination();
+            updateNotificationCount();
+        } catch (error) {
+            console.error('Error al cargar la tabla:', error);
         }
-    });
-};
-
-deleteCell.appendChild(deleteButton);
-row.appendChild(deleteCell);
-
-// Botón de comentario
-const commentCell = document.createElement('td');
-const commentButton = document.createElement('button');
-commentButton.className = 'btn btn-sm ' + (operation.comentario ? 'btn-success' : 'btn-secondary');
-commentButton.innerHTML = '<i class="bi bi-pencil"></i>';
-commentCell.appendChild(commentButton);
-row.appendChild(commentCell);
-
-// Agregar la fila a la tabla
-tableBody.appendChild(row);
-
-commentButton.onclick = () => {
-    console.log('ID de operación:', operation ? operation.idOperacion : 'undefined');
-
-    if (!operation || !operation.idOperacion) {
-        Swal.fire('Error', 'No se puede cargar el comentario: operación no válida.', 'error');
-        return;
     }
-
-    // Cargar los datos existentes desde Firebase
-    db.ref('envios').child(operation.idOperacion).once('value', snapshot => {
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            document.getElementById('comentarioInput').value = data.comentario || '';
-            document.querySelector('input[type="email"]').value = data.email || '';
-            document.querySelector('input[type="tel"]').value = data.Telefono || '';
-
-            // Verificar si existe el trackingNumber
-            if (data.trackingNumber) {
-                actualizarEstadoDespacho(true);
-            } else {
-                actualizarEstadoDespacho(false);
-            }
+    
+    function actualizarEstadoDespacho(isDespachado) {
+        const estadoDespacho = document.getElementById('estadoDespacho');
+        if (isDespachado) {
+            estadoDespacho.innerHTML = '<i class="bi bi-check-circle-fill"></i> Etiqueta de envío generada';
+            estadoDespacho.style.backgroundColor = '#d4edda';
+            estadoDespacho.style.color = '#155724';
         } else {
-            document.getElementById('comentarioInput').value = '';
-            document.querySelector('input[type="email"]').value = '';
-            document.querySelector('input[type="tel"]').value = '';
-            actualizarEstadoDespacho(false);
+            estadoDespacho.innerHTML = '<i class="bi bi-x-circle-fill"></i> Etiqueta de envío sin generar';
+            estadoDespacho.style.backgroundColor = '#f8d7da';
+            estadoDespacho.style.color = '#721c24';
         }
-    });
-
-    $('#comentarioModal').modal('show');
-
-    document.getElementById('guardarComentarioBtn').onclick = function() {
-        const comentario = document.getElementById('comentarioInput').value;
-        db.ref('envios').child(operation.idOperacion).update({ comentario: comentario })
-            .then(() => {
-                Swal.fire('¡Éxito!', 'Comentario actualizado correctamente.', 'success');
-                $('#comentarioModal').modal('hide');
-                loadTable();
-                commentButton.classList.remove('btn-secondary'); 
-                commentButton.classList.add('btn-success'); 
-            })
-            .catch(error => {
-                Swal.fire('Error', 'No se pudo actualizar el comentario: ' + error.message, 'error');
-            });
-    };
-
-    document.getElementById('guardarEmailBtn').onclick = function() {
-        const email = document.querySelector('input[type="email"]').value;
-        db.ref('envios').child(operation.idOperacion).update({ email: email })
-            .then(() => {
-                mostrarAlertaExito('Email actualizado correctamente.');
-            })
-            .catch(error => {
-                Swal.fire('Error', 'No se pudo actualizar el email: ' + error.message, 'error');
-            });
-    };
-
-    document.getElementById('guardarTelefonoBtn').onclick = function() {
-        const telefono = document.querySelector('input[type="tel"]').value;
-        db.ref('envios').child(operation.idOperacion).update({ Telefono: telefono })
-            .then(() => {
-                mostrarAlertaExito('Teléfono actualizado correctamente.');
-            })
-            .catch(error => {
-                Swal.fire('Error', 'No se pudo actualizar el teléfono: ' + error.message, 'error');
-            });
-    };
-};
-
-function actualizarEstadoDespacho(isDespachado) {
-    const estadoDespacho = document.getElementById('estadoDespacho');
-    if (isDespachado) {
-        estadoDespacho.innerHTML = '<i class="bi bi-check-circle-fill"></i> Etiqueta de envío generada';
-        estadoDespacho.style.backgroundColor = '#d4edda';
-        estadoDespacho.style.color = '#155724';
-    } else {
-        estadoDespacho.innerHTML = '<i class="bi bi-x-circle-fill"></i> Etiqueta de envío sin generar';
-        estadoDespacho.style.backgroundColor = '#f8d7da';
-        estadoDespacho.style.color = '#721c24';
     }
-}
-
-function mostrarAlertaExito(mensaje) {
-    console.log('Mostrando alerta de éxito:', mensaje); // Verifica que la función se llama
-    const alertContainer = document.getElementById('alertContainerFacturacion');
-    if (alertContainer) {
-        console.log('Contenedor de alertas encontrado:', alertContainer); // Verifica que el contenedor se encuentra
-        alertContainer.innerText = `${mensaje} ✅`;
-        setTimeout(() => {
-            alertContainer.innerText = ''; // Limpiar la alerta después de 3 segundos
-        }, 3000);
-    } else {
-        console.error('Contenedor de alertas no encontrado.');
+    
+    function mostrarAlertaExito(mensaje) {
+        console.log('Mostrando alerta de éxito:', mensaje); // Verifica que la función se llama
+        const alertContainer = document.getElementById('alertContainerFacturacion');
+        if (alertContainer) {
+            console.log('Contenedor de alertas encontrado:', alertContainer); // Verifica que el contenedor se encuentra
+            alertContainer.innerText = `${mensaje} ✅`;
+            setTimeout(() => {
+                alertContainer.innerText = ''; // Limpiar la alerta después de 3 segundos
+            }, 3000);
+        } else {
+            console.error('Contenedor de alertas no encontrado.');
+        }
     }
-}
-
-    });
-
-    // Paginación
-    updatePagination();
-    updateNotificationCount();
-}
-
+     
 // Actualizar la paginación
 function updatePagination() {
     paginationContainer.innerHTML = '';
-    const totalItems = allData.length;
+    const totalItems = allData.length; // Asegúrate de que allData esté disponible
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     let startPage = Math.max(1, currentPageGroup + 1);
     let endPage = Math.min(currentPageGroup + 6, totalPages);
 
+    // Botón "Atrás"
+    if (currentPageGroup > 0) {
+        const backItem = document.createElement("li");
+        backItem.className = "page-item";
+        backItem.innerHTML = `<a class="page-link" href="#">Atrás</a>`;
+        backItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPageGroup -= 6;
+            loadTable(currentPageGroup * itemsPerPage); // Cargar datos de la página anterior
+            updatePagination();
+        });
+        paginationContainer.appendChild(backItem);
+    }
+
+    // Páginas
     for (let i = startPage; i <= endPage; i++) {
         const pageItem = document.createElement('li');
         pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
@@ -545,11 +549,12 @@ function updatePagination() {
         pageItem.addEventListener("click", (e) => {
             e.preventDefault();
             currentPage = i;
-            loadTable();
+            loadTable(allData); // Asegúrate de pasar allData aquí
         });
         paginationContainer.appendChild(pageItem);
     }
 
+    // Botón "Más" (Adelante)
     if (endPage < totalPages) {
         const loadMoreItem = document.createElement("li");
         loadMoreItem.className = "page-item";
@@ -557,8 +562,9 @@ function updatePagination() {
         loadMoreItem.addEventListener("click", (e) => {
             e.preventDefault();
             currentPageGroup += 6;
+            loadTable(currentPageGroup * itemsPerPage); // Cargar datos de la siguiente página
             updatePagination();
-            loadTable();
+            loadTable(allData); // Asegúrate de pasar allData aquí
         });
         paginationContainer.appendChild(loadMoreItem);
     }
@@ -571,7 +577,7 @@ function updatePagination() {
             e.preventDefault();
             currentPageGroup -= 6;
             updatePagination();
-            loadTable();
+            loadTable(allData); // Asegúrate de pasar allData aquí
         });
         paginationContainer.appendChild(backItem);
     }
@@ -783,15 +789,15 @@ $(document).ready(function() {
 
   function updateNotificationCount() {
     const count = allData.filter(operation => 
-        operation.estadoFacturacion === 'web' || 
-        operation.estadoFacturacion === 'pendiente' || 
-        operation.estadoFacturacion === 'no pasa'
-        || 
+        operation.estadoFacturacion === 'pendiente'|| 
+        operation.estadoFacturacion === 'pendiente_no_pasa_web'||
         operation.estadoFacturacion === undefined
     ).length;
 
     document.getElementById('contadorNotificaciones').textContent = count;
 }
+
+// FUNCIONES PARA EL FILTRADO DE ESTADOS
 
 let filteredData = []; // Nueva variable para almacenar los datos filtrados
 
@@ -943,6 +949,7 @@ function loadTable2() {
                 .then(() => {
                     console.log(`Estado actualizado a analizar_pasado_a_web para la operación ${operation.idOperacion}`);
                     updateRowColor(); // Llamar a updateRowColor después de actualizar el estado
+                    updateNotificationCount();
                 })
                 .catch(error => {
                     console.error("Error al actualizar el estado de facturación:", error);
@@ -1281,4 +1288,19 @@ document.getElementById('estadoFilter').addEventListener('change', function() {
 currentPage = 1; // Reiniciar a la primera página
 currentPageGroup = 0; // Reiniciar el grupo de páginas
 loadTable2(); // Recargar la tabla cada vez que cambie el filtro
+});
+
+document.getElementById('estadoFilter').addEventListener('change', function() {
+    loadTable2(); // Recargar la tabla cada vez que cambie el filtro
+});
+
+// Manejador para el botón "Pendientes"
+document.getElementById('btnNotificaciones').addEventListener('click', function() {
+    loadTable2(); // Recargar la tabla cada vez que cambie el filtro
+});
+
+// Listener para cambiar el estado y recargar la tabla
+document.getElementById('estadoFilter').addEventListener('change', function() {
+    const selectedValue = this.getAttribute('data-selected-value') || '';
+    loadTable2(selectedValue); // Pasamos el valor seleccionado como argumento
 });
