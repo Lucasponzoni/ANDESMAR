@@ -22,6 +22,34 @@ const paginationContainer = document.getElementById('pagination');
 const searchInput = document.getElementById('searchDespachos');
 const spinner = document.getElementById('spinner');
 
+let lastKey = null; // Variable para almacenar la última clave cargada
+
+function loadTable(currentPage) {
+    const itemsPerPage = 50;
+    const enviosRef = db.ref('envios').orderByKey().limitToLast(itemsPerPage);
+
+    // Si hay una última clave, carga los siguientes 50 elementos
+    if (lastKey) {
+        enviosRef.startAt(lastKey).limitToFirst(itemsPerPage);
+    }
+
+    enviosRef.once('value', snapshot => {
+        const data = snapshot.val();
+        allData = Object.values(data).sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
+
+        // Almacenar en caché
+        localStorage.setItem('enviosData', JSON.stringify(allData));
+
+        // Mostrar datos en la tabla
+        loadTableData(allData);
+        
+        // Actualizar la última clave
+        lastKey = allData.length > 0 ? allData[allData.length - 1].idOperacion : null;
+    }, error => {
+        console.error("Error al cargar datos: ", error);
+    });
+}
+
 document.getElementById('estadoFilter').addEventListener('change', function() {
     loadTable2(); // Recargar la tabla cada vez que cambie el filtro
 });
@@ -55,6 +83,7 @@ function formatCurrency(amount) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadTable(currentPage);
     const searchInput = document.getElementById('searchFacturacion');
     const spinner = document.getElementById('spinner');
 
@@ -538,31 +567,7 @@ function updatePagination() {
     let startPage = Math.max(1, currentPageGroup + 1);
     let endPage = Math.min(currentPageGroup + 6, totalPages);
 
-    for (let i = startPage; i <= endPage; i++) {
-        const pageItem = document.createElement('li');
-        pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
-        pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-        pageItem.addEventListener("click", (e) => {
-            e.preventDefault();
-            currentPage = i;
-            loadTable();
-        });
-        paginationContainer.appendChild(pageItem);
-    }
-
-    if (endPage < totalPages) {
-        const loadMoreItem = document.createElement("li");
-        loadMoreItem.className = "page-item";
-        loadMoreItem.innerHTML = `<a class="page-link" href="#">Más</a>`;
-        loadMoreItem.addEventListener("click", (e) => {
-            e.preventDefault();
-            currentPageGroup += 6;
-            updatePagination();
-            loadTable();
-        });
-        paginationContainer.appendChild(loadMoreItem);
-    }
-
+    // Botón "Atrás"
     if (currentPageGroup > 0) {
         const backItem = document.createElement("li");
         backItem.className = "page-item";
@@ -570,10 +575,37 @@ function updatePagination() {
         backItem.addEventListener("click", (e) => {
             e.preventDefault();
             currentPageGroup -= 6;
+            loadTable(currentPageGroup * itemsPerPage); // Cargar datos de la página anterior
             updatePagination();
-            loadTable();
         });
         paginationContainer.appendChild(backItem);
+    }
+
+    // Páginas
+    for (let i = startPage; i <= endPage; i++) {
+        const pageItem = document.createElement('li');
+        pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        pageItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPage = i;
+            loadTable((currentPage - 1) * itemsPerPage); // Cargar datos de la página seleccionada
+        });
+        paginationContainer.appendChild(pageItem);
+    }
+
+    // Botón "Más" (Adelante)
+    if (endPage < totalPages) {
+        const loadMoreItem = document.createElement("li");
+        loadMoreItem.className = "page-item";
+        loadMoreItem.innerHTML = `<a class="page-link" href="#">Más</a>`;
+        loadMoreItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPageGroup += 6;
+            loadTable(currentPageGroup * itemsPerPage); // Cargar datos de la siguiente página
+            updatePagination();
+        });
+        paginationContainer.appendChild(loadMoreItem);
     }
 }
 
@@ -1282,3 +1314,4 @@ currentPage = 1; // Reiniciar a la primera página
 currentPageGroup = 0; // Reiniciar el grupo de páginas
 loadTable2(); // Recargar la tabla cada vez que cambie el filtro
 });
+
