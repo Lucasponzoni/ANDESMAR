@@ -16,7 +16,7 @@ const db = firebase.database();
 
 let allData = [];
 let currentPage = 1;
-let itemsPerPage = 50; // Número de elementos por página
+let itemsPerPage = 10; // Número de elementos por página
 let currentPageGroup = 0; // Grupo de páginas actuales
 const paginationContainer = document.getElementById('pagination');
 const searchInput = document.getElementById('searchDespachos');
@@ -106,15 +106,20 @@ db.ref('PasarAWebMonto').once('value')
         try {
             // Verificar si hay datos para cargar
             if (!data || data.length === 0) {
-                console.error('No hay datos para mostrar en la tabla.');
+                console.log('No hay datos para mostrar en la tabla.');
                 return;
             }
+
+            // Verificar si `data` es un array
+            if (!Array.isArray(data)) {
+            return; 
+        }
     
-        allData = data;
-        const start = (currentPage - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const paginatedData = data.slice(start, end);
-        const tableBody = document.querySelector('#data-table tbody');
+            allData = data;
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = data.slice(start, end);
+            const tableBody = document.querySelector('#data-table tbody');
 
         tableBody.innerHTML = ''; // Limpiar tabla antes de cargar nuevos datos
 
@@ -527,21 +532,6 @@ function updatePagination() {
     let startPage = Math.max(1, currentPageGroup + 1);
     let endPage = Math.min(currentPageGroup + 6, totalPages);
 
-    // Botón "Atrás"
-    if (currentPageGroup > 0) {
-        const backItem = document.createElement("li");
-        backItem.className = "page-item";
-        backItem.innerHTML = `<a class="page-link" href="#">Atrás</a>`;
-        backItem.addEventListener("click", (e) => {
-            e.preventDefault();
-            currentPageGroup -= 6;
-            loadTable(currentPageGroup * itemsPerPage); // Cargar datos de la página anterior
-            updatePagination();
-        });
-        paginationContainer.appendChild(backItem);
-    }
-
-    // Páginas
     for (let i = startPage; i <= endPage; i++) {
         const pageItem = document.createElement('li');
         pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
@@ -554,7 +544,6 @@ function updatePagination() {
         paginationContainer.appendChild(pageItem);
     }
 
-    // Botón "Más" (Adelante)
     if (endPage < totalPages) {
         const loadMoreItem = document.createElement("li");
         loadMoreItem.className = "page-item";
@@ -562,7 +551,6 @@ function updatePagination() {
         loadMoreItem.addEventListener("click", (e) => {
             e.preventDefault();
             currentPageGroup += 6;
-            loadTable(currentPageGroup * itemsPerPage); // Cargar datos de la siguiente página
             updatePagination();
             loadTable(allData); // Asegúrate de pasar allData aquí
         });
