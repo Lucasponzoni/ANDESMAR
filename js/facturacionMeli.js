@@ -1240,7 +1240,7 @@ function mostrarAlertaExito(mensaje) {
 
         tableBody.appendChild(row);
     });
-
+    updateNotificationCount();
 updatePagination2(filteredData.length); // Actualizar la paginación con el nuevo tamaño de datos
 }
 
