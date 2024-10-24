@@ -3144,6 +3144,31 @@ div.card-body > p > i{
     right: -10px !important;
 }
 
+#statusCard {
+    border: solid 1px cornflowerblue;
+    background-color: rgba(255, 255, 255, 0.851); /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1050;
+    display: none;
+    border-radius: 15px; /* Bordes redondeados */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+}
+.card-body {
+    padding: 20px; /* Padding más amplio */
+}
+.btn {
+    padding: 10px;
+    margin-inline-end: 5px; /* Espaciado entre botones */
+    border-radius: 5px; /* Bordes redondeados en botones */
+}
+#timer {
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+}
 
 
 

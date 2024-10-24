@@ -100,6 +100,35 @@
             <div class="spinner-border" role="status" id="spinner">
                 <span class="sr-only">Cargando...</span>
             </div>     
+
+            <div id="statusCard" class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Estado de los Botones</h5>
+                    <div class="d-flex justify-content-around mb-3">
+                        <button class="btn btn-sm btn-secondary">
+                            <i class="bi bi-pencil"></i> Vacío
+                        </button>
+                        <button class="btn btn-sm btn-success">
+                            <i class="bi bi-pencil"></i> Comentario
+                        </button>
+                        <button class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil"></i> Email
+                        </button>
+                    </div>
+                    <p class="text-muted text-center">
+                        <small>
+                            <strong>Gris:</strong> Sin información.<br>
+                            <strong>Verde:</strong> Con comentarios cargados.<br>
+                            <strong>Amarillo:</strong> Email cargado.
+                        </small>
+                    </p>
+                    <div id="timer">Me cerraré en <span id="countdown">10</span> segundos</div>
+                    <div class="text-center">
+                    <button id="closeCard" class="btn btn-danger btn-sm">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+            
         
             <div class="error-message" style="display: none;">
                 <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">

@@ -410,83 +410,111 @@ db.ref('PasarAWebMonto').once('value')
                 row.appendChild(deleteCell);
     
                 // Botón de comentario
-                const commentCell = document.createElement('td');
-                const commentButton = document.createElement('button');
-                commentButton.className = 'btn btn-sm ' + (operation.comentario ? 'btn-success' : 'btn-secondary');
-                commentButton.innerHTML = '<i class="bi bi-pencil"></i>';
-                commentCell.appendChild(commentButton);
-                row.appendChild(commentCell);
-    
-                // Agregar la fila a la tabla
-                tableBody.appendChild(row);
-    
-                commentButton.onclick = () => {
-                    console.log('ID de operación:', operation ? operation.idOperacion : 'undefined');
-    
-                    if (!operation || !operation.idOperacion) {
-                        Swal.fire('Error', 'No se puede cargar el comentario: operación no válida.', 'error');
-                        return;
-                    }
-    
-                    db.ref('envios').child(operation.idOperacion).once('value', snapshot => {
-                        if (snapshot.exists()) {
-                            const data = snapshot.val();
-                            document.getElementById('comentarioInput').value = data.comentario || '';
-                            document.querySelector('input[type="email"]').value = data.email || '';
-                            document.querySelector('input[type="tel"]').value = data.Telefono || '';
-    
-                            if (data.trackingNumber) {
-                                actualizarEstadoDespacho(true);
-                            } else {
-                                actualizarEstadoDespacho(false);
-                            }
-                        } else {
-                            document.getElementById('comentarioInput').value = '';
-                            document.querySelector('input[type="email"]').value = '';
-                            document.querySelector('input[type="tel"]').value = '';
-                            actualizarEstadoDespacho(false);
-                        }
-                    });
-    
-                    $('#comentarioModal').modal('show');
-    
-                    document.getElementById('guardarComentarioBtn').onclick = function() {
-                        const comentario = document.getElementById('comentarioInput').value;
-                        db.ref('envios').child(operation.idOperacion).update({ comentario: comentario })
-                            .then(() => {
-                                Swal.fire('¡Éxito!', 'Comentario actualizado correctamente.', 'success');
-                                $('#comentarioModal').modal('hide');
-                                loadTable(data); // Asegúrate de pasar los datos correctos aquí.
-                                commentButton.classList.remove('btn-secondary'); 
-                                commentButton.classList.add('btn-success'); 
-                            })
-                            .catch(error => {
-                                Swal.fire('Error', 'No se pudo actualizar el comentario: ' + error.message, 'error');
-                            });
-                    };
-    
-                    document.getElementById('guardarEmailBtn').onclick = function() {
-                        const email = document.querySelector('input[type="email"]').value;
-                        db.ref('envios').child(operation.idOperacion).update({ email: email })
-                            .then(() => {
-                                mostrarAlertaExito('Email actualizado correctamente.');
-                            })
-                            .catch(error => {
-                                Swal.fire('Error', 'No se pudo actualizar el email: ' + error.message, 'error');
-                            });
-                    };
-    
-                    document.getElementById('guardarTelefonoBtn').onclick = function() {
-                        const telefono = document.querySelector('input[type="tel"]').value;
-                        db.ref('envios').child(operation.idOperacion).update({ Telefono: telefono })
-                            .then(() => {
-                                mostrarAlertaExito('Teléfono actualizado correctamente.');
-                            })
-                            .catch(error => {
-                                Swal.fire('Error', 'No se pudo actualizar el teléfono: ' + error.message, 'error');
-                            });
-                    };
-                };
+// Botón de comentario
+const commentCell = document.createElement('td');
+const commentButton = document.createElement('button');
+
+// Inicializar la clase del botón según los datos disponibles
+if (operation.comentario) {
+    commentButton.className = 'btn btn-sm btn-success';
+} else if (operation.email) {
+    commentButton.className = 'btn btn-sm btn-warning';
+} else {
+    commentButton.className = 'btn btn-sm btn-secondary';
+}
+
+commentButton.innerHTML = '<i class="bi bi-pencil"></i>';
+commentCell.appendChild(commentButton);
+row.appendChild(commentCell);
+
+// Agregar la fila a la tabla
+tableBody.appendChild(row);
+
+commentButton.onclick = () => {
+    console.log('ID de operación:', operation ? operation.idOperacion : 'undefined');
+
+    if (!operation || !operation.idOperacion) {
+        Swal.fire('Error', 'No se puede cargar el comentario: operación no válida.', 'error');
+        return;
+    }
+
+    db.ref('envios').child(operation.idOperacion).once('value', snapshot => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            document.getElementById('comentarioInput').value = data.comentario || '';
+            document.querySelector('input[type="email"]').value = data.email || '';
+            document.querySelector('input[type="tel"]').value = data.Telefono || '';
+
+            // Cambiar el estado del botón según los datos
+            if (data.email) {
+                commentButton.classList.remove('btn-secondary', 'btn-success');
+                commentButton.classList.add('btn-warning');
+            } else if (data.comentario) {
+                commentButton.classList.remove('btn-secondary', 'btn-warning');
+                commentButton.classList.add('btn-success');
+            } else {
+                commentButton.classList.remove('btn-warning', 'btn-success');
+                commentButton.classList.add('btn-secondary');
+            }
+
+            if (data.trackingNumber) {
+                actualizarEstadoDespacho(true);
+            } else {
+                actualizarEstadoDespacho(false);
+            }
+        } else {
+            document.getElementById('comentarioInput').value = '';
+            document.querySelector('input[type="email"]').value = '';
+            document.querySelector('input[type="tel"]').value = '';
+            actualizarEstadoDespacho(false);
+            commentButton.classList.remove('btn-warning', 'btn-success');
+            commentButton.classList.add('btn-secondary');
+        }
+    });
+
+    $('#comentarioModal').modal('show');
+
+    document.getElementById('guardarComentarioBtn').onclick = function() {
+        const comentario = document.getElementById('comentarioInput').value;
+        db.ref('envios').child(operation.idOperacion).update({ comentario: comentario })
+            .then(() => {
+                Swal.fire('¡Éxito!', 'Comentario actualizado correctamente.', 'success');
+                $('#comentarioModal').modal('hide');
+                loadTable(data); // Asegúrate de pasar los datos correctos aquí.
+                commentButton.classList.remove('btn-secondary', 'btn-warning');
+                commentButton.classList.add('btn-success');
+            })
+            .catch(error => {
+                Swal.fire('Error', 'No se pudo actualizar el comentario: ' + error.message, 'error');
+            });
+    };
+
+    document.getElementById('guardarEmailBtn').onclick = function() {
+        const email = document.querySelector('input[type="email"]').value;
+        db.ref('envios').child(operation.idOperacion).update({ email: email })
+            .then(() => {
+                mostrarAlertaExito('Email actualizado correctamente.');
+                // Cambiar el estado del botón después de actualizar el email
+                commentButton.classList.remove('btn-secondary', 'btn-success');
+                commentButton.classList.add('btn-warning');
+            })
+            .catch(error => {
+                Swal.fire('Error', 'No se pudo actualizar el email: ' + error.message, 'error');
+            });
+    };
+
+    document.getElementById('guardarTelefonoBtn').onclick = function() {
+        const telefono = document.querySelector('input[type="tel"]').value;
+        db.ref('envios').child(operation.idOperacion).update({ Telefono: telefono })
+            .then(() => {
+                mostrarAlertaExito('Teléfono actualizado correctamente.');
+            })
+            .catch(error => {
+                Swal.fire('Error', 'No se pudo actualizar el teléfono: ' + error.message, 'error');
+            });
+    };
+};
+
             });
     
             // Paginación y actualización de notificaciones
@@ -1292,3 +1320,33 @@ document.getElementById('estadoFilter').addEventListener('change', function() {
     const selectedValue = this.getAttribute('data-selected-value') || '';
     loadTable2(selectedValue); // Pasamos el valor seleccionado como argumento
 });
+
+
+// NOTIFICADOR DE COMENTARIO EN FACTURACION
+document.addEventListener("DOMContentLoaded", function() {
+    const statusCard = document.getElementById('statusCard');
+    const closeCardButton = document.getElementById('closeCard');
+    const countdownElement = document.getElementById('countdown');
+    let countdown = 20; // Tiempo en segundos
+
+    // Mostrar la card
+    statusCard.style.display = 'block';
+
+    // Actualizar el temporizador cada segundo
+    const timerInterval = setInterval(() => {
+        countdown--;
+        countdownElement.textContent = countdown;
+
+        if (countdown <= 0) {
+            clearInterval(timerInterval);
+            statusCard.style.display = 'none';
+        }
+    }, 1000);
+
+    // Cerrar la card al hacer clic en el botón
+    closeCardButton.onclick = function() {
+        clearInterval(timerInterval);
+        statusCard.style.display = 'none';
+    };
+});
+// FIN NOTIFICADOR DE COMENTARIO EN FACTURACION
