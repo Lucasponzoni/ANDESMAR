@@ -3264,7 +3264,7 @@ margin-bottom: 20px;
 }
 
 .cantidad-Meli {
-    max-width: 80px !important;
+    max-width:  40px !important;
     color: white !important;
     background-color: red;
     font-weight: 900;
@@ -3273,11 +3273,10 @@ margin-bottom: 20px;
 }
 
 .SKU-Meli {
-    width: 50px !important;
     text-wrap: wrap !important;
     color: #333; 
     font-weight: 700; 
-    font-size: 1rem; 
+    font-size: small; 
     text-align: center; 
     padding: 5px;
     border-radius: 5px; 
@@ -3302,6 +3301,8 @@ td.imagen-Meli img {
 }
 
 .producto-Meli {
+    font-size: small;
+    max-width: 220px;
     color: #333; 
     font-weight: 500; 
     font-size: 1rem; 
@@ -3317,6 +3318,17 @@ td.imagen-Meli img {
     font-size: 1rem !important;
 }
 
+.select-imprimir {
+    font-weight: 900;
+    width: min-content;
+    background-color: #000;
+    color: #0051cb;
+    background-color: transparent; /* Fondo transparente */
+    border: none; /* Sin borde */
+    padding: 5px; /* Espaciado interno */
+    font-size: 12px; /* Tamaño de fuente */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+}
 
 
 
