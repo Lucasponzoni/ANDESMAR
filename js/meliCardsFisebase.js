@@ -151,7 +151,7 @@ const database2 = app2.database();
 
 let allData = []; // Arreglo global para almacenar todos los datos
 let currentPage = 1;
-const itemsPerPage = 3;
+const itemsPerPage = 12;
 let currentPageGroup = 0; // Grupo de páginas actual
 
 // Función para cargar datos de Firebase
