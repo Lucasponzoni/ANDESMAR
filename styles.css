@@ -3172,6 +3172,16 @@ div.card-body > p > i{
     margin-top: 10px;
 }
 
+.email-notification1{
+    font-size: 1.3rem;
+    color: red;
+}
+
+.email-notification2{
+    font-size: 1.3rem;
+    color: green;
+}
+
 
 
 

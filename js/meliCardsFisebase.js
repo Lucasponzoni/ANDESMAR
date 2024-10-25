@@ -333,7 +333,7 @@ function crearCard(data) {
                         <p><i class="fas fa-home ios-icon"></i> Calle: <span id="calle-${data.idOperacion}">${data.Calle}</span></p>
                         <p><i class="bi bi-123 ios-icon"></i> Altura: <span id="altura-${data.idOperacion}">${data.Altura}</span></p>
                         <p><i class="fas fa-phone ios-icon"></i> Telefono: <span id="telefono-${data.idOperacion}">${data.Telefono!== undefined ? data.Telefono : 'No Disponible'}</span></p>
-                        <p><i class="bi bi-envelope-at-fill ios-icon"></i> Email: <span id="email-${data.idOperacion}" style="text-transform: lowercase;">${data.Email !== undefined ? data.Email : 'webnovogar@gmail.com'}</span></p>
+                        <p><i class="bi bi-envelope-at-fill ios-icon"></i> Email: <span id="email-${data.idOperacion}" style="text-transform: lowercase;">${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}</span></p>
                         <p><i class="bi bi-info-circle-fill ios-icon"></i> Autorizado: <span id="autorizado-${data.idOperacion}">${data.Recibe !== undefined ? data.Recibe : 'Sin Autorizado, solo titular'}</span></p>
                         <p><i class="bi bi-sticky-fill ios-icon"></i> Observaciones: <span id="observaciones-${data.idOperacion}">${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}</span></p>
                     </div>
@@ -383,8 +383,10 @@ function crearCard(data) {
             </div>
 
             <button class="btn btn-link lock-btn p-1 m-0" style="display: inline-flex; align-items: center;">
-            <i class="bi bi-shield-lock-fill"></i>
+            <i class="${data.email === undefined ? 'bi bi-envelope-x-fill email-notification1' : 'bi bi-envelope-fill email-notification2'}"></i>
             </button>
+
+
             
         </div>
     `;
@@ -534,7 +536,7 @@ async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
         // Crear un enlace temporal para la descarga
         const a = document.createElement('a');
         a.href = pdfUrl;
-        a.download = `Etiqueta_Mercado_Libre_${numeroDeEnvio}.pdf`; // Nombre del archivo
+        a.download = `Etiqueta_Mercado_Libre_${id}.pdf`; // Nombre del archivo
         document.body.appendChild(a);
         a.click(); // Simular clic en el enlace
         document.body.removeChild(a); // Eliminar el enlace del DOM
@@ -569,7 +571,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     // Dividir medidas para obtener alto, ancho y largo
     const [largo, ancho, alto] = Medidas.split('x').map(Number);
     const productoLowerCase = Producto.toLowerCase();
-    const cantidadFinal = productoLowerCase.includes("split") ? cantidad * 2 : cantidad;
+    const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000") ? cantidad * 2 : cantidad;
 
     // Definir los datos que se enviarán a la API
     const requestObj = {
@@ -789,7 +791,7 @@ const volumenTotal = volumenCM3 || 0; // Obtener volumen total
 const productoLowerCase = Producto.toLowerCase();
 
 // Determinar la cantidad a usar
-const cantidadFinal = productoLowerCase.includes("split") ? cantidad * 2 : cantidad;
+const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000") ? cantidad * 2 : cantidad;
 
 for (let i = 0; i < cantidadFinal; i++) {
     bultos.push({
