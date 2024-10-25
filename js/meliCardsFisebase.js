@@ -156,7 +156,12 @@ function cargarDatos() {
                     medidas: data.medidas,
                     permalink: data.permalink,
                     shippingMode: data.shippingMode,
-                    nombreDeUsuario: data.nombreDeUsuario
+                    nombreDeUsuario: data.nombreDeUsuario,
+                    transportCompany: data.transportCompany,
+                    trackingNumber: data.trackingNumber,
+                    trackingLink: data.trackingLink,
+                    estadoFacturacion: data.estadoFacturacion,
+                    andesmarId: data.andesmarId
                 });
             });
 
@@ -196,6 +201,11 @@ function crearCard(data) {
     const cardDiv = document.createElement('div');
     cardDiv.className = 'col-md-4';
 
+    // Verificar si transportCompany
+    const isAndesmar = data.transportCompany === "Andesmar";
+    const isAndreani = data.transportCompany === "Andreani"
+    const isLogPropia = data.transportCompany === "Logistica Propia"
+
     // Verificar si data.pictures existe y es un array
     const filteredPictures = Array.isArray(data.pictures) ? 
         data.pictures.filter(picture => 
@@ -232,10 +242,17 @@ function crearCard(data) {
 
     cardDiv.innerHTML = `
         <div class="card position-relative">
-            <div class="em-circle-isNotFraud">Seguro</div>
-            <div class="em-circle-${data.shippingMode.toLowerCase() === 'me1' ? 'ME1' : 'ME2'}">${data.shippingMode.toUpperCase()}</div>
-            <div id="estadoEnvio${data.idOperacion}" class="em-circle-state">Envio pendiente</div>
+
+            <div class="${data.estadoFacturacion === 'facturado' ? 'em-circle-isNotFraud' : 'em-circle-isFraud'}">
+             ${data.estadoFacturacion === 'facturado' ? 'Facturado' : 'Factura X'}
+            </div>
+            
+        <div id="estadoEnvio${data.idOperacion}" class="${isAndesmar || isAndreani || isLogPropia ? 'em-circle-state2' : 'em-circle-state'}">
+        ${isAndesmar || isAndreani || isLogPropia ? 'Envio Preparado' : 'Envio pendiente'}
+        </div>
+
             <div class="card-body-meli">
+
                 <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> ${data.NombreyApellido}</h5>
                 <h6 class="user-title-meli">${data.nombreDeUsuario}</h6>
                 <div class="meli-box1"> 
@@ -247,6 +264,7 @@ function crearCard(data) {
                       '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
                     }
                     </p>
+
                     </div>
 
                 <div class="d-flex align-items-center">
@@ -273,18 +291,38 @@ function crearCard(data) {
                 Producto: X ${data.Cantidad} ${data.SKU}
                 </div>
                 
+                <div class="em-circle-${data.shippingMode.toLowerCase() === 'me1' ? 'ME1' : 'ME2'}">${data.shippingMode.toUpperCase()}</div>
+
                 <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails${data.idOperacion}" aria-expanded="false" aria-controls="collapseDetails${data.idOperacion}">
                     <i class="bi bi-chevron-down"></i> Ver más detalles
                 </button>
                 <div class="collapse" id="collapseDetails${data.idOperacion}">
-                    <p class="numeroDeEnvioGenerado" id="numeroDeEnvioGenerado${data.idOperacion}">Número de Envío Pendiente</p>
+
+                
+                <p class="numeroDeEnvioGenerado" id="numeroDeEnvioGenerado${data.idOperacion}">
+                Envío: 
+                ${isAndesmar ? 
+                `<a href="${data.trackingLink}" target="_blank">Andesmar: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                isAndreani ? 
+                `<a href="${data.trackingLink}" target="_blank">Andreani: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                'Número Pendiente'}
+                </p>
+
+
                     <div class="little-card-meli">
-                        <p>
-                            <i class="fas fa-map-marker-alt ios-icon"></i> 
-                            <span id="localidadDeEnvio-${data.idOperacion}">${data.Cp}, ${data.localidad}, ${data.Provincia}</span>
-                            <button class="btn btn-link btn-sm" onclick="editarLocalidad('${data.idOperacion}')"><i class="bi bi-pencil-square ios-icon"></i></button>
-                            <button id="btnBorrar-${data.idOperacion}" class="btn btn-outline-danger btn-sm" style="display: none;" onclick="borrarLocalidad('${data.idOperacion}')">Borrar localidad <i class="bi bi-x-circle"></i></button>
-                        </p>
+
+                    <p class="editarLocalidad" style="display: flex; align-items: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <i class="fas fa-map-marker-alt ios-icon"></i> 
+                    <span id="localidadDeEnvio-${data.idOperacion}" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${data.Cp}, ${data.localidad}, ${data.Provincia}</span>
+                    <button class="btn btn-primary" style="padding: 2px; margin: 0;" onclick="editarLocalidad('${data.idOperacion}')">
+                    <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button id="btnBorrar-${data.idOperacion}" class="btn btn-outline-danger btn-sm" style="display: none; margin-left: 5px;" onclick="borrarLocalidad('${data.idOperacion}')">
+                    Borrar localidad <i class="bi bi-x-circle"></i>
+                    </button>
+                    </p>
+
+
                         <div id="inputLocalidad-${data.idOperacion}" style="display:none;">
                             <input type="text" id="localidadInput-${data.idOperacion}" 
                                    placeholder="Buscar localidad" 
@@ -294,10 +332,10 @@ function crearCard(data) {
                         </div>
                         <p><i class="fas fa-home ios-icon"></i> Calle: <span id="calle-${data.idOperacion}">${data.Calle}</span></p>
                         <p><i class="bi bi-123 ios-icon"></i> Altura: <span id="altura-${data.idOperacion}">${data.Altura}</span></p>
-                        <p><i class="fas fa-phone ios-icon"></i> Telefono: <span id="telefono-${data.idOperacion}">${data.Telefono}</span></p>
+                        <p><i class="fas fa-phone ios-icon"></i> Telefono: <span id="telefono-${data.idOperacion}">${data.Telefono!== undefined ? data.Telefono : 'No Disponible'}</span></p>
                         <p><i class="bi bi-envelope-at-fill ios-icon"></i> Email: <span id="email-${data.idOperacion}" style="text-transform: lowercase;">${data.Email !== undefined ? data.Email : 'webnovogar@gmail.com'}</span></p>
-                        <p><i class="bi bi-info-circle-fill ios-icon"></i> Autorizado: <span id="autorizado-${data.idOperacion}">${data.Recibe}</span></p>
-                        <p><i class="bi bi-sticky-fill ios-icon"></i> Observaciones: <span id="observaciones-${data.idOperacion}">${data.Observaciones}</span></p>
+                        <p><i class="bi bi-info-circle-fill ios-icon"></i> Autorizado: <span id="autorizado-${data.idOperacion}">${data.Recibe !== undefined ? data.Recibe : 'Sin Autorizado, solo titular'}</span></p>
+                        <p><i class="bi bi-sticky-fill ios-icon"></i> Observaciones: <span id="observaciones-${data.idOperacion}">${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}</span></p>
                     </div>
                     <div class="dimensions-info">
                     <h6>Dimensiones</h6>
@@ -316,14 +354,31 @@ function crearCard(data) {
 
                     <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.idOperacion}" onclick="editarDatos('${data.idOperacion}')">Editar datos</button>
                 </div>
-                <button class="btn btn-primary btnAndesmarMeli" id="andesmarButton${data.idOperacion}" onclick="enviarDatosAndesmar('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
-                    <span id="andesmarText${data.idOperacion}"><i class="bi bi-file-text"></i> Etiqueta Andesmar</span>
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.idOperacion}"></span>
+
+                <!-- Botón Andesmar --> 
+                <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} btnAndesmarMeli" 
+                id="andesmarButton${data.idOperacion}" 
+                ${isAndreani ? 'disabled' : ''} 
+                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')`}">
+                <span id="andesmarText${data.idOperacion}">
+                ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<i class="bi bi-file-text"></i> Etiqueta Andesmar'}
+                </span>
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.idOperacion}"></span>
                 </button>
-                <button class="btn btn-danger btnAndreaniMeli" id="andreaniButton${data.idOperacion}" onclick="enviarDatosAndreani('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')">
-                    <span id="andreaniText${data.idOperacion}"><i class="bi bi-file-text"></i> Etiqueta Andreani</span>
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.idOperacion}" style="display:none;"></span>
+                <!-- Botón Andesmar --> 
+
+                <!-- Botón Andreani -->
+                <button class="btn ${isAndreani ? 'btn-success' : 'btn-danger'} btnAndreaniMeli" 
+                id="andreaniButton${data.idOperacion}" 
+                ${isAndesmar ? 'disabled' : ''} 
+                onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')`}">
+                <span id="andreaniText${data.idOperacion}">
+                ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
+                </span>
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.idOperacion}" style="display:none;"></span>
                 </button>
+                <!-- Botón Andreani -->
+
                 <div id="resultado${data.idOperacion}" class="mt-2 errorMeli"></div>
             </div>
 
@@ -441,6 +496,53 @@ document.querySelectorAll('.editarDatos').forEach(button => {
     });
 });
 
+async function handleButtonClick(numeroDeEnvio, id) {
+    // Mostrar spinner
+    document.getElementById(`spinnerAndreani${id}`).style.display = 'inline-block';
+    
+    // Obtener el token de autenticación
+    const token = await getAuthToken();
+    if (token) {
+        // Obtener la etiqueta
+        await obtenerEtiqueta2(numeroDeEnvio, token, id);
+    }
+
+    // Ocultar spinner
+    document.getElementById(`spinnerAndreani${id}`).style.display = 'none';
+}
+
+async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
+    const url = `https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
+    
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                "x-authorization-token": token,
+                "Accept": "application/pdf"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error HTTP! Status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const pdfUrl = URL.createObjectURL(blob);
+
+        // Crear un enlace temporal para la descarga
+        const a = document.createElement('a');
+        a.href = pdfUrl;
+        a.download = `Etiqueta_Mercado_Libre_${numeroDeEnvio}.pdf`; // Nombre del archivo
+        document.body.appendChild(a);
+        a.click(); // Simular clic en el enlace
+        document.body.removeChild(a); // Eliminar el enlace del DOM
+    } catch (error) {
+        console.error('Error al obtener la etiqueta:', error);
+    }
+}
+
 const usuario = "BOM6765";
 const clave = "BOM6765";
 const codigoCliente = "6765";
@@ -536,7 +638,9 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
             firebase.database().ref('envios/' + idOperacionSinME1).update({
                 trackingNumber: idOperacionFinal,
                 trackingLink: trackingLinkAndesmar,
-                trackingMessage: trackingMessage
+                trackingMessage: trackingMessage,
+                transportCompany: "Andesmar",
+                andesmarId: data.NroPedido
             }).then(() => {
                 console.log(`Datos actualizados en Firebase para la operación: ${idOperacion}`);
             }).catch(error => {
@@ -569,7 +673,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
             button.classList.remove('btn-primary');
             button.classList.add('btn-success');
             button.onclick = () => window.open(link, '_blank'); 
-            NroEnvio.innerHTML = `<a href="https://andesmarcargas.com/seguimiento.html?numero=${idOperacion}&tipo=remito&cod=" target="_blank">Andesmar: ${idOperacion} <i class="bi bi-box-arrow-up-right"></i></a>`;
+            NroEnvio.innerHTML = `<a href="https://andesmarcargas.com/seguimiento.html?numero=${idOperacionFinal}&tipo=remito&cod=" target="_blank">Andesmar: ${idOperacionFinal} <i class="bi bi-box-arrow-up-right"></i></a>`;
             spinner.style.display = 'none';
             if (envioState) {
                 envioState.className = 'em-circle-state2';
@@ -797,7 +901,8 @@ for (let i = 0; i < cantidadFinal; i++) {
         firebase.database().ref('envios/' + idOperacionSinME1).update({
             trackingNumber: numeroDeEnvio,
             trackingLink: trackingLink,
-            trackingMessage: trackingMessage
+            trackingMessage: trackingMessage,
+            transportCompany: "Andreani"
         }).then(() => {
             console.log(`Datos actualizados en Firebase para la operación: ${idOperacionFinalAndreani}`);
         }).catch(error => {
