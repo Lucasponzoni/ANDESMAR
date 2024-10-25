@@ -3182,7 +3182,140 @@ div.card-body > p > i{
     color: green;
 }
 
+/* QUERY DE MERCADO LIBRE */
 
+.query-modal-content {
+    width: 600px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.query-modal-header {
+    border-bottom: none;
+    background-color: #f7f7f7;
+}
+
+.query-modal-title {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.alerta-query {
+    text-align: center;
+    background-color: #ffeeba; /* Color de fondo de alerta */
+    border-bottom: 5px solid #ffc107; /* Color de borde */
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #856404; /* Color del texto */
+}
+
+.query-btn-prepararME1,
+.query-btn-prepararME2 {
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    width: 45%; /* Ajusta el ancho de los botones */
+}
+
+.btn-ios-success {
+    background-color: #4CAF50; /* Verde */
+    border: none;
+    color: white;
+    transition: .5s;
+}
+
+.btn-ios-danger {
+    background-color: #F44336; /* Rojo */
+    border: none;
+    color: white;
+    transition: .5s;
+}
+
+.btn-ios-danger:hover {
+    color: white;
+}
+
+.btn-ios-success:hover {
+    color: white;
+}
+
+.contenedor-botones-meli{
+margin-bottom: 20px;
+}
+
+#spinner3 {
+    display: none;
+    border: 8px solid #f3f3f3; /* Color de fondo */
+    border-top: 8px solid orangered; /* Color del spinner */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.cantidad-Meli {
+    max-width: 80px !important;
+    color: white !important;
+    background-color: red;
+    font-weight: 900;
+    font-size: 1.2rem !important; /* Tamaño de letra más grande */
+    text-align: center;
+}
+
+.SKU-Meli {
+    width: 50px !important;
+    text-wrap: wrap !important;
+    color: #333; 
+    font-weight: 700; 
+    font-size: 1rem; 
+    text-align: center; 
+    padding: 5px;
+    border-radius: 5px; 
+    background-color: #f0f0f0; 
+}
+
+td.SKU-Meli{
+   max-width: 100px !important;
+   font-size: small;
+   text-wrap: wrap;
+}
+
+td.imagen-Meli {
+    padding: 0 !important;
+    max-width: 120px; 
+    overflow: hidden; 
+    text-align: center; 
+}
+
+td.imagen-Meli img {
+    height: auto; 
+}
+
+.producto-Meli {
+    color: #333; 
+    font-weight: 500; 
+    font-size: 1rem; 
+    text-align: left; 
+    padding: 5px; 
+    border-radius: 5px; 
+    background-color: #f0f0f0;
+}
+
+.table-striped > thead > tr > th{
+    background-color: #000;
+    border-radius: 0px !important;
+    font-size: 1rem !important;
+}
 
 
 
