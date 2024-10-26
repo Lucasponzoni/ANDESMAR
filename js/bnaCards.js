@@ -69,7 +69,7 @@ const filterSelect = document.getElementById("filter");
 document.getElementById('importButton').addEventListener('click', function() {
     const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
-    const cardsContainer = document.getElementById('envios-cards');
+    const cardsContainer = document.getElementById('meli-cards');
     const spinner = document.createElement('div');
 
     // Mostrar spinner mientras se cargan los datos
@@ -236,7 +236,7 @@ function lowercaseWords(str) {
 
 // CARGAR DATOS DE FIREBASE
 function loadEnviosFromFirebase() {
-    const cardsContainer = document.getElementById('envios-cards');
+    const cardsContainer = document.getElementById('meli-cards');
     const spinner = document.getElementById('spinner');
     cardsContainer.innerHTML = '';
 
@@ -330,7 +330,7 @@ function loadEnviosFromFirebase() {
 }
 
 function renderCards(data) {
-    const cardsContainer = document.getElementById('envios-cards');
+    const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = ''; // Limpiar contenedor de tarjetas
 
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -452,45 +452,39 @@ function renderCards(data) {
                 </div>
                             
                             ${carritoContenido}
-                            <div class="d-flex align-items-center contenedorRemito">
+<div class="d-flex align-items-center justify-content-center contenedorRemito">
+    <button class="btn btn-link btn-sm text-decoration-none copy-btn me-2 ios-icon3">
+        <i class="bi bi-clipboard"></i>
+    </button>
 
-                            <p class="orden">${data[i].remito}</p>
+    <p class="orden mx-2">${data[i].remito}</p>
 
-                            <div class="button-container d-block mt-2">
-                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2">
-                                    <i class="bi bi-clipboard"></i>
-                                </button>
-
-                                <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon2" 
-                                    onclick="window.open(
-                                        ${data[i].cuotas === '30' 
-                                            ? `'https://api.avenida.com/manage/shops/2943/orders/${data[i].orden_publica_}'` 
-                                            : (data[i].cuotas === '12' || data[i].cuotas === '6' || data[i].cuotas === '1') 
-                                                ? `'https://api.avenida.com/manage/shops/2941/orders/${data[i].orden_publica_}'` 
-                                                : `'#' // URL por defecto`
-                                        }, '_blank');">
-                                                                   <i class="bi bi-bag-check"></i>
-                                </button>
-
-                            </div>
-
-                            <div class="d-flex flex-column ms-2 text-center"> <!-- Contenedor para apilar los switches -->
-    
-                            <div class="form-check form-switch"> 
-                            <input class="form-check-input" type="checkbox" id="preparacion-${data[i].id}" ${data[i].marcaPreparado === 'Si' ? 'checked' : ''}>
-                            <label class="form-check-label" for="preparacion-${data[i].id}"><strong>1</strong> Preparación</label>
-                            </div>
-
-                            <div class="form-check form-switch"> 
-                            <input class="form-check-input" type="checkbox" id="entregado-${data[i].id}-1" ${data[i].marcaEntregado === 'Si' ? 'checked' : ''}>
-                            <label class="form-check-label" for="entregado-${data[i].id}-1"><strong>2</strong> Entregado</label>
-        
-                            </div>
-
-                            </div>
+    <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3" 
+        onclick="window.open(
+            ${data[i].cuotas === '30' 
+                ? `'https://api.avenida.com/manage/shops/2943/orders/${data[i].orden_publica_}'` 
+                : (data[i].cuotas === '12' || data[i].cuotas === '6' || data[i].cuotas === '1') 
+                    ? `'https://api.avenida.com/manage/shops/2941/orders/${data[i].orden_publica_}'` 
+                    : `'#' // URL por defecto`
+            }, '_blank');">
+        <i class="bi bi-bag-check"></i>
+    </button>
+</div>
 
 
-                            </div>
+<!-- Nuevo contenedor para los switches -->
+<div class="d-flex contenedor-switches mt-1 justify-content-between">
+    <div class="form-check form-switch switch-ios"> 
+        <input class="form-check-input input-interruptor" type="checkbox" id="preparacion-${data[i].id}" ${data[i].marcaPreparado === 'Si' ? 'checked' : ''}>
+        <label class="form-check-label etiqueta-interruptor" for="preparacion-${data[i].id}"><strong>1</strong> Preparación</label>
+    </div>
+
+    <div class="form-check form-switch switch-ios"> 
+        <input class="form-check-input input-interruptor" type="checkbox" id="entregado-${data[i].id}-1" ${data[i].marcaEntregado === 'Si' ? 'checked' : ''}>
+        <label class="form-check-label etiqueta-interruptor" for="entregado-${data[i].id}-1"><strong>2</strong> Entregado</label>
+    </div>
+</div>
+
 
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
                                 ${isLogPropia ? 
@@ -2677,7 +2671,7 @@ document.getElementById('btnPreparar').addEventListener('click', () => {
     ).reverse();
     
     // Limpiar el contenedor de tarjetas
-    const cardsContainer = document.getElementById('envios-cards');
+    const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = '';
 
     // Renderizar solo las tarjetas sin preparar
@@ -2695,7 +2689,7 @@ document.getElementById('btnFacturar').addEventListener('click', () => {
     const sinFacturarCards = allData.filter(item => !item.datoFacturacion).reverse(); // Invertir el orden de los elementos filtrados
     
     // Limpiar el contenedor de tarjetas
-    const cardsContainer = document.getElementById('envios-cards');
+    const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = '';
     
     // Ocultar la paginación
@@ -2720,7 +2714,7 @@ document.getElementById('btnSwitch').addEventListener('click', () => {
         .reverse(); // Invertir el orden de los elementos filtrados
 
     // Limpiar el contenedor de tarjetas
-    const cardsContainer = document.getElementById('envios-cards');
+    const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = '';
 
     // Ocultar la paginación
@@ -2743,7 +2737,7 @@ document.getElementById('btnSwitch1').addEventListener('click', () => {
         .reverse(); // Invertir el orden de los elementos filtrados
 
     // Limpiar el contenedor de tarjetas
-    const cardsContainer = document.getElementById('envios-cards');
+    const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = '';
 
     // Ocultar la paginación
@@ -2798,7 +2792,7 @@ searchInput.addEventListener("input", function() {
     
     // Si no se encuentra ningún resultado, mostrar una imagen de error
     if (filteredData.length === 0) {
-        document.getElementById("envios-cards").innerHTML = `
+        document.getElementById("meli-cards").innerHTML = `
             <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
                 <p class="errorp">No se encontraron resultados para "${searchTerm}"</p>
                 <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">

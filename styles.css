@@ -59,7 +59,8 @@ form {
 }
 
 .form-switch .form-check-input{
-    width: 40px !important;
+    margin-left: 10px !important;
+    width: 50px !important;
 }
 
 .badge-large2 {
@@ -1301,10 +1302,11 @@ p.card-text:nth-child(9){
     text-align: center;
     color: #333; 
     background-color: #ffffff; 
-    border: 1px solid #dcdcdc; 
+    border: 1px solid #ccc; 
     font-weight: 500 !important;
     padding: 10px 15px; 
-    border-radius: 15px;  
+    border-radius: 15px 15px 0 0;  
+    margin-bottom: -5px !important;
 }
 
 .remitoCard{
@@ -2391,6 +2393,12 @@ div.card-body > p > i{
     color: grey;
 }
 
+.ios-icon3 {
+    font-size: 26px;
+    color: #007aff;
+    margin-right: 10px;
+}
+
 #direccion-bna .ios-icon.bi-house {
     content: "\f015";
 }
@@ -2419,57 +2427,71 @@ div.card-body > p > i{
     justify-content: flex-start; /* Alinear horizontalmente al inicio */
 }
 
-/* SWITCH REDUCIDO */
+/* SWITCH MEJORADO */
 .form-check {
     display: flex;
+    justify-content: center;
     flex-direction: column; 
     align-items: center; 
-    margin-left: 10px;
+    padding-left: 0 !important;
+}
+
+div .form-check {
+    display: flex!important;
+    justify-content: center!important;
+    align-items: center!important;
 }
 
 .form-check-input {
-    width: 40px; 
-    height: 20px; 
-    background-color: cornsilk;
-    border: solid 1px rgba(128, 128, 128, 0.456);
-    border-radius: 50px;
+    width: 50px; /* Ancho aumentado */
+    height: 25px; /* Alto aumentado */
+    background-color: orangered; /* Color de fondo más atractivo */
+    border: solid 2px rgba(128, 128, 128, 0.5); /* Borde más definido */
+    border-radius: 50px; /* Bordes redondeados */
     cursor: pointer;
     -webkit-appearance: none;
     appearance: none;
     outline: none;
-    transition: background-color 0.3s;
+    position: relative; /* Para el pseudo-elemento */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Transición suave */
 }
 
 .form-check-input:checked {
     background-color: #4caf50; /* Color verde cuando está activo */
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); /* Sombra verde al activarse */
 }
 
 .form-check-input:checked::before {
-    transform: translateX(18px); /* Ajustar la posición del círculo */
+    transform: translateX(25px); /* Ajustar la posición del círculo */
 }
 
 .form-check-input::before {
     content: '';
     position: absolute;
-    width: 25px; 
-    height: 25px; 
-    background-color: white;
-    border: solid 1px grey;
-    border-radius: 50%;
-    transition: transform 0.3s;
-    top: -2px; 
+    width: 30px; /* Aumento del ancho del círculo */
+    height: 30px; /* Aumento de la altura del círculo */
+    background-color: white; /* Color del círculo */
+    border: solid 1px grey; /* Borde gris */
+    border-radius: 50%; /* Círculo perfecto */
+    transition: transform 0.3s; /* Transición suave */
+    top: -2.5px; /* Ajuste de posición */
     left: 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Sombra más pronunciada */
 }
 
 .form-check-label {
-    margin-top: 25px; 
-    margin-left: -12px; 
-    font-size: 12px; 
-    color: #333; 
+    margin-top: 0 !important; /* Espaciado superior aumentado */
+    font-size: 14px; /* Tamaño de fuente aumentado */
+    color: #333; /* Color del texto */
+    font-weight: bold; /* Texto en negrita */
     cursor: pointer;
+    transition: color 0.3s; /* Transición suave para el color */
 }
-/* FIN SWITCH REDUCIDO */
+
+.form-check-label:hover {
+    color: #4caf50; /* Color del texto al pasar el ratón */
+}
+/* FIN SWITCH MEJORADO */
 
 /* Estilo para el alert */
 .alert {
@@ -3409,7 +3431,24 @@ input[disabled] {
     z-index: 10000000;
 }
 
+.contenedor-switches {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white; /* Color de fondo claro */
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 0 0 15px 15px; /* Bordes redondeados */
+    padding: 15px; /* Espaciado interno */
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-top: -5px !important;
+    margin-bottom: 5px;
+}
 
+.contenedor-switches div{
+    justify-content: center;
+    align-items: center;
+}
 
 
 
