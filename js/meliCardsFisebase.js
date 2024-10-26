@@ -429,7 +429,7 @@ function crearCard(data) {
                 <div id="resultado${data.idOperacion}" class="mt-2 errorMeli"></div>
             </div>
 
-            <button class="btn btn-link lock-btn p-1 m-0" style="display: inline-flex; align-items: center;">
+            <button class="btn btn-link lock-btn p-1 m-0 disabled" style="display: inline-flex; align-items: center;">
             <i class="${data.email === undefined ? 'bi bi-envelope-x-fill email-notification1' : 'bi bi-envelope-fill email-notification2'}"></i>
             </button>
 

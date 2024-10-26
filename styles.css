@@ -54,6 +54,16 @@ form {
 
 .badge-large {
     font-size: 1rem;
+    min-width: 25px !important;
+    z-index: 1000 !important;
+}
+
+.form-switch .form-check-input{
+    width: 40px !important;
+}
+
+.badge-large2 {
+    font-size: 1rem;
     top: -10px !important;
     min-width: 25px !important;
     z-index: 1000 !important;
@@ -3328,6 +3338,75 @@ td.imagen-Meli img {
     padding: 5px; /* Espaciado interno */
     font-size: 12px; /* Tamaño de fuente */
     cursor: pointer; /* Cambia el cursor al pasar por encima */
+}
+
+.card-facturacion-meli {
+    border: 1px solid #d0d0d0;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background-color: #ffffff; /* Fondo blanco para un look limpio */
+}
+
+.card-header-facturacion-meli {
+    border-radius: 12px 12px 0 0;
+    background-color: #007aff; /* Azul similar al de Apple */
+    color: white;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 1.1rem; /* Aumentar el tamaño de la fuente */
+    border-bottom: 1px solid #d0d0d0;
+}
+
+.card-header-facturacion-meli-presea {
+    border-radius: 12px 12px 0 0;
+    background-color: #a75cb6; /* Color morado */
+    color: white;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 1.1rem; /* Aumentar el tamaño de la fuente */
+    border-bottom: 1px solid #d0d0d0;
+}
+
+.card-body-facturacion-meli {
+    padding: 20px;
+}
+
+div .card-body-facturacion-meli input, select, textarea {
+    margin-bottom: 0 ;
+    border-radius: 0 0 5px 5px !important;
+}
+input[disabled] {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.btn-primary.success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.oculto{
+    display:  none;
+}
+
+.card-body-facturacion-meli div div label{
+    margin-bottom: 0 !important;
+    font-size: .8rem;
+    background-color: rgb(211, 226, 253);
+    color: rgb(81, 81, 81);
+    border-radius: 5px 5px 0 0;
+    padding: 3px;
+    border: 1px solid #ccc;
+    border-bottom: none;
+}
+
+#passwordModal{
+    z-index: 10000000;
 }
 
 

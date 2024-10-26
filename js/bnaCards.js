@@ -255,12 +255,15 @@ function loadEnviosFromFirebase() {
             const data = childSnapshot.val();
             allData.push({ 
                 id: childSnapshot.key, 
+                nombreFacturacion: (data.nombre),
+                apellidoFacturacion: (data.apellido),
                 nombre: capitalizeWords(data.nombre_completo_envio), 
                 cp: (data.codigo_postal), 
                 localidad: capitalizeWords(data.ciudad),
                 provincia: capitalizeWords(data.provincia),
                 calle: capitalizeWords(data.direccion.replace(/"/g, '')), 
-                telefono: (data.telefono),
+                telefono: (data.telefono), 
+                telefono_facturacion: (data.telefono_facturacion), 
                 email: lowercaseWords(data.email), 
                 remito: (data.orden_),
                 carrito:(data.carritoCompra2),
@@ -286,10 +289,15 @@ function loadEnviosFromFirebase() {
                 cuit: (data.cuit),
                 marcaEntregado: (data.marcaEntregado),
                 marcaPreparado: (data.marcaPreparado),
-                direccion_facturacion: capitalizeWords(data.direccion_facturacion),
-                ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
+                direccion_facturacion: capitalizeWords(data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '')),
+                ciudad_facturacion: (data.ciudad_facturacion),
+                dni: (data.dni),
                 codigo_postal_facturacion: (data.codigo_postal_facturacion),
+                nombre_completo_envio: (data.nombre_completo_envio)
+
             });
+
+
 
             // Incrementar el contador si tipoElectrodomesticoBna está vacío
             if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
@@ -345,6 +353,7 @@ function renderCards(data) {
 
 
         // Lógica para calcular el estado de facturación
+        const costoEnvio = (data[i].suborden_total - (data[i].precio_venta * data[i].cantidad)).toFixed(2);
         const fechaDeCreacion = data[i].fechaDeCreacion; // "21-09-2024 19:30:18"
         const [fecha, hora] = fechaDeCreacion.split(' ');
         const [dia, mes, anio] = fecha.split('-');
@@ -375,6 +384,7 @@ function renderCards(data) {
         mensajeElement.textContent = mensajeFactura;
         card.appendChild(mensajeElement);
 
+        const direccionEnvio = data[i].direccion;
         const ordenPublica = data[i].orden_publica.replace(/-/g, '');
         const cupon = ordenPublica.substring(0, 13); 
         const autorizacion = ordenPublica.substring(ordenPublica.length - 4); 
@@ -595,11 +605,12 @@ function renderCards(data) {
                        </p>
 
                        <p class="card-text-pago">
-                           <strong>Costo de Envío:</strong> <strong class="strong-costo">$ ${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad))}</strong>
-                           <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad)).toFixed(2)}')">
-                               <i class="bi bi-clipboard"></i>
-                           </button>
-                       </p>
+                        <strong>Costo de Envío:</strong> <strong class="strong-costo">$${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad)).toFixed(2)}</strong>
+                        <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad)).toFixed(2)}')">
+                        <i class="bi bi-clipboard"></i>
+                        </button>
+                        </p>
+
 
                         <p class="card-text-pago">
                         <strong>Total:</strong> ${new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(data[i].suborden_total)}
@@ -734,16 +745,318 @@ function renderCards(data) {
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
                             </button>
 
+                            <!-- Botón para abrir el modal -->
+                            <button id="infoFacturacionButton${data[i].id}" class="btn btn-info mt-1" data-bs-toggle="modal" data-bs-target="#infoFacturacionModal${data[i].id}">
+                            Facturación Automatica
+                            </button>
+
                             <div id="resultado${data[i].id}" class="mt-2 errorMeli"></div>
                         </div>
                     </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="infoFacturacionModal${data[i].id}" tabindex="-1" aria-labelledby="infoFacturacionLabel${data[i].id}" inert>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoFacturacionLabel${data[i].id}">Información de Facturación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Datos de Pago -->
+                <div class="card-facturacion-meli mb-3">
+                    <div class="card-header-facturacion-meli"><i class="bi bi-credit-card-2-front-fill"></i> Datos de Pago:</div>
+                    <div class="card-body-facturacion-meli">
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="order_id_${data[i].id}">Order ID:</label>
+                                <input type="text" id="order_id_${data[i].id}" value="${data[i].remito}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="estado_${data[i].id}">Estado:</label>
+                                <input type="text" id="estado_${data[i].id}" value="Aprobado" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="metodo_pago_${data[i].id}">Método de Pago:</label>
+                                <input type="text" id="metodo_pago_${data[i].id}" value="BNA TIENDA BANCO NACION" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="numero_lote_${data[i].id}">Número de Lote:</label>
+                                <input type="text" id="numero_lote_${data[i].id}" value="11" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="cupon_pago_${data[i].id}">Cupón de Pago:</label>
+                                <input type="text" id="cupon_pago_${data[i].id}" value="${cupon}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="cod_autorizacion_${data[i].id}">Código de Autorización:</label>
+                                <input type="text" id="cod_autorizacion_${data[i].id}" value="${autorizacion}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="numero_tarjeta_visible_${data[i].id}">Número de Tarjeta Visible:</label>
+                                <input type="text" id="numero_tarjeta_visible_${data[i].id}" value="${data[i].numeros_tarjeta}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="codigo_pago_${data[i].id}">Código de Pago:</label>
+                                <input type="text" id="codigo_pago_${data[i].id}" value="${data[i].remito}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="cuotas_${data[i].id}">Cuotas:</label>
+                                <input type="text" id="cuotas_${data[i].id}" value="${data[i].cuotas}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="banco_${data[i].id}">Banco:</label>
+                                <input type="text" id="banco_${data[i].id}" value="BANCO NACION" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="tipo_entrega_${data[i].id}">Tipo de Entrega:</label>
+                                <input type="text" id="tipo_entrega_${data[i].id}" value="33" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="deposito_${data[i].id}">Depósito:</label>
+                                <input type="text" id="deposito_${data[i].id}" value="9" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="fecha_acreditacion_${data[i].id}">Fecha de Acreditación:</label>
+                                <input type="text" id="fecha_acreditacion_${data[i].id}" value="${fechaDeCreacion}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="fecha_${data[i].id}">Fecha:</label>
+                                <input type="text" id="fecha_${data[i].id}" value="${fechaDeCreacion}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2 oculto">
+                            <div class="col">
+                                <label for="monto_depositado_${data[i].id}">Monto Depositado:</label>
+                                <input type="text" id="monto_depositado_${data[i].id}" value="" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="observacion_deposito_transferencia_${data[i].id}">Observación Depósito/Transferencia:</label>
+                                <input type="text" id="observacion_deposito_transferencia_${data[i].id}" value="" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos de Compra -->
+                <div class="card-facturacion-meli mb-3">
+                    <div class="card-header-facturacion-meli"><i class="bi bi-bag-fill"></i> Datos de Compra:</div>
+                    <div class="card-body-facturacion-meli">
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="codigo_promocion_${data[i].id}">Código Promoción:</label>
+                                <input type="text" id="codigo_promocion_${data[i].id}" value="5000" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="codigo_item_${data[i].id}">Código Item:</label>
+                                <input type="text" id="codigo_item_${data[i].id}" value="${data[i].sku}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="nombre_item_${data[i].id}">Nombre Item:</label>
+                                <input type="text" id="nombre_item_${data[i].id}" value="${data[i].producto_nombre}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="recargo_item_${data[i].id}">Recargo Item:</label>
+                                <input type="text" id="recargo_item_${data[i].id}" value="0" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="cantidad_item_${data[i].id}">Cantidad Item:</label>
+                                <input type="text" id="cantidad_item_${data[i].id}" value="${data[i].cantidad}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="precio_item_${data[i].id}">Precio Item:</label>
+                                <input type="text" id="precio_item_${data[i].id}" value="${data[i].precio_venta}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="monto_envio_${data[i].id}">Monto de Envío:</label>
+                                <input type="text" id="monto_envio_${data[i].id}" value="${costoEnvio}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="monto_total_${data[i].id}">Monto Total:</label>
+                                <input type="text" id="monto_total_${data[i].id}" value="${data[i].suborden_total}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2 oculto">
+                            <div class="col">
+                                <label for="descuentos_${data[i].id}">Descuentos:</label>
+                                <input type="text" id="descuentos_${data[i].id}" value="" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="iva_${data[i].id}">IVA:</label>
+                                <input type="text" id="iva_${data[i].id}" value="" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos de Cliente -->
+                <div class="card-facturacion-meli mb-3">
+                    <div class="card-header-facturacion-meli-presea"><img id="presea" src="./Img/logo-presea.png"> Datos de Cliente:</div>
+                    <div class="card-body-facturacion-meli">
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="razon_social_${data[i].id}">Razón Social:</label>
+                                <input type="text" id="razon_social_${data[i].id}" value="${data[i].razon_social}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="cuit_${data[i].id}">CUIT:</label>
+                                <input type="text" id="cuit_${data[i].id}" value="${data[i].cuit}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                        <div class="col">
+                        <label for="condicion_iva_${data[i].id}">Condición IVA:</label>
+                            <select id="condicion_iva_${data[i].id}" disabled>
+                                <option value="IVA Responsable Inscripto" ${data[i].cuit.length > 7 ? 'selected' : ''}>IVA Responsable Inscripto</option>
+                                <option value="Consumidor Final" ${data[i].cuit.length <= 8 ? 'selected' : ''}>Consumidor Final</option>
+                                <option value="IVA Liberado - Ley N° 19.640">IVA Liberado - Ley N° 19.640</option>
+                                <option value="IVA Responsable Exento">IVA Responsable Exento</option>
+                                <option value="IVA Responsable Inscripto - Agente de Percepción">IVA Responsable Inscripto - Agente de Percepción</option>
+                                <option value="IVA Responsable Monotributo">IVA Responsable Monotributo</option>
+                                <option value="IVA Sujeto Exento">IVA Sujeto Exento</option>
+                            </select>
+                        </div>
+                    </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="nombre_${data[i].id}">Nombre:</label>
+                                <input type="text" id="nombre_${data[i].id}" value="${data[i].nombreFacturacion}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="apellido_${data[i].id}">Apellido:</label>
+                                <input type="text" id="apellido_${data[i].id}" value="${data[i].apellidoFacturacion}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="dni_${data[i].id}">DNI:</label>
+                                <input type="text" id="dni_${data[i].id}" value="${data[i].dni}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="telefono_${data[i].id}">Teléfono:</label>
+                                <input type="text" id="telefono_${data[i].id}" value="${data[i].telefono_facturacion}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="domicilio_fiscal_${data[i].id}">Domicilio Fiscal:</label>
+                                <input type="text" id="domicilio_fiscal_${data[i].id}" value="${data[i].direccion_facturacion}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="calle_${data[i].id}">Calle:</label>
+                                <input type="text" id="calle_${data[i].id}" value="${data[i].calle}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="altura_${data[i].id}">Altura:</label>
+                                <input type="text" id="altura_${data[i].id}" value="0" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="localidad_${data[i].id}">Localidad:</label>
+                                <input type="text" id="localidad_${data[i].id}" value="${data[i].ciudad_facturacion}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="codigo_postal_${data[i].id}">Código Postal:</label>
+                                <input type="text" id="codigo_postal_${data[i].id}" value="${data[i].codigo_postal_facturacion}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2 oculto">
+                            <div class="col">
+                                <label for="timbre_${data[i].id}">Timbre:</label>
+                                <input type="text" id="timbre_${data[i].id}" value="0" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos de Envío -->
+                <div class="card-facturacion-meli mb-3">
+                    <div class="card-header-facturacion-meli"><i class="bi bi-rocket-takeoff-fill"></i> Datos de Envio:</div>
+                    <div class="card-body-facturacion-meli">
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="domicilio_envio_${data[i].id}">Domicilio de Envío:</label>
+                                <input type="text" id="domicilio_envio_${data[i].id}" value="${data[i].calle}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2 oculto">
+                            <div class="col">
+                                <label for="numero_envio_${data[i].id}">Número de Envío:</label>
+                                <input type="text" id="numero_envio_${data[i].id}" value="Número del domicilio de envío" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="piso_envio_${data[i].id}">Piso de Envío:</label>
+                                <input type="text" id="piso_envio_${data[i].id}" value="Piso del domicilio de envío" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="localidad_envio_${data[i].id}">Localidad de Envío:</label>
+                                <input type="text" id="localidad_envio_${data[i].id}" value="${data[i].localidad}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="cp_envio_${data[i].id}">Código Postal de Envío:</label>
+                                <input type="text" id="cp_envio_${data[i].id}" value="${data[i].cp}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="telefono_envio_${data[i].id}">Teléfono de Envío:</label>
+                                <input type="text" id="telefono_envio_${data[i].id}" value="${data[i].telefono}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="persona_autorizada_${data[i].id}">Persona Autorizada:</label>
+                                <input type="text" id="persona_autorizada_${data[i].id}" value="${data[i].nombre_completo_envio}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="otros_comentarios_entrega_${data[i].id}">Otros Comentarios de Entrega:</label>
+                                <input type="text" id="otros_comentarios_entrega_${data[i].id}" value="Coordinar a Linea ${data[i].telefono}" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="editButton_${data[i].id}" class="btn btn-primary" onclick="toggleEdit('${data[i].id}')">Editar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
                 `;
 
                 // Elimina Comillas en el nombre de los productos
                 function cleanString(value) {
                     return value.replace(/["']/g, "");
                 }
-                
+                  
 // Evento para manejar el cambio del switch "Entregado"
 document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function() {
     const nuevoEstado = this.checked ? 'Si' : 'No';
@@ -895,6 +1208,83 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
     addUpdateObservacionesEvent();
 
 }
+
+function toggleEdit(id) {
+    const editButton = document.getElementById(`editButton_${id}`);
+    let isEditing = editButton.textContent === "Guardar";
+
+    if (!isEditing) {
+        // Mostrar SweetAlert para pedir la contraseña
+        Swal.fire({
+            title: 'Clave de edición 🔒',
+            input: 'password',
+            inputLabel: 'Contraseña de facturación (Solicitela al gerente)',
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',
+            inputAttributes: {
+                maxlength: 4
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const clave = result.value;
+                
+                if (clave === "5472") {
+                    // Habilitar los inputs
+                    toggleInputs(id, editButton);
+                } else {
+                    Swal.fire('Error', 'Contraseña incorrecta', 'error');
+                }
+            }
+        });
+    } else {
+        toggleInputs(id, editButton);
+    }
+}
+
+function toggleInputs(id, editButton) {
+    const inputs = document.querySelectorAll(`#infoFacturacionModal${id} input`);
+    const select = document.querySelector(`#condicion_iva_${id}`);
+
+    let isEditing = editButton.textContent === "Guardar";
+
+    inputs.forEach(input => {
+        input.disabled = isEditing; // Deshabilitar/habilitar el input
+    });
+
+    if (select) {
+        select.disabled = isEditing; // Deshabilitar/habilitar el select
+    }
+
+    // Cambiar el texto del botón
+    editButton.textContent = isEditing ? "Editar" : "Guardar";
+
+    // Manejar el modal
+    const modal = document.getElementById(`infoFacturacionModal${id}`);
+    if (!isEditing) {
+        modal.removeAttribute('inert'); // Mostrar el modal
+        modal.style.display = 'block';
+    } else {
+        modal.setAttribute('inert', ''); // Ocultar el modal
+        modal.style.display = 'none';
+    }
+
+    // Lógica para guardar cambios si es necesario
+    if (!isEditing) {
+        const updatedData = {
+            nombre: document.getElementById(`nombre_${id}`).value,
+            apellido: document.getElementById(`apellido_${id}`).value,
+        };
+        console.log("Datos actualizados:", updatedData);
+    }
+}
+
+function hideModal(id) {
+    const modal = document.getElementById(`infoFacturacionModal${id}`);
+    modal.setAttribute('inert', ''); // Agregar inert al ocultar
+    modal.style.display = 'none';
+}
+
 
 async function handleButtonClick(numeroDeEnvio, id) {
     // Mostrar spinner
