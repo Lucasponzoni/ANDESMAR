@@ -1972,7 +1972,7 @@ div.card-body > p > i{
     position: absolute;
     top: -15px; 
     right: 10px;
-    border: solid 1px grey;
+    border: solid 1px #ccc;
     background-color: white;
     display: flex; 
     align-items: center; 
