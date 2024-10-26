@@ -985,6 +985,11 @@ function renderCards(data) {
                                 <label for="domicilio_fiscal_${data[i].id}">Domicilio Fiscal:</label>
                                 <input type="text" id="domicilio_fiscal_${data[i].id}" value="${data[i].direccion_facturacion}" disabled>
                             </div>
+
+                            <div class="col">
+                            <label for="email_${data[i].id}">Email:</label>
+                                <input type="text" id="email_${data[i].id}" value="${data[i].email}" disabled>
+                            </div>
                         </div>
                         <div class="row mb-2">
                             <div class="col">
@@ -1267,6 +1272,7 @@ function toggleEdit(id) {
         `telefono_${id}`,
         `domicilio_fiscal_${id}`,
         `calle_${id}`,
+        `email_${id}`,
         `altura_${id}`,
         `localidad_${id}`,
         `codigo_postal_${id}`,
@@ -1305,6 +1311,7 @@ function toggleEdit(id) {
             domicilio_envio: document.getElementById(`domicilio_envio_${id}`).value,
             localidad_envio: document.getElementById(`localidad_envio_${id}`).value,
             cp_envio: document.getElementById(`cp_envio_${id}`).value,
+            email: document.getElementById(`email_${id}`).value,
             telefono_envio: document.getElementById(`telefono_envio_${id}`).value,
             persona_autorizada: document.getElementById(`persona_autorizada_${id}`).value,
             otros_comentarios_entrega: document.getElementById(`otros_comentarios_entrega_${id}`).value
@@ -1515,9 +1522,61 @@ function marcarFacturado2(id) {
     estadoFacturaDiv.classList.add('facturado-bna'); // Agregar la clase
 
     // Pushear en Firebase
-    const ref = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
-    ref.set(contenidoBoton).then(() => {
-        Swal.fire('Datos guardados correctamente', '', 'success');
+    const refEnvios = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
+    const refFacturacion = firebase.database().ref(`facturacionBna/${id}`);
+
+    // Crear objeto con los datos
+    const datos = {
+        order_id: document.getElementById(`order_id_${id}`).value,
+        estado: 'Aprobado',
+        metodo_pago: 'BNA TIENDA BANCO NACION',
+        numero_lote: '11',
+        cupon_pago: document.getElementById(`cupon_pago_${id}`).value,
+        cod_autorizacion: document.getElementById(`cod_autorizacion_${id}`).value,
+        numero_tarjeta_visible: document.getElementById(`numero_tarjeta_visible_${id}`).value,
+        codigo_pago: document.getElementById(`codigo_pago_${id}`).value,
+        cuotas: document.getElementById(`cuotas_${id}`).value,
+        banco: 'BANCO NACION',
+        tipo_entrega: '33',
+        deposito: '9',
+        fecha_acreditacion: document.getElementById(`fecha_acreditacion_${id}`).value,
+        fecha: document.getElementById(`fecha_${id}`).value,
+        monto_depositado: document.getElementById(`monto_depositado_${id}`).value,
+        observacion_deposito_transferencia: document.getElementById(`observacion_deposito_transferencia_${id}`).value,
+        codigo_promocion: document.getElementById(`codigo_promocion_${id}`).value,
+        codigo_item: document.getElementById(`codigo_item_${id}`).value,
+        nombre_item: document.getElementById(`nombre_item_${id}`).value,
+        recargo_item: '0',
+        email: document.getElementById(`email_${id}`).value,
+        cantidad_item: document.getElementById(`cantidad_item_${id}`).value,
+        precio_item: document.getElementById(`precio_item_${id}`).value,
+        monto_envio: document.getElementById(`monto_envio_${id}`).value,
+        monto_total: document.getElementById(`monto_total_${id}`).value,
+        razon_social: document.getElementById(`razon_social_${id}`).value,
+        cuit: document.getElementById(`cuit_${id}`).value,
+        condicion_iva: document.getElementById(`condicion_iva_${id}`).value,
+        nombre: document.getElementById(`nombre_${id}`).value,
+        apellido: document.getElementById(`apellido_${id}`).value,
+        dni: document.getElementById(`dni_${id}`).value,
+        telefono: document.getElementById(`telefono_${id}`).value,
+        domicilio_fiscal: document.getElementById(`domicilio_fiscal_${id}`).value,
+        calle: document.getElementById(`calle_${id}`).value,
+        altura: document.getElementById(`altura_${id}`).value,
+        localidad: document.getElementById(`localidad_${id}`).value,
+        codigo_postal: document.getElementById(`codigo_postal_${id}`).value,
+        domicilio_envio: document.getElementById(`domicilio_envio_${id}`).value,
+        localidad_envio: document.getElementById(`localidad_envio_${id}`).value,
+        telefono_envio: document.getElementById(`telefono_envio_${id}`).value,
+        persona_autorizada: document.getElementById(`persona_autorizada_${id}`).value,
+        otros_comentarios_entrega: document.getElementById(`otros_comentarios_entrega_${id}`).value
+    };
+
+    // Guardar contenido del botón en Firebase
+    refEnvios.set(contenidoBoton).then(() => {
+        // Guardar datos en Firebase
+        return refFacturacion.set(datos);
+    }).then(() => {
+        Swal.fire('Datos enviados para su facturacion', '', 'success');
     }).catch((error) => {
         console.error('Error al guardar en Firebase:', error);
         Swal.fire('Error al guardar datos', '', 'error');
@@ -1526,31 +1585,6 @@ function marcarFacturado2(id) {
     setTimeout(() => {
         location.reload();
     }, 4000);
-}
-
-
-async function pedirContraseña() {
-    const { value: password } = await Swal.fire({
-        title: 'Ingrese la contraseña 🔒',
-        input: 'password',
-        inputLabel: 'Contraseña de logística (Solicitela al administrador)',
-        inputPlaceholder: 'Ingrese la contraseña',
-        showCancelButton: true,
-        confirmButtonText: 'Enviar',
-        cancelButtonText: 'Cancelar'
-    });
-
-    // Verificar si la contraseña es correcta
-    if (password !== '6572') {
-        Swal.fire({
-            icon: 'error',
-            title: 'Contraseña incorrecta',
-            text: 'La contraseña ingresada es incorrecta. Intente nuevamente.',
-            confirmButtonText: 'OK'
-        });
-        return false; // Retornar false si la contraseña es incorrecta
-    }
-    return true; // Retornar true si la contraseña es correcta
 }
 
 const usuario = "BOM6765";
