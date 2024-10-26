@@ -1383,6 +1383,13 @@ div.card-body > p > i{
     align-items: center;
 }
 
+#spinner4 {
+    color: orangered;
+    display: flex; /* Mostrar el spinner al cargar */
+    justify-content: center;
+    align-items: center;
+}
+
 @media (max-width: 768px) {
     .card {
         margin: 10px;
@@ -3450,5 +3457,53 @@ input[disabled] {
     align-items: center;
 }
 
+.no-data {
+    font-size: 1.2rem !important;
+    color: gray !important;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 20px;
+}
+.counter {
+    width: 300px;
+    font-weight: 600;
+    width: fit-content;
+    background-color: #FF4C4C; 
+    color: white; 
+    padding: 20px; 
+    border-radius: 10px;
+    text-align: center; 
+    font-size: 24px; 
+    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.2); 
+    transition: transform 0.3s; 
+    
+}
+
+.fixed-counter {
+    font-weight: 600;
+    width: 300px;
+    background-color: #FF4C4C; 
+    color: white; 
+    padding: 20px; 
+    border-radius: 10px;
+    text-align: center; 
+    font-size: 24px; 
+    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.2); 
+    transition: transform 0.3s; 
+    position: fixed;
+    bottom: 20px;
+    left: 150px; 
+    z-index: 1000; 
+}
 
 
+#cantidad-control-Meli{
+    background-color: #FF4C4C;
+    color: yellow;
+    font-size: large;
+    font-weight: 800;
+}
+
+#sku-control-Meli{
+    font-weight: 800;
+}
