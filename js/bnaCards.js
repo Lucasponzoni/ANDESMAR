@@ -255,13 +255,15 @@ function loadEnviosFromFirebase() {
             const data = childSnapshot.val();
             allData.push({ 
                 id: childSnapshot.key, 
-                nombreFacturacion: (data.nombre),
-                apellidoFacturacion: (data.apellido),
+                altura: (data.altura),
+                nombreFacturacion: capitalizeWords(data.nombre),
+                apellidoFacturacion: capitalizeWords(data.apellido),
                 nombre: capitalizeWords(data.nombre_completo_envio), 
                 cp: (data.codigo_postal), 
                 localidad: capitalizeWords(data.ciudad),
                 provincia: capitalizeWords(data.provincia),
-                calle: capitalizeWords(data.direccion.replace(/"/g, '')), 
+                calle: (data.calle), 
+                calle2: capitalizeWords(data.direccion.replace(/"/g, '')), 
                 telefono: (data.telefono), 
                 telefono_facturacion: (data.telefono_facturacion), 
                 email: lowercaseWords(data.email), 
@@ -290,14 +292,13 @@ function loadEnviosFromFirebase() {
                 marcaEntregado: (data.marcaEntregado),
                 marcaPreparado: (data.marcaPreparado),
                 direccion_facturacion: capitalizeWords(data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '')),
-                ciudad_facturacion: (data.ciudad_facturacion),
+                ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
                 dni: (data.dni),
                 codigo_postal_facturacion: (data.codigo_postal_facturacion),
-                nombre_completo_envio: (data.nombre_completo_envio)
-
+                otros_comentarios_entrega: (data.otros_comentarios_entrega),
+                iva: (data.condicion_iva),
+                nombre_completo_envio: capitalizeWords(data.nombre_completo_envio)
             });
-
-
 
             // Incrementar el contador si tipoElectrodomesticoBna está vacío
             if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
@@ -431,8 +432,8 @@ function renderCards(data) {
 
                 <div id="direccion-bna" class="ios-card">
                     <p class="ios-card-text">
-                                       <i class="bi bi-house ios-icon"></i> Calle: ${data[i].calle}
-                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].calle}')">
+                                       <i class="bi bi-house ios-icon"></i> Calle: ${data[i].calle2}
+                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].calle2}')">
                             <i class="bi bi-clipboard icon-gray"></i>
                         </button>
                     </p>
@@ -644,9 +645,14 @@ function renderCards(data) {
                             </div>
                                     
                                     
-                                    <button id="marcar-facturado-${data[i].id}" type="button" class="btn ${hasDatoFacturacion ? 'btn-success' : 'btn-danger'} w-100" ${hasDatoFacturacion ? 'disabled' : ''} onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}')`}">${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
+                                    <button id="marcar-facturado-${data[i].id}" type="button" class="btn ${hasDatoFacturacion ? 'btn-success' : 'btn-danger'} w-100 mb-1" ${hasDatoFacturacion ? 'disabled' : ''} onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}')`}">${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
                                         <i class="bi bi-lock-fill icono"></i>
                                     </button>
+
+                            <!-- Botón para abrir el modal -->
+                            <button id="infoFacturacionButton${data[i].id}" class="btn btn-warning mt-1 w-100" data-bs-toggle="modal" data-bs-target="#infoFacturacionModal${data[i].id}">
+                            <img id="presea" src="./Img/logo-presea.png"> Facturación Automatica
+                            </button>
 
                                 </div>
                             </div>
@@ -716,7 +722,7 @@ function renderCards(data) {
                             <!-- Botón Logística Propia --> 
                             <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
                                 id="LogPropiaMeliButton${data[i].id}" 
-                                onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
+                                onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
                                 <span>
                                     ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<i class="bi bi-file-text"></i> Etiqueta Novogar`}
                                 </span>
@@ -727,7 +733,7 @@ function renderCards(data) {
                             <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'}" 
                             id="andesmarButton${data[i].id}" 
                             ${isAndreani ? 'disabled' : ''} 
-                            ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
+                            ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
                             <span id="andesmarText${data[i].id}">
                             ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andesmar`}
                             </span>
@@ -738,16 +744,11 @@ function renderCards(data) {
                             <button class="mt-1 btn btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'}"
                             id="andreaniButton${data[i].id}" 
                             ${isAndesmar ? 'disabled' : ''} 
-                            onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
+                            onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
                             <span id="andreaniText${data[i].id}">
                             ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
                             </span>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
-                            </button>
-
-                            <!-- Botón para abrir el modal -->
-                            <button id="infoFacturacionButton${data[i].id}" class="btn btn-info mt-1" data-bs-toggle="modal" data-bs-target="#infoFacturacionModal${data[i].id}">
-                            Facturación Automatica
                             </button>
 
                             <div id="resultado${data[i].id}" class="mt-2 errorMeli"></div>
@@ -756,7 +757,7 @@ function renderCards(data) {
 
 
 <!-- Modal -->
-<div class="modal fade" id="infoFacturacionModal${data[i].id}" tabindex="-1" aria-labelledby="infoFacturacionLabel${data[i].id}" inert>
+<div class="modal fade" id="infoFacturacionModal${data[i].id}" tabindex="-1" aria-labelledby="infoFacturacionLabel${data[i].id}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -924,18 +925,39 @@ function renderCards(data) {
                             </div>
                         </div>
                         <div class="row mb-2">
-                        <div class="col">
-                        <label for="condicion_iva_${data[i].id}">Condición IVA:</label>
-                            <select id="condicion_iva_${data[i].id}" disabled>
-                                <option value="IVA Responsable Inscripto" ${data[i].cuit.length > 7 ? 'selected' : ''}>IVA Responsable Inscripto</option>
-                                <option value="Consumidor Final" ${data[i].cuit.length <= 8 ? 'selected' : ''}>Consumidor Final</option>
-                                <option value="IVA Liberado - Ley N° 19.640">IVA Liberado - Ley N° 19.640</option>
-                                <option value="IVA Responsable Exento">IVA Responsable Exento</option>
-                                <option value="IVA Responsable Inscripto - Agente de Percepción">IVA Responsable Inscripto - Agente de Percepción</option>
-                                <option value="IVA Responsable Monotributo">IVA Responsable Monotributo</option>
-                                <option value="IVA Sujeto Exento">IVA Sujeto Exento</option>
-                            </select>
-                        </div>
+<div class="col">
+    <label for="condicion_iva_${data[i].id}">Condición IVA:</label>
+    <select id="condicion_iva_${data[i].id}" disabled>
+        <option value="IVA Responsable Inscripto" 
+            ${data[i].iva === 'IVA Responsable Inscripto' || (data[i].iva === undefined && data[i].cuit.length > 7) ? 'selected' : ''}>
+            IVA Responsable Inscripto
+        </option>
+        <option value="Consumidor Final" 
+            ${data[i].iva === 'Consumidor Final' || (data[i].iva === undefined && data[i].cuit.length <= 8) ? 'selected' : ''}>
+            Consumidor Final
+        </option>
+        <option value="IVA Liberado - Ley N° 19.640" 
+            ${data[i].iva === 'IVA Liberado - Ley N° 19.640' ? 'selected' : ''}>
+            IVA Liberado - Ley N° 19.640
+        </option>
+        <option value="IVA Responsable Exento" 
+            ${data[i].iva === 'IVA Responsable Exento' ? 'selected' : ''}>
+            IVA Responsable Exento
+        </option>
+        <option value="IVA Responsable Inscripto - Agente de Percepción" 
+            ${data[i].iva === 'IVA Responsable Inscripto - Agente de Percepción' ? 'selected' : ''}>
+            IVA Responsable Inscripto - Agente de Percepción
+        </option>
+        <option value="IVA Responsable Monotributo" 
+            ${data[i].iva === 'IVA Responsable Monotributo' ? 'selected' : ''}>
+            IVA Responsable Monotributo
+        </option>
+        <option value="IVA Sujeto Exento" 
+            ${data[i].iva === 'IVA Sujeto Exento' ? 'selected' : ''}>
+            IVA Sujeto Exento
+        </option>
+    </select>
+</div>
                     </div>
 
                         <div class="row mb-2">
@@ -966,13 +988,15 @@ function renderCards(data) {
                         </div>
                         <div class="row mb-2">
                             <div class="col">
-                                <label for="calle_${data[i].id}">Calle:</label>
-                                <input type="text" id="calle_${data[i].id}" value="${data[i].calle}" disabled>
+                            <label for="calle_${data[i].id}">Calle:</label>
+                            <input type="text" id="calle_${data[i].id}" value="${data[i].calle !== undefined ? data[i].calle : data[i].calle2}" disabled>
                             </div>
+
                             <div class="col">
-                                <label for="altura_${data[i].id}">Altura:</label>
-                                <input type="text" id="altura_${data[i].id}" value="0" disabled>
+                            <label for="altura_${data[i].id}">Altura:</label>
+                                <input type="text" id="altura_${data[i].id}" value="${data[i].altura !== undefined ? data[i].altura : 0}" disabled>
                             </div>
+
                         </div>
                         <div class="row mb-2">
                             <div class="col">
@@ -1035,16 +1059,38 @@ function renderCards(data) {
                         </div>
                         <div class="row mb-2">
                             <div class="col">
-                                <label for="otros_comentarios_entrega_${data[i].id}">Otros Comentarios de Entrega:</label>
-                                <input type="text" id="otros_comentarios_entrega_${data[i].id}" value="Coordinar a Linea ${data[i].telefono}" disabled>
+                            <label for="otros_comentarios_entrega_${data[i].id}">Otros Comentarios de Entrega:</label>
+                            <input type="text" id="otros_comentarios_entrega_${data[i].id}" value="${data[i].otros_comentarios_entrega !== undefined ? data[i].otros_comentarios_entrega : `Coordinar a Línea ${data[i].telefono}`}" disabled>
                             </div>
+
                         </div>
                     </div>
                 </div>
 
             </div>
             <div class="modal-footer">
-                <button type="button" id="editButton_${data[i].id}" class="btn btn-primary" onclick="toggleEdit('${data[i].id}')">Editar</button>
+<input type="${data[i].datoFacturacion ? 'text' : 'password'}" 
+       id="clave-facturacion-${data[i].id}" 
+       placeholder="Clave de facturación" 
+       maxlength="4" 
+       class="form-control" 
+       ${data[i].datoFacturacion ? 'disabled' : ''} 
+       value="${data[i].datoFacturacion || ''}" />
+
+<button id="facturar-automata-${data[i].id}" 
+        class="btn ${data[i].datoFacturacion ? 'btn-success' : 'btn-danger'}" 
+        onclick="marcarFacturado2('${data[i].id}')"
+        ${data[i].datoFacturacion ? 'disabled' : ''}>
+    ${data[i].datoFacturacion ? 'Producto ya facturado' : 'Facturar Automata'}
+</button>
+
+<button type="button" 
+        id="editButton_${data[i].id}" 
+        class="btn btn-primary" 
+        onclick="toggleEdit('${data[i].id}')"
+        ${data[i].datoFacturacion ? 'disabled' : ''}>
+    Editar
+</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -1211,80 +1257,83 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
 
 function toggleEdit(id) {
     const editButton = document.getElementById(`editButton_${id}`);
-    let isEditing = editButton.textContent === "Guardar";
+    const inputs = [
+        `razon_social_${id}`,
+        `cuit_${id}`,
+        `condicion_iva_${id}`,
+        `nombre_${id}`,
+        `apellido_${id}`,
+        `dni_${id}`,
+        `telefono_${id}`,
+        `domicilio_fiscal_${id}`,
+        `calle_${id}`,
+        `altura_${id}`,
+        `localidad_${id}`,
+        `codigo_postal_${id}`,
+        `domicilio_envio_${id}`,
+        `localidad_envio_${id}`,
+        `cp_envio_${id}`,
+        `telefono_envio_${id}`,
+        `persona_autorizada_${id}`,
+        `otros_comentarios_entrega_${id}`
+    ].map(fieldId => document.getElementById(fieldId));
 
-    if (!isEditing) {
-        // Mostrar SweetAlert para pedir la contraseña
-        Swal.fire({
-            title: 'Clave de edición 🔒',
-            input: 'password',
-            inputLabel: 'Contraseña de facturación (Solicitela al gerente)',
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            inputAttributes: {
-                maxlength: 4
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const clave = result.value;
-                
-                if (clave === "5472") {
-                    // Habilitar los inputs
-                    toggleInputs(id, editButton);
-                } else {
-                    Swal.fire('Error', 'Contraseña incorrecta', 'error');
-                }
-            }
-        });
-    } else {
-        toggleInputs(id, editButton);
-    }
-}
+    const isEditing = editButton.textContent === "Guardar";
 
-function toggleInputs(id, editButton) {
-    const inputs = document.querySelectorAll(`#infoFacturacionModal${id} input`);
-    const select = document.querySelector(`#condicion_iva_${id}`);
-
-    let isEditing = editButton.textContent === "Guardar";
-
+    // Habilitar o deshabilitar los campos de entrada
     inputs.forEach(input => {
-        input.disabled = isEditing; // Deshabilitar/habilitar el input
+        if (input) {
+            input.disabled = isEditing;
+        }
     });
 
-    if (select) {
-        select.disabled = isEditing; // Deshabilitar/habilitar el select
-    }
-
-    // Cambiar el texto del botón
-    editButton.textContent = isEditing ? "Editar" : "Guardar";
-
-    // Manejar el modal
-    const modal = document.getElementById(`infoFacturacionModal${id}`);
-    if (!isEditing) {
-        modal.removeAttribute('inert'); // Mostrar el modal
-        modal.style.display = 'block';
-    } else {
-        modal.setAttribute('inert', ''); // Ocultar el modal
-        modal.style.display = 'none';
-    }
-
-    // Lógica para guardar cambios si es necesario
-    if (!isEditing) {
+    if (isEditing) {
+        // Recoger datos actualizados
         const updatedData = {
+            razon_social: document.getElementById(`razon_social_${id}`).value,
+            cuit: document.getElementById(`cuit_${id}`).value,
+            condicion_iva: document.getElementById(`condicion_iva_${id}`).value,
             nombre: document.getElementById(`nombre_${id}`).value,
             apellido: document.getElementById(`apellido_${id}`).value,
+            dni: document.getElementById(`dni_${id}`).value,
+            telefono: document.getElementById(`telefono_${id}`).value,
+            domicilio_fiscal: document.getElementById(`domicilio_fiscal_${id}`).value,
+            calle: document.getElementById(`calle_${id}`).value,
+            altura: document.getElementById(`altura_${id}`).value,
+            localidad: document.getElementById(`localidad_${id}`).value,
+            codigo_postal: document.getElementById(`codigo_postal_${id}`).value,
+            domicilio_envio: document.getElementById(`domicilio_envio_${id}`).value,
+            localidad_envio: document.getElementById(`localidad_envio_${id}`).value,
+            cp_envio: document.getElementById(`cp_envio_${id}`).value,
+            telefono_envio: document.getElementById(`telefono_envio_${id}`).value,
+            persona_autorizada: document.getElementById(`persona_autorizada_${id}`).value,
+            otros_comentarios_entrega: document.getElementById(`otros_comentarios_entrega_${id}`).value
         };
-        console.log("Datos actualizados:", updatedData);
+
+        // Actualizar en Firebase
+        firebase.database().ref('enviosBNA/' + id).update(updatedData)
+            .then(() => {
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Datos actualizados correctamente.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+                editButton.textContent = "Editar"; // Cambiar texto a "Editar"
+            })
+            .catch(error => {
+                console.error("Error al actualizar datos: ", error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudieron actualizar los datos.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+    } else {
+        editButton.textContent = "Guardar"; // Cambiar texto a "Guardar"
     }
 }
-
-function hideModal(id) {
-    const modal = document.getElementById(`infoFacturacionModal${id}`);
-    modal.setAttribute('inert', ''); // Agregar inert al ocultar
-    modal.style.display = 'none';
-}
-
 
 async function handleButtonClick(numeroDeEnvio, id) {
     // Mostrar spinner
@@ -1416,6 +1465,69 @@ function marcarFacturado(id) {
         }, 4000);
     });
 }
+
+function marcarFacturado2(id) {
+    const facturaStatusDiv = document.getElementById(`factura-status-${id}`);
+    const claveInput = document.getElementById(`clave-facturacion-${id}`);
+    const clave = claveInput.value;
+
+    // Comprobación de la clave y formateo de la fecha y hora
+    let contenidoBoton;
+    const fechaActual = new Date();
+    
+    // Formateo de la hora
+    const horaFormateada = fechaActual.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+    
+    // Formateo de la fecha
+    const opcionesFecha = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const fechaFormateada = fechaActual.toLocaleDateString('es-AR', opcionesFecha);
+    
+    // Mensaje para el contenido del botón
+    let mensajeFactura = '';
+
+    if (clave === '1110') {
+        contenidoBoton = `Facturado Automata Brisa ${horaFormateada} ${fechaFormateada}`;
+        mensajeFactura = 'Facturado ✅';
+    } else if (clave === '1111') {
+        contenidoBoton = `Facturado Automata Leo ${horaFormateada} ${fechaFormateada}`;
+        mensajeFactura = 'Facturado ✅';
+    } else if (clave === '1112') {
+        contenidoBoton = `Facturado Automata Julian ${horaFormateada} ${fechaFormateada}`;
+        mensajeFactura = 'Facturado ✅';
+    } else if (clave === '1113') {
+        contenidoBoton = `Facturado Automata Mauricio ${horaFormateada} ${fechaFormateada}`;
+        mensajeFactura = 'Facturado ✅';
+    } else {
+        Swal.fire('Clave incorrecta', '', 'error');
+        return; // Salir si la clave es incorrecta
+    }
+
+    // Cambiar el contenido del botón y deshabilitarlo
+    const boton = document.getElementById(`marcar-facturado-${id}`);
+    boton.textContent = contenidoBoton;
+    boton.classList.remove('btn-danger');
+    boton.classList.add('btn-success');
+    boton.disabled = true;
+
+    // Asegúrate de definir estadoFacturaDiv correctamente
+    const estadoFacturaDiv = document.getElementById(`factura-status-${id}`);
+    estadoFacturaDiv.textContent = mensajeFactura;
+    estadoFacturaDiv.classList.add('facturado-bna'); // Agregar la clase
+
+    // Pushear en Firebase
+    const ref = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
+    ref.set(contenidoBoton).then(() => {
+        Swal.fire('Datos guardados correctamente', '', 'success');
+    }).catch((error) => {
+        console.error('Error al guardar en Firebase:', error);
+        Swal.fire('Error al guardar datos', '', 'error');
+    });
+
+    setTimeout(() => {
+        location.reload();
+    }, 4000);
+}
+
 
 async function pedirContraseña() {
     const { value: password } = await Swal.fire({
