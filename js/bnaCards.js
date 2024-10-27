@@ -1023,7 +1023,7 @@ function renderCards(data) {
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="domicilio_envio_${data[i].id}">Domicilio de Envío:</label>
-                                <input type="text" id="domicilio_envio_${data[i].id}" value="${data[i].calle}" disabled>
+                                <input type="text" id="domicilio_envio_${data[i].id}" value="${data[i].calle !== undefined ? data[i].calle : data[i].calle2}" disabled>
                             </div>
                         </div>
                         <div class="row mb-2 oculto">
