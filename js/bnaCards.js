@@ -1780,6 +1780,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             }
 
             // Enviar el email después de procesar el envío
+            const remito = `BNA${remito}`;
             await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte);
         } else {
             buttonAndr.disabled = false;

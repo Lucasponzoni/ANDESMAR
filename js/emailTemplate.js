@@ -13,7 +13,7 @@ const emailTemplateAndesmar = (Name, Subject, templateName, nombre, email, remit
             <div style="background-color: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin: 10px 0;">
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Orden:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${remito}</span></p>
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Transportista:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${transporte}</span></p>
-                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Seguimiento:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">BNA${remito}</span></p>
+                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Seguimiento:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${remito}</span></p>
             </div><a href="${linkSeguimiento2}" style="display: inline-block; background-color: #007aff; color: #ffffff; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 10px;">Rastrear mi pedido</a>
         </div>
         <hr style="border: 1px solid #e0e0e0; margin: 20px 0;">

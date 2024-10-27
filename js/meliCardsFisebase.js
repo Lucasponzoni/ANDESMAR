@@ -414,7 +414,7 @@ function crearCard(data) {
                 id="andesmarButton${data.idOperacion}" 
                 ${isAndreani ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
-                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${email}')`}">
+                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}')`}">
                 <span id="andesmarText${data.idOperacion}">
                 ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<i class="bi bi-file-text"></i> Etiqueta Andesmar'}
                 </span>
@@ -623,7 +623,27 @@ const clave = "BOM6765";
 const codigoCliente = "6765";
 
 // Función para enviar datos a la API de Andesmar
-async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto, localidad, provincia) {
+async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto, localidad, provincia, email) {
+    
+    console.log({
+        id,
+        NombreyApellido,
+        Cp,
+        idOperacion,
+        calleDestinatario,
+        alturaDestinatario,
+        telefonoDestinatario,
+        observaciones,
+        peso,
+        volumenM3,
+        cantidad,
+        Medidas,
+        Producto,
+        localidad,
+        provincia,
+        email
+    });
+
     const button = document.getElementById(`andesmarButton${id}`);
     const spinner = document.getElementById(`spinnerAndesmar${id}`);
     const text = document.getElementById(`andesmarText${id}`);
@@ -656,6 +676,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         CalleDestinatario: calleDestinatario,
         CalleNroDestinatario: alturaDestinatario,
         TelefonoDestinatario: telefonoDestinatario,
+        MailDestinatario: email,
         NroRemito: idOperacionFinal,
         Bultos: cantidadFinal,
         Peso: peso,
@@ -741,6 +762,17 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
             }).catch((error) => {
                 console.error("Error al agregar entrada a Firebase:", error);
             });
+
+            const nombre = NombreyApellido
+            const Name = `Confirmación de Envio Mercado Libre`;
+            const Subject = `Tu compra en Novogar ${idOperacion} ya fue preparada para despacho por Andesmar Cargas`;
+            const template = "emailTemplateAndesmar";
+            const transporte = "Andesmar Cargas";
+            const linkSeguimiento2 = `https://andesmarcargas.com/seguimiento.html?numero=${idOperacionSinME1}ME1&tipo=remito&cod=`;
+
+            // Enviar el email después de procesar el envío
+            const remito = `${idOperacionSinME1}ME1`;
+            await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte);
 
             // Mostrar el botón de descarga
             const link = `https://andesmarcargas.com//ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
