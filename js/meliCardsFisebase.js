@@ -1434,6 +1434,8 @@ if (prepararME2Btn) {
 
 
 // FIN QUERY DE DATOS MELI
+
+// GENERAR ETIQUETA LOGISTICA PROPIA
 async function generarPDF(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia) {
     let button = document.getElementById(`LogPropiaMeliButton${id}`);
     let spinner = document.getElementById(`spinnerLogPropia${id}`);
@@ -1456,6 +1458,27 @@ async function generarPDF(id, NombreyApellido, Cp, idOperacion, calleDestinatari
         putOnlyUsedFonts: true,
         floatPrecision: 16
     });
+
+    function sumarDiasHabiles(fecha, dias) {
+        let diasAgregados = 0;
+        let nuevaFecha = new Date(fecha);
+    
+        while (diasAgregados < dias) {
+            nuevaFecha.setDate(nuevaFecha.getDate() + 1);
+            // Si no es domingo, sumar un día hábil
+            if (nuevaFecha.getDay() !== 0) {
+                diasAgregados++;
+            }
+        }
+    
+        return nuevaFecha;
+    }
+    
+    // Obtener la fecha actual
+    const fechaActual = new Date();
+    const fechaFormateada = `${fechaActual.getDate().toString().padStart(2, '0')}-${(fechaActual.getMonth() + 1).toString().padStart(2, '0')}-${fechaActual.getFullYear().toString().slice(-2)}`;
+    const fechaVencimiento = sumarDiasHabiles(fechaActual, 3);
+    const fechaVencimientoFormateada = `${fechaVencimiento.getDate().toString().padStart(2, '0')}-${(fechaVencimiento.getMonth() + 1).toString().padStart(2, '0')}-${fechaVencimiento.getFullYear().toString().slice(-2)}`;    
 
     // Contenido HTML
     const contenido = `
@@ -1549,11 +1572,11 @@ async function generarPDF(id, NombreyApellido, Cp, idOperacion, calleDestinatari
     <body>
         <div class="etiqueta">
             <div class="logo">
-                <img src="./Img/BNA-Novogar.png" alt="Logo">
+                <img src="./Img/Meli-Novogar.png" alt="Logo">
             </div>
             <div class="campo">
                 <i class="bi bi-person-square"></i>
-                <span>Orden: ${idOperacion}, Cliente: ${NombreyApellido}</span>
+                <span>Orden: Cliente: ${NombreyApellido}</span>
             </div>
             <div class="campo">
                 <i class="bi bi-geo-alt-fill"></i>
@@ -1566,6 +1589,10 @@ async function generarPDF(id, NombreyApellido, Cp, idOperacion, calleDestinatari
             <div class="campo">
                 <i class="bi bi-telephone-outbound-fill"></i>
                 <span>Teléfono: ${telefonoDestinatario}</span>
+            </div>
+            <div class="campo">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>Vencimiento: ${fechaFormateada} al ${fechaVencimientoFormateada}</span>
             </div>
             <div class="campo-extra">
                 <p><strong>Firma:</strong>  ________________________</p>
@@ -1605,7 +1632,7 @@ async function generarPDF(id, NombreyApellido, Cp, idOperacion, calleDestinatari
 
             ¡Buenas noticias! Tu producto ya está listo para ser enviado por nuestra logística. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes o después. Esté atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
 
-            En Rosario, realizamos entregas en 48 horas. En Villa Gobernador Gálvez y Arroyo Seco, los lunes, miércoles y viernes. En Funes, Roldán y Pérez, los sábados. En Rafaela, los jueves, y en Santa Fe Capital, los jueves o viernes.
+            En Rosario, realizamos entregas en 48 horas. En Villa Gobernador Gálvez, Arroyo Seco, San Lorezo, Bairria, Capitan B y zona los lunes, miércoles y viernes. En Funes, Roldán y Pérez, los sábados. En Rafaela, los jueves, y en Santa Fe Capital, los jueves o viernes. 
 
             Si tienes alguna duda, no dudes en consultarnos por WhatsApp al 341 2010598.
 
@@ -1618,9 +1645,9 @@ async function generarPDF(id, NombreyApellido, Cp, idOperacion, calleDestinatari
             trackingNumber: "Logistica Novogar",
             trackingLink: "Logistica Novogar",
             trackingMessage: trackingMessage,
-            transportCompany: "Andreani"
+            transportCompany: "Novogar"
         }).then(() => {
-            console.log(`Datos actualizados en Firebase para la operación: ${idOperacionFinalAndreani}`);
+            console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
         }).catch(error => {
             console.error('Error al actualizar en Firebase:', error);
         });    
