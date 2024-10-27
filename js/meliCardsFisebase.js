@@ -343,12 +343,15 @@ function crearCard(data) {
                 
                 <p class="numeroDeEnvioGenerado" id="numeroDeEnvioGenerado${data.idOperacion}">
                 Envío: 
-                ${isAndesmar ? 
+                ${isLogPropia ? 
+                'Logística Propia' : 
+                isAndesmar ? 
                 `<a href="${data.trackingLink}" target="_blank">Andesmar: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
                 isAndreani ? 
                 `<a href="${data.trackingLink}" target="_blank">Andreani: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
                 'Número Pendiente'}
                 </p>
+
 
 
                     <div class="little-card-meli">
@@ -427,14 +430,15 @@ function crearCard(data) {
                 <!-- Botón Andreani -->
 
                 <!-- Botón Logística Propia --> 
-<button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
-    id="LogPropiaMeliButton${data.idOperacion}" 
-    onclick="generarPDF('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
-    <span>
-        ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<i class="bi bi-file-text"></i> Etiqueta Novogar`}
-    </span>
-    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data.idOperacion}" style="display:none;"></span>
-</button>
+                <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
+                id="LogPropiaMeliButton${data.idOperacion}" 
+                onclick="generarPDF('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
+                <span>
+                ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<i class="bi bi-file-text"></i> Etiqueta Novogar`}
+                </span>
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data.idOperacion}" style="display:none;"></span>
+                </button>
+                <!-- Botón Logística Propia --> 
 
                 <div id="resultado${data.idOperacion}" class="mt-2 errorMeli"></div>
             </div>
@@ -1596,6 +1600,30 @@ async function generarPDF(id, NombreyApellido, Cp, idOperacion, calleDestinatari
 
         const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
         NroEnvio.innerHTML = `Logistica Propia`;
+
+        const trackingMessage = `¡Hola ${NombreyApellido}! 🎉
+
+            ¡Buenas noticias! Tu producto ya está listo para ser enviado por nuestra logística. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes o después. Esté atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
+
+            En Rosario, realizamos entregas en 48 horas. En Villa Gobernador Gálvez y Arroyo Seco, los lunes, miércoles y viernes. En Funes, Roldán y Pérez, los sábados. En Rafaela, los jueves, y en Santa Fe Capital, los jueves o viernes.
+
+            Si tienes alguna duda, no dudes en consultarnos por WhatsApp al 341 2010598.
+
+            ¡Saludos!`;
+
+
+        const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
+    
+        firebase.database().ref('envios/' + idOperacionSinME1).update({
+            trackingNumber: "Logistica Novogar",
+            trackingLink: "Logistica Novogar",
+            trackingMessage: trackingMessage,
+            transportCompany: "Andreani"
+        }).then(() => {
+            console.log(`Datos actualizados en Firebase para la operación: ${idOperacionFinalAndreani}`);
+        }).catch(error => {
+            console.error('Error al actualizar en Firebase:', error);
+        });    
 
 
         // Crear un enlace para abrir el PDF en una nueva ventana
