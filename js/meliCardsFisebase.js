@@ -246,7 +246,7 @@ function crearCard(data) {
     // Verificar si transportCompany
     const isAndesmar = data.transportCompany === "Andesmar";
     const isAndreani = data.transportCompany === "Andreani"
-    const isLogPropia = data.transportCompany === "Logistica Propia"
+    const isLogPropia = data.transportCompany === "Novogar"
 
     // Verificar si data.pictures existe y es un array
     const filteredPictures = Array.isArray(data.pictures) ? 
