@@ -247,6 +247,7 @@ function crearCard(data) {
     const isAndesmar = data.transportCompany === "Andesmar";
     const isAndreani = data.transportCompany === "Andreani"
     const isLogPropia = data.transportCompany === "Novogar"
+    const isBlocked = data.estadoFacturacion === "bloqueado"
 
     // Verificar si data.pictures existe y es un array
     const filteredPictures = Array.isArray(data.pictures) ? 
@@ -285,9 +286,10 @@ function crearCard(data) {
     cardDiv.innerHTML = `
         <div class="card position-relative">
 
-            <div class="${data.estadoFacturacion === 'facturado' ? 'em-circle-isNotFraud' : 'em-circle-isFraud'}">
-             ${data.estadoFacturacion === 'facturado' ? 'Facturado' : 'Factura X'}
+            <div class="${isBlocked ? 'em-circle-isFraud' : (data.estadoFacturacion === 'facturado' ? 'em-circle-isNotFraud' : 'em-circle-isFraud')}">
+            ${isBlocked ? 'Bloqueado' : (data.estadoFacturacion === 'facturado' ? 'Facturado' : 'Factura X')}
             </div>
+
             
         <div id="estadoEnvio${data.idOperacion}" class="${isAndesmar || isAndreani || isLogPropia ? 'em-circle-state2' : 'em-circle-state'}">
         ${isAndesmar || isAndreani || isLogPropia ? 'Envio Preparado' : 'Envio pendiente'}
@@ -409,6 +411,7 @@ function crearCard(data) {
                 <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} btnAndesmarMeli" 
                 id="andesmarButton${data.idOperacion}" 
                 ${isAndreani ? 'disabled' : ''} 
+                ${isBlocked ? 'disabled' : ''} 
                 ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')`}">
                 <span id="andesmarText${data.idOperacion}">
                 ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<i class="bi bi-file-text"></i> Etiqueta Andesmar'}
@@ -421,6 +424,7 @@ function crearCard(data) {
                 <button class="btn ${isAndreani ? 'btn-success' : 'btn-danger'} btnAndreaniMeli" 
                 id="andreaniButton${data.idOperacion}" 
                 ${isAndesmar ? 'disabled' : ''} 
+                ${isBlocked ? 'disabled' : ''} 
                 onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')`}">
                 <span id="andreaniText${data.idOperacion}">
                 ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
@@ -432,6 +436,7 @@ function crearCard(data) {
                 <!-- Botón Logística Propia --> 
                 <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
                 id="LogPropiaMeliButton${data.idOperacion}" 
+                ${isBlocked ? 'disabled' : ''} 
                 onclick="generarPDF('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
                 <span>
                 ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<i class="bi bi-file-text"></i> Etiqueta Novogar`}
@@ -440,7 +445,10 @@ function crearCard(data) {
                 </button>
                 <!-- Botón Logística Propia --> 
 
-                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli"></div>
+                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli">
+                ${isBlocked ? '<i class="bi bi-info-square-fill"></i> Despacho Bloqueado por Facturación, separar remito para realizar circuito' : ''}
+                </div>
+
             </div>
 
             <button class="btn btn-link lock-btn p-1 m-0 disabled" style="display: inline-flex; align-items: center;">

@@ -2055,14 +2055,19 @@ div.card-body > p > i{
 }
 
 .errorMeli{
+    width: 90%;
+    font-weight: 800;
+    text-align: left;
     font-family: "Chakra Petch", sans-serif;
     text-transform: uppercase;
     color: green;
+    border: dashed rgba(255, 68, 0, 0.285) 2px;
+    background-color: #d0ffd1;
     margin-top: 5px;
     font-size: small;
-    text-align: justify;
     border-radius: 10px;
-    padding: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
 }
 
 .trio-de-botones{
