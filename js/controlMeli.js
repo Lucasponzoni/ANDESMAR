@@ -268,3 +268,212 @@ function filtrarTabla(query) {
         actualizarContador();
     }
 }
+
+function obtenerDatosTabla() {
+    const totalCantidad = document.getElementById('totalCantidad').innerText; // Obtener el texto del contador
+    let html = `<h2 style="text-align: center;">${totalCantidad}</h2>`; // Incluir el contador centrado
+    html += '<table style="width:100%; border-collapse: collapse; border: 1px solid black; text-align: center;">'; // Centrar tabla
+    html += '<thead style="background-color: #f2f2f2;"><tr>';
+    html += '<th style="border: 1px solid black; padding: 8px;"><i class="bi bi-calendar"></i> Fecha y Hora</th>';
+    html += '<th style="border: 1px solid black; padding: 8px;"><i class="bi bi-file-earmark-text"></i> Operación</th>'; 
+    html += '<th style="border: 1px solid black; padding: 8px;"><i class="bi bi-rocket-takeoff-fill"></i> Shipping ID</th>';
+    html += '<th style="border: 1px solid black; padding: 8px;"><i class="bi bi-box"></i> Cantidad</th>'; 
+    html += '<th style="border: 1px solid black; padding: 8px;"><i class="bi bi-info-circle"></i> Descripción</th>'; 
+    html += '</tr></thead><tbody>'; 
+
+    $('#data-table-body tr').each(function() {
+        const fechaHora = $(this).find('td').eq(0).text(); // Primer td es Fecha y Hora
+        const operacion = $(this).find('td').eq(1).html(); // Mantener HTML para hipervínculo
+        const shippingId = $(this).find('td').eq(2).text(); // Tercer td es Shipping ID
+        const cantidad = $(this).find('td').eq(3).text(); // Cuarto td es Cantidad
+        const descripcion = $(this).find('td').eq(4).text(); // Quinto td es Descripción
+
+        html += `<tr>
+            <td style="border: 1px solid black; padding: 8px;">${fechaHora}</td>
+            <td style="border: 1px solid black; padding: 8px;">${operacion}</td>
+            <td style="border: 1px solid black; padding: 8px;">${shippingId}</td>
+            <td style="border: 1px solid black; padding: 8px;">${cantidad}</td>
+            <td style="border: 1px solid black; padding: 8px;">${descripcion}</td>
+        </tr>`;
+    });
+
+    html += '</tbody></table>';
+    return html;
+}
+
+async function enviarCorreoDespacho(destinatarioEmail) {
+    const emailBody = obtenerDatosTabla();
+    const fecha = new Date().toLocaleDateString(); // Formato de fecha
+    const Subject = `Despacho MERCADO LIBRE del dia: ${fecha}`;
+    const smtpU = 's154745_3';
+    const smtpP = 'QbikuGyHqJ';
+
+    const emailData = {
+        "Html": {
+            "DocType": null,
+            "Head": null,
+            "Body": emailBody,
+            "BodyTag": "<body>"
+        },
+        "Text": "",
+        "Subject": Subject,
+        "From": {
+            "Name": "Posventa Novogar",
+            "Email": "posventa@novogar.com.ar"
+        },
+        "To": [
+            {
+                "Name": "Despacho Mercado Libre",
+                "Email": destinatarioEmail
+            }
+        ],
+        "Cc": [],
+        "Bcc": ["webnovagar@gmail.com", "posventa@novogar.com.ar"],
+        "CharSet": "utf-8",
+        "User": {
+            "Username": smtpU,
+            "Secret": smtpP,
+        }
+    };
+
+    try {
+        const response = await fetch('https://proxy.cors.sh/https://send.mailup.com/API/v2.0/messages/sendmessage', {
+            method: 'POST',
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(emailData)
+        });
+
+        const result = await response.json();
+        if (result.Status === 'done') {
+            console.log('Email enviado exitosamente');
+            showAlert(`<i class="bi bi-envelope-check"></i> Email de Despacho enviado a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
+        } else {
+            console.log(`Error al enviar el email: ${result.Message}`);
+            showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
+        }
+    } catch (error) {
+        console.error('Error al enviar el email:', error);
+        showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
+    }
+}
+
+document.getElementById('cerrarButton').onclick = async function() {
+    const tableBody = document.getElementById('data-table-body');
+    const totalCantidad = document.getElementById('totalCantidad').innerText;
+
+    // Verificar si hay datos en la tabla
+    if (tableBody.querySelectorAll('tr').length <= 1 || totalCantidad === 'Total Cantidad: 0') {
+        showAlertError('<i class="bi bi-exclamation-triangle-fill"></i> No hay datos en la colecta.');
+        return; // Salir de la función si no hay datos
+    }
+
+    const destinatarios = [
+        "lucasponzoninovogar@gmail.com",
+        "lucas.ponzoni@novogar.com.ar",
+        "mauricio.daffonchio@novogar.com.ar",
+        "esperanza.toffalo@novogar.com.ar",
+        "posventa@novogar.com.ar",
+        "recepcionesweb@novogar.com.ar",
+        "mauricio.villan@novogar.com.ar"
+    ];
+
+    const { value: password } = await Swal.fire({
+        title: 'Clave de Cierre de Colecta 🔒',
+        input: 'password',
+        inputLabel: 'Solicitarla al Preparador',
+        inputAttributes: {
+            autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Enviar',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Necesitas ingresar la contraseña!';
+            } else if (value !== '6572') {
+                return 'Contraseña incorrecta!';
+            }
+        }
+    });
+
+    if (password === '6572') {
+        for (const email of destinatarios) {
+            await enviarCorreoDespacho(email);
+        }
+
+        // Eliminar el nodo en Firebase
+        const firebaseUrl = 'https://despachos-meli-novogar-default-rtdb.firebaseio.com/despachoDelDiaMeli.json';
+        await fetch(firebaseUrl, {
+            method: 'DELETE'
+        });
+        console.log('Nodo eliminado de Firebase');
+
+        // Resetear la tabla
+        tableBody.innerHTML = '<tr><td colspan="7" class="no-data">No has comenzado una colecta aún, manos a la obra 😎</td></tr>';
+        document.getElementById('totalCantidad').innerText = 'Total Cantidad: 0';
+
+        showAlert('<i class="bi bi-check-circle"></i> Colecta cerrada y datos enviados exitosamente.');
+    }
+};
+
+let alertCount = 0;
+
+function showAlert(message) {
+    const alertElement = document.createElement('div');
+    alertElement.className = 'alert';
+    alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
+    document.body.appendChild(alertElement);
+    alertElement.style.bottom = `${20 + alertCount * 70}px`;
+    setTimeout(() => {
+        alertElement.classList.add('show');
+    }, 10);
+    alertElement.querySelector('.close').onclick = () => {
+        closeAlert(alertElement);
+    };
+    setTimeout(() => {
+        closeAlert(alertElement);
+    }, 8000);
+    alertCount++;
+}
+
+function showAlertError(message) {
+    const alertElement = document.createElement('div');
+    alertElement.className = 'alertError';
+    alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
+    document.body.appendChild(alertElement);
+    alertElement.style.bottom = `${20 + alertCount * 70}px`;
+    setTimeout(() => {
+        alertElement.classList.add('show');
+    }, 10);
+    alertElement.querySelector('.close').onclick = () => {
+        closeAlert(alertElement);
+    };
+    setTimeout(() => {
+        closeAlert(alertElement);
+    }, 8000);
+    alertCount++;
+}
+
+function closeAlert(alertElement) {
+    alertElement.classList.remove('show');
+    setTimeout(() => {
+        document.body.removeChild(alertElement);
+        alertCount--;
+        updateAlertPositions();
+    }, 300);
+}
+
+function updateAlertPositions() {
+    const alerts = document.querySelectorAll('.alert, .alertError');
+    alerts.forEach((alert, index) => {
+        alert.style.bottom = `${20 + index * 70}px`;
+    });
+}
+
+function obtenerDatosTabla() {
+    // Implementa la lógica para obtener los datos de la tabla
+    return "<p>Datos de la tabla aquí</p>"; // Ejemplo de cuerpo de email
+}

@@ -2501,9 +2501,8 @@ div .form-check {
 /* FIN SWITCH MEJORADO */
 
 /* Estilo para el alert */
-.alert {
-    position: fixed;
-    bottom: 20px;
+.alert, .alertError {
+    position: absolute; /* Cambiar a absolute */
     right: 20px;
     background-color: #28a745; 
     color: white;
@@ -2517,51 +2516,19 @@ div .form-check {
     opacity: 0; 
 }
 
-
-
-.alert.show {
+.alert.show, .alertError.show {
     display: block; 
     transform: translateY(0); 
     opacity: 1; 
 }
 
-.alert .close {
-    cursor: pointer;
-    margin-left: 10px;
-    font-weight: bold;
-    font-size: 18px;
-    color: white;
-    transition: color 0.3s; 
-}
-
-.alert .close:hover {
-    color: #ffcc00; 
-}
-
-/* Estilo para el alert Error */
+/* Estilo específico para alertError */
 .alertError {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
     background-color: red; 
-    color: white;
-    padding: 15px 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    display: none; 
-    z-index: 1000;
-    transition: transform 0.3s ease, opacity 0.3s ease; 
-    transform: translateY(20px); 
-    opacity: 0; 
 }
 
-.alertError.show {
-    display: block; 
-    transform: translateY(0); 
-    opacity: 1; 
-}
-
-.alertError .close {
+/* Cerrar botón */
+.alert .close, .alertError .close {
     cursor: pointer;
     margin-left: 10px;
     font-weight: bold;
@@ -2570,11 +2537,14 @@ div .form-check {
     transition: color 0.3s; 
 }
 
-.alertError .close:hover {
+.alert .close:hover, .alertError .close:hover {
     color: #ffcc00; 
 }
+/* Fin Estilo para el alert */
 
-/* TABLA DE ENVIOS */
+.escaneoColecta{
+    margin-right: 5px;
+}
 
 .table {
     border-collapse: collapse;

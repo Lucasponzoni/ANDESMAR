@@ -62,17 +62,18 @@
                 </div>
             </div>
             
-            <div class="col-md-3 mb-3 d-flex justify-content-between">
+            <div class="col-md-3 mb-3 d-flex justify-content-end">
                 <!-- Aca van los botones -->
-                <button type="button" class="btn btn-danger me-2" data-toggle="modal" data-target="#escaneoColecta">
+                <button type="button" class="btn btn-danger me-2 escaneoColecta" data-toggle="modal" data-target="#escaneoColecta">
                     <i class="bi bi-tags-fill"></i> Escanear
                 </button>
-                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#queryModal">
+                <button type="button" id="cerrarButton" class="btn btn-success" data-toggle="modal" data-target="#queryModal">
                     <i class="bi bi-x-lg"></i> Cerrar
                 </button>
             </div>
         </div>
     </div>
+    
 
     <div class="container mt-5" id="cards-container">
         <div class="spinner-border" role="status" id="spinner">
@@ -150,6 +151,8 @@
     
     <!-- Incluir jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- jsPDF AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.10/jspdf.plugin.autotable.min.js"></script>
     
     
         <!-- Scripts Bootstrap-->
