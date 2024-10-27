@@ -82,27 +82,29 @@
         </div>
     
         <h2 class="counter" id="totalCantidad">Total Cantidad: 0</h2>
-        <table class="table table-bordered">
-            <thead class="table-header">
-                <tr>
-                    <th><i class="bi bi-calendar"></i> Fecha y Hora</th>
-                    <th><i class="bi bi-file-earmark-text"></i> Operación</th> 
-                    <th><i class="bi bi-rocket-takeoff-fill"></i> Shipping ID</th>
-                    <th><i class="bi bi-box"></i> Cantidad</th> 
-                    <th><i class="bi bi-info-circle"></i> Descripción</th> 
-                    <th><i class="bi bi-image"></i> Imagen</th>
-                    <th><i class="bi bi-trash"></i></th>
-                </tr>
-            </thead>
-            <tbody id="data-table-body">
-                <tr>
-                    <td colspan="7" class="no-data">No has comenzado una colecta aún, manos a la obra 😎</td>
-                </tr>
-            </tbody>
-        </table>
+        
+        <div class="table-responsive"> <!-- Contenedor para hacer la tabla responsive -->
+            <table class="table table-bordered">
+                <thead class="table-header">
+                    <tr>
+                        <th><i class="bi bi-calendar"></i> Fecha y Hora</th>
+                        <th><i class="bi bi-file-earmark-text"></i> Operación</th> 
+                        <th><i class="bi bi-rocket-takeoff-fill"></i> Shipping ID</th>
+                        <th><i class="bi bi-box"></i> Cantidad</th> 
+                        <th><i class="bi bi-info-circle"></i> Descripción</th> 
+                        <th><i class="bi bi-image"></i> Imagen</th>
+                        <th><i class="bi bi-trash"></i></th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    <tr>
+                        <td colspan="7" class="no-data">No has comenzado una colecta aún, manos a la obra 😎</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     
-
     <!-- Modal para escanear -->
     <div class="modal fade" id="escaneoColecta" tabindex="-1" role="dialog" aria-labelledby="escaneoColectaLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
