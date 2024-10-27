@@ -49,47 +49,44 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.disabled = true;
     spinner.style.display = 'block';
 
-    const filterDate = new Date('2024-10-20T00:00:00.000-04:00');
 
-    // Cargar solo los datos que tengan shippingMode 'me1' desde Firebase
-    db.ref('envios').orderByChild('shippingMode').equalTo('me1').once('value')
-    .then(snapshot => {
-        const data = snapshot.val();
+// Cargar solo los datos que tengan shippingMode 'me1' desde Firebase
+db.ref('envios').orderByChild('shippingMode').equalTo('me1').once('value')
+.then(snapshot => {
+    const data = snapshot.val();
 
-        if (!data) {
-            console.log('No se encontraron datos con shippingMode "me1"');
-            searchInput.value = "No se encontraron datos";
-            spinner.style.display = 'none';
-            return;
-        }
-
-        // Filtrar solo los datos que cumplen con la fecha
-        const filteredData = Object.values(data).filter(item => {
-            const itemDate = new Date(item.dateCreated);
-            return itemDate >= filterDate;
-        });
-
-        // Invertir el orden de los datos
-        filteredData.reverse();
-
-        // Contar la cantidad de datos filtrados
-        const count = filteredData.length;
-
-        // Mostrar datos filtrados y la cantidad en la consola
-        // console.log('Datos filtrados:', filteredData);
-        console.log(`Cantidad de datos recibidos: ${count}`);
-
-        // Cargar los datos en la tabla
-        loadTable(filteredData);
-
-        // Habilitar buscador y limpiar mensaje
-        searchInput.disabled = false;
-        searchInput.value = "";
+    if (!data) {
+        console.log('No se encontraron datos con shippingMode "me1"');
+        searchInput.value = "No se encontraron datos";
         spinner.style.display = 'none';
-    })
-    .catch(error => {
-        console.error('Error al cargar los datos:', error);
-    });
+        return;
+    }
+
+    // Obtener todos los datos y tomar los últimos 200
+    const allData = Object.values(data);
+    const last200Data = allData.slice(-200); // Toma los últimos 200 registros
+
+    // Invertir el orden de los datos
+    last200Data.reverse();
+
+    // Contar la cantidad de datos
+    const count = last200Data.length;
+
+    // Mostrar datos y la cantidad en la consola
+    console.log(`Cantidad de datos recibidos: ${count}`);
+
+    // Cargar los datos en la tabla
+    loadTable(last200Data);
+
+    // Habilitar buscador y limpiar mensaje
+    searchInput.disabled = false;
+    searchInput.value = "";
+    spinner.style.display = 'none';
+})
+.catch(error => {
+    console.error('Error al cargar los datos:', error);
+});
+
 });
 
 // Obtener el valor de PasarAWebMonto antes de cargar las filas
