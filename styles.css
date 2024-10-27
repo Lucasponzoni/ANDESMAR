@@ -2061,8 +2061,6 @@ div.card-body > p > i{
     font-family: "Chakra Petch", sans-serif;
     text-transform: uppercase;
     color: green;
-    border: dashed rgba(255, 68, 0, 0.285) 2px;
-    background-color: #d0ffd1;
     margin-top: 5px;
     font-size: small;
     border-radius: 10px;

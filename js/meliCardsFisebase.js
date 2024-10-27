@@ -445,9 +445,10 @@ function crearCard(data) {
                 </button>
                 <!-- Botón Logística Propia --> 
 
-                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli">
+                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked ? 'background-color: #d0ffd1;' : ''}">
                 ${isBlocked ? '<i class="bi bi-info-square-fill"></i> Despacho Bloqueado por Facturación, separar remito para realizar circuito' : ''}
                 </div>
+
 
             </div>
 
