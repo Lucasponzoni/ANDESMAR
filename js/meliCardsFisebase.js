@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        if (query.length >= 16) {
+        if (query.length >= 9) {
             const queryNumber = Number(query);
 
             spinner.style.display = 'block';
@@ -111,9 +111,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 database.ref('envios')
                     .orderByChild('idOperacion')
                     .equalTo(queryNumber)
+                    .limitToLast(800) 
                     .once('value')
                     .then(snapshot => {
-                        const allData = snapshot.val(); // Obtiene todo el JSON del nodo
+                        const allData = snapshot.val(); 
+            
 
                         if (allData) {
                             // Mostrar los datos en la consola
@@ -153,6 +155,12 @@ let allData = []; // Arreglo global para almacenar todos los datos
 let currentPage = 1;
 const itemsPerPage = 12;
 let currentPageGroup = 0; // Grupo de páginas actual
+
+const searchInput = document.getElementById('searchMercadoLibre');
+
+// Deshabilitar el buscador al inicio
+searchInput.disabled = true;
+searchInput.value = "Aguardando que cargue la web ⏳";
 
 // Función para cargar datos de Firebase
 function cargarDatos() {
@@ -217,6 +225,7 @@ function cargarDatos() {
             pagination.style.display = 'none'; 
             spinner.style.display = 'none';
             updatePagination(allData.length);
+            searchInput.disabled = false;
         })
         .catch(error => {
             console.error("Error al cargar los datos: ", error);
