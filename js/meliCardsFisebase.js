@@ -249,7 +249,7 @@ function crearCard(data) {
     const isLogPropia = data.transportCompany === "Novogar"
     const isBlocked = data.estadoFacturacion === "bloqueado"
     // Definir Email con valor por defecto
-    const email = data.email !== undefined ? data.email : 'lucasponzoni@gmail.com';
+    const email = (data.email && data.email.trim() !== '') ? data.email : 'lucasponzoni@gmail.com';
 
     // Verificar si data.pictures existe y es un array
     const filteredPictures = Array.isArray(data.pictures) ? 
@@ -427,7 +427,7 @@ function crearCard(data) {
                 id="andreaniButton${data.idOperacion}" 
                 ${isAndesmar ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
-                onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}','${email}')`}">
+                onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.email !== undefined ? data.email : 'lucasponzoni@gmail.com'}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')`}">
                 <span id="andreaniText${data.idOperacion}">
                 ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
                 </span>
@@ -435,11 +435,12 @@ function crearCard(data) {
                 </button>
                 <!-- Botón Andreani -->
 
+
                 <!-- Botón Logística Propia --> 
                 <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
                 id="LogPropiaMeliButton${data.idOperacion}" 
                 ${isBlocked ? 'disabled' : ''} 
-                onclick="generarPDF('${email}', '${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
+                onclick="generarPDF('${data.email !== undefined ? data.email : 'lucasponzoni@gmail.com'}', '${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
                 <span>
                 ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<i class="bi bi-file-text"></i> Etiqueta Novogar`}
                 </span>
@@ -827,14 +828,33 @@ async function getAuthToken() {
     }
 }
 
-async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, Email, observaciones, peso, volumenCM3, cantidad, medidas, Producto) {
-    const buttonAndr = document.getElementById(`andreaniButton${id}`);
+async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto) {    const buttonAndr = document.getElementById(`andreaniButton${id}`);
     const spinnerAndr = document.getElementById(`spinnerAndreani${id}`);
     const textAndr = document.getElementById(`andreaniText${id}`);
     const resultadoDivAndr = document.getElementById(`resultado${id}`);
     const envioStateAndr = document.getElementById(`estadoEnvio${id}`);
     const button = document.getElementById(`andesmarButton${id}`);
     const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
+
+    console.log('Parámetros enviados a enviarDatosAndreani:');
+    console.log({
+        id,
+        NombreyApellido,
+        Cp,
+        localidad,
+        Provincia,
+        idOperacion,
+        calleDestinatario,
+        alturaDestinatario,
+        telefonoDestinatario,
+        observaciones,
+        peso,
+        volumenCM3,
+        cantidad,
+        medidas,
+        Producto,
+        email
+    });
 
     // Eliminar el prefijo "200000" del idOperacion
     const idOperacionFinalAndreani = idOperacion.replace(/^200000/, '');
@@ -914,7 +934,7 @@ for (let i = 0; i < cantidadFinal; i++) {
         },
         "destinatario": [{
             "nombreCompleto": NombreyApellido,
-            "email": Email,
+            "email": email,
             "documentoTipo": "CUIT",
             "documentoNumero": "30685437011",
             "telefonos": [{ "tipo": 1, "numero": telefonoDestinatario }]
@@ -982,6 +1002,16 @@ for (let i = 0; i < cantidadFinal; i++) {
         }).catch(error => {
             console.error('Error al actualizar en Firebase:', error);
         });    
+
+        const nombre = NombreyApellido
+        const remito = idOperacion.replace(/ME1$/, '');
+        const Name = `Confirmación de envio Mercado Libre`;
+        const Subject = `Tu compra en Novogar ${remito} ya fue preparada para despacho con Andreani`;
+        const template = "emailTemplateAndreani";
+        const linkSeguimiento2 = `https://andreani.com/#!/informacionEnvio/${numeroDeEnvio}`;
+        const transporte = "Correo Andreani";
+
+        await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
 
             // Llamar a la API para obtener la etiqueta
             await obtenerEtiqueta(numeroDeEnvio, token, buttonAndr);
@@ -1451,6 +1481,10 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     let button = document.getElementById(`LogPropiaMeliButton${id}`);
     let spinner = document.getElementById(`spinnerLogPropia${id}`);
     let spinner2 = document.getElementById("spinner2");
+
+    // Mostrar en consola los parámetros recibidos
+    console.log('Parámetros recibidos por generarPDF:');
+    console.log({ email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia });
 
     // Mostrar spinner y cambiar texto del botón
     spinner.style.display = "inline-block"; // Usar inline-block en lugar de flex para el spinner
