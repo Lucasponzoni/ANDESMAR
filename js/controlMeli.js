@@ -472,8 +472,3 @@ function updateAlertPositions() {
         alert.style.bottom = `${20 + index * 70}px`;
     });
 }
-
-function obtenerDatosTabla() {
-    // Implementa la lógica para obtener los datos de la tabla
-    return "<p>Datos de la tabla aquí</p>"; // Ejemplo de cuerpo de email
-}
