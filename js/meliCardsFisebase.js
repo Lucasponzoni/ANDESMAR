@@ -426,6 +426,16 @@ function crearCard(data) {
                 </button>
                 <!-- Botón Andreani -->
 
+                <!-- Botón Logística Propia --> 
+<button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
+    id="LogPropiaMeliButton${data.idOperacion}" 
+    onclick="generarPDF('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
+    <span>
+        ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<i class="bi bi-file-text"></i> Etiqueta Novogar`}
+    </span>
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data.idOperacion}" style="display:none;"></span>
+</button>
+
                 <div id="resultado${data.idOperacion}" class="mt-2 errorMeli"></div>
             </div>
 
@@ -1420,6 +1430,190 @@ if (prepararME2Btn) {
 
 
 // FIN QUERY DE DATOS MELI
+async function generarPDF(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia) {
+    let button = document.getElementById(`LogPropiaMeliButton${id}`);
+    let spinner = document.getElementById(`spinnerLogPropia${id}`);
+    let spinner2 = document.getElementById("spinner2");
+
+    // Mostrar spinner y cambiar texto del botón
+    spinner.style.display = "inline-block"; // Usar inline-block en lugar de flex para el spinner
+    button.innerHTML = '<i class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></i> Generando...';
+    button.disabled = true; // Desactivar el botón
+
+    const { jsPDF } = window.jspdf;
+
+    spinner2.style.display = "flex";
+
+    // Crear un nuevo documento PDF en tamaño 10x15 cm
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'cm',
+        format: [15, 10],
+        putOnlyUsedFonts: true,
+        floatPrecision: 16
+    });
+
+    // Contenido HTML
+    const contenido = `
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Etiqueta</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+        <style>
+            body {
+                margin: 10px;
+                padding: 0;
+                display: grid;
+                place-items: center;
+                height: 100vh;
+                background-color: #f0f0f0;
+            }
+            .etiqueta {
+                width: 10cm;
+                margin: 5px;
+                height: auto;
+                max-height: 15cm;
+                border: 2px dashed #000;
+                border-radius: 10px;
+                padding: 1cm;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                font-family: Arial, sans-serif;
+                background-color: #fff;
+            }
+            .logo {
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            .logo img {
+                max-width: 250px;
+                height: auto;
+                display: block;
+                margin: 0 auto;
+            }
+            .campo {
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                margin-bottom: 6px;
+                padding: 8px;
+                border: 2px solid #ccc;
+                background-color: #f9f9f9;
+            }
+            .campo i {
+                margin-right: 8px;
+                font-size: 1.2em;
+                color: #000;
+            }
+            .campo span {
+                font-size: 1em;
+                font-weight: bold;
+                color: #333;
+            }
+            .footer {
+                text-align: center;
+                font-size: 0.9em;
+                color: #000;
+                margin-top: auto;
+                padding-top: 10px;
+                border-top: 2px solid #ccc;
+            }
+            .contacto {
+                font-size: 0.8em;
+                color: #333;
+                margin-top: 10px;
+                text-align: center;
+            }
+            .contacto p {
+                margin: 3px 0;
+            }
+            .campo-extra {
+                border-radius: 8px;
+                margin-top: 10px;
+                border: 2px dashed #ccc;
+                padding: 5px;
+                text-align: center;
+                font-size: 0.9em;
+                color: #555;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="etiqueta">
+            <div class="logo">
+                <img src="./Img/BNA-Novogar.png" alt="Logo">
+            </div>
+            <div class="campo">
+                <i class="bi bi-person-square"></i>
+                <span>Orden: ${idOperacion}, Cliente: ${NombreyApellido}</span>
+            </div>
+            <div class="campo">
+                <i class="bi bi-geo-alt-fill"></i>
+                <span>${Cp}, ${localidad}, ${provincia}</span>
+            </div>
+            <div class="campo">
+                <i class="bi bi-compass"></i>
+                <span>Dirección: ${calleDestinatario} ${alturaDestinatario}</span>
+            </div>
+            <div class="campo">
+                <i class="bi bi-telephone-outbound-fill"></i>
+                <span>Teléfono: ${telefonoDestinatario}</span>
+            </div>
+            <div class="campo-extra">
+                <p><strong>Firma:</strong>  ________________________</p>
+            </div>
+            <div class="campo-extra">
+                <p><strong>Aclaración:</strong>  ________________________</p>
+            </div>
+            <div class="campo-extra">
+                <p><strong>DNI:</strong>  ________________________</p>
+            </div>
+            <div class="contacto">
+                <p>Ante cualquier inconveniente, contáctese con posventa:</p>
+                <p><strong><i class="bi bi-chat-dots-fill"></i></strong> (0341) 6680658 (Solo WhatsApp)</p>
+                <p><i class="bi bi-envelope-check-fill"></i> posventa@novogar.com.ar</p>
+            </div>
+        </div>
+    </body>
+    </html>`;
+
+    // Crear un elemento temporal para renderizar el HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = contenido;
+    document.body.appendChild(tempDiv);
+
+    // Usar html2canvas para capturar el contenido
+    html2canvas(tempDiv, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', 0, 0, 10, 15);
+        const pdfBlob = doc.output('blob');
+
+
+
+        const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
+        NroEnvio.innerHTML = `Logistica Propia`;
+
+
+        // Crear un enlace para abrir el PDF en una nueva ventana
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        setTimeout(() => {
+            spinner2.style.display = "none";
+            // Ocultar el spinner y restaurar el botón
+            spinner.style.display = "none";
+            window.open(pdfUrl, '_blank');
+            button.innerHTML = '<i class="bi bi-file-text"></i> Etiqueta Novogar';
+            button.disabled = false;
+        }, 2000);
+
+        document.body.removeChild(tempDiv);
+    });
+}
+// FIN GENERAR ETIQUETA LOGISTICA PROPIA
 
 // Llama a cargarDatos para iniciar el proceso
 cargarDatos();
