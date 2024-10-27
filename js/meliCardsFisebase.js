@@ -249,7 +249,7 @@ function crearCard(data) {
     const isLogPropia = data.transportCompany === "Novogar"
     const isBlocked = data.estadoFacturacion === "bloqueado"
     // Definir Email con valor por defecto
-    const email = (data.email && data.email.trim() !== '') ? data.email : 'lucasponzoni@gmail.com';
+    const email = (data.email && data.email.trim() !== '') ? data.email : 'webnovogar@gmail.com';
 
     // Verificar si data.pictures existe y es un array
     const filteredPictures = Array.isArray(data.pictures) ? 
@@ -322,7 +322,7 @@ function crearCard(data) {
 
                 <button class="btn btn-link copy-btn p-1 m-0" style="display: inline-flex; align-items: center;">
                     <i class="bi bi-clipboard ios-icon" style="margin: 0;"></i>
-                    </button>
+                </button>
 
                     <button class="btn btn-link p-1 m-0" style="display: inline-flex; align-items: center;" onclick="window.open('${data.permalink}', '_blank');">
                     <i class="bi bi-shop ios-icon" style="margin: 0;"></i>
@@ -427,7 +427,7 @@ function crearCard(data) {
                 id="andreaniButton${data.idOperacion}" 
                 ${isAndesmar ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
-                onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.email !== undefined ? data.email : 'lucasponzoni@gmail.com'}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')`}">
+                onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')`}">
                 <span id="andreaniText${data.idOperacion}">
                 ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
                 </span>
@@ -440,7 +440,7 @@ function crearCard(data) {
                 <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
                 id="LogPropiaMeliButton${data.idOperacion}" 
                 ${isBlocked ? 'disabled' : ''} 
-                onclick="generarPDF('${data.email !== undefined ? data.email : 'lucasponzoni@gmail.com'}', '${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
+                onclick="generarPDF('${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
                 <span>
                 ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<i class="bi bi-file-text"></i> Etiqueta Novogar`}
                 </span>
