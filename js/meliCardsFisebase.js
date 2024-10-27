@@ -248,6 +248,8 @@ function crearCard(data) {
     const isAndreani = data.transportCompany === "Andreani"
     const isLogPropia = data.transportCompany === "Novogar"
     const isBlocked = data.estadoFacturacion === "bloqueado"
+    // Definir Email con valor por defecto
+    const email = data.email !== undefined ? data.email : 'lucasponzoni@gmail.com';
 
     // Verificar si data.pictures existe y es un array
     const filteredPictures = Array.isArray(data.pictures) ? 
@@ -412,7 +414,7 @@ function crearCard(data) {
                 id="andesmarButton${data.idOperacion}" 
                 ${isAndreani ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
-                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')`}">
+                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${email}')`}">
                 <span id="andesmarText${data.idOperacion}">
                 ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<i class="bi bi-file-text"></i> Etiqueta Andesmar'}
                 </span>
@@ -425,7 +427,7 @@ function crearCard(data) {
                 id="andreaniButton${data.idOperacion}" 
                 ${isAndesmar ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
-                onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')`}">
+                onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Email}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}','${email}')`}">
                 <span id="andreaniText${data.idOperacion}">
                 ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<i class="bi bi-file-text"></i> Etiqueta Andreani`}
                 </span>
@@ -437,7 +439,7 @@ function crearCard(data) {
                 <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
                 id="LogPropiaMeliButton${data.idOperacion}" 
                 ${isBlocked ? 'disabled' : ''} 
-                onclick="generarPDF('${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
+                onclick="generarPDF('${email}', '${data.idOperacion}', '${data.NombreyApellido}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.Observaciones}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
                 <span>
                 ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<i class="bi bi-file-text"></i> Etiqueta Novogar`}
                 </span>
@@ -1445,7 +1447,7 @@ if (prepararME2Btn) {
 // FIN QUERY DE DATOS MELI
 
 // GENERAR ETIQUETA LOGISTICA PROPIA
-async function generarPDF(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia) {
+async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia) {
     let button = document.getElementById(`LogPropiaMeliButton${id}`);
     let spinner = document.getElementById(`spinnerLogPropia${id}`);
     let spinner2 = document.getElementById("spinner2");
@@ -1676,6 +1678,15 @@ async function generarPDF(id, NombreyApellido, Cp, idOperacion, calleDestinatari
 
         document.body.removeChild(tempDiv);
     });
+
+const nombre = NombreyApellido
+const remito = idOperacion.replace(/ME1$/, '');
+const Name = `Confirmación de envio Mercado Libre`;
+const Subject = `Tu compra en Novogar ${remito} ya fue preparada para despacho`;
+const template = "emailTemplateLogPropia";
+
+await sendEmail(Name, Subject, template, nombre, email, remito);
+
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
 

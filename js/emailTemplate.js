@@ -11,7 +11,7 @@ const emailTemplateAndesmar = (Name, Subject, templateName, nombre, email, remit
         <div style="margin: 20px 0; text-align: center;">
             <p style="font-size: 16px; color: #333;">Dentro de los pr&oacute;ximos <strong style="color: #28a745;">2 d&iacute;as h&aacute;biles</strong>, podr&aacute;s seguir el estado de tu compra con el n&uacute;mero de seguimiento:</p>
             <div style="background-color: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin: 10px 0;">
-                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Pedido Tienda BNA N&deg;:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${remito}</span></p>
+                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Orden:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${remito}</span></p>
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Transportista:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${transporte}</span></p>
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Seguimiento:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">BNA${remito}</span></p>
             </div><a href="${linkSeguimiento2}" style="display: inline-block; background-color: #007aff; color: #ffffff; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 10px;">Rastrear mi pedido</a>
@@ -45,7 +45,7 @@ const emailTemplateAndreani = (Name, Subject, templateName, nombre, email, remit
         <div style="margin: 20px 0; text-align: center;">
             <p style="font-size: 16px; color: #333;">Dentro de los pr&oacute;ximos <strong style="color: #28a745;">2 d&iacute;as h&aacute;biles</strong>, podr&aacute;s seguir el estado de tu compra con el n&uacute;mero de seguimiento:</p>
             <div style="background-color: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin: 10px 0;">
-                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Pedido Tienda BNA N&deg;:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${remito}</span></p>
+                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Orden:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${remito}</span></p>
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Transportista:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${transporte}</span></p>
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Seguimiento:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${numeroDeEnvio}</span></p>
             </div><a href="${linkSeguimiento2}" style="display: inline-block; background-color: #007aff; color: #ffffff; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 10px;">Rastrear mi pedido</a>
@@ -79,7 +79,7 @@ const emailTemplateLogPropia = (Name, Subject, templateName, nombre, email, remi
         <div style="margin: 20px 0; text-align: center;">
             <p style="font-size: 16px; color: #333;">Dentro de los pr&oacute;ximos <strong style="color: #28a745;">3 d&iacute;as h&aacute;biles</strong>, estaremos entregando tu compra con nuestra log&iacute;stica Novogar. En las localidades de P&eacute;rez, Rold&aacute;n y Funes, solo entregamos los d&iacute;as S&aacute;bados. En Santa Fe Capital, las entregas se realizan los viernes.</p>
             <div style="background-color: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin: 10px 0;">
-                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Pedido Tienda BNA N&deg;:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${remito}</span></p>
+                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Orden:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${remito}</span></p>
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Transportista:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">Logistica Novogar</span></p>
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Seguimiento:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">Sin Seguimiento</span></p>
             </div>
