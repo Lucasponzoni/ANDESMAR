@@ -1586,10 +1586,6 @@ const clave = "BOM6765";
 const codigoCliente = "6765";
 
 async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, suborden_total, precio_venta, producto_nombre) {
-    const contraseñaCorrecta = await pedirContraseña();
-    if (!contraseñaCorrecta) {
-        return; // Salir de la función si la contraseña es incorrecta
-    }
 
     // Obtener los elementos de volumen
     const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
@@ -1889,11 +1885,6 @@ async function getAuthToken() {
 
 async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
     
-    const contraseñaCorrecta = await pedirContraseña();
-    if (!contraseñaCorrecta) {
-        return; // Salir de la función si la contraseña es incorrecta
-    }
-
     // Redondear el precio_venta y convertirlo a un entero
     const precioVentaRedondeado = Math.round(precio_venta);
 

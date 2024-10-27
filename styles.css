@@ -2545,6 +2545,47 @@ div .form-check {
 }
 /* Fin Estilo para el alert */
 
+/* Alertas BNA y MELI */
+.custom-alert, .custom-alert-error {
+    position: fixed; /* Cambiar a fixed para que se mantenga en la pantalla */
+    bottom: 70px; /* Colocarlo en la parte superior */
+    right: 20px;
+    background-color: #28a745; 
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: transform 0.3s ease, opacity 0.3s ease; 
+    transform: translateY(-20px); /* Cambiar para que baje desde arriba */
+    opacity: 0; 
+    visibility: hidden; 
+}
+
+.custom-alert.show, .custom-alert-error.show {
+    transform: translateY(0); 
+    opacity: 1; 
+    visibility: visible; 
+}
+
+.custom-alert-error {
+    background-color: red; 
+}
+
+.custom-alert .close, .custom-alert-error .close {
+    cursor: pointer;
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    color: white;
+    transition: color 0.3s; 
+}
+
+.custom-alert .close:hover, .custom-alert-error .close:hover {
+    color: #ffcc00; 
+}
+/* Alertas BNA y MELI */
+
 .escaneoColecta{
     margin-right: 5px;
 }

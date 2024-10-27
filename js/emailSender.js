@@ -81,20 +81,20 @@ async function sendEmail(Name, Subject, templateName, nombre, email, remito, lin
         const result = await response.json();
         if (result.Status === 'done') {
             console.log('Email enviado exitosamente');
-            showAlert(`<i class="bi bi-envelope-check"></i> Email de Despacho enviado a ${emailData.To[0].Email} a las ${new Date().toLocaleTimeString()}`);
+            showCustomAlert(`<i class="bi bi-envelope-check"></i> Email de Despacho enviado a ${emailData.To[0].Email} a las ${new Date().toLocaleTimeString()}`);
         } else {
             console.log(`Error al enviar el email: ${result.Message}`);
-            showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${emailData.To[0].Email} a las ${new Date().toLocaleTimeString()}`);
-        }
+            showCustomAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${emailData.To[0].Email} a las ${new Date().toLocaleTimeString()}`);
+        }              
     } catch (error) {
         console.error('Error al enviar el email:', error);
-        showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${emailData.To[0].Email} a las ${new Date().toLocaleTimeString()}`);
+        showCustomAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${emailData.To[0].Email} a las ${new Date().toLocaleTimeString()}`);
     }
 }
 
-function showAlert(message) {
+function showCustomAlert(message) {
     const alertElement = document.createElement('div');
-    alertElement.className = 'alert';
+    alertElement.className = 'custom-alert';
     alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
     
     document.body.appendChild(alertElement);
@@ -102,6 +102,7 @@ function showAlert(message) {
     // Mostrar el alert con animación
     setTimeout(() => {
         alertElement.classList.add('show');
+        alertElement.style.visibility = 'visible'; // Asegurarse de que sea visible
     }, 10); // Pequeño retraso para permitir que el DOM se actualice
 
     // Cerrar el alert al hacer clic en el botón de cerrar
@@ -112,7 +113,7 @@ function showAlert(message) {
         }, 300); // Esperar a que termine la animación
     };
 
-    // Cerrar automáticamente después de 3 segundos
+    // Cerrar automáticamente después de 8 segundos
     setTimeout(() => {
         if (alertElement.classList.contains('show')) {
             alertElement.classList.remove('show');
@@ -123,9 +124,9 @@ function showAlert(message) {
     }, 8000);
 }
 
-function showAlertError(message) {
+function showCustomAlertError(message) {
     const alertElement = document.createElement('div');
-    alertElement.className = 'alertError';
+    alertElement.className = 'custom-alert-error';
     alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
     
     document.body.appendChild(alertElement);
@@ -133,6 +134,7 @@ function showAlertError(message) {
     // Mostrar el alert con animación
     setTimeout(() => {
         alertElement.classList.add('show');
+        alertElement.style.visibility = 'visible'; // Asegurarse de que sea visible
     }, 10); // Pequeño retraso para permitir que el DOM se actualice
 
     // Cerrar el alert al hacer clic en el botón de cerrar
@@ -143,7 +145,7 @@ function showAlertError(message) {
         }, 300); // Esperar a que termine la animación
     };
 
-    // Cerrar automáticamente después de 3 segundos
+    // Cerrar automáticamente después de 8 segundos
     setTimeout(() => {
         if (alertElement.classList.contains('show')) {
             alertElement.classList.remove('show');
@@ -153,5 +155,3 @@ function showAlertError(message) {
         }
     }, 8000);
 }
-
-
