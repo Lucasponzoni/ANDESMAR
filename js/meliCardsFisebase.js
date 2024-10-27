@@ -768,10 +768,10 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
             const Subject = `Tu compra en Novogar ${idOperacion} ya fue preparada para despacho por Andesmar Cargas`;
             const template = "emailTemplateAndesmar";
             const transporte = "Andesmar Cargas";
-            const linkSeguimiento2 = `https://andesmarcargas.com/seguimiento.html?numero=${idOperacionSinME1}ME1&tipo=remito&cod=`;
+            const linkSeguimiento2 = `https://andesmarcargas.com/seguimiento.html?numero=${idOperacionFinal}ME1&tipo=remito&cod=`;
 
             // Enviar el email después de procesar el envío
-            const remito = `${idOperacionSinME1}ME1`;
+            const remito = idOperacionFinal
             await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte);
 
             // Mostrar el botón de descarga
