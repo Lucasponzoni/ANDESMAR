@@ -774,7 +774,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
 
             const nombre = NombreyApellido
             const Name = `Confirmación de Envio Mercado Libre`;
-            const Subject = `Tu compra en Novogar ${idOperacion} ya fue preparada para despacho por Andesmar Cargas`;
+            const Subject = `Tu compra en Novogar ${idOperacionSinME1} ya fue preparada para despacho por Andesmar Cargas`;
             const template = "emailTemplateAndesmar";
             const transporte = "Andesmar Cargas";
             const linkSeguimiento2 = `https://andesmarcargas.com/seguimiento.html?numero=${idOperacionFinal}ME1&tipo=remito&cod=`;
