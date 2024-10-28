@@ -405,6 +405,13 @@ function renderCards(data) {
         <i class="bi bi-cart-fill carrito-icon"></i>
         COMPRA EN CARRITO
         </p>` : '';
+
+// Agregar la tarjeta al contenedor
+const descuentoContenido = data[i].equivalencia_puntos_pesos > 0 ? `
+<p class="puntos">
+<i class="bi bi-award-fill puntos-icon"></i>
+COMPRA CON USO DE PUNTOS BNA
+</p>` : '';
         
         // Agregar la tarjeta al contenedor
         cardsContainer.appendChild(card);
@@ -461,6 +468,7 @@ function renderCards(data) {
                 </div>
                             
                             ${carritoContenido}
+                            ${descuentoContenido}
 <div class="d-flex align-items-center justify-content-center contenedorRemito">
     <button class="btn btn-link btn-sm text-decoration-none copy-btn me-2 ios-icon3">
         <i class="bi bi-clipboard"></i>
