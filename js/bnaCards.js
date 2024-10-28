@@ -331,6 +331,48 @@ function loadEnviosFromFirebase() {
     });
 }
 
+const cpsAndesmar = [
+    ...Array.from({length: 501}, (_, i) => i + 1000), // Del 1000 al 1500
+    1602, 1603, 1605, 1606, 1607, 1609,
+    1611, 1612, 1613, 1614, 1615, 1617,
+    1618, 1619, 1620, 1621, 1623, 1625,
+    1627, 1629, 1631, 1633, 1635, 1636,
+    1638, 1640, 1641, 1642, 1643, 1644,
+    1646, 1648, 1650, 1651, 1653, 1655,
+    1657, 1659, 1661, 1663, 1664, 1665,
+    1667, 1669, 1671, 1672, 1674, 1676,
+    1678, 1682, 1684, 1686, 1688, 1702,
+    1704, 1706, 1708, 1712, 1713, 1714,
+    1716, 1718, 1722, 1723, 1742, 1744,
+    1746, 1752, 1754, 1755, 1757, 1759,
+    1763, 1765, 1766, 1768, 1770, 1771,
+    1772, 1773, 1774, 1776, 1778, 1802,
+    1804, 1805, 1806, 1812, 1822, 1824,
+    1825, 1826, 1828, 1832, 1834, 1835,
+    1836, 1838, 1842, 1846, 1852, 1854,
+    1856, 1870, 1871, 1872, 1874, 1875,
+    1876, 1878, 1879, 1882, 1884, 1886,
+    1888, 1890, 1891, 1894, 1895, 1896,
+    1897, 1900, 1901, 1923, 1925, 8000,
+    4700, 2400, 2415, 2419, 2424, 2434,
+    2566, 2568, 2587, 2594, 2624, 2657,
+    2677, 2681, 5000, 5001, 5002, 5003,
+    5004, 5005, 5006, 5007, 5008, 5009,
+    5010, 5011, 5012, 5013, 5014, 5015,
+    5016, 5017, 5021, 5022, 5023, 5101,
+    5103, 5105, 5107, 5109, 5111, 5113,
+    5123, 5125, 5127, 5145, 5147, 5166,
+    5168, 5172, 5174, 5176, 5182, 5184,
+    5186, 5194, 5220, 5223, 5236, 5280,
+    5800, 5817, 5841, 5850, 5870, 5881,
+    5883, 6216, 6277, 6279, 6389, 9011,
+    9400, 4000, 4101, 4103, 4105, 4107,
+    4109, 4111, 4117, 4128, 4129, 4132,
+    4142, 4144, 4152, 4153, 4158, 4166,
+    4168, 4178, 2000
+];
+
+
 function renderCards(data) {
     const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = ''; // Limpiar contenedor de tarjetas
@@ -432,13 +474,22 @@ COMPRA CON USO DE PUNTOS BNA
                             <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
                                                 <div class="d-flex align-items-center">
                             
+                            
+                            <p class="card-text correo-meli ${cpsAndesmar.includes(Number(data[i].cp)) ? 'correo-andesmar' : 'correo-andreani'}">
+                            ${cpsAndesmar.includes(Number(data[i].cp)) ? 
+                            '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
+                            '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
+                            }
+                            </p>
+
                             <p class="card-text cpLocalidadBna mb-0 me-2">
                             ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}
                             </p>
-    
+
                             <button class="btn btn-sm btn-" style="color: #007bff;" id="edit-localidad-${data[i].id}">
                             <i class="bi bi-pencil-square ios-icon2"></i>
                             </button>
+
                     </div>
 
                     <div id="edit-input-${data[i].id}" style="display: none;">
@@ -459,7 +510,7 @@ COMPRA CON USO DE PUNTOS BNA
                             <i class="bi bi-clipboard icon-gray"></i>
                         </button>
                     </p>
-                    <p class="ios-card-text">
+                    <p class="ios-card-text email-container">
                         <i class="bi bi-envelope ios-icon"></i> ${data[i].email}
                         <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].email}')">
                             <i class="bi bi-clipboard icon-gray"></i>

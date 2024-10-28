@@ -1115,12 +1115,19 @@ p.card-text{
     margin-right: 5px !important;
 }
 
-.cpLocalidadBna{
+.email-container{
+    text-wrap: wrap !important;
+}
+.cpLocalidadBna {
+    margin-left: 5px;
+    white-space: nowrap; /* Cambia text-wrap a white-space */
+    overflow: hidden; /* Agrega overflow para ocultar el texto que se sale */
+    text-overflow: ellipsis; /* Mantén esta propiedad */
     font-family: "Reddit Sans Condensed", sans-serif;
     text-transform: capitalize;
-    font-size: .8rem;
+    font-size: 0.8rem;
     font-weight: 400;
-    width: fit-content;
+    max-width: 70%; /* Establece un ancho fijo según tus necesidades */
     background-color: grey;
     color: white;
     border-radius: 8px;
