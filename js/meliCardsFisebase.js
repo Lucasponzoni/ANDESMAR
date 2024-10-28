@@ -469,8 +469,6 @@ function crearCard(data) {
             <i class="${email === "" ? 'bi bi-envelope-x-fill email-notification1' : 'bi bi-envelope-fill email-notification2'}"></i>
             </button>
 
-
-            
         </div>
     `;
 
