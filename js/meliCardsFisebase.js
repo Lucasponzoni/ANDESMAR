@@ -259,7 +259,7 @@ function crearCard(data) {
     const isLogPropia = data.transportCompany === "Novogar"
     const isBlocked = data.estadoFacturacion === "bloqueado"
     // Definir Email con valor por defecto
-    const email = (data.email && data.email.trim() !== '') ? data.email : 'webnovogar@gmail.com';
+    const email = data.Email || data.email || '';
 
     // Verificar si data.pictures existe y es un array
     const filteredPictures = Array.isArray(data.pictures) ? 
@@ -392,7 +392,7 @@ function crearCard(data) {
                         <p><i class="fas fa-home ios-icon"></i> Calle: <span id="calle-${data.idOperacion}">${data.Calle}</span></p>
                         <p><i class="bi bi-123 ios-icon"></i> Altura: <span id="altura-${data.idOperacion}">${data.Altura}</span></p>
                         <p><i class="fas fa-phone ios-icon"></i> Telefono: <span id="telefono-${data.idOperacion}">${data.Telefono!== undefined ? data.Telefono : 'No Disponible'}</span></p>
-                        <p><i class="bi bi-envelope-at-fill ios-icon"></i> Email: <span id="email-${data.idOperacion}" style="text-transform: lowercase;">${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}</span></p>
+                        <p><i class="bi bi-envelope-at-fill ios-icon"></i> Email: <span id="email-${data.idOperacion}" style="text-transform: lowercase;">${email}</span></p>
                         <p><i class="bi bi-info-circle-fill ios-icon"></i> Autorizado: <span id="autorizado-${data.idOperacion}">${data.Recibe !== undefined ? data.Recibe : 'Sin Autorizado, solo titular'}</span></p>
                         <p><i class="bi bi-sticky-fill ios-icon"></i> Observaciones: <span id="observaciones-${data.idOperacion}">${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}</span></p>
                     </div>
@@ -466,7 +466,7 @@ function crearCard(data) {
             </div>
 
             <button class="btn btn-link lock-btn p-1 m-0 disabled" style="display: inline-flex; align-items: center;">
-            <i class="${data.email === undefined ? 'bi bi-envelope-x-fill email-notification1' : 'bi bi-envelope-fill email-notification2'}"></i>
+            <i class="${email === "" ? 'bi bi-envelope-x-fill email-notification1' : 'bi bi-envelope-fill email-notification2'}"></i>
             </button>
 
 
