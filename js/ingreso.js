@@ -72,6 +72,8 @@ function formatearValor(valor) {
 
 // Manejar el evento 'keypress' para el escáner
 document.getElementById('ingresoForm').addEventListener('keypress', function (event) {
+
+
     if (event.key === 'Enter') {
         event.preventDefault(); // Evitar el comportamiento por defecto
 
@@ -186,6 +188,11 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
 });
 
 function cargarDatos() {
+    // Inicializa el campo de búsqueda
+const searchInput = document.getElementById('searchDespachosLogistica');
+// Mensaje inicial
+searchInput.value = "Aguardando que cargue la web ⏳";
+searchInput.disabled = true;
     db.ref('DespachosLogisticos').once('value').then(snapshot => {
         allData = []; // Limpiar allData
         const tableBody = document.querySelector('#data-table tbody');
@@ -210,6 +217,8 @@ function cargarDatos() {
         
         // Ocultar el spinner al cargar los datos
         document.getElementById('spinner').style.display = 'none';
+        searchInput.value = ""; 
+        searchInput.disabled = false; 
     }).catch(error => {
         Swal.fire({
             icon: 'error',
