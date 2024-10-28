@@ -297,6 +297,7 @@ function loadEnviosFromFirebase() {
                 codigo_postal_facturacion: (data.codigo_postal_facturacion),
                 otros_comentarios_entrega: (data.otros_comentarios_entrega),
                 iva: (data.condicion_iva),
+                equivalencia_puntos_pesos: (data.equivalencia_puntos_pesos),
                 nombre_completo_envio: capitalizeWords(data.nombre_completo_envio),
                 monto_cobrado: (data.monto_cobrado)
             });
@@ -396,6 +397,7 @@ function renderCards(data) {
         const montoCobrado = parseFloat(data[i].monto_cobrado);
 
         const total = (precioVenta * cantidad) + montoCobrado;
+        const puntosBna = (data[i].equivalencia_puntos_pesos);
 
         // Agregar la tarjeta al contenedor
         const carritoContenido = data[i].carrito ? `
@@ -890,6 +892,16 @@ function renderCards(data) {
                         </div>
                         <div class="row mb-2">
                             <div class="col">
+                                <label for="descuentos_${data[i].id}">Descuentos (Puntos BNA):</label>
+                                <input type="text" id="descuentos_${data[i].id}" value="${puntosBna}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="iva_${data[i].id}">IVA:</label>
+                                <input type="text" id="iva_${data[i].id}" value="" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
                                 <label for="monto_envio_${data[i].id}">Monto de Envío:</label>
                                 <input type="text" id="monto_envio_${data[i].id}" value="${data[i].monto_cobrado}" disabled>
                             </div>
@@ -898,16 +910,7 @@ function renderCards(data) {
                                 <input type="text" id="monto_total_${data[i].id}" value="${total}" disabled>
                             </div>
                         </div>
-                        <div class="row mb-2 oculto">
-                            <div class="col">
-                                <label for="descuentos_${data[i].id}">Descuentos:</label>
-                                <input type="text" id="descuentos_${data[i].id}" value="" disabled>
-                            </div>
-                            <div class="col">
-                                <label for="iva_${data[i].id}">IVA:</label>
-                                <input type="text" id="iva_${data[i].id}" value="" disabled>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
 
@@ -1540,6 +1543,8 @@ function marcarFacturado2(id) {
         banco: 'BANCO NACION',
         tipo_entrega: '33',
         deposito: '9',
+        exportado: '0',
+        descuentos: document.getElementById(`descuentos_${id}`).value,
         fecha_acreditacion: document.getElementById(`fecha_acreditacion_${id}`).value,
         fecha: document.getElementById(`fecha_${id}`).value,
         monto_depositado: document.getElementById(`monto_depositado_${id}`).value,
