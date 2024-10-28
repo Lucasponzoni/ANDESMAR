@@ -413,10 +413,6 @@ function renderCards(data) {
     } else {
         document.getElementById('promedioBtn').innerHTML = `<i class="bi bi-alarm-fill"></i> Promedio: -`;
     }
-
-    // Deshabilitar el buscador al inicio
-    searchInput.disabled = false;
-    searchInput.value = "";
 }
 
 async function generarPDF(remito, cliente, fechaEntrega, button) {
@@ -747,7 +743,7 @@ function updatePagination(totalItems) {
 }
 // FIN PAGINATION
 
-const searchInput = document.getElementById("searchDespachos");
+const searchInput = document.getElementById("searchDespachosLogistica");
 
 // BUSCADOR
 searchInput.addEventListener("input", function() {
@@ -784,6 +780,7 @@ searchInput.addEventListener("input", function() {
         updatePagination(filteredData.length);
     }
 });
+
 // FIN BUSCADOR
 
 // MODAL COMENTARIO
