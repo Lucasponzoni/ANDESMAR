@@ -1338,6 +1338,21 @@ function mostrarResultados(resultados) {
 
     tablaContainer.appendChild(tabla);
 
+    // Crear botón de "Marcar todos como No"
+    const btnMarcarNo = document.createElement('button');
+    btnMarcarNo.innerHTML = '<i class="bi bi-x-circle"></i> Marcar todos como No';
+    btnMarcarNo.className = 'btn btn-danger btn-mark-no';
+    btnMarcarNo.onclick = () => {
+        const rows = tabla.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const select = row.querySelector('.select-imprimir');
+            select.value = 'no'; // Cambia el valor a "No"
+        });
+    };
+
+    // Insertar el botón antes del botón de imprimir
+    tablaContainer.insertBefore(btnMarcarNo, tabla);
+
     // Crear botón de imprimir
     const btnImprimir = document.createElement('button');
     btnImprimir.innerHTML = '<i class="bi bi-printer-fill"></i> Imprimir en PDF';
@@ -1497,6 +1512,13 @@ function eliminarBotonImpresion() {
     }
 }
 
+function eliminarBotonMarcarNo() {
+    const btnMarcarNo = document.querySelector('.btn-mark-no'); // Selecciona el botón por su clase
+    if (btnMarcarNo) {
+        btnMarcarNo.remove(); // Elimina el botón del DOM
+    }
+}
+
 // Agregar eventos a los botones ME1 y ME2
 const prepararME1Btn = document.getElementById('prepararME1');
 const prepararME2Btn = document.getElementById('prepararME2');
@@ -1504,6 +1526,7 @@ const prepararME2Btn = document.getElementById('prepararME2');
 if (prepararME1Btn) {
     prepararME1Btn.addEventListener('click', () => {
         eliminarBotonImpresion(); // Eliminar el botón de impresión
+        eliminarBotonMarcarNo();
         obtenerDatos('me1', prepararME1Btn);
     });
 }
@@ -1511,6 +1534,7 @@ if (prepararME1Btn) {
 if (prepararME2Btn) {
     prepararME2Btn.addEventListener('click', () => {
         eliminarBotonImpresion(); // Eliminar el botón de impresión
+        eliminarBotonMarcarNo();
         obtenerDatos('me2', prepararME2Btn);
     });
 }

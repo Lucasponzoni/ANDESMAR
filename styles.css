@@ -1111,6 +1111,10 @@ p.card-text{
     padding: 5px;
 }
 
+.btn-mark-no{
+    margin-right: 5px !important;
+}
+
 .cpLocalidadBna{
     font-family: "Reddit Sans Condensed", sans-serif;
     text-transform: capitalize;
