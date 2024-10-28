@@ -1111,8 +1111,9 @@ p.card-text{
     padding: 5px;
 }
 
-.btn-mark-no{
+.btn-mark{
     margin-right: 5px !important;
+    height: 100%;
 }
 
 .email-container{
@@ -3344,13 +3345,17 @@ margin-bottom: 20px;
     margin: auto;
 }
 
+.botonImpresion .btn-mark{
+    margin-top: 20px;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
 .cantidad-Meli {
-    max-width:  40px !important;
+    max-width:  80px !important;
     color: white !important;
     background-color: red;
     font-weight: 900;
