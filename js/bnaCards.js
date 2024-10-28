@@ -871,7 +871,7 @@ function renderCards(data) {
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="nombre_item_${data[i].id}">Nombre Item:</label>
-                                <input type="text" id="nombre_item_${data[i].id}" value="${data[i].producto_nombre}" disabled>
+                                <input type="text" id="nombre_item_${data[i].id}" value="${cleanString(data[i].producto_nombre)}" disabled>
                             </div>
                             <div class="col">
                                 <label for="recargo_item_${data[i].id}">Recargo Item:</label>
@@ -891,11 +891,11 @@ function renderCards(data) {
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="monto_envio_${data[i].id}">Monto de Envío:</label>
-                                <input type="text" id="monto_envio_${data[i].id}" value="${costoEnvio}" disabled>
+                                <input type="text" id="monto_envio_${data[i].id}" value="${data[i].monto_cobrado}" disabled>
                             </div>
                             <div class="col">
                                 <label for="monto_total_${data[i].id}">Monto Total:</label>
-                                <input type="text" id="monto_total_${data[i].id}" value="${data[i].suborden_total}" disabled>
+                                <input type="text" id="monto_total_${data[i].id}" value="${total}" disabled>
                             </div>
                         </div>
                         <div class="row mb-2 oculto">
