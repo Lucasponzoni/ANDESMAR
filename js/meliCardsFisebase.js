@@ -226,6 +226,7 @@ function cargarDatos() {
             spinner.style.display = 'none';
             updatePagination(allData.length);
             searchInput.disabled = false;
+            searchInput.value = "";
         })
         .catch(error => {
             console.error("Error al cargar los datos: ", error);
@@ -1370,7 +1371,7 @@ function mostrarResultados(resultados) {
                 if (result.isConfirmed) {
                     mostrarSpinner(); // Muestra el spinner antes de generar el PDF
                     setTimeout(() => {
-                        generarPDF(seleccionados); // Llama a la función para generar PDF con los seleccionados
+                        generarPDF2(seleccionados); // Llama a la función para generar PDF con los seleccionados
                         marcarComoPreparado(seleccionados.map(item => item.sku)); // Marca como preparado en Firebase
                     }, 3000); // Esperar 3 segundos antes de generar el PDF
                 }
@@ -1411,7 +1412,7 @@ function marcarComoPreparado(seleccionados) {
 
 const { jsPDF } = window.jspdf; // Asegúrate de esta línea antes de usar jsPDF
 
-function generarPDF(seleccionados) {
+function generarPDF2(seleccionados) {
     const pdf = new jsPDF('p', 'mm', 'a4');
     let y = 20; // Posición inicial en el eje Y
     const pageHeight = pdf.internal.pageSize.height; // Altura de la página
@@ -1513,7 +1514,6 @@ if (prepararME2Btn) {
         obtenerDatos('me2', prepararME2Btn);
     });
 }
-
 
 // FIN QUERY DE DATOS MELI
 
