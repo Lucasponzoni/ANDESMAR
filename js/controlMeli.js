@@ -116,6 +116,7 @@ function agregarFila(data) {
     
     $('#data-table-body').append(newRow);
     actualizarContador();
+    actualizarContadorFilas();
 
     // Agregar datos a Firebase
     database.ref('/despachoDelDiaMeli/' + data.shippingId).set({
@@ -155,6 +156,7 @@ function eliminarFila(id) {
     database.ref('/despachoDelDiaMeli/' + id).remove().then(() => {
         $(`#data-table-body tr[data-id="${id}"]`).remove();
         actualizarContador();
+        actualizarContadorFilas();
     }).catch(error => {
         console.error("Error al eliminar el registro de Firebase: ", error);
     });
@@ -168,7 +170,7 @@ function actualizarCantidad(cantidad) {
 
 function actualizarContador() {
     let totalCantidad = 0; // Iniciar el total a 0
-    const cantidadFilas = $('#data-table-body tr').length;
+    const cantidadFilas = $('#data-table-body tr').length - 1;
 
     // Sumar las cantidades de cada fila
     $('#data-table-body tr').each(function() {
@@ -190,6 +192,55 @@ function actualizarContador() {
     }
 }
 
+function actualizarCantidad(cantidad) {
+    const currentTotal = parseInt($('#totalCantidad').text().split(': ')[1]);
+    const totalCantidad = isNaN(currentTotal) ? cantidad : currentTotal + cantidad;
+    $('#totalCantidad').text(`Total Cantidad: ${totalCantidad}`);
+}
+
+function actualizarContador() {
+    let totalCantidad = 0; // Iniciar el total a 0
+    const cantidadFilas = $('#data-table-body tr').length;
+
+    // Sumar las cantidades de cada fila
+    $('#data-table-body tr').each(function() {
+        const cantidad = parseInt($(this).find('#cantidad-control-Meli').text());
+        if (!isNaN(cantidad)) {
+            totalCantidad += cantidad;
+        }
+    });
+
+    $('#totalCantidad').text(`Total Cantidad: ${totalCantidad}`);
+    $('#totalFila').text(`Total Filas: ${cantidadFilas}`); // Actualizar el texto de filas
+
+    // Manejar las clases según la cantidad total
+    if (cantidadFilas > 5) { // Cambiar 5 por el número de filas que consideres
+        $('#totalCantidad').addClass('fixed-counter');
+        $('#totalCantidad').removeClass('counter'); // Asegúrate de eliminar la clase counter
+        $('#totalFila').addClass('fixed-counter');
+        $('#totalFila').removeClass('counter'); // Asegúrate de eliminar la clase counter
+    } else {
+        $('#totalCantidad').removeClass('fixed-counter');
+        $('#totalCantidad').addClass('counter'); // Agregar la clase counter
+        $('#totalFila').removeClass('fixed-counter');
+        $('#totalFila').addClass('counter'); // Agregar la clase counter
+    }
+}
+
+// Nueva función para contar solo las filas
+function actualizarContadorFilas() {
+    const cantidadFilas = $('#data-table-body tr').length; // Contar las filas
+    $('#totalFila').text(`Total Filas: ${cantidadFilas}`); // Actualizar el texto
+
+    // Opcional: manejar clases según la cantidad de filas
+    if (cantidadFilas > 5) { // Cambiar 5 por el número de filas que consideres
+        $('#totalFila').addClass('fixed-counter');
+        $('#totalFila').removeClass('counter'); // Asegúrate de eliminar la clase counter
+    } else {
+        $('#totalFila').removeClass('fixed-counter');
+        $('#totalFila').addClass('counter'); // Agregar la clase counter
+    }
+}
 
 function cargarDatos() {
     $('#data-table-body').empty(); // Limpiar la tabla antes de cargar nuevos datos
@@ -266,6 +317,7 @@ function filtrarTabla(query) {
     } else {
         cargarDatos(); // Si el input está vacío, recargar todos los datos
         actualizarContador();
+        actualizarContadorFilas();
     }
 }
 
