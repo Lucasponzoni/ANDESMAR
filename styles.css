@@ -3487,14 +3487,26 @@ input[disabled] {
     font-weight: 600;
     width: fit-content;
     background-color: #FF4C4C; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 0px 4px rgba(0, 0, 0, 0.359); /* Sombra del texto */
     color: white; 
     padding: 20px; 
     border-radius: 10px;
     text-align: center; 
     font-size: 24px; 
-    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.2); 
     transition: transform 0.3s; 
     
+}
+
+.contadores{
+    display: flex;
+}
+
+.counterfila{
+    margin-left: 5px;
+    background-color: orange; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 0px 4px rgba(0, 0, 0, 0.359); /* Sombra del texto */
 }
 
 .fixed-counter {
@@ -3506,11 +3518,31 @@ input[disabled] {
     border-radius: 10px;
     text-align: center; 
     font-size: 24px; 
-    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.553); 
+    text-shadow: 1px 0px 4px rgba(0, 0, 0, 0.359); /* Sombra del texto */
     transition: transform 0.3s; 
     position: fixed;
     bottom: 20px;
     left: 150px; 
+    z-index: 1000; 
+}
+
+.fixed-counter2 {
+    font-weight: 600;
+    width: 300px;
+    background-color: orange; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 0px 4px rgba(0, 0, 0, 0.359); /* Sombra del texto */
+    color: white; 
+    padding: 20px; 
+    border-radius: 10px;
+    text-align: center; 
+    font-size: 24px; 
+    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.553); 
+    transition: transform 0.3s; 
+    position: fixed;
+    bottom: 100px;
+    left: 145px; 
     z-index: 1000; 
 }
 

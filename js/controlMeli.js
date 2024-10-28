@@ -162,42 +162,6 @@ function eliminarFila(id) {
     });
 }
 
-function actualizarCantidad(cantidad) {
-    const currentTotal = parseInt($('#totalCantidad').text().split(': ')[1]);
-    const totalCantidad = isNaN(currentTotal) ? cantidad : currentTotal + cantidad;
-    $('#totalCantidad').text(`Total Cantidad: ${totalCantidad}`);
-}
-
-function actualizarContador() {
-    let totalCantidad = 0; // Iniciar el total a 0
-    const cantidadFilas = $('#data-table-body tr').length - 1;
-
-    // Sumar las cantidades de cada fila
-    $('#data-table-body tr').each(function() {
-        const cantidad = parseInt($(this).find('#cantidad-control-Meli').text());
-        if (!isNaN(cantidad)) {
-            totalCantidad += cantidad;
-        }
-    });
-
-    $('#totalCantidad').text(`Total Cantidad: ${totalCantidad}`);
-
-    // Manejar las clases según la cantidad total
-    if (cantidadFilas > 5) { // Cambiar 5 por el número de filas que consideres
-        $('#totalCantidad').addClass('fixed-counter');
-        $('#totalCantidad').removeClass('counter'); // Asegúrate de eliminar la clase counter
-    } else {
-        $('#totalCantidad').removeClass('fixed-counter');
-        $('#totalCantidad').addClass('counter'); // Agregar la clase counter
-    }
-}
-
-function actualizarCantidad(cantidad) {
-    const currentTotal = parseInt($('#totalCantidad').text().split(': ')[1]);
-    const totalCantidad = isNaN(currentTotal) ? cantidad : currentTotal + cantidad;
-    $('#totalCantidad').text(`Total Cantidad: ${totalCantidad}`);
-}
-
 function actualizarContador() {
     let totalCantidad = 0; // Iniciar el total a 0
     const cantidadFilas = $('#data-table-body tr').length;
@@ -210,19 +174,20 @@ function actualizarContador() {
         }
     });
 
-    $('#totalCantidad').text(`Total Cantidad: ${totalCantidad}`);
-    $('#totalFila').text(`Total Filas: ${cantidadFilas}`); // Actualizar el texto de filas
+    // Actualizar el texto con el nuevo formato
+    $('#totalCantidad').html(`<i class="bi bi-box-seam-fill"></i> Total Unidades: ${totalCantidad}`);
+    $('#totalFila').html(`<i class="bi bi-bookmark-check-fill"></i> Total Etiquetas: ${cantidadFilas}`); // Actualizar el texto de filas
 
     // Manejar las clases según la cantidad total
     if (cantidadFilas > 5) { // Cambiar 5 por el número de filas que consideres
         $('#totalCantidad').addClass('fixed-counter');
         $('#totalCantidad').removeClass('counter'); // Asegúrate de eliminar la clase counter
-        $('#totalFila').addClass('fixed-counter');
+        $('#totalFila').addClass('fixed-counter2'); // Clase específica para total de filas
         $('#totalFila').removeClass('counter'); // Asegúrate de eliminar la clase counter
     } else {
         $('#totalCantidad').removeClass('fixed-counter');
         $('#totalCantidad').addClass('counter'); // Agregar la clase counter
-        $('#totalFila').removeClass('fixed-counter');
+        $('#totalFila').removeClass('fixed-counter2'); // Eliminar clase específica
         $('#totalFila').addClass('counter'); // Agregar la clase counter
     }
 }
@@ -230,14 +195,26 @@ function actualizarContador() {
 // Nueva función para contar solo las filas
 function actualizarContadorFilas() {
     const cantidadFilas = $('#data-table-body tr').length; // Contar las filas
-    $('#totalFila').text(`Total Filas: ${cantidadFilas}`); // Actualizar el texto
+    let totalCantidad = 0; // Iniciar el total de unidades a 0
+
+    // Sumar las cantidades de cada fila
+    $('#data-table-body tr').each(function() {
+        const cantidad = parseInt($(this).find('#cantidad-control-Meli').text());
+        if (!isNaN(cantidad)) {
+            totalCantidad += cantidad;
+        }
+    });
+
+    // Actualizar el texto con el nuevo formato
+    $('#totalCantidad').html(`<i class="bi bi-box-seam-fill"></i> Total Unidades: ${totalCantidad}`);
+    $('#totalFila').html(`<i class="bi bi-bookmark-check-fill"></i> Total Etiquetas: ${cantidadFilas}`); // Actualizar el texto de filas
 
     // Opcional: manejar clases según la cantidad de filas
     if (cantidadFilas > 5) { // Cambiar 5 por el número de filas que consideres
-        $('#totalFila').addClass('fixed-counter');
+        $('#totalFila').addClass('fixed-counter2'); // Clase específica para total de filas
         $('#totalFila').removeClass('counter'); // Asegúrate de eliminar la clase counter
     } else {
-        $('#totalFila').removeClass('fixed-counter');
+        $('#totalFila').removeClass('fixed-counter2'); // Eliminar clase específica
         $('#totalFila').addClass('counter'); // Agregar la clase counter
     }
 }
@@ -465,7 +442,8 @@ document.getElementById('cerrarButton').onclick = async function() {
 
         // Resetear la tabla
         tableBody.innerHTML = '<tr><td colspan="7" class="no-data">No has comenzado una colecta aún, manos a la obra 😎</td></tr>';
-        document.getElementById('totalCantidad').innerText = 'Total Cantidad: 0';
+        document.getElementById('totalCantidad').innerHTML = '<i class="bi bi-box-seam-fill"></i> Total Unidades: 0';
+        document.getElementById('totalFila').innerHTML = '<i class="bi bi-bookmark-check-fill"></i> Total Etiquetas: 0';
 
         showAlert('<i class="bi bi-check-circle"></i> Colecta cerrada y datos enviados exitosamente.');
     }
