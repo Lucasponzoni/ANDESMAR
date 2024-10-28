@@ -297,7 +297,8 @@ function loadEnviosFromFirebase() {
                 codigo_postal_facturacion: (data.codigo_postal_facturacion),
                 otros_comentarios_entrega: (data.otros_comentarios_entrega),
                 iva: (data.condicion_iva),
-                nombre_completo_envio: capitalizeWords(data.nombre_completo_envio)
+                nombre_completo_envio: capitalizeWords(data.nombre_completo_envio),
+                monto_cobrado: (data.monto_cobrado)
             });
 
             // Incrementar el contador si tipoElectrodomesticoBna está vacío
@@ -389,6 +390,12 @@ function renderCards(data) {
         const ordenPublica = data[i].orden_publica.replace(/-/g, '');
         const cupon = ordenPublica.substring(0, 13); 
         const autorizacion = ordenPublica.substring(ordenPublica.length - 4); 
+
+        const precioVenta = parseFloat(data[i].precio_venta);
+        const cantidad = parseFloat(data[i].cantidad);
+        const montoCobrado = parseFloat(data[i].monto_cobrado);
+
+        const total = (precioVenta * cantidad) + montoCobrado;
 
         // Agregar la tarjeta al contenedor
         const carritoContenido = data[i].carrito ? `
@@ -581,12 +588,12 @@ function renderCards(data) {
                                     <p class="card-text-pago"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
                                     
 
-                                <p class="card-text-pago">
-                           <strong>Precio de Venta:</strong> $ ${(data[i].precio_venta * data[i].cantidad).toFixed(2)}
-                           <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].precio_venta * data[i].cantidad).toFixed(2)}')">
-                                                      <i class="bi bi-clipboard"></i>
-                           </button>
-                               </p>
+<p class="card-text-pago">
+    <strong>Precio de Venta:</strong> $ ${(data[i].precio_venta * data[i].cantidad).toFixed(2)}
+    <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].precio_venta * data[i].cantidad).toFixed(2)}')">
+        <i class="bi bi-clipboard"></i>
+    </button>
+</p>
 
                        <p class="card-text-pago">
                            <strong>Cantidad:</strong> <strong class="strong-costo2">${data[i].cantidad} U.</strong>
@@ -600,16 +607,16 @@ function renderCards(data) {
                        </p>
 
                        <p class="card-text-pago">
-                        <strong>Costo de Envío:</strong> <strong class="strong-costo">$${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad)).toFixed(2)}</strong>
-                        <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].suborden_total - (data[i].precio_venta * data[i].cantidad)).toFixed(2)}')">
+                        <strong>Costo de Envío:</strong> <strong class="strong-costo">$${data[i].monto_cobrado}</strong>
+                        <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].monto_cobrado}')">
                         <i class="bi bi-clipboard"></i>
                         </button>
                         </p>
 
 
-                        <p class="card-text-pago">
-                        <strong>Total:</strong> ${new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(data[i].suborden_total)}
-                        </p>
+<p class="card-text-pago">
+    <strong>Total:</strong> ${new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(total)}
+</p>
 
                             <!-- Contenedor gris con CUPON y AUTORIZACION -->
                             <div class="bg-light p-3 mb-2 rounded" style="border: solid 1px #dc3545;">
