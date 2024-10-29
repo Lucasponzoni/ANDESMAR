@@ -406,8 +406,43 @@ db.ref('PasarAWebMonto').once('value')
     
                 deleteCell.appendChild(deleteButton);
                 row.appendChild(deleteCell);
-    
-                // Botón de comentario
+
+
+// TRACKING CONTROL
+// Botón para verificar si fue enviado
+const trackingCell = document.createElement('td');
+const trackingButton = document.createElement('button');
+trackingButton.type = 'button';
+trackingButton.className = operation.trackingNumber ? 'btn btn-sm btn-success' : 'btn btn-sm btn-dark disabled'; // Verde si existe, oscuro si no
+trackingButton.innerHTML = '<i class="bi bi-truck-front-fill"></i>';
+
+// Solo agregar tooltip si hay un trackingNumber
+if (operation.trackingNumber) {
+    trackingButton.setAttribute('data-bs-toggle', 'tooltip');
+    trackingButton.setAttribute('data-bs-placement', 'top');
+    trackingButton.setAttribute('data-bs-custom-class', 'custom-tooltip');
+
+    // Verificar si la transportCompany es "Novogar"
+    if (operation.transportCompany === "Novogar") {
+        trackingButton.setAttribute('data-bs-title', `${operation.transportCompany}: ${operation.trackingNumber}`);
+    } else {
+        trackingButton.setAttribute('data-bs-title', `${operation.transportCompany}: ${operation.trackingNumber} <a href="${operation.trackingLink}" target="_blank" style="color: white;">Ver seguimiento</a>`);
+    }
+
+    // Inicializar el tooltip
+    const tooltip = new bootstrap.Tooltip(trackingButton, {
+        html: true // Permitir HTML en el tooltip
+    });
+
+    // Mostrar el tooltip de manera permanente para pruebas
+    tooltip.show();
+}
+
+// Agregar el botón a la celda
+trackingCell.appendChild(trackingButton);
+row.appendChild(trackingCell);
+// FIN TRACKING CONTROL
+
 // Botón de comentario
 const commentCell = document.createElement('td');
 const commentButton = document.createElement('button');
@@ -512,8 +547,7 @@ commentButton.onclick = () => {
             });
     };
 };
-
-            });
+          });
     
             // Paginación y actualización de notificaciones
             updatePagination();
@@ -1127,10 +1161,51 @@ function loadTable2() {
         deleteCell.appendChild(deleteButton);
         row.appendChild(deleteCell);
 
-        // Botón de comentario
+// Agregar la fila a la tabla
+tableBody.appendChild(row);
+
+// TRACKING CONTROL
+    // Botón para verificar si fue enviado
+    const trackingCell = document.createElement('td');
+    const trackingButton = document.createElement('button');
+    trackingButton.type = 'button';
+    trackingButton.className = operation.trackingNumber ? 'btn btn-sm btn-success' : 'btn btn-sm btn-dark disabled'; // Verde si existe, rojo si no
+    trackingButton.innerHTML = '<i class="bi bi-truck-front-fill"></i>';
+
+    // Solo agregar tooltip si hay un trackingNumber
+    if (operation.trackingNumber) {
+        trackingButton.setAttribute('data-bs-toggle', 'tooltip');
+        trackingButton.setAttribute('data-bs-placement', 'top');
+        trackingButton.setAttribute('data-bs-custom-class', 'custom-tooltip');
+        trackingButton.setAttribute('data-bs-title', `${operation.transportCompany}: ${operation.trackingNumber} <a href="${operation.trackingLink}" target="_blank" style="color: white;">Ver seguimiento</a>`);
+        
+        // Inicializar el tooltip
+        const tooltip = new bootstrap.Tooltip(trackingButton, {
+            html: true // Permitir HTML en el tooltip
+        });
+
+        // Mostrar el tooltip de manera permanente para pruebas
+        tooltip.show();
+    }
+
+    // Agregar el botón a la celda
+    trackingCell.appendChild(trackingButton);
+    row.appendChild(trackingCell);
+// FIN TRACKING CONTROL
+
+// Botón de comentario
 const commentCell = document.createElement('td');
 const commentButton = document.createElement('button');
-commentButton.className = 'btn btn-sm ' + (operation.comentario ? 'btn-success' : 'btn-secondary');
+
+// Inicializar la clase del botón según los datos disponibles
+if (operation.comentario) {
+    commentButton.className = 'btn btn-sm btn-success';
+} else if (operation.email) {
+    commentButton.className = 'btn btn-sm btn-warning';
+} else {
+    commentButton.className = 'btn btn-sm btn-secondary';
+}
+
 commentButton.innerHTML = '<i class="bi bi-pencil"></i>';
 commentCell.appendChild(commentButton);
 row.appendChild(commentCell);

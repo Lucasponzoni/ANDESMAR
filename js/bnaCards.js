@@ -437,8 +437,9 @@ function renderCards(data) {
         const precioVenta = parseFloat(data[i].precio_venta);
         const cantidad = parseFloat(data[i].cantidad);
         const montoCobrado = parseFloat(data[i].monto_cobrado);
+        const equivalencia_puntos_pesos = parseFloat(data[i].equivalencia_puntos_pesos);
 
-        const total = (precioVenta * cantidad) + montoCobrado;
+        const total = (precioVenta * cantidad) + montoCobrado - equivalencia_puntos_pesos;
         const puntosBna = (data[i].equivalencia_puntos_pesos);
 
         // Agregar la tarjeta al contenedor
