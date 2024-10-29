@@ -25,7 +25,6 @@ const firebaseConfig2 = {
     measurementId: "G-64DDP7D6Q2"
 };
 
-
 function mostrarResultados(resultados) {
     const tabla = document.createElement('table');
     tabla.className = 'table table-striped';
@@ -62,7 +61,6 @@ function mostrarResultados(resultados) {
 // Agregar eventos a los botones
 document.getElementById('prepararME1').addEventListener('click', () => obtenerDatos('me1'));
 document.getElementById('prepararME2').addEventListener('click', () => obtenerDatos('me2'));
-
 
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchMercadoLibre');
@@ -210,8 +208,6 @@ function cargarDatos() {
                     estadoFacturacion: data.estadoFacturacion,
                     andesmarId: data.andesmarId,
                     shippingId: data.shippingId
-
-
                 });
             });
 

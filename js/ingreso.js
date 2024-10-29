@@ -402,16 +402,18 @@ function renderCards(data) {
         const entregaEntreClass = item.estado.startsWith("(se entrega entre") ? "estado-entrega" : "";
         const entregaEntreIcon = item.estado.startsWith("(se entrega entre") ? '<i class="bi bi-check-circle-fill icon-state-ios"></i>' : '';
 
-        const row = `<tr>
-                <td>${formattedDateTime}</td>
-                <td class="${estadoClass} ${entregaEntreClass}">${alertIcon} ${entregaEntreIcon} ${item.estado} ${tiempoTexto}</td>
-                <td>${item.cliente}</td>
-                <td class="remito-columna">${remito}</td>
-                <td class="valor-columna">${item.valorDeclarado}</td>
-                <td>${operadorLogistico}</td>
-                <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
-                <td><button class="btn btn-info btn-sm" onclick="abrirModalComentario('${remito}')"><i class="bi bi-pencil-fill"></i></button></td> <!-- Botón de comentario -->
-            </tr>`;
+        const comentarioClase = item.comentario ? 'btn-success' : 'btn-secondary';
+const row = `<tr>
+    <td>${formattedDateTime}</td>
+    <td class="${estadoClass} ${entregaEntreClass}">${alertIcon} ${entregaEntreIcon} ${item.estado} ${tiempoTexto}</td>
+    <td>${item.cliente}</td>
+    <td class="remito-columna">${remito}</td>
+    <td class="valor-columna">${item.valorDeclarado}</td>
+    <td>${operadorLogistico}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
+    <td><button class="btn ${comentarioClase} btn-sm" onclick="abrirModalComentario('${remito}')"><i class="bi bi-pencil-fill"></i></button></td> <!-- Botón de comentario -->
+</tr>`;
+
         tableBody.insertAdjacentHTML('beforeend', row);
     }
 
@@ -793,7 +795,7 @@ searchInput.addEventListener("input", function() {
 // FIN BUSCADOR
 
 // MODAL COMENTARIO
-function abrirModalComentario(remito) {
+function abrirModalComentario(remito, button) {
     // Obtener el comentario de Firebase
     db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remito).once('value', snapshot => {
         if (snapshot.exists()) {
@@ -817,6 +819,12 @@ function abrirModalComentario(remito) {
                 childSnapshot.ref.update({ comentario: comentario }).then(() => {
                     Swal.fire('¡Éxito!', 'Comentario actualizado correctamente.', 'success');
                     $('#comentarioModal').modal('hide'); // Cerrar modal
+
+                    // Cambiar la clase del botón en el DOM
+                    if (button) {
+                        button.classList.remove('btn-secondary');
+                        button.classList.add('btn-success');
+                    }
                 }).catch(error => {
                     Swal.fire('Error', 'No se pudo actualizar el comentario: ' + error.message, 'error');
                 });
@@ -832,7 +840,35 @@ comentarioInput.addEventListener('input', () => {
     comentarioInput.style.height = `${comentarioInput.scrollHeight}px`; // Ajusta a la altura del contenido
 });
 
-// FINMODAL COMENTARIO
+// FIN MODAL COMENTARIO
+
+// NOTIFICADOR DE COMENTARIO EN FACTURACION
+document.addEventListener("DOMContentLoaded", function() {
+    const statusCard = document.getElementById('statusCard');
+    const closeCardButton = document.getElementById('closeCard');
+    const countdownElement = document.getElementById('countdown');
+    let countdown = 20; // Tiempo en segundos
+
+    // Mostrar la card
+    statusCard.style.display = 'block';
+
+    // Actualizar el temporizador cada segundo
+    const timerInterval = setInterval(() => {
+        countdown--;
+        countdownElement.textContent = countdown;
+
+        if (countdown <= 0) {
+            clearInterval(timerInterval);
+            statusCard.style.display = 'none';
+        }
+    }, 2000);
+
+    // Cerrar la card al hacer clic en el botón
+    closeCardButton.onclick = function() {
+        clearInterval(timerInterval);
+        statusCard.style.display = 'none';
+    };
+});
 
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;

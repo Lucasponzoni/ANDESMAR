@@ -212,6 +212,32 @@
 </div>
 <!-- Fin Modal Comentario -->
 
+            <!-- Comentarios Alert -->
+            <div id="statusCard" class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Estado de los Botones</h5>
+                    <div class="d-flex justify-content-around mb-3">
+                        <button class="btn btn-sm btn-secondary btn-timer">
+                            <i class="bi bi-pencil"></i> Sin Comentario
+                        </button>
+                        <button class="btn btn-sm btn-success btn-timer">
+                            <i class="bi bi-pencil"></i> Con Comentario
+                        </button>
+                    </div>
+                    <p class="text-muted text-center">
+                        <small>
+                            <strong>Gris:</strong> Sin información.<br>
+                            <strong>Verde:</strong> Con comentarios cargados.<br>
+                        </small>
+                    </p>
+                    <div id="timer">Me cerraré en <span id="countdown">20</span> segundos</div>
+                    <div class="text-center">
+                    <button id="closeCard" class="btn btn-danger btn-sm">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Fin Comentarios Alert -->
+
     <!-- Botón de flecha hacia arriba -->
     <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
         <i class="fas fa-arrow-up"></i>
