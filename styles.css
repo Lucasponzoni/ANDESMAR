@@ -556,13 +556,14 @@ button:hover {
     height: 6rem;
     border: dashed 2px red;
     background-color: rgb(253, 242, 240);
-    border-radius: 10px;
+    border-radius: 10px !important;
 }
 
 #tipoElectrodomestico{
     color: red;
     border: 1px solid red;
     font-weight: 800;
+    margin-bottom: 10px;
 }
 
 .tipoElectrodomesticoBna{

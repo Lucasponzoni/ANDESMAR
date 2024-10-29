@@ -803,6 +803,8 @@ function abrirModalComentario(remito, button) {
                 const data = childSnapshot.val();
                 document.getElementById('comentarioInput').value = data.comentario || ''; // Cargar comentario existente
             });
+        } else {
+            document.getElementById('comentarioInput').value = ''; // Limpiar si no existe
         }
     });
 
@@ -833,6 +835,7 @@ function abrirModalComentario(remito, button) {
     };
 }
 
+// Ajustar el tamaño del input de comentario
 const comentarioInput = document.getElementById('comentarioInput');
 
 comentarioInput.addEventListener('input', () => {
