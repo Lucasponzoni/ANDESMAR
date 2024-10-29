@@ -1001,7 +1001,7 @@ for (let i = 0; i < cantidadFinal; i++) {
             console.log(`Datos Respuesta API ANDREANI (MELI ${idOperacionFinalAndreani}):`, response);
             // Mostrar el número de envío
             NroEnvio.innerHTML = `<a href="https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}" target="_blank">Andreani: ${numeroDeEnvio} <i class="bi bi-box-arrow-up-right"></i></a>`;
-            const trackingLink = `andreani.com/#!/informacionEnvio/${numeroDeEnvio}`
+            const trackingLink = `https://andreani.com/#!/informacionEnvio/${numeroDeEnvio}`
 
             // Configurar el botón de descarga inicial
             textAndr.innerHTML = `Orden ${numeroDeEnvio}`;
