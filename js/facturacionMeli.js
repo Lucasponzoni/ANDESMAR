@@ -290,20 +290,22 @@ db.ref('PasarAWebMonto').once('value')
                 const shippingCost = operation.payments[0]?.shipping_cost || 0;
                 shippingCell.style.whiteSpace = 'nowrap';
     
-                if (operation.client && operation.client.billing_info && Array.isArray(operation.client.billing_info.additional_info)) {
-                    const stateName = operation.client.billing_info.additional_info.find(info => info.type === "STATE_NAME")?.value;
-    
-                    if (stateName === "Jujuy") {
-                        shippingCell.innerHTML = `<strong class="alerta">⚠️ JUJUY</strong>`;
-                    } else {
-                        shippingCell.innerHTML = shippingCost === 0 
-                            ? `<strong class="grauito" style="color: orangered;">GRATUITO</strong>` 
-                            : `<strong style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
-                    }
-                } else {
-                    console.warn("Información de facturación no disponible para la operación:", operation.idOperacion);
-                    shippingCell.innerHTML = `<strong style="color: red;">X</strong>`;
-                }
+                // Verifica el estado de manera segura
+if (operation.client && operation.client.billing_info && Array.isArray(operation.client.billing_info.additional_info)) {
+    const stateName = operation.client.billing_info.additional_info.find(info => info.type === "STATE_NAME")?.value;
+
+    if (["Jujuy", "Misiones", "Tierra del Fuego"].includes(stateName)) {
+        shippingCell.innerHTML = `<strong class="alerta">⚠️ ${stateName.toUpperCase()}</strong>`;
+    } else {
+        shippingCell.innerHTML = shippingCost === 0 
+            ? `<strong class="grauito" style="color: orangered;">GRATUITO</strong>` 
+            : `<strong style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
+    }
+} else {
+    console.warn("Información de facturación no disponible para la operación:", operation.idOperacion);
+    shippingCell.innerHTML = `<strong style="color: red;">X</strong>`;
+}
+
     
                 row.appendChild(shippingCell);
     
@@ -1043,20 +1045,21 @@ function loadTable2() {
         shippingCell.style.whiteSpace = 'nowrap';
 
         // Verifica el estado de manera segura
-        if (operation.client && operation.client.billing_info && Array.isArray(operation.client.billing_info.additional_info)) {
-            const stateName = operation.client.billing_info.additional_info.find(info => info.type === "STATE_NAME")?.value;
+// Verifica el estado de manera segura
+if (operation.client && operation.client.billing_info && Array.isArray(operation.client.billing_info.additional_info)) {
+    const stateName = operation.client.billing_info.additional_info.find(info => info.type === "STATE_NAME")?.value;
 
-            if (stateName === "Jujuy") {
-                shippingCell.innerHTML = `<strong class="alerta">⚠️ JUJUY</strong>`;
-            } else {
-                shippingCell.innerHTML = shippingCost === 0 
-                    ? `<strong class="grauito" style="color: orangered;">GRATUITO</strong>` 
-                    : `<strong style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
-            }
-        } else {
-            console.warn("Información de facturación no disponible para la operación:", operation.idOperacion);
-            shippingCell.innerHTML = `<strong style="color: red;">X</strong>`;
-        }
+    if (["Jujuy", "Misiones", "Tierra del Fuego"].includes(stateName)) {
+        shippingCell.innerHTML = `<strong class="alerta">⚠️ ${stateName.toUpperCase()}</strong>`;
+    } else {
+        shippingCell.innerHTML = shippingCost === 0 
+            ? `<strong class="grauito" style="color: orangered;">GRATUITO</strong>` 
+            : `<strong style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
+    }
+} else {
+    console.warn("Información de facturación no disponible para la operación:", operation.idOperacion);
+    shippingCell.innerHTML = `<strong style="color: red;">X</strong>`;
+}
 
         row.appendChild(shippingCell);
 
