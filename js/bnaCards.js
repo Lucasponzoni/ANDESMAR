@@ -1600,7 +1600,7 @@ function marcarFacturado2(id) {
         numero_tarjeta_visible: document.getElementById(`numero_tarjeta_visible_${id}`).value,
         codigo_pago: document.getElementById(`codigo_pago_${id}`).value,
         cuotas: document.getElementById(`cuotas_${id}`).value,
-        banco: 'BANCO NACION',
+        banco: '',
         tipo_entrega: '33',
         deposito: '9',
         exportado: '0',
