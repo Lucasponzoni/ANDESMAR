@@ -981,11 +981,11 @@ COMPRA CON USO DE PUNTOS BNA
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="razon_social_${data[i].id}">Razón Social:</label>
-                                <input type="text" id="razon_social_${data[i].id}" value="" disabled>
+                                <input type="text" id="razon_social_${data[i].id}" value="" placeholder="Completar en caso de factura A" disabled>
                             </div>
                             <div class="col">
                                 <label for="cuit_${data[i].id}">CUIT:</label>
-                                <input type="text" id="cuit_${data[i].id}" value="" disabled>
+                                <input type="text" id="cuit_${data[i].id}" value="" placeholder="Completar en caso de factura A" disabled>
                             </div>
                         </div>
                         <div class="row mb-2">
@@ -1046,9 +1046,10 @@ COMPRA CON USO DE PUNTOS BNA
                         </div>
                         <div class="row mb-2">
                             <div class="col">
-                                <label for="domicilio_fiscal_${data[i].id}">Domicilio Fiscal:</label>
-                                <input type="text" id="domicilio_fiscal_${data[i].id}" value="" disabled>
-                            </div>
+    <label for="domicilio_fiscal_${data[i].id}">Domicilio Fiscal:</label>
+    <input type="text" id="domicilio_fiscal_${data[i].id}" value="" placeholder="Completar en caso de factura A" disabled>
+    </div>
+
 
                             <div class="col">
                             <label for="email_${data[i].id}">Email:</label>
