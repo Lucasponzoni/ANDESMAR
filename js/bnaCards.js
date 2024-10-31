@@ -1658,7 +1658,6 @@ const clave = "BOM6765";
 const codigoCliente = "6765";
 
 async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, suborden_total, precio_venta, producto_nombre) {
-
     // Obtener los elementos de volumen
     const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
     const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
@@ -1678,11 +1677,11 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     const volumenCm3Texto = volumenCm3Elemento.textContent;
     const volumenM3Texto = volumenM3Elemento.textContent;
 
-    const alto = document.getElementById(`alto-${id}`).value;
-    const ancho = document.getElementById(`ancho-${id}`).value;
-    const largo = document.getElementById(`largo-${id}`).value;
-    const cantidad = document.getElementById(`cantidad-${id}`).value;
-    const peso = document.getElementById(`peso-${id}`).value;
+    const alto = parseFloat(document.getElementById(`alto-${id}`).value);
+    const ancho = parseFloat(document.getElementById(`ancho-${id}`).value);
+    const largo = parseFloat(document.getElementById(`largo-${id}`).value);
+    const cantidad = parseInt(document.getElementById(`cantidad-${id}`).value);
+    const peso = parseFloat(document.getElementById(`peso-${id}`).value);
 
     const button = document.getElementById(`andesmarButton${id}`);
     const spinner = document.getElementById(`spinnerAndesmar${id}`);
@@ -1693,11 +1692,11 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     const buttonAndr = document.getElementById(`andreaniButton${id}`);
 
     // Comprobar si los elementos existen y asignar null si no existen
-    const altoInterior = document.getElementById(`altoInterior-${id}`) ? document.getElementById(`altoInterior-${id}`).value : null;
-    const anchoInterior = document.getElementById(`anchoInterior-${id}`) ? document.getElementById(`anchoInterior-${id}`).value : null;
-    const largoInterior = document.getElementById(`largoInterior-${id}`) ? document.getElementById(`largoInterior-${id}`).value : null;
+    const altoInterior = parseFloat(document.getElementById(`altoInterior-${id}`)?.value) || null;
+    const anchoInterior = parseFloat(document.getElementById(`anchoInterior-${id}`)?.value) || null;
+    const largoInterior = parseFloat(document.getElementById(`largoInterior-${id}`)?.value) || null;
     const observaciones = document.getElementById(`observaciones-${id}`).value; // Obtiene el valor del campo de observaciones
-    const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; 
+    const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value;
 
     // Extraer los números de los textos (eliminar 'cm³' y 'm³')
     const volumenCm3 = parseInt(volumenCm3Texto.replace(' cm³', ''));
@@ -1724,10 +1723,47 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
     const isSplit = splitTypes.includes(tipoElectrodomestico);
 
+    // Inicializar cantidadKits
+    let cantidadKitsParsed = 0;
+
     // Calcular la cantidad de bultos
     let bultos = cantidad;
+
     if (isSplit) {
-        bultos *= 2; // Duplicar bultos si es un split
+        // Preguntar si incluye kit de instalación solo si es un split
+        const { value: incluyeKit } = await Swal.fire({
+            title: '¿Incluye kit de instalación?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'No'
+        });
+
+        if (incluyeKit) {
+            // Preguntar la cantidad de kits de instalación
+            const { value: cantidadKits } = await Swal.fire({
+                title: 'Cantidad de kits de instalación',
+                input: 'number',
+                inputLabel: 'Ingrese la cantidad de kits',
+                inputAttributes: {
+                    min: 1,
+                    max: 100
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (cantidadKits === null) {
+                // Si el usuario cancela, salir de la función
+                return;
+            }
+
+            cantidadKitsParsed = parseInt(cantidadKits) || 1; // Usar 1 si no es un número válido
+            bultos = (cantidad * 2) + cantidadKitsParsed; // Duplicar bultos si es un split y sumar los kits
+        } else {
+            bultos *= 2; // Duplicar bultos si es un split y no incluye kit
+        }
     }
 
     spinner.style.display = 'inline-block';
@@ -1735,9 +1771,9 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     buttonAndr.disabled = true;
 
     const requestObj = {
-        CalleRemitente: "Mendoza", 
+        CalleRemitente: "Mendoza",
         CalleNroRemitente: "2799",
-        CodigoPostalRemitente: "2000", 
+        CodigoPostalRemitente: "2000",
         NombreApellidoDestinatario: nombre,
         CodigoPostalDestinatario: cp,
         CalleDestinatario: calle,
@@ -1745,19 +1781,19 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         TelefonoDestinatario: telefono,
         MailDestinatario: email,
         NroRemito: "BNA" + remito,
-        Bultos: bultos, 
-        Peso: peso * cantidad, 
-        ValorDeclarado: precio_venta * cantidad, 
+        Bultos: bultos,
+        Peso: peso * cantidad,
+        ValorDeclarado: precio_venta * cantidad,
         M3: volumenM3,
         Alto: [],
         Ancho: [],
         Largo: [],
         Observaciones: `${calle}, Telefono: ${telefono}, Electrodomestico: ${producto_nombre}`,
-        ModalidadEntrega: "Puerta-Puerta", 
-        UnidadVenta: "cargas remito conformado", 
+        ModalidadEntrega: "Puerta-Puerta",
+        UnidadVenta: "cargas remito conformado",
         servicio: {
-            EsFletePagoDestino: false, 
-            EsRemitoconformado: true 
+            EsFletePagoDestino: false,
+            EsRemitoconformado: true
         },
         logueo: {
             Usuario: usuario,
@@ -1779,6 +1815,15 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             requestObj.Alto.push(altoInterior);
             requestObj.Ancho.push(anchoInterior);
             requestObj.Largo.push(largoInterior);
+        }
+    }
+
+    // Si incluye kit de instalación, agregar sus medidas (40x35x30 cm)
+    if (cantidadKitsParsed > 0) {
+        for (let i = 0; i < cantidadKitsParsed; i++) {
+            requestObj.Alto.push(40); // Alto del kit en cm
+            requestObj.Ancho.push(35); // Ancho del kit en cm
+            requestObj.Largo.push(30); // Largo del kit en cm
         }
     }
 
@@ -1809,7 +1854,6 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             const linkSeguimiento = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}&tipo=remito&cod=`;
             const linkSeguimiento2 = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}&tipo=remito&cod=`;
 
-            
             // Actualizar el texto del botón
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
             button.classList.remove('btn-primary');
@@ -1852,7 +1896,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             }
 
             // Enviar el email después de procesar el envío
-            await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte);
+            await sendEmail(Name, Subject, template, nombre, email, `BNA${remito}`, linkSeguimiento2, transporte);
         } else {
             buttonAndr.disabled = false;
             text.innerHTML = `Envio No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
@@ -2046,8 +2090,43 @@ const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${
 const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
 const isSplit = splitTypes.includes(tipoElectrodomestico);
 
+// Inicializar cantidadKits
+let cantidadKitsParsed = 0;
+
+// Preguntar si incluye kit de instalación solo si es un split
+if (isSplit) {
+    const { value: incluyeKit } = await Swal.fire({
+        title: '¿Incluye kit de instalación?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No'
+    });
+
+    if (incluyeKit) {
+        const { value: cantidadKits } = await Swal.fire({
+            title: 'Cantidad de kits de instalación',
+            input: 'number',
+            inputLabel: 'Ingrese la cantidad de kits',
+            inputAttributes: {
+                min: 1,
+                max: 100
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (cantidadKits === null) {
+            return; // Si el usuario cancela, salir de la función
+        }
+
+        cantidadKitsParsed = parseInt(cantidadKits) || 1; // Usar 1 si no es un número válido
+    }
+}
+
 // Ajustar la cantidad de bultos
-const cantidadBultos = isSplit ? cantidad * 2 : cantidad;
+const cantidadBultos = isSplit ? (cantidad * 2) + cantidadKitsParsed : cantidad;
 const VolumenTotalFinal = isSplit ? volumenCm3 / 2 : volumenCm3 / cantidad;
 
 for (let i = 0; i < cantidadBultos; i++) {
