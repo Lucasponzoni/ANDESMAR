@@ -1037,7 +1037,7 @@ COMPRA CON USO DE PUNTOS BNA
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="dni_${data[i].id}">DNI:</label>
-                                <input type="text" id="dni_${data[i].id}" value="${data[i].dni}" disabled>
+                                <input type="text" id="dni_${data[i].id}" value="${data[i].cuit}" disabled>
                             </div>
                             <div class="col">
                                 <label for="telefono_${data[i].id}">Teléfono:</label>
