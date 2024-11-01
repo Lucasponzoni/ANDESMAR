@@ -31,10 +31,21 @@ h1 {
     display: none;
 }
 
-.navbar-brand-text{
+.navbar-brand-text {
     font-family: "Titan One", sans-serif;
-    color: gray;
     font-size: 2rem;
+    color: black;
+    padding: 5px;
+}
+
+.navbar-brand-text2{
+    font-family: "Titan One", sans-serif;
+    font-size: 2rem;
+    color: orangered;
+}
+
+.blackCat{
+    width: 90px;
 }
 
 form {
