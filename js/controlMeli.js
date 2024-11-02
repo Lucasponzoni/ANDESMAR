@@ -12,6 +12,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// RECARGAR PAGINA AL CERRAR EL MODAL
+$(document).ready(function() {
+    $('#escaneoColecta').on('hidden.bs.modal', function () {
+        location.reload(); // Recarga la página
+    });
+});
+
 $(document).ready(function() {
     $('#spinner4').hide(); // Asegurarse de que el spinner de la página esté oculto al cargar
     cargarDatos();
@@ -49,7 +56,18 @@ function buscarCodigo(codigo) {
                 encontrado = true; // Se encontró el código
 
                 // Verificar si el estado es Jujuy
-                const additionalInfo = data.client.billing_info.additional_info;
+                let additionalInfo;
+                if (data.client && data.client.billing_info && data.client.billing_info.additional_info) {
+                    additionalInfo = data.client.billing_info.additional_info;
+                } else {
+                    additionalInfo = []; // Si no existe, definir como un array vacío
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Validación manual requerida',
+                        text: 'No se pudo validar la provincia de compra por un error en Mercado Libre, pero el envío fue agregado igualmente. Verifica la etiqueta de forma manual.'
+                    });
+                }
+
                 const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value === "Jujuy");
 
                 if (estadoJujuy) {
@@ -102,9 +120,25 @@ function agregarFila(data) {
         hour12: false 
     }).replace(',', 'h').replace('h', ', '); // Formato "26/10/24, 18:27h"
 
+    // Verificar si ya existe en Firebase antes de guardar
+    database.ref('/despachoDelDiaMeli/' + data.shippingId).once('value').then(snapshot => {
+        if (!snapshot.exists()) {
+            // Si el registro no existe en Firebase, lo agrega con la fecha actual
+            database.ref('/despachoDelDiaMeli/' + data.shippingId).set({
+                fechaHora: fechaHora,
+                shippingId: data.shippingId,
+                idOperacion: data.idOperacion,
+                Cantidad: data.Cantidad,
+                Producto: data.Producto,
+                pictures: data.pictures // Solo si es necesario
+            });
+        }
+    });
+
+    // Generar la fila de la tabla sin actualizar la fecha en Firebase
     const newRow = `
         <tr data-id="${data.shippingId}">
-            <td>${fechaHora}</td>
+            <td>${data.fechaHora}</td>
             <td><a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank">${data.idOperacion}</a></td>
             <td id="sku-control-Meli">${data.shippingId}</td>
             <td id="cantidad-control-Meli">${data.Cantidad}</td>
@@ -113,20 +147,10 @@ function agregarFila(data) {
             <td><button class="btn btn-danger btn-delete" onclick="confirmarEliminacion('${data.shippingId}')">X</button></td>
         </tr>
     `;
-    
+
     $('#data-table-body').append(newRow);
     actualizarContador();
     actualizarContadorFilas();
-
-    // Agregar datos a Firebase
-    database.ref('/despachoDelDiaMeli/' + data.shippingId).set({
-        fechaHora: fechaHora,
-        shippingId: data.shippingId,
-        idOperacion: data.idOperacion,
-        Cantidad: data.Cantidad,
-        Producto: data.Producto,
-        pictures: data.pictures // Solo si es necesario
-    });
 
     // Eliminar la fila de "No has comenzado una colecta aún" si existe
     $('.no-data').remove();
