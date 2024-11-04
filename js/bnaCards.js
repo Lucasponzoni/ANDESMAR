@@ -464,7 +464,7 @@ COMPRA CON USO DE PUNTOS BNA
                         <div class="card-body">
 
                            <div class="em-circle-state5">
-                            ${data[i].cuotas === "30" ? '⚠️ bnapromo2' : data[i].cuotas === "12" || "6"|| "1" ? '⚠️ bnapromo' : '*'}
+${["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"].includes(data[i].cuotas) ? '⚠️ bnapromo3' : data[i].cuotas === "30" ? '⚠️ bnapromo2' : '*'}
                             </div>
 
                             <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
@@ -532,12 +532,13 @@ COMPRA CON USO DE PUNTOS BNA
         onclick="window.open(
             ${data[i].cuotas === '30' 
                 ? `'https://api.avenida.com/manage/shops/2943/orders/${data[i].orden_publica_}'` 
-                : (data[i].cuotas === '12' || data[i].cuotas === '6' || data[i].cuotas === '1') 
-                    ? `'https://api.avenida.com/manage/shops/2941/orders/${data[i].orden_publica_}'` 
+                : (['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'].includes(data[i].cuotas)) 
+                    ? `'https://api.avenida.com/manage/shops/2942/orders/${data[i].orden_publica_}'` 
                     : `'#' // URL por defecto`
             }, '_blank');">
         <i class="bi bi-bag-check"></i>
     </button>
+
 </div>
 
 
