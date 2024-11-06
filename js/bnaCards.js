@@ -1792,7 +1792,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         Largo: [],
         Observaciones: `${calle}, Telefono: ${telefono}, Electrodomestico: ${producto_nombre}`,
         ModalidadEntrega: "Puerta-Puerta",
-        UnidadVenta: [3500, 3100, 3400].includes(parseInt(Cp)) ? "CARGAS LOG RTO C Y SEGUIMIENTO" : "cargas remito conformado",        servicio: {
+        UnidadVenta: [3500, 3100, 3400].includes(parseInt(cp)) ? "CARGAS LOG RTO C Y SEGUIMIENTO" : "cargas remito conformado",        servicio: {
             EsFletePagoDestino: false,
             EsRemitoconformado: true
         },
