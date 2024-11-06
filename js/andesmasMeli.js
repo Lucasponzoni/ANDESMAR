@@ -62,8 +62,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         Largo: Array(cantidadFinal).fill(largo),
         Observaciones: observaciones + Producto,
         ModalidadEntrega: "Puerta-Puerta",
-        UnidadVenta: "cargas remito conformado",
-        servicio: {
+        UnidadVenta: [3500, 3100, 3400].includes(parseInt(Cp)) ? "CARGAS LOG RTO C Y SEGUIMIENTO" : "cargas remito conformado",        servicio: {
             EsFletePagoDestino: false,
             EsRemitoconformado: true
         },
