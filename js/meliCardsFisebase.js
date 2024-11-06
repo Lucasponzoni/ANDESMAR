@@ -670,6 +670,11 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     const productoLowerCase = Producto.toLowerCase();
     const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000") ? cantidad * 2 : cantidad;
 
+    // Verificar el código postal y definir la unidad de venta
+    const unidadVenta = [3500, 3100, 3400].includes(parseInt(Cp))
+        ? "CARGAS LOG RTO C Y SEGUIMIENTO"
+        : "cargas remito conformado";
+        
     // Definir los datos que se enviarán a la API
     const requestObj = {
         CalleRemitente: "Mendoza", // Reemplaza con el valor correcto
@@ -691,7 +696,8 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         Largo: Array(cantidadFinal).fill(largo),
         Observaciones: observaciones + Producto,
         ModalidadEntrega: "Puerta-Puerta",
-        UnidadVenta: [3500, 3100, 3400].includes(parseInt(Cp)) ? "CARGAS LOG RTO C Y SEGUIMIENTO" : "cargas remito conformado",        servicio: {
+        UnidadVenta: unidadVenta,
+        servicio: {
             EsFletePagoDestino: false,
             EsRemitoconformado: true
         },
