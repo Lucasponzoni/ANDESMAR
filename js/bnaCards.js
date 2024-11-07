@@ -331,6 +331,21 @@ function loadEnviosFromFirebase() {
     });
 }
 
+// Función para obtener la URL
+function getOrderUrl(ordenPublica) {
+    const shopCode = ordenPublica.split('-').pop(); // Obtener los últimos 4 dígitos
+    switch (shopCode) {
+        case "2941":
+            return `https://api.avenida.com/manage/shops/2941/orders/${ordenPublica}`;
+        case "2942":
+            return `https://api.avenida.com/manage/shops/2942/orders/${ordenPublica}`;
+        case "2943":
+            return `https://api.avenida.com/manage/shops/2943/orders/${ordenPublica}`;
+        default:
+            return '#'; // URL por defecto si no coincide
+    }
+}
+
 const cpsAndesmar = [
     ...Array.from({length: 501}, (_, i) => i + 1000), // Del 1000 al 1500
     1602, 1603, 1605, 1606, 1607, 1609,
@@ -463,9 +478,22 @@ COMPRA CON USO DE PUNTOS BNA
                     <div class="card">
                         <div class="card-body">
 
-                           <div class="em-circle-state5">
-${["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"].includes(data[i].cuotas) ? '⚠️ bnapromo3' : data[i].cuotas === "30" ? '⚠️ bnapromo2' : '*'}
-                            </div>
+<div class="em-circle-state5">
+    ${(() => {
+        const shopCode = data[i].orden_publica_.split('-').pop(); // Obtener los últimos 4 dígitos
+        switch (shopCode) {
+            case "2941":
+                return 'novogarbna';
+            case "2942":
+                return 'novogarbnapromo';
+            case "2943":
+                return 'novogarbnapromo2';
+            default:
+                return 'Shop Desconocido'; // Valor por defecto si no coincide
+        }
+    })()}
+</div>
+
 
                             <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
                             ${(isAndreani || isAndesmar || isLogPropia) ? 'Preparado' : 'Pendiente'}
@@ -529,13 +557,7 @@ ${["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "1
     <p class="orden mx-2">${data[i].remito}</p>
 
     <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3" 
-        onclick="window.open(
-            ${data[i].cuotas === '30' 
-                ? `'https://api.avenida.com/manage/shops/2943/orders/${data[i].orden_publica_}'` 
-                : (['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'].includes(data[i].cuotas)) 
-                    ? `'https://api.avenida.com/manage/shops/2942/orders/${data[i].orden_publica_}'` 
-                    : `'#' // URL por defecto`
-            }, '_blank');">
+        onclick="window.open(getOrderUrl('${data[i].orden_publica_}'), '_blank');">
         <i class="bi bi-bag-check"></i>
     </button>
 
