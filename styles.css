@@ -1882,6 +1882,10 @@ div.card-body > p > i{
     height: 30px;
 }
 
+.botonesMeli{
+    gap: 5px;
+}
+
 .em-circle-state5 {
     font-weight: 600;
     font-family: "Helvetica Neue", Arial, sans-serif;

@@ -250,9 +250,19 @@ function cargarDatos() {
     $('#spinner').show(); // Mostrar spinner de la página durante la carga
 
     database.ref('/despachoDelDiaMeli').once('value').then(snapshot => {
+        const datos = []; // Array para almacenar los datos
+
         if (snapshot.exists()) {
             snapshot.forEach(childSnapshot => {
                 const data = childSnapshot.val();
+                datos.push(data); // Agregar cada dato al array
+            });
+
+            // Ordenar los datos por fechaHora (o cualquier otra propiedad que determines)
+            datos.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+
+            // Agregar las filas a la tabla
+            datos.forEach(data => {
                 agregarFila(data);
             });
         } else {
