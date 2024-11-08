@@ -15,7 +15,8 @@ const database = firebase.database();
 // RECARGAR PAGINA AL CERRAR EL MODAL
 $(document).ready(function() {
     $('#escaneoColecta').on('hidden.bs.modal', function () {
-        location.reload(); // Recarga la página
+        actualizarContador();
+        actualizarContadorFilas();
     });
 });
 
@@ -215,6 +216,7 @@ function actualizarContador() {
         $('#totalFila').addClass('counter'); // Agregar la clase counter
     }
 }
+
 
 // Nueva función para contar solo las filas
 function actualizarContadorFilas() {
