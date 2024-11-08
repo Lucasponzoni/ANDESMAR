@@ -538,3 +538,32 @@ function updateAlertPositions() {
         alert.style.bottom = `${20 + index * 70}px`;
     });
 }
+
+// NOTIFICADOR DE COMENTARIO EN FACTURACION
+document.addEventListener("DOMContentLoaded", function() {
+    const statusCard = document.getElementById('statusCard2');
+    const closeCardButton = document.getElementById('closeCard');
+    const countdownElement = document.getElementById('countdown');
+    let countdown = 5; // Tiempo en segundos
+
+    // Mostrar la card
+    statusCard.style.display = 'block';
+
+    // Actualizar el temporizador cada segundo
+    const timerInterval = setInterval(() => {
+        countdown--;
+        countdownElement.textContent = countdown;
+
+        if (countdown <= 0) {
+            clearInterval(timerInterval);
+            statusCard.style.display = 'none';
+        }
+    }, 2000);
+
+    // Cerrar la card al hacer clic en el botón
+    closeCardButton.onclick = function() {
+        clearInterval(timerInterval);
+        statusCard.style.display = 'none';
+    };
+});
+// FIN NOTIFICADOR DE COMENTARIO EN FACTURACION
