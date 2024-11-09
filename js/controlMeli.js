@@ -105,11 +105,13 @@ function buscarCodigo(codigo) {
         $('#escaneoColecta').modal('hide');
         $('#codigoInput').val(''); // Limpiar input
         $('#spinner4').hide(); // Ocultar spinner de la página
+        
     }).catch(error => {
         console.error("Error al buscar el código: ", error);
         $('#spinner4').hide(); // Ocultar spinner en caso de error
     });
 }
+
 
 function agregarFila(data) {
     const fechaHora = new Date().toLocaleString('es-AR', { 
@@ -276,6 +278,8 @@ function cargarDatos() {
         console.error("Error al cargar datos: ", error);
     }).finally(() => {
         $('#spinner').hide(); // Ocultar spinner de la página al finalizar carga
+        // Llamar a la función para pintar filas preparadas después de cargar los datos
+        pintarFilasPreparadas();
     });
 }
 
@@ -576,6 +580,12 @@ $(document).ready(function() {
             buscarCodigoEscaneo2(codigo);
         }
     });
+
+    // Al abrir el modal, actualizar contadores
+    $('#escaneoColecta2').on('shown.bs.modal', function() {
+        $('#codigoInput2').focus();
+        actualizarContadores(); // Llamar a la función para actualizar contadores al abrir el modal
+    });
 });
 
 function buscarCodigoEscaneo2(codigo) {
@@ -604,9 +614,12 @@ function buscarCodigoEscaneo2(codigo) {
                     }).then(() => {
                         console.log('Estado actualizado a preparado en Firebase.');
                         mostrarNotificacion(`Se ha marcado como preparado el ID ${shippingId} en fila ${index + 1}`);
+                        actualizarContadores(); // Actualizar contadores después de marcar como preparado
                     }).catch(error => {
                         console.error("Error al actualizar el estado en Firebase: ", error);
                     });
+
+                    pintarFilasPreparadas();
                 }
             });
 
@@ -624,6 +637,9 @@ function buscarCodigoEscaneo2(codigo) {
 
     $('#spinner4').hide(); // Ocultar spinner
     $('#codigoInput2').val(''); // Limpiar input
+
+    // Llamar a la función para pintar filas preparadas
+    pintarFilasPreparadas();
 }
 
 // Función para mostrar notificaciones
@@ -646,4 +662,40 @@ function mostrarNotificacion(mensaje) {
     setTimeout(() => {
         notificationDiv.fadeOut();
     }, 3000);
+}
+
+function pintarFilasPreparadas() {
+    $('#data-table-body tr').each(function() {
+        const shippingId = $(this).data('id'); // Obtener el shippingId de la fila
+
+        // Consultar el estado en Firebase
+        database.ref('/despachoDelDiaMeli/' + shippingId).once('value').then(snapshot => {
+            if (snapshot.exists() && snapshot.val().estado === 'preparado') {
+                // Si el estado es "preparado", aplicar el estilo de fondo verde
+                $(this).css('background-color', '#d4edda'); // Color verde claro
+            }
+        }).catch(error => {
+            console.error("Error al consultar el estado en Firebase: ", error);
+        });
+    });
+}
+
+function actualizarContadores() {
+    let preparados = 0;
+    let sinPreparar = 0;
+
+    $('#data-table-body tr').each(function() {
+        const shippingId = $(this).data('id'); // Obtener el ID de la fila
+        database.ref('/despachoDelDiaMeli/' + shippingId).once('value').then(snapshot => {
+            if (snapshot.exists() && snapshot.val().estado === 'preparado') {
+                preparados++;
+            } else {
+                sinPreparar++;
+            }
+
+            // Actualizar el contador en el modal
+            $('#totalPreparados').text(preparados);
+            $('#totalSinPreparar').text(sinPreparar);
+        });
+    });
 }
