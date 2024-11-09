@@ -567,3 +567,83 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 });
 // FIN NOTIFICADOR DE COMENTARIO EN FACTURACION
+
+$(document).ready(function() {
+    // Evento para el input del segundo escaneo
+    $('#codigoInput2').on('keypress', function(e) {
+        if (e.which === 13) { // Enter key
+            const codigo = $(this).val();
+            buscarCodigoEscaneo2(codigo);
+        }
+    });
+});
+
+function buscarCodigoEscaneo2(codigo) {
+    const codigoNumerico = parseInt(codigo); // Convertir a número
+    $('#spinner4').show(); // Mostrar spinner
+
+    let encontrado = false;
+    $('#data-table-body tr').each(function(index) {
+        const shippingId = $(this).find('td').eq(2).text(); // Columna Shipping ID
+        if (shippingId == codigoNumerico) {
+            encontrado = true; // Se encontró el código
+
+            // Verificar el estado en Firebase
+            database.ref('/despachoDelDiaMeli/' + shippingId).once('value').then(snapshot => {
+                if (snapshot.exists() && snapshot.val().estado === 'preparado') {
+                    // Si ya está preparado, mostrar Sweet Alert
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Pedido ya preparado',
+                        text: 'Este pedido ya fue marcado como preparado con anterioridad.'
+                    });
+                } else {
+                    // Actualizar Firebase
+                    database.ref('/despachoDelDiaMeli/' + shippingId).update({
+                        estado: 'preparado'
+                    }).then(() => {
+                        console.log('Estado actualizado a preparado en Firebase.');
+                        mostrarNotificacion(`Se ha marcado como preparado el ID ${shippingId} en fila ${index + 1}`);
+                    }).catch(error => {
+                        console.error("Error al actualizar el estado en Firebase: ", error);
+                    });
+                }
+            });
+
+            return false; // Salir del each
+        }
+    });
+
+    if (!encontrado) {
+        Swal.fire({
+            icon: 'error',
+            title: 'No encontrado',
+            text: `No se encontró preparación para el Shipping ID ${codigoNumerico}.`
+        });
+    }
+
+    $('#spinner4').hide(); // Ocultar spinner
+    $('#codigoInput2').val(''); // Limpiar input
+}
+
+// Función para mostrar notificaciones
+function mostrarNotificacion(mensaje) {
+    const notificationDiv = $(`
+        <div class="notificationModal2">
+            ${mensaje}
+            <span class="close">&times;</span>
+        </div>
+    `);
+    
+    $('#notificationContainer').append(notificationDiv);
+
+    // Cerrar notificación al hacer clic en la "x"
+    notificationDiv.find('.close').on('click', function() {
+        notificationDiv.fadeOut();
+    });
+
+    // Cerrar notificación después de 3 segundos
+    setTimeout(() => {
+        notificationDiv.fadeOut();
+    }, 3000);
+}

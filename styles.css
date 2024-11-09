@@ -3248,6 +3248,33 @@ div .form-check {
     margin-bottom: 0;
 }
 
+#notificationContainer {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: max-content; /* Ajusta el ancho máximo según tus necesidades */
+}
+
+.notificationModal2 {
+    background-color: #28a745; /* Color verde */
+    color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.notificationModal2 .close {
+    cursor: pointer;
+    margin-left: 5px;
+    color: red;
+}
+
 .contenedorSelect{
     padding: 5px;
     border-radius: 6px;

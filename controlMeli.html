@@ -136,26 +136,39 @@
         </div>
     </div>
 
-        <!-- Modal para escanear 2 -->
-        <div class="modal fade" id="escaneoColecta2" tabindex="-1" role="dialog" aria-labelledby="escaneoColectaLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="escaneoColectaLabel">Escanear Código para marcar Preparacion</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="text" id="codigoInput" class="form-control" placeholder="Ingresa el código" autofocus>
-                        <p>EN CONSTRUCION, PROXIMAMENTE...</p>
-                        <div class="spinner-border" role="status" id="spinner4">
-                            <span class="sr-only">Cargando...</span>
-                        </div>
-                    </div>
+<!-- Modal para escanear 2 -->
+<div class="modal fade" id="escaneoColecta2" tabindex="-1" role="dialog" aria-labelledby="escaneoColectaLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="escaneoColectaLabel">Escanear Código para marcar Preparación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="codigoInput" class="sr-only">Código de Shipping ID</label>
+                    <input type="text" id="codigoInput2" class="form-control" placeholder="Ingresa el código" autofocus>
                 </div>
+                
+                <!-- Spinner para mostrar durante la búsqueda -->
+                <div id="spinner4" class="spinner-border text-primary mt-3" role="status" style="display: none;">
+                    <span class="sr-only">Cargando...</span>
+                </div>
+                
+                <!-- Contenedor para alertas -->
+                <div id="alertContainer" class="mt-3"></div>
+                <!-- aca debe mostrar el div con la alerta -->
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Contenedor para notificaciones -->
+<div id="notificationContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+
+
 
 <!-- Comentarios Alert -->
 <div id="statusCard2" class="card">
