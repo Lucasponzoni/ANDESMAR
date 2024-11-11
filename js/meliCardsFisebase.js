@@ -671,7 +671,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     // Dividir medidas para obtener alto, ancho y largo
     const [largo, ancho, alto] = Medidas.split('x').map(Number);
     const productoLowerCase = Producto.toLowerCase();
-    const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000") ? cantidad * 2 : cantidad;
+    const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000")|| productoLowerCase.includes("tiro balanceado") ? cantidad * 2 : cantidad;
 
     // Verificar el código postal y definir la unidad de venta
     const unidadVenta = [3500, 3100, 3400].includes(parseInt(Cp))
@@ -927,7 +927,7 @@ const volumenTotal = volumenCM3 || 0; // Obtener volumen total
 const productoLowerCase = Producto.toLowerCase();
 
 // Determinar la cantidad a usar
-const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000") ? cantidad * 2 : cantidad;
+const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000")|| productoLowerCase.includes("tiro balanceado") ? cantidad * 2 : cantidad;
 
 for (let i = 0; i < cantidadFinal; i++) {
     bultos.push({
