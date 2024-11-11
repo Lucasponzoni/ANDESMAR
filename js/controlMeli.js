@@ -48,7 +48,7 @@ function buscarCodigo(codigo) {
     const codigoNumerico = parseInt(codigo); // Convertir a número
     $('#spinner4').show(); // Mostrar spinner de la página
 
-    database.ref('/envios').orderByChild('shippingId').limitToLast(600).once('value').then(snapshot => {
+    database.ref('/envios').orderByChild('shippingId').limitToLast(500).once('value').then(snapshot => {
         let encontrado = false;
 
         snapshot.forEach(childSnapshot => {
