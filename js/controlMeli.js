@@ -48,6 +48,17 @@ function buscarCodigo(codigo) {
     const codigoNumerico = parseInt(codigo); // Convertir a número
     $('#spinner4').show(); // Mostrar spinner de la página
 
+    // Primero, intentamos obtener el resultado del localStorage
+    const datosAlmacenados = JSON.parse(localStorage.getItem('envios')) || {};
+
+    if (datosAlmacenados[codigoNumerico]) {
+        // Si el código ya está en localStorage, usamos esos datos
+        procesarDatos(datosAlmacenados[codigoNumerico]);
+        $('#spinner4').hide(); // Ocultar spinner
+        return;
+    }
+
+    // Si no está en localStorage, buscamos en Firebase
     database.ref('/envios').orderByChild('shippingId').limitToLast(500).once('value').then(snapshot => {
         let encontrado = false;
 
@@ -56,41 +67,10 @@ function buscarCodigo(codigo) {
             if (data.shippingId === codigoNumerico) { // Comparar como número
                 encontrado = true; // Se encontró el código
 
-                // Verificar si el estado es Jujuy
-                let additionalInfo;
-                if (data.client && data.client.billing_info && data.client.billing_info.additional_info) {
-                    additionalInfo = data.client.billing_info.additional_info;
-                } else {
-                    additionalInfo = []; // Si no existe, definir como un array vacío
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Validación manual requerida',
-                        text: 'No se pudo validar la provincia de compra por un error en Mercado Libre, pero el envío fue agregado igualmente. Verifica la etiqueta de forma manual.'
-                    });
-                }
-
-                const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value === "Jujuy");
-
-                if (estadoJujuy) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Envío no permitido',
-                        text: 'Los envíos a Jujuy no están permitidos, separar etiqueta.'
-                    });
-                    $('#spinner4').hide(); // Ocultar spinner
-                    return; // Salir de la función
-                }
-
-                // Verificar si ya existe en la tabla
-                if ($(`#data-table-body tr[data-id="${data.shippingId}"]`).length === 0) {
-                    agregarFila(data);
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Código ya escaneado',
-                        text: 'Este código ya ha sido agregado a la tabla.'
-                    });
-                }
+                // Procesar datos y guardarlos en localStorage
+                procesarDatos(data);
+                datosAlmacenados[codigoNumerico] = data; // Guardar en localStorage
+                localStorage.setItem('envios', JSON.stringify(datosAlmacenados));
             }
         });
 
@@ -112,6 +92,42 @@ function buscarCodigo(codigo) {
     });
 }
 
+function procesarDatos(data) {
+    // Verificar si el estado es Jujuy
+    let additionalInfo;
+    if (data.client && data.client.billing_info && data.client.billing_info.additional_info) {
+        additionalInfo = data.client.billing_info.additional_info;
+    } else {
+        additionalInfo = []; // Si no existe, definir como un array vacío
+        Swal.fire({
+            icon: 'warning',
+            title: 'Validación manual requerida',
+            text: 'No se pudo validar la provincia de compra por un error en Mercado Libre, pero el envío fue agregado igualmente. Verifica la etiqueta de forma manual.'
+        });
+    }
+
+    const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value === "Jujuy");
+
+    if (estadoJujuy) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Envío no permitido',
+            text: 'Los envíos a Jujuy no están permitidos, separar etiqueta.'
+        });
+        return; // Salir de la función
+    }
+
+    // Verificar si ya existe en la tabla
+    if ($(`#data-table-body tr[data-id="${data.shippingId}"]`).length === 0) {
+        agregarFila(data);
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Código ya escaneado',
+            text: 'Este código ya ha sido agregado a la tabla.'
+        });
+    }
+}
 
 function agregarFila(data) {
     const fechaHora = new Date().toLocaleString('es-AR', { 
