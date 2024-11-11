@@ -83,9 +83,9 @@ form {
 }
 
 .badge-large2 {
-    font-size: 1rem;
+    font-size: 1.1rem;
     top: 0px !important;
-    min-width: 25px !important;
+    min-width: fit-content !important;
     z-index: 1000 !important;
 }
 

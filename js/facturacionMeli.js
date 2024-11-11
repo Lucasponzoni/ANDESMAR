@@ -16,7 +16,7 @@ const db = firebase.database();
 
 let allData = [];
 let currentPage = 1;
-let itemsPerPage = 50; // Número de elementos por página
+let itemsPerPage = 200; // Número de elementos por página
 let currentPageGroup = 0; // Grupo de páginas actuales
 const paginationContainer = document.getElementById('pagination');
 const searchInput = document.getElementById('searchDespachos');
@@ -632,63 +632,6 @@ function updatePagination() {
         paginationContainer.appendChild(backItem);
     }
 }
-
-// BUSCADOR
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('searchFacturacion');
-    const tableBody = document.querySelector('#data-table tbody');
-    const pagination = document.getElementById('pagination');
-    const errorContainer = document.querySelector('.error-message');
-    const searchTermDisplay = document.getElementById('search-term'); // Añade esta línea
-
-    searchInput.addEventListener('input', () => {
-        const filter = searchInput.value.toLowerCase();
-        const rows = tableBody.getElementsByTagName('tr');
-        let hasVisibleRows = false;
-
-        for (let i = 0; i < rows.length; i++) {
-            const cells = rows[i].getElementsByTagName('td');
-            let rowVisible = false;
-
-            for (let j = 0; j < cells.length; j++) {
-                const cell = cells[j];
-                if (cell) {
-                    const cellText = cell.textContent || cell.innerText;
-                    if (cellText.toLowerCase().includes(filter)) {
-                        rowVisible = true;
-                        break;
-                    }
-                }
-            }
-
-            if (rowVisible) {
-                rows[i].style.display = ""; // Muestra la fila
-                hasVisibleRows = true;
-            } else {
-                rows[i].style.display = "none"; // Oculta la fila
-            }
-        }
-
-        // Manejo de la paginación
-        pagination.style.display = filter ? "none" : "";
-
-        // Manejo del mensaje de error
-        if (filter) {
-            if (!hasVisibleRows) {
-                searchTermDisplay.textContent = filter; // Actualiza el contenido del input en el mensaje de error
-                errorContainer.style.display = ''; // Mostrar mensaje de error
-                tableBody.parentElement.style.display = 'none'; // Ocultar la tabla
-            } else {
-                errorContainer.style.display = 'none'; // Ocultar mensaje de error
-                tableBody.parentElement.style.display = ''; // Mostrar la tabla
-            }
-        } else {
-            errorContainer.style.display = 'none'; // Ocultar mensaje de error si el input está vacío
-            tableBody.parentElement.style.display = ''; // Mostrar la tabla
-        }
-    });
-});
-// FIN BUSCADOR
 
 // BUSCADOR
 document.addEventListener('DOMContentLoaded', () => {
