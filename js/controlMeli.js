@@ -187,7 +187,7 @@ function agregarFila(data) {
     // Generar la fila de la tabla sin actualizar la fecha en Firebase
     const newRow = `
         <tr data-id="${data.shippingId}">
-            <td>${fechaHora}</td>
+            <td>${data.fechaHora}</td>
             <td><a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank">${data.idOperacion}</a></td>
             <td id="sku-control-Meli">${data.shippingId}</td>
             <td id="cantidad-control-Meli">${data.Cantidad}</td>
