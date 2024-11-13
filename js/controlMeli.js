@@ -55,6 +55,7 @@ function buscarCodigo(codigo) {
         // Si el código ya está en localStorage, usamos esos datos
         procesarDatos(datosAlmacenados[codigoNumerico]);
         $('#spinner4').hide(); // Ocultar spinner
+        $('#codigoInput').val(''); // Limpiar input
         return;
     }
 
@@ -83,12 +84,16 @@ function buscarCodigo(codigo) {
         }
 
         $('#escaneoColecta').modal('hide');
-        $('#codigoInput').val(''); // Limpiar input
-        $('#spinner4').hide(); // Ocultar spinner de la página
-        
     }).catch(error => {
         console.error("Error al buscar el código: ", error);
-        $('#spinner4').hide(); // Ocultar spinner en caso de error
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al buscar el código.'
+        });
+    }).finally(() => {
+        $('#codigoInput').val(''); // Limpiar input siempre al final
+        $('#spinner4').hide(); // Ocultar spinner de la página
     });
 }
 
@@ -129,6 +134,31 @@ function procesarDatos(data) {
     }
 }
 
+function ordenarFilasPorFecha() {
+    const filas = $('#data-table-body tr').get(); // Obtener todas las filas de la tabla
+
+    filas.sort(function(a, b) {
+        const fechaA = $(a).find('td').eq(0).text(); // Obtener la fecha de la primera columna
+        const fechaB = $(b).find('td').eq(0).text(); // Obtener la fecha de la primera columna
+
+        // Convertir la fecha de formato "dd/mm/yy, hh:mm" a un objeto Date
+        const [fechaAString, horaAString] = fechaA.split(', ');
+        const [diaA, mesA, anioA] = fechaAString.split('/').map(Number);
+        const [horaA, minutoA] = horaAString.split(':').map(Number);
+        const fechaAObj = new Date(2000 + anioA, mesA - 1, diaA, horaA, minutoA);
+
+        const [fechaBString, horaBString] = fechaB.split(', ');
+        const [diaB, mesB, anioB] = fechaBString.split('/').map(Number);
+        const [horaB, minutoB] = horaBString.split(':').map(Number);
+        const fechaBObj = new Date(2000 + anioB, mesB - 1, diaB, horaB, minutoB);
+
+        return fechaBObj - fechaAObj; // Ordenar de más nuevo a más viejo
+    });
+
+    // Vaciar el cuerpo de la tabla y volver a agregar las filas ordenadas
+    $('#data-table-body').empty().append(filas);
+}
+
 function agregarFila(data) {
     const fechaHora = new Date().toLocaleString('es-AR', { 
         day: '2-digit', 
@@ -157,7 +187,7 @@ function agregarFila(data) {
     // Generar la fila de la tabla sin actualizar la fecha en Firebase
     const newRow = `
         <tr data-id="${data.shippingId}">
-            <td>${data.fechaHora}</td>
+            <td>${fechaHora}</td>
             <td><a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank">${data.idOperacion}</a></td>
             <td id="sku-control-Meli">${data.shippingId}</td>
             <td id="cantidad-control-Meli">${data.Cantidad}</td>
@@ -167,7 +197,9 @@ function agregarFila(data) {
         </tr>
     `;
 
-    $('#data-table-body').append(newRow);
+    // Agregar la nueva fila al principio de la tabla
+    $('#data-table-body').prepend(newRow);
+
     actualizarContador();
     actualizarContadorFilas();
 
@@ -283,6 +315,8 @@ function cargarDatos() {
             datos.forEach(data => {
                 agregarFila(data);
             });
+
+            ordenarFilasPorFecha();
         } else {
             $('#data-table-body').append(`
                 <tr>
@@ -349,6 +383,7 @@ function filtrarTabla(query) {
         });
     } else {
         cargarDatos(); // Si el input está vacío, recargar todos los datos
+        ordenarFilasPorFecha();
         actualizarContador();
         actualizarContadorFilas();
     }
