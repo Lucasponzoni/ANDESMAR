@@ -60,7 +60,7 @@ function buscarCodigo(codigo) {
     }
 
     // Si no está en localStorage, buscamos en Firebase
-    database.ref('/envios').orderByChild('shippingId').limitToLast(500).once('value').then(snapshot => {
+    database.ref('/envios').orderByChild('shippingId').limitToLast(1800).once('value').then(snapshot => {
         let encontrado = false;
 
         snapshot.forEach(childSnapshot => {
