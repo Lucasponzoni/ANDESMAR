@@ -48,6 +48,65 @@ h1 {
     width: 110px;
 }
 
+.mac-buttons {
+    background-color: cornflowerblue;
+    padding: 5px;
+    width: 92%;
+    border-radius: 10px 10px 0 0;
+    position: absolute;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px; /* Espacio entre los botones y el párrafo */
+}
+.button {
+    width: 12px; /* Diámetro de los círculos */
+    height: 12px;
+    border-radius: 50%;
+    margin: 0 3px; /* Espacio entre los botones */
+    cursor: pointer; /* Cambia el cursor al pasar sobre los botones */
+    border: 1px solid #ccc; /* Borde ligero */
+    background: #fff; /* Fondo blanco para el bisel */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5); /* Sombra y bisel interno */
+    transition: all 0.2s; /* Transición suave para efectos */
+}
+
+.button.red {
+    background: linear-gradient(to bottom, #ff4d4d, #cc0000); /* Degradado rojo */
+}
+
+.button.yellow {
+    background: linear-gradient(to bottom, #ffff66, #cccc00); /* Degradado amarillo */
+}
+
+.button.green {
+    background: linear-gradient(to bottom, #66ff66, #009900); /* Degradado verde */
+}
+
+/* Efecto hover para los botones */
+.button:hover {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7); /* Sombra más intensa y bisel al pasar el mouse */
+    transform: translateY(-1px); /* Eleva el botón ligeramente */
+}
+
+.lookBase {
+    text-align: center;
+    background-color: white; /* Fondo similar a macOS */
+    border: 1px solid cornflowerblue;
+    padding: 15px;
+    color: rgb(69, 69, 69);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-top: 22px; /* Espacio adicional para separar del input */
+}
+
+.AndesmarMeli , .AndreaniMeli , .NovogarMeli{
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+}
+
 form {
     max-width: 600px;
     margin: 20px auto;
@@ -1425,6 +1484,7 @@ div.card-body > p > i{
     display: flex; /* Mostrar el spinner al cargar */
     justify-content: center;
     align-items: center;
+    margin-bottom: 10px;
 }
 
 @media (max-width: 768px) {
