@@ -1106,6 +1106,10 @@ COMPRA CON USO DE PUNTOS BNA
                                 <label for="timbre_${data[i].id}">Timbre:</label>
                                 <input type="text" id="timbre_${data[i].id}" value="0" disabled>
                             </div>
+                            <div class="col">
+                                <label for="provincia_${data[i].id}">Provincia:</label>
+                                <input type="text" id="provincia_${data[i].id}" value="${data[i].provincia}" disabled>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1658,7 +1662,8 @@ function marcarFacturado2(id) {
         localidad_envio: document.getElementById(`localidad_envio_${id}`).value,
         telefono_envio: document.getElementById(`telefono_envio_${id}`).value,
         persona_autorizada: document.getElementById(`persona_autorizada_${id}`).value,
-        otros_comentarios_entrega: document.getElementById(`otros_comentarios_entrega_${id}`).value
+        otros_comentarios_entrega: document.getElementById(`otros_comentarios_entrega_${id}`).value,
+        provincia: document.getElementById(`provincia_${data[i].id}`).value
     };
 
     // Guardar contenido del botón en Firebase
@@ -1802,7 +1807,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     const requestObj = {
         CalleRemitente: "Mendoza",
         CalleNroRemitente: "2799",
-        CodigoPostalRemitente: "2000",
+        CodigoPostalRemitente: "8300",
         NombreApellidoDestinatario: nombre,
         CodigoPostalDestinatario: cp,
         CalleDestinatario: calle,
