@@ -101,6 +101,12 @@ h1 {
     margin-top: 22px; /* Espacio adicional para separar del input */
 }
 
+.AndesmarMeli , .AndreaniMeli , .NovogarMeli{
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+}
+
 form {
     max-width: 600px;
     margin: 20px auto;
