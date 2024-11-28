@@ -47,6 +47,7 @@ $(document).ready(function() {
 function buscarCodigo(codigo) {
     const codigoNumerico = parseInt(codigo); // Convertir a número
     $('#spinner4').show(); // Mostrar spinner de la página
+    $('.lookBase').hide(); // Ocultar mensaje inicial
 
     // Primero, intentamos obtener el resultado del localStorage
     const datosAlmacenados = JSON.parse(localStorage.getItem('envios')) || {};
@@ -56,34 +57,57 @@ function buscarCodigo(codigo) {
         procesarDatos(datosAlmacenados[codigoNumerico]);
         $('#spinner4').hide(); // Ocultar spinner
         $('#codigoInput').val(''); // Limpiar input
+        $('.lookBase').hide(); // Ocultar mensaje
         return;
     }
 
-    // Si no está en localStorage, buscamos en Firebase
-    database.ref('/envios').orderByChild('shippingId').limitToLast(500).once('value').then(snapshot => {
-        let encontrado = false;
+    // Función para buscar en Firebase
+    const buscarEnFirebase = (limite) => {
+        return database.ref('/envios').orderByChild('shippingId').limitToLast(limite).once('value').then(snapshot => {
+            let encontrado = false;
 
-        snapshot.forEach(childSnapshot => {
-            const data = childSnapshot.val();
-            if (data.shippingId === codigoNumerico) { // Comparar como número
-                encontrado = true; // Se encontró el código
+            snapshot.forEach(childSnapshot => {
+                const data = childSnapshot.val();
+                if (data.shippingId === codigoNumerico) {
+                    encontrado = true; // Se encontró el código
 
-                // Procesar datos y guardarlos en localStorage
-                procesarDatos(data);
-                datosAlmacenados[codigoNumerico] = data; // Guardar en localStorage
-                localStorage.setItem('envios', JSON.stringify(datosAlmacenados));
-            }
+                    // Procesar datos y guardarlos en localStorage
+                    procesarDatos(data);
+                    datosAlmacenados[codigoNumerico] = data; // Guardar en localStorage
+                    localStorage.setItem('envios', JSON.stringify(datosAlmacenados));
+                }
+            });
+
+            return encontrado;
         });
+    };
 
+    // Buscar en los últimos 300
+    buscarEnFirebase(200).then(encontrado => {
         if (!encontrado) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Código no encontrado',
-                text: 'No se encontraron resultados para el código ingresado.'
+            $('.lookBase').text('Buscando en últimas 500 ventas...').show(); // Mostrar mensaje solo si no se encontró
+            $('.mac-buttons').removeClass('hidden'); // Mostrar botones al encontrar el mensaje
+            $('.lookBase').removeClass('hidden'); // Mostrar botones al encontrar el mensaje
+            return buscarEnFirebase(500).then(encontrado => {
+                if (!encontrado) {
+                    $('.lookBase').text('Buscando en últimas 1000 ventas...').show(); // Mostrar mensaje para la siguiente búsqueda
+                    return buscarEnFirebase(1000).then(encontrado => {
+                        if (!encontrado) {
+                            $('.lookBase').text('Buscando en últimos 3000 ventas...').show(); // Mostrar mensaje para la siguiente búsqueda
+                            return buscarEnFirebase(3000).then(encontrado => {
+                                if (!encontrado) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Código no encontrado',
+                                        text: 'No se encontraron resultados para el código ingresado.'
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
             });
         }
-
-        $('#escaneoColecta').modal('hide');
     }).catch(error => {
         console.error("Error al buscar el código: ", error);
         Swal.fire({
@@ -94,6 +118,9 @@ function buscarCodigo(codigo) {
     }).finally(() => {
         $('#codigoInput').val(''); // Limpiar input siempre al final
         $('#spinner4').hide(); // Ocultar spinner de la página
+        $('.lookBase').hide(); // Ocultar mensaje
+        $('.mac-buttons').addClass('hidden'); // Ocultar botones al final
+        $('.lookBase').addClass('hidden'); // Ocultar botones al final
     });
 }
 
