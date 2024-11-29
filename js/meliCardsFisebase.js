@@ -940,8 +940,8 @@ for (let i = 0; i < cantidadFinal; i++) {
         "altoCm": null,
         "anchoCm": null,
         "volumenCm": volumenTotal,
-        "valorDeclaradoSinImpuestos": 99999 * 0.21,
-        "valorDeclaradoConImpuestos": 99999,
+        "valorDeclaradoSinImpuestos": 999999 * 0.21,
+        "valorDeclaradoConImpuestos": 999999,
         "referencias": [
             { "meta": "detalle", "contenido": Producto },
             { "meta": "idCliente", "contenido": (idOperacionFinalAndreani + "-MELI").toUpperCase() },
