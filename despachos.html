@@ -17,6 +17,22 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 
 </head>
+
+<script>
+    // Verificación de sesión
+    function checkLogin() {
+        const savedTimestamp = localStorage.getItem('loginTimestamp');
+        const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 3600000; // 1 hora
+
+        if (isExpired) {
+            window.location.href = 'logiPaq.html'; // Redirige al login si la sesión ha expirado
+        }
+    }
+
+    // Ejecutar la verificación al cargar la página
+    checkLogin();
+</script>
+
 <body class="envios-body"> <strong></strong>
     
     <nav class="navbar navbar-expand-lg navbar-light bg-light">

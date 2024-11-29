@@ -34,6 +34,21 @@
         }
     </style>
 
+<script>
+    // Verificación de sesión
+    function checkLogin() {
+        const savedTimestamp = localStorage.getItem('loginTimestamp');
+        const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 3600000; // 1 hora
+
+        if (isExpired) {
+            window.location.href = 'logiPaq.html'; // Redirige al login si la sesión ha expirado
+        }
+    }
+
+    // Ejecutar la verificación al cargar la página
+    checkLogin();
+</script>
+
 </head>
 <body class="envios-body">
     

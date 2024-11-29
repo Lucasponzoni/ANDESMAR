@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Signika:wght@300..700&family=Titan+One&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="./Img/caja.png">
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(183deg, rgba(52,152,219,1) 0%, rgba(0,70,139,1) 100%);
+        }
+        .login-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        .custom-spinner {
+            width: 1.5rem; /* Aumentar el tamaño del spinner */
+            height: 1.5rem; /* Aumentar el tamaño del spinner */
+            margin-right: 8px;
+        }
+        .btn {
+            display: flex;
+            align-items: center; /* Alinea verticalmente el contenido */
+            justify-content: center; /* Centra el contenido horizontalmente */
+        }
+        .spinner-container2 {
+            display: flex;
+            align-items: center; /* Alinea verticalmente el spinner y el texto */
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container text-center">
+        <h2 class="navbar-brand-text">Logi<span class="navbar-brand-text2">Paq</span></h2>
+        <form id="loginForm">
+            <div class="mb-3">
+                <input type="text" id="username" class="form-control" placeholder="Usuario" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" id="password" class="form-control" placeholder="Contraseña" required>
+            </div>
+            <button type="submit" id="loginButton" class="btn btn-primary w-100">
+                <div class="spinner-container2">
+                    <span id="customSpinner" class="spinner-border custom-spinner d-none" role="status"></span>
+                    <span id="buttonText">Ingresar</span>
+                </div>
+            </button>
+        </form>
+        <p id="errorMsg" class="text-danger mt-2 d-none"></p>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPw7ElqCPC92nag2oFW57aLD9t018FvC4",
+            authDomain: "emails-novogar.firebaseapp.com",
+            databaseURL: "https://emails-novogar-default-rtdb.firebaseio.com",
+            projectId: "emails-novogar",
+            storageBucket: "emails-novogar.appspot.com",
+            messagingSenderId: "1085815449583",
+            appId: "1:1085815449583:web:72f836c378bd971fb8b81a",
+            measurementId: "G-BW9ML8LVV6"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        const dbRef = firebase.database().ref('LogiPaq');
+        const loginForm = document.getElementById('loginForm');
+        const loginButton = document.getElementById('loginButton');
+        const customSpinner = document.getElementById('customSpinner');
+        const buttonText = document.getElementById('buttonText');
+        const errorMsg = document.getElementById('errorMsg');
+
+        function saveLoginTimestamp() {
+            localStorage.setItem('loginTimestamp', Date.now());
+        }
+
+        function isLoginExpired() {
+            const savedTimestamp = localStorage.getItem('loginTimestamp');
+            return !savedTimestamp || (Date.now() - savedTimestamp) > 3600000; // 1 hora
+        }
+
+        // Verificar si ya está logueado
+        if (!isLoginExpired()) {
+            window.location.href = 'index.html';
+        }
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            loginButton.disabled = true;
+            customSpinner.classList.remove('d-none'); // Muestra el spinner
+            buttonText.textContent = 'Verificando datos...';
+
+            setTimeout(() => { // Delay de 3 segundos para mostrar "Verificando"
+                dbRef.once('value').then(snapshot => {
+                    const data = snapshot.val();
+                    if (data[1] === username && data[2] === password) {
+                        buttonText.textContent = 'Ingresando';
+                        loginButton.classList.replace('btn-primary', 'btn-success');
+                        let countdown = 3;
+                        const interval = setInterval(() => {
+                            buttonText.textContent = `Ingresando (${countdown})`;
+                            countdown--;
+                            if (countdown < 0) {
+                                clearInterval(interval);
+                                saveLoginTimestamp();
+                                window.location.href = 'index.html';
+                            }
+                        }, 1000);
+                    } else {
+                        loginButton.disabled = false;
+                        customSpinner.classList.add('d-none'); // Oculta el spinner
+                        loginButton.classList.replace('btn-primary', 'btn-danger');
+                        buttonText.textContent = 'Contraseña incorrecta';
+                        let countdown = 5;
+                        errorMsg.textContent = `Reintento en ${countdown}...`;
+                        errorMsg.classList.remove('d-none');
+                        const interval = setInterval(() => {
+                            countdown--;
+                            errorMsg.textContent = `Reintento en ${countdown}...`;
+                            if (countdown === 0) {
+                                clearInterval(interval);
+                                loginButton.classList.replace('btn-danger', 'btn-primary');
+                                buttonText.textContent = 'Ingresar';
+                                errorMsg.classList.add('d-none');
+                            }
+                        }, 1000);
+                    }
+                }).catch(error => {
+                    console.error('Error al conectar con Firebase:', error);
+                    customSpinner.classList.add('d-none'); // Oculta el spinner
+                    loginButton.disabled = false;
+                    buttonText.textContent = 'Error de conexión';
+                });
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
