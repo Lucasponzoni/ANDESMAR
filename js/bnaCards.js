@@ -1101,7 +1101,7 @@ COMPRA CON USO DE PUNTOS BNA
                                 <input type="text" id="codigo_postal_${data[i].id}" value="${data[i].codigo_postal_facturacion}" disabled>
                             </div>
                         </div>
-                        <div class="row mb-2 oculto">
+                        <div class="row mb-2">
                             <div class="col">
                                 <label for="timbre_${data[i].id}">Timbre:</label>
                                 <input type="text" id="timbre_${data[i].id}" value="0" disabled>
@@ -1663,7 +1663,7 @@ function marcarFacturado2(id) {
         telefono_envio: document.getElementById(`telefono_envio_${id}`).value,
         persona_autorizada: document.getElementById(`persona_autorizada_${id}`).value,
         otros_comentarios_entrega: document.getElementById(`otros_comentarios_entrega_${id}`).value,
-        provincia: document.getElementById(`provincia_${data[i].id}`).value
+        provincia: document.getElementById(`provincia_${id}`).value
     };
 
     // Guardar contenido del botón en Firebase
