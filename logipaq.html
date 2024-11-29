@@ -30,18 +30,18 @@
             max-width: 400px;
         }
         .custom-spinner {
-            width: 1.5rem; /* Aumentar el tamaño del spinner */
-            height: 1.5rem; /* Aumentar el tamaño del spinner */
+            width: 1.5rem;
+            height: 1.5rem;
             margin-right: 8px;
         }
         .btn {
             display: flex;
-            align-items: center; /* Alinea verticalmente el contenido */
-            justify-content: center; /* Centra el contenido horizontalmente */
+            align-items: center; 
+            justify-content: center;
         }
         .spinner-container2 {
             display: flex;
-            align-items: center; /* Alinea verticalmente el spinner y el texto */
+            align-items: center;
         }
     </style>
 </head>
@@ -111,10 +111,10 @@
             const password = document.getElementById('password').value.trim();
 
             loginButton.disabled = true;
-            customSpinner.classList.remove('d-none'); // Muestra el spinner
+            customSpinner.classList.remove('d-none'); 
             buttonText.textContent = 'Verificando datos...';
 
-            setTimeout(() => { // Delay de 3 segundos para mostrar "Verificando"
+            setTimeout(() => {
                 dbRef.once('value').then(snapshot => {
                     const data = snapshot.val();
                     if (data[1] === username && data[2] === password) {
@@ -132,7 +132,7 @@
                         }, 1000);
                     } else {
                         loginButton.disabled = false;
-                        customSpinner.classList.add('d-none'); // Oculta el spinner
+                        customSpinner.classList.add('d-none'); 
                         loginButton.classList.replace('btn-primary', 'btn-danger');
                         buttonText.textContent = 'Contraseña incorrecta';
                         let countdown = 5;
@@ -151,7 +151,7 @@
                     }
                 }).catch(error => {
                     console.error('Error al conectar con Firebase:', error);
-                    customSpinner.classList.add('d-none'); // Oculta el spinner
+                    customSpinner.classList.add('d-none'); 
                     loginButton.disabled = false;
                     buttonText.textContent = 'Error de conexión';
                 });
