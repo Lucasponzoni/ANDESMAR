@@ -45,6 +45,13 @@ h1 {
     color: #41c9c9;
 }
 
+.navbar-brand-text3{
+    font-family: "Titan One", sans-serif;
+    font-size: 2rem;
+    color: crimson;
+}
+
+
 .blackCat{
     width: 110px;
 }
