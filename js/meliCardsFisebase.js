@@ -664,7 +664,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
 
     // Eliminar el prefijo "200000" del idOperacion
-    const idOperacionFinal = idOperacion.replace(/^200000/, '');
+    const idOperacionFinal = idOperacion.replace(/^20000[0-9]/, '');
 
     // Mostrar spinner y cambiar texto
     spinner.style.display = 'inline-block';
@@ -905,7 +905,7 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
     });
 
     // Eliminar el prefijo "200000" del idOperacion
-    const idOperacionFinalAndreani = idOperacion.replace(/^200000/, '');
+    const idOperacionFinalAndreani = idOperacion.replace(/^20000[0-9]/, '');
 
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
