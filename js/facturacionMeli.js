@@ -212,7 +212,7 @@ db.ref('PasarAWebMonto').once('value')
     
                 // Operación
                 const operationCell = document.createElement('td');
-                const operationId = operation.idOperacion.toString().replace('200000', '');
+                const operationId = operation.idOperacion.toString().replace('200001', '');
                 operationCell.innerHTML = `
                     <a href="https://www.mercadolibre.com.ar/ventas/${operation.idOperacion}/detalle" target="_blank"><img id="Meli-trends" src="./Img/meli-trends.png" alt="Meli Trends"></a>
                 `;
@@ -221,7 +221,7 @@ db.ref('PasarAWebMonto').once('value')
                 // Imagen
                 const imageCell = document.createElement('td');
                 imageCell.innerHTML = `
-                <a href="https://app.real-trends.com/orders/sale_detail/?order_id=200000${operationId}" target="_blank">
+                <a href="https://app.real-trends.com/orders/sale_detail/?order_id=200001${operationId}" target="_blank">
                 <img id="real-trends" src="./Img/real-trends.png" alt="Real Trends">
                 </a>
                 `;
@@ -914,7 +914,7 @@ function loadTable2() {
 
         // Operación
         const operationCell = document.createElement('td');
-        const operationId = operation.idOperacion.toString().replace('200000', '');
+        const operationId = operation.idOperacion.toString().replace('200001', '');
         operationCell.innerHTML = `
             <a href="https://www.mercadolibre.com.ar/ventas/${operation.idOperacion}/detalle" target="_blank"><img id="Meli-trends" src="./Img/meli-trends.png" alt="Meli Trends"></a>
         `;
@@ -923,7 +923,7 @@ function loadTable2() {
         // Imagen
         const imageCell = document.createElement('td');
         imageCell.innerHTML = `
-            <a href="https://app.real-trends.com/orders/sale_detail/?order_id=200000${operationId}" target="_blank">
+            <a href="https://app.real-trends.com/orders/sale_detail/?order_id=200001${operationId}" target="_blank">
                 <img id="real-trends" src="./Img/real-trends.png" alt="Real Trends">
             </a>
         `;
