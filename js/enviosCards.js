@@ -290,9 +290,6 @@ async function renderCards(data) {
                 modal.show();
                 });
 
-
-
-
                 estadoDiv.appendChild(reclamarButton);
                 
                 estadoDiv.insertBefore(guiaContainer, estadoDiv.firstChild);
