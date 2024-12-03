@@ -24,7 +24,7 @@
     // Verificación de sesión
     function checkLogin() {
         const savedTimestamp = localStorage.getItem('loginTimestamp');
-        const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 3600000; // 1 hora
+        const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 10800000; // 3 horas
 
         if (isExpired) {
             window.location.href = 'logipaq.html'; // Redirige al login si la sesión ha expirado
@@ -100,7 +100,7 @@
             </div>
             <div class="modal-body d-flex justify-content-center align-items-center" style="height: auto;">
                 <div id="trackingContent">
-                    <!-- Aca van los datos Carcados -->
+                    <!-- Aca van los datos Cargados -->
                 </div>
             </div>
         </div>
@@ -108,7 +108,7 @@
 </div> 
 <!-- Fin Modal -->
 
-        <div class="row" id="envios-cards">
+        <div class="row" id="meli-cards">
 
         </div>
         <nav aria-label="Page navigation">

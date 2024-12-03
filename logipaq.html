@@ -100,8 +100,13 @@
                 </div>
             </button>
         </form>
-        <p id="errorMsg" class="text-danger mt-2 d-none"></p>
+        <p id="errorMsg" class="text-danger mt-2 d-none"></p>     
+        
     </div>
+
+
+    
+    
 
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -135,7 +140,7 @@
 
         function isLoginExpired() {
             const savedTimestamp = localStorage.getItem('loginTimestamp');
-            return !savedTimestamp || (Date.now() - savedTimestamp) > 3600000; // 1 hora
+            return !savedTimestamp || (Date.now() - savedTimestamp) > 10800000; // 3 horas
         }
 
         // Verificar si ya está logueado

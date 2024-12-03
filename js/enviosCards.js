@@ -36,7 +36,7 @@ function capitalizeText(text) {
 
 document.addEventListener("DOMContentLoaded", function() {
     const spinner = document.getElementById("spinner");
-    const cardsContainer = document.getElementById("envios-cards");
+    const cardsContainer = document.getElementById("meli-cards");
     const searchInput = document.getElementById("search");
     const filterSelect = document.getElementById("filter");
     const paginationContainer = document.getElementById("pagination");
@@ -235,9 +235,9 @@ async function renderCards(data) {
                 const estadoDiv = document.createElement('div');
                 estadoDiv.className = 'mb-3';
                 
-                const guia = data.NroGuia === "0" ? "Pendiente de Ingreso" : `Guia: ${data.NroGuia}`;
+                const guia = data.NroGuia === "0" ? "Pendiente de Envío" : `Guia: ${data.NroGuia}`;
                 const estadoActual = `${capitalizeText(data.EstadoActual)}`;
-                const fecha = `Fecha: ${new Date(data.FechaEmision).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+                const fecha = `Fecha de creación: ${new Date(data.FechaEmision).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
                 
                 const guiaContainer = document.createElement('div');
                 guiaContainer.className = 'd-flex align-items-center';
@@ -360,7 +360,7 @@ searchInput.addEventListener("input", function() {
     
     // Si no se encuentra ningún resultado, mostrar una imagen de error
     if (filteredData.length === 0) {
-        document.getElementById("envios-cards").innerHTML = `
+        document.getElementById("meli-cards").innerHTML = `
             <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
                 <p class="errorp">No se encontraron resultados para "${searchTerm}"</p>
                 <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">

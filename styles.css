@@ -1191,17 +1191,22 @@ p.card-text{
     margin-bottom: 10px;
 }
 
-.cpLocalidad{
-    font-family: "Reddit Sans Condensed", sans-serif;
+.cpLocalidad {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     text-transform: capitalize;
-    font-size: .8rem;
-    font-weight: 300;
+    font-size: 0.8rem;
+    font-weight: 400 !important;
     width: fit-content;
-    background-color: orange;
+    max-width: 100%; 
+    background-color: rgb(76, 76, 76); 
     color: white;
     border-radius: 8px;
     padding: 5px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
 }
+
 
 .btn-mark{
     margin-right: 5px !important;
@@ -1413,17 +1418,19 @@ p.card-text:nth-child(9){
     margin-bottom: -5px !important;
 }
 
-.remitoCard{
-    margin-bottom: 5px !important;
+.remitoCard {
+    margin-bottom: 10px !important;
     text-align: center;
-    padding: .2rem;
+    padding: 10px;
     width: fit-content;
-    border-radius: 10px;
-    border: dashed #ffc107 2px;
-    color: cornflowerblue;
-    font-size: 1.3rem;
-    font-family: "Reddit Sans Condensed", sans-serif;
-    font-weight: 800 !important;
+    border-radius: 12px;
+    border: 1px solid cornflowerblue;
+    background-color: #ffffff; 
+    color: #007aff;
+    font-size: 1.1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .remitoCardMeli {
@@ -1670,23 +1677,29 @@ div.card-body > p > i{
     box-shadow: none;
 }
 
-.apiSeguimiento{
+.apiSeguimiento {
     height: fit-content;
-    margin-bottom: 5px;
-    border: dashed cornflowerblue 2px;
-    border-radius: 10px;
-    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid cornflowerblue;
+    border-radius: 12px;
+    padding: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-.apiSeguimiento p > i{
-    font-size: 1rem;
+.apiSeguimiento p > i {
+    font-size: 1.2rem;
+    color: #007aff;
 }
 
 .apiSeguimiento p {
     font-size: 1rem;
-    font-family: "Reddit Sans Condensed", sans-serif;
-    font-weight: 400 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    color: #333;
+    margin: 0;
 }
+
 
 .apiSeguimiento p:nth-child(3) {
     margin-bottom: -15px;
@@ -2030,7 +2043,7 @@ div.card-body > p > i{
     font-size: 1rem;
     padding-inline: 5px;
     padding: 5px;
-    border-radius: 10px;
+    border-radius: 5px;
     position: absolute;
     top: -18px; 
     right: 10px;
@@ -2048,11 +2061,11 @@ div.card-body > p > i{
     height: 30px !important;
     padding-inline: 5px;
     padding: 5px;
-    border-radius: 10px;
+    border-radius: 5px;
     position: absolute;
     top: -18px; 
     right: 10px;
-    background-color:#ec0043; 
+    background-color:crimson; 
     color: white;
     display: flex; 
     align-items: center; 
@@ -2065,12 +2078,12 @@ div.card-body > p > i{
     font-size: 1rem;
     padding-inline: 5px;
     padding: 5px;
-    border-radius: 10px;
+    border-radius: 5px;
     position: absolute;
     top: -18px; 
     right: 10px;
-    background-color: rgb(37, 37, 142);
-    color: yellow;
+    background-color: #007aff;
+    color: whitesmoke;
     display: flex; 
     align-items: center; 
     justify-content: center;
@@ -2106,12 +2119,12 @@ div.card-body > p > i{
     height: 30px;
     padding-inline: 5px;
     padding: 5px;
-    border-radius: 10px;
+    border-radius: 5px;
     position: absolute;
     top: -15px; 
     right: 10px;
     color: white;
-    background-color: indigo;
+    background-color: rgb(68, 46, 84);
     display: flex; 
     align-items: center; 
     justify-content: center;
