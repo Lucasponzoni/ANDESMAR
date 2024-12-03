@@ -266,6 +266,34 @@ async function renderCards(data) {
                     <p class="card-text"><i class="bi bi-info-circle"></i> ${estadoActual}</p>
                     <p class="card-text"><i class="bi bi-calendar"></i> ${fecha}</p>
                 `;
+
+                // Agregar el botón de Reclamar Envío
+                const reclamarButton = document.createElement('button');
+                reclamarButton.className = 'btn btn-danger mt-2 reclamo-andesmar w-100';
+                reclamarButton.innerHTML = '<i class="bi bi-exclamation-circle"></i> Reclamar envío';
+
+                if (data.NroGuia === "0") {
+                    reclamarButton.className = 'btn btn-secondary mt-2 reclamo-andesmar w-100'; // Cambiar a color secondary
+                    reclamarButton.disabled = true; // Deshabilitar el botón
+                    reclamarButton.innerHTML = '<i class="bi bi-exclamation-circle"></i> Reclamo activo cuando se envíe';
+                } else if (estadoActual === "En Destino - Entregada") {
+                    reclamarButton.className = 'btn btn-success mt-2 reclamo-andesmar w-100'; // Cambiar a color success
+                    reclamarButton.disabled = true; // Deshabilitar el botón
+                    reclamarButton.innerHTML = '<i class="bi bi-check-circle"></i> Entrega Exitosa'; // Actualizar texto
+                }
+
+                // Agregar evento para abrir el modal
+                reclamarButton.addEventListener('click', () => {
+                document.getElementById('asunto').value = `Reclamo Novogar / Remito: ${item.remito} Guia: ${data.NroGuia}`;
+                document.getElementById('cuerpo').value = `Estimados, nos contactamos para realizar un reclamo por el envío ${data.NroGuia}.`;
+                const modal = new bootstrap.Modal(document.getElementById('emailModal'));
+                modal.show();
+                });
+
+
+
+
+                estadoDiv.appendChild(reclamarButton);
                 
                 estadoDiv.insertBefore(guiaContainer, estadoDiv.firstChild);
                 

@@ -2113,6 +2113,11 @@ div.card-body > p > i{
     width:50px;
 }
 
+.reclamo-andesmar{
+    margin-top: 20px !important;
+    margin-bottom: -15px !important;
+}
+
 .em-state-bna2{
     font-family: "Reddit Sans Condensed", sans-serif;
     font-size: 1rem;

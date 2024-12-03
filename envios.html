@@ -121,6 +121,93 @@
             <i class="fas fa-arrow-up"></i>
         </a>
 
+<!-- Modal de Envío de Email -->
+<div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header-crimson">
+                <h5 class="modal-title" id="emailModalLabel">Enviar Email</h5>
+            </div>
+            <div class="modal-body">
+                <form id="formularioEmail">
+                    <div class="mb-3">
+                        <label for="destinatario" class="form-label">Destinatario</label>
+                        <input type="email" class="form-control input-email" id="destinatario" value="lucasponzoni@gmail.com" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="origen" class="form-label">Origen</label>
+                        <input type="email" class="form-control input-email" id="origen" value="posventa@novogar.com.ar" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="asunto" class="form-label">Asunto</label>
+                        <input type="text" class="form-control input-email" id="asunto" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cuerpo" class="form-label">Cuerpo del Email</label>
+                        <textarea class="form-control input-email" id="cuerpo" rows="3">Estimados, nos contactamos para realizar un reclamo por el envío en asunto.</textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="alert-modal text-center">
+                <i class="bi bi-exclamation-circle me-2" style="font-size: 1.5rem;"></i>
+                <span> Para cerrar haga clic fuera de la ventana.</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="botonEnviarEmail">Enviar Email</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos CSS -->
+<style>
+    .modal-content {
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header-crimson {
+        padding: 20px;
+        background-color: crimson;
+        color: white;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+
+    .modal-title {
+        font-weight: bold;
+    }
+
+    .alert-modal {
+        margin-top: -50px !important;
+        text-align: center;
+        font-weight: 400 !important;
+        background-color: crimson; 
+        color: whitesmoke; 
+        border: 1px solid orangered;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 15px auto; 
+    }
+
+    .input-email {
+        border-radius: 10px;
+        border: 1px solid #ced4da;
+        padding: 10px;
+        transition: border-color 0.3s;
+    }
+
+    .input-email:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    #formularioEmail{
+        border: crimson solid 1px;
+    }
+</style>
+
+
     <footer class="center">
         <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
         <a class="www" href="https://novogar.com.ar/" target="_blank">NOVOGAR</a>
