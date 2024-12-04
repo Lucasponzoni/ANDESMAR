@@ -130,6 +130,10 @@
             </div>
             <div class="modal-body">
                 <form id="formularioEmail">
+                    <div class="mb-3 idModalDiv">
+                        <label for="idModal" class="form-label">Id de Operacion</label>
+                        <input type="email" class="form-control input-email" id="idModal" readonly>
+                    </div>
                     <div class="mb-3">
                         <label for="destinatario" class="form-label">Destinatario</label>
                         <input type="email" class="form-control input-email" id="destinatario" value="lucasponzoni@gmail.com" readonly>
@@ -147,10 +151,11 @@
                         <textarea class="form-control input-email" id="cuerpo" rows="3">Estimados, nos contactamos para realizar un reclamo por el envío en asunto.</textarea>
                     </div>
                 </form>
+                <div id="mensajeReclamo" class="alert alert-info" style="display: none;"></div>
             </div>
             <div class="alert-modal text-center">
                 <i class="bi bi-exclamation-circle me-2" style="font-size: 1.5rem;"></i>
-                <span> Para cerrar haga clic fuera de la ventana.</span>
+                <span> Para cerrar haga click fuera de la ventana.</span>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="botonEnviarEmail">Enviar Email</button>

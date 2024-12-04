@@ -170,6 +170,24 @@ async function renderCards(data) {
             </div>
         `;
 
+        // Verificar si existe reclamoEmail1 en Firebase
+        const reclamoSnapshot = await database.ref(`enviosAndesmar/${item.id}/reclamoEmail1`).once('value');
+        if (reclamoSnapshot.exists()) {
+            const reclamoData = reclamoSnapshot.val();
+            console.log('Reclamo activo:', reclamoData); // Muestra en consola el contenido del reclamo
+
+            // Crear el div para mostrar el mensaje
+            const reclamoDiv = document.createElement('div');
+            reclamoDiv.className = 'alerta-card-andesmar';
+            reclamoDiv.innerHTML = `<span class="message"><div class="circle"></div> Posee reclamo activo</span>`;
+
+            // Insertar el div debajo de apiSeguimiento
+            const apiSeguimientoDiv = card.querySelector('.apiSeguimiento');
+            apiSeguimientoDiv.parentNode.insertBefore(reclamoDiv, apiSeguimientoDiv.nextSibling); // Inserta justo después de apiSeguimiento
+        } else {
+            console.log('No hay reclamos activos para este envío.');
+        }
+
         cardsContainer.appendChild(card);
 
         // Lógica del botón de copiar al portapapeles
@@ -185,127 +203,127 @@ async function renderCards(data) {
 
         // Lógica para actualizar observaciones
         const updateButton = card.querySelector('.update-observaciones');
-        updateButton.addEventListener('click', () => {
-            const observacionesInput = card.querySelector(`#observaciones-${item.id}`);
-            const observacionesValue = observacionesInput.value;
+        if (updateButton) {
+            updateButton.addEventListener('click', () => {
+                const observacionesInput = card.querySelector(`#observaciones-${item.id}`);
+                const observacionesValue = observacionesInput.value;
 
-            // Actualizar en Firebase
-            database.ref(`enviosAndesmar/${item.id}`).update({ observaciones: observacionesValue })
-            .then(() => {
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Actualización exitosa!',
-                    text: 'Las observaciones han sido actualizadas correctamente.',
-                    confirmButtonText: 'Aceptar'
-                });
-            })
-            .catch((error) => {
-                console.error("Error al actualizar observaciones: ", error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'No se pudieron actualizar las observaciones. Inténtalo de nuevo.',
-                    confirmButtonText: 'Aceptar'
+                // Actualizar en Firebase
+                database.ref(`enviosAndesmar/${item.id}`).update({ observaciones: observacionesValue })
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Actualización exitosa!',
+                        text: 'Las observaciones han sido actualizadas correctamente.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error al actualizar observaciones: ", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudieron actualizar las observaciones. Inténtalo de nuevo.',
+                        confirmButtonText: 'Aceptar'
+                    });
                 });
             });
-        });
+        }
 
-
-            cardsContainer.appendChild(card);
-
-            // Llamar a la API para obtener el estado actual
-            try {
-                const response = await fetch('https://proxy.cors.sh/https://api.andesmarcargas.com/api/EstadoActual', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+        // Llamar a la API para obtener el estado actual
+        try {
+            const response = await fetch('https://proxy.cors.sh/https://api.andesmarcargas.com/api/EstadoActual', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+                },
+                body: JSON.stringify({
+                    "logueo": {
+                        "Usuario": "BOM6765",
+                        "Clave": "BOM6765",
+                        "CodigoCliente": "6765"
                     },
-                    body: JSON.stringify({
-                        "logueo": {
-                            "Usuario": "BOM6765",
-                            "Clave": "BOM6765",
-                            "CodigoCliente": "6765"
-                        },
-                        "NroPedido": item.nroPedido
-                    })
-                });
+                    "NroPedido": item.nroPedido
+                })
+            });
 
-                const data = await response.json();
-                const estadoDiv = document.createElement('div');
-                estadoDiv.className = 'mb-3';
-                
-                const guia = data.NroGuia === "0" ? "Pendiente de Envío" : `Guia: ${data.NroGuia}`;
-                const estadoActual = `${capitalizeText(data.EstadoActual)}`;
-                const fecha = `Fecha de creación: ${new Date(data.FechaEmision).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
-                
-                const guiaContainer = document.createElement('div');
-                guiaContainer.className = 'd-flex align-items-center';
-                
-                const guiaParagraph = document.createElement('p');
-                guiaParagraph.className = 'card-text mb-0';
-                guiaParagraph.innerHTML = `<i class="bi bi-truck"></i> ${guia}`;
-                
-                const copyGuideButton = document.createElement('button');
-                copyGuideButton.className = 'btn btn-link copy-guide-btn ms-2';
-                copyGuideButton.innerHTML = '<i class="bi bi-clipboard"></i>';
-                
-                copyGuideButton.addEventListener('click', () => {
-                    navigator.clipboard.writeText(data.NroGuia).then(() => {
-                        copyGuideButton.innerHTML = 'Copiado';
-                        setTimeout(() => {
-                            copyGuideButton.innerHTML = '<i class="bi bi-clipboard"></i>';
-                        }, 2000);
-                    }).catch(err => console.error('Error al copiar al portapapeles: ', err));
-                });
-                
-                guiaContainer.appendChild(guiaParagraph);
-                guiaContainer.appendChild(copyGuideButton);
-                
-                estadoDiv.innerHTML += `
-                    <p class="card-text"><i class="bi bi-info-circle"></i> ${estadoActual}</p>
-                    <p class="card-text"><i class="bi bi-calendar"></i> ${fecha}</p>
-                `;
+            const data = await response.json();
+            const estadoDiv = document.createElement('div');
+            estadoDiv.className = 'mb-3';
+            
+            const guia = data.NroGuia === "0" ? "Pendiente de Envío" : `Guia: ${data.NroGuia}`;
+            const estadoActual = `${capitalizeText(data.EstadoActual)}`;
+            const fecha = `Fecha de creación: ${new Date(data.FechaEmision).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+            
+            const guiaContainer = document.createElement('div');
+            guiaContainer.className = 'd-flex align-items-center';
+            
+            const guiaParagraph = document.createElement('p');
+            guiaParagraph.className = 'card-text mb-0';
+            guiaParagraph.innerHTML = `<i class="bi bi-truck"></i> ${guia}`;
+            
+            const copyGuideButton = document.createElement('button');
+            copyGuideButton.className = 'btn btn-link copy-guide-btn ms-2';
+            copyGuideButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+            
+            copyGuideButton.addEventListener('click', () => {
+                navigator.clipboard.writeText(data.NroGuia).then(() => {
+                    copyGuideButton.innerHTML = 'Copiado';
+                    setTimeout(() => {
+                        copyGuideButton.innerHTML = '<i class="bi bi-clipboard"></i>';
+                    }, 2000);
+                }).catch(err => console.error('Error al copiar al portapapeles: ', err));
+            });
+            
+            guiaContainer.appendChild(guiaParagraph);
+            guiaContainer.appendChild(copyGuideButton);
+            
+            estadoDiv.innerHTML += `
+                <p class="card-text"><i class="bi bi-info-circle"></i> ${estadoActual}</p>
+                <p class="card-text"><i class="bi bi-calendar"></i> ${fecha}</p>
+            `;
 
-                // Agregar el botón de Reclamar Envío
-                const reclamarButton = document.createElement('button');
-                reclamarButton.className = 'btn btn-danger mt-2 reclamo-andesmar w-100';
-                reclamarButton.innerHTML = '<i class="bi bi-exclamation-circle"></i> Reclamar envío';
+            // Agregar el botón de Reclamar Envío
+            const reclamarButton = document.createElement('button');
+            reclamarButton.className = 'btn btn-danger mt-2 reclamo-andesmar w-100';
+            reclamarButton.innerHTML = '<i class="bi bi-exclamation-circle"></i> Reclamar envío';
 
-                if (data.NroGuia === "0") {
-                    reclamarButton.className = 'btn btn-secondary mt-2 reclamo-andesmar w-100'; // Cambiar a color secondary
-                    reclamarButton.disabled = true; // Deshabilitar el botón
-                    reclamarButton.innerHTML = '<i class="bi bi-exclamation-circle"></i> Reclamo activo cuando se envíe';
-                } else if (estadoActual === "En Destino - Entregada") {
-                    reclamarButton.className = 'btn btn-success mt-2 reclamo-andesmar w-100'; // Cambiar a color success
-                    reclamarButton.disabled = true; // Deshabilitar el botón
-                    reclamarButton.innerHTML = '<i class="bi bi-check-circle"></i> Entrega Exitosa'; // Actualizar texto
-                }
+            if (data.NroGuia === "0") {
+                reclamarButton.className = 'btn btn-secondary mt-2 reclamo-andesmar w-100'; // Cambiar a color secondary
+                reclamarButton.disabled = true; // Deshabilitar el botón
+                reclamarButton.innerHTML = '<i class="bi bi-exclamation-circle"></i> Reclamo activo cuando se envíe';
+            } else if (estadoActual === "En Destino - Entregada") {
+                reclamarButton.className = 'btn btn-success mt-2 reclamo-andesmar w-100'; // Cambiar a color success
+                reclamarButton.disabled = true; // Deshabilitar el botón
+                reclamarButton.innerHTML = '<i class="bi bi-check-circle"></i> Entrega Exitosa'; // Actualizar texto
+            }
 
-                // Agregar evento para abrir el modal
-                reclamarButton.addEventListener('click', () => {
+            // Agregar evento para abrir el modal
+            reclamarButton.addEventListener('click', () => {
+                document.getElementById('idModal').value = `${item.id}`;
                 document.getElementById('asunto').value = `Reclamo Novogar / Remito: ${item.remito} Guia: ${data.NroGuia}`;
                 document.getElementById('cuerpo').value = `Estimados, nos contactamos para realizar un reclamo por el envío ${data.NroGuia}.`;
                 const modal = new bootstrap.Modal(document.getElementById('emailModal'));
                 modal.show();
-                });
+            });
 
-                estadoDiv.appendChild(reclamarButton);
-                
-                estadoDiv.insertBefore(guiaContainer, estadoDiv.firstChild);
-                
-                const apiSeguimientoDiv = card.querySelector('.apiSeguimiento');
-                apiSeguimientoDiv.innerHTML = ''; 
-                apiSeguimientoDiv.appendChild(estadoDiv); 
-                apiSeguimientoDiv.removeAttribute('style');
+            estadoDiv.appendChild(reclamarButton);
+            
+            estadoDiv.insertBefore(guiaContainer, estadoDiv.firstChild);
+            
+            const apiSeguimientoDiv = card.querySelector('.apiSeguimiento');
+            apiSeguimientoDiv.innerHTML = ''; 
+            apiSeguimientoDiv.appendChild(estadoDiv); 
+            apiSeguimientoDiv.removeAttribute('style');
 
-            } catch (error) {
-                console.error('Error al obtener el estado de seguimiento:', error);
-            }
-        });
+        } catch (error) {
+            console.error('Error al obtener el estado de seguimiento:', error);
+        }
+    });
 
-        await Promise.all(promises);
-    }
+    await Promise.all(promises);
+}
 
     // Lógica para el botón de filtrar etiquetas
     const filterLabelsButton = document.getElementById("filter-labels");
@@ -553,10 +571,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Función para enviar el correo
-    async function enviarCorreo(destinatarioEmail, emailOrigen, emailBody, emailSubject) {
+    async function enviarCorreo(destinatarioEmail, emailOrigen, emailBody, emailSubject, item) {
         const smtpU = 's154745_3';
         const smtpP = 'QbikuGyHqJ';
-
+    
         const emailData = {
             "Html": {
                 "DocType": null,
@@ -584,7 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "Secret": smtpP
             }
         };
-
+    
         try {
             const response = await fetch('https://proxy.cors.sh/https://send.mailup.com/API/v2.0/messages/sendmessage', {
                 method: 'POST',
@@ -594,11 +612,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify(emailData)
             });
-
+    
             const result = await response.json();
             if (result.Status === 'done') {
                 console.log('Email enviado exitosamente');
                 showAlert(`<i class="bi bi-envelope-check"></i> Email enviado a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
+                
+                // Llamar la función para gestionar el reclamoEmail
+                await manejarReclamoEmail(item);
             } else {
                 console.log(`Error al enviar el email: ${result.Message}`);
                 showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
@@ -608,23 +629,79 @@ document.addEventListener('DOMContentLoaded', () => {
             showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
         }
     }
-
+    
+    // Función para manejar el reclamoEmail
+    async function manejarReclamoEmail(item) {
+        const item2 = document.getElementById('idModal').value;
+        const emailBody2 = document.getElementById('cuerpo').value;
+        const emailSubject2 = document.getElementById('asunto').value;
+        const ref = database.ref(`enviosAndesmar/${item2}`);
+        
+        // Obtener los datos actuales del nodo
+        const snapshot = await ref.once('value');
+        const data = snapshot.val();
+        
+        // Verificar si ya existe el campo reclamoEmail
+        let reclamoKey = 'reclamoEmail1'; // Valor predeterminado si no existe
+        let count = 1;
+    
+        // Si ya existen reclamoEmails numerados, buscar el siguiente número disponible
+        while (data && data[`reclamoEmail${count}`]) {
+            count++;
+        }
+    
+        // Definir la nueva clave de reclamoEmail
+        reclamoKey = `reclamoEmail${count}`;
+    
+        // Crear un nuevo reclamoEmail
+        const nuevoReclamo = {
+            fecha: new Date().toISOString(),
+            asunto: emailSubject2, // Asunto del reclamo
+            cuerpo: emailBody2, // Cuerpo del reclamo
+        };
+    
+        // Guardar el nuevo reclamoEmail en la base de datos
+        await ref.update({
+            [reclamoKey]: nuevoReclamo
+        });
+    
+        console.log(`Reclamo guardado como ${reclamoKey}`);
+    }
+    
     // Evento para el botón de enviar email
     botonEnviarEmail.addEventListener('click', async () => {
         botonEnviarEmail.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando email...';
         botonEnviarEmail.disabled = true; // Deshabilitar el botón
-
+    
         const destinatarioEmail = document.getElementById('destinatario').value;
         const emailOrigen = document.getElementById('origen').value;
         const emailBody = document.getElementById('cuerpo').value;
         const emailSubject = document.getElementById('asunto').value;
-
-        await enviarCorreo(destinatarioEmail, emailOrigen, emailBody, emailSubject);
-
-        // Reiniciar el botón después de enviar
-        botonEnviarEmail.innerHTML = 'Enviar Email';
-        botonEnviarEmail.disabled = false; // Habilitar el botón
-    });
+        const item = document.getElementById('idModal').value;
+    
+        // Enviar correo
+        await enviarCorreo(destinatarioEmail, emailOrigen, emailBody, emailSubject, item);
+    
+        // Actualizar el botón tras el envío
+        botonEnviarEmail.innerHTML = 'Email enviado con éxito (5)';
+        botonEnviarEmail.classList.add('btn-success');
+        botonEnviarEmail.classList.remove('btn-primary');
+        botonEnviarEmail.disabled = true;
+    
+        // Contador descendente
+        let counter = 5;
+        const interval = setInterval(() => {
+            counter--;
+            botonEnviarEmail.innerHTML = `Email enviado con éxito (${counter})`;
+            if (counter <= 0) {
+                clearInterval(interval); // Detener el contador
+                botonEnviarEmail.innerHTML = 'Enviar Email';
+                botonEnviarEmail.classList.remove('btn-success');
+                botonEnviarEmail.classList.add('btn-primary');
+                botonEnviarEmail.disabled = false; // Habilitar el botón
+            }
+        }, 1000); // Decrementa el contador cada segundo
+    });    
 });
 
 let alertCount = 0;

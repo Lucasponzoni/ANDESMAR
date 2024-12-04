@@ -736,6 +736,10 @@ button:hover {
     position: relative;
 }
 
+.idModalDiv{
+    display: none;
+}
+
 #reclamarButton{
     display: none;
 }
@@ -3788,5 +3792,58 @@ input[disabled] {
 .contador2 span {
     font-weight: bold;
 }
+
+.message{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alerta-card-andesmar {
+    position: absolute;
+    bottom: -15px; 
+    right: 10px; 
+    background-color: white; 
+    border: 1px solid #d1d1d6;
+    border-radius: 10px;
+    display: flex; 
+    align-items: center; 
+    z-index: 10;
+}
+
+/* Estilo del círculo rojo */
+.alerta-card-andesmar .circle {
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%; 
+    background-color: crimson; 
+    margin-right: 10px; 
+    animation: pulse-circle 1.5s infinite;
+}
+
+/* Animación del círculo */
+@keyframes pulse-circle {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    }
+    50% {
+        transform: scale(1.5);
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.9); 
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.8); 
+    }
+}
+
+/* Estilo del texto */
+.alerta-card-andesmar .message {
+    padding: 5px;
+    font-size: small;
+    font-weight: 500; 
+    color: crimson;
+}
+
 
 
