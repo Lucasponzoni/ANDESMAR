@@ -747,6 +747,13 @@ button:hover {
     margin-right: 10px;
 }
 
+@media (max-width: 767px) {
+    .navbar-logo {
+        display: none;
+    }
+}
+
+
 .brand-name {
     text-transform: uppercase;
     font-family: 'Modica Oft';
