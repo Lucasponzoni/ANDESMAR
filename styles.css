@@ -3803,7 +3803,7 @@ input[disabled] {
     position: absolute;
     bottom: -15px; 
     right: 10px; 
-    background-color: white; 
+    background-color: crimson; 
     border: 1px solid #d1d1d6;
     border-radius: 10px;
     display: flex; 
@@ -3816,7 +3816,7 @@ input[disabled] {
     width: 10px; 
     height: 10px; 
     border-radius: 50%; 
-    background-color: crimson; 
+    background-color: yellow; 
     margin-right: 10px; 
     animation: pulse-circle 1.5s infinite;
 }
@@ -3825,23 +3825,23 @@ input[disabled] {
 @keyframes pulse-circle {
     0% {
         transform: scale(1);
-        box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        box-shadow: 0 0 10px rgba(255, 255, 0, 0.8); /* Amarillo */
     }
     50% {
         transform: scale(1.5);
-        box-shadow: 0 0 20px rgba(255, 0, 0, 0.9); 
+        box-shadow: 0 0 20px rgba(255, 255, 0, 0.9); /* Amarillo */
     }
     100% {
         transform: scale(1);
-        box-shadow: 0 0 10px rgba(255, 0, 0, 0.8); 
+        box-shadow: 0 0 10px rgba(255, 255, 0, 0.8); /* Amarillo */
     }
 }
 
 .alerta-card-andesmar .message {
     padding: 5px;
-    font-size: small;
+    font-size: .8rem;
     font-weight: 500; 
-    color: crimson;
+    color: white;
 }
 
 #modalFecha {
