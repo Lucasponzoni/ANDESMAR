@@ -143,7 +143,7 @@ async function renderCards(data) {
                     </div>
 
                     <div class="apiSeguimiento" style="display: flex; justify-content: center; align-items: center; height: 100px">
-                        <img class="blueSpinner" src="./Img/spinner.gif" alt="Cargando...">
+                        <img class="blueSpinner" src="./Img/loading-buffering.gif" alt="Cargando...">
                     </div>
 
                     <!-- Botón para abrir el modal -->
