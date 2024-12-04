@@ -540,3 +540,146 @@ function generatePDF() {
     html2pdf().from(trackingContent).set(opt).save();
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const reclamarButton = document.getElementById('reclamarButton');
+    const botonEnviarEmail = document.getElementById('botonEnviarEmail');
+
+    // Agregar evento para abrir el modal
+    reclamarButton.addEventListener('click', () => {
+        document.getElementById('asunto').value = `Reclamo Novogar / Remito: ${item.remito} Guia: ${data.NroGuia}`;
+        document.getElementById('cuerpo').value = `Estimados, nos contactamos para realizar un reclamo por el envío ${data.NroGuia}.`;
+        const modal = new bootstrap.Modal(document.getElementById('emailModal'));
+        modal.show();
+    });
+
+    // Función para enviar el correo
+    async function enviarCorreo(destinatarioEmail, emailOrigen, emailBody, emailSubject) {
+        const smtpU = 's154745_3';
+        const smtpP = 'QbikuGyHqJ';
+
+        const emailData = {
+            "Html": {
+                "DocType": null,
+                "Head": null,
+                "Body": emailBody,
+                "BodyTag": "<body>"
+            },
+            "Text": "",
+            "Subject": emailSubject,
+            "From": {
+                "Name": "Posventa Novogar",
+                "Email": emailOrigen
+            },
+            "To": [
+                {
+                    "Name": "Cliente",
+                    "Email": destinatarioEmail
+                }
+            ],
+            "Cc": [],
+            "Bcc": ["webnovagar@gmail.com", "posventa@novogar.com.ar"],
+            "CharSet": "utf-8",
+            "User": {
+                "Username": smtpU,
+                "Secret": smtpP
+            }
+        };
+
+        try {
+            const response = await fetch('https://proxy.cors.sh/https://send.mailup.com/API/v2.0/messages/sendmessage', {
+                method: 'POST',
+                headers: {
+                    'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(emailData)
+            });
+
+            const result = await response.json();
+            if (result.Status === 'done') {
+                console.log('Email enviado exitosamente');
+                showAlert(`<i class="bi bi-envelope-check"></i> Email enviado a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
+            } else {
+                console.log(`Error al enviar el email: ${result.Message}`);
+                showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
+            }
+        } catch (error) {
+            console.error('Error al enviar el email:', error);
+            showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
+        }
+    }
+
+    // Evento para el botón de enviar email
+    botonEnviarEmail.addEventListener('click', async () => {
+        botonEnviarEmail.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando email...';
+        botonEnviarEmail.disabled = true; // Deshabilitar el botón
+
+        const destinatarioEmail = document.getElementById('destinatario').value;
+        const emailOrigen = document.getElementById('origen').value;
+        const emailBody = document.getElementById('cuerpo').value;
+        const emailSubject = document.getElementById('asunto').value;
+
+        await enviarCorreo(destinatarioEmail, emailOrigen, emailBody, emailSubject);
+
+        // Reiniciar el botón después de enviar
+        botonEnviarEmail.innerHTML = 'Enviar Email';
+        botonEnviarEmail.disabled = false; // Habilitar el botón
+    });
+});
+
+let alertCount = 0;
+
+function showAlert(message) {
+    const alertElement = document.createElement('div');
+    alertElement.className = 'alert';
+    alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
+    document.body.appendChild(alertElement);
+    alertElement.style.bottom = `${20 + alertCount * 70}px`;
+    setTimeout(() => {
+        alertElement.classList.add('show');
+    }, 10);
+    alertElement.querySelector('.close').onclick = () => {
+        closeAlert(alertElement);
+    };
+    setTimeout(() => {
+        closeAlert(alertElement);
+    }, 8000);
+    alertCount++;
+}
+
+function showAlertError(message) {
+    const alertElement = document.createElement('div');
+    alertElement.className = 'alertError';
+    alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
+    document.body.appendChild(alertElement);
+    alertElement.style.bottom = `${20 + alertCount * 70}px`;
+    setTimeout(() => {
+        alertElement.classList.add('show');
+    }, 10);
+    alertElement.querySelector('.close').onclick = () => {
+        closeAlert(alertElement);
+    };
+    setTimeout(() => {
+        closeAlert(alertElement);
+    }, 8000);
+    alertCount++;
+}
+
+function closeAlert(alertElement) {
+    alertElement.classList.remove('show');
+    setTimeout(() => {
+        document.body.removeChild(alertElement);
+        alertCount--;
+        updateAlertPositions();
+    }, 300);
+}
+
+function updateAlertPositions() {
+    const alerts = document.querySelectorAll('.alert, .alertError');
+    alerts.forEach((alert, index) => {
+        alert.style.bottom = `${20 + index * 70}px`;
+    });
+}
+
+
+

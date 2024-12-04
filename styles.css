@@ -736,6 +736,10 @@ button:hover {
     position: relative;
 }
 
+#reclamarButton{
+    display: none;
+}
+
 .logo {
     display: flex;
     align-items: center;
