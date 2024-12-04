@@ -179,7 +179,7 @@ async function renderCards(data) {
             // Crear el div para mostrar el mensaje
             const reclamoDiv = document.createElement('div');
             reclamoDiv.className = 'alerta-card-andesmar';
-            reclamoDiv.innerHTML = `<span class="message"><div class="circle"></div> Posee reclamo activo</span>`;
+            reclamoDiv.innerHTML = `<span class="message"><div class="circle"></div> Posee reclamo activo</span><img id="click" src="./Img/click-red-unscreen.gif" alt="Click" />`;
 
             // Agregar evento de clic
 reclamoDiv.addEventListener('click', async () => {

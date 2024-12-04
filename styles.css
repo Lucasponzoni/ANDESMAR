@@ -3800,12 +3800,12 @@ input[disabled] {
 }
 
 .alerta-card-andesmar {
-    position: absolute;
-    bottom: -15px; 
-    right: 10px; 
-    background-color: crimson; 
+    position: relative;
+    margin-bottom: 5px;
+    margin-top: -5px;
+    background-color: white; 
     border: 1px solid #d1d1d6;
-    border-radius: 10px;
+    border-radius: 5px;
     display: flex; 
     align-items: center; 
     z-index: 10;
@@ -3816,7 +3816,7 @@ input[disabled] {
     width: 10px; 
     height: 10px; 
     border-radius: 50%; 
-    background-color: yellow; 
+    background-color: crimson; 
     margin-right: 10px; 
     animation: pulse-circle 1.5s infinite;
 }
@@ -3825,23 +3825,27 @@ input[disabled] {
 @keyframes pulse-circle {
     0% {
         transform: scale(1);
-        box-shadow: 0 0 10px rgba(255, 255, 0, 0.8); /* Amarillo */
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.9); /* Rojo intenso */
     }
     50% {
-        transform: scale(1.5);
-        box-shadow: 0 0 20px rgba(255, 255, 0, 0.9); /* Amarillo */
+        transform: scale(1.7);
+        box-shadow: 0 0 40px rgba(255, 0, 0, 1); /* Rojo más brillante */
     }
     100% {
         transform: scale(1);
-        box-shadow: 0 0 10px rgba(255, 255, 0, 0.8); /* Amarillo */
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.9); /* Rojo intenso */
     }
+}
+
+#click{
+    width: 30px;
 }
 
 .alerta-card-andesmar .message {
     padding: 5px;
-    font-size: .8rem;
-    font-weight: 500; 
-    color: white;
+    font-size: .9rem;
+    font-weight: 600;
+    color: crimson;
 }
 
 #modalFecha {
