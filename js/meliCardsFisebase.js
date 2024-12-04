@@ -1710,7 +1710,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             </div>
             <div class="campo">
                 <i class="bi bi-person-square"></i>
-                <span>Orden: Cliente: ${NombreyApellido}</span>
+                <span>${NombreyApellido}</span>
             </div>
             <div class="campo">
                 <i class="bi bi-geo-alt-fill"></i>
