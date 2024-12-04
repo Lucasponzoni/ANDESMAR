@@ -197,6 +197,17 @@
         margin: 15px auto; 
     }
 
+    .alert-modal2 {
+        text-align: center;
+        font-weight: 400 !important;
+        background-color: crimson; 
+        color: whitesmoke; 
+        border: 1px solid orangered;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 15px auto; 
+    }
+
     .input-email {
         border-radius: 10px;
         border: 1px solid #ced4da;
@@ -214,6 +225,34 @@
     }
 </style>
 <!-- Fin Modal de Envío de Email -->
+
+<!-- Modal Detalle de reclamo-->
+<div class="modal fade" id="reclamoModal" tabindex="-1" aria-labelledby="reclamoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header-crimson">
+                <h5 class="modal-title" id="reclamoModalLabel">Detalles del Reclamo</h5>
+            </div>
+            <div class="modal-body">
+
+                <div class="div-mini-email">
+                <small id="modalFecha"></small>
+                <h6 id="modalAsunto"></h6>
+                <p id="modalCuerpo"></p>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <div class="alert-modal2 text-center">
+                    <i class="bi bi-exclamation-circle me-2" style="font-size: 1.5rem;"></i>
+                    <span>Para cerrar haga click fuera de la ventana.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin Modal Detalle de reclamo-->
+  
 
     <footer class="center">
         <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">

@@ -3837,7 +3837,6 @@ input[disabled] {
     }
 }
 
-/* Estilo del texto */
 .alerta-card-andesmar .message {
     padding: 5px;
     font-size: small;
@@ -3845,5 +3844,25 @@ input[disabled] {
     color: crimson;
 }
 
+#modalFecha {
+    display: block; 
+    color: crimson; 
+    margin-bottom: 10px; 
+}
 
+#modalAsunto {
+    font-size: 1rem; 
+    font-weight: bold; 
+    margin-bottom: 15px; 
+}
 
+#modalCuerpo {
+    font-size: 1rem; 
+    line-height: 1.5; 
+}
+
+.div-mini-email{
+    border: crimson dashed 2px;
+    padding: 20px;
+    border-radius: 10px;
+}

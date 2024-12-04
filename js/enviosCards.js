@@ -181,6 +181,31 @@ async function renderCards(data) {
             reclamoDiv.className = 'alerta-card-andesmar';
             reclamoDiv.innerHTML = `<span class="message"><div class="circle"></div> Posee reclamo activo</span>`;
 
+            // Agregar evento de clic
+reclamoDiv.addEventListener('click', async () => {
+    // Cargar datos desde Firebase
+    const reclamoData = await loadReclamoData(item.id); // Pasar el ID del item
+    if (reclamoData) {
+        document.getElementById('modalAsunto').innerText = reclamoData.asunto;
+        document.getElementById('modalCuerpo').innerText = reclamoData.cuerpo;
+        document.getElementById('modalFecha').innerText = new Date(reclamoData.fecha).toLocaleString();
+    }
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('reclamoModal'));
+    modal.show();
+});
+
+// Función para cargar datos desde Firebase
+async function loadReclamoData(itemId) {
+    try {
+        const reclamoSnapshot = await database.ref(`enviosAndesmar/${itemId}/reclamoEmail1`).once('value');
+        return reclamoSnapshot.val(); // Devuelve el objeto del reclamo
+    } catch (error) {
+        console.error("Error al cargar los datos del reclamo: ", error);
+        return null;
+    }
+}
+        
             // Insertar el div debajo de apiSeguimiento
             const apiSeguimientoDiv = card.querySelector('.apiSeguimiento');
             apiSeguimientoDiv.parentNode.insertBefore(reclamoDiv, apiSeguimientoDiv.nextSibling); // Inserta justo después de apiSeguimiento
