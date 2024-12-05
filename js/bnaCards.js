@@ -1806,7 +1806,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     const requestObj = {
         CalleRemitente: "Mendoza",
         CalleNroRemitente: "2799",
-        CodigoPostalRemitente: "8300",
+        CodigoPostalRemitente: "2000",
         NombreApellidoDestinatario: nombre,
         CodigoPostalDestinatario: cp,
         CalleDestinatario: calle,
