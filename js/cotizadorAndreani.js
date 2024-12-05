@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const altoCm = null; // Define según tu lógica
             const largoCm = null; // Define según tu lógica
             const anchoCm = null; // Define según tu lógica
-            const contrato = parseFloat(volumen) > 100000 ? "351002753" : "400017259";
+            const contrato = parseFloat(volumen) > 100000 ? "351002753" : "400017260";
 
             const apiUrl = `https://apis.andreani.com/v1/tarifas?cpDestino=${cpDestino}&contrato=${contrato}&cliente=${cliente}&sucursalOrigen=${sucursalOrigen}&bultos[0][valorDeclarado]=${valorDeclarado}&bultos[0][volumen]=${volumen}&bultos[0][kilos]=${kilos}&bultos[0][altoCm]=${altoCm}&bultos[0][largoCm]=${largoCm}&bultos[0][anchoCm]=${anchoCm}`;
 
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch(apiUrl);
                 const data = await response.json();
                 const tarifaConIvaTotal = data.tarifaConIva.total;
-                valorCotizacionElement.innerHTML = `$ ${parseFloat(tarifaConIvaTotal).toLocaleString()}`;
+                valorCotizacionElement.innerHTML = `$ ${parseFloat(tarifaConIvaTotal).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             } catch (error) {
                 console.error('Error al obtener la cotización:', error);
                 valorCotizacionElement.innerHTML = 'Error al cargar la cotización';
