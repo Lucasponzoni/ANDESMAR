@@ -175,7 +175,7 @@ async function calcularMonto() {
             console.error('Error:', data.Error);
         }
     } catch (error) {
-        ocultarSpinner(0); // O puedes manejar el error de otra manera
+        ocultarSpinner(0); // Si es 0 muestra Spinner
         console.error('Error en la solicitud:', error);
     }
 }
