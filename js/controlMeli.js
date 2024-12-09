@@ -360,61 +360,62 @@ function cargarDatos() {
     });
 }
 
-function filtrarTabla(query) {
-    const dataTableBody = $('#data-table-body');
-    dataTableBody.empty();
+// // BUSCADOR
+// function filtrarTabla(query) {
+//     const dataTableBody = $('#data-table-body');
+//     dataTableBody.empty();
 
-    let totalCantidad = 0; // Variable para contar la cantidad total
+//     let totalCantidad = 0; // Variable para contar la cantidad total
 
-    if (query) {
-        database.ref('/despachoDelDiaMeli').once('value').then(snapshot => {
-            let encontrado = false;
+//     if (query) {
+//         database.ref('/despachoDelDiaMeli').once('value').then(snapshot => {
+//             let encontrado = false;
 
-            snapshot.forEach(childSnapshot => {
-                const data = childSnapshot.val();
-                if (data.shippingId.toString().includes(query) || data.idOperacion.toString().includes(query)) {
-                    const newRow = `
-                        <tr data-id="${childSnapshot.key}">
-                            <td>${data.fechaHora}</td>
-                            <td><a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank">${data.idOperacion}</a></td>
-                            <td>${data.shippingId}</td>
-                            <td id="cantidad-control-Meli">${data.Cantidad}</td>
-                            <td id="sku-control-Meli">${data.Producto}</td>
-                            <td><img src="${data.pictures && data.pictures.length > 0 ? data.pictures[0].secure_url : ''}" alt="Imagen" style="width: auto; height: 80px;"></td>
-                            <td><button class="btn btn-danger btn-delete" onclick="confirmarEliminacion('${childSnapshot.key}')">X</button></td>
-                        </tr>
-                    `;
-                    dataTableBody.append(newRow);
-                    totalCantidad += data.Cantidad; // Sumar la cantidad
-                    encontrado = true;
-                }
-            });
+//             snapshot.forEach(childSnapshot => {
+//                 const data = childSnapshot.val();
+//                 if (data.shippingId.toString().includes(query) || data.idOperacion.toString().includes(query)) {
+//                     const newRow = `
+//                         <tr data-id="${childSnapshot.key}">
+//                             <td>${data.fechaHora}</td>
+//                             <td><a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank">${data.idOperacion}</a></td>
+//                             <td>${data.shippingId}</td>
+//                             <td id="cantidad-control-Meli">${data.Cantidad}</td>
+//                             <td id="sku-control-Meli">${data.Producto}</td>
+//                             <td><img src="${data.pictures && data.pictures.length > 0 ? data.pictures[0].secure_url : ''}" alt="Imagen" style="width: auto; height: 80px;"></td>
+//                             <td><button class="btn btn-danger btn-delete" onclick="confirmarEliminacion('${childSnapshot.key}')">X</button></td>
+//                         </tr>
+//                     `;
+//                     dataTableBody.append(newRow);
+//                     totalCantidad += data.Cantidad; // Sumar la cantidad
+//                     encontrado = true;
+//                 }
+//             });
 
-            if (!encontrado) {
-                dataTableBody.append(`
-                    <tr>
-                        <td colspan="7">
-                            <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
-                                <p class="errorp">No se encontraron resultados para "${query}" en el servidor</p>
-                                <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
-                            </div>
-                        </td>
-                    </tr>
-                `);
-            }
+//             if (!encontrado) {
+//                 dataTableBody.append(`
+//                     <tr>
+//                         <td colspan="7">
+//                             <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
+//                                 <p class="errorp">No se encontraron resultados para "${query}" en el servidor</p>
+//                                 <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
+//                             </div>
+//                         </td>
+//                     </tr>
+//                 `);
+//             }
 
-            // Actualizar el contador total después de filtrar
-            $('#totalCantidad').text(`Total Cantidad: ${totalCantidad}`);
-        }).catch(error => {
-            console.error("Error al filtrar la tabla: ", error);
-        });
-    } else {
-        cargarDatos(); // Si el input está vacío, recargar todos los datos
-        ordenarFilasPorFecha();
-        actualizarContador();
-        actualizarContadorFilas();
-    }
-}
+//             // Actualizar el contador total después de filtrar
+//             $('#totalCantidad').text(`Total Cantidad: ${totalCantidad}`);
+//         }).catch(error => {
+//             console.error("Error al filtrar la tabla: ", error);
+//         });
+//     } else {
+//         cargarDatos(); // Si el input está vacío, recargar todos los datos
+//         ordenarFilasPorFecha();
+//         actualizarContador();
+//         actualizarContadorFilas();
+//     }
+// }
 
 function obtenerDatosTabla() {
     const totalCantidad = document.getElementById('totalCantidad').innerText; // Obtener el texto del contador

@@ -83,7 +83,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-3 mb-3 d-flex justify-content-end botonesMeli">
                 <!-- Aca van los botones -->
                 <button type="button" class="btn btn-danger me-2" data-toggle="modal" data-target="#escaneoColecta">
@@ -123,12 +123,21 @@
                         <th><i class="bi bi-trash"></i></th>
                     </tr>
                 </thead>
+                
                 <tbody id="data-table-body">
                     <tr>
                         <td colspan="7" class="no-data">No has comenzado una colecta aún, manos a la obra 😎</td>
                     </tr>
                 </tbody>
             </table>
+
+            <div id="no-results-message" class="text-center" style="display: none;">
+                <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
+                    <p class="errorp">No se encontraron resultados para <span id="query-placeholder"></span> en el servidor</p>
+                    <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
+                </div>
+            </div>
+
         </div>
     </div>
     
@@ -258,8 +267,78 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
         <script src="./js/features.js"></script>
         <script src="./js/controlMeli.js"></script>
+
+        <!-- BUSCADOR -->
+        <style>
+            .highlight {
+                background-color: yellow; /* Color de fondo para resaltar */
+                animation: blink 1s infinite; /* Animación de parpadeo */
+            }
+            
+            @keyframes blink {
+                0%, 100% {
+                    background-color: yellow;
+                }
+                50% {
+                    background-color: transparent;
+                }
+            }
+            </style>
+            
+            <script>
+            $(document).ready(function() {
+                $('#searchMercadoLibre').on('input', function() {
+                    const query = $(this).val().toLowerCase(); // Obtener el texto de búsqueda
+                    filtrarTabla(query); // Llamar a la función para filtrar la tabla
+                });
+            });
+            
+            function filtrarTabla(query) {
+                let found = false; // Variable para verificar si se encontraron resultados
+            
+                $('#data-table-body tr').each(function() {
+                    const shippingIdCell = $(this).find('td').eq(2);
+                    const operacionCell = $(this).find('td').eq(1);
+                    const shippingId = shippingIdCell.text().toLowerCase(); // Obtener el Shipping ID
+                    const operacion = operacionCell.text().toLowerCase(); // Obtener la operación
+            
+                    // Limpiar resaltado previo
+                    shippingIdCell.removeClass('highlight');
+                    operacionCell.removeClass('highlight');
+            
+                    // Verificar si hay texto en el input
+                    if (query) {
+                        // Verificar si el Shipping ID o la operación coinciden con la consulta
+                        if (shippingId.includes(query) || operacion.includes(query)) {
+                            $(this).show(); // Mostrar la fila si coincide
+                            found = true; // Se encontró al menos un resultado
+            
+                            // Resaltar las coincidencias
+                            if (shippingId.includes(query)) {
+                                shippingIdCell.addClass('highlight'); // Resaltar el Shipping ID
+                            }
+                            if (operacion.includes(query)) {
+                                operacionCell.addClass('highlight'); // Resaltar la operación
+                            }
+                        } else {
+                            $(this).hide(); // Ocultar la fila si no coincide
+                        }
+                    } else {
+                        $(this).show(); // Mostrar todas las filas si no hay consulta
+                    }
+                });
+            
+                // Mostrar o ocultar el mensaje de "No se encontraron resultados"
+                if (!found && query) {
+                    $('#query-placeholder').text(query); // Actualizar el texto con la consulta
+                    $('#no-results-message').show(); // Mostrar el mensaje si no se encontraron resultados
+                } else {
+                    $('#no-results-message').hide(); // Ocultar el mensaje si se encontraron resultados o si no hay consulta
+                }
+            }
+            </script>
+            <!-- FIN BUSCADOR -->
         
-    
     </body>
     
     </html>
