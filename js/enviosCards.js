@@ -342,7 +342,7 @@ async function renderCards(data) {
             apiSeguimientoDiv.appendChild(estadoDiv); 
             apiSeguimientoDiv.removeAttribute('style');
 
-                        // Agregar el botón para descargar el comprobante de entrega
+// Agregar el botón para descargar el comprobante de entrega
 const descargarComprobanteButton = document.createElement('button');
 descargarComprobanteButton.className = 'btn btn-primary descargar-comprobante w-100 mt-1 comprobanteEntrega';
 descargarComprobanteButton.innerHTML = '<i class="bi bi-download"></i> Comprobante de Entrega';
