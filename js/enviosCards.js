@@ -377,7 +377,7 @@ descargarComprobanteButton.addEventListener('click', async () => {
         const data = await response.json();
         
         // Mostrar la respuesta de la API en la consola
-        console.log(data); // Agregado para mostrar la respuesta
+        console.log("respuesta de API Remito Conformado: ", data);
 
         if (data.Error) {
             // Si hay un error, cambiar el texto del botón
