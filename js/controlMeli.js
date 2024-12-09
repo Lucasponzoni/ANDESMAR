@@ -82,32 +82,57 @@ function buscarCodigo(codigo) {
         });
     };
 
-    // Buscar en los últimos 300
-    buscarEnFirebase(200).then(encontrado => {
-        if (!encontrado) {
-            $('.lookBase').text('Buscando en últimas 500 ventas...').show(); // Mostrar mensaje solo si no se encontró
-            $('.mac-buttons').removeClass('hidden'); // Mostrar botones al encontrar el mensaje
-            $('.lookBase').removeClass('hidden'); // Mostrar botones al encontrar el mensaje
-            return buscarEnFirebase(500).then(encontrado => {
-                if (!encontrado) {
-                    $('.lookBase').text('Buscando en últimas 1000 ventas...').show(); // Mostrar mensaje para la siguiente búsqueda
-                    return buscarEnFirebase(1000).then(encontrado => {
-                        if (!encontrado) {
-                            $('.lookBase').text('Buscando en últimos 3000 ventas...').show(); // Mostrar mensaje para la siguiente búsqueda
-                            return buscarEnFirebase(3000).then(encontrado => {
-                                if (!encontrado) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Código no encontrado',
-                                        text: 'No se encontraron resultados para el código ingresado.'
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
+// Buscar en los últimos 100
+buscarEnFirebase(100).then(encontrado => {
+    if (!encontrado) {
+        $('.lookBase').text('Buscando en últimas 200 ventas...').show(); // Mostrar mensaje
+        $('.mac-buttons').removeClass('hidden'); // Mostrar botones al encontrar el mensaje
+        return buscarEnFirebase(200).then(encontrado => {
+            if (!encontrado) {
+                $('.lookBase').text('Buscando en últimas 300 ventas...').show(); // Mostrar mensaje
+                return buscarEnFirebase(300).then(encontrado => {
+                    if (!encontrado) {
+                        $('.lookBase').text('Buscando en últimas 500 ventas...').show(); // Mostrar mensaje
+                        return buscarEnFirebase(500).then(encontrado => {
+                            if (!encontrado) {
+                                $('.lookBase').text('Buscando en últimas 700 ventas...').show(); // Mostrar mensaje
+                                return buscarEnFirebase(700).then(encontrado => {
+                                    if (!encontrado) {
+                                        $('.lookBase').text('Buscando en últimas 1000 ventas...').show(); // Mostrar mensaje
+                                        return buscarEnFirebase(1000).then(encontrado => {
+                                            if (!encontrado) {
+                                                $('.lookBase').text('Buscando en últimas 1500 ventas...').show(); // Mostrar mensaje
+                                                return buscarEnFirebase(1500).then(encontrado => {
+                                                    if (!encontrado) {
+                                                        $('.lookBase').text('Buscando en últimas 2000 ventas...').show(); // Mostrar mensaje
+                                                        return buscarEnFirebase(2000).then(encontrado => {
+                                                            if (!encontrado) {
+                                                                $('.lookBase').text('Buscando en últimas 3000 ventas...').show(); // Mostrar mensaje
+                                                                return buscarEnFirebase(3000).then(encontrado => {
+                                                                    if (!encontrado) {
+                                                                        Swal.fire({
+                                                                            icon: 'error',
+                                                                            title: 'Código no encontrado',
+                                                                            text: 'No se encontraron resultados para el código ingresado.'
+                                                                        });
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     }).catch(error => {
         console.error("Error al buscar el código: ", error);
         Swal.fire({
