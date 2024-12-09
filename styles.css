@@ -2130,6 +2130,13 @@ div.card-body > p > i{
 
 .reclamo-andesmar{
     margin-top: 20px !important;
+}
+
+.comprobanteEntrega{
+    margin-bottom: -15px !important;
+}
+
+.comprobanteEntregaFail, .comprobanteEntregaSuccess{
     margin-bottom: -15px !important;
 }
 

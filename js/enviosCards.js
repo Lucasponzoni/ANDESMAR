@@ -182,30 +182,30 @@ async function renderCards(data) {
             reclamoDiv.innerHTML = `<span class="message"><div class="circle"></div> Posee reclamo activo</span><img id="click" src="./Img/click-red-unscreen.gif" alt="Click" />`;
 
             // Agregar evento de clic
-reclamoDiv.addEventListener('click', async () => {
-    // Cargar datos desde Firebase
-    const reclamoData = await loadReclamoData(item.id); // Pasar el ID del item
-    if (reclamoData) {
-        document.getElementById('modalAsunto').innerText = reclamoData.asunto;
-        document.getElementById('modalCuerpo').innerText = reclamoData.cuerpo;
-        document.getElementById('modalFecha').innerText = new Date(reclamoData.fecha).toLocaleString();
-    }
-    // Mostrar el modal
-    const modal = new bootstrap.Modal(document.getElementById('reclamoModal'));
-    modal.show();
-});
+            reclamoDiv.addEventListener('click', async () => {
+                // Cargar datos desde Firebase
+                const reclamoData = await loadReclamoData(item.id); // Pasar el ID del item
+                if (reclamoData) {
+                    document.getElementById('modalAsunto').innerText = reclamoData.asunto;
+                    document.getElementById('modalCuerpo').innerText = reclamoData.cuerpo;
+                    document.getElementById('modalFecha').innerText = new Date(reclamoData.fecha).toLocaleString();
+                }
+                // Mostrar el modal
+                const modal = new bootstrap.Modal(document.getElementById('reclamoModal'));
+                modal.show();
+            });
 
-// Función para cargar datos desde Firebase
-async function loadReclamoData(itemId) {
-    try {
-        const reclamoSnapshot = await database.ref(`enviosAndesmar/${itemId}/reclamoEmail1`).once('value');
-        return reclamoSnapshot.val(); // Devuelve el objeto del reclamo
-    } catch (error) {
-        console.error("Error al cargar los datos del reclamo: ", error);
-        return null;
-    }
-}
-        
+            // Función para cargar datos desde Firebase
+            async function loadReclamoData(itemId) {
+                try {
+                    const reclamoSnapshot = await database.ref(`enviosAndesmar/${itemId}/reclamoEmail1`).once('value');
+                    return reclamoSnapshot.val(); // Devuelve el objeto del reclamo
+                } catch (error) {
+                    console.error("Error al cargar los datos del reclamo: ", error);
+                    return null;
+                }
+            }
+            
             // Insertar el div debajo de apiSeguimiento
             const apiSeguimientoDiv = card.querySelector('.apiSeguimiento');
             apiSeguimientoDiv.parentNode.insertBefore(reclamoDiv, apiSeguimientoDiv.nextSibling); // Inserta justo después de apiSeguimiento
@@ -341,6 +341,66 @@ async function loadReclamoData(itemId) {
             apiSeguimientoDiv.innerHTML = ''; 
             apiSeguimientoDiv.appendChild(estadoDiv); 
             apiSeguimientoDiv.removeAttribute('style');
+
+                        // Agregar el botón para descargar el comprobante de entrega
+const descargarComprobanteButton = document.createElement('button');
+descargarComprobanteButton.className = 'btn btn-primary descargar-comprobante w-100 mt-1 comprobanteEntrega';
+descargarComprobanteButton.innerHTML = '<i class="bi bi-download"></i> Comprobante de Entrega';
+
+// Evento para manejar la descarga del comprobante
+descargarComprobanteButton.addEventListener('click', async () => {
+    // Verificar si el botón ya es un enlace de descarga
+    if (descargarComprobanteButton.classList.contains('comprobanteEntregaSuccess')) {
+        return; // No hacer nada si ya es un botón de descarga
+    }
+
+    // Cambiar el botón a estado de carga
+    descargarComprobanteButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verificando...`;
+    descargarComprobanteButton.disabled = true; // Deshabilitar botón
+
+    // Esperar 3 segundos antes de hacer la solicitud
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    try {
+        const response = await fetch('https://proxy.cors.sh/https://apitest.andesmarcargas.com/api/UrlDigitalizadas', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+            },
+            body: JSON.stringify({
+                CodigoCliente: "6765",
+                NroRemito: item.remito
+            })
+        });
+
+        const data = await response.json();
+        
+        // Mostrar la respuesta de la API en la consola
+        console.log(data); // Agregado para mostrar la respuesta
+
+        if (data.Error) {
+            // Si hay un error, cambiar el texto del botón
+            descargarComprobanteButton.className = 'btn btn-danger mt-1 w-100 comprobanteEntregaFail';
+            descargarComprobanteButton.innerHTML = '<i class="bi bi-exclamation-circle"></i> Remito de entrega pendiente';
+            descargarComprobanteButton.disabled = true; // Mantener deshabilitado
+        } else {
+            // Si la respuesta es exitosa, transformar el botón en un botón de descarga
+            descargarComprobanteButton.className = 'btn btn-success mt-1 w-100 comprobanteEntregaSuccess';
+            descargarComprobanteButton.innerHTML = `<a href="${data.Url}" target="_blank" style="color: white; text-decoration: none;"><i class="bi bi-download"></i> Descargar comprobante</a>`;
+            descargarComprobanteButton.disabled = false; // Habilitar el botón
+        }
+    } catch (error) {
+        console.error("Error al obtener el comprobante: ", error);
+        // Cambiar el texto del botón en caso de error
+        descargarComprobanteButton.className = 'btn btn-secondary mt-1 w-100';
+        descargarComprobanteButton.innerHTML = '<i class="bi bi-exclamation-circle"></i> Remito de entrega pendiente';
+        descargarComprobanteButton.disabled = true; // Mantener deshabilitado
+    }
+});
+
+// Agregar el botón al div de estado
+estadoDiv.appendChild(descargarComprobanteButton);
 
         } catch (error) {
             console.error('Error al obtener el estado de seguimiento:', error);
