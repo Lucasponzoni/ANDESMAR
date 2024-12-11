@@ -12,15 +12,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// RECARGAR PAGINA AL CERRAR EL MODAL
 $(document).ready(function() {
     $('#escaneoColecta').on('hidden.bs.modal', function () {
         actualizarContador();
         actualizarContadorFilas();
     });
-});
 
-$(document).ready(function() {
     $('#spinner4').hide(); // Asegurarse de que el spinner de la página esté oculto al cargar
     cargarDatos();
 
@@ -38,11 +35,72 @@ $(document).ready(function() {
         filtrarTabla(query);
     });
 
-    // Al abrir el modal, enfocar el input
+    // Al abrir el modal, enfocar el input y actualizar la base de datos
     $('#escaneoColecta').on('shown.bs.modal', function() {
         $('#codigoInput').focus();
+        verificarActualizacionBaseDeDatos();
     });
 });
+
+function verificarActualizacionBaseDeDatos() {
+    const ultimaActualizacion = localStorage.getItem('ultimaActualizacion');
+    const ahora = new Date().getTime();
+    const unaHora = 60 * 60 * 1000; // Una hora
+
+    if (!ultimaActualizacion || (ahora - ultimaActualizacion > unaHora)) {
+        // Si no hay registro de última actualización o ha pasado más de una hora
+        $('.lookBase').text('Actualizando Base de Datos Local...').show();
+        $('#spinner4').show();
+
+        // Mostrar el spinner por al menos 3 segundos
+        setTimeout(() => {
+            descargarDatosDesdeFirebase(2000).then(() => {
+                const fechaActual = new Date().toLocaleString('es-AR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+                localStorage.setItem('ultimaActualizacion', ahora); // Tiempo de actualización
+                $('.lookBase').text(`Base de datos actualizada al día ${fechaActual}`).show();
+                $('#spinner4').hide();
+            }).catch(error => {
+                console.error("Error al descargar datos: ", error);
+                $('#spinner4').hide();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al descargar la base de datos.'
+                });
+            });
+        }, 3000); // Esperar 3 segundos
+    } else {
+        // Si no ha pasado una hora, mostrar el mensaje de la última actualización
+        const fechaActual = new Date(parseInt(ultimaActualizacion)).toLocaleString('es-AR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+        const minutosRestantes = Math.ceil((unaHora - (ahora - ultimaActualizacion)) / 60000);
+        $('.lookBase').text(`Base de datos actualizada al día ${fechaActual}, se volverá a actualizar en ${minutosRestantes} minutos.`).show();
+    }
+}
+
+function descargarDatosDesdeFirebase(limite) {
+    return database.ref('/envios').orderByChild('shippingId').limitToLast(limite).once('value').then(snapshot => {
+        const datosAlmacenados = {};
+        snapshot.forEach(childSnapshot => {
+            const data = childSnapshot.val();
+            datosAlmacenados[data.shippingId] = data; // Guardar datos en un objeto
+        });
+        localStorage.setItem('envios', JSON.stringify(datosAlmacenados)); // Guardar en localStorage
+    });
+}
 
 function buscarCodigo(codigo) {
     const codigoNumerico = parseInt(codigo); // Convertir a número
@@ -52,100 +110,133 @@ function buscarCodigo(codigo) {
     // Primero, intentamos obtener el resultado del localStorage
     const datosAlmacenados = JSON.parse(localStorage.getItem('envios')) || {};
 
-    if (datosAlmacenados[codigoNumerico]) {
-        // Si el código ya está en localStorage, usamos esos datos
-        procesarDatos(datosAlmacenados[codigoNumerico]);
-        $('#spinner4').hide(); // Ocultar spinner
-        $('#codigoInput').val(''); // Limpiar input
-        $('.lookBase').hide(); // Ocultar mensaje
-        return;
-    }
+    $('.lookBase').text('Buscando en Local Storage...').show();
+    
+    // Mostrar spinner por al menos 3 segundos
+    setTimeout(() => {
+        if (datosAlmacenados[codigoNumerico]) {
+            // Si el código ya está en localStorage, usamos esos datos
+            $('.lookBase').text(`Se encontró etiqueta: ${codigoNumerico} en localStorage y fue agregado`).show();
+            procesarDatos(datosAlmacenados[codigoNumerico]);
+            $('#spinner4').hide(); // Ocultar spinner
+            $('#codigoInput').val(''); // Limpiar input
+            return;
+        }
 
-    // Función para buscar en Firebase
-    const buscarEnFirebase = (limite) => {
-        return database.ref('/envios').orderByChild('shippingId').limitToLast(limite).once('value').then(snapshot => {
-            let encontrado = false;
-
-            snapshot.forEach(childSnapshot => {
-                const data = childSnapshot.val();
-                if (data.shippingId === codigoNumerico) {
-                    encontrado = true; // Se encontró el código
-
-                    // Procesar datos y guardarlos en localStorage
-                    procesarDatos(data);
-                    datosAlmacenados[codigoNumerico] = data; // Guardar en localStorage
-                    localStorage.setItem('envios', JSON.stringify(datosAlmacenados));
+        // Si no se encuentra en localStorage, buscar en Firebase
+        $('.lookBase').text('No se encontró en localStorage, buscando en Firebase...').show();
+        
+        // Esperar 2 segundos antes de buscar en Firebase
+setTimeout(() => {
+    buscarEnFirebase(codigoNumerico, 100).then(encontrado => {
+        if (!encontrado) {
+            $('.lookBase').text('Buscando en últimas 200 ventas...').show();
+            return buscarEnFirebase(codigoNumerico, 200).then(encontrado => {
+                if (!encontrado) {
+                    $('.lookBase').text('Buscando en últimas 300 ventas...').show();
+                    return buscarEnFirebase(codigoNumerico, 300).then(encontrado => {
+                        if (!encontrado) {
+                            $('.lookBase').text('Buscando en últimas 500 ventas...').show();
+                            return buscarEnFirebase(codigoNumerico, 500).then(encontrado => {
+                                if (!encontrado) {
+                                    $('.lookBase').text('Buscando en últimas 700 ventas...').show();
+                                    return buscarEnFirebase(codigoNumerico, 700).then(encontrado => {
+                                        if (!encontrado) {
+                                            $('.lookBase').text('Buscando en últimas 1.000 ventas...').show();
+                                            return buscarEnFirebase(codigoNumerico, 1000).then(encontrado => {
+                                                if (!encontrado) {
+                                                    $('.lookBase').text('Buscando en últimas 1.500 ventas...').show();
+                                                    return buscarEnFirebase(codigoNumerico, 1500).then(encontrado => {
+                                                        if (!encontrado) {
+                                                            $('.lookBase').text('Buscando en últimas 2.000 ventas...').show();
+                                                            return buscarEnFirebase(codigoNumerico, 2000).then(encontrado => {
+                                                                if (!encontrado) {
+                                                                    $('.lookBase').text('Buscando en últimas 3.000 ventas...').show();
+                                                                    return buscarEnFirebase(codigoNumerico, 3000).then(encontrado => {
+                                                                        if (!encontrado) {
+                                                                            $('.lookBase').text('Buscando en últimas 4.000 ventas...').show();
+                                                                            return buscarEnFirebase(codigoNumerico, 4000).then(encontrado => {
+                                                                                if (!encontrado) {
+                                                                                    $('.lookBase').text('Buscando en últimas 5.000 ventas...').show();
+                                                                                    return buscarEnFirebase(codigoNumerico, 5000).then(encontrado => {
+                                                                                        if (!encontrado) {
+                                                                                            $('.lookBase').text('Buscando en últimas 6.000 ventas...').show();
+                                                                                            return buscarEnFirebase(codigoNumerico, 6000).then(encontrado => {
+                                                                                                if (!encontrado) {
+                                                                                                    $('.lookBase').text('Buscando en últimas 7.000 ventas...').show();
+                                                                                                    return buscarEnFirebase(codigoNumerico, 7000).then(encontrado => {
+                                                                                                        if (!encontrado) {
+                                                                                                            $('.lookBase').text('Buscando en últimas 8.000 ventas...').show();
+                                                                                                            return buscarEnFirebase(codigoNumerico, 8000).then(encontrado => {
+                                                                                                                if (!encontrado) {
+                                                                                                                    $('.lookBase').text('Buscando en últimas 9.000 ventas...').show();
+                                                                                                                    return buscarEnFirebase(codigoNumerico, 9000).then(encontrado => {
+                                                                                                                        if (!encontrado) {
+                                                                                                                            $('.lookBase').text('Buscando en últimas 10.000 ventas...').show();
+                                                                                                                            return buscarEnFirebase(codigoNumerico, 10000).then(encontrado => {
+                                                                                                                                if (!encontrado) {
+                                                                                                                                    Swal.fire({
+                                                                                                                                        icon: 'error',
+                                                                                                                                        title: 'Código no encontrado',
+                                                                                                                                        text: 'No se encontraron resultados para el código ingresado.'
+                                                                                                                                    });
+                                                                                                                                }
+                                                                                                                            });
+                                                                                                                        }
+                                                                                                                    });
+                                                                                                                }
+                                                                                                            });
+                                                                                                        }
+                                                                                                    });
+                                                                                                }
+                                                                                            });
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
                 }
             });
+        }
+    }).catch(error => {
+        console.error("Error en la búsqueda: ", error);
+        $('#spinner4').hide();
+    });
+}, 1000); // Esperar 1 segundo antes de buscar en Firebase
+    }, 3000); // Mostrar spinner por al menos 3 segundos
+}
 
-            return encontrado;
-        });
-    };
+function buscarEnFirebase(codigoNumerico, limite) {
+    return database.ref('/envios').orderByChild('shippingId').limitToLast(limite).once('value').then(snapshot => {
+        let encontrado = false;
 
-// Buscar en los últimos 100
-buscarEnFirebase(100).then(encontrado => {
-    if (!encontrado) {
-        $('.lookBase').text('Buscando en últimas 200 ventas...').show(); // Mostrar mensaje
-        $('.mac-buttons').removeClass('hidden'); // Mostrar botones al encontrar el mensaje
-        return buscarEnFirebase(200).then(encontrado => {
-            if (!encontrado) {
-                $('.lookBase').text('Buscando en últimas 300 ventas...').show(); // Mostrar mensaje
-                return buscarEnFirebase(300).then(encontrado => {
-                    if (!encontrado) {
-                        $('.lookBase').text('Buscando en últimas 500 ventas...').show(); // Mostrar mensaje
-                        return buscarEnFirebase(500).then(encontrado => {
-                            if (!encontrado) {
-                                $('.lookBase').text('Buscando en últimas 700 ventas...').show(); // Mostrar mensaje
-                                return buscarEnFirebase(700).then(encontrado => {
-                                    if (!encontrado) {
-                                        $('.lookBase').text('Buscando en últimas 1000 ventas...').show(); // Mostrar mensaje
-                                        return buscarEnFirebase(1000).then(encontrado => {
-                                            if (!encontrado) {
-                                                $('.lookBase').text('Buscando en últimas 1500 ventas...').show(); // Mostrar mensaje
-                                                return buscarEnFirebase(1500).then(encontrado => {
-                                                    if (!encontrado) {
-                                                        $('.lookBase').text('Buscando en últimas 2000 ventas...').show(); // Mostrar mensaje
-                                                        return buscarEnFirebase(2000).then(encontrado => {
-                                                            if (!encontrado) {
-                                                                $('.lookBase').text('Buscando en últimas 3000 ventas...').show(); // Mostrar mensaje
-                                                                return buscarEnFirebase(3000).then(encontrado => {
-                                                                    if (!encontrado) {
-                                                                        Swal.fire({
-                                                                            icon: 'error',
-                                                                            title: 'Código no encontrado',
-                                                                            text: 'No se encontraron resultados para el código ingresado.'
-                                                                        });
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
+        snapshot.forEach(childSnapshot => {
+            const data = childSnapshot.val();
+            if (data.shippingId === codigoNumerico) {
+                encontrado = true;
+
+                // Procesar datos y guardarlos en localStorage
+                procesarDatos(data);
+                const datosAlmacenados = JSON.parse(localStorage.getItem('envios')) || {};
+                datosAlmacenados[codigoNumerico] = data; // Guardar en localStorage
+                localStorage.setItem('envios', JSON.stringify(datosAlmacenados));
             }
         });
-    }
 
-    }).catch(error => {
-        console.error("Error al buscar el código: ", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un error al buscar el código.'
-        });
-    }).finally(() => {
-        $('#codigoInput').val(''); // Limpiar input siempre al final
-        $('#spinner4').hide(); // Ocultar spinner de la página
-        $('.lookBase').hide(); // Ocultar mensaje
-        $('.mac-buttons').addClass('hidden'); // Ocultar botones al final
-        $('.lookBase').addClass('hidden'); // Ocultar botones al final
+        return encontrado;
     });
 }
 

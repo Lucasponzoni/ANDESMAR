@@ -100,7 +100,7 @@ h1 {
     text-align: center;
     background-color: white; /* Fondo similar a macOS */
     border: 1px solid cornflowerblue;
-    padding: 15px;
+    padding: 30px 15px 15px 15px;
     color: rgb(69, 69, 69);
     font-size: 1rem;
     font-weight: 600;
