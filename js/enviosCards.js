@@ -358,10 +358,13 @@ descargarComprobanteButton.addEventListener('click', async () => {
     descargarComprobanteButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verificando...`;
     descargarComprobanteButton.disabled = true; // Deshabilitar botón
 
-    // Esperar 3 segundos antes de hacer la solicitud
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
     try {
+        // Mostrar el request en consola
+        console.log("Realizando solicitud a la API con los siguientes datos:", {
+            CodigoCliente: "6765",
+            NroRemito: item.remito
+        });
+
         const response = await fetch('https://proxy.cors.sh/https://apitest.andesmarcargas.com/api/UrlDigitalizadas', {
             method: 'POST',
             headers: {
