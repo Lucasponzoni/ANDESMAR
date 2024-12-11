@@ -47,14 +47,20 @@ function verificarActualizacionBaseDeDatos() {
     const ahora = new Date().getTime();
     const unaHora = 60 * 60 * 1000; // Una hora
 
+    // Variable para almacenar el intervalo
+    let intervalo;
+
     if (!ultimaActualizacion || (ahora - ultimaActualizacion > unaHora)) {
         // Si no hay registro de última actualización o ha pasado más de una hora
         $('.lookBase').text('Actualizando Base de Datos Local...').show();
         $('#spinner4').show();
 
+        // Eliminar el localStorage actual antes de descargar nuevos datos
+        localStorage.removeItem('envios');
+
         // Mostrar el spinner por al menos 3 segundos
         setTimeout(() => {
-            descargarDatosDesdeFirebase(2000).then(() => {
+            descargarDatosDesdeFirebase(1000).then(() => {
                 const fechaActual = new Date().toLocaleString('es-AR', {
                     day: '2-digit',
                     month: '2-digit',
@@ -64,7 +70,7 @@ function verificarActualizacionBaseDeDatos() {
                     hour12: false
                 });
                 localStorage.setItem('ultimaActualizacion', ahora); // Tiempo de actualización
-                $('.lookBase').text(`Base de datos actualizada al día ${fechaActual}`).show();
+                $('.lookBase').html(`Base de datos actualizada al día <span class="redStrong">${fechaActual}</span>`).show();
                 $('#spinner4').hide();
             }).catch(error => {
                 console.error("Error al descargar datos: ", error);
@@ -77,7 +83,7 @@ function verificarActualizacionBaseDeDatos() {
             });
         }, 3000); // Esperar 3 segundos
     } else {
-        // Si no ha pasado una hora, mostrar el mensaje de la última actualización
+        // Si no ha pasado una hora, mostrar el mensaje de la última actualización con un temporizador
         const fechaActual = new Date(parseInt(ultimaActualizacion)).toLocaleString('es-AR', {
             day: '2-digit',
             month: '2-digit',
@@ -86,8 +92,35 @@ function verificarActualizacionBaseDeDatos() {
             minute: '2-digit',
             hour12: false
         });
-        const minutosRestantes = Math.ceil((unaHora - (ahora - ultimaActualizacion)) / 60000);
-        $('.lookBase').text(`Base de datos actualizada al día ${fechaActual}, se volverá a actualizar en ${minutosRestantes} minutos.`).show();
+
+        const actualizarTemporizador = () => {
+            const ahora = new Date().getTime();
+            const tiempoRestante = unaHora - (ahora - ultimaActualizacion);
+
+            if (tiempoRestante <= 0) {
+                $('.lookBase').text('Listo para actualizar la base de datos.').show();
+                clearInterval(intervalo); // Detener el intervalo
+                return;
+            }
+
+            const minutosRestantes = Math.floor(tiempoRestante / 60000);
+            const segundosRestantes = Math.floor((tiempoRestante % 60000) / 1000);
+
+            $('.lookBase').html(`Base de datos actualizada al día <span class="redStrong">${fechaActual}</span>, se volverá a actualizar en <span class="redStrong">${minutosRestantes}:${segundosRestantes.toString().padStart(2, '0')}</span> minutos.`).show();
+        };
+
+        actualizarTemporizador(); // Ejecutar inmediatamente
+        intervalo = setInterval(actualizarTemporizador, 1000); // Actualizar cada segundo
+
+        // Detener el intervalo si el mensaje cambia
+        const observer = new MutationObserver(() => {
+            if (!$('.lookBase').html().includes('se volverá a actualizar en')) {
+                clearInterval(intervalo);
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(document.querySelector('.lookBase'), { childList: true, subtree: true });
     }
 }
 
@@ -116,7 +149,7 @@ function buscarCodigo(codigo) {
     setTimeout(() => {
         if (datosAlmacenados[codigoNumerico]) {
             // Si el código ya está en localStorage, usamos esos datos
-            $('.lookBase').text(`Se encontró etiqueta: ${codigoNumerico} en localStorage y fue agregado`).show();
+            $('.lookBase').html(`Se encontró etiqueta: <span class="redStrong">${codigoNumerico}</span> en localStorage y fue agregada a la planilla.`).show();
             procesarDatos(datosAlmacenados[codigoNumerico]);
             $('#spinner4').hide(); // Ocultar spinner
             $('#codigoInput').val(''); // Limpiar input

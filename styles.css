@@ -96,6 +96,11 @@ h1 {
     transform: translateY(-1px); /* Eleva el botón ligeramente */
 }
 
+.redStrong{
+    font-weight: 700;
+    color: cornflowerblue;
+}
+
 .lookBase {
     text-align: center;
     background-color: white; /* Fondo similar a macOS */
