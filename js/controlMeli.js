@@ -49,7 +49,7 @@ $(document).ready(function() {
             buscarCodigo(codigo);
         }
     });
-    
+
     // Función para mostrar notificaciones
     function mostrarNotificacion(mensaje) {
         const notificacion = $('<div class="notificacion" style="position: fixed; bottom: 20px; right: 20px; background-color: #f44336; color: white; padding: 10px; border-radius: 5px; z-index: 1000;">' + mensaje + '</div>');
@@ -86,8 +86,6 @@ function verificarActualizacionBaseDeDatos() {
     const ultimaActualizacion = localStorage.getItem('ultimaActualizacion');
     const ahora = new Date().getTime();
     const unaHora = 60 * 60 * 1000; // Una hora
-
-    // Variable para almacenar el intervalo
     let intervalo;
 
     if (!ultimaActualizacion || (ahora - ultimaActualizacion > unaHora)) {
@@ -139,6 +137,7 @@ function verificarActualizacionBaseDeDatos() {
 
             if (tiempoRestante <= 0) {
                 $('.lookBase').text('Listo para actualizar la base de datos.').show();
+                $('#temporizadorMensaje').hide(); // Ocultar el temporizador del modal
                 clearInterval(intervalo); // Detener el intervalo
                 return;
             }
@@ -147,6 +146,8 @@ function verificarActualizacionBaseDeDatos() {
             const segundosRestantes = Math.floor((tiempoRestante % 60000) / 1000);
 
             $('.lookBase').html(`Base de datos actualizada al día <span class="redStrong">${fechaActual}</span>, se volverá a actualizar en <span class="redStrong">${minutosRestantes}:${segundosRestantes.toString().padStart(2, '0')}</span> minutos.`).show();
+            $('#temporizadorMensaje').show(); // Mostrar el temporizador en el modal
+            $('#temporizador').text(`${minutosRestantes}:${segundosRestantes.toString().padStart(2, '0')}`); // Actualizar el temporizador en el modal
         };
 
         actualizarTemporizador(); // Ejecutar inmediatamente
