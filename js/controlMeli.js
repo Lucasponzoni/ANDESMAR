@@ -21,13 +21,45 @@ $(document).ready(function() {
     $('#spinner4').hide(); // Asegurarse de que el spinner de la página esté oculto al cargar
     cargarDatos();
 
-    // Evento para escanear
     $('#codigoInput').on('keypress', function(e) {
-        if (e.which === 13) { // Enter key
-            const codigo = $(this).val();
+        if (e.which === 13) { // Tecla Enter
+            const codigo = $(this).val().trim(); // Obtener el valor y eliminar espacios
+    
+            if (codigo === '') {
+                // Si el input está vacío
+                mostrarNotificacion("Intentaste buscar un código sin ingresar datos, operación cancelada");
+                return; // Cancelar la operación
+            }
+    
+            if (codigo.length < 11) {
+                // Si el código tiene menos de 11 caracteres
+                mostrarNotificacion("El ID de envío ingresado debe tener 11 caracteres");
+                $(this).val(''); // Limpiar el input
+                return; // Cancelar la operación
+            }
+    
+            if (codigo.length > 11) {
+                // Si el código tiene más de 11 caracteres
+                mostrarNotificacion("El código ingresado no es un ID de envío de Mercado Libre");
+                $(this).val(''); // Limpiar el input
+                return; // Cancelar la operación
+            }
+    
+            // Si el código tiene exactamente 11 caracteres, proceder a buscar
             buscarCodigo(codigo);
         }
     });
+    
+    // Función para mostrar notificaciones
+    function mostrarNotificacion(mensaje) {
+        const notificacion = $('<div class="notificacion" style="position: fixed; bottom: 20px; right: 20px; background-color: #f44336; color: white; padding: 10px; border-radius: 5px; z-index: 1000;">' + mensaje + '</div>');
+        $('body').append(notificacion);
+        setTimeout(() => {
+            notificacion.fadeOut(300, () => {
+                notificacion.remove(); // Eliminar la notificación después de que se desvanezca
+            });
+        }, 3000); // Mostrar la notificación por 3 segundos
+    }    
 
     // Evento para el buscador
     $('#searchMercadoLibre').on('input', function() {
@@ -257,7 +289,7 @@ setTimeout(() => {
         $('#spinner4').hide();
     });
 }, 1000); // Esperar 1 segundo antes de buscar en Firebase
-    }, 3000); // Mostrar spinner por al menos 3 segundos
+    }, 1000); // Mostrar spinner por al menos 1 segundo
 }
 
 function buscarEnFirebase(codigoNumerico, limite) {
