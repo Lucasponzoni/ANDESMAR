@@ -27,12 +27,14 @@ $(document).ready(function() {
     
             if (codigo === '') {
                 // Si el input está vacío
+                $('.lookBase').html(`Intentaste buscar un ID de envío sin ingresar datos, <span class="redStrong2"><i class="bi bi-x-circle-fill"></i> Operación cancelada</span>`).show();
                 mostrarNotificacion("Intentaste buscar un código sin ingresar datos, operación cancelada");
                 return; // Cancelar la operación
             }
     
             if (codigo.length < 11) {
                 // Si el código tiene menos de 11 caracteres
+                $('.lookBase').html(`El ID de envío ingresado debe tener 11 caracteres, <span class="redStrong2"><i class="bi bi-x-circle-fill"></i> Operación cancelada</span>`).show();
                 mostrarNotificacion("El ID de envío ingresado debe tener 11 caracteres");
                 $(this).val(''); // Limpiar el input
                 return; // Cancelar la operación
@@ -40,6 +42,7 @@ $(document).ready(function() {
     
             if (codigo.length > 11) {
                 // Si el código tiene más de 11 caracteres
+                $('.lookBase').html(`El ID de envío ingresado no pertenece a un envío de Mercado Libre, <span class="redStrong2"><i class="bi bi-x-circle-fill"></i> Operación cancelada</span>`).show();
                 mostrarNotificacion("El código ingresado no es un ID de envío de Mercado Libre");
                 $(this).val(''); // Limpiar el input
                 return; // Cancelar la operación
@@ -189,9 +192,15 @@ function buscarCodigo(codigo) {
     // Mostrar spinner por al menos 3 segundos
     setTimeout(() => {
         if (datosAlmacenados[codigoNumerico]) {
-            // Si el código ya está en localStorage, usamos esos datos
-            $('.lookBase').html(`Se encontró etiqueta: <span class="redStrong">${codigoNumerico}</span> en localStorage y fue agregada a la planilla.`).show();
-            procesarDatos(datosAlmacenados[codigoNumerico]);
+            // Si el código ya está en localStorage
+            if ($(`#data-table-body tr[data-id="${codigoNumerico}"]`).length > 0) {
+                // Si ya está en la planilla
+                $('.lookBase').html(`La etiqueta <span class="redStrong2">${codigoNumerico}</span> ya se encontraba en planilla. <span class="redStrong2"><i class="bi bi-x-circle-fill"></i> ¡Fue omitida, continúa escaneando!</span>`).show();
+            } else {
+                // Si no está en la planilla, se agrega
+                $('.lookBase').html(`Se encontró etiqueta: <span class="redStrong">${codigoNumerico}</span> en localStorage y fue agregada a la planilla. <span class="redStrong3"><i class="bi bi-check-circle-fill"></i> ¡Exito!</span>`).show();
+                procesarDatos(datosAlmacenados[codigoNumerico]);
+            }
             $('#spinner4').hide(); // Ocultar spinner
             $('#codigoInput').val(''); // Limpiar input
             return;
@@ -290,7 +299,7 @@ setTimeout(() => {
         $('#spinner4').hide();
     });
 }, 1000); // Esperar 1 segundo antes de buscar en Firebase
-    }, 1000); // Mostrar spinner por al menos 1 segundo
+    }, ); // Mostrar spinner por al menos 1 segundo
 }
 
 function buscarEnFirebase(codigoNumerico, limite) {

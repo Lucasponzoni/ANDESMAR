@@ -101,6 +101,16 @@ h1 {
     color: cornflowerblue;
 }
 
+.redStrong2{
+    font-weight: 700;
+    color: red;
+}
+
+.redStrong3{
+    font-weight: 700;
+    color: rgb(0, 150, 0);
+}
+
 .lookBase {
     text-align: center;
     background-color: white; /* Fondo similar a macOS */
