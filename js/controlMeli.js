@@ -353,12 +353,22 @@ function procesarDatos(data) {
     }
 
     const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value === "Jujuy");
-
+    const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value === "Tierra del Fuego");
+    
     if (estadoJujuy) {
         Swal.fire({
             icon: 'error',
             title: 'Envío no permitido',
             text: 'Los envíos a Jujuy no están permitidos, separar etiqueta.'
+        });
+        return; // Salir de la función
+    }
+
+    if (estadoTierraDelFuego) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Envío no permitido',
+            text: 'Los envíos a Tierra del Fuego no están permitidos, separar etiqueta.'
         });
         return; // Salir de la función
     }
