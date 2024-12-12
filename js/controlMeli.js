@@ -98,7 +98,7 @@ function verificarActualizacionBaseDeDatos() {
 
         // Mostrar el spinner por al menos 3 segundos
         setTimeout(() => {
-            descargarDatosDesdeFirebase(1000).then(() => {
+            descargarDatosDesdeFirebase(600).then(() => {
                 const fechaActual = new Date().toLocaleString('es-AR', {
                     day: '2-digit',
                     month: '2-digit',
