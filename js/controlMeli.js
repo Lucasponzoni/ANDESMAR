@@ -87,7 +87,7 @@ $(document).ready(function() {
 
     $('#escaneoColecta').on('shown.bs.modal', function() {
         $('#codigoInput').focus();
-        $('.lookBase').text('Borrando Cache ...').show();
+        $('.lookBase').text('Iniciando. Borrando Cache ...').show();
         $('#spinner4').show(); // Mostrar el spinner
     
         // Simular un pequeño retraso para mostrar el mensaje
