@@ -35,11 +35,19 @@ $(document).ready(function() {
         filtrarTabla(query);
     });
 
-    // Al abrir el modal, enfocar el input y actualizar la base de datos
     $('#escaneoColecta').on('shown.bs.modal', function() {
         $('#codigoInput').focus();
-        verificarActualizacionBaseDeDatos();
+        $('.lookBase').text('Borrando Cache ...').show();
+        $('#spinner4').show(); // Mostrar el spinner
+    
+        // Simular un pequeño retraso para mostrar el mensaje
+        setTimeout(() => {
+            $('#spinner4').hide(); // Ocultar el spinner
+            $('.lookBase').hide(); // Ocultar el mensaje de borrado
+            verificarActualizacionBaseDeDatos(); // Llamar a la función de verificación
+        }, 2000); // Esperar 2 segundos antes de verificar la base de datos
     });
+    
 });
 
 function verificarActualizacionBaseDeDatos() {
