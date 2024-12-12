@@ -27,14 +27,24 @@ $(document).ready(function() {
     
             if (codigo === '') {
                 // Si el input está vacío
-                $('.lookBase').html(`Intentaste buscar un ID de envío sin ingresar datos, <span class="redStrong2"><i class="bi bi-x-circle-fill"></i> Operación cancelada</span>`).show();
+                $('.lookBase').html(`
+                    No se pudo realizar la búsqueda del ID de envío porque no se ingresaron datos. 
+                    <span class="redStrong2">
+                        <i class="bi bi-x-circle-fill"></i> Operación cancelada
+                    </span>
+                `).show();
                 mostrarNotificacion("Intentaste buscar un código sin ingresar datos, operación cancelada");
                 return; // Cancelar la operación
             }
     
             if (codigo.length < 11) {
                 // Si el código tiene menos de 11 caracteres
-                $('.lookBase').html(`El ID de envío ingresado debe tener 11 caracteres, <span class="redStrong2"><i class="bi bi-x-circle-fill"></i> Operación cancelada</span>`).show();
+                $('.lookBase').html(`
+                    El ID de envío ingresado debe contener exactamente 11 caracteres. 
+                    <span class="redStrong2">
+                        <i class="bi bi-x-circle-fill"></i> Operación cancelada
+                    </span>
+                `).show();
                 mostrarNotificacion("El ID de envío ingresado debe tener 11 caracteres");
                 $(this).val(''); // Limpiar el input
                 return; // Cancelar la operación
@@ -42,7 +52,12 @@ $(document).ready(function() {
     
             if (codigo.length > 11) {
                 // Si el código tiene más de 11 caracteres
-                $('.lookBase').html(`El ID de envío ingresado no pertenece a un envío de Mercado Libre, <span class="redStrong2"><i class="bi bi-x-circle-fill"></i> Operación cancelada</span>`).show();
+                $('.lookBase').html(`
+                    El ID de envío ingresado no corresponde a ningún envío de Mercado Libre. 
+                    <span class="redStrong2">
+                        <i class="bi bi-x-circle-fill"></i> Operación cancelada
+                    </span>
+                `).show();
                 mostrarNotificacion("El código ingresado no es un ID de envío de Mercado Libre");
                 $(this).val(''); // Limpiar el input
                 return; // Cancelar la operación
@@ -80,7 +95,7 @@ $(document).ready(function() {
             $('#spinner4').hide(); // Ocultar el spinner
             $('.lookBase').hide(); // Ocultar el mensaje de borrado
             verificarActualizacionBaseDeDatos(); // Llamar a la función de verificación
-        }, 2000); // Esperar 2 segundos antes de verificar la base de datos
+        }, 1000); // Esperar 2 segundos antes de verificar la base de datos
     });
     
 });
