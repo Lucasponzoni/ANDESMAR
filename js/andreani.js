@@ -39,34 +39,35 @@ function validarFormulario() {
         }
     }
 
-return true; // Si todo está completo, permitir el envío sin mostrar nada
+    return true; // Si todo está completo, permitir el envío sin mostrar nada
 }
 
 // Mapeo de provincias a códigos de región
-const regionMap = {"Salta": "AR-A",
-"buenos aires": "AR-B",
-"capital federal": "AR-C",
-"san luis": "AR-D",
-"entre rios": "AR-E",
-"la rioja": "AR-F",
-"santiago del estero": "AR-G",
-"chaco": "AR-H",
-"san juan": "AR-J",
-"catamarca": "AR-K",
-"la pampa": "AR-L",
-"mendoza": "AR-M",
-"misiones": "AR-N",
-"formosa": "AR-P",
-"neuquen": "AR-Q",
-"rio negro": "AR-R",
-"santa fe": "AR-S",
-"tucuman": "AR-T",
-"chubut": "AR-U",
-"tierra del Fuego": "AR-V",
-"corrientes": "AR-W",
-"cordoba": "AR-X",
-"jujuy": "AR-Y",
-"santa cruz": "AR-Z"
+const regionMap = {
+    "Salta": "AR-A",
+    "buenos aires": "AR-B",
+    "capital federal": "AR-C",
+    "san luis": "AR-D",
+    "entre rios": "AR-E",
+    "la rioja": "AR-F",
+    "santiago del estero": "AR-G",
+    "chaco": "AR-H",
+    "san juan": "AR-J",
+    "catamarca": "AR-K",
+    "la pampa": "AR-L",
+    "mendoza": "AR-M",
+    "misiones": "AR-N",
+    "formosa": "AR-P",
+    "neuquen": "AR-Q",
+    "rio negro": "AR-R",
+    "santa fe": "AR-S",
+    "tucuman": "AR-T",
+    "chubut": "AR-U",
+    "tierra del Fuego": "AR-V",
+    "corrientes": "AR-W",
+    "cordoba": "AR-X",
+    "jujuy": "AR-Y",
+    "santa cruz": "AR-Z"
 };
 
 async function getAuthToken() {
@@ -120,22 +121,25 @@ async function enviarSolicitudAndreani() {
 
     // Obtener valores totales
     const pesoTotal = parseFloat(document.getElementById('peso').value) || 0; // Obtener peso total
-    const volumenTotal = parseFloat(document.getElementById('volumenTotalcm').textContent) || 0; // Obtener volumen total
 
     bultoElements.forEach(bulto => {
         const cantidad = parseInt(bulto.querySelector(`input[name^="Cantidad"]`).value) || 1; // Obtener cantidad
 
-        // Calcular el peso y volumen por bulto
+        // Obtener dimensiones de cada bulto
+        const alto = parseFloat(bulto.querySelector(`input[name^="Alto"]`).value) || 0;
+        const ancho = parseFloat(bulto.querySelector(`input[name^="Ancho"]`).value) || 0;
+        const largo = parseFloat(bulto.querySelector(`input[name^="Largo"]`).value) || 0;
+
+        // Calcular el peso por bulto
         const pesoPorBulto = pesoTotal / cantidad;
-        const volumenPorBulto = volumenTotal / cantidad;
 
         for (let i = 0; i < cantidad; i++) {
             bultos.push({
                 "kilos": pesoPorBulto,
-                "largoCm": null,
-                "altoCm": null,
-                "anchoCm": null,
-                "volumenCm": volumenPorBulto,
+                "largoCm": largo, 
+                "altoCm": alto,   
+                "anchoCm": ancho,  
+                "volumenCm": (alto * ancho * largo) / 1000000, // Calcular volumen en m³
                 "valorDeclaradoSinImpuestos": parseFloat(document.getElementById('valorDeclarado').value) - (parseFloat(document.getElementById('valorDeclarado').value) * 0.21),
                 "valorDeclaradoConImpuestos": parseFloat(document.getElementById('valorDeclarado').value),
                 "referencias": [
@@ -218,7 +222,7 @@ async function enviarSolicitudAndreani() {
             
             // Mostrar el contenedor de descarga
             document.getElementById('descargaAndreani').style.display = 'block';
-            console.log("Resuesta API ANDREANI:", response)
+            console.log("Respuesta API ANDREANI:", response)
             
         } else {
             const errorMessage = await response.text();
@@ -271,12 +275,11 @@ async function enviarSolicitudAndreani() {
     
             const apiResponseContainer = document.getElementById('apiResponse');
             apiResponseContainer.innerHTML = ''; // Limpiar contenido previo
-            apiResponseContainer.appendChild(link);
+            apiResponseContainer.appendChild(link); // Añadir el nuevo enlace
         })
         .catch(error => {
-            console.error('Error:', error);
-            const apiResponseContainer = document.getElementById('apiResponse');
-            apiResponseContainer.textContent = `Error: ${error.message}`;
+            console.error('Error al descargar el PDF:', error);
+            showError(error.message);
         });
-    }}
-     
+    }
+}
