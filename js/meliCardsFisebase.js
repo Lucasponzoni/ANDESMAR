@@ -673,8 +673,9 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     buttonAndr.disabled = true;
 
     // Dividir medidas para obtener alto, ancho y largo
-    const [largo, ancho, alto] = Medidas.split('x').map(Number);
     const productoLowerCase = Producto.toLowerCase();
+
+    const [largo, ancho, alto] = Medidas.split('x').map(Number);
     const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000")|| productoLowerCase.includes("tiro balanceado") ? cantidad * 2 : cantidad;
 
     // Verificar el código postal y definir la unidad de venta
@@ -918,9 +919,9 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
 
     const token = await getAuthToken();
 
-    // Obtener el nombre de la provincia y convertirlo a minúsculas
-    const provinciaNombre = Provincia.toLowerCase();
-    const regionCodigo = regionMap[provinciaNombre] || ""; // Obtener el código de región
+// Obtener el nombre de la provincia y convertirlo a minúsculas
+const provinciaNombre = Provincia.toLowerCase();
+const regionCodigo = regionMap[provinciaNombre] || ""; // Obtener el código de región
 
 // Inicializar el array de bultos
 const bultos = [];
@@ -931,21 +932,28 @@ const volumenTotal = volumenCM3 || 0; // Obtener volumen total
 const productoLowerCase = Producto.toLowerCase();
 
 // Determinar la cantidad a usar
-const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000")|| productoLowerCase.includes("tiro balanceado") ? cantidad * 2 : cantidad;
+const cantidadFinal = productoLowerCase.includes("split") || 
+                      productoLowerCase.includes("18000") || 
+                      productoLowerCase.includes("tiro balanceado") ? 
+                      cantidad * 2 : cantidad;
 
+// Desestructurar las medidas y convertir a número
+const [largoAnd, anchoAnd, altoAnd] = medidas.split('x').map(Number);
+
+// Crear los bultos
 for (let i = 0; i < cantidadFinal; i++) {
     bultos.push({
         "kilos": pesoTotal,
-        "largoCm": null,
-        "altoCm": null,
-        "anchoCm": null,
+        "largoCm": largoAnd,
+        "altoCm": altoAnd,
+        "anchoCm": anchoAnd,
         "volumenCm": volumenTotal,
         "valorDeclaradoSinImpuestos": 999999 * 0.21,
         "valorDeclaradoConImpuestos": 999999,
         "referencias": [
             { "meta": "detalle", "contenido": Producto },
             { "meta": "idCliente", "contenido": (idOperacionFinalAndreani + "-MELI").toUpperCase() },
-            { "meta": "observaciones", contenido: observaciones }
+            { "meta": "observaciones", "contenido": observaciones }
         ]
     });
 }
