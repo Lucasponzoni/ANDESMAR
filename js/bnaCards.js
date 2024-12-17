@@ -2159,24 +2159,66 @@ if (isSplit) {
 }
 
 // Ajustar la cantidad de bultos
-const cantidadBultos = isSplit ? (cantidad * 2) + cantidadKitsParsed : cantidad;
+const cantidadBultos = isSplit ? (cantidad * 1) + cantidadKitsParsed : cantidad;
 const VolumenTotalFinal = isSplit ? volumenCm3 / 2 : volumenCm3 / cantidad;
 
+// Inicializar arreglos para las medidas
+const Alto = [];
+const Ancho = [];
+const Largo = [];
+
+// Llenar las medidas de acuerdo a la cantidad de bultos
+for (let i = 0; i < cantidadBultos; i++) {
+    Alto.push(altoA);
+    Ancho.push(anchoA);
+    Largo.push(largoA);
+}
+
+// Si es un split, agregar las medidas de la unidad interior tantas veces como la cantidad de bultos
+if (isSplit) {
+    for (let i = 0; i < cantidadBultos; i++) {
+        Alto.push(altoInterior);
+        Ancho.push(anchoInterior);
+        Largo.push(largoInterior);
+    }
+}
+
+// Crear bultos con las medidas reales
 for (let i = 0; i < cantidadBultos; i++) {
     bultos.push({
         "kilos": peso / cantidadBultos,
-        "largoCm": null,
-        "altoCm": null,
-        "anchoCm": null,
+        "largoCm": Ancho[i] || null, // Usar Ancho[i] si existe, de lo contrario null
+        "altoCm": Alto[i] || null, // Usar Alto[i] si existe, de lo contrario null
+        "anchoCm": Largo[i] || null, // Usar Largo[i] si existe, de lo contrario null
         "volumenCm": VolumenTotalFinal,
         "valorDeclaradoSinImpuestos": precioSinIVA,
         "valorDeclaradoConImpuestos": precioVentaRedondeado,
         "referencias": [
             { "meta": "detalle", "contenido": producto_nombre },
             { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
-            { "meta": "observaciones", "contenido": calle + ",Telefono: " + telefono + " " + "Electrodomestico: " + producto_nombre }
+            { "meta": "observaciones", "contenido": `${calle}, Telefono: ${telefono} Electrodomestico: ${producto_nombre}` }
         ]
     });
+}
+
+// Si es un split, agregar los bultos de la unidad interior
+if (isSplit) {
+    for (let i = 0; i < cantidadBultos; i++) {
+        bultos.push({
+            "kilos": peso / cantidadBultos, // Ajusta según sea necesario
+            "largoCm": anchoInterior,
+            "altoCm": altoInterior,
+            "anchoCm": largoInterior,
+            "volumenCm": VolumenTotalFinal, // Ajustar según sea necesario
+            "valorDeclaradoSinImpuestos": precioSinIVA,
+            "valorDeclaradoConImpuestos": precioVentaRedondeado,
+            "referencias": [
+                { "meta": "detalle", "contenido": "Unidad Interior" }, // Detalle de la unidad interior
+                { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
+                { "meta": "observaciones", "contenido": `${calle}, Telefono: ${telefono} Unidad Interior: ${producto_nombre}` }
+            ]
+        });
+    }
 }
 
     const requestData = {
