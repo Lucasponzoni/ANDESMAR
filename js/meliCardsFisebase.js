@@ -948,7 +948,7 @@ for (let i = 0; i < cantidadFinal; i++) {
         "altoCm": altoAnd,
         "anchoCm": anchoAnd,
         "volumenCm": volumenTotal,
-        "valorDeclaradoSinImpuestos": 999999 * 0.21,
+        "valorDeclaradoSinImpuestos": 999999 / 1.21,
         "valorDeclaradoConImpuestos": 999999,
         "referencias": [
             { "meta": "detalle", "contenido": Producto },
