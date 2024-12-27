@@ -161,12 +161,14 @@ form {
     }
 }
 
-.six{
-    background-color: #349cfa;
-    border-radius: 5px;
-    padding: .2rem;
-    margin-bottom: .5rem;
+.six {
+    background: linear-gradient(135deg, #e0f2ff, #b2dffb); /* Mismo degradado */
+    border-radius: 5px; /* Bordes suaves */
+    padding: 0.2rem; /* Espaciado interno */
+    margin-bottom: 0.5rem; /* Espaciado inferior */
+    border: 1px solid #a3cde6; /* Borde sutil */
 }
+
 
 .badge-large {
     font-size: 1rem;
@@ -646,30 +648,42 @@ button:hover {
     background-color: #bebebe;
 }
 
+/* BULTO ESTILO DESTACADO EN TONOS ROJOS */
 .bulto {
-    border: 2px dashed red;
-    padding: 10px;
+    border: 2px dashed #d9534f;
+    padding: 12px;
     margin: 10px 0;
-    background-color: rgb(246, 190, 190);
-    border-radius: 10px;
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb); 
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); 
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.bultoImput, .bultoDescripccion{
+.bulto:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); 
+    cursor: pointer;
+}
+
+.bultoImput, .bultoDescripccion {
     display: flex;
     justify-content: space-between;
-    gap: .5rem;
+    gap: 0.5rem;
+    align-items: center;
 }
 
-.bultoTitle{
+.bultoTitle {
     font-family: "Chakra Petch", sans-serif;
-    font-weight: 500;
-    font-style: normal;
-    background-color: red;
+    font-weight: 600;
+    font-size: 1rem;
+    background: linear-gradient(135deg, #c9302c, #a52a2a); 
     color: white;
     width: max-content;
-    padding: .4rem;
-    border-radius: 10px;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    text-transform: uppercase;
     margin-top: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #mensajePersonalizado{
@@ -932,50 +946,72 @@ a.nav-link:hover{
     display: none;
 }
 
-/* VOLUMENES */
-.volumen-container {
-    border: 2px dashed #28a745;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 10px;
-    text-align: center;
-    background-color: #e9f7ef;
-    transition: transform 0.2s;
-    align-items: center;
-    justify-content: center;
+/* VOLUMENES ESTILO iOS */
+.containerVolumen {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background: linear-gradient(135deg, #e0f2ff, #b2dffb);
+    border-radius: 0 0 10px 10px;
+    margin-bottom: 10px;
+    margin-top: -12px;
+    padding: 10px;
 }
+
+.volumen-container {
+    border: 1px solid #a3cde6;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 5px;
+    text-align: center;
+    background: linear-gradient(135deg, #f0faff, #d0eaff);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 .volumen-container:hover {
-    transform: scale(1.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     cursor: pointer;
 }
+
 .volumen-container > img {
-    width: 60px;
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
 }
+
 .volumen-label {
     font-family: "Chakra Petch", sans-serif;
-    font-weight: 700;
-    font-style: normal;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0;
+    color: #003366;
 }
 
-#volumenTotalcm, #volumenTotal{
-    color: #004701;
-    font-size: 1.7rem;
+#volumenTotalcm, #volumenTotal {
+    color: #005599;
+    font-size: 1.2rem;
     font-family: "Chakra Petch", sans-serif;
     font-weight: 700;
-    font-style: normal;
 }
 
-.cubic{
+.cubic {
+    font-size: 0.9rem;
     font-family: "Chakra Petch", sans-serif;
-    font-size: 1.3rem;
+    color: #0077cc;
 }
 
-.provincia{
+.provincia {
     display: none;
 }
-
 /* FIN VOLUMENES */
 
 /* FOOTER */

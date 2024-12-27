@@ -141,20 +141,10 @@
             <input type="number" id="telefonoDestinatario" name="TelefonoDestinatario" value="" required placeholder="Teléfono Destinatario">
             <input type="text" id="nroRemito" name="NroRemito" value="" required placeholder="REMITO ej: 23012345678R">
         </div>
-        
-        <div class="dobleText">
-            <label for="bultos">Bultos Diferentes</label>
-            <label for="peso">Peso Total (kg)</label>
-            <label for="valorDeclarado">Valor Declarado</label>
-        </div>
 
-        <div class="six">
-            <div class="doble">
-                <input type="number" id="bultos" name="Bultos" value="1" min="1" required readonly>
-                <input type="number" id="peso" name="Peso" step="1" value="" required>
-                <input type="number" id="valorDeclarado" name="ValorDeclarado" value="" required>
-            </div>
-        </div>
+        <label for="observaciones">Observaciones:</label>
+        <textarea id="observaciones" lass="mensaje-personalizado" name="Observaciones"></textarea>
+        <div id="mensajePersonalizado" class="mensaje-personalizado"></div>
 
         <select id="tipoElectrodomestico" name="TipoElectrodomestico" onchange="rellenarMedidas()">
             <option value="">Seleccione un producto</option>
@@ -199,7 +189,44 @@
             <option value="bulto30">Bulto Pequeño 30x30</option>
             <option value="bulto40">Bulto Pequeño 40x40</option>
             <option value="bulto50">Bulto Pequeño 50x50</option>
-        </select>    
+        </select>            
+        
+        <div class="dobleText">
+            <label for="bultos">Bultos Diferentes</label>
+            <label for="peso">Peso Total (kg)</label>
+            <label for="valorDeclarado">Valor Declarado</label>
+        </div>
+
+        <div class="six">
+            <div class="doble">
+                <input type="number" id="bultos" name="Bultos" value="1" min="1" required readonly>
+                <input type="number" id="peso" name="Peso" step="1" value="" required>
+                <input type="number" id="valorDeclarado" name="ValorDeclarado" value="" required>
+            </div>
+
+            <div class="container containerVolumen">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="volumen-container">
+                            <img src="./Img/m3.png" alt="m3">
+                            <div>
+                                <div class="volumen-label">Volumen Total <span class="cubic">(m³):</span></div>
+                                <span id="volumenTotal">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="volumen-container">
+                            <img src="./Img/cm3.png" alt="cm3">
+                            <div>
+                                <div class="volumen-label">Volumen Total <span class="cubic">(cm³):</span></div>
+                                <span id="volumenTotalcm">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div> 
 
         <div id="medidasBultosContainer">
             <div class="bulto" id="bulto0">
@@ -227,30 +254,6 @@
         </div>
 
         <button type="button" id="addBultoButton">Agregar otro bulto</button>
-
-        <label for="observaciones">Observaciones:</label>
-        <textarea id="observaciones" lass="mensaje-personalizado" name="Observaciones"></textarea>
-        <div id="mensajePersonalizado" class="mensaje-personalizado"></div>
-
-
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="volumen-container">
-                        <img src="./Img/m3.png" alt="m3">
-                        <div class="volumen-label">Volumen Total <span class="cubic">(m³):</span></div>
-                        <span id="volumenTotal">0.00</span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="volumen-container">
-                        <img src="./Img/cm3.png" alt="cm3">
-                        <div class="volumen-label">Volumen Total <span class="cubic">(cm³):</span></div>
-                        <span id="volumenTotalcm">0.00</span>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="grid-container">
             <h2 class="titulo-cotizacion">*Precios finales con IVA (Cotizados directo por Api)</h2>
