@@ -690,6 +690,19 @@ button:hover {
     display: none;
 }
 
+.contenedorDatosCliente {
+    background: linear-gradient(190deg, #ffffff, #ffffff);
+    border-radius: 10px;
+    padding: 18px;
+    margin: 12px 0;
+    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #405572;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
 #observaciones{
     text-transform: lowercase;
     height: 6rem;
@@ -983,8 +996,8 @@ a.nav-link:hover{
 }
 
 .volumen-container > img {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     object-fit: contain;
 }
 

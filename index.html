@@ -85,175 +85,181 @@
             </select>
         </div>
 
-        <div class="trucks">
-            <div class="truck" id="truckAndesmar">
-                <img src="./Img/Andesmartruck2.png" alt="Truck Andesmar">
-                <div class="label">Andesmar</div>
-            </div>
-            <div class="truck" id="truckAndreani">
-                <img src="./Img/Andreanitruck2.png" alt="Truck Andreani">
-                <div class="label">Andreani</div>
-            </div>
+<div class="contenedorDatosCliente">
+    <div class="trucks">
+        <div class="truck" id="truckAndesmar">
+            <img src="./Img/Andesmartruck2.png" alt="Truck Andesmar">
+            <div class="label">Andesmar</div>
         </div>
-        
-        <input type="text" id="nombreApellidoDestinatario" name="NombreApellidoDestinatario" value="" required placeholder="Nombre & Apellido">
-
-        <p id="respuesta2"></p>
-
-        <div class="CpyLocalidad" style="position: relative;">
-            <div class="cp">
-                <input type="text" id="codigoPostalDestinatario" name="CodigoPostalDestinatario" value="" required placeholder="Código Postal">
-            </div>
+        <div class="truck" id="truckAndreani">
+            <img src="./Img/Andreanitruck2.png" alt="Truck Andreani">
+            <div class="label">Andreani</div>
+        </div>
+    </div>
     
-            <div class="localidad">
-                <input type="text" id="localidad" name="localidad" value="" autocomplete="off" placeholder="Localidad" required>
-                <span class="clear-button" id="clearButton">✖</span>
-                <div class="spinner2" id="loadingSpinner"></div>
-                <div class="lista-localidades" id="listaLocalidades"></div>
-            </div>
+    <input type="text" id="nombreApellidoDestinatario" name="NombreApellidoDestinatario" value="" required placeholder="Nombre & Apellido">
+
+    <p id="respuesta2"></p>
+
+    <div class="CpyLocalidad" style="position: relative;">
+        <div class="cp">
+            <input type="text" id="codigoPostalDestinatario" name="CodigoPostalDestinatario" value="" required placeholder="Código Postal">
         </div>
 
+        <div class="localidad">
+            <input type="text" id="localidad" name="localidad" value="" autocomplete="off" placeholder="Localidad" required>
+            <span class="clear-button" id="clearButton">✖</span>
+            <div class="spinner2" id="loadingSpinner"></div>
+            <div class="lista-localidades" id="listaLocalidades"></div>
+        </div>
+    </div>
 
-        <div class="provincia">
-            <p id="nombre-provincia"></p>
+
+    <div class="provincia">
+        <p id="nombre-provincia"></p>
+    </div>
+
+    <input type="text" id="calleDestinatario" name="CalleDestinatario" value="" required placeholder="Calle del Destinatario">
+
+    <input type="text" id="calleNroDestinatario" name="CalleNroDestinatario" value="" required placeholder="Número de Calle Destinatario">
+
+    <h3 class="Andrean hidden">Andreani (Opcional) <i class="fas fa-chevron-down"></i></h3>
+    <div class="PisoyDepto hidden" style="position: relative;">
+        <div class="piso">
+            <input type="text" id="pisolDestinatario" name="pisolDestinatario" placeholder="Piso" value="" required>
         </div>
 
-        <input type="text" id="calleDestinatario" name="CalleDestinatario" value="" required placeholder="Calle del Destinatario">
+        <div class="depto">
+            <input type="text" id="deptoDestinatario" name="deptoDestinatario" value="" placeholder="Depto" autocomplete="off">
+        </div>
 
-        <input type="text" id="calleNroDestinatario" name="CalleNroDestinatario" value="" required placeholder="Número de Calle Destinatario">
-
-        <h3 class="Andrean hidden">Andreani (Opcional) <i class="fas fa-chevron-down"></i></h3>
-        <div class="PisoyDepto hidden" style="position: relative;">
-            <div class="piso">
-                <input type="text" id="pisolDestinatario" name="pisolDestinatario" placeholder="Piso" value="" required>
-            </div>
+        <div class="email">
+            <input type="email" id="emailDestinatario" name="emailDestinatario" value="posventa@novogar.com.ar" placeholder="E-mail" autocomplete="off">
+        </div>
+    </div>
     
-            <div class="depto">
-                <input type="text" id="deptoDestinatario" name="deptoDestinatario" value="" placeholder="Depto" autocomplete="off">
-            </div>
+    <div style="display: flex; gap: 10px;">
+        <input type="number" id="telefonoDestinatario" name="TelefonoDestinatario" value="" required placeholder="Teléfono Destinatario">
+        <input type="text" id="nroRemito" name="NroRemito" value="" required placeholder="REMITO ej: 23012345678R">
+    </div>
 
-            <div class="email">
-                <input type="email" id="emailDestinatario" name="emailDestinatario" value="posventa@novogar.com.ar" placeholder="E-mail" autocomplete="off">
-            </div>
+    <label for="observaciones">Observaciones:</label>
+    <textarea id="observaciones" lass="mensaje-personalizado" name="Observaciones"></textarea>
+    <div id="mensajePersonalizado" class="mensaje-personalizado"></div>
+
+</div>
+
+<div class="contenedorDatosCliente">
+    <select id="tipoElectrodomestico" name="TipoElectrodomestico" onchange="rellenarMedidas()">
+        <option value="">Seleccione un producto</option>
+        <option value="heladera">Heladera</option>
+        <option value="cocina">Cocina</option>
+        <option value="hornoEmpotrable">Horno Empotrable</option>
+        <option value="lavavajillas">Lavavajillas</option>
+        <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
+        <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
+        <option value="split2700">Split 2700W</option>
+        <option value="split3300">Split 3300W</option>
+        <option value="split4500">Split 4500W</option>
+        <option value="split5500">Split 5500W</option>
+        <option value="split6000">Split 6000W</option>
+        <option value="pisoTecho18000">Piso Techo 18000 Frigorías</option>
+        <option value="aireportatil">Aire Portatil</option>
+        <option value="ventiladordepared">Ventilador de Pared</option>
+        <option value="colchon80cm">Colchon 80cm</option>
+        <option value="colchon100cm">Colchon 100cm</option>
+        <option value="colchon140cm">Colchon 140cm</option>
+        <option value="colchon160cm">Colchon 160cm</option>
+        <option value="colchon200cm">Colchon 200cm</option>
+        <option value="termotanque50">Termotanque 50L</option>
+        <option value="termotanque80">Termotanque 80L</option>
+        <option value="termotanque110">Termotanque 110L</option>
+        <option value="termotanque150">Termotanque 150L</option>
+        <option value="termotanque180">Termotanque 180L</option>
+        <option value="termotanque255">Termotanque 255L COM255</option>
+        <option value="termotanque300">Termotanque 300L RHCTP300N</option>
+        <option value="smartTV32">Smart TV 32"</option>
+        <option value="smartTV40">Smart TV 40"</option>
+        <option value="smartTV43">Smart TV 43"</option>
+        <option value="smartTV50">Smart TV 50"</option>
+        <option value="smartTV58">Smart TV 58"</option>
+        <option value="smartTV65">Smart TV 65"</option>
+        <option value="smartTV70">Smart TV 70"</option>
+        <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
+        <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
+        <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
+        <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
+        <option value="bulto20">Bulto Pequeño 20x20</option>
+        <option value="bulto30">Bulto Pequeño 30x30</option>
+        <option value="bulto40">Bulto Pequeño 40x40</option>
+        <option value="bulto50">Bulto Pequeño 50x50</option>
+    </select>            
+    
+    <div class="dobleText">
+        <label for="bultos">Bultos Diferentes</label>
+        <label for="peso">Peso Total (kg)</label>
+        <label for="valorDeclarado">Valor Declarado</label>
+    </div>
+
+    <div class="six">
+        <div class="doble">
+            <input type="number" id="bultos" name="Bultos" value="1" min="1" required readonly>
+            <input type="number" id="peso" name="Peso" step="1" value="" required>
+            <input type="number" id="valorDeclarado" name="ValorDeclarado" value="" required>
         </div>
-        
-        <div style="display: flex; gap: 10px;">
-            <input type="number" id="telefonoDestinatario" name="TelefonoDestinatario" value="" required placeholder="Teléfono Destinatario">
-            <input type="text" id="nroRemito" name="NroRemito" value="" required placeholder="REMITO ej: 23012345678R">
-        </div>
 
-        <label for="observaciones">Observaciones:</label>
-        <textarea id="observaciones" lass="mensaje-personalizado" name="Observaciones"></textarea>
-        <div id="mensajePersonalizado" class="mensaje-personalizado"></div>
-
-        <select id="tipoElectrodomestico" name="TipoElectrodomestico" onchange="rellenarMedidas()">
-            <option value="">Seleccione un producto</option>
-            <option value="heladera">Heladera</option>
-            <option value="cocina">Cocina</option>
-            <option value="hornoEmpotrable">Horno Empotrable</option>
-            <option value="lavavajillas">Lavavajillas</option>
-            <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
-            <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
-            <option value="split2700">Split 2700W</option>
-            <option value="split3300">Split 3300W</option>
-            <option value="split4500">Split 4500W</option>
-            <option value="split5500">Split 5500W</option>
-            <option value="split6000">Split 6000W</option>
-            <option value="pisoTecho18000">Piso Techo 18000 Frigorías</option>
-            <option value="aireportatil">Aire Portatil</option>
-            <option value="ventiladordepared">Ventilador de Pared</option>
-            <option value="colchon80cm">Colchon 80cm</option>
-            <option value="colchon100cm">Colchon 100cm</option>
-            <option value="colchon140cm">Colchon 140cm</option>
-            <option value="colchon160cm">Colchon 160cm</option>
-            <option value="colchon200cm">Colchon 200cm</option>
-            <option value="termotanque50">Termotanque 50L</option>
-            <option value="termotanque80">Termotanque 80L</option>
-            <option value="termotanque110">Termotanque 110L</option>
-            <option value="termotanque150">Termotanque 150L</option>
-            <option value="termotanque180">Termotanque 180L</option>
-            <option value="termotanque255">Termotanque 255L COM255</option>
-            <option value="termotanque300">Termotanque 300L RHCTP300N</option>
-            <option value="smartTV32">Smart TV 32"</option>
-            <option value="smartTV40">Smart TV 40"</option>
-            <option value="smartTV43">Smart TV 43"</option>
-            <option value="smartTV50">Smart TV 50"</option>
-            <option value="smartTV58">Smart TV 58"</option>
-            <option value="smartTV65">Smart TV 65"</option>
-            <option value="smartTV70">Smart TV 70"</option>
-            <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
-            <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
-            <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
-            <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
-            <option value="bulto20">Bulto Pequeño 20x20</option>
-            <option value="bulto30">Bulto Pequeño 30x30</option>
-            <option value="bulto40">Bulto Pequeño 40x40</option>
-            <option value="bulto50">Bulto Pequeño 50x50</option>
-        </select>            
-        
-        <div class="dobleText">
-            <label for="bultos">Bultos Diferentes</label>
-            <label for="peso">Peso Total (kg)</label>
-            <label for="valorDeclarado">Valor Declarado</label>
-        </div>
-
-        <div class="six">
-            <div class="doble">
-                <input type="number" id="bultos" name="Bultos" value="1" min="1" required readonly>
-                <input type="number" id="peso" name="Peso" step="1" value="" required>
-                <input type="number" id="valorDeclarado" name="ValorDeclarado" value="" required>
-            </div>
-
-            <div class="container containerVolumen">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="volumen-container">
-                            <img src="./Img/m3.png" alt="m3">
-                            <div>
-                                <div class="volumen-label">Volumen Total <span class="cubic">(m³):</span></div>
-                                <span id="volumenTotal">0.00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="volumen-container">
-                            <img src="./Img/cm3.png" alt="cm3">
-                            <div>
-                                <div class="volumen-label">Volumen Total <span class="cubic">(cm³):</span></div>
-                                <span id="volumenTotalcm">0.00</span>
-                            </div>
+        <div class="container containerVolumen">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="volumen-container">
+                        <img src="./Img/m3.png" alt="m3">
+                        <div>
+                            <div class="volumen-label">Volumen Total <span class="cubic">(m³):</span></div>
+                            <span id="volumenTotal">0.00</span>
                         </div>
                     </div>
                 </div>
-            </div> 
+                <div class="col-md-6">
+                    <div class="volumen-container">
+                        <img src="./Img/cm3.png" alt="cm3">
+                        <div>
+                            <div class="volumen-label">Volumen Total <span class="cubic">(cm³):</span></div>
+                            <span id="volumenTotalcm">0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div> 
+    </div> 
 
-        <div id="medidasBultosContainer">
-            <div class="bulto" id="bulto0">
-                <h3 class="bultoTitle" >Bulto: Paquete 1</h3>
+    <div id="medidasBultosContainer">
+        <div class="bulto" id="bulto0">
+            <h3 class="bultoTitle" >Bulto: Paquete 1</h3>
 
-                <div class="bultoDescripccion">
-                    <label for="alto0">Alto (cm)</label>
-                    <label for="ancho0">Ancho (cm)</label>
-                    <label for="largo0">Largo (cm)</label>
-                    <label for="Cantidad0">Cantidad</label>
-                </div>
-                
-            
-                <div class="bultoImput">
-                    <input type="number" id="alto0" name="Alto0" step="1" value="" required>
-                    <input type="number" id="ancho0" name="Ancho0" step="1" value="" required>
-                    <input type="number" id="largo0" name="Largo0" step="1" value="" required>
-                    <input type="number" id="cantidad0" name="Cantidad0" step="1" value="1" min="1" required>
-                </div>
-                
-                
-                
-                <button type="button" class="removeBultoButton">Eliminar Bulto</button>
+            <div class="bultoDescripccion">
+                <label for="alto0">Alto (cm)</label>
+                <label for="ancho0">Ancho (cm)</label>
+                <label for="largo0">Largo (cm)</label>
+                <label for="Cantidad0">Cantidad</label>
             </div>
+            
+        
+            <div class="bultoImput">
+                <input type="number" id="alto0" name="Alto0" step="1" value="" required>
+                <input type="number" id="ancho0" name="Ancho0" step="1" value="" required>
+                <input type="number" id="largo0" name="Largo0" step="1" value="" required>
+                <input type="number" id="cantidad0" name="Cantidad0" step="1" value="1" min="1" required>
+            </div>
+            
+            
+            
+            <button type="button" class="removeBultoButton">Eliminar Bulto</button>
         </div>
+    </div>
 
-        <button type="button" id="addBultoButton">Agregar otro bulto</button>
+    <button type="button" id="addBultoButton">Agregar otro bulto</button>
+
+</div>
 
         <div class="grid-container">
             <h2 class="titulo-cotizacion">*Precios finales con IVA (Cotizados directo por Api)</h2>
