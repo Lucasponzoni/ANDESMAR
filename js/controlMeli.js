@@ -339,7 +339,7 @@ function buscarEnFirebase(codigoNumerico, limite) {
 }
 
 function procesarDatos(data) {
-    // Verificar si el estado es Jujuy
+    // Verificar si el estado es Jujuy o Tierra del Fuego en billing_info
     let additionalInfo;
     if (data.client && data.client.billing_info && data.client.billing_info.additional_info) {
         additionalInfo = data.client.billing_info.additional_info;
@@ -359,7 +359,7 @@ function procesarDatos(data) {
         Swal.fire({
             icon: 'error',
             title: 'Envío no permitido',
-            text: 'Los envíos a Jujuy no están permitidos, separar etiqueta.'
+            text: 'Los envíos que facturan a Jujuy no están permitidos, separar etiqueta.'
         });
         return; // Salir de la función
     }
@@ -368,7 +368,17 @@ function procesarDatos(data) {
         Swal.fire({
             icon: 'error',
             title: 'Envío no permitido',
-            text: 'Los envíos a Tierra del Fuego no están permitidos, separar etiqueta.'
+            text: 'Los envíos que facturan a Tierra del Fuego no están permitidos, separar etiqueta.'
+        });
+        return; // Salir de la función
+    }
+
+    // Nueva validación para data.Provincia
+    if (data.Provincia === 'Jujuy' || data.Provincia === 'Tierra del Fuego') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Envío no permitido',
+            text: `Se detectó un envío a ${data.Provincia}, verificar en Mercado Pago si posee retención de impuesto a esta provincia.`
         });
         return; // Salir de la función
     }
