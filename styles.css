@@ -22,7 +22,7 @@ body {
     margin: 0;
     padding: 0;
     background: rgb(52,152,219);
-    background: linear-gradient(183deg, #76baed 0%, #349cfa 50%, #1a73e8 100%);
+    background: linear-gradient(145deg, rgba(255, 102, 102, 1) 20%, rgba(139, 0, 0, 1) 80%, rgba(255, 85, 85, 1) 100%);
 }
 
 h1 {
