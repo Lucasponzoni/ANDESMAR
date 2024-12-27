@@ -47,7 +47,7 @@
         
         <a class="navbar-brand" href="#">
             <img src="./Img/Novogar N.png" alt="Logo" class="navbar-logo">
-            <span class="navbar-brand-text">Logi<span class="navbar-brand-text2">Paq</span> <img class="blackCat" src="./Img/ruta-unscreen.gif" alt="LogiPaq" srcset=""> </span>
+            <span class="navbar-brand-text">L<span class="navbar-brand-text4">gi</span><span class="navbar-brand-text2">Paq</span> <img class="blackCat" src="./Img/Location.gif" alt="LogiPaq" srcset=""> </span>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -87,11 +87,11 @@
 
         <div class="trucks">
             <div class="truck" id="truckAndesmar">
-                <img src="./Img/AndesmarTruck.png" alt="Truck Andesmar">
+                <img src="./Img/Andesmartruck2.png" alt="Truck Andesmar">
                 <div class="label">Andesmar</div>
             </div>
             <div class="truck" id="truckAndreani">
-                <img src="./Img/Andreanitruck.png" alt="Truck Andreani">
+                <img src="./Img/Andreanitruck2.png" alt="Truck Andreani">
                 <div class="label">Andreani</div>
             </div>
         </div>
@@ -137,11 +137,25 @@
             </div>
         </div>
         
-        <input type="number" id="telefonoDestinatario" name="TelefonoDestinatario" value="" required placeholder="Teléfono Destinatario">
+        <div style="display: flex; gap: 10px;">
+            <input type="number" id="telefonoDestinatario" name="TelefonoDestinatario" value="" required placeholder="Teléfono Destinatario">
+            <input type="text" id="nroRemito" name="NroRemito" value="" required placeholder="REMITO ej: 23012345678R">
+        </div>
+        
+        <div class="dobleText">
+            <label for="bultos">Bultos Diferentes</label>
+            <label for="peso">Peso Total (kg)</label>
+            <label for="valorDeclarado">Valor Declarado</label>
+        </div>
 
-        <input type="text" id="nroRemito" name="NroRemito" value="" required placeholder="REMITO Valor Unico ejemplo 23012345678R">
+        <div class="six">
+            <div class="doble">
+                <input type="number" id="bultos" name="Bultos" value="1" min="1" required readonly>
+                <input type="number" id="peso" name="Peso" step="1" value="" required>
+                <input type="number" id="valorDeclarado" name="ValorDeclarado" value="" required>
+            </div>
+        </div>
 
-        <label for="tipoElectrodomestico">Tipo de Electrodoméstico:</label>
         <select id="tipoElectrodomestico" name="TipoElectrodomestico" onchange="rellenarMedidas()">
             <option value="">Seleccione un producto</option>
             <option value="heladera">Heladera</option>
@@ -185,20 +199,7 @@
             <option value="bulto30">Bulto Pequeño 30x30</option>
             <option value="bulto40">Bulto Pequeño 40x40</option>
             <option value="bulto50">Bulto Pequeño 50x50</option>
-        </select>        
-
-        <div class="six">
-            <div class="doble">
-                <label for="bultos">Cantidad de Bultos Diferentes</label>
-                <label for="peso">Peso Total (kg)</label>
-                <label for="valorDeclarado">Valor Declarado</label>
-            </div>
-            <div class="doble">
-                <input type="number" id="bultos" name="Bultos" value="1" min="1" required readonly>
-                <input type="number" id="peso" name="Peso" step="1" value="" required>
-                <input type="number" id="valorDeclarado" name="ValorDeclarado" value="" required>
-            </div>
-        </div>
+        </select>    
 
         <div id="medidasBultosContainer">
             <div class="bulto" id="bulto0">
