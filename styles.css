@@ -36,7 +36,18 @@ h1 {
     font-size: 2rem;
     color: #405572;
     text-shadow: 2px 3px 0px #bfd5e9;
-    padding: 5px;
+    padding: 7px;
+}
+
+@keyframes pulseColor {
+    0%, 100% {
+        color: #349cfa;
+        text-shadow: 2px 3px 0px #9ed3f4;
+    }
+    50% {
+        color: #e63946;
+        text-shadow: 2px 3px 0px #f8b4b4;
+    }
 }
 
 .navbar-brand-text2 {
@@ -47,7 +58,9 @@ h1 {
     text-shadow: 2px 3px 0px #9ed3f4;
     padding: 5px; 
     border-radius: 5px; 
+    animation: pulseColor 10s infinite steps(1);
 }
+
 
 .navbar-brand-text4 {
     margin-left: 25px;
