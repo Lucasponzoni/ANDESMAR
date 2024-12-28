@@ -1279,6 +1279,13 @@ margin-bottom: -1rem;
     color: #333;
 }
 
+.cotizacion-label .imgParcel {
+    width: 170px;
+    opacity: .3; 
+    overflow: hidden;
+    display: none;
+}
+
 /* Título */
 .titulo-cotizacion {
     grid-column: span 1; 
