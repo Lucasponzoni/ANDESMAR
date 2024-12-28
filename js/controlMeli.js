@@ -1099,10 +1099,16 @@ function llenarTabla(datos) {
     actualizarContadores();
 }
 
-// Cerrar el modal y limpiar al cerrarlo
 $('#escaneoColecta2').on('hidden.bs.modal', function () {
-    $('body').removeClass('modal-open'); // Eliminar clase modal-open
-    $('.modal-backdrop').remove(); // Eliminar fondo
+    setTimeout(() => {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        $('body').css('overflow', 'auto'); 
+        window.scrollTo(0, 0); 
+    }, 300); 
 });
+
+
+
 
 
