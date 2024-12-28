@@ -125,6 +125,11 @@ h1 {
     color: rgb(0, 150, 0);
 }
 
+.redStrong4{
+    font-weight: 700;
+    color: orangered;
+}
+
 .lookBase {
     text-align: center;
     background-color: white; /* Fondo similar a macOS */
@@ -3875,11 +3880,44 @@ input[disabled] {
     background-color: #28a745;
     color: white;
     margin-right: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#contadorPreparados:hover {
+    background-color: #218838;
+    transform: scale(1.05);
 }
 
 #contadorSinPreparar {
     background-color: #dc3545;
     color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#contadorSinPreparar:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+}
+
+.alertContador {
+    background: linear-gradient(190deg, rgba(255, 77, 77, 0.8), rgba(255, 26, 26, 0.8));
+    color: white;
+    margin-bottom: -10px !important;
+    padding: 8px 12px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 14px;
+    margin: 10px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.alertContador i {
+    margin-right: 8px;
+    margin-left: 4px;
 }
 
 .contador2 span {

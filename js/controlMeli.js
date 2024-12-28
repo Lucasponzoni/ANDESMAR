@@ -213,7 +213,7 @@ function buscarCodigo(codigo) {
                 $('.lookBase').html(`La etiqueta <span class="redStrong2">${codigoNumerico}</span> ya se encontraba en planilla. <span class="redStrong2"><i class="bi bi-x-circle-fill"></i> ¡Fue omitida, continúa escaneando!</span>`).show();
             } else {
                 // Si no está en la planilla, se agrega
-                $('.lookBase').html(`Se encontró etiqueta: <span class="redStrong">${codigoNumerico}</span> en localStorage y fue agregada a la planilla. <span class="redStrong3"><i class="bi bi-check-circle-fill"></i> ¡Exito!</span>`).show();
+                $('.lookBase').html(`Se encontró etiqueta: <span class="redStrong">${codigoNumerico}</span> en <span style="color:rgb(134, 77, 255); font-weight: bold;">LocalStorage <i class="bi bi-floppy2-fill"></i></span> y fue agregada a la planilla. <span class="redStrong3"><i class="bi bi-check-circle-fill"></i> ¡Exito!</span>`).show();
                 procesarDatos(datosAlmacenados[codigoNumerico]);
             }
             $('#spinner4').hide(); // Ocultar spinner
@@ -273,11 +273,11 @@ setTimeout(() => {
                                                                                                                             $('.lookBase').text('Buscando en últimas 10.000 ventas...').show();
                                                                                                                             return buscarEnFirebase(codigoNumerico, 10000).then(encontrado => {
                                                                                                                                 if (!encontrado) {
-                                                                                                                                    Swal.fire({
-                                                                                                                                        icon: 'error',
-                                                                                                                                        title: 'Código no encontrado',
-                                                                                                                                        text: 'No se encontraron resultados para el código ingresado.'
-                                                                                                                                    });
+                                                                                                                                    $('#spinner4').hide(); // Ocultar spinner
+                                                                                                                                    $('.lookBase').html(`NO se encontró etiqueta: <span class="redStrong">${codigoNumerico}</span> en <span style="color: #FF8C00; font-weight: bold;">Firebase <i class="bi bi-fire"></i></span> en las últimas 10.000 ventas. <span class="redStrong4"><i class="bi bi-search"></i> Verifica la fecha en Mercado Libre: <a href="https://www.mercadolibre.com.ar/ventas/omni/listado?filters=&startPeriod=WITH_DATE_CLOSED_6M_OLD&sort=DATE_CLOSED_DESC&subFilters=&search=${codigoNumerico}&limit=50&offset=0" target="_blank" style="color: #007bff; text-decoration: underline;">CLICK AQUÍ <i class="bi bi-box-arrow-up-right"></i></a></span>`).show();
+
+                                                                                                                                    // Limpiar el input
+                                                                                                                                    $('#codigoInput').val(''); // Limpiar el input
                                                                                                                                 }
                                                                                                                             });
                                                                                                                         }
@@ -331,6 +331,13 @@ function buscarEnFirebase(codigoNumerico, limite) {
                 const datosAlmacenados = JSON.parse(localStorage.getItem('envios')) || {};
                 datosAlmacenados[codigoNumerico] = data; // Guardar en localStorage
                 localStorage.setItem('envios', JSON.stringify(datosAlmacenados));
+
+                // Ocultar spinner y mostrar mensaje
+                $('#spinner4').hide(); // Ocultar spinner
+                $('.lookBase').html(`Se encontró etiqueta: <span class="redStrong">${codigoNumerico}</span> en <span style="color: #FF8C00; font-weight: bold;">Firebase <i class="bi bi-fire"></i></span> y fue agregada a la planilla. <span class="redStrong3"><i class="bi bi-check-circle-fill"></i> ¡Éxito!</span>`).show();
+
+                // Limpiar el input
+                $('#codigoInput').val(''); // Limpiar el input
             }
         });
 
@@ -440,20 +447,20 @@ function agregarFila(data) {
                 idOperacion: data.idOperacion,
                 Cantidad: data.Cantidad,
                 Producto: data.Producto,
-                pictures: data.pictures // Solo si es necesario
+                pictures: data.pictures
             });
         }
     });
 
-    // Generar la fila de la tabla sin actualizar la fecha en Firebase
+    // Generar la fila de la tabla
     const newRow = `
         <tr data-id="${data.shippingId}">
-            <td>${data.fechaHora}</td>
+            <td>${data.fechaHora || fechaHora}
             <td><a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank">${data.idOperacion}</a></td>
             <td id="sku-control-Meli">${data.shippingId}</td>
             <td id="cantidad-control-Meli">${data.Cantidad}</td>
             <td>${data.Producto}</td>
-            <td><img src="${data.pictures && data.pictures.length > 0 ? data.pictures[0].secure_url : ''}" alt="Imagen" style="width: auto; height: 80px;"></td>
+            <td><img src="${data.pictures && data.pictures.length > 0 ? data.pictures[0].secure_url : ''}" alt="Imagen" style="max-width: 200px; height: 80px;"></td>
             <td><button class="btn btn-danger btn-delete" onclick="confirmarEliminacion('${data.shippingId}')">X</button></td>
         </tr>
     `;
@@ -1012,3 +1019,90 @@ function actualizarContadores() {
         });
     });
 }
+
+$(document).ready(function() {
+    $('#contadorPreparados').on('click', function() {
+        cargarDatosPorEstado('preparado'); // Cargar solo preparados
+        $('#escaneoColecta2').modal('show'); // Mostrar el modal
+    });
+
+    $('#contadorSinPreparar').on('click', function() {
+        cargarDatosPorEstado('sin preparar'); // Cargar solo sin preparar
+        $('#escaneoColecta2').modal('show'); // Mostrar el modal
+    });
+
+    // Cerrar el modal y limpiar al cerrarlo
+    $('#escaneoColecta2').on('hidden.bs.modal', function () {
+        $('#detalleTablaBody').empty(); // Limpiar la tabla
+        $('#tablaCabecera').hide(); // Ocultar cabecera
+        $('#totalPreparados').text('0');
+        $('#totalSinPreparar').text('0');
+    });
+});
+
+function cargarDatosPorEstado(estado) {
+    const datosFiltrados = [];
+
+    // Obtener todos los datos de Firebase
+    database.ref('/despachoDelDiaMeli').once('value').then(snapshot => {
+        snapshot.forEach(childSnapshot => {
+            const data = childSnapshot.val();
+            if (estado === 'preparado' && data.estado === 'preparado') {
+                datosFiltrados.push(data);
+            } else if (estado === 'sin preparar' && data.estado !== 'preparado') {
+                datosFiltrados.push(data);
+            }
+        });
+
+        // Actualizar contadores
+        const totalPreparados = datosFiltrados.filter(d => d.estado === 'preparado').length;
+        const totalSinPreparar = datosFiltrados.filter(d => d.estado !== 'preparado').length;
+
+        $('#totalPreparados').text(totalPreparados);
+        $('#totalSinPreparar').text(totalSinPreparar);
+
+        // Llenar la tabla
+        llenarTabla(datosFiltrados);
+    }).catch(error => {
+        console.error("Error al cargar datos: ", error);
+    });
+}
+
+function llenarTabla(datos) {
+    const tbody = $('#detalleTablaBody');
+    tbody.empty(); // Limpiar la tabla antes de llenarla
+
+    if (datos.length === 0) {
+        tbody.append(`<tr><td colspan="4" class="no-data">No hay datos disponibles.</td></tr>`);
+        $('#tablaCabecera').hide(); // Asegúrate de ocultar la cabecera si no hay datos
+        return;
+    }
+
+    // Mostrar cabecera de la tabla
+    $('#tablaCabecera').show();
+
+    datos.forEach((data) => {
+        // Truncar el texto del producto a 10 caracteres
+        const productoTruncado = data.Producto.length > 10 ? data.Producto.substring(0, 30) + '...' : data.Producto;
+
+        const newRow = `
+            <tr>
+                <td><a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank">${data.idOperacion}</a></td>
+                <td>${data.shippingId}</td>
+                <td>${data.Cantidad}</td>
+                <td>${productoTruncado}</td>
+            </tr>
+        `;
+        tbody.append(newRow);
+    });
+
+    actualizarContadores();
+}
+
+// Cerrar el modal y limpiar al cerrarlo
+$('#escaneoColecta2').on('hidden.bs.modal', function () {
+    $('body').removeClass('modal-open'); // Eliminar clase modal-open
+    $('.modal-backdrop').remove(); // Eliminar fondo
+});
+
+

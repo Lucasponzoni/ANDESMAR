@@ -126,7 +126,7 @@
                         <th><i class="bi bi-rocket-takeoff-fill"></i> Shipping ID</th>
                         <th><i class="bi bi-box"></i> Cantidad</th> 
                         <th><i class="bi bi-info-circle"></i> Descripción</th> 
-                        <th><i class="bi bi-image"></i> Imagen</th>
+                        <th class="imgMeli" ><i class="bi bi-image"></i> Imagen</th>
                         <th><i class="bi bi-trash"></i></th>
                     </tr>
                 </thead>
@@ -192,15 +192,13 @@
                     <input type="text" id="codigoInput2" class="form-control" placeholder="Ingresa el código" autofocus>
                 </div>
                 
-                <!-- Spinner para mostrar durante la búsqueda -->
                 <div id="spinner4" class="spinner-border text-primary mt-3" role="status" style="display: none;">
                     <span class="sr-only">Cargando...</span>
                 </div>
                 
-                <!-- Contenedor para alertas -->
-                <div id="alertContainer" class="mt-3"></div>
-                
-                <!-- Contadores de filas en un contenedor dividido -->
+                <div id="alertContainer" class="mt-3"></div>               
+
+    
                 <div class="contador-container2">
                     <div class="contador2" id="contadorPreparados">
                         <span id="totalPreparados">0</span> Preparados <i class="bi bi-check2-circle"></i>
@@ -209,11 +207,32 @@
                         <span id="totalSinPreparar">0</span> Sin Preparar <i class="bi bi-clock-history"></i>
                     </div>
                 </div>
+
+                <div class="alertContador">
+                    <i class="bi bi-info-circle"></i>
+                    Click sobre los botones para ver el listado.
+                </div>
+
+                <div id="detalleTablaContainer" class="mt-3">
+                    <table class="table">
+                        <thead id="tablaCabecera" style="display: none;">
+                            <tr>
+                                <th>Operación</th>
+                                <th>Ship. ID</th>
+                                <th>Unit</th>
+                                <th>Producto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detalleTablaBody">
+                            <!-- Aquí se llenarán los datos -->
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
-
 
 <!-- Contenedor para notificaciones -->
 <div id="notificationContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
