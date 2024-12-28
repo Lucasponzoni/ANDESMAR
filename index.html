@@ -261,19 +261,27 @@
 
 </div>
 
-        <div class="grid-container">
-            <h2 class="titulo-cotizacion">*Precios finales con IVA (Cotizados directo por Api)</h2>
-            <div class="cotizacion-container">
-                <span class="signo-peso"><img src="./Img/dollar.webp" alt="Dollar Sign"></span>
-                <span class="valor-cotizacion" id="valor-cotizacion">0</span>
-                <div class="cotizacion-label">ANDREANI (Api)</div>
-            </div>
-            <div class="cotizacion-container">
-                <span class="signo-peso"><img src="./Img/dollar.webp" alt="Dollar Sign"></span>
-                <span class="valor-cotizacion" id="valor-cotizacion2">0</span>
-                <div class="cotizacion-label">ANDESMAR (Api)</div>
-            </div>
-        </div>
+<div class="grid-container">
+    <h2 class="titulo-cotizacion">*Precios finales con IVA (Cotizados directo por Api)</h2>
+    
+    <div class="cotizacion-container andreani">
+        <div class="icono-transporte"><img src="./Img/andreani-tini.png" alt="Correo ANdreani" srcset=""></div>
+        <span class="valor-cotizacion" id="valor-cotizacion">0</span>
+        <div class="cotizacion-label"></div>
+    </div>
+    
+    <div class="cotizacion-container andesmar">
+        <div class="icono-transporte"><img src="./Img/andesmar-tini.png" alt="Andesmar Cargas" srcset=""></div>
+        <span class="valor-cotizacion" id="valor-cotizacion2">0</span>
+        <div class="cotizacion-label"></div>
+    </div>
+    
+    <div class="cotizacion-container tercer-transporte">
+        <div class="icono-transporte"><img src="./Img/oca-tini.png" alt="Correo Oca" srcset=""></div>
+        <span class="valor-cotizacion" id="valor-cotizacion3">0</span>
+        <div class="cotizacion-label">OCA (Api Proximamente)</div>
+    </div>
+</div>
         
         <input type="number" id="m3" name="M3" step="0.001" value="0.1" style="display:none;">
 

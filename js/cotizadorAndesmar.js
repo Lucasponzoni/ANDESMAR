@@ -409,7 +409,7 @@ function formatearPrecio(precio) {
 // Función para mostrar el spinner
 function mostrarSpinner() {
     const spinner = document.createElement('div');
-    spinner.className = 'spinner-border text-success';
+    spinner.className = 'spinner-border text-primary';
     spinner.role = 'status';
     spinner.innerHTML = '<span class="visually-hidden">Cargando...</span>';
 
