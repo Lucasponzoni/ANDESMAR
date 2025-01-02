@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const cliente = "0012007490";
     const sucursalOrigen = "PRC";
+
+    const cpOrigen = "2000";
+    const operativa = "431395";
+    const cuit = "30-68543701-1";
+    const cantidad = document.getElementById('codigoPostalDestinatario'); 
     const cpDestinoInput = document.getElementById('codigoPostalDestinatario');
     const valorDeclaradoInput = document.getElementById('valorDeclarado');
     const volumenTotalElement = document.getElementById('volumenTotalcm');

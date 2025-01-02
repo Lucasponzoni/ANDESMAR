@@ -1269,8 +1269,19 @@ margin-bottom: -1rem;
 .valor-cotizacion {
     color: #333;
     font-size: 1.5rem;
-    font-family: "Chakra Petch", sans-serif;
+    font-family: "Chakra Petch", sans-serif !important;
     font-weight: 700;
+}
+
+.plazo-ios {
+    color: #0000ff; /* Gris típico de iOS */
+    font-size: 0.85rem; /* Tamaño de texto más pequeño */
+    font-weight: 400; /* Fuente fina */
+    font-style: normal;
+    margin-top: 4px; /* Espaciado superior */
+    display: block; /* Asegura que el plazo esté debajo */
+    text-align: left; /* Alineado a la izquierda */
+    letter-spacing: 0.2px; /* Espaciado entre letras para mejor legibilidad */
 }
 
 .cotizacion-label {
@@ -1655,6 +1666,38 @@ div.card-body > p > i{
     .card {
         margin: 10px;
     }
+}
+
+.spinner-border {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-width: 0.2em;
+}
+
+.text-purple {
+    color: purple; /* Cambia a lila */
+}
+
+.plazo-entrega {
+    color: #8e24aa;
+    font-size: 0.9rem; 
+    font-style: italic; 
+    font-weight: 600; 
+    display: inline-block; 
+    line-height: 1.2; 
+    border-radius: 5px;
+    padding: 2px 2px; 
+}
+
+.plazo-entrega strong {
+    color: #76208e; 
+    font-weight: 600; 
+    text-shadow: none; 
+}
+
+.spinner-container {
+    display: flex;
+    align-items: center;
 }
 
 #cards-container {
