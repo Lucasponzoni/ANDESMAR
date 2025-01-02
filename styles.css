@@ -3808,9 +3808,14 @@ td.imagen-Meli img {
 }
 
 div .card-body-facturacion-meli input, select, textarea {
-    margin-bottom: 0 ;
+    margin-bottom: 0px !important ;
     border-radius: 0 0 5px 5px !important;
 }
+
+.contenedorDatosCliente > input, .doble-tel-remito > input, .label-mensaje-personalizado, #respuestaNegativa, #respuesta2{
+    margin-bottom: 2px;
+}
+
 input[disabled] {
     background-color: #f0f0f0;
     border: 1px solid #ccc;
