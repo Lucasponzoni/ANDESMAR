@@ -1,21 +1,49 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const firebaseConfigCDS = {
+        apiKey: "AIzaSyBPw7ElqCPC92nag2oFW57aLD9t018FvC4",
+        authDomain: "emails-novogar.firebaseapp.com",
+        databaseURL: "https://emails-novogar-default-rtdb.firebaseio.com",
+        projectId: "emails-novogar",
+        storageBucket: "emails-novogar.appspot.com",
+        messagingSenderId: "1085815449583",
+        appId: "1:1085815449583:web:72f836c378bd971fb8b81a",
+        measurementId: "G-BW9ML8LVV6"
+    };
+
+    // Inicializar Firebase
+    const appCDS = firebase.initializeApp(firebaseConfigCDS, "appCDS");
+    const dbCDS = appCDS.database();
+
     // Variables Cruz del Sur
-    const idCDS = "87231e4b-b414-47c0-882b-ef98adb94fe4";
-    const usuarioCDS = "necommerce";
-    const passCDS = "novogar71!";
     const cpDestinoCDS = document.getElementById('codigoPostalDestinatario');
     const valorDeclaradoCDS = document.getElementById('valorDeclarado');
     const volumenTotalElementCDS = document.getElementById('volumenTotalcm');
     const pesoCDS = document.getElementById('peso');
     const valorCotizacionElementCDS = document.getElementById('valor-cotizacion4');
-    const cotizacionContainer = document.querySelector('.cotizacion-container.cuarto-transporte'); // Seleccionar específicamente el contenedor de Cruz del Sur
+    const cotizacionContainer = document.querySelector('.cotizacion-container.cuarto-transporte');
+
+    let idCDS, usuarioCDS, passCDS;
+
+    // Obtener credenciales de Firebase
+    dbCDS.ref('LogiPaq').once('value')
+        .then(snapshot => {
+            const data = snapshot.val();
+            idCDS = data[3];
+            usuarioCDS = data[4];
+            passCDS = data[5];
+
+            actualizarCotizacionCDS();
+        })
+        .catch(error => {
+            console.error('Error al obtener credenciales de Firebase:', error);
+        });
 
     // Spinner
     const spinnerCDS = document.createElement('div');
     spinnerCDS.className = 'spinner-border';
     spinnerCDS.role = 'status';
     spinnerCDS.innerHTML = '<span class="visually-hidden">Cargando...</span>';
-    
+
     const spinnerContainerCDS = document.createElement('div');
     spinnerContainerCDS.appendChild(spinnerCDS);
     spinnerContainerCDS.appendChild(document.createTextNode(' Esperando...'));
@@ -37,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data.Cotizaciones && data.Cotizaciones.length > 0) {
             const segundaCotizacion = data.Cotizaciones[0];
-
             const horasDesde = segundaCotizacion.HorasDesde;
             const horasHasta = segundaCotizacion.HorasHasta;
 
@@ -55,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             valorCotizacionElementCDS.innerHTML = resultado;
-
             mostrarInformacionSucursal(data.Sucursal);
         } else {
             valorCotizacionElementCDS.innerHTML = 'No hay cotizaciones disponibles.';
@@ -67,50 +93,45 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sucursalDiv) {
             sucursalDiv.remove();
         }
-    
+
         const sucursalContainer = document.createElement('div');
         sucursalContainer.id = 'sucursal-info';
         sucursalContainer.className = 'sucursal-container';
-    
+
         const sucursalInfo = sucursales.map(sucursal => `
             <div class="sucursal-details">
-                <img class="cds-img" src="./Img/cruz-del-sur-logo.jpg" alt="Cruz del Sur" srcset="">                
-                <h5><i class="bi bi-lightning-charge-fill"></i> Disponible retiro en Sucursal CDS mas cercana:</h5> 
-                <h4><i class="bi bi-geo-alt"></i> ${sucursal.Nombre.replace(/\*/g, '')}, ${sucursal.Ciudad.replace(/\*/g, '')}</h4>                
+                <img class="cds-img" src="./Img/cruz-del-sur-logo.jpg" alt="Cruz del Sur">                
+                <h5><i class="bi bi-lightning-charge-fill"></i> Disponible retiro en Sucursal CDS más cercana:</h5> 
+                <h4><i class="bi bi-geo-alt"></i> ${sucursal.Nombre.replace(/\*/g, '')}, ${sucursal.Ciudad.replace(/\*/g, '')}</h4>
                 <p><i class="bi bi-house-fill"></i> Dirección: ${sucursal.Domicilio}, CP: ${sucursal.CP}</p>
                 <p><i class="bi bi-telephone-fill"></i> Teléfono: ${sucursal.Telefono}</p>
                 <p><i class="bi bi-clock-fill"></i> Horario: ${sucursal.Horario}</p>                
                 <div id="map-${sucursal.IdSucursal}" class="map" style="height: 300px;"></div>
             </div>
         `).join('');
-    
+
         sucursalContainer.innerHTML = sucursalInfo;
-    
-        // Agregar el div de sucursal debajo del contenedor de Cruz del Sur
+
         if (cotizacionContainer) {
             cotizacionContainer.insertAdjacentElement('afterend', sucursalContainer);
         } else {
             console.error("El contenedor de cotización no se encontró.");
         }
-    
-        // Inicializar Leaflet para cada sucursal
+
         sucursales.forEach(sucursal => {
             const latLng = [sucursal.Latitud, sucursal.Longitud];
             initMap(`map-${sucursal.IdSucursal}`, latLng);
         });
     };
-    
 
     // Función para inicializar el mapa con Leaflet
     const initMap = (mapId, location) => {
-        const map = L.map(mapId).setView(location, 15); // Establecer la vista del mapa
+        const map = L.map(mapId).setView(location, 15);
 
-        // Capa de OpenStreetMap
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors',
         }).addTo(map);
 
-        // Marcador en la ubicación de la sucursal
         L.marker(location).addTo(map)
             .bindPopup('Sucursal Cruz del Sur / Novogar')
             .openPopup();
@@ -157,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 valorCotizacionElementCDS.innerHTML = 'Error al obtener cotización.';
             }
         } else {
-            mostrarSpinnerCDS();
+             mostrarSpinnerCDS();
         }
     };
 
