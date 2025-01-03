@@ -131,3 +131,4 @@ function actualizarCantidadBultos() {
 
     observerOCA.observe(volumenTotalElement, { childList: true, subtree: true });
 });
+

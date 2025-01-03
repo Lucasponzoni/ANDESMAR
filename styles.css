@@ -1266,6 +1266,78 @@ margin-bottom: -1rem;
     background: #8e24aa; /* Lila */
 }
 
+.cuarto-transporte {
+    border: 1px solid #0d47a1; 
+    background: linear-gradient(135deg,  #e3f2fd, #bbdefb, #629fd1, #1a73e8); 
+}
+
+.cuarto-transporte > span {
+    color: #0d47a1; 
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.cuarto-transporte .icono-transporte {
+    background: #0d47a1; 
+}
+
+.sucursal-container {
+    margin-top: 5px; 
+    border-radius: 10px; 
+    background-color: #ffffff; 
+}
+
+.sucursal-details {
+    padding: 10px; 
+    border: 1px solid #0d47a1; 
+    border-radius: 8px; 
+}
+
+.sucursal-details h5 {
+    background-color: #0d47a1;
+    width: fit-content;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px; 
+    color: white; 
+    margin-bottom: 10px; 
+}
+
+.cds-img{
+    width: 200px;
+    margin-bottom: -15px;
+    margin-top: -25px;
+}
+
+.sucursal-details h4 {
+    font-size: 22px; 
+    font-weight: 600; 
+    color: #0d47a1; 
+}
+
+.sucursal-details p {
+    font-weight: 400;
+    font-size: 14px; 
+    margin: 5px; 
+    color: #333;
+}
+
+
+.bi-clock-fill, .bi-telephone-fill, .bi-house-fill {
+    font-weight: 900;
+    font-size: x-large;
+    color: #0d47a1;
+}
+
+.map {
+    border-radius: 10px; 
+    margin-top: 10px; 
+    height: 150px !important; 
+    border: 2px dashed #0d47a1; 
+}
+
+
+
 .valor-cotizacion {
     color: #333;
     font-size: 1.5rem;
@@ -1691,6 +1763,23 @@ div.card-body > p > i{
 
 .plazo-entrega strong {
     color: #76208e; 
+    font-weight: 600; 
+    text-shadow: none; 
+}
+
+.plazo-entrega2 {
+    color: #0d47a1;
+    font-size: 0.9rem; 
+    font-style: italic; 
+    font-weight: 600; 
+    display: inline-block; 
+    line-height: 1.2; 
+    border-radius: 5px;
+    padding: 2px 2px; 
+}
+
+.plazo-entrega2 strong {
+    color: #083373; 
     font-weight: 600; 
     text-shadow: none; 
 }
