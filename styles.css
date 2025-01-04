@@ -780,6 +780,7 @@ button:hover {
 }
 
 .card-body-medidas{
+    margin-top: 5px;
     box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
     border: 1px solid grey;
     border-radius: 10px;
