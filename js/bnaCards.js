@@ -13,6 +13,102 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// CARGA SKU
+// Función para cargar SKU desde Firebase
+function cargarSKUs() {
+    const skuListBody = document.getElementById('skuListBody');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    loadingSpinner.style.display = 'block'; // Mostrar spinner
+
+    firebase.database().ref('imei/').once('value').then(snapshot => {
+        skuListBody.innerHTML = ''; // Limpiar la tabla
+        snapshot.forEach(childSnapshot => {
+            const sku = childSnapshot.val().sku;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${sku}</td>
+                <td>
+                    <button class="btn btn-danger" onclick="eliminarSKU('${childSnapshot.key}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            skuListBody.appendChild(row);
+        });
+        loadingSpinner.style.display = 'none'; // Ocultar spinner
+    }).catch(error => {
+        console.error("Error al cargar SKU: ", error);
+        loadingSpinner.style.display = 'none'; // Ocultar spinner
+    });
+}
+
+// Función para agregar nuevo SKU
+document.getElementById('addSkuButton').addEventListener('click', () => {
+    const newSku = document.getElementById('newSkuInput').value;
+    const alertContainer = document.getElementById('alertContainer');
+
+    if (newSku) {
+        const newRef = firebase.database().ref('imei/' + newSku.replace(/\s+/g, '_'));
+        
+        // Verificar si el SKU ya existe
+        newRef.once('value').then(snapshot => {
+            if (snapshot.exists()) {
+                // SKU ya existe
+                mostrarAlerta('El SKU ya existe en el listado', 'danger');
+            } else {
+                // Agregar nuevo SKU
+                newRef.set({ sku: newSku })
+                    .then(() => {
+                        console.log(`SKU agregado: ${newSku}`);
+                        mostrarAlerta('Se ha agregado el SKU al listado', 'success');
+                        cargarSKUs(); // Recargar la lista de SKU
+                        document.getElementById('newSkuInput').value = ''; // Limpiar input
+                    })
+                    .catch(error => {
+                        console.error("Error al agregar SKU: ", error);
+                    });
+            }
+        });
+    }
+});
+
+// Función para mostrar alertas
+function mostrarAlerta(mensaje, tipo) {
+    const alertContainer = document.getElementById('alertContainer');
+    alertContainer.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            <i class="${tipo === 'danger' ? 'fas fa-exclamation-triangle' : 'fas fa-check'}"></i>
+            ${mensaje}
+        </div>
+    `;
+    alertContainer.style.display = 'block'; // Mostrar alerta
+
+    // Ocultar alerta después de 5 segundos
+    setTimeout(() => {
+        alertContainer.style.display = 'none';
+    }, 5000);
+}
+
+// Función para eliminar SKU
+function eliminarSKU(key) {
+    firebase.database().ref('imei/' + key).remove()
+        .then(() => {
+            console.log(`SKU eliminado: ${key}`);
+            cargarSKUs(); // Recargar la lista de SKU
+        })
+        .catch(error => {
+            console.error("Error al eliminar SKU: ", error);
+        });
+}
+
+// Limpiar el input al abrir el modal
+$('#skuModal').on('show.bs.modal', () => {
+    document.getElementById('newSkuInput').value = ''; // Limpiar el input
+    cargarSKUs(); // Cargar los SKU al abrir el modal
+});
+
+// FIN CARGA SKU
+
 // VERIFICA ORDENES DUPLICADAS
 // Referencia a la base de datos
 const databaseRef = firebase.database().ref('enviosBNA');
@@ -234,6 +330,8 @@ function lowercaseWords(str) {
     return str.toLowerCase(); // Convertir toda la cadena a minúsculas
 }
 
+let skusList = [];
+
 // CARGAR DATOS DE FIREBASE
 function loadEnviosFromFirebase() {
     const cardsContainer = document.getElementById('meli-cards');
@@ -246,10 +344,21 @@ function loadEnviosFromFirebase() {
 
     spinner.style.display = 'block'; 
 
-    firebase.database().ref('enviosBNA').once('value', function(snapshot) {
-        allData = []; // Asegúrate de reiniciar allData
-        let sinPrepararCount = 0; // Contador para las tarjetas sin preparar
-        let sinFacturarCount = 0;
+    // Cargar SKUs desde Firebase
+    firebase.database().ref('imei/').once('value')
+        .then(skuSnapshot => {
+            skusList = []; // Reiniciar skusList
+            skuSnapshot.forEach(childSnapshot => {
+                skusList.push(childSnapshot.val().sku);
+            });
+
+            // Ahora cargar envíos
+            return firebase.database().ref('enviosBNA').once('value');
+        })
+        .then(snapshot => {
+            allData = []; // Asegúrate de reiniciar allData
+            let sinPrepararCount = 0; // Contador para las tarjetas sin preparar
+            let sinFacturarCount = 0;
 
         snapshot.forEach(function(childSnapshot) {
             const data = childSnapshot.val();
@@ -387,7 +496,6 @@ const cpsAndesmar = [
     4168, 4178, 2000, 3500, 3100, 3400
 ];
 
-
 function renderCards(data) {
     const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = ''; // Limpiar contenedor de tarjetas
@@ -470,378 +578,17 @@ const descuentoContenido = data[i].equivalencia_puntos_pesos > 0 ? `
 <i class="bi bi-award-fill puntos-icon"></i>
 COMPRA CON USO DE PUNTOS BNA
 </p>` : '';
+
+// Verificar si el SKU está incluido en el listado
+const isSkuIncluded = skusList.includes(data[i].sku);
         
         // Agregar la tarjeta al contenedor
         cardsContainer.appendChild(card);
 
         card.innerHTML = `
-                    <div class="card">
-                        <div class="card-body">
 
-<div class="em-circle-state5">
-    ${(() => {
-        const shopCode = data[i].orden_publica_.split('-').pop(); // Obtener los últimos 4 dígitos
-        switch (shopCode) {
-            case "2941":
-                return 'novogarbna';
-            case "2942":
-                return 'novogarbnapromo';
-            case "2943":
-                return 'novogarbnapromo2';
-            default:
-                return 'Shop Desconocido'; // Valor por defecto si no coincide
-        }
-    })()}
-</div>
-
-                            <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
-                            ${(isAndreani || isAndesmar || isLogPropia) ? 'Preparado' : 'Pendiente'}
-                            </div>
-
-                            <div class="em-state-bna"><img id="TiendaBNA" src="./Img/bna-logo.png"></div>
-                            <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
-                                                <div class="d-flex align-items-center">
-                            
-                            
-                            <p class="card-text correo-meli ${cpsAndesmar.includes(Number(data[i].cp)) ? 'correo-andesmar' : 'correo-andreani'}">
-                            ${cpsAndesmar.includes(Number(data[i].cp)) ? 
-                            '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
-                            '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
-                            }
-                            </p>
-
-                            <p class="card-text cpLocalidadBna mb-0 me-2">
-                            ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}
-                            </p>
-
-                            <button class="btn btn-sm btn-" style="color: #007bff;" id="edit-localidad-${data[i].id}">
-                            <i class="bi bi-pencil-square ios-icon2"></i>
-                            </button>
-
-                    </div>
-
-                    <div id="edit-input-${data[i].id}" style="display: none;">
-                        <input type="text" id="localidad-input-${data[i].id}" placeholder="Buscar localidad" class="form-control" autocomplete="off">
-                        <ul id="suggestions-${data[i].id}" class="suggestions-container list-group"></ul>
-                    </div>
-
-                <div id="direccion-bna" class="ios-card">
-                    <p class="ios-card-text">
-                                       <i class="bi bi-house ios-icon"></i> Calle: ${data[i].calle2}
-                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].calle2}')">
-                            <i class="bi bi-clipboard icon-gray"></i>
-                        </button>
-                    </p>
-                    <p class="ios-card-text">
-                        <i class="bi bi-telephone ios-icon"></i> Teléfono: ${data[i].telefono}
-                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].telefono}')">
-                            <i class="bi bi-clipboard icon-gray"></i>
-                        </button>
-                    </p>
-                    <p class="ios-card-text email-container">
-                        <i class="bi bi-envelope ios-icon"></i> ${data[i].email}
-                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].email}')">
-                            <i class="bi bi-clipboard icon-gray"></i>
-                        </button>
-                    </p>
-                </div>
-                            
-                            ${carritoContenido}
-                            ${descuentoContenido}
-<div class="d-flex align-items-center justify-content-center contenedorRemito">
-    <button class="btn btn-link btn-sm text-decoration-none copy-btn me-2 ios-icon3">
-        <i class="bi bi-clipboard"></i>
-    </button>
-
-    <p class="orden mx-2">${data[i].remito}</p>
-
-    <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3" 
-        onclick="window.open(getOrderUrl('${data[i].orden_publica_}'), '_blank');">
-        <i class="bi bi-bag-check"></i>
-    </button>
-
-</div>
-
-
-<!-- Nuevo contenedor para los switches -->
-<div class="d-flex contenedor-switches mt-1 justify-content-between">
-    <div class="form-check form-switch switch-ios"> 
-        <input class="form-check-input input-interruptor" type="checkbox" id="preparacion-${data[i].id}" ${data[i].marcaPreparado === 'Si' ? 'checked' : ''}>
-        <label class="form-check-label etiqueta-interruptor" for="preparacion-${data[i].id}"><strong>1</strong> Preparación</label>
-    </div>
-
-    <div class="form-check form-switch switch-ios"> 
-        <input class="form-check-input input-interruptor" type="checkbox" id="entregado-${data[i].id}-1" ${data[i].marcaEntregado === 'Si' ? 'checked' : ''}>
-        <label class="form-check-label etiqueta-interruptor" for="entregado-${data[i].id}-1"><strong>2</strong> Entregado</label>
-    </div>
-</div>
-
-
-                            <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
-                                ${isLogPropia ? 
-                                'Logística Propia' : 
-                                (isAndreani ? 
-                                `<a href="${data[i].trackingLink}" target="_blank">Andreani: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                (isAndesmar ? 
-                                `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                'Número de Envío Pendiente'))}
-                            </p>
-
-                            <div class="factura-status em-circle-state-time ${isParaFacturar ? 'facturable' : ''}" id="factura-status-${data[i].id}">
-                                ${mensajeFactura}
-                            </div>
-
-                            <!-- Botón para mostrar/ocultar el detalle del producto -->
-                            <button class="btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleProducto-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleProducto-${data[i].id}">
-                                                           <i class="bi bi-chevron-down"></i> Detalle de Producto <i class="bi bi-cart-check"></i>
-                            </button>
-
-                            <!-- Contenido del colapso -->
-                            <div class="collapse" id="collapseDetalleProducto-${data[i].id}">
-                             <div class="pago descripcion-div p-2 mt-2"">
-                                <p class="card-text-pago">
-
-                            <i class="bi bi-box-seam"></i> 
-                            <strong>SKU:</strong> <strong>${data[i].sku}</strong>, Cantidad: ${data[i].cantidad}
-                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].sku}')">
-                            <i class="bi bi-clipboard"></i>
-                            </button>
-                            </p>
-
-                                <p class="card-text-pago"><i class="bi bi-card-text"></i> <strong>Descripción:</strong> ${data[i].producto_nombre}</p>
-                             </div>
-                            </div>
-
-                            <!-- Botón para mostrar/ocultar el detalle de Facturacion -->
-                            <button class="btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleFacturacion-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleFacturacion-${data[i].id}">
-                                                           <i class="bi bi-chevron-down"></i> Detalle de Facturacion <i class="bi bi-receipt"></i>
-                            </button>
-
-                            <!-- Contenido del colapso -->
-                            <div class="collapse" id="collapseDetalleFacturacion-${data[i].id}">
-                             <div class="facturacion descripcion-div p-2 mt-2"">
-
-                            <p class="card-text-facturacion">
-                            <strong>Tipo:</strong> ${tipoFactura}
-                            </p>
-
-                            <p class="card-text-facturacion">
-                                <strong>Nombre / Razon social:</strong> ${data[i].razon_social}
-                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].razon_social}')">
-                                    <i class="bi bi-clipboard"></i>
-                                </button>
-                            </p>
-                            <p class="card-text-facturacion">
-                                <strong>D.N.I. / CUIT:</strong> ${data[i].cuit}
-                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].cuit}')">
-                                    <i class="bi bi-clipboard"></i>
-                                </button>
-                            </p>
-                            <p class="card-text-facturacion">
-                                <strong>Direccion:</strong> ${data[i].direccion_facturacion}
-                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].direccion_facturacion}')">
-                                    <i class="bi bi-clipboard"></i>
-                                </button>
-                            </p>
-                            <p class="card-text-facturacion">
-                                <strong>Localidad:</strong> ${data[i].ciudad_facturacion}
-                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].ciudad_facturacion}')">
-                                    <i class="bi bi-clipboard"></i>
-                                </button>
-                            </p>
-                            <p class="card-text-facturacion">
-                                <strong>CP:</strong> ${data[i].codigo_postal_facturacion}
-                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].codigo_postal_facturacion}')">
-                                    <i class="bi bi-clipboard"></i>
-                                </button>
-                            </p>
-
-                             </div>
-                            </div>
-
-                            <!-- Botón para mostrar/ocultar el detalle del Pago -->
-                            <button class="btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetallePago-${data[i].id}" aria-expanded="false" aria-controls="collapseDetallePago-${data[i].id}">
-                                <i class="bi bi-chevron-down"></i> Detalle de Pago <i class="bi bi-credit-card"></i>
-                            </button>
-
-                            <!-- Contenido del colapso -->
-                            <div class="collapse" id="collapseDetallePago-${data[i].id}">
-                                <div class="pago p-2 mt-2 mb-2"">
-                                    <p class="card-text-pago"><strong>Entidad: ${data[i].brand_name || 'N/A'}</p>
-                                    <p class="card-text-pago"><strong>Cuotas:</strong> ${data[i].cuotas || 'N/A'}</p>
-                                    <p class="card-text-pago"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
-                                    
-
-<p class="card-text-pago">
-    <strong>Precio de Venta:</strong> $ ${(data[i].precio_venta * data[i].cantidad).toFixed(2)}
-    <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].precio_venta * data[i].cantidad).toFixed(2)}')">
-        <i class="bi bi-clipboard"></i>
-    </button>
-</p>
-
-                       <p class="card-text-pago">
-                           <strong>Cantidad:</strong> <strong class="strong-costo2">${data[i].cantidad} U.</strong>
-                       </p>
-                       
-                       <p class="card-text-pago">
-                           <strong>Valor por producto:</strong> <strong class="strong-costo">$ ${data[i].precio_venta}</strong>
-                           <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta}')">
-                               <i class="bi bi-clipboard"></i>
-                           </button>
-                       </p>
-
-                       <p class="card-text-pago">
-                        <strong>Costo de Envío:</strong> <strong class="strong-costo">$${data[i].monto_cobrado}</strong>
-                        <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].monto_cobrado}')">
-                        <i class="bi bi-clipboard"></i>
-                        </button>
-                        </p>
-
-
-<p class="card-text-pago">
-    <strong>Total:</strong> ${new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(total)}
-</p>
-
-                            <!-- Contenedor gris con CUPON y AUTORIZACION -->
-                            <div class="bg-light p-3 mb-2 rounded" style="border: solid 1px #dc3545;">
-                            <div class="mb-3 text-center">
-                            <strong class="text-primary">CUPON:</strong>
-                            <div class="d-flex justify-content-center align-items-center">
-                            <span class="me-2">${cupon}</span>
-                            
-                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${cupon}')">
-                            <i class="bi bi-clipboard"></i>
-                            </button>
-
-                            </div>
-                            </div>
-
-                            <div class="text-center">
-                            <strong class="text-primary">AUTORIZACION:</strong>
-                            <div class="d-flex justify-content-center align-items-center">
-                            <span class="me-2">${autorizacion}</span>
-                            
-                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${autorizacion}')">
-                            <i class="bi bi-clipboard"></i>
-                            </button>
-
-                            </div>
-                            </div>
-                            </div>
-                                    
-                                    
-                                    <button id="marcar-facturado-${data[i].id}" type="button" class="btn ${hasDatoFacturacion ? 'btn-success' : 'btn-danger'} w-100 mb-1" ${hasDatoFacturacion ? 'disabled' : ''} onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}')`}">${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
-                                        <i class="bi bi-lock-fill icono"></i>
-                                    </button>
-
-                            <!-- Botón para abrir el modal -->
-                            <button id="infoFacturacionButton${data[i].id}" class="btn btn-warning mt-1 w-100" data-bs-toggle="modal" data-bs-target="#infoFacturacionModal${data[i].id}">
-                            <img id="presea" src="./Img/logo-presea.png"> Facturación Automatica
-                            </button>
-
-                                </div>
-                            </div>
-        
-                            <button class="btn btn-secondary btn-sm w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
-                                <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
-                            </button>
-                            <div class="collapse" id="collapseObservaciones-${data[i].id}">
-                                <div class="mb-3 mt-2 divObs">
-                                    <label for="observaciones-${data[i].id}" class="form-label">Observaciones</label>
-                                    <textarea id="observaciones-${data[i].id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${data[i].observaciones || ''}</textarea>
-                                    <button class="btn btn-secondary mt-1 update-observaciones mb-1" data-id="${data[i].id}">Actualizar Observaciones</button>
-                                </div>
-                            </div>
-
-                            <div class="alert alert-danger d-none" id="alert-${data[i].id}" role="alert">
-                                Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
-                            </div>
-
-                                <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
-                        <option value="">Seleccione un producto</option>
-                        <option value="heladera">Heladera</option>
-                        <option value="cocina">Cocina</option>
-                        <option value="hornoEmpotrable">Horno Empotrable</option>
-                        <option value="lavavajillas">Lavavajillas</option>
-                        <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
-                        <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
-                        <option value="split2700">Split 2700W</option>
-                        <option value="split3300">Split 3300W</option>
-                        <option value="split4500">Split 4500W</option>
-                        <option value="split5500">Split 5500W</option>
-                        <option value="split6000">Split 6000W</option>
-                        <option value="splitPisoTecho18000">Piso Techo 18000 Frigorías</option>
-                        <option value="aireportatil">Aire Portatil</option>
-                        <option value="ventiladordepared">Ventilador de Pared</option>
-                        <option value="colchon80cm">Colchon 80cm</option>
-                        <option value="colchon100cm">Colchon 100cm</option>
-                        <option value="colchon140cm">Colchon 140cm</option>
-                        <option value="colchon160cm">Colchon 160cm</option>
-                        <option value="colchon200cm">Colchon 200cm</option>
-                        <option value="termotanque50">Termotanque 50L</option>
-                        <option value="termotanque80">Termotanque 80L</option>
-                        <option value="termotanque110">Termotanque 110L</option>
-                        <option value="termotanque150">Termotanque 150L</option>
-                        <option value="termotanque180">Termotanque 180L</option>
-                        <option value="termotanque255">Termotanque 255L COM255</option>
-                        <option value="termotanque300">Termotanque 300L RHCTP300N</option>
-                        <option value="smartTV32">Smart TV 32"</option>
-                        <option value="smartTV40">Smart TV 40"</option>
-                        <option value="smartTV43">Smart TV 43"</option>
-                        <option value="smartTV50">Smart TV 50"</option>
-                        <option value="smartTV58">Smart TV 58"</option>
-                        <option value="smartTV65">Smart TV 65"</option>
-                        <option value="smartTV70">Smart TV 70"</option>
-                        <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
-                        <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
-                        <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
-                        <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
-                        <option value="bulto20">Bulto Pequeño 20x20</option>
-                        <option value="bulto30">Bulto Pequeño 30x30</option>
-                        <option value="bulto40">Bulto Pequeño 40x40</option>
-                        <option value="bulto50">Bulto Pequeño 50x50</option>
-                    </select>     
-        
-                            <div class="medidas"></div> <!-- Div para las medidas -->
-
-                            <!-- Botón Logística Propia --> 
-                            <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
-                                id="LogPropiaMeliButton${data[i].id}" 
-                                onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
-                                <span>
-                                    ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
-                                </span>
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
-                            </button>
-        
-                            <!-- Botón Andesmar -->          
-                            <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'}" 
-                            id="andesmarButton${data[i].id}" 
-                            ${isAndreani ? 'disabled' : ''} 
-                            ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
-                            <span id="andesmarText${data[i].id}">
-                            ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
-                            </span>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
-                            </button>
-
-                            <!-- Botón Andreani --> 
-                            <button class="mt-1 btn btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'}"
-                            id="andreaniButton${data[i].id}" 
-                            ${isAndesmar ? 'disabled' : ''} 
-                            onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
-                            <span id="andreaniText${data[i].id}">
-                            ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
-                            </span>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
-                            </button>
-
-                            <div id="resultado${data[i].id}" class="mt-2 errorMeli"></div>
-                        </div>
-                    </div>
-
-
-<!-- Modal -->
+<!-- MODAL FACTURACION -->
+        <!-- Modal -->
 <div class="modal fade" id="infoFacturacionModal${data[i].id}" tabindex="-1" aria-labelledby="infoFacturacionLabel${data[i].id}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -1192,12 +939,390 @@ COMPRA CON USO DE PUNTOS BNA
         </div>
     </div>
 </div>
+<!-- FIN MODAL FACTURACION -->
+
+
+                    <div class="card">
+                        <div class="card-body">
+
+<div class="em-circle-state5">
+    ${(() => {
+        const shopCode = data[i].orden_publica_.split('-').pop(); // Obtener los últimos 4 dígitos
+        switch (shopCode) {
+            case "2941":
+                return 'novogarbna';
+            case "2942":
+                return 'novogarbnapromo';
+            case "2943":
+                return 'novogarbnapromo2';
+            default:
+                return 'Shop Desconocido'; // Valor por defecto si no coincide
+        }
+    })()}
+</div>
+
+                            <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
+                            ${(isAndreani || isAndesmar || isLogPropia) ? 'Preparado' : 'Pendiente'}
+                            </div>
+
+                            <div class="em-state-bna"><img id="TiendaBNA" src="./Img/bna-logo.png"></div>
+                            <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
+                                                <div class="d-flex align-items-center">
+                            
+                            
+                            <p class="card-text correo-meli ${cpsAndesmar.includes(Number(data[i].cp)) ? 'correo-andesmar' : 'correo-andreani'}">
+                            ${cpsAndesmar.includes(Number(data[i].cp)) ? 
+                            '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
+                            '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
+                            }
+                            </p>
+
+                            <p class="card-text cpLocalidadBna mb-0 me-2">
+                            ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}
+                            </p>
+
+                            <button class="btn btn-sm btn-" style="color: #007bff;" id="edit-localidad-${data[i].id}">
+                            <i class="bi bi-pencil-square ios-icon2"></i>
+                            </button>
+
+                    </div>
+
+                    <div id="edit-input-${data[i].id}" style="display: none;">
+                        <input type="text" id="localidad-input-${data[i].id}" placeholder="Buscar localidad" class="form-control" autocomplete="off">
+                        <ul id="suggestions-${data[i].id}" class="suggestions-container list-group"></ul>
+                    </div>
+
+                <div id="direccion-bna" class="ios-card">
+                    
+                    <p class="ios-card-text">
+                        <i class="bi bi-house ios-icon"></i> Calle: 
+                                         <span class="text-content">${data[i].calle2}</span>
+                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].calle2}')">
+                            <i class="bi bi-clipboard icon-gray"></i>
+                        </button>
+                    </p>
+
+                    <p class="ios-card-text">
+                        <i class="bi bi-telephone ios-icon"></i> Teléfono: 
+                        <span class="text-content">${data[i].telefono}</span>
+                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].telefono}')">
+                            <i class="bi bi-clipboard icon-gray"></i>
+                        </button>
+                    </p>
+
+                    <p class="ios-card-text email-container">
+                        <i class="bi bi-envelope ios-icon"></i> 
+                        <span class="text-content">${data[i].email}</span>
+                        <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].email}')">
+                                               <i class="bi bi-clipboard icon-gray"></i>
+                                           </button>
+                    </p>
+
+                            
+                            ${carritoContenido}
+                            ${descuentoContenido}
+
+                            ${isSkuIncluded ? `<p class="card-text-isSkuIncluded"><i class="bi bi-lightning-charge-fill"></i> SKU ${data[i].sku} con imei</p>` : ''}
+                            
+<div class="d-flex align-items-center justify-content-center contenedorRemito">
+    <button class="btn btn-link btn-sm text-decoration-none copy-btn me-2 ios-icon3">
+        <i class="bi bi-clipboard"></i>
+    </button>
+
+    <p class="orden mx-2">${data[i].remito}</p>
+
+    <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3" 
+        onclick="window.open(getOrderUrl('${data[i].orden_publica_}'), '_blank');">
+        <i class="bi bi-bag-check"></i>
+    </button>
+
+</div>
+
+
+<!-- Nuevo contenedor para los switches -->
+<div class="d-flex contenedor-switches mt-1 justify-content-between">
+    <div class="form-check form-switch switch-ios"> 
+        <input class="form-check-input input-interruptor" type="checkbox" id="preparacion-${data[i].id}" ${data[i].marcaPreparado === 'Si' ? 'checked' : ''}>
+        <label class="form-check-label etiqueta-interruptor" for="preparacion-${data[i].id}"><strong>1</strong> Preparación</label>
+    </div>
+
+    <div class="form-check form-switch switch-ios"> 
+        <input class="form-check-input input-interruptor" type="checkbox" id="entregado-${data[i].id}-1" ${data[i].marcaEntregado === 'Si' ? 'checked' : ''}>
+        <label class="form-check-label etiqueta-interruptor" for="entregado-${data[i].id}-1"><strong>2</strong> Entregado</label>
+    </div>
+</div>
+
+
+                            <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
+                                ${isLogPropia ? 
+                                'Logística Propia' : 
+                                (isAndreani ? 
+                                `<a href="${data[i].trackingLink}" target="_blank">Andreani: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                (isAndesmar ? 
+                                `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                'Número de Envío Pendiente'))}
+                            </p>
+
+                            <div class="factura-status em-circle-state-time ${isParaFacturar ? 'facturable' : ''}" id="factura-status-${data[i].id}">
+                                ${mensajeFactura}
+                            </div>
+
+                            <!-- Botón para mostrar/ocultar el detalle del producto -->
+                            <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleProducto-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleProducto-${data[i].id}">
+                                                           <i class="bi bi-chevron-down"></i> Detalle de Producto <i class="bi bi-cart-check"></i>
+                            </button>
+
+                            <!-- Contenido del colapso -->
+                            <div class="collapse" id="collapseDetalleProducto-${data[i].id}">
+                             <div class="pago descripcion-div p-2 mt-2"">
+                                <p class="card-text-pago">
+
+                            <i class="bi bi-box-seam"></i> 
+                            <strong>SKU:</strong> <strong>${data[i].sku}</strong>, Cantidad: ${data[i].cantidad}
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].sku}')">
+                            <i class="bi bi-clipboard"></i>
+                            </button>
+                            </p>
+
+                                <p class="card-text-pago"><i class="bi bi-card-text"></i> <strong>Descripción:</strong> ${data[i].producto_nombre}</p>
+                             </div>
+                            </div>
+
+                            <!-- Botón para mostrar/ocultar el detalle de Facturacion -->
+                            <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleFacturacion-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleFacturacion-${data[i].id}">
+                                                           <i class="bi bi-chevron-down"></i> Detalle de Facturacion <i class="bi bi-receipt"></i>
+                            </button>
+
+                            <!-- Contenido del colapso -->
+                            <div class="collapse" id="collapseDetalleFacturacion-${data[i].id}">
+                             <div class="facturacion descripcion-div p-2 mt-2"">
+
+                            <p class="card-text-facturacion">
+                            <strong>Tipo:</strong> ${tipoFactura}
+                            </p>
+
+                            <p class="card-text-facturacion">
+                                <strong>Nombre / Razon social:</strong> ${data[i].razon_social}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].razon_social}')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </p>
+                            <p class="card-text-facturacion">
+                                <strong>D.N.I. / CUIT:</strong> ${data[i].cuit}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].cuit}')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </p>
+                            <p class="card-text-facturacion">
+                                <strong>Direccion:</strong> ${data[i].direccion_facturacion}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].direccion_facturacion}')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </p>
+                            <p class="card-text-facturacion">
+                                <strong>Localidad:</strong> ${data[i].ciudad_facturacion}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].ciudad_facturacion}')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </p>
+                            <p class="card-text-facturacion">
+                                <strong>CP:</strong> ${data[i].codigo_postal_facturacion}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].codigo_postal_facturacion}')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </p>
+
+                             </div>
+                            </div>
+
+                            <!-- Botón para mostrar/ocultar el detalle del Pago -->
+                            <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetallePago-${data[i].id}" aria-expanded="false" aria-controls="collapseDetallePago-${data[i].id}">
+                                <i class="bi bi-chevron-down"></i> Detalle de Pago <i class="bi bi-credit-card"></i>
+                            </button>
+
+                            <!-- Contenido del colapso -->
+                            <div class="collapse" id="collapseDetallePago-${data[i].id}">
+                                <div class="pago p-2 mt-2 mb-2"">
+                                    <p class="card-text-pago"><strong>Entidad: ${data[i].brand_name || 'N/A'}</p>
+                                    <p class="card-text-pago"><strong>Cuotas:</strong> ${data[i].cuotas || 'N/A'}</p>
+                                    <p class="card-text-pago"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
+                                    
+
+<p class="card-text-pago">
+    <strong>Precio de Venta:</strong> $ ${(data[i].precio_venta * data[i].cantidad).toFixed(2)}
+    <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].precio_venta * data[i].cantidad).toFixed(2)}')">
+        <i class="bi bi-clipboard"></i>
+    </button>
+</p>
+
+                       <p class="card-text-pago">
+                           <strong>Cantidad:</strong> <strong class="strong-costo2">${data[i].cantidad} U.</strong>
+                       </p>
+                       
+                       <p class="card-text-pago">
+                           <strong>Valor por producto:</strong> <strong class="strong-costo">$ ${data[i].precio_venta}</strong>
+                           <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta}')">
+                               <i class="bi bi-clipboard"></i>
+                           </button>
+                       </p>
+
+                       <p class="card-text-pago">
+                        <strong>Costo de Envío:</strong> <strong class="strong-costo">$${data[i].monto_cobrado}</strong>
+                        <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].monto_cobrado}')">
+                        <i class="bi bi-clipboard"></i>
+                        </button>
+                        </p>
+
+
+<p class="card-text-pago">
+    <strong>Total:</strong> ${new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(total)}
+</p>
+
+                            <!-- Contenedor gris con CUPON y AUTORIZACION -->
+                            <div class="bg-light p-3 mb-2 rounded" style="border: solid 1px #dc3545;">
+                            <div class="mb-3 text-center">
+                            <strong class="text-primary">CUPON:</strong>
+                            <div class="d-flex justify-content-center align-items-center">
+                            <span class="me-2">${cupon}</span>
+                            
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${cupon}')">
+                            <i class="bi bi-clipboard"></i>
+                            </button>
+
+                            </div>
+                            </div>
+
+                            <div class="text-center">
+                            <strong class="text-primary">AUTORIZACION:</strong>
+                            <div class="d-flex justify-content-center align-items-center">
+                            <span class="me-2">${autorizacion}</span>
+                            
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${autorizacion}')">
+                            <i class="bi bi-clipboard"></i>
+                            </button>
+
+                            </div>
+                            </div>
+                            </div>
+                                    
+                                    
+                                    <button id="marcar-facturado-${data[i].id}" type="button" class="btn ${hasDatoFacturacion ? 'btn-success' : 'btn-danger'} w-100 mb-1" ${hasDatoFacturacion ? 'disabled' : ''} onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}')`}">${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
+                                        <i class="bi bi-lock-fill icono"></i>
+                                    </button>
+
+                            <!-- Botón para abrir el modal -->
+                            <button id="infoFacturacionButton${data[i].id}" class="btn btn-warning mt-1 w-100" data-bs-toggle="modal" data-bs-target="#infoFacturacionModal${data[i].id}">
+                            <img id="presea" src="./Img/logo-presea.png"> Facturación Automatica
+                            </button>
+
+                                </div>
+                            </div>
+        
+                            <button class="btn btn-secondary btn-sm w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
+                                <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
+                            </button>
+                            <div class="collapse" id="collapseObservaciones-${data[i].id}">
+                                <div class="mb-3 mt-2 divObs">
+                                    <label for="observaciones-${data[i].id}" class="form-label">Observaciones</label>
+                                    <textarea id="observaciones-${data[i].id}" class="form-control-obs" placeholder="Agregar observaciones" style="resize: both; min-height: 50px;">${data[i].observaciones || ''}</textarea>
+                                    <button class="btn btn-secondary mt-1 update-observaciones mb-1" data-id="${data[i].id}">Actualizar Observaciones</button>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-danger d-none" id="alert-${data[i].id}" role="alert">
+                                Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
+                            </div>
+
+                                <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
+                        <option value="">Seleccione un producto</option>
+                        <option value="heladera">Heladera</option>
+                        <option value="cocina">Cocina</option>
+                        <option value="hornoEmpotrable">Horno Empotrable</option>
+                        <option value="lavavajillas">Lavavajillas</option>
+                        <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
+                        <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
+                        <option value="split2700">Split 2700W</option>
+                        <option value="split3300">Split 3300W</option>
+                        <option value="split4500">Split 4500W</option>
+                        <option value="split5500">Split 5500W</option>
+                        <option value="split6000">Split 6000W</option>
+                        <option value="splitPisoTecho18000">Piso Techo 18000 Frigorías</option>
+                        <option value="aireportatil">Aire Portatil</option>
+                        <option value="ventiladordepared">Ventilador de Pared</option>
+                        <option value="colchon80cm">Colchon 80cm</option>
+                        <option value="colchon100cm">Colchon 100cm</option>
+                        <option value="colchon140cm">Colchon 140cm</option>
+                        <option value="colchon160cm">Colchon 160cm</option>
+                        <option value="colchon200cm">Colchon 200cm</option>
+                        <option value="termotanque50">Termotanque 50L</option>
+                        <option value="termotanque80">Termotanque 80L</option>
+                        <option value="termotanque110">Termotanque 110L</option>
+                        <option value="termotanque150">Termotanque 150L</option>
+                        <option value="termotanque180">Termotanque 180L</option>
+                        <option value="termotanque255">Termotanque 255L COM255</option>
+                        <option value="termotanque300">Termotanque 300L RHCTP300N</option>
+                        <option value="smartTV32">Smart TV 32"</option>
+                        <option value="smartTV40">Smart TV 40"</option>
+                        <option value="smartTV43">Smart TV 43"</option>
+                        <option value="smartTV50">Smart TV 50"</option>
+                        <option value="smartTV58">Smart TV 58"</option>
+                        <option value="smartTV65">Smart TV 65"</option>
+                        <option value="smartTV70">Smart TV 70"</option>
+                        <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
+                        <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
+                        <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
+                        <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
+                        <option value="bulto20">Bulto Pequeño 20x20</option>
+                        <option value="bulto30">Bulto Pequeño 30x30</option>
+                        <option value="bulto40">Bulto Pequeño 40x40</option>
+                        <option value="bulto50">Bulto Pequeño 50x50</option>
+                    </select>     
+        
+                            <div class="medidas"></div> <!-- Div para las medidas -->
+
+                            <!-- Botón Logística Propia --> 
+                            <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
+                                id="LogPropiaMeliButton${data[i].id}" 
+                                onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
+                                <span>
+                                    ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
+                                </span>
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
+                            </button>
+        
+                            <!-- Botón Andesmar -->          
+                            <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'}" 
+                            id="andesmarButton${data[i].id}" 
+                            ${isAndreani ? 'disabled' : ''} 
+                            ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
+                            <span id="andesmarText${data[i].id}">
+                            ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
+                            </span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
+                            </button>
+
+                            <!-- Botón Andreani --> 
+                            <button class="mt-1 btn btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'}"
+                            id="andreaniButton${data[i].id}" 
+                            ${isAndesmar ? 'disabled' : ''} 
+                            onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
+                            <span id="andreaniText${data[i].id}">
+                            ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
+                            </span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
+                            </button>
+
+                            <div id="resultado${data[i].id}" class="mt-2 errorMeli"></div>
+                        </div>
+                    </div>
+
                 `;
+                     
 
                 // Elimina Comillas en el nombre de los productos
                 function cleanString(value) {
                     return value.replace(/["']/g, "");
-                }
+                }               
                   
 // Evento para manejar el cambio del switch "Entregado"
 document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function() {
@@ -1612,73 +1737,88 @@ function marcarFacturado2(id) {
     estadoFacturaDiv.textContent = mensajeFactura;
     estadoFacturaDiv.classList.add('facturado-bna'); // Agregar la clase
 
-    // Pushear en Firebase
-    const refEnvios = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
-    const refFacturacion = firebase.database().ref(`facturacionBna/${id}`);
+// Pushear en Firebase
+const refEnvios = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
+const refFacturacion = firebase.database().ref(`facturacionBna/${id}`);
 
-    // Crear objeto con los datos
-    const datos = {
-        order_id: document.getElementById(`order_id_${id}`).value,
-        estado: 'Aprobado',
-        metodo_pago: 'BNA TIENDA BANCO NACION',
-        numero_lote: '11',
-        cupon_pago: document.getElementById(`cupon_pago_${id}`).value,
-        cod_autorizacion: document.getElementById(`cod_autorizacion_${id}`).value,
-        numero_tarjeta_visible: document.getElementById(`numero_tarjeta_visible_${id}`).value,
-        codigo_pago: document.getElementById(`codigo_pago_${id}`).value,
-        cuotas: document.getElementById(`cuotas_${id}`).value,
-        banco: '',
-        tipo_entrega: '33',
-        deposito: '9',
-        exportado: '0',
-        descuentos: document.getElementById(`descuentos_${id}`).value,
-        fecha_acreditacion: document.getElementById(`fecha_acreditacion_${id}`).value,
-        fecha: document.getElementById(`fecha_${id}`).value,
-        monto_depositado: document.getElementById(`monto_depositado_${id}`).value,
-        observacion_deposito_transferencia: document.getElementById(`observacion_deposito_transferencia_${id}`).value,
-        codigo_promocion: document.getElementById(`codigo_promocion_${id}`).value,
-        codigo_item: document.getElementById(`codigo_item_${id}`).value,
-        nombre_item: document.getElementById(`nombre_item_${id}`).value,
-        recargo_item: '0',
-        email: document.getElementById(`email_${id}`).value,
-        cantidad_item: document.getElementById(`cantidad_item_${id}`).value,
-        precio_item: document.getElementById(`precio_item_${id}`).value,
-        monto_envio: document.getElementById(`monto_envio_${id}`).value,
-        monto_total: document.getElementById(`monto_total_${id}`).value,
-        razon_social: document.getElementById(`razon_social_${id}`).value,
-        cuit: document.getElementById(`cuit_${id}`).value,
-        condicion_iva: document.getElementById(`condicion_iva_${id}`).value,
-        nombre: document.getElementById(`nombre_${id}`).value,
-        apellido: document.getElementById(`apellido_${id}`).value,
-        dni: document.getElementById(`dni_${id}`).value,
-        telefono: document.getElementById(`telefono_${id}`).value,
-        domicilio_fiscal: document.getElementById(`domicilio_fiscal_${id}`).value,
-        calle: document.getElementById(`calle_${id}`).value,
-        altura: document.getElementById(`altura_${id}`).value,
-        localidad: document.getElementById(`localidad_${id}`).value,
-        codigo_postal: document.getElementById(`codigo_postal_${id}`).value,
-        domicilio_envio: document.getElementById(`domicilio_envio_${id}`).value,
-        localidad_envio: document.getElementById(`localidad_envio_${id}`).value,
-        telefono_envio: document.getElementById(`telefono_envio_${id}`).value,
-        persona_autorizada: document.getElementById(`persona_autorizada_${id}`).value,
-        otros_comentarios_entrega: document.getElementById(`otros_comentarios_entrega_${id}`).value,
-        provincia: document.getElementById(`provincia_${id}`).value
-    };
+// Obtener el SKU desde ambos campos
+const skuInput = document.getElementById(`sku_${id}`);
+const codigoItemInput = document.getElementById(`codigo_item_${id}`);
 
-    // Guardar contenido del botón en Firebase
-    refEnvios.set(contenidoBoton).then(() => {
-        // Guardar datos en Firebase
-        return refFacturacion.set(datos);
-    }).then(() => {
-        Swal.fire('Datos enviados para su facturacion', '', 'success');
-    }).catch((error) => {
-        console.error('Error al guardar en Firebase:', error);
-        Swal.fire('Error al guardar datos', '', 'error');
-    });
+const skuValue = skuInput ? skuInput.value : '';
+const codigoItemValue = codigoItemInput ? codigoItemInput.value : '';
 
-    setTimeout(() => {
-        location.reload();
-    }, 4000);
+// Verificar si el SKU está incluido en la lista
+const isSkuIncluded = skusList.includes(skuValue) || skusList.includes(codigoItemValue);
+
+// Crear objeto con los datos
+const datos = {
+    order_id: document.getElementById(`order_id_${id}`)?.value || '',
+    estado: 'Aprobado',
+    metodo_pago: 'BNA TIENDA BANCO NACION',
+    numero_lote: '11',
+    cupon_pago: document.getElementById(`cupon_pago_${id}`)?.value || '',
+    cod_autorizacion: document.getElementById(`cod_autorizacion_${id}`)?.value || '',
+    numero_tarjeta_visible: document.getElementById(`numero_tarjeta_visible_${id}`)?.value || '',
+    codigo_pago: document.getElementById(`codigo_pago_${id}`)?.value || '',
+    cuotas: document.getElementById(`cuotas_${id}`)?.value || '',
+    banco: '',
+    tipo_entrega: '33',
+    deposito: '9',
+    exportado: '0',
+    descuentos: document.getElementById(`descuentos_${id}`)?.value || '',
+    fecha_acreditacion: document.getElementById(`fecha_acreditacion_${id}`)?.value || '',
+    fecha: document.getElementById(`fecha_${id}`)?.value || '',
+    monto_depositado: document.getElementById(`monto_depositado_${id}`)?.value || '',
+    observacion_deposito_transferencia: document.getElementById(`observacion_deposito_transferencia_${id}`)?.value || '',
+    codigo_promocion: document.getElementById(`codigo_promocion_${id}`)?.value || '',
+    codigo_item: codigoItemValue, // Usar el valor del campo codigo_item
+    nombre_item: document.getElementById(`nombre_item_${id}`).value || '',
+    recargo_item: '0',
+    email: document.getElementById(`email_${id}`)?.value || '',
+    cantidad_item: document.getElementById(`cantidad_item_${id}`)?.value || '',
+    precio_item: document.getElementById(`precio_item_${id}`)?.value || '',
+    monto_envio: document.getElementById(`monto_envio_${id}`)?.value || '',
+    monto_total: document.getElementById(`monto_total_${id}`)?.value || '',
+    razon_social: document.getElementById(`razon_social_${id}`)?.value || '',
+    cuit: document.getElementById(`cuit_${id}`)?.value || '',
+    condicion_iva: document.getElementById(`condicion_iva_${id}`)?.value || '',
+    nombre: document.getElementById(`nombre_${id}`)?.value || '',
+    apellido: document.getElementById(`apellido_${id}`)?.value || '',
+    dni: document.getElementById(`dni_${id}`)?.value || '',
+    telefono: document.getElementById(`telefono_${id}`)?.value || '',
+    domicilio_fiscal: document.getElementById(`domicilio_fiscal_${id}`)?.value || '',
+    calle: document.getElementById(`calle_${id}`)?.value || '',
+    altura: document.getElementById(`altura_${id}`)?.value || '',
+    localidad: document.getElementById(`localidad_${id}`)?.value || '',
+    codigo_postal: document.getElementById(`codigo_postal_${id}`)?.value || '',
+    domicilio_envio: document.getElementById(`domicilio_envio_${id}`)?.value || '',
+    localidad_envio: document.getElementById(`localidad_envio_${id}`)?.value || '',
+    telefono_envio: document.getElementById(`telefono_envio_${id}`)?.value || '',
+    persona_autorizada: document.getElementById(`persona_autorizada_${id}`)?.value || '',
+    otros_comentarios_entrega: document.getElementById(`otros_comentarios_entrega_${id}`)?.value || '',
+    provincia: document.getElementById(`provincia_${id}`)?.value || ''
+};
+
+// Solo agregar imei: "si" si el SKU está incluido
+if (isSkuIncluded) {
+    datos.imei = "si";
+}
+
+// Guardar contenido del botón en Firebase
+refEnvios.set(contenidoBoton).then(() => {
+    // Guardar datos en Firebase
+    return refFacturacion.set(datos);
+}).then(() => {
+    Swal.fire('Datos enviados para su facturación', '', 'success');
+}).catch((error) => {
+    console.error('Error al guardar en Firebase:', error);
+    Swal.fire('Error al guardar datos', '', 'error');
+});
+
+setTimeout(() => {
+    location.reload();
+}, 4000);
 }
 
 const usuario = "BOM6765";

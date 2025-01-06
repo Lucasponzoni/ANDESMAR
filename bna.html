@@ -78,7 +78,7 @@
                 <!-- Botones -->
                  <div class="trio-de-botones">
 
-                    <button id="btnFacturar" type="button" class="btn btn-primary position-relative" style="white-space: nowrap; min-width: 140px;">
+                    <button id="btnFacturar" type="button" class="btn btn-primary position-relative" style="white-space: nowrap;">
                         Facturar <i class="bi bi-cart-check-fill"></i>
                         <span id="contadorCardsFacturar" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-large">
                             <i class="bi bi-arrow-clockwise"></i>
@@ -86,7 +86,7 @@
                         </span>
                     </button>
                     
-                    <button id="btnPreparar" type="button" class="btn btn-secondary position-relative" style="white-space: nowrap; min-width: 140px;">
+                    <button id="btnPreparar" type="button" class="btn btn-secondary position-relative" style="white-space: nowrap;">
                         Preparar <i class="bi bi-box2"></i>
                         <span id="contadorCards" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-large">
                             <i class="bi bi-arrow-clockwise"></i>
@@ -101,6 +101,10 @@
                     <button id="btnSwitch" type="button" class="btn btn-success position-relative" style="white-space: nowrap">
                         <i class="bi bi-2-circle-fill" style="font-size: 24px;"></i>
                     </button>
+
+                    <button class="btn btn-warning" data-toggle="modal" data-target="#skuModal" id="openSkuModal" type="button" style="white-space: nowrap">
+                        <i class="fas fa-laptop" style="font-size: 24px;"></i> 
+                    </button>                    
 
                  </div>
 
@@ -151,7 +155,45 @@
     <!-- Botón de flecha hacia arriba -->
     <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
         <i class="fas fa-arrow-up"></i>
-    </a>     
+    </a>   
+    
+<!-- Modal para Agregar SKU -->
+<div class="modal fade" id="skuModal" tabindex="-1" role="dialog" aria-labelledby="skuModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header sku-modal-header">
+                <h5 class="modal-title sku-modal-title" id="skuModalLabel">Agregar SKU</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="sku-input-group">
+                    <input type="text" class="form-control sku-input" id="newSkuInput" placeholder="Ingrese el SKU">
+                    <button id="addSkuButton" class="btn btn-primary">Agregar SKU</button>
+                </div>
+                <div class="spinner-border sku-spinner" id="loadingSpinner" role="status" style="display: none;">
+                    <span class="sr-only">Cargando...</span>
+                </div>
+
+                <div id="alertContainer" style="display: none;"></div>
+
+                <table class="table table-bordered sku-table">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="skuListBody">
+                        <!-- Los SKU se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin Modal para Agregar SKU -->
 
     <footer class="center">
         <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">

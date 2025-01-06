@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar SKU a Firebase</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+    <h1>Agregar SKU a Firebase</h1>
+    <p>Los SKU se están agregando al nodo "imei" en Firebase.</p>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIXlgOct2UzkrZbZYbyHu6_NbLDzTqqig",
+            authDomain: "despachos-novogar.firebaseapp.com",
+            databaseURL: "https://despachos-novogar-default-rtdb.firebaseio.com",
+            projectId: "despachos-novogar",
+            storageBucket: "despachos-novogar.firebasestorage.app",
+            messagingSenderId: "346020771441",
+            appId: "1:346020771441:web:c4a29c0db4200352080dd0",
+            measurementId: "G-64DDP7D6Q2"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // SKU a agregar
+        const skus = [
+            "ALEL23BLRET", "SM-A500", "SMG-318ML", "L435", "SM-A300MZK",
+            "SMG-357MZAAR", "S388", "SM-J415-DORADO", "LG-K22-GRIS", "XT-2095-GRIS",
+            "SM-G715-NEGRO", "AXSII", "A6", "SM-J111-BLANCO", "SM-J200-BLANCO",
+            "SM-J200-NEGRO-INACTIVO", "SM-J700-BLANCO", "SM-J320-BLANCO", "SM-J320-NEGRO",
+            "asdasdsadsa", "PIXI3", "Y625-NEGRO", "SM-J510-BLANCO", "SM-J510-NEGRO",
+            "SM-J710-NEGRO", "G935-DORADO", "XT1542", "SM-J610-ROJO", "N-4513",
+            "SM-J111-NEGRO", "SM-J710-BLANCO-INACTIVO", "LGH735", "G935-NEGRO", 
+            "LGH440", "SM-J710-BLANCO", "SM-J200-NEGRO", "SM-J105-BLANCO", 
+            "VIBE-K5", "Y6-NEGRO", "SM-J510-DORADO", "SM-J710-DORADO", 
+            "SM-G532-NEGRO", "LG-H815-NEGRO", "LG-H815-DORADO", "LGH635-TITANIUM", 
+            "ALEL23NERET", "V6-GOLD", "V6-SILVER", "X2-BLANCO", "X2-NEGRO", 
+            "X5-SILVER", "LUAL03BLRET", "LUAL03NERET", "N5034SWOS", "N5514DWOS", 
+            "LG-K220", "LG-K350", "N5034SBOS", "V6-SILVER-CROJO", "V6-SILVER-CNEGR", 
+            "SM-G532-PLATA", "LG-K120", "LG-M250", "XT-1601", "XT-1621", 
+            "XT-1680", "SM-G950-NEGRO", "SM-G950-DORADO", "SM-G955-NEGRO", 
+            "SM-G955-GRIS", "SM-G955-PLATA", "SM-G532-DORADO", "LG-X240", 
+            "XT-1670", "XT-1725", "XT-1772", "SM-J701NEO-DOR", "SM-J701NEO-NEG", 
+            "SM-G610-BLANCO", "XT-1725-DORADO", "XT-1772-AZUL", "XT-1772-DORADO", 
+            "XT-1756", "XT-1800-DORADO", "XT-1800-GRIS", "XT-1725-NEGRO", 
+            "SM-J701NEO-PLAT", "SM-G570-NEGRO", "SM-J400-DORADO", "XT-1922-AZUL", 
+            "XT-1941-NEGRO", "XT-1926-6-AZUL", "XT-1922-DORADO", "SM-G570-DORADO", 
+            "COMBO-MOTOROLA", "N5044DPOS-ROS", "SM-G9600-PURPLE", "XT-1924-DORADO", 
+            "SM-J600-DORADO", "SM-G610-NEGRO", "5033A", "XT-1924-GRIS", 
+            "XT-1920-DORADO", "XT-1920-NEGRO", "N5044DWOS-BL", "N5044DBOS-NE", 
+            "SM-J400-NEGRO", "SM-J400-VIOLETA", "SM-J600-NEGRO", "SM-J260-NEGRO", 
+            "SM-J260-VIOLETA", "XT-1941-BLANCO", "SM-J260-DORADO", "XT-1962-NEGRO", 
+            "SM-A750-NEGRO", "SM-A750-DORADO", "SM-J610-GRIS", "SM-J610-NEGRO", 
+            "SM-J415-NEGRO", "SM-J415-ROSA", "SM-J410-DORADO", "SM-J410-NEGRO", 
+            "XT-1965-INDIGO", "XT-1955-AZUL", "BOMBA-CELULAR", "SM-A920-NEGRO", 
+            "SM-A920-AZUL", "SM-A920-ROSA", "XT-1962-BLANCO", "T1-NEGRO", 
+            "SM-A305-AZUL", "XT-2053ESP-ROJO", "XT-1955-VIOLETA", "SM-A305-BLANCO", 
+            "XT-1944-DORADO", "XT-1952-INDIGO", "XT-1944-GRIS", "XT-2019-BLUE", 
+            "XT-2025ESP-AZUL", "XT-2015-MAGENTA", "XT-2063-256GB", "XT-2025-GRAFITO", 
+            "XT-2025ESPECIAL", "SM-A205-AZUL", "SM-A105-AZUL", "XT-2025-CHERRY", 
+            "SM-A105-NEGRO", "SM-A205-NEGRO", "SM-A305-NEGRO", "XT-2025ESP-ARRA", 
+            "XT-2029-NEGRO", "XT-2029-AZUL", "XT-2027-VIOLETA", "LG-K50S", 
+            "SM-A307-NEGRO", "XT-2015-GREY", "SM-A025-NEGRO", "XT-2041-AZUL", 
+            "XT-2019-PINK", "XT-2041-GRIS", "SM-A107-AZUL", "T1-GRIS", 
+            "T1-AZUL", "LG-K9", "XT-2087-AZUL", "XT2203-GRIS", "SM-A107-NEGRO", 
+            "L1-NEGRO", "TA-1115-CARBON", "TA-1112-NEGRO", "TA-1179-ACERO", 
+            "XT-2053ESP-R", "XT-2053-ROJO", "XT-2055-AZUL", "A3-LITE", 
+            "XT-2063-ROJO", "XT-2045-BLANCO", "XT-2073-AZUL", "XT-2053-AZUL", 
+            "LG-K22+AZUL", "LG-K20", "SM-A515-BLANCO", "XT-2073-ESMERA", 
+            "XT-2083-AZUL", "SM-A013-NEGRO", "SM-A015-NEGRO", "SM-A115-BLANCO", 
+            "SM-A217-AZUL", "SM-A315-NEGRO", "SM-A115-NEGRO", "SM-A217-NEGRO", 
+            "SM-A315-BLANCO", "A5-PLUS", "LG-Q60", "SM-A515-NEGRO", 
+            "XT-2063-256GB-G", "SM-A015-AZUL", "SM-A217-BLANCO", "SM-A315-AZUL", 
+            "SM-A715-NEGRO", "SM-A715-PLATA", "XT-2081-NARANJA", "XT-2083-ROSA", 
+            "XT-2073-ESMERAL", "XT-2081-AZUL", "SM-A115-BLUE", "SM-G780-LAVANDA", 
+            "XT-2087-ROSA", "XT-2053-ROSA", "SM-A013-BLUE", "SM-A207-NEGRO", 
+            "SM-A207-AZUL", "SM-A307-BLANCO", "XT-2091-MORADO", "XT-2053-GRIS", 
+            "XT-2053ESP-AZUL", "XT-2095-AZUL", "XT-2091-VERDE", "XT-2055-TURQUES", 
+            "XT-2095-ROSA", "SM-A022-64GB-NE", "SM-A022-NEGRO", "SM-A022-AZUL", 
+            "SM-A125-NEGRO", "SM-A025-AZUL", "SM-A217-128-NEG", "TCL-L7+", 
+            "TCL-TPRO", "SM-A125-AZUL", "SM-A217-128-BLA", "XT-2053FIJIROSA", 
+            "TCL-L10LITE", "LG-K22+GRIS", "LG-K22-AZUL", "XT-2129-GRIS", 
+            "COMBO-L1-NEGRO", "SM-A525-AZUL", "SM-A325-NEGRO", "SM-A725-VIOLETA", 
+            "XT-2125-VERDE", "SM-A525-BLANCO", "SM-A725-NEGRO", "XT-2129-LILA", 
+            "SM-A336-AZUL", "SM-A217-128-AZU", "SM-A325-AZUL", "SM-A235-BLANCO", 
+            "XT-2053FIJIGRIS", "LG-K41S-GRIS", "SM-G780-BLUE", "SM-M127-NEGRO", 
+            "XT-2097-NARANJA", "XT-2128-AZUL", "SM-M127-AZUL", "SM-A325-BLANCO", 
+            "XT-2097-AZUL", "TCL-20E", "SM-A525-NEGRO", "SM-G780-GREEN", 
+            "XT-2128-ROSA", "SM-A125-128-NEG", "SM-A225-NEGRO", "TCL-L10+", 
+            "TCL-20SE-VERDE", "TCL-20Y-AZUL", "TCL-20E-128-VER", "SM-A225-BLANCO", 
+            "SM-A225-VERDE", "XT-2133-AQUA", "SM-A725-BLANCO", "L1PRO-GRIS", 
+            "XT-2155-AZUL", "SM-A037-NEGRO", "SM-A127-128-NEG", "SM-A127-64-AZUL", 
+            "SM-A127-64-NEG", "XT-2125-AZUL", "XT-2128-128-AZU", "TCL-10SE", 
+            "TCL-20E-128-AZU", "TCL-20SE-256GB", "TCL-20SE-GRIS", "TCL-L9S", 
+            "XT-2139-VERDE", "XT-2159-ROSA", "SM-A032-AZUL", "XT-2128-128-VER", 
+            "XT-2159-GRIS", "SM-A525-VIOLETA", "XT-2133-AZUL", "XT-2139-GRIS", 
+            "XT-2155-GRAFITO", "XT-2153-BLANCO", "TCL-20Y-NEGRO", "SM-M236-VERDE", 
+            "SM-A032-NEGRO", "TCL-20B-MORADO", "TCL-20B-GRIS", "XT-2153-AZUL", 
+            "SM-A528-NEGRO", "5033MR", "6025A", "A50UNS", "SM-A035-NEGRO", 
+            "SM-A226-GRIS", "SM-A035-32GB-AZ", "SM-A536-NEGRO", "XT-2171-DORADO", 
+            "XT-2175-MORADO", "XT-2167-NEGRO", "XT-2169-AZUL", "XT-2169-VERDE", 
+            "XT-2173-AZUL", "XT-2173-GRIS", "XT-2231-NEGRO", "SM-A035-32GB-NE", 
+            "SM-A536E-BLANCO", "SM-A035-64GB-AZ", "SM-A135-NEGRO", "BOMBA-4", 
+            "A60UNS", "SM-A135-64GB-NE", "XT-2231-AZUL", "SM-A226-BLANCO", 
+            "SM-A536E-AZUL", "SM-M236-AZUL", "SM-A235-NEGRO", "XT-2221-NEGRO", 
+            "SM-A235-AZUL", "SM-G781-AZUL", "SM-A035-64GB-NE", "SM-A336-NEGRO", 
+            "SM-A135-64GB-AZ", "SM-A135-64GB-BL", "SM-A336-BLANCO", "TCL-305-GRIS", 
+            "TCL-30E-GRIS", "XT-2175-MOR-CR", "SM-A032-VERDE", "XT2227-PLATA", 
+            "XT-2221-AZUL", "XT2227-GRIS", "SM-A032-COBRE", "XT-2225-BLANCO", 
+            "SM-M135-CELESTE", "SM-M135-VERDE", "SM-A045-64GB-VE", "220333QL-AZUL", 
+            "SM-A236-BLANCO", "SM-G990-GRAFITO", "SM-A037-AZUL", "SM-A042-64GB-NE", 
+            "SM-A047-BLANCO", "B30-NEGRO", "SM-A045-NEGRO", "SM-A045-VERDE", 
+            "SM-A045-BLANCO", "SM-A045-128GB-N", "SM-A045-64GB-NE", "SM-A047-NEGRO", 
+            "XT-2233-ROSA", "XT-2225-NEGRO", "A60-PLUS", "SM-A045-64GB-BL", 
+            "XT-2167-DORADO", "XT-2227-PLATA", "XT-2239-AZUL", "XT-2239-NEGRO", 
+            "XT-2239-GRIS", "XT-2235-GRIS", "XT-2203-PLATA", "XT-2243-BLANCO", 
+            "XT-2235-PLATA", "SM-A042-64GB-RO", "SM-A042-64GB-CO", "SM-A042-NEGRO", 
+            "XT-2233-VERDE", "SM-A042-AZUL", "SM-A146-PLATA", "SM-A047-VERDE", 
+            "XT-2235-ROSA", "XT-2245-PLATA", "A50-PLUS", "XT-2245-VIOLETA", 
+            "XT-2345-NATURAL", "SM-A236-AZUL", "SM-A236-NEGRO", "XT-2255-BLANCO", 
+            "SM-A042-COBRE", "XT-2241-NEGRO", "SM-A346-PLATA", "SM-A546-NEGRO", 
+            "SM-A346-LIME", "TCL-40SE-128-LI", "SM-A145-NEGRO", "SM-A145-PLATA", 
+            "SM-A145-VERDE", "TCL-405-GRIS", "SM-A245-128GB-N", "SM-A346-GRAFITO", 
+            "XT-2255-AZUL", "XT-2331-ROSA", "XT-2333-AZUL", "XT-2333-BLANCO", 
+            "XT-2345-AZUL", "2201117TL-AZUL", "XT-2243-AZUL", "XT-2331-GRIS", 
+            "SM-A042-64GB-A", "SM-A546-128GB-N", "SM-A546-128GB-B", "TCL-408-GRIS", 
+            "2201117TL-GRIS", "XT-2331-128-ROS", "220333QL-GRIS", "TCL-408-AZUL", 
+            "TCL-403-NEGRO", "TCL-403-LILA", "TCL-405-LILA",             "TCL-40SE-128-GR", "TCL-40SE-256-GR", "TCL-40SE-256-LI",
+            "SM-A245-128GB-P", "SM-A245-128GB-V", "SM-A546-128GB-V", 
+            "SM-A546-LIME", "XT-2235-6GB-PLA", "XT-2235-6GB-ROS", 
+            "XT-2239-64GB-AZ", "XT-2331-128-GR", "XT-2303-NEGRO", 
+            "XT-2331-DS-AZUL", "SM-S901-VERDE", "SM-S918-256GB-B", 
+            "SM-S918-512GB-V", "A53PLUS", "A72S", "23100RN82L-NEG", 
+            "SM-A055-SILVE-1", "SM-A055-SILVER", "SM-S711-128GB", 
+            "SM-A146-NEGRO", "TCL40-NXTPAPER", "TCL-408-6GB-GR", 
+            "TCL-408-6GB-AZ", "SM-A346-GRAFI-1", "SM-A146-NEGRO-1", 
+            "SM-A045-64G-N-1", "SM-A055-NEGRO", "SM-A346-LIME-1", 
+            "SM-A245-128G-1", "SM-A042-NEGRO-1", "SM-A045-128G-1", 
+            "SM-A546-128GB-1", "SM-A045-64G-B-1", "SM-F731-CREMA", 
+            "SM-F731-ROSA", "SM-A055-128-NEG", "SM-A055-VERDE", 
+            "SM-A146-VERDE", "XT-2239-64GB-NE", "XT-2307-NEGRO", 
+            "XT-2307-VER", "N62-NEGRO", "N62-AZUL", "N52-NEGRO", 
+            "XT-2235-6GB-GRI", "XT-2341-BEIGE", "XT-2341-GRIS", 
+            "XT-2341-ROSA", "XT-2343-VER", "XT-2347-AZ"
+        ];
+
+        // Función para agregar SKU como nodos en Firebase
+        function agregarSKUs() {
+            skus.forEach(sku => {
+                const newRef = database.ref('imei/' + sku.replace(/\s+/g, '_')); // Reemplaza espacios en blanco si los hay
+                newRef.set({ sku: sku })
+                    .then(() => {
+                        console.log(`SKU agregado: ${sku}`);
+                    })
+                    .catch((error) => {
+                        console.error("Error al agregar SKU: ", error);
+                    });
+            });
+        }
+
+        // Llamar a la función al cargar la página
+        window.onload = agregarSKUs;
+    </script>
+</body>
+</html>
