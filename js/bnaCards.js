@@ -1784,6 +1784,8 @@ function marcarCancelado2(id) {
 // Pushear en Firebase
 const refEnvios = firebase.database().ref(`enviosBNA/${id}`);
 refEnvios.update({
+    marcaEntregado: "Si",
+    marcaPreparado:"Si",
     tipoElectrodomesticoBna: "bulto20",
     estado: "Cancelado",
     datoFacturacion: `Cancelado ${nombreFacturador} ${horaFormateada} ${fechaFormateada}`,
