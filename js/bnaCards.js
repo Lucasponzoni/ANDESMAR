@@ -519,6 +519,7 @@ function renderCards(data) {
 
         // Verificar si datoFacturacion existe
         const hasDatoFacturacion = data[i].datoFacturacion !== undefined && data[i].datoFacturacion !== null;
+        const hasCancelado = data[i].cancelado !== undefined && data[i].cancelado !== null;
 
 
         // Lógica para calcular el estado de facturación
@@ -921,28 +922,33 @@ const isSkuIncluded = skusList.includes(data[i].sku);
        ${data[i].datoFacturacion ? 'disabled' : ''} 
        value="${data[i].datoFacturacion || ''}" />
 
-<button id="facturar-automata-${data[i].id}" 
-        class="btn ${data[i].datoFacturacion ? 'btn-success' : 'btn-primary'}" 
-        onclick="marcarFacturado2('${data[i].id}')"
-        ${data[i].datoFacturacion ? 'disabled' : ''}>
-    ${data[i].datoFacturacion ? '<i class="bi bi-check2-circle"></i> Producto ya facturado' : '<i class="bi bi-check-circle-fill"></i> Facturar Automata'}
-</button>
+<div class="button-container">
+    <button id="facturar-automata-${data[i].id}" 
+            class="btn ${data[i].cancelado ? 'btn-secondary' : (data[i].datoFacturacion ? 'btn-success' : 'btn-primary')}" 
+            onclick="marcarFacturado2('${data[i].id}')"
+            ${data[i].cancelado ? 'disabled' : (data[i].datoFacturacion ? 'disabled' : '')}>
+        ${data[i].cancelado ? '<i class="bi bi-x-octagon"></i> Sin facturar Cancelado' : (data[i].datoFacturacion ? '<i class="bi bi-check2-circle"></i> Producto ya Facturado' : '<i class="bi bi-check-circle-fill"></i> Facturar Automata')}
+    </button>
 
-<button id="cancelar-venta-${data[i].id}" 
-        class="btn btn-danger" 
+    <button id="cancelar-venta-${data[i].id}" 
+        class="btn ${data[i].cancelado ? 'btn-success' : (data[i].datoFacturacion ? 'btn-secondary' : 'btn-danger')}" 
         onclick="marcarCancelado2('${data[i].id}')"
         ${data[i].datoFacturacion ? 'disabled' : ''}>
-    ${data[i].cancelado ? '<i class="bi bi-x-square"></i> Venta Cancelada' : '<i class="bi bi-x-square-fill"></i> Cancelar Venta'}
-</button>
+    ${data[i].cancelado ? '<i class="bi bi-check2-circle"></i> Venta Cancelada' : '<i class="bi bi-x-square-fill"></i> Cancelar Venta'}
+    </button>
 
-<button type="button" 
-        id="editButton_${data[i].id}" 
-        class="btn btn-primary" 
-        onclick="toggleEdit('${data[i].id}')"
-        ${data[i].datoFacturacion ? 'disabled' : ''}>
-    <i class="bi bi-pen-fill"></i> Editar
-</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-arrow-return-left"></i> Cerrar</button>
+    <button type="button" 
+            id="editButton_${data[i].id}" 
+            class="btn btn-primary" 
+            onclick="toggleEdit('${data[i].id}')"
+            ${data[i].datoFacturacion ? 'disabled' : ''}>
+        <i class="bi bi-pen-fill"></i> Editar
+    </button>
+
+    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+        <i class="bi bi-arrow-return-left"></i> Cerrar
+    </button>
+</div>
             </div>
         </div>
     </div>
@@ -1214,8 +1220,12 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             </div>
                                     
                                     
-                                    <button id="marcar-facturado-${data[i].id}" type="button" class="btn ${hasDatoFacturacion ? 'btn-success' : 'btn-danger'} w-100 mb-1" ${hasDatoFacturacion ? 'disabled' : ''} onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}')`}">${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
-                                        <i class="bi bi-lock-fill icono"></i>
+                                    <button id="marcar-facturado-${data[i].id}" type="button" 
+                                    class="btn ${data[i].cancelado ? 'btn-danger' : (hasDatoFacturacion ? 'btn-success' : 'btn-danger')} w-100 mb-1" 
+                                    ${hasDatoFacturacion ? 'disabled' : ''} 
+                                    onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}')`}">
+                                    ${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
+                                    <i class="bi bi-lock-fill icono"></i>
                                     </button>
 
                             <!-- Botón para abrir el modal -->
@@ -1237,11 +1247,12 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                                 </div>
                             </div>
 
+
                             <div class="alert alert-danger d-none" id="alert-${data[i].id}" role="alert">
                                 Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
                             </div>
 
-                                <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
+                    <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
                         <option value="">Seleccione un producto</option>
                         <option value="heladera">Heladera</option>
                         <option value="cocina">Cocina</option>
@@ -1290,18 +1301,19 @@ const isSkuIncluded = skusList.includes(data[i].sku);
 
                             <!-- Botón Logística Propia --> 
                             <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
-                                id="LogPropiaMeliButton${data[i].id}" 
-                                onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
-                                <span>
-                                    ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
-                                </span>
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
+                            id="LogPropiaMeliButton${data[i].id}" 
+                            ${data[i].cancelado ? 'disabled' : ''} 
+                            onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
+                            <span>
+                            ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
+                            </span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
                             </button>
-        
+
                             <!-- Botón Andesmar -->          
                             <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'}" 
                             id="andesmarButton${data[i].id}" 
-                            ${isAndreani ? 'disabled' : ''} 
+                            ${isAndreani || data[i].cancelado ? 'disabled' : ''} 
                             ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
                             <span id="andesmarText${data[i].id}">
                             ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
@@ -1312,7 +1324,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             <!-- Botón Andreani --> 
                             <button class="mt-1 btn btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'}"
                             id="andreaniButton${data[i].id}" 
-                            ${isAndesmar ? 'disabled' : ''} 
+                            ${isAndesmar || data[i].cancelado ? 'disabled' : ''} 
                             onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
                             <span id="andreaniText${data[i].id}">
                             ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
@@ -1320,12 +1332,19 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
                             </button>
 
-                            <div id="resultado${data[i].id}" class="mt-2 errorMeli"></div>
+                           <div id="resultado${data[i].id}" class="mt-2 errorMeliBna">
+                            ${data[i].cancelado ? 
+                            'Atencion: Venta cancelada o con Boton de Arrepentimiento' : ''
+                            }
+                            </div>
+
                         </div>
+                        
                     </div>
 
-                `;
-                     
+                `
+                ;
+
 
                 // Elimina Comillas en el nombre de los productos
                 function cleanString(value) {
@@ -1445,17 +1464,26 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
                 });                             
 
                 // Lógica para determinar el mensaje estado de Facturacion
-                const facturaStatusDiv = document.getElementById(`factura-status-${data[i].id}`);
-                if (hasDatoFacturacion) {
-                    facturaStatusDiv.innerHTML = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado'; 
-                    facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
-                    facturaStatusDiv.classList.remove('facturable'); 
-                    facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
-                } else {
-                    facturaStatusDiv.textContent = mensajeFactura;
-                    facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
-                    facturaStatusDiv.classList.add('em-circle-state-time'); 
-                }
+const facturaStatusDiv = document.getElementById(`factura-status-${data[i].id}`);
+if (hasCancelado) {
+    // Si ha sido cancelado
+    facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+    facturaStatusDiv.classList.remove('facturable'); 
+    facturaStatusDiv.classList.add('em-circle-state-time-cancelado'); 
+    facturaStatusDiv.innerHTML = '<i class="bi bi-x-circle-fill" style="margin-right: 5px;"></i> Cancelado'; // Mensaje de cancelación
+} else if (hasDatoFacturacion) {
+    // Si ha sido facturado
+    facturaStatusDiv.innerHTML = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado'; 
+    facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+    facturaStatusDiv.classList.remove('facturable'); 
+    facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
+} else {
+    // Si no ha sido facturado
+    facturaStatusDiv.textContent = mensajeFactura;
+    facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+    facturaStatusDiv.classList.add('em-circle-state-time'); 
+}
+
         // Lógica para cargar el tipoElectrodomesticoBna si existe
         const tipoElectrodomesticoBnaSelect = card.querySelector(`#tipoElectrodomesticoBna-${data[i].id}`);
         if (data[i].tipoElectrodomesticoBna) {
@@ -1693,7 +1721,7 @@ function marcarFacturado(id) {
 
         setTimeout(() => {
             location.reload();
-        }, 4000);
+        }, 3000);
     });
 }
 
@@ -1756,6 +1784,7 @@ function marcarCancelado2(id) {
 // Pushear en Firebase
 const refEnvios = firebase.database().ref(`enviosBNA/${id}`);
 refEnvios.update({
+    tipoElectrodomesticoBna: "bulto20",
     estado: "Cancelado",
     datoFacturacion: `Cancelado ${nombreFacturador} ${horaFormateada} ${fechaFormateada}`,
     cancelado: true
@@ -1764,6 +1793,11 @@ refEnvios.update({
 }).catch((error) => {
     console.error("Error al pushear a Firebase:", error);
 });
+
+setTimeout(() => {
+    location.reload();
+}, 3000);
+
 }
 
 function marcarFacturado2(id) {
