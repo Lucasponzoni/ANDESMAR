@@ -365,6 +365,7 @@ function loadEnviosFromFirebase() {
             allData.push({ 
                 id: childSnapshot.key, 
                 altura: (data.altura),
+                cancelado: (data.cancelado),
                 nombreFacturacion: capitalizeWords(data.nombre),
                 apellidoFacturacion: capitalizeWords(data.apellido),
                 nombre: capitalizeWords(data.nombre_completo_envio), 
@@ -921,10 +922,17 @@ const isSkuIncluded = skusList.includes(data[i].sku);
        value="${data[i].datoFacturacion || ''}" />
 
 <button id="facturar-automata-${data[i].id}" 
-        class="btn ${data[i].datoFacturacion ? 'btn-success' : 'btn-danger'}" 
+        class="btn ${data[i].datoFacturacion ? 'btn-success' : 'btn-primary'}" 
         onclick="marcarFacturado2('${data[i].id}')"
         ${data[i].datoFacturacion ? 'disabled' : ''}>
-    ${data[i].datoFacturacion ? 'Producto ya facturado' : 'Facturar Automata'}
+    ${data[i].datoFacturacion ? '<i class="bi bi-check2-circle"></i> Producto ya facturado' : '<i class="bi bi-check-circle-fill"></i> Facturar Automata'}
+</button>
+
+<button id="cancelar-venta-${data[i].id}" 
+        class="btn btn-danger" 
+        onclick="marcarCancelado2('${data[i].id}')"
+        ${data[i].datoFacturacion ? 'disabled' : ''}>
+    ${data[i].cancelado ? '<i class="bi bi-x-square"></i> Venta Cancelada' : '<i class="bi bi-x-square-fill"></i> Cancelar Venta'}
 </button>
 
 <button type="button" 
@@ -932,9 +940,9 @@ const isSkuIncluded = skusList.includes(data[i].sku);
         class="btn btn-primary" 
         onclick="toggleEdit('${data[i].id}')"
         ${data[i].datoFacturacion ? 'disabled' : ''}>
-    Editar
+    <i class="bi bi-pen-fill"></i> Editar
 </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-arrow-return-left"></i> Cerrar</button>
             </div>
         </div>
     </div>
@@ -1689,6 +1697,75 @@ function marcarFacturado(id) {
     });
 }
 
+function marcarCancelado2(id) {
+    const facturaStatusDiv = document.getElementById(`factura-status-${id}`);
+    const claveInput = document.getElementById(`clave-facturacion-${id}`);
+    const clave = claveInput.value;
+
+    // Comprobación de la clave y formateo de la fecha y hora
+    let contenidoBoton;
+    const fechaActual = new Date();
+    
+    // Formateo de la hora
+    const horaFormateada = fechaActual.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+    
+    // Formateo de la fecha
+    const opcionesFecha = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const fechaFormateada = fechaActual.toLocaleDateString('es-AR', opcionesFecha);
+    
+    // Mensaje para el contenido del botón
+    let mensajeCancelado = '';
+    let nombreFacturador = '';
+
+    // Determinar el nombre del facturador según la clave
+    switch (clave) {
+        case '1110':
+            nombreFacturador = 'Brisa';
+            contenidoBoton = `Cancelado Brisa ${horaFormateada} ${fechaFormateada}`;
+            break;
+        case '1111':
+            nombreFacturador = 'Mauricio';
+            contenidoBoton = `Cancelado Mauricio ${horaFormateada} ${fechaFormateada}`;
+            break;
+        case '1112':
+            nombreFacturador = 'Marina';
+            contenidoBoton = `Cancelado Marina ${horaFormateada} ${fechaFormateada}`;
+            break;
+        case '1113':
+            nombreFacturador = 'Leo';
+            contenidoBoton = `Cancelado Leo ${horaFormateada} ${fechaFormateada}`;
+            break;
+        default:
+            Swal.fire('Clave incorrecta', '', 'error');
+            return; // Salir si la clave es incorrecta
+    }
+
+    mensajeCancelado = 'Cancelado ❌';
+
+    // Cambiar el contenido del botón y deshabilitarlo
+    const boton = document.getElementById(`cancelar-venta-${id}`);
+    boton.textContent = contenidoBoton;
+    boton.classList.remove('btn-danger');
+    boton.classList.add('btn-secondary');
+    boton.disabled = true;
+
+    // Asegúrate de definir estadoFacturaDiv correctamente
+    facturaStatusDiv.textContent = mensajeCancelado;
+    facturaStatusDiv.classList.add('cancelado-bna'); // Agregar la clase
+
+// Pushear en Firebase
+const refEnvios = firebase.database().ref(`enviosBNA/${id}`);
+refEnvios.update({
+    estado: "Cancelado",
+    datoFacturacion: `Cancelado ${nombreFacturador} ${horaFormateada} ${fechaFormateada}`,
+    cancelado: true
+}).then(() => {
+    console.log(`Venta cancelada y pusheada: ${nombreFacturador} ${horaFormateada} ${fechaFormateada}`);
+}).catch((error) => {
+    console.error("Error al pushear a Firebase:", error);
+});
+}
+
 function marcarFacturado2(id) {
     const facturaStatusDiv = document.getElementById(`factura-status-${id}`);
     const claveInput = document.getElementById(`clave-facturacion-${id}`);
@@ -1715,7 +1792,7 @@ function marcarFacturado2(id) {
         contenidoBoton = `Facturado Automata Leo ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = 'Facturado ✅';
     } else if (clave === '1112') {
-        contenidoBoton = `Facturado Automata Julian ${horaFormateada} ${fechaFormateada}`;
+        contenidoBoton = `Facturado Automata Marina ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = 'Facturado ✅';
     } else if (clave === '1113') {
         contenidoBoton = `Facturado Automata Mauricio ${horaFormateada} ${fechaFormateada}`;
