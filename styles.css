@@ -4311,3 +4311,95 @@ input[disabled] {
 .sku-table th, .sku-table td {
     text-align: center;
 }
+
+/* CALENDARIO */
+
+.mc-os-modal-content {
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    border: none;
+}
+.mc-os-modal-header {
+    background-color: #007bff;
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.mc-os-close {
+    color: white;
+}
+.mc-os-dia{
+    margin-bottom: -5px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    margin-top: 10px;
+    padding: 5px;
+    border-radius: 10px 10px 0 0;
+    background-color: cornflowerblue;
+    color: white;
+}
+.mc-os-circle {
+    display: inline-block;
+    border: 1px solid white;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+.mc-os-circle-red {
+    background-color: orangered;
+}
+.mc-os-circle-blue {
+    background-color: yellow;
+}
+.mc-os-select {
+    border-radius: 0 0 10px 10px !important;
+}
+.mc-os-calendar {
+    border: solid cornflowerblue 2px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: white;
+    border-radius: 0 0 10px 10px;
+    padding: 10px;
+    margin-top: 10px;
+}
+.mc-os-calendar > .font-weight-bold{
+    color: cornflowerblue;
+    margin-top: -10px;
+}
+.mc-os-calendar div {
+    width: 14.28%;
+    text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
+    border: solid #ffff 1px;
+}
+.mc-os-calendar .mc-os-day-red {
+    background-color: orangered;
+    color: white;
+}
+.mc-os-calendar .mc-os-day-blue {
+    background-color: yellow;
+    color: black;
+}
+.mc-os-calendar .mc-os-day-red.past,
+.mc-os-calendar .mc-os-day-blue.past {
+    opacity: 0.5;
+}
+.mc-os-btn {
+    background-color: #007bff;
+    color: white;
+}
+.mc-os-month {
+    background-color: cornflowerblue;
+    padding: 10px;
+    color: white;
+    border-radius: 10px 10px 0 0;
+    margin-top: 10px;
+    margin-bottom: -20px;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
