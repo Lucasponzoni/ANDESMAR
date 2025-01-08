@@ -4348,10 +4348,10 @@ input[disabled] {
     margin-right: 5px;
 }
 .mc-os-circle-red {
-    background-color: orangered;
+    background-color: red;
 }
 .mc-os-circle-blue {
-    background-color: yellow;
+    background-color: orange;
 }
 .mc-os-select {
     border-radius: 0 0 10px 10px !important;
@@ -4378,11 +4378,11 @@ input[disabled] {
     border: solid #ffff 1px;
 }
 .mc-os-calendar .mc-os-day-red {
-    background-color: orangered;
+    background-color: red;
     color: white;
 }
 .mc-os-calendar .mc-os-day-blue {
-    background-color: yellow;
+    background-color: orange;
     color: black;
 }
 .mc-os-calendar .mc-os-day-red.past,
