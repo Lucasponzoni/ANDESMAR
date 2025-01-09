@@ -26,20 +26,31 @@ const firebaseConfig2 = {
 };
 
 let logBsCps = []; // Array para almacenar los CPs de LogBsAs
+let logStaFeCps = []; // Array para almacenar los CPs de LogSantaFe
 
 // Función para cargar los CPs de LogBsAs
 function cargarCpsLogBsAs() {
-    return database.ref('LogSantaFe').once('value').then(snapshot => {
+    return database.ref('LogBsAs').once('value').then(snapshot => {
         const logBsData = snapshot.val();
         if (logBsData) {
-            logBsCps = Object.keys(logBsData).map(cp => Number(cp)); // Convertir a números
+            logBsCps = Object.keys(logBsData).map(cp => Number(cp));
         }
     });
 }
 
-// Llamar a la función para cargar los CPs antes de cargar los datos
-cargarCpsLogBsAs().then(() => {
-    cargarDatos(); // Cargar los datos después de obtener los CPs
+// Función para cargar los CPs de LogSantaFe
+function cargarCpsLogStaFe() {
+    return database.ref('LogSantaFe').once('value').then(snapshot => {
+        const logStaFeData = snapshot.val();
+        if (logStaFeData) {
+            logStaFeCps = Object.keys(logStaFeData).map(cp => Number(cp));
+        }
+    });
+}
+
+// Llamar a las funciones para cargar los CPs antes de cargar los datos
+Promise.all([cargarCpsLogBsAs(), cargarCpsLogStaFe()]).then(() => {
+    cargarDatos(); 
 });
 
 function mostrarResultados(resultados) {
@@ -261,6 +272,37 @@ function renderCards(data) {
     });
 }
 
+// Desbloquear Logisticas
+function desbloquearLogisticas(idOperacion) {
+    Swal.fire({
+        title: 'Ingrese la contraseña para desbloquear',
+        input: 'password',
+        inputLabel: 'Contraseña',
+        inputPlaceholder: 'Ingrese la contraseña',
+        inputAttributes: {
+            maxlength: 10,
+            autocapitalize: 'off',
+            autocorrect: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Desbloquear',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed && result.value === '37892345') {
+            document.getElementById(`andesmarButton${idOperacion}`).removeAttribute('disabled');
+            document.getElementById(`andreaniButton${idOperacion}`).removeAttribute('disabled');
+            const unlockButton = document.getElementById(`unlockLogisticsButton${idOperacion}`);
+            unlockButton.classList.remove('btn-warning');
+            unlockButton.classList.add('btn-secondary');
+            unlockButton.setAttribute('disabled', 'true');
+            Swal.fire('Desbloqueado', 'Las logísticas han sido desbloqueadas.', 'success');
+        } else {
+            Swal.fire('Error', 'Contraseña incorrecta.', 'error');
+        }
+    });
+}
+// Fin Desbloquear Logisticas
+
 // Función para crear una card
 function crearCard(data) {
     const cardDiv = document.createElement('div');
@@ -338,15 +380,20 @@ function crearCard(data) {
                 <div class="meli-box1"> 
                     <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> ${data.Cp}, ${data.localidad}, ${data.Provincia}</p>
 
-                    <p class="card-text correo-meli ${logBsCps.includes(Number(data.Cp)) ? 'correo-novogar' : (cpsAndesmar.includes(Number(data.Cp)) ? 'correo-andesmar' : 'correo-andreani')}">
-                    ${logBsCps.includes(Number(data.Cp)) ? 
-                    '<img src="Img/logistica-novogar.png" alt="Logística Novogar" width="20" height="20">' : 
-                    (cpsAndesmar.includes(Number(data.Cp)) ? 
-                    '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
-                    '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
-                    )
-                    }
+                    
+                    <p class="card-text correo-meli ${logBsCps.includes(Number(data.Cp)) ? 'correo-novogar' : (logStaFeCps.includes(Number(data.Cp)) ? 'correo-santafe' : (cpsAndesmar.includes(Number(data.Cp)) ? 'correo-andesmar' : 'correo-andreani'))}">
+                             ${logBsCps.includes(Number(data.Cp)) ? 
+                            '<img src="Img/novogar-tini.png" alt="Logística Novogar" width="20" height="20">Buenos Aires' : 
+                            (logStaFeCps.includes(Number(data.Cp)) ? 
+                            '<img src="Img/novogar-tini.png" alt="Logística Santa Fe" width="20" height="20">Santa Fe' : 
+                            (cpsAndesmar.includes(Number(data.Cp)) ? 
+                            '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
+                            '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">' 
+                            )
+                        )
+                        }
                     </p>
+
 
 
                     </div>
@@ -450,7 +497,7 @@ function crearCard(data) {
                 <!-- Botón Andesmar --> 
                 <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} btnAndesmarMeli" 
                 id="andesmarButton${data.idOperacion}" 
-                ${isAndreani ? 'disabled' : ''} 
+                ${isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
                 ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}')`}">
                 <span id="andesmarText${data.idOperacion}">
@@ -459,11 +506,11 @@ function crearCard(data) {
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.idOperacion}"></span>
                 </button>
                 <!-- Botón Andesmar --> 
-
+                
                 <!-- Botón Andreani -->
                 <button class="btn ${isAndreani ? 'btn-success' : 'btn-danger'} btnAndreaniMeli" 
                 id="andreaniButton${data.idOperacion}" 
-                ${isAndesmar ? 'disabled' : ''} 
+                ${isAndesmar || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
                 onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')`}">
                 <span id="andreaniText${data.idOperacion}">
@@ -485,11 +532,15 @@ function crearCard(data) {
                 </button>
                 <!-- Botón Logística Propia --> 
 
-                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked ? 'background-color: #d0ffd1;' : ''}">
-                ${isBlocked ? '<i class="bi bi-info-square-fill"></i> Despacho Bloqueado por Facturación, separar remito para realizar circuito' : ''}
+                
+                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) ? 'background-color: #d0ffd1;' : ''}">
+                    ${isBlocked ? '<i class="bi bi-info-square-fill"></i> Despacho Bloqueado por Facturación, separar remito para realizar circuito' : ''}
+                    ${logBsCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Buenos Aires, se ha bloqueado el despacho por logistica privada.' : ''}
+                    ${logStaFeCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Santa Fe, se ha bloqueado el despacho por logistica privada.' : ''}
+                    ${(logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp))) ? `<button class="btn btn-sm btn-warning mt-2" id="unlockLogisticsButton${data.idOperacion}" onclick="desbloquearLogisticas('${data.idOperacion}')"><i class="bi bi-unlock-fill"></i> Desbloquear Logisticas</button>` : ''}
                 </div>
 
-
+                            
             </div>
 
             <button class="btn btn-link lock-btn p-1 m-0 disabled" style="display: inline-flex; align-items: center;">
