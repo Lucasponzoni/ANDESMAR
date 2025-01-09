@@ -25,6 +25,23 @@ const firebaseConfig2 = {
     measurementId: "G-64DDP7D6Q2"
 };
 
+let logBsCps = []; // Array para almacenar los CPs de LogBsAs
+
+// Función para cargar los CPs de LogBsAs
+function cargarCpsLogBsAs() {
+    return database.ref('LogSantaFe').once('value').then(snapshot => {
+        const logBsData = snapshot.val();
+        if (logBsData) {
+            logBsCps = Object.keys(logBsData).map(cp => Number(cp)); // Convertir a números
+        }
+    });
+}
+
+// Llamar a la función para cargar los CPs antes de cargar los datos
+cargarCpsLogBsAs().then(() => {
+    cargarDatos(); // Cargar los datos después de obtener los CPs
+});
+
 function mostrarResultados(resultados) {
     const tabla = document.createElement('table');
     tabla.className = 'table table-striped';
@@ -265,6 +282,9 @@ function crearCard(data) {
         return nombreApellido.replace(/[^a-zA-Z\s]/g, '').trim().replace(/\s+/g, ' ');
     }    
 
+     // Verificar si data.Cp está en LogBsAs
+     const isLogBs = logBsCps.includes(Number(data.Cp));
+
     // Verificar si data.pictures existe y es un array
     const filteredPictures = Array.isArray(data.pictures) ? 
         data.pictures.filter(picture => 
@@ -318,12 +338,16 @@ function crearCard(data) {
                 <div class="meli-box1"> 
                     <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> ${data.Cp}, ${data.localidad}, ${data.Provincia}</p>
 
-                    <p class="card-text correo-meli ${cpsAndesmar.includes(Number(data.Cp)) ? 'correo-andesmar' : 'correo-andreani'}">
-                    ${cpsAndesmar.includes(Number(data.Cp)) ? 
-                      '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
-                      '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
+                    <p class="card-text correo-meli ${logBsCps.includes(Number(data.Cp)) ? 'correo-novogar' : (cpsAndesmar.includes(Number(data.Cp)) ? 'correo-andesmar' : 'correo-andreani')}">
+                    ${logBsCps.includes(Number(data.Cp)) ? 
+                    '<img src="Img/logistica-novogar.png" alt="Logística Novogar" width="20" height="20">' : 
+                    (cpsAndesmar.includes(Number(data.Cp)) ? 
+                    '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
+                    '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
+                    )
                     }
                     </p>
+
 
                     </div>
 
