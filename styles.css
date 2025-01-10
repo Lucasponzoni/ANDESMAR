@@ -1511,6 +1511,7 @@ p.card-text{
     background-color: green;
     color: white;
     border: solid 1px greenyellow;
+    min-width: fit-content;
 }
 
 .meli-box1{
