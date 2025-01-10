@@ -1698,7 +1698,18 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     
         return nuevaFecha;
     }
-    
+
+    function obtenerProximoDia(fecha, dia) {
+        const diasDeLaSemana = {
+            'martes': 2,
+            'jueves': 4
+        };
+        const diaActual = fecha.getDay();
+        let diasParaSumar = (diasDeLaSemana[dia] - diaActual + 7) % 7;
+        if (diasParaSumar === 0) diasParaSumar = 7; // Si es hoy, sumar 7 días
+        return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar);
+    }
+
     // Obtener la fecha actual
     const fechaActual = new Date();
     const fechaFormateada = `${fechaActual.getDate().toString().padStart(2, '0')}-${(fechaActual.getMonth() + 1).toString().padStart(2, '0')}-${fechaActual.getFullYear().toString().slice(-2)}`;
@@ -1714,7 +1725,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     }
 
     // Contenido HTML
-    const contenido = `
+    let contenido = `
     <html lang="es">
     <head>
         <meta charset="UTF-8">
@@ -1822,24 +1833,36 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             <div class="campo">
                 <i class="bi bi-telephone-outbound-fill"></i>
                 <span>Teléfono: ${telefonoDestinatario}</span>
-            </div>
-            <div class="campo">
-                <i class="bi bi-info-circle-fill"></i>
-                <span>Vencimiento: ${fechaFormateada} al ${fechaVencimientoFormateada}</span>
-            </div>
+            </div>`;
+
+    // Determinar la fecha de vencimiento según el CP
+    if (logBsCps.includes(Number(Cp))) {
+        const fechaProximoMartes = obtenerProximoDia(fechaActual, 'martes');
+        const fechaProximoMartesFormateada = `${fechaProximoMartes.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+        const diaMartes = fechaProximoMartes.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaMartes}</span></div>`;
+    } else if (logStaFeCps.includes(Number(Cp))) {
+        const fechaProximoJueves = obtenerProximoDia(fechaActual, 'jueves');
+        const diaJueves = fechaProximoJueves.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaJueves}</span></div>`;
+    } else {
+        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Vencimiento: ${fechaFormateada} al ${fechaVencimientoFormateada}</span></div>`;
+    }
+
+    const idOperacionsSinMe1 = idOperacion.replace(/ME1$/, '');
+
+    contenido += `
             <div class="campo-extra">
                 <p><strong>Firma:</strong>  ________________________</p>
             </div>
             <div class="campo-extra">
-                <p><strong>Aclaración:</strong>  ________________________</p>
+                <p><strong>Operación:</strong>  ${idOperacionsSinMe1}</p>
             </div>
             <div class="campo-extra">
                 <p><strong>DNI:</strong>  ________________________</p>
             </div>
             <div class="contacto">
-                <p>Ante cualquier inconveniente, contáctese con posventa:</p>
-                <p><strong><i class="bi bi-chat-dots-fill"></i></strong> (0341) 6680658 (Solo WhatsApp)</p>
-                <p><i class="bi bi-envelope-check-fill"></i> posventa@novogar.com.ar</p>
+                <p><strong><i class="bi bi-chat-dots-fill"></i></strong> Posventa Novogar: (0341) 6680658 (Solo WhatsApp)</p>
             </div>
         </div>
     </body>
