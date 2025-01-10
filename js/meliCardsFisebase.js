@@ -1656,7 +1656,7 @@ if (prepararME2Btn) {
 
 // FIN QUERY DE DATOS MELI
 
-// GENERAR ETIQUETA LOGISTICA PROPIA
+// ETIQUETA LOGISTICA PROPIA
 async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia) {
     let button = document.getElementById(`LogPropiaMeliButton${id}`);
     let spinner = document.getElementById(`spinnerLogPropia${id}`);
@@ -1704,6 +1704,14 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     const fechaFormateada = `${fechaActual.getDate().toString().padStart(2, '0')}-${(fechaActual.getMonth() + 1).toString().padStart(2, '0')}-${fechaActual.getFullYear().toString().slice(-2)}`;
     const fechaVencimiento = sumarDiasHabiles(fechaActual, 3);
     const fechaVencimientoFormateada = `${fechaVencimiento.getDate().toString().padStart(2, '0')}-${(fechaVencimiento.getMonth() + 1).toString().padStart(2, '0')}-${fechaVencimiento.getFullYear().toString().slice(-2)}`;    
+
+    // Determinar la imagen según el CP
+    let logoSrc = './Img/Meli-Novogar.png';
+    if (logBsCps.includes(Number(Cp))) {
+        logoSrc = './Img/Camion-BsAs-Novogar.png';
+    } else if (logStaFeCps.includes(Number(Cp))) {
+        logoSrc = './Img/Camion-Santa-fe-Novogar.png';
+    }
 
     // Contenido HTML
     const contenido = `
@@ -1797,7 +1805,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     <body>
         <div class="etiqueta">
             <div class="logo">
-                <img src="./Img/Meli-Novogar.png" alt="Logo">
+                <img src="${logoSrc}" alt="Logo">
             </div>
             <div class="campo">
                 <i class="bi bi-person-square"></i>
