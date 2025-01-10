@@ -811,15 +811,19 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         if (data.NroPedido) {
             const trackingLinkAndesmar = `https://andesmarcargas.com/seguimiento.html?numero=${idOperacionFinal}&tipo=remito&cod=`;
 
-            const trackingMessage = `¡Hola ${NombreyApellido}! 🎉
+            const trackingMessage = `¡Hola, ${NombreyApellido}!
 
-            ¡Buenas noticias! Tu producto ya está listo para ser enviado por Andesmar Cargas. Recuerda que la fecha de entrega es estimativa, así que podrías recibirlo un poco antes o después. Mantente atento a tu teléfono por si te contactan.
-            
-            Si notas algún daño en el paquete, recházalo para que podamos reenviarlo.
-            
-            Tu número de seguimiento es: ${trackingLinkAndesmar}.
-            
-            ¡Saludos!`;
+            ¡Buenas noticias! 🎉  Tu producto ya está listo para ser enviado con Andesmar Cargas. 📦  
+
+            Recordá que la fecha de entrega es aproximada, así que puede que lo recibas antes. 🚚📲 Estate atento a tu teléfono ya que estaremos en contacto para asegurarnos de que la entrega sea exitosa.
+
+            ✅ Acá te dejamos tu número de seguimiento: ${trackingLinkAndesmar}.  
+
+            ¡Esperamos que disfrutes tu compra!
+
+            Estamos a tu disposición.
+
+            Equipo Posventa Novogar`;
 
             const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
             
@@ -1111,15 +1115,19 @@ for (let i = 0; i < cantidadFinal; i++) {
             }
 
             // Guardar en Firebase
-    const trackingMessage = `¡Hola ${NombreyApellido}! 🎉
+    const trackingMessage = `¡Hola, ${NombreyApellido}!
 
-    ¡Buenas noticias! Tu producto ya está listo para ser enviado por Correo Andreani. Recuerda que la fecha de entrega es estimativa, así que podrías recibirlo un poco antes o después. Mantente atento a tu teléfono por si te contactan.
-    
-    Si notas algún daño en el paquete, recházalo para que podamos reenviarlo.
-    
-    Tu número de seguimiento es: ${trackingLink}.
-    
-    ¡Saludos!`;
+    ¡Buenas noticias! 🎉  Tu producto ya está listo para ser enviado con Andesmar Cargas. 📦  
+
+    Recordá que la fecha de entrega es aproximada, así que puede que lo recibas antes. 🚚📲 Estate atento a tu teléfono ya que estaremos en contacto para asegurarnos de que la entrega sea exitosa.
+
+    ✅ Acá te dejamos tu número de seguimiento: ${trackingLink}.  
+
+    ¡Esperamos que disfrutes tu compra!
+
+    Estamos a tu disposición.
+
+    Equipo Posventa Novogar`;
 
         const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
     
@@ -1845,16 +1853,25 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
         NroEnvio.innerHTML = `Logistica Propia`;
 
-        const trackingMessage = `¡Hola ${NombreyApellido}! 🎉
+        const trackingMessage = `¡Hola, ${NombreyApellido}! 
 
-            ¡Buenas noticias! Tu producto ya está listo para ser enviado por nuestra logística. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes o después. Esté atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
+        ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
 
-            En Rosario, realizamos entregas en 48 horas. En Villa Gobernador Gálvez, Arroyo Seco, San Lorezo, Bairria, Capitan B y zona los lunes, miércoles y viernes. En Funes, Roldán y Pérez, los sábados. En Rafaela, los jueves, y en Santa Fe Capital, los jueves o viernes. 
+        -Detalles de Entrega-
+        .Rosario: Entregas en 48 horas.
+        .Villa Gobernador Gálvez, Arroyo Seco, San Lorenzo, Baigorria, Capitán Bermúdez: Lunes, miércoles y viernes.
+        .Funes, Roldán y Pérez: Sábados.
+        .Rafaela: Jueves.
+        .Santa Fe Capital: Jueves o viernes.
 
-            Si tienes alguna duda, no dudes en consultarnos por WhatsApp al 341 2010598.
+        Si tienes alguna duda, no dudes en consultarnos por WhatsApp al 341 2010598.
 
-            ¡Saludos!`;
+        Estamos a tu servicio.
 
+        ¡Saludos!
+
+        Equipo Posventa Novogar
+        `;
 
         const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
     
