@@ -359,8 +359,8 @@ function procesarDatos(data) {
         });
     }
 
-    const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value === "Jujuy");
-    const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value === "Tierra del Fuego");
+    const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "jujuy");
+    const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "tierra del fuego");
     
     if (estadoJujuy) {
         Swal.fire({
@@ -381,7 +381,7 @@ function procesarDatos(data) {
     }
 
     // Nueva validación para data.Provincia
-    if (data.Provincia === 'Jujuy' || data.Provincia === 'Tierra del Fuego') {
+    if (data.Provincia.toLowerCase() === 'jujuy' || data.Provincia.toLowerCase() === 'tierra del fuego') {
         Swal.fire({
             icon: 'error',
             title: 'Envío no permitido',
