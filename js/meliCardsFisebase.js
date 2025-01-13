@@ -1975,26 +1975,58 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
         NroEnvio.innerHTML = `Logistica Propia`;
 
-        const trackingMessage = `¡Hola, ${NombreyApellido}! 
-
-        ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
-
-        -Detalles de Entrega-
-        .Rosario: Entregas en 48 horas.
-        .Villa Gobernador Gálvez, Arroyo Seco, San Lorenzo, Baigorria, Capitán Bermúdez: Lunes, miércoles y viernes.
-        .Funes, Roldán y Pérez: Sábados.
-        .Rafaela: Jueves.
-        .Santa Fe Capital: Jueves o viernes.
-
-        Si tienes alguna duda, no dudes en consultarnos por WhatsApp al 341 2010598.
-
-        Estamos a tu servicio.
-
-        ¡Saludos!
-
-        Equipo Posventa Novogar
-        `;
-
+        if (logBsCps.includes(Number(Cp))) {
+            const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoBsAs);
+            const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+            
+            trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
+        
+            Queremos informarte que vamos a visitarte el ${diaFormateado} entre las 8 y las 16 hs.
+        
+            Te contamos que nuestro equipo de logística comienza el reparto desde Rosario, así que el recorrido es largo y necesitamos que la entrega sea exitosa para brindarte la mejor experiencia de compra.
+        
+            Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+        
+            Cualquier duda, estamos a tu servicio. ¡Gracias!
+            
+            Equipo Posventa Novogar`;
+        } else if (logStaFeCps.includes(Number(Cp))) {
+            const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoStaFe);
+            const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+            
+            trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
+        
+            Queremos informarte que vamos a visitarte el ${diaFormateado} entre las 8 y las 16 hs.
+        
+            Te contamos que nuestro equipo de logística comienza el reparto desde Rosario, así que el recorrido es largo y necesitamos que la entrega sea exitosa para brindarte la mejor experiencia de compra.
+        
+            Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+        
+            Cualquier duda, estamos a tu servicio. ¡Gracias!
+            
+            Equipo Posventa Novogar`;
+        } else {
+            // Mensaje anterior o el que deseas usar para otras zonas
+            trackingMessage = `¡Hola, ${NombreyApellido}! 
+        
+            ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
+            
+            -Detalles de Entrega-
+            .Rosario: Entregas en 48 horas.
+            .Villa Gobernador Gálvez, Arroyo Seco, San Lorenzo, Baigorria, Capitán Bermúdez: Lunes, miércoles y viernes.
+            .Funes, Roldán y Pérez: Sábados.
+            .Rafaela: Jueves.
+            .Santa Fe Capital: Jueves o viernes.
+        
+            Si tienes alguna duda, no dudes en consultarnos por WhatsApp al 341 2010598.
+        
+            Estamos a tu servicio.
+        
+            ¡Saludos!
+        
+            Equipo Posventa Novogar`;
+        }
+        
         const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
     
         firebase.database().ref('envios/' + idOperacionSinME1).update({
