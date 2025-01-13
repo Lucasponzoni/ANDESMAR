@@ -25,6 +25,85 @@ const firebaseConfig2 = {
     measurementId: "G-64DDP7D6Q2"
 };
 
+// MODAL MELI LOCALIDADES
+document.getElementById('logisticaBsAsButton').addEventListener('click', () => loadPostalCodes('LogBsAs'));
+document.getElementById('logisticaSantaFeButton').addEventListener('click', () => loadPostalCodes('LogSantaFe'));
+document.getElementById('addPostalCodeButton').addEventListener('click', addPostalCode);
+
+let currentLogRef = null;
+
+$('#localidadesModal').on('show.bs.modal', function () {
+    document.getElementById('initialAlert').style.display = 'block';
+    document.getElementById('postalCodesContainer').style.display = 'none';
+    document.getElementById('cp-alertContainer').style.display = 'none';
+    document.getElementById('newPostalCodeInput').value = ''; // Vaciar el input al abrir el modal
+});
+
+function loadPostalCodes(logRef) {
+    currentLogRef = logRef;
+    document.getElementById('initialAlert').style.display = 'none';
+    document.getElementById('postalCodesContainer').style.display = 'block';
+    database.ref(logRef).once('value').then(snapshot => {
+        const postalCodesList = document.getElementById('postalCodesList');
+        postalCodesList.innerHTML = '';
+        snapshot.forEach(childSnapshot => {
+            const postalCode = childSnapshot.key;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${postalCode}</td>
+                <td><button class="btn btn-danger" onclick="deletePostalCode('${postalCode}')">Eliminar</button></td>
+            `;
+            postalCodesList.appendChild(row);
+        });
+    });
+}
+
+function addPostalCode() {
+    const newPostalCodeInput = document.getElementById('newPostalCodeInput');
+    const newPostalCode = newPostalCodeInput.value.trim();
+    if (newPostalCode && currentLogRef) {
+        const newRef = database.ref(`${currentLogRef}/${newPostalCode}`);
+        newRef.once('value').then(snapshot => {
+            if (snapshot.exists()) {
+                mostrarAlertaCP('El código postal ya existe en el listado', 'danger', 'bi-exclamation-circle-fill');
+                newPostalCodeInput.value = ''; // Vaciar el input si hay error
+            } else {
+                newRef.set(true).then(() => {
+                    mostrarAlertaCP('Se ha agregado el código postal al listado', 'success', 'bi-check-circle-fill');
+                    loadPostalCodes(currentLogRef);
+                    newPostalCodeInput.value = ''; // Vaciar el input al agregar con éxito
+                }).catch(error => {
+                    console.error("Error al agregar código postal: ", error);
+                    mostrarAlertaCP('Error al agregar código postal', 'danger', 'bi-exclamation-circle-fill');
+                    newPostalCodeInput.value = ''; // Vaciar el input si hay error
+                });
+            }
+        });
+    }
+}
+
+function deletePostalCode(postalCode) {
+    if (currentLogRef) {
+        database.ref(`${currentLogRef}/${postalCode}`).remove().then(() => {
+            mostrarAlertaCP('Código postal eliminado correctamente', 'success', 'bi-check-circle-fill');
+            loadPostalCodes(currentLogRef);
+        }).catch(error => {
+            console.error("Error al eliminar código postal: ", error);
+            mostrarAlertaCP('Error al eliminar código postal', 'danger', 'bi-exclamation-circle-fill');
+        });
+    }
+}
+
+function mostrarAlertaCP(mensaje, tipo, icono) {
+    const alertContainer = document.getElementById('cp-alertContainer');
+    alertContainer.innerHTML = `<div class="cp-custom-alert cp-custom-alert-${tipo}" role="alert"><i class="bi ${icono}"></i> ${mensaje}</div>`;
+    alertContainer.style.display = 'block';
+    setTimeout(() => {
+        alertContainer.style.display = 'none';
+    }, 3000);
+}
+// FIN MODAL MELI LOCALIDADES
+
 let logBsCps = []; // Array para almacenar los CPs de LogBsAs
 let logStaFeCps = []; // Array para almacenar los CPs de LogSantaFe
 
@@ -52,6 +131,8 @@ function cargarCpsLogStaFe() {
 Promise.all([cargarCpsLogBsAs(), cargarCpsLogStaFe()]).then(() => {
     cargarDatos(); 
 });
+
+// QUERY DE DATOS
 
 function mostrarResultados(resultados) {
     const tabla = document.createElement('table');
@@ -172,6 +253,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// FIN QQUERY DE DATOS
 
 // Inicializa el segundo proyecto
 const app2 = firebase.initializeApp(firebaseConfig2, "app2");

@@ -31,6 +31,11 @@ h1 {
     display: none;
 }
 
+.cajonBtnMeli{
+    display: flex;
+    justify-content: end;
+}
+
 .navbar-brand-text {
     font-family: "Titan One", sans-serif;
     font-size: 2rem;
@@ -4410,4 +4415,40 @@ input[disabled] {
     margin-bottom: -20px;
     font-size: 1.25rem;
     font-weight: bold;
+}
+
+/* MODAL LOCALIDADES MELI */
+
+.cp-custom-alert {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    position: relative;
+    z-index: 1000;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.cp-custom-alert-info {
+    color: #ffffff;
+    background-color: #4cd964; /* Verde Apple */
+    border-color: #4cd964;
+}
+
+.cp-custom-alert-success {
+    color: #ffffff;
+    background-color: #4cd964; /* Verde Apple */
+    border-color: #4cd964;
+}
+
+.cp-custom-alert-danger {
+    color: #ffffff;
+    background-color: #ff3b30;
+    border-color: #ff3b30;
+}
+
+#cp-alertContainer {
+    position: relative;
+    margin-top: 10px;
 }
