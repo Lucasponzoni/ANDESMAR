@@ -157,6 +157,7 @@
                 </button>
             </div>
             <div class="modal-body mc-os-modal-body">
+                <div id="logisticaAlertContainer" class="mc-os-alert-container" style="display: none;"></div>
                 <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-red"></span> Dia predeterminado para logistica Buenos Aires</p>
                 <select id="logistica-bsas" class="form-control mc-os-select">
                     <option value="">Sin día predeterminado</option>
@@ -204,6 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const logisticaBsAsSelect = document.getElementById('logistica-bsas');
     const logisticaSantaFeSelect = document.getElementById('logistica-santafe');
     const currentMonthLabel = document.getElementById('current-month');
+    const logisticaAlertContainer = document.getElementById('logisticaAlertContainer');
 
     let currentDate = new Date();
 
@@ -233,13 +235,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateDefaultDay(location, day) {
         const ref = location === 'BsAs' ? 'DiaPredeterminadoBsAs' : 'DiaPredeterminadoStaFe';
-        database.ref(ref).set(day).then(() => {
-            const message = `Se ha modificado el día predeterminado para ${location === 'BsAs' ? 'Buenos Aires' : 'Santa Fe'}`;
-            mostrarAlertaCP(message, 'success', 'bi-check-circle-fill');
-            renderCalendar(); // Renderizar el calendario después de actualizar el día predeterminado
-        }).catch(error => {
-            console.error(`Error al modificar el día predeterminado para ${location}: `, error);
-            mostrarAlertaCP(`Error al modificar el día predeterminado para ${location}`, 'danger', 'bi-exclamation-circle-fill');
+        database.ref(ref).once('value').then(snapshot => {
+            const previousDay = snapshot.exists() ? snapshot.val() : 'Sin día predeterminado';
+            if (day === previousDay) {
+                mostrarLogisticaAlert("No se detectó cambio de días", 'AlertCalendario2');
+                return;
+            }
+
+            database.ref(ref).set(day).then(() => {
+                const message = `Día de entrega en Logistica ${location === 'BsAs' ? 'Buenos Aires' : 'Santa Fe'} cambiado de ${previousDay} a ${day}`;
+                mostrarLogisticaAlert(message, 'info');
+                renderCalendar(); // Renderizar el calendario después de actualizar el día predeterminado
+            }).catch(error => {
+                console.error(`Error al modificar el día predeterminado para ${location}: `, error);
+                mostrarLogisticaAlert(`Error al modificar el día predeterminado para ${location}`, 'danger');
+            });
         });
     }
 
@@ -252,6 +262,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedDay = this.value;
         updateDefaultDay('StaFe', selectedDay);
     });
+
+    function mostrarLogisticaAlert(mensaje, tipo) {
+        logisticaAlertContainer.innerHTML = `<div class="AlertCalendario" role="alert"><i class="bi bi-arrow-left-right"></i> ${mensaje}</div>`;
+        logisticaAlertContainer.style.display = 'block';
+        setTimeout(() => {
+            logisticaAlertContainer.style.display = 'none';
+        }, 3000);
+    }
 
     function renderCalendar() {
         calendar.innerHTML = '';
@@ -338,8 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
     renderCalendar();
 });
 </script>
-<!-- FIN MODAL CALENDARIO -->
-                 
+<!-- FIN MODAL CALENDARIO -->                
             </div>
         </div>
     </div>

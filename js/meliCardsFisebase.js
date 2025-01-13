@@ -68,7 +68,7 @@ function addPostalCode() {
                 mostrarAlertaCP('El código postal ya existe en el listado', 'danger', 'bi-exclamation-circle-fill');
                 newPostalCodeInput.value = ''; // Vaciar el input si hay error
             } else {
-                newRef.set(true).then(() => {
+                newRef.set({ cp: parseInt(newPostalCode) }).then(() => {
                     mostrarAlertaCP('Se ha agregado el código postal al listado', 'success', 'bi-check-circle-fill');
                     loadPostalCodes(currentLogRef);
                     newPostalCodeInput.value = ''; // Vaciar el input al agregar con éxito
