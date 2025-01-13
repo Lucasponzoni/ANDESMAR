@@ -1784,12 +1784,17 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 
     function obtenerProximoDia(fecha, dia) {
         const diasDeLaSemana = {
+            'lunes': 1,
             'martes': 2,
-            'jueves': 4
+            'miercoles': 3,
+            'jueves': 4,
+            'viernes': 5,
+            'sabado': 6,
+            'domingo': 0
         };
         const diaActual = fecha.getDay();
         let diasParaSumar = (diasDeLaSemana[dia] - diaActual + 7) % 7;
-        if (diasParaSumar === 0) diasParaSumar = 7; // Si es hoy, sumar 7 días
+        if (diasParaSumar <= 1) diasParaSumar += 7; // Si es mañana, sumar 7 días adicionales
         return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar);
     }
 
@@ -1806,6 +1811,10 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     } else if (logStaFeCps.includes(Number(Cp))) {
         logoSrc = './Img/Camion-Santa-fe-Novogar.png';
     }
+
+    // Obtener los días predeterminados desde Firebase
+    const diaPredeterminadoBsAs = await database.ref('DiaPredeterminadoBsAs').once('value').then(snapshot => snapshot.val());
+    const diaPredeterminadoStaFe = await database.ref('DiaPredeterminadoStaFe').once('value').then(snapshot => snapshot.val());
 
     // Contenido HTML
     let contenido = `
@@ -1920,14 +1929,13 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 
     // Determinar la fecha de vencimiento según el CP
     if (logBsCps.includes(Number(Cp))) {
-        const fechaProximoMartes = obtenerProximoDia(fechaActual, 'martes');
-        const fechaProximoMartesFormateada = `${fechaProximoMartes.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
-        const diaMartes = fechaProximoMartes.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
-        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaMartes}</span></div>`;
+        const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoBsAs);
+        const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
     } else if (logStaFeCps.includes(Number(Cp))) {
-        const fechaProximoJueves = obtenerProximoDia(fechaActual, 'jueves');
-        const diaJueves = fechaProximoJueves.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
-        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaJueves}</span></div>`;
+        const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoStaFe);
+        const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
     } else {
         contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Vencimiento: ${fechaFormateada} al ${fechaVencimientoFormateada}</span></div>`;
     }
