@@ -4402,6 +4402,10 @@ input[disabled] {
 .mc-os-calendar .mc-os-day-blue.past {
     opacity: 0.5;
 }
+.mc-os-calendar .mc-os-day-both {
+    background: linear-gradient(to right, red 50%, orange 50%);
+    color: white;
+}
 .mc-os-btn {
     background-color: #007bff;
     color: white;

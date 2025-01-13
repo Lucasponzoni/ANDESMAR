@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// FIN QQUERY DE DATOS
+// FIN QUERYDE DATOS
 
 // Inicializa el segundo proyecto
 const app2 = firebase.initializeApp(firebaseConfig2, "app2");

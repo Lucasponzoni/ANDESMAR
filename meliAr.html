@@ -159,8 +159,9 @@
             <div class="modal-body mc-os-modal-body">
                 <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-red"></span> Dia predeterminado para logistica Buenos Aires</p>
                 <select id="logistica-bsas" class="form-control mc-os-select">
+                    <option value="">Sin día predeterminado</option>
                     <option value="lunes">Lunes</option>
-                    <option selected value="martes">Martes</option>
+                    <option value="martes">Martes</option>
                     <option value="miercoles">Miércoles</option>
                     <option value="jueves">Jueves</option>
                     <option value="viernes">Viernes</option>
@@ -169,10 +170,11 @@
                 </select>
                 <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-blue"></span> Dia predeterminado para logistica Santa Fe</p>
                 <select id="logistica-santafe" class="form-control mc-os-select">
+                    <option value="">Sin día predeterminado</option>
                     <option value="lunes">Lunes</option>
                     <option value="martes">Martes</option>
                     <option value="miercoles">Miércoles</option>
-                    <option selected value="jueves">Jueves</option>
+                    <option value="jueves">Jueves</option>
                     <option value="viernes">Viernes</option>
                     <option value="sabado">Sábado</option>
                     <option value="domingo">Domingo</option>
@@ -204,6 +206,52 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentMonthLabel = document.getElementById('current-month');
 
     let currentDate = new Date();
+
+    $('#logisticaModal').on('show.bs.modal', function () {
+        loadDefaultDays();
+    });
+
+    function loadDefaultDays() {
+        database.ref('DiaPredeterminadoBsAs').once('value').then(snapshot => {
+            if (snapshot.exists()) {
+                logisticaBsAsSelect.value = snapshot.val();
+            } else {
+                logisticaBsAsSelect.value = '';
+            }
+            renderCalendar(); // Renderizar el calendario después de cargar el día predeterminado
+        });
+
+        database.ref('DiaPredeterminadoStaFe').once('value').then(snapshot => {
+            if (snapshot.exists()) {
+                logisticaSantaFeSelect.value = snapshot.val();
+            } else {
+                logisticaSantaFeSelect.value = '';
+            }
+            renderCalendar(); // Renderizar el calendario después de cargar el día predeterminado
+        });
+    }
+
+    function updateDefaultDay(location, day) {
+        const ref = location === 'BsAs' ? 'DiaPredeterminadoBsAs' : 'DiaPredeterminadoStaFe';
+        database.ref(ref).set(day).then(() => {
+            const message = `Se ha modificado el día predeterminado para ${location === 'BsAs' ? 'Buenos Aires' : 'Santa Fe'}`;
+            mostrarAlertaCP(message, 'success', 'bi-check-circle-fill');
+            renderCalendar(); // Renderizar el calendario después de actualizar el día predeterminado
+        }).catch(error => {
+            console.error(`Error al modificar el día predeterminado para ${location}: `, error);
+            mostrarAlertaCP(`Error al modificar el día predeterminado para ${location}`, 'danger', 'bi-exclamation-circle-fill');
+        });
+    }
+
+    logisticaBsAsSelect.addEventListener('change', function () {
+        const selectedDay = this.value;
+        updateDefaultDay('BsAs', selectedDay);
+    });
+
+    logisticaSantaFeSelect.addEventListener('change', function () {
+        const selectedDay = this.value;
+        updateDefaultDay('StaFe', selectedDay);
+    });
 
     function renderCalendar() {
         calendar.innerHTML = '';
@@ -250,11 +298,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const dayNumber = parseInt(day.textContent);
             if (!isNaN(dayNumber)) {
                 const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNumber);
-                if (dayDate.getDay() === getDayNumber(bsAsDay)) {
-                    day.classList.add('mc-os-day-red');
-                }
-                if (dayDate.getDay() === getDayNumber(santaFeDay)) {
-                    day.classList.add('mc-os-day-blue');
+                const dayOfWeek = dayDate.getDay();
+                if (dayOfWeek === getDayNumber(bsAsDay) && dayOfWeek === getDayNumber(santaFeDay)) {
+                    day.classList.add('mc-os-day-both');
+                } else {
+                    if (dayOfWeek === getDayNumber(bsAsDay)) {
+                        day.classList.add('mc-os-day-red');
+                    }
+                    if (dayOfWeek === getDayNumber(santaFeDay)) {
+                        day.classList.add('mc-os-day-blue');
+                    }
                 }
             }
         });
@@ -272,9 +325,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    logisticaBsAsSelect.addEventListener('change', renderCalendar);
-    logisticaSantaFeSelect.addEventListener('change', renderCalendar);
-
     prevMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
         renderCalendar();
@@ -289,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <!-- FIN MODAL CALENDARIO -->
-                
+                 
             </div>
         </div>
     </div>
