@@ -122,6 +122,7 @@ function mostrarAlertaCP(mensaje, tipo, icono) {
 
 let logBsCps = []; // Array para almacenar los CPs de LogBsAs
 let logStaFeCps = []; // Array para almacenar los CPs de LogSantaFe
+let logRafaelaCps = []; // Array para almacenar los CPs de LogRafaela
 
 // Función para cargar los CPs de LogBsAs
 function cargarCpsLogBsAs() {
@@ -143,8 +144,18 @@ function cargarCpsLogStaFe() {
     });
 }
 
+// Función para cargar los CPs de LogRafaela
+function cargarCpsLogRafaela() {
+    return database.ref('LogRafaela').once('value').then(snapshot => {
+        const logRafaelaData = snapshot.val();
+        if (logRafaelaData) {
+            logRafaelaCps = Object.keys(logRafaelaData).map(cp => Number(cp));
+        }
+    });
+}
+
 // Llamar a las funciones para cargar los CPs antes de cargar los datos
-Promise.all([cargarCpsLogBsAs(), cargarCpsLogStaFe()]).then(() => {
+Promise.all([cargarCpsLogBsAs(), cargarCpsLogStaFe(), cargarCpsLogRafaela()]).then(() => {
     cargarDatos(); 
 });
 
@@ -479,21 +490,20 @@ function crearCard(data) {
                 <div class="meli-box1"> 
                     <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> ${data.Cp}, ${data.localidad}, ${data.Provincia}</p>
 
-                    
-                    <p class="card-text correo-meli ${logBsCps.includes(Number(data.Cp)) ? 'correo-novogar' : (logStaFeCps.includes(Number(data.Cp)) ? 'correo-santafe' : (cpsAndesmar.includes(Number(data.Cp)) ? 'correo-andesmar' : 'correo-andreani'))}">
-                             ${logBsCps.includes(Number(data.Cp)) ? 
+                    <p class="card-text correo-meli ${logBsCps.includes(Number(data.Cp)) ? 'correo-novogar' : (logStaFeCps.includes(Number(data.Cp)) ? 'correo-santafe' : (logRafaelaCps.includes(Number(data.Cp)) ? 'correo-rafaela' : (cpsAndesmar.includes(Number(data.Cp)) ? 'correo-andesmar' : 'correo-andreani')))}">
+                        ${logBsCps.includes(Number(data.Cp)) ? 
                             '<img src="Img/novogar-tini.png" alt="Logística Novogar" width="20" height="20">Buenos Aires' : 
                             (logStaFeCps.includes(Number(data.Cp)) ? 
                             '<img src="Img/novogar-tini.png" alt="Logística Santa Fe" width="20" height="20">Santa Fe' : 
+                            (logRafaelaCps.includes(Number(data.Cp)) ? 
+                            '<img src="Img/novogar-tini.png" alt="Logística Rafaela" width="20" height="20">Rafaela' : 
                             (cpsAndesmar.includes(Number(data.Cp)) ? 
                             '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
                             '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">' 
                             )
                         )
-                        }
+                    )}
                     </p>
-
-
 
                     </div>
 
@@ -596,7 +606,7 @@ function crearCard(data) {
                 <!-- Botón Andesmar --> 
                 <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} btnAndesmarMeli" 
                 id="andesmarButton${data.idOperacion}" 
-                ${isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
+                ${isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
                 ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}')`}">
                 <span id="andesmarText${data.idOperacion}">
@@ -609,7 +619,7 @@ function crearCard(data) {
                 <!-- Botón Andreani -->
                 <button class="btn ${isAndreani ? 'btn-success' : 'btn-danger'} btnAndreaniMeli" 
                 id="andreaniButton${data.idOperacion}" 
-                ${isAndesmar || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
+                ${isAndesmar || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
                 onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')`}">
                 <span id="andreaniText${data.idOperacion}">
@@ -618,7 +628,7 @@ function crearCard(data) {
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.idOperacion}" style="display:none;"></span>
                 </button>
                 <!-- Botón Andreani -->
-
+                
                 <!-- Botón Logística Propia --> 
                 <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
                 id="LogPropiaMeliButton${data.idOperacion}" 
@@ -630,13 +640,13 @@ function crearCard(data) {
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data.idOperacion}" style="display:none;"></span>
                 </button>
                 <!-- Botón Logística Propia --> 
-
                 
-                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) ? 'background-color: #d0ffd1;' : ''}">
+                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) ? 'background-color: #d0ffd1;' : ''}">
                     ${isBlocked ? '<i class="bi bi-info-square-fill"></i> Despacho Bloqueado por Facturación, separar remito para realizar circuito' : ''}
                     ${logBsCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Buenos Aires, se ha bloqueado el despacho por logistica privada.' : ''}
                     ${logStaFeCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Santa Fe, se ha bloqueado el despacho por logistica privada.' : ''}
-                    ${(logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp))) ? `<button class="btn btn-sm btn-warning mt-2" id="unlockLogisticsButton${data.idOperacion}" onclick="desbloquearLogisticas('${data.idOperacion}')"><i class="bi bi-unlock-fill"></i> Desbloquear Logisticas</button>` : ''}
+                    ${logRafaelaCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Rafaela, se ha bloqueado el despacho por logistica privada.' : ''}
+                    ${(logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp))) ? `<button class="btn btn-sm btn-warning mt-2" id="unlockLogisticsButton${data.idOperacion}" onclick="desbloquearLogisticas('${data.idOperacion}')"><i class="bi bi-unlock-fill"></i> Desbloquear Logisticas</button>` : ''}
                 </div>
 
                             
@@ -1826,12 +1836,15 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         logoSrc = './Img/Camion-BsAs-Novogar.png';
     } else if (logStaFeCps.includes(Number(Cp))) {
         logoSrc = './Img/Camion-Santa-fe-Novogar.png';
+    } else if (logRafaelaCps.includes(Number(Cp))) {
+        logoSrc = './Img/Camion-Rafaela-Novogar.png';
     }
 
     // Obtener los días predeterminados desde Firebase
     const diaPredeterminadoBsAs = await database.ref('DiaPredeterminadoBsAs').once('value').then(snapshot => snapshot.val());
     const diaPredeterminadoStaFe = await database.ref('DiaPredeterminadoStaFe').once('value').then(snapshot => snapshot.val());
-
+    const diaPredeterminadoRafaela = await database.ref('DiaPredeterminadoRafaela').once('value').then(snapshot => snapshot.val());
+    
     // Contenido HTML
     let contenido = `
     <html lang="es">
@@ -1936,7 +1949,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             </div>
             <div class="campo">
                 <i class="bi bi-compass"></i>
-                <span>Dirección: ${calleDestinatario} ${alturaDestinatario}</span>
+                <span>${calleDestinatario} ${alturaDestinatario}</span>
             </div>
             <div class="campo">
                 <i class="bi bi-telephone-outbound-fill"></i>
@@ -1950,6 +1963,10 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
     } else if (logStaFeCps.includes(Number(Cp))) {
         const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoStaFe);
+        const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
+    } else if (logRafaelaCps.includes(Number(Cp))) {
+        const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoRafaela);
         const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
         contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
     } else {
@@ -1986,8 +2003,6 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         doc.addImage(imgData, 'PNG', 0, 0, 10, 15);
         const pdfBlob = doc.output('blob');
 
-
-
         const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
         NroEnvio.innerHTML = `Logistica Propia`;
 
@@ -2022,9 +2037,24 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             Equipo Posventa Novogar
             
             ENVIO CON LOGISTICA SANTA FE`;
+        } else if (logRafaelaCps.includes(Number(Cp))) {
+            const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoStaFe);
+            const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
             
-        } else {
-            // Mensaje anterior o el que deseas usar para otras zonas
+            trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
+        
+            Queremos informarte que vamos a visitarte el ${diaFormateado}.
+        
+            Te contamos que nuestro equipo de logística comienza el reparto desde Rosario, así que el recorrido es largo y necesitamos que la entrega sea exitosa para brindarte la mejor experiencia de compra.
+                
+            Cualquier consulta, estamos a tu servicio. ¡Gracias!
+            
+            Equipo Posventa Novogar
+            
+            ENVIO CON LOGISTICA RAFAELA`;
+            
+        }else {
+            // Mensaje para otras zonas
             trackingMessage = `¡Hola, ${NombreyApellido}! 
         
             ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
@@ -2033,8 +2063,6 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             .Rosario: Entregas en 48 horas.
             .Villa Gobernador Gálvez, Arroyo Seco, San Lorenzo, Baigorria, Capitán Bermúdez: Lunes, miércoles y viernes.
             .Funes, Roldán y Pérez: Sábados.
-            .Rafaela: Jueves.
-            .Santa Fe Capital: Jueves o viernes.
         
             Si tienes alguna duda, no dudes en consultarnos por WhatsApp al 341 2010598.
         
