@@ -208,6 +208,7 @@ searchInput.disabled = true;
 
         // Renderizar la primera página de datos
         renderCards(allData);
+
         // Actualizar la paginación
         updatePagination(allData.length);
         
@@ -341,6 +342,12 @@ function formatearTiempoPromedio(totalMs, count) {
 }
 
 function renderCards(data) {
+    // Ordenar los datos por fecha de manera descendente
+    data.sort((a, b) => {
+        const dateA = new Date(a.fechaHora.split(',')[0].split('/').reverse().join('-') + 'T' + a.fechaHora.split(',')[1].trim());
+        const dateB = new Date(b.fechaHora.split(',')[0].split('/').reverse().join('-') + 'T' + b.fechaHora.split(',')[1].trim());
+        return dateB - dateA;
+    });
 
     const tableBody = document.querySelector('#data-table tbody');
     tableBody.innerHTML = '';
@@ -353,9 +360,11 @@ function renderCards(data) {
     for (let i = startIndex; i < endIndex; i++) {
         const item = data[i];
         const estadoClass = item.estado === "Pendiente de despacho" ? "pendiente-despacho" : 
-                            item.estado === "Despachado" ? "estado-despachado" : "";
+                            item.estado === "Despachado" ? "estado-despachado" : 
+                            item.estado.startsWith("Se entrega el día") ? "estado-entrega2" : "";
         const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning icon-state-ios"></i>' : 
-                          item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success icon-state-ios"></i>' : '';
+                          item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success icon-state-ios"></i>' : 
+                          item.estado.startsWith("Se entrega el día") ? '<i class="bi bi-box-seam-fill"></i>' : '';
 
         const remito = item.remito ? item.remito : item.remitoVBA;
         const formattedDateTime = formatDateTime(item.fechaHora);
@@ -402,16 +411,18 @@ function renderCards(data) {
         const entregaEntreIcon = item.estado.startsWith("(se entrega entre") ? '<i class="bi bi-check-circle-fill icon-state-ios"></i>' : '';
 
         const comentarioClase = item.comentario ? 'btn-success' : 'btn-secondary';
-const row = `<tr>
-    <td>${formattedDateTime}</td>
-    <td class="${estadoClass} ${entregaEntreClass}">${alertIcon} ${entregaEntreIcon} ${item.estado} ${tiempoTexto}</td>
-    <td>${item.cliente}</td>
-    <td class="remito-columna">${remito}</td>
-    <td class="valor-columna">${item.valorDeclarado}</td>
-    <td>${operadorLogistico}</td>
-    <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
-    <td><button class="btn ${comentarioClase} btn-sm" onclick="abrirModalComentario('${remito}')"><i class="bi bi-pencil-fill"></i></button></td> <!-- Botón de comentario -->
-</tr>`;
+        const subdatoTexto = item.subdato ? 
+        `<br><span class="${item.subdato.startsWith('Pendiente de confirmar') ? 'subdato-texto1' : 'subdato-texto2'}">${item.subdato}</span>` : '';
+        const row = `<tr>
+            <td>${formattedDateTime}</td>
+            <td class="${estadoClass} ${entregaEntreClass}">${alertIcon} ${entregaEntreIcon} ${item.estado} ${subdatoTexto} ${tiempoTexto}</td>
+            <td>${item.cliente}</td>
+            <td class="remito-columna">${remito}</td>
+            <td class="valor-columna">${item.valorDeclarado}</td>
+            <td>${operadorLogistico}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
+            <td><button class="btn ${comentarioClase} btn-sm" onclick="abrirModalComentario('${remito}')"><i class="bi bi-pencil-fill"></i></button></td> <!-- Botón de comentario -->
+        </tr>`;
 
         tableBody.insertAdjacentHTML('beforeend', row);
     }
@@ -880,7 +891,14 @@ let diaPredeterminado = {
 };
 
 $('#bsarStaFeModal').on('shown.bs.modal', function () {
-    $('#remitoLogisticaBsArStaFe').focus();
+    const remitoInput = $('#remitoLogisticaBsArStaFe');
+    remitoInput.prop('disabled', true);
+    remitoInput.val('Seleccione Logistica para desbloquear');
+    remitoInput.focus();
+});
+
+$('#bsarStaFeModal').on('hidden.bs.modal', function () {
+    location.reload();
 });
 
 function cargarDiaPredeterminado(logistica) {
@@ -889,6 +907,10 @@ function cargarDiaPredeterminado(logistica) {
         diaPredeterminado[logistica] = snapshot.val();
         actualizarBotones(logistica);
         mostrarDiaEntrega(logistica);
+        const remitoInput = $('#remitoLogisticaBsArStaFe');
+        remitoInput.prop('disabled', false);
+        remitoInput.val('');
+        remitoInput.focus();
     });
 }
 
@@ -904,10 +926,13 @@ function actualizarBotones(logistica) {
         if (key === logistica) {
             buttonElement.classList.add('btn-primary');
             buttonElement.classList.remove('btn-outline-primary');
+            buttonElement.style.color = 'white';
             buttonElement.innerHTML = `<i class="bi bi-lightning-charge-fill"></i> ${key}`;
         } else {
             buttonElement.classList.add('btn-outline-primary');
             buttonElement.classList.remove('btn-primary');
+            buttonElement.style.color = 'green';
+            buttonElement.style.borderColor = 'green';
             buttonElement.innerHTML = `<i class="bi bi-arrow-repeat"></i> Cambiar a ${key}`;
         }
     });
@@ -952,9 +977,20 @@ function confirmarLogistica() {
         return;
     }
 
+    if (!/^(230|231|232|233|234|235|236|237|238|239)\d{8}$/.test(remito)) {
+        Swal.fire('Error', 'El valor ingresado no corresponde a un remito válido.', 'error');
+        return;
+    }
+
     db.ref('DespachosLogisticos').orderByKey().equalTo(remito).once('value').then(snapshot => {
         if (snapshot.exists()) {
             snapshot.forEach(childSnapshot => {
+                if (childSnapshot.val().subdato) {
+                    Swal.fire('Error', 'El Remito ya fue escaneado anteriormente.', 'error');
+                    $('#remitoLogisticaBsArStaFe').val('');
+                    return;
+                }
+
                 const fechaActual = new Date();
                 const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminado[logisticaSeleccionada]);
                 const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
@@ -974,8 +1010,8 @@ function confirmarLogistica() {
                                         <td>${childSnapshot.val().fechaHora}</td>
                                         <td>${estado}</td>
                                         <td>${childSnapshot.val().cliente}</td>
-                                        <td>${remito}</td>
-                                        <td>${childSnapshot.val().valorDeclarado}</td>
+                                        <td class="remito-columna">${remito}</td>
+                                        <td class="valor-columna">${childSnapshot.val().valorDeclarado}</td>
                                         <td>${operadorLogistico}</td>
                                         <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
                                     </tr>`;
@@ -999,6 +1035,24 @@ function confirmarLogistica() {
         mostrarAlerta('Error al buscar el remito: ' + error.message, 'error');
     });
 }
+
+document.getElementById('remitoLogisticaBsArStaFe').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        e.preventDefault(); // Evitar que la página se recargue
+        confirmarLogistica();
+    }
+});
+
+// Estilos para los botones
+const style = document.createElement('style');
+style.innerHTML = `
+    .btn-outline-primary:hover {
+        color: white !important;
+        background-color: green !important;
+        border-color: green !important;
+    }
+`;
+document.head.appendChild(style);
 
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;

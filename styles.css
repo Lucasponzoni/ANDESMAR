@@ -3269,6 +3269,25 @@ div .form-check {
     background-color: rgba(172, 255, 47, 0.255);
 }
 
+.estado-entrega2 {
+    color: green !important;
+    font-weight: bold !important;
+    background-color: rgba(172, 255, 47, 0.255);
+}
+
+.estado-entrega2 > i {
+    font-size: 1.1rem;
+}
+
+.subdato-texto1{
+    background-color: orange;
+    color: white;
+    padding: 3px;
+    border-radius: 5px;
+    font-size: .8rem;
+    font-weight: 600;
+}
+
 .valor-columna {
     color: green !important;
     font-weight: bold; 
