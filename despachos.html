@@ -216,6 +216,7 @@
                             </button>
                         </div>
                     </div>
+                    
                     <div id="diaEntregaAlert" class="Alert33 text-center" style="display: none;">
                         <i class="bi bi-info-circle-fill"></i> <span id="diaEntregaText"></span>
                     </div>
@@ -228,15 +229,24 @@
                             <i class="bi bi-exclamation-triangle-fill"></i> Escaneo de remitos con reparto Buenos Aires, Santa Fe o Rafaela
                         </div>
                     </form>
+
+                    <hr class="my-2">
+                    <p class="mt-2 mb-1 text-center"><strong><i class="bi bi-info-circle-fill"></i> Sale en el camión de mañana</strong></p>
+                    <div class="form-check form-switch apple-switch">
+                        <input class="form-check-input" type="checkbox" id="camionCheckbox" checked>
+                    </div>
+
                 </div>
+
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                     <button type="button" class="btn btn-info" id="confirmLogisticaBsArStaFeBtn" onclick="confirmarLogistica()">Confirmar</button>
                 </div>
             </div>
         </div>
-    </div>  
-<!-- Fin Modal para Logística BsAr-StaFe -->  
+    </div>
+    <!-- Fin Modal para Logística BsAr-StaFe --> 
 
 <!-- Modal para Logística Propia -->
 <div class="modal fade" id="logisticaModal" tabindex="-1" aria-labelledby="logisticaModalLabel" aria-hidden="true">

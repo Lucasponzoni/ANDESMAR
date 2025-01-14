@@ -966,12 +966,14 @@ function obtenerProximoDia(fecha, dia) {
     };
     const diaActual = fecha.getDay();
     let diasParaSumar = (diasDeLaSemana[dia] - diaActual + 7) % 7;
-    if (diasParaSumar <= 1) diasParaSumar += 7; // Si es mañana, sumar 7 días adicionales
+    if (diasParaSumar === 0) diasParaSumar = 7; // Si es hoy, sumar 7 días adicionales
     return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar);
 }
 
 function confirmarLogistica() {
     const remito = document.getElementById('remitoLogisticaBsArStaFe').value.trim();
+    const camionCheckbox = document.getElementById('camionCheckbox').checked;
+
     if (!remito) {
         alert('Ingrese el número de remito');
         return;
@@ -998,7 +1000,28 @@ function confirmarLogistica() {
                 }
 
                 const fechaActual = new Date();
-                const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminado[logisticaSeleccionada]);
+                let fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminado[logisticaSeleccionada]);
+
+                // Verificar si el checkbox está desmarcado y si solo falta un día para la fecha de entrega
+                if (!camionCheckbox) {
+                    const diasDeLaSemana = {
+                        'lunes': 1,
+                        'martes': 2,
+                        'miercoles': 3,
+                        'jueves': 4,
+                        'viernes': 5,
+                        'sabado': 6,
+                        'domingo': 0
+                    };
+                    const diaActual = fechaActual.getDay();
+                    const diaEntrega = diasDeLaSemana[diaPredeterminado[logisticaSeleccionada].toLowerCase()];
+                    const diasParaEntrega = (diaEntrega - diaActual + 7) % 7;
+
+                    if (diasParaEntrega <= 1) {
+                        fechaProximoDia = new Date(fechaProximoDia.getFullYear(), fechaProximoDia.getMonth(), fechaProximoDia.getDate() + 7);
+                    }
+                }
+
                 const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
 
                 const estado = `Se entrega el día ${diaFormateado}`;
