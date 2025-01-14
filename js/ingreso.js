@@ -386,25 +386,31 @@ function renderCards(data) {
                     const numeroDeEnvio = item.numeroDeEnvio;
                     let link, imgSrc;
         
-                    // Verificar el formato del número de envío
-                    if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
-                        (numeroDeEnvio.length === 15 && (numeroDeEnvio.startsWith('36') || numeroDeEnvio.startsWith('40')))) {
-                        link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
-                        imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
-                        operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
-                    } else {
-                        link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=remito`;
-                        imgSrc = './Img/andesmar-mini.png'; // Ruta de la imagen
-                        operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
-                    }
-                } else {
-                    // Si el operador logístico es "Logística Novogar"
-                    if (item.operadorLogistico === "Logística Novogar") {
-                        operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><i class="bi bi-pin-map-fill"></i> Novogar</button>`;
-                    } else {
-                        operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
-                    }
-                }
+            // Verificar el formato del número de envío
+            if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
+                (numeroDeEnvio.length === 15 && (numeroDeEnvio.startsWith('36') || numeroDeEnvio.startsWith('40')))) {
+                link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
+                imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
+            } else {
+                link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=remito`;
+                imgSrc = './Img/andesmar-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
+            }
+        } else {
+            // Si el operador logístico es "Logística Novogar"
+            if (item.operadorLogistico === "Logística Novogar") {
+                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
+            } else if (item.operadorLogistico === "Logística Novogar StaFe") {
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
+            } else if (item.operadorLogistico === "Logística Novogar Rafaela") {
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
+            } else if (item.operadorLogistico === "Logística Novogar BsAs") {
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
+            } else {
+                operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
+            }
+        }
 
         // Agregar estilo e ícono si el estado inicia con "(se entrega entre"
         const entregaEntreClass = item.estado.startsWith("(se entrega entre") ? "estado-entrega" : "";

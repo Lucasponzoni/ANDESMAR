@@ -167,6 +167,13 @@ h1 {
     width: 20px;
 }
 
+.NovogarMeli2 {
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    filter: invert(1);
+}
+
 form {
     max-width: 600px;
     margin: 20px auto;
@@ -3333,6 +3340,9 @@ div .form-check {
 }
 
 #promedioBtn {
+    right: 65px;
+    bottom: 20px;
+    position: fixed;
     background-color: #f9f9f9;
     color: #2c3e50; 
     border: 1px solid #bdc3c7; 
@@ -3368,6 +3378,12 @@ div .form-check {
 .btn-novogar {
     background: linear-gradient(135deg, #717171, #323232); 
     color: white; 
+}
+
+.btn-novogar2 {
+    background: linear-gradient(360deg, #ff8000, #ffb936); /* Tono amarillito ocaco */
+    color: black; 
+    font-weight: 400;
 }
 
 .btn-ios:hover {
