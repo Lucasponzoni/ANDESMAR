@@ -3411,7 +3411,6 @@ div .form-check {
     height: auto; 
     display: block; 
 }
-
 /* FIN TRANSPORTE EN TABLAS */
 
 #porcentajes {
@@ -3820,15 +3819,15 @@ div .form-check {
 
 #statusCard {
     border: solid 1px cornflowerblue;
-    background-color: rgba(255, 255, 255, 0.851); /* Fondo blanco con transparencia */
-    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    background-color: rgba(255, 255, 255, 0.851);
+    backdrop-filter: blur(10px); 
     position: fixed;
     bottom: 20px;
     left: 20px;
     z-index: 1050;
     display: none;
-    border-radius: 15px; /* Bordes redondeados */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); 
 }
 
 #statusCard2 {
