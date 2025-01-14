@@ -3,6 +3,46 @@ const apiUrlLabel = 'https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-
 const username = 'novogar_gla';
 const password = 'JoBOraCDJZC';
 
+async function obtenerTokenAndreaniV2() {
+        try {
+            const response = await fetch(apiUrlLogin, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Basic ${btoa(`${username}:${password}`)}`
+                }
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Token de autenticación:', data.token);
+    
+                // Copiar el token al portapapeles
+                navigator.clipboard.writeText(data.token);
+    
+                // Cambiar el estado del botón
+                const tokenButton = document.getElementById('tokenButton');
+                tokenButton.classList.remove('btn-warning');
+                tokenButton.classList.add('btn-success');
+                tokenButton.disabled = true;
+                tokenButton.innerHTML = '<i class="bi bi-clipboard-check"></i> Se ha copiado el token al portapapeles';
+    
+                // Restaurar el estado original del botón después de 5 segundos
+                setTimeout(() => {
+                    tokenButton.classList.remove('btn-success');
+                    tokenButton.classList.add('btn-warning');
+                    tokenButton.disabled = false;
+                    tokenButton.innerHTML = '<i class="bi bi-key"></i> Obtener token Andreani';
+                }, 5000);
+    
+                return data.token;
+            } else {
+                throw new Error('No se pudo obtener el token');
+            }
+        } catch (error) {
+            console.error('Error al obtener el token de autenticación:', error);
+        }
+    }
+
 function validarFormulario() {
     const camposRequeridos = [
         "calleRemitente",

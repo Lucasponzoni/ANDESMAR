@@ -73,7 +73,6 @@ function formatearValor(valor) {
 // Manejar el evento 'keypress' para el escáner
 document.getElementById('ingresoForm').addEventListener('keypress', function (event) {
 
-
     if (event.key === 'Enter') {
         event.preventDefault(); // Evitar el comportamiento por defecto
 
@@ -140,13 +139,12 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
             // Push a Firebase solo si todos los campos están llenos
             if (valorDeclaradoValue) {
                 const fechaHoraFormateada = formatearFechaHora(fechaHora); // Formatear a 24 horas
-                firebase.database().ref('DespachosLogisticos').push({
+                firebase.database().ref(`DespachosLogisticos/${remitoValue}`).set({
                     cliente: clienteValue,
                     estado: "Pendiente de despacho",
                     fechaHora: fechaHoraFormateada,
                     operadorLogistico: "Pendiente",
                     remito: remitoValue,
-                    remitoVBA: remitoValue,
                     valorDeclarado: formatearValor(valorDeclaradoValue) // Formatear el valor antes de guardar
                 })
                 .then(() => {

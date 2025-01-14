@@ -319,7 +319,7 @@
         </select>
 
 <!-- Botón principal para generar ambas etiquetas -->
-<button type="button" class="btn btn-warning mb-2" onclick="enviarSolicitud(); enviarSolicitudAndreani();">
+<button type="button" class="btn btn-success" onclick="enviarSolicitud(); enviarSolicitudAndreani();">
     <i class="bi bi-printer"></i> Generar Etiquetas
 </button>
 
@@ -330,11 +330,16 @@
 
 <!-- Contenedor colapsable con los dos botones ocultos -->
 <div class="collapse mt-2" id="etiquetasCollapse">
-    <button type="button" class="btn btn-primary mt-2" onclick="enviarSolicitud()">
+    <button type="button" class="btn btn-primary mt-2 mb-1" onclick="enviarSolicitud()">
         <i class="bi bi-file-earmark-text"></i> Generar Etiqueta Andesmar
     </button>
-    <button type="button" class="btn btn-danger mt-2" onclick="enviarSolicitudAndreani()">
+    <button type="button" class="btn btn-danger mt-2 mb-1" onclick="enviarSolicitudAndreani()">
         <i class="bi bi-file-earmark-text"></i> Generar Etiqueta Andreani
+    </button>
+    <hr class="my-2">
+    <p class="mt-2 mb-1"><strong>Opciones para desarrollador</strong></p>
+    <button type="button" class="btn btn-warning mt-2 mb-1" id="tokenButton" onclick="obtenerTokenAndreaniV2()">
+        <i class="bi bi-key"></i> Obtener token Andreani
     </button>
 </div>
 
