@@ -1981,30 +1981,32 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             
             trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
         
-            Queremos informarte que vamos a visitarte el ${diaFormateado} entre las 8 y las 16 hs.
-        
-            Te contamos que nuestro equipo de logística comienza el reparto desde Rosario, así que el recorrido es largo y necesitamos que la entrega sea exitosa para brindarte la mejor experiencia de compra.
-        
+            Queremos informarte que vamos a visitarte el ${diaFormateado}.
+                
             Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
         
-            Cualquier duda, estamos a tu servicio. ¡Gracias!
+            Cualquier consulta, estamos a tu servicio. ¡Gracias!
             
-            Equipo Posventa Novogar`;
+            Equipo Posventa Novogar
+            
+            ENVIO CON LOGISTICA BUENOS AIRES`;
+
         } else if (logStaFeCps.includes(Number(Cp))) {
             const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoStaFe);
             const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
             
             trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
         
-            Queremos informarte que vamos a visitarte el ${diaFormateado} entre las 8 y las 16 hs.
+            Queremos informarte que vamos a visitarte el ${diaFormateado}.
         
             Te contamos que nuestro equipo de logística comienza el reparto desde Rosario, así que el recorrido es largo y necesitamos que la entrega sea exitosa para brindarte la mejor experiencia de compra.
-        
-            Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
-        
-            Cualquier duda, estamos a tu servicio. ¡Gracias!
+                
+            Cualquier consulta, estamos a tu servicio. ¡Gracias!
             
-            Equipo Posventa Novogar`;
+            Equipo Posventa Novogar
+            
+            ENVIO CON LOGISTICA SANTA FE`;
+            
         } else {
             // Mensaje anterior o el que deseas usar para otras zonas
             trackingMessage = `¡Hola, ${NombreyApellido}! 
