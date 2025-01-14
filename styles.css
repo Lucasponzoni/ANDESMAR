@@ -3358,6 +3358,20 @@ div .form-check {
     width: 120px;
 }
 
+.btn-mc-os-Check{
+    margin-bottom: -12px;
+    background-color: white;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
 .btn-ios {
     display: inline-block;
     border-radius: 5px; 
