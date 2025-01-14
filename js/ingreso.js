@@ -145,6 +145,7 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
                     fechaHora: fechaHoraFormateada,
                     operadorLogistico: "Pendiente",
                     remito: remitoValue,
+                    remitoVBA: remitoValue,
                     valorDeclarado: formatearValor(valorDeclaradoValue) // Formatear el valor antes de guardar
                 })
                 .then(() => {
@@ -870,6 +871,134 @@ document.addEventListener("DOMContentLoaded", function() {
         statusCard.style.display = 'none';
     };
 });
+
+// MODAL LOGISTICA BS AS - RAFAELA - SANTA FE
+let diaPredeterminado = {
+    BsAs: null,
+    StaFe: null,
+    Rafaela: null
+};
+
+$('#bsarStaFeModal').on('shown.bs.modal', function () {
+    $('#remitoLogisticaBsArStaFe').focus();
+});
+
+function cargarDiaPredeterminado(logistica) {
+    const ref = logistica === 'BsAs' ? 'DiaPredeterminadoBsAs' : logistica === 'StaFe' ? 'DiaPredeterminadoStaFe' : 'DiaPredeterminadoRafaela';
+    db.ref(ref).once('value').then(snapshot => {
+        diaPredeterminado[logistica] = snapshot.val();
+        actualizarBotones(logistica);
+        mostrarDiaEntrega(logistica);
+    });
+}
+
+function actualizarBotones(logistica) {
+    const botones = {
+        BsAs: 'logisticaBsAsButton',
+        StaFe: 'logisticaSantaFeButton',
+        Rafaela: 'logisticaRafaelaButton'
+    };
+
+    Object.keys(botones).forEach(key => {
+        const buttonElement = document.getElementById(botones[key]);
+        if (key === logistica) {
+            buttonElement.classList.add('btn-primary');
+            buttonElement.classList.remove('btn-outline-primary');
+            buttonElement.innerHTML = `<i class="bi bi-lightning-charge-fill"></i> ${key}`;
+        } else {
+            buttonElement.classList.add('btn-outline-primary');
+            buttonElement.classList.remove('btn-primary');
+            buttonElement.innerHTML = `<i class="bi bi-arrow-repeat"></i> Cambiar a ${key}`;
+        }
+    });
+}
+
+function mostrarDiaEntrega(logistica) {
+    const diaEntregaText = document.getElementById('diaEntregaText');
+    const diaEntregaAlert = document.getElementById('diaEntregaAlert');
+    diaEntregaText.innerHTML = `Día de entrega: ${diaPredeterminado[logistica].toUpperCase()}`;
+    diaEntregaAlert.style.display = 'block';
+    setTimeout(() => {
+        diaEntregaAlert.style.display = 'none';
+    }, 5000);
+}
+
+function obtenerProximoDia(fecha, dia) {
+    const diasDeLaSemana = {
+        'lunes': 1,
+        'martes': 2,
+        'miercoles': 3,
+        'jueves': 4,
+        'viernes': 5,
+        'sabado': 6,
+        'domingo': 0
+    };
+    const diaActual = fecha.getDay();
+    let diasParaSumar = (diasDeLaSemana[dia] - diaActual + 7) % 7;
+    if (diasParaSumar <= 1) diasParaSumar += 7; // Si es mañana, sumar 7 días adicionales
+    return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar);
+}
+
+function confirmarLogistica() {
+    const remito = document.getElementById('remitoLogisticaBsArStaFe').value.trim();
+    if (!remito) {
+        alert('Ingrese el número de remito');
+        return;
+    }
+
+    const logisticaSeleccionada = Object.keys(diaPredeterminado).find(key => diaPredeterminado[key] !== null);
+    if (!logisticaSeleccionada) {
+        alert('Seleccione una logística');
+        return;
+    }
+
+    db.ref('DespachosLogisticos').orderByKey().equalTo(remito).once('value').then(snapshot => {
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const fechaActual = new Date();
+                const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminado[logisticaSeleccionada]);
+                const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+
+                const estado = `Se entrega el día ${diaFormateado}`;
+                const subdato = `Pendiente de confirmar en CAMION ${logisticaSeleccionada.toUpperCase()}`;
+                const operadorLogistico = `Logística Novogar ${logisticaSeleccionada.charAt(0).toUpperCase() + logisticaSeleccionada.slice(1)}`;
+
+                // Actualizar el estado en Firebase
+                childSnapshot.ref.update({
+                    estado,
+                    subdato,
+                    operadorLogistico
+                }).then(() => {
+                    // Agregar el nuevo estado a la tabla
+                    const newRow = `<tr>
+                                        <td>${childSnapshot.val().fechaHora}</td>
+                                        <td>${estado}</td>
+                                        <td>${childSnapshot.val().cliente}</td>
+                                        <td>${remito}</td>
+                                        <td>${childSnapshot.val().valorDeclarado}</td>
+                                        <td>${operadorLogistico}</td>
+                                        <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
+                                    </tr>`;
+                    const tableBody = document.querySelector('#data-table tbody');
+                    tableBody.insertAdjacentHTML('afterbegin', newRow); // Agregar nuevo registro en la parte superior
+
+                    // Mostrar alerta
+                    mostrarAlerta('Estado actualizado a Logística Propia.', 'success');
+
+                    // Limpiar el input y volver a enfocar
+                    $('#remitoLogisticaBsArStaFe').val('');
+                    $('#remitoLogisticaBsArStaFe').focus();
+                }).catch(error => {
+                    mostrarAlerta('Error al actualizar el estado: ' + error.message, 'error');
+                });
+            });
+        } else {
+            mostrarAlerta('Remito no encontrado.', 'error');
+        }
+    }).catch(error => {
+        mostrarAlerta('Error al buscar el remito: ' + error.message, 'error');
+    });
+}
 
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;

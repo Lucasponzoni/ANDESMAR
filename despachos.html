@@ -188,8 +188,55 @@
     <div id="spinner2" class="spinner-container" style="display:none;">
         <div class="spinner"></div>
     </div>
+
+
     
-    
+    <!-- Modal para Logística BsAr-StaFe -->
+    <div class="modal fade" id="bsarStaFeModal" tabindex="-1" aria-labelledby="bsarStaFeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="bsarStaFeModalLabel">Logística Propia BsAr-StaFe</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center mb-3">
+                        <div class="btn-group" role="group" aria-label="Basic outlined example">
+                            <button id="logisticaBsAsButton" class="btn btn-outline-primary" onclick="cargarDiaPredeterminado('BsAs')">
+                                <i class="bi bi-lightning-charge-fill"></i> Buenos Aires
+                            </button>
+                            <button id="logisticaSantaFeButton" class="btn btn-outline-primary" onclick="cargarDiaPredeterminado('StaFe')">
+                                <i class="bi bi-lightning-charge-fill"></i> Santa Fe
+                            </button>
+                            <button id="logisticaRafaelaButton" class="btn btn-outline-primary" onclick="cargarDiaPredeterminado('Rafaela')">
+                                <i class="bi bi-lightning-charge-fill"></i> Rafaela
+                            </button>
+                        </div>
+                    </div>
+                    <div id="diaEntregaAlert" class="Alert33 text-center" style="display: none;">
+                        <i class="bi bi-info-circle-fill"></i> <span id="diaEntregaText"></span>
+                    </div>
+                    <form id="logisticaBsArStaFeForm">
+                        <div class="form-group">
+                            <label for="remitoLogisticaBsArStaFe">Número de Remito</label>
+                            <input type="text" class="form-control" id="remitoLogisticaBsArStaFe" maxlength="11" placeholder="Ingrese el número de remito" autofocus>
+                        </div>
+                        <div class="alert alert-danger text-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i> Escaneo de remitos con reparto Buenos Aires, Santa Fe o Rafaela
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-info" id="confirmLogisticaBsArStaFeBtn" onclick="confirmarLogistica()">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>  
+<!-- Fin Modal para Logística BsAr-StaFe -->  
+
 <!-- Modal para Logística Propia -->
 <div class="modal fade" id="logisticaModal" tabindex="-1" aria-labelledby="logisticaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
