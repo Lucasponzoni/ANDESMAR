@@ -73,9 +73,9 @@
             </div>
         </div>
         
-        <div class="col-md-3 mb-3 d-flex justify-content-end ingreso-egreso trio-de-botones">
+        <div class="col-md-6 mb-3 d-flex justify-content-end ingreso-egreso trio-de-botones">
             <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
-               <i class="bi bi-arrow-return-left"></i>
+                <i class="bi bi-arrow-return-left"></i>
             </button>
             <button class="btn btn-primary" id="ingresoBtn" data-toggle="modal" data-target="#ingresoModal">
                 <i class="bi bi-box-arrow-in-down"></i>
@@ -83,11 +83,15 @@
             <!-- Botón de Logística Propia -->
             <button class="btn btn-secondary ml-2" id="logisticaPropiaBtn" data-toggle="modal" data-target="#logisticaModal">
                 <i class="bi bi-truck"></i>
-            </button> 
+            </button>
+            <!-- Nuevo botón BsAr-StaFe -->
+            <button class="btn btn-info ml-2" id="bsarStaFeBtn" data-toggle="modal" data-target="#bsarStaFeModal">
+                <i class="bi bi-truck"></i> 34/35
+            </button>
             <!-- Botón para filtrar por antigüedad -->
             <button class="btn btn-danger ml-2" id="filterOldestBtn" title="Filtrar por antigüedad">
                 <i class="bi bi-clock"></i>
-            </button>          
+            </button>
             <button class="btn btn-secondary ml-2" id="promedioBtn" title="Promedio Despacho: Xd Yh Zm">
                 <i class="bi bi-calculator"></i> Calculando Promedio...
             </button>
@@ -191,7 +195,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title" id="logisticaModalLabel">Logística Propia - Escanear Remito</h5>
+                <h5 class="modal-title" id="logisticaModalLabel">Logística Propia ROSARIO - Escanear Remito</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -201,6 +205,9 @@
                     <div class="form-group">
                         <label for="remitoLogistica">Número de Remito</label>
                         <input type="text" class="form-control" id="remitoLogistica" maxlength="11" placeholder="Ingrese el número de remito" autofocus>
+                    </div>
+                    <div class="alert-modal-logRosario">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Escaneo de remitos con reparto Rosario o Gran Rosario
                     </div>
                 </form>
             </div>

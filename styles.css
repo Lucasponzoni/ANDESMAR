@@ -4434,16 +4434,21 @@ input[disabled] {
     font-weight: bold;
     font-size: 1rem;
 }
+.cp-custom-alert-info-principal {
+    color: #004085;
+    background-color: #cce5ff;
+    border-color: #b8daff;
+}
 
 .cp-custom-alert-info {
-    color: #ffffff;
-    background-color: #4cd964; /* Verde Apple */
-    border-color: #4cd964;
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
 }
 
 .cp-custom-alert-success {
     color: #ffffff;
-    background-color: #4cd964; /* Verde Apple */
+    background-color: #4cd964;
     border-color: #4cd964;
 }
 
@@ -4468,4 +4473,24 @@ input[disabled] {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 14px;
     text-align: center;
+}
+
+.alert-modal-logRosario {
+    background-color: orangered;
+    font-size: small;
+    text-align: center;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    padding: 5px;
+    align-items: center;
+    color: whitesmoke;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert-modal-logRosario i {
+    text-align: center;
+    margin-right: 8px;
+    color: yellow;
+    font-size: 20px;
 }

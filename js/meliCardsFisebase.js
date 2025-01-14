@@ -26,8 +26,18 @@ const firebaseConfig2 = {
 };
 
 // MODAL MELI LOCALIDADES
-document.getElementById('logisticaBsAsButton').addEventListener('click', () => loadPostalCodes('LogBsAs'));
-document.getElementById('logisticaSantaFeButton').addEventListener('click', () => loadPostalCodes('LogSantaFe'));
+document.getElementById('logisticaBsAsButton').addEventListener('click', () => {
+    loadPostalCodes('LogBsAs');
+    mostrarAlertaCP('Vista cambiada a Logística Buenos Aires', 'info', 'bi-info-circle-fill');
+});
+document.getElementById('logisticaSantaFeButton').addEventListener('click', () => {
+    loadPostalCodes('LogSantaFe');
+    mostrarAlertaCP('Vista cambiada a Logística Santa Fe', 'info', 'bi-info-circle-fill');
+});
+document.getElementById('logisticaRafaelaButton').addEventListener('click', () => {
+    loadPostalCodes('LogRafaela');
+    mostrarAlertaCP('Vista cambiada a Logística Rafaela', 'info', 'bi-info-circle-fill');
+});
 document.getElementById('addPostalCodeButton').addEventListener('click', addPostalCode);
 
 let currentLogRef = null;
