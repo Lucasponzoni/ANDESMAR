@@ -49,6 +49,12 @@ $('#localidadesModal').on('show.bs.modal', function () {
     document.getElementById('newPostalCodeInput').value = ''; // Vaciar el input al abrir el modal
 });
 
+document.getElementById('newPostalCodeInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        addPostalCode();
+    }
+});
+
 function loadPostalCodes(logRef) {
     currentLogRef = logRef;
     document.getElementById('initialAlert').style.display = 'none';
@@ -110,7 +116,7 @@ function mostrarAlertaCP(mensaje, tipo, icono) {
     alertContainer.style.display = 'block';
     setTimeout(() => {
         alertContainer.style.display = 'none';
-    }, 3000);
+    }, 5000);
 }
 // FIN MODAL MELI LOCALIDADES
 
