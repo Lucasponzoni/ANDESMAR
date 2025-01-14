@@ -871,7 +871,7 @@ button:hover {
 }
 
 .nav-item {
-    margin: 0 15px;
+    margin: 0 8px;
 }
 
 a.nav-link{
@@ -1920,13 +1920,19 @@ div.card-body > p > i{
     }
 }
 
-/* BUSCADOR */
 .search-filter-container {
     background-color: rgb(220, 220, 220);
     padding: 15px;
     padding-bottom: 0;
     border-radius: 8px 8px 0 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+}
+
+@media (max-width: 990px) {
+    .search-filter-container {
+        flex-direction: column;
+    }
 }
 
 /* ORDENAR MAS ANTIGUO Y NUEVO */
