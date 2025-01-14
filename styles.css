@@ -3350,6 +3350,7 @@ div .form-check {
     padding: 0.4rem 0.8rem; 
     transition: background-color 0.3s ease, box-shadow 0.3s ease; 
     white-space: nowrap; 
+    z-index: 10000;
 }
 
 /* TRANSPORTE EN TABLAS */
