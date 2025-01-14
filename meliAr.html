@@ -163,29 +163,52 @@
             </div>
             <div class="modal-body mc-os-modal-body">
                 <div id="logisticaAlertContainer" class="mc-os-alert-container" style="display: none;"></div>
-                <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-red"></span> Dia predeterminado para logistica Buenos Aires</p>
-                <select id="logistica-bsas" class="form-control mc-os-select">
-                    <option value="">Sin día predeterminado</option>
-                    <option value="lunes">Lunes</option>
-                    <option value="martes">Martes</option>
-                    <option value="miercoles">Miércoles</option>
-                    <option value="jueves">Jueves</option>
-                    <option value="viernes">Viernes</option>
-                    <option value="sabado">Sábado</option>
-                    <option value="domingo">Domingo</option>
-                </select>
-                <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-blue"></span> Dia predeterminado para logistica Santa Fe</p>
-                <select id="logistica-santafe" class="form-control mc-os-select">
-                    <option value="">Sin día predeterminado</option>
-                    <option value="lunes">Lunes</option>
-                    <option value="martes">Martes</option>
-                    <option value="miercoles">Miércoles</option>
-                    <option value="jueves">Jueves</option>
-                    <option value="viernes">Viernes</option>
-                    <option value="sabado">Sábado</option>
-                    <option value="domingo">Domingo</option>
-                </select>
-                <div class="text-center mb-3">
+
+<hr class="my-2">
+<p class="mt-2 mb-1 text-center"><strong>Dias predeterminados para logistica Novogar</strong></p>
+
+<div class="modal-select-logistica">
+    <div class="div">
+        <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-red"></span> Buenos Aires</p>
+    <select id="logistica-bsas" class="form-control mc-os-select">
+        <option value="">Sin día predeterminado</option>
+        <option value="lunes">Lunes</option>
+        <option value="martes">Martes</option>
+        <option value="miercoles">Miércoles</option>
+        <option value="jueves">Jueves</option>
+        <option value="viernes">Viernes</option>
+        <option value="sabado">Sábado</option>
+        <option value="domingo">Domingo</option>
+    </select>
+    </div>
+    <div class="div">
+        <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-blue"></span> Santa Fe</p>
+    <select id="logistica-santafe" class="form-control mc-os-select">
+        <option value="">Sin día predeterminado</option>
+        <option value="lunes">Lunes</option>
+        <option value="martes">Martes</option>
+        <option value="miercoles">Miércoles</option>
+        <option value="jueves">Jueves</option>
+        <option value="viernes">Viernes</option>
+        <option value="sabado">Sábado</option>
+        <option value="domingo">Domingo</option>
+    </select>
+    </div>
+    <div class="div">
+        <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-green"></span> Rafaela</p>
+    <select id="logistica-rafaela" class="form-control mc-os-select">
+        <option value="">Sin día predeterminado</option>
+        <option value="lunes">Lunes</option>
+        <option value="martes">Martes</option>
+        <option value="miercoles">Miércoles</option>
+        <option value="jueves">Jueves</option>
+        <option value="viernes">Viernes</option>
+        <option value="sabado">Sábado</option>
+        <option value="domingo">Domingo</option>
+    </select>
+    </div>
+
+</div>                <div class="text-center mb-3">
                     <h6 id="current-month" class="mc-os-month"></h6>
                 </div>
                 <div id="calendar" class="mc-os-calendar"></div>
@@ -209,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextMonthBtn = document.getElementById('next-month');
     const logisticaBsAsSelect = document.getElementById('logistica-bsas');
     const logisticaSantaFeSelect = document.getElementById('logistica-santafe');
+    const logisticaRafaelaSelect = document.getElementById('logistica-rafaela');
     const currentMonthLabel = document.getElementById('current-month');
     const logisticaAlertContainer = document.getElementById('logisticaAlertContainer');
 
@@ -236,10 +260,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             renderCalendar(); // Renderizar el calendario después de cargar el día predeterminado
         });
+
+        database.ref('DiaPredeterminadoRafaela').once('value').then(snapshot => {
+            if (snapshot.exists()) {
+                logisticaRafaelaSelect.value = snapshot.val();
+            } else {
+                logisticaRafaelaSelect.value = '';
+            }
+            renderCalendar(); // Renderizar el calendario después de cargar el día predeterminado
+        });
     }
 
     function updateDefaultDay(location, day) {
-        const ref = location === 'BsAs' ? 'DiaPredeterminadoBsAs' : 'DiaPredeterminadoStaFe';
+        const ref = location === 'BsAs' ? 'DiaPredeterminadoBsAs' : location === 'StaFe' ? 'DiaPredeterminadoStaFe' : 'DiaPredeterminadoRafaela';
         database.ref(ref).once('value').then(snapshot => {
             const previousDay = snapshot.exists() ? snapshot.val() : 'Sin día predeterminado';
             if (day === previousDay) {
@@ -248,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             database.ref(ref).set(day).then(() => {
-                const message = `Día de entrega en Logistica ${location === 'BsAs' ? 'Buenos Aires' : 'Santa Fe'} cambiado de ${previousDay} a ${day}`;
+                const message = `Día de entrega en Logistica ${location === 'BsAs' ? 'Buenos Aires' : location === 'StaFe' ? 'Santa Fe' : 'Rafaela'} cambiado de ${previousDay} a ${day}`;
                 mostrarLogisticaAlert(message, 'info');
                 renderCalendar(); // Renderizar el calendario después de actualizar el día predeterminado
             }).catch(error => {
@@ -266,6 +299,11 @@ document.addEventListener('DOMContentLoaded', function() {
     logisticaSantaFeSelect.addEventListener('change', function () {
         const selectedDay = this.value;
         updateDefaultDay('StaFe', selectedDay);
+    });
+
+    logisticaRafaelaSelect.addEventListener('change', function () {
+        const selectedDay = this.value;
+        updateDefaultDay('Rafaela', selectedDay);
     });
 
     function mostrarLogisticaAlert(mensaje, tipo) {
@@ -315,6 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function markDays() {
         const bsAsDay = logisticaBsAsSelect.value;
         const santaFeDay = logisticaSantaFeSelect.value;
+        const rafaelaDay = logisticaRafaelaSelect.value;
         const days = calendar.querySelectorAll('div');
 
         days.forEach(day => {
@@ -322,14 +361,27 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isNaN(dayNumber)) {
                 const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNumber);
                 const dayOfWeek = dayDate.getDay();
-                if (dayOfWeek === getDayNumber(bsAsDay) && dayOfWeek === getDayNumber(santaFeDay)) {
-                    day.classList.add('mc-os-day-both');
+                const isBsAsDay = dayOfWeek === getDayNumber(bsAsDay);
+                const isSantaFeDay = dayOfWeek === getDayNumber(santaFeDay);
+                const isRafaelaDay = dayOfWeek === getDayNumber(rafaelaDay);
+
+                if (isBsAsDay && isSantaFeDay && isRafaelaDay) {
+                    day.classList.add('mc-os-day-all');
+                } else if (isBsAsDay && isSantaFeDay) {
+                    day.classList.add('mc-os-day-bsas-santafe');
+                } else if (isBsAsDay && isRafaelaDay) {
+                    day.classList.add('mc-os-day-bsas-rafaela');
+                } else if (isSantaFeDay && isRafaelaDay) {
+                    day.classList.add('mc-os-day-santafe-rafaela');
                 } else {
-                    if (dayOfWeek === getDayNumber(bsAsDay)) {
+                    if (isBsAsDay) {
                         day.classList.add('mc-os-day-red');
                     }
-                    if (dayOfWeek === getDayNumber(santaFeDay)) {
+                    if (isSantaFeDay) {
                         day.classList.add('mc-os-day-blue');
+                    }
+                    if (isRafaelaDay) {
+                        day.classList.add('mc-os-day-green');
                     }
                 }
             }
@@ -361,7 +413,8 @@ document.addEventListener('DOMContentLoaded', function() {
     renderCalendar();
 });
 </script>
-<!-- FIN MODAL CALENDARIO -->                
+<!-- FIN MODAL CALENDARIO -->     
+
             </div>
         </div>
     </div>

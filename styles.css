@@ -4346,7 +4346,6 @@ input[disabled] {
     align-items: center;
     justify-content: center;
     display: flex;
-    margin-top: 10px;
     padding: 5px;
     border-radius: 10px 10px 0 0;
     background-color: cornflowerblue;
@@ -4399,11 +4398,42 @@ input[disabled] {
     color: black;
 }
 .mc-os-calendar .mc-os-day-red.past,
-.mc-os-calendar .mc-os-day-blue.past {
+.mc-os-calendar .mc-os-day-blue.past,
+.mc-os-calendar .mc-os-day-green.past,
+.mc-os-calendar .mc-os-day-all.past,
+.mc-os-calendar .mc-os-day-santafe-rafaela.past,
+.mc-os-calendar .mc-os-day-bsas-rafaela.past,
+.mc-os-calendar .mc-os-day-bsas-santafe.past
+{
     opacity: 0.5;
 }
-.mc-os-calendar .mc-os-day-both {
+
+.mc-os-circle-green {
+    background-color: green;
+}
+
+.mc-os-day-green {
+    background-color: green;
+    color: white;
+}
+
+.mc-os-day-all {
+    background: linear-gradient(to right, red 33.33%, orange 33.33% 66.66%, green 33.34%);
+    color: white;
+}
+
+.mc-os-day-bsas-santafe {
     background: linear-gradient(to right, red 50%, orange 50%);
+    color: white;
+}
+
+.mc-os-day-bsas-rafaela {
+    background: linear-gradient(to right, red 50%, green 50%);
+    color: white;
+}
+
+.mc-os-day-santafe-rafaela {
+    background: linear-gradient(to right, green 50%, orange 50%);
     color: white;
 }
 .mc-os-btn {
@@ -4421,6 +4451,14 @@ input[disabled] {
     font-weight: bold;
 }
 
+.modal-select-logistica{
+    display: flex;
+}
+
+.modal-select-logistica div{
+    padding: 0 5px 0 5px;
+    margin-top: 0;
+}
 /* MODAL LOCALIDADES MELI */
 
 /* MODAL CODIGO POSTAL */
@@ -4471,8 +4509,10 @@ input[disabled] {
     border-radius: 12px;
     padding: 10px 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 14px;
+    font-size: 12px;
     text-align: center;
+    margin-bottom: 5px;
+    margin-top: -10px;
 }
 
 .alert-modal-logRosario {
