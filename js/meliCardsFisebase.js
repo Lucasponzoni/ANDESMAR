@@ -608,7 +608,7 @@ function crearCard(data) {
                 id="andesmarButton${data.idOperacion}" 
                 ${isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
-                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}')`}">
+                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${data.Recibe}')`}">
                 <span id="andesmarText${data.idOperacion}">
                 ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>'}
                 </span>
@@ -621,7 +621,7 @@ function crearCard(data) {
                 id="andreaniButton${data.idOperacion}" 
                 ${isAndesmar || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
                 ${isBlocked ? 'disabled' : ''} 
-                onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}')`}">
+                onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.Recibe}')`}">
                 <span id="andreaniText${data.idOperacion}">
                 ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
                 </span>
@@ -633,7 +633,7 @@ function crearCard(data) {
                 <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
                 id="LogPropiaMeliButton${data.idOperacion}" 
                 ${isBlocked ? 'disabled' : ''} 
-                onclick="generarPDF('${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}')">
+                onclick="generarPDF('${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}')">
                 <span>
                 ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
                 </span>
@@ -818,7 +818,7 @@ const clave = "BOM6765";
 const codigoCliente = "6765";
 
 // Función para enviar datos a la API de Andesmar
-async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto, localidad, provincia, email) {
+async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto, localidad, provincia, email, recibe) {
     
     console.log({
         id,
@@ -836,7 +836,8 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         Producto,
         localidad,
         provincia,
-        email
+        email,
+        recibe
     });
 
     const button = document.getElementById(`andesmarButton${id}`);
@@ -872,7 +873,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         CalleRemitente: "Mendoza", // Reemplaza con el valor correcto
         CalleNroRemitente: "2799", // Reemplaza con el valor correcto
         CodigoPostalRemitente: "2000", // Reemplaza con el valor correcto
-        NombreApellidoDestinatario: NombreyApellido,
+        NombreApellidoDestinatario: NombreyApellido || recibe,
         CodigoPostalDestinatario: Cp,
         CalleDestinatario: calleDestinatario,
         CalleNroDestinatario: alturaDestinatario,
@@ -1065,7 +1066,7 @@ async function getAuthToken() {
     }
 }
 
-async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto) {    const buttonAndr = document.getElementById(`andreaniButton${id}`);
+async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe) {    const buttonAndr = document.getElementById(`andreaniButton${id}`);
     const spinnerAndr = document.getElementById(`spinnerAndreani${id}`);
     const textAndr = document.getElementById(`andreaniText${id}`);
     const resultadoDivAndr = document.getElementById(`resultado${id}`);
@@ -1090,7 +1091,8 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
         cantidad,
         medidas,
         Producto,
-        email
+        email,
+        recibe
     });
 
     // Eliminar el prefijo "200000" del idOperacion
@@ -1177,7 +1179,7 @@ for (let i = 0; i < cantidadFinal; i++) {
             "telefonos": [{ "tipo": 1, "numero": "3416680658" }]
         },
         "destinatario": [{
-            "nombreCompleto": NombreyApellido,
+            "nombreCompleto": NombreyApellido || recibe,
             "email": email,
             "documentoTipo": "CUIT",
             "documentoNumero": "30685437011",
@@ -1226,7 +1228,7 @@ for (let i = 0; i < cantidadFinal; i++) {
             // Guardar en Firebase
     const trackingMessage = `¡Hola, ${NombreyApellido}!
 
-    ¡Buenas noticias! 🎉  Tu producto ya está listo para ser enviado con Andesmar Cargas. 📦  
+    ¡Buenas noticias! 🎉  Tu producto ya está listo para ser enviado con CORRO ANDREANI. 📦  
 
     Recordá que la fecha de entrega es aproximada, así que puede que lo recibas antes. 🚚📲 Estate atento a tu teléfono ya que estaremos en contacto para asegurarnos de que la entrega sea exitosa.
 
@@ -1766,7 +1768,7 @@ if (prepararME2Btn) {
 // FIN QUERY DE DATOS MELI
 
 // ETIQUETA LOGISTICA PROPIA
-async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia) {
+async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe) {
     let button = document.getElementById(`LogPropiaMeliButton${id}`);
     let spinner = document.getElementById(`spinnerLogPropia${id}`);
     let spinner2 = document.getElementById("spinner2");
@@ -1941,7 +1943,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             </div>
             <div class="campo">
                 <i class="bi bi-person-square"></i>
-                <span>${NombreyApellido}</span>
+                <span>${NombreyApellido || recibe}</span>
             </div>
             <div class="campo">
                 <i class="bi bi-geo-alt-fill"></i>
@@ -2010,7 +2012,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoBsAs);
             const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
             
-            trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
+            trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
         
             Queremos informarte que vamos a visitarte el ${diaFormateado}.
                 
@@ -2041,7 +2043,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoStaFe);
             const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
             
-            trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
+            trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
         
             Queremos informarte que vamos a visitarte el ${diaFormateado}.
         
@@ -2055,7 +2057,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             
         }else {
             // Mensaje para otras zonas
-            trackingMessage = `¡Hola, ${NombreyApellido}! 
+            trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
         
             ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
             
