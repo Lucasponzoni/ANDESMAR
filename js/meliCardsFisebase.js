@@ -485,8 +485,8 @@ function crearCard(data) {
 
             <div class="card-body-meli">
 
-                <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> ${data.NombreyApellido}</h5>
-                <h6 class="user-title-meli">${data.nombreDeUsuario}</h6>
+                <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> ${data.NombreyApellido && data.NombreyApellido.trim() !== '' ? data.NombreyApellido : data.Recibe}</h5>
+                <h6 class="user-title-meli">${data.nombreDeUsuario && data.nombreDeUsuario.trim() !== '' ? data.nombreDeUsuario : data.Recibe}</h6>
                 <div class="meli-box1"> 
                     <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> ${data.Cp}, ${data.localidad}, ${data.Provincia}</p>
 
