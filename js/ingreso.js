@@ -400,13 +400,13 @@ function renderCards(data) {
         } else {
             // Si el operador logístico es "Logística Novogar"
             if (item.operadorLogistico === "Logística Novogar") {
-                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}', this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
             } else if (item.operadorLogistico === "Logística Novogar StaFe") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
             } else if (item.operadorLogistico === "Logística Novogar Rafaela") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
             } else if (item.operadorLogistico === "Logística Novogar BsAs") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
             } else {
                 operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
             }
@@ -442,7 +442,7 @@ function renderCards(data) {
     }
 }
 
-async function generarPDF(remito, cliente, fechaEntrega, button) {
+async function generarPDF(remito, cliente, fechaEntrega, operadorLogistico, button) {
 
     let spinner = document.getElementById("spinner2");
     spinner.style.display = "flex";
@@ -460,6 +460,16 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
         putOnlyUsedFonts: true,
         floatPrecision: 16 // Precisión para los números flotantes
     });
+
+    // Determinar la imagen según el operador logístico
+    let logoSrc = './Img/Camion-Rosario.png';
+    if (operadorLogistico === 'Logística Novogar BsAs') {
+        logoSrc = './Img/Camion-BsAs-Novogar.png';
+    } else if (operadorLogistico === 'Logística Novogar StaFe') {
+        logoSrc = './Img/Camion-Santa-fe-Novogar.png';
+    } else if (operadorLogistico === 'Logística Novogar Rafaela') {
+        logoSrc = './Img/Camion-Rafaela-Novogar.png';
+    }
 
     // Contenido HTML
     const contenido = `
@@ -498,7 +508,7 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
                 margin-bottom: 15px; /* Ajustado */
             }
             .logo img {
-                max-width: 75px; /* Ajustado */
+                max-width: 300px; /* Ajustado */
                 height: auto;
                 display: block; /* Asegura que la imagen sea un bloque */
                 margin: 0 auto; /* Centra la imagen */
@@ -553,7 +563,7 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
     <body>
         <div class="etiqueta">
             <div class="logo">
-                <img src="./Img/Novogar N.png" alt="Logo">
+                <img src="${logoSrc}" alt="Logo">
             </div>
             <div class="campo">
                 <i class="bi bi-file-earmark-text"></i>
@@ -565,7 +575,7 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
             </div>
             <div class="campo">
                 <i class="bi bi-calendar-check"></i>
-                <span>Fecha de Entrega Máxima: ${fechaEntrega}</span>
+                <span>Vencimiento: ${fechaEntrega}</span>
             </div>
           <div class="campo">
                 <i class="bi bi-telephone-outbound-fill"></i>
@@ -587,7 +597,8 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
             </div>
         </div>
     </body>
-    </html>`;
+    </html>`;    
+    
     // Crear un elemento temporal para renderizar el HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = contenido;
@@ -606,17 +617,37 @@ async function generarPDF(remito, cliente, fechaEntrega, button) {
         setTimeout(() => {
             spinner.style.display = "none";
             window.open(pdfUrl, '_blank');
-            button.innerHTML = '<i class="bi bi-pin-map-fill"></i> Novogar'; // Restaurar el texto del botón
+            
+            let buttonText = 'Novogar';
+            if (operadorLogistico === 'Logística Novogar BsAs') {
+                buttonText = 'Buenos Aires';
+            } else if (operadorLogistico === 'Logística Novogar StaFe') {
+                buttonText = 'Santa Fé';
+            } else if (operadorLogistico === 'Logística Novogar Rafaela') {
+                buttonText = 'Rafaela';
+            }
+        
+            button.innerHTML = `<img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> ${buttonText}`; // Restaurar el texto del botón
             button.disabled = false; // Reactivar el botón
         }, 2000); // Retraso de 2000 ms (2 segundos)
-
+        
         document.body.removeChild(tempDiv); // Eliminar el elemento temporal
-    }).catch(error => {
-        spinner.style.display = "none";
-        console.error("Error al generar el PDF:", error);
-        button.innerHTML = '<i class="bi bi-pin-map-fill"></i> Novogar'; // Restaurar el texto del botón en caso de error
-        button.disabled = false; // Reactivar el botón
-    });
+        }).catch(error => {
+            spinner.style.display = "none";
+            console.error("Error al generar el PDF:", error);
+            
+            let buttonText = 'Novogar';
+            if (operadorLogistico === 'Logística Novogar BsAs') {
+                buttonText = 'Buenos Aires';
+            } else if (operadorLogistico === 'Logística Novogar StaFe') {
+                buttonText = 'Santa Fé';
+            } else if (operadorLogistico === 'Logística Novogar Rafaela') {
+                buttonText = 'Rafaela';
+            }
+        
+            button.innerHTML = `<img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> ${buttonText}`; // Restaurar el texto del botón en caso de error
+            button.disabled = false; // Reactivar el botón
+        });
 }
 
 // Función para formatear la fecha y hora
