@@ -1187,46 +1187,92 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
+$('#scanRemitoModal').on('shown.bs.modal', function () {
+    $('#remitoInput').focus();
+});
+
 function subirFoto() {
     const remito = document.getElementById('remitoInput').value.trim();
     const fotoInput = document.getElementById('fotoRemitoInput').files[0];
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const logisticsAlert = document.getElementById('logisticsAlert');
 
     if (!remito) {
-        alert('Ingrese el número de remito');
+        Swal.fire('Error', 'Ingrese el número de remito', 'error');
         return;
     }
 
     if (!fotoInput) {
-        alert('Adjunte una foto del remito');
+        Swal.fire('Error', 'Adjunte una foto del remito', 'error');
         return;
     }
 
-    const storageRef = firebase.storage().ref();
-    const remitoFotoRef = storageRef.child(`remitos/${remito}.jpg`);
+    // Verificar si el remito existe en DespachosLogisticos
+    const remitoRef = db.ref(`DespachosLogisticos/${remito}`);
+    remitoRef.once('value', (snapshot) => {
+        if (!snapshot.exists()) {
+            Swal.fire('Error', 'El remito no existe en DespachosLogisticos', 'error');
+            return;
+        }
+
+        const storageRef = firebase.storage().ref();
+        const remitoFotoRef = storageRef.child(`remitos/${remito}.jpg`);
+
+        remitoFotoRef.getDownloadURL().then(() => {
+            Swal.fire({
+                title: 'La foto ya existe',
+                text: "¿Desea sobreescribir la foto existente?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, sobreescribir'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    uploadFile(remitoFotoRef, fotoInput, remito);
+                }
+            });
+        }).catch((error) => {
+            if (error.code === 'storage/object-not-found') {
+                uploadFile(remitoFotoRef, fotoInput, remito);
+            } else {
+                Swal.fire('Error', 'Error al verificar la existencia de la foto', 'error');
+            }
+        });
+    });
+}
+
+function uploadFile(remitoFotoRef, fotoInput, remito) {
     const uploadTask = remitoFotoRef.put(fotoInput);
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const logisticsAlert = document.getElementById('logisticsAlert');
+    loadingSpinner.style.display = 'block';
 
     uploadTask.on('state_changed', (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        const progressBar = document.querySelector('#uploadProgress .progress-bar');
-        progressBar.style.width = `${progress}%`;
-        progressBar.setAttribute('aria-valuenow', progress);
-        document.getElementById('uploadProgress').style.display = 'block';
+        // No se necesita la barra de progreso
     }, (error) => {
         console.error('Error al subir la foto:', error);
-        alert('Error al subir la foto');
+        Swal.fire('Error', 'Error al subir la foto', 'error');
+        loadingSpinner.style.display = 'none';
     }, () => {
         uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
             const remitoRef = firebase.database().ref(`DespachosLogisticos/${remito}`);
             remitoRef.update({
                 fotoURL: downloadURL
             }).then(() => {
-                alert('Foto subida y enlace guardado en Firebase');
                 document.getElementById('scanRemitoForm').reset();
-                document.getElementById('uploadProgress').style.display = 'none';
+                loadingSpinner.style.display = 'none';
                 $('#scanRemitoModal').modal('hide');
+                logisticsAlert.innerHTML = `<i class="bi bi-check-circle-fill"></i> Remito actualizado para ${remito}`;
+                logisticsAlert.style.display = 'block';
+                setTimeout(() => {
+                    logisticsAlert.style.display = 'none';
+                }, 5000);
+                $('#remitoInput').focus();
             }).catch((error) => {
                 console.error('Error al guardar el enlace en Firebase:', error);
-                alert('Error al guardar el enlace en Firebase');
+                Swal.fire('Error', 'Error al guardar el enlace en Firebase', 'error');
+                loadingSpinner.style.display = 'none';
             });
         });
     });
