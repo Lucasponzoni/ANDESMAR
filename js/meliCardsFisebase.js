@@ -921,9 +921,9 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         if (data.NroPedido) {
             const trackingLinkAndesmar = `https://andesmarcargas.com/seguimiento.html?numero=${idOperacionFinal}&tipo=remito&cod=`;
 
-            const trackingMessage = `¡Hola, ${NombreyApellido}!
+            const trackingMessage = `¡Hola, ${NombreyApellido || recibe}!
 
-            ¡Buenas noticias! 🎉  Tu producto ya está listo para ser enviado con Andesmar Cargas. 📦  
+            ¡Buenas noticias! 🎉  Tu producto ya está listo para ser enviado con ANDESMAR CARGAS. 📦  
 
             Recordá que la fecha de entrega es aproximada, así que puede que lo recibas antes. 🚚📲 Estate atento a tu teléfono ya que estaremos en contacto para asegurarnos de que la entrega sea exitosa.
 
@@ -1226,9 +1226,9 @@ for (let i = 0; i < cantidadFinal; i++) {
             }
 
             // Guardar en Firebase
-    const trackingMessage = `¡Hola, ${NombreyApellido}!
+    const trackingMessage = `¡Hola, ${NombreyApellido || recibe}!
 
-    ¡Buenas noticias! 🎉  Tu producto ya está listo para ser enviado con CORRO ANDREANI. 📦  
+    ¡Buenas noticias! 🎉  Tu producto ya está listo para ser enviado con CORREO ANDREANI. 📦  
 
     Recordá que la fecha de entrega es aproximada, así que puede que lo recibas antes. 🚚📲 Estate atento a tu teléfono ya que estaremos en contacto para asegurarnos de que la entrega sea exitosa.
 
