@@ -73,7 +73,7 @@
             </div>
         </div>
         
-        <div class="col-md-6 mb-3 d-flex justify-content-end ingreso-egreso trio-de-botones">
+                <div class="col-md-6 mb-3 d-flex justify-content-end ingreso-egreso trio-de-botones">
             <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
                 <i class="bi bi-arrow-return-left"></i>
             </button>
@@ -92,7 +92,10 @@
             <button class="btn btn-info ml-2" id="bsarStaFeBtn" data-toggle="modal" data-target="#bsarStaFeModal">
                 <i class="bi bi-truck"></i> Interior
             </button>
-
+            <!-- Botón para abrir el modal de escanear remito y adjuntar foto -->
+            <button class="btn btn-warning ml-2" id="scanRemitoBtn" data-toggle="modal" data-target="#scanRemitoModal">
+                <i class="bi bi-camera"></i>
+            </button>
             <button class="btn btn-secondary ml-2" id="promedioBtn" title="Promedio Despacho: Xd Yh Zm">
                 <i class="bi bi-calculator"></i> Calculando Promedio...
             </button>
@@ -189,6 +192,40 @@
     <div id="spinner2" class="spinner-container" style="display:none;">
         <div class="spinner"></div>
     </div>
+
+    <!-- Modal para escanear remito y adjuntar foto -->
+<div class="modal fade" id="scanRemitoModal" tabindex="-1" aria-labelledby="scanRemitoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="scanRemitoModalLabel">Escanear Remito y Adjuntar Foto</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="scanRemitoForm">
+                    <div class="form-group">
+                        <label for="remitoInput">Número de Remito</label>
+                        <input type="text" class="form-control" id="remitoInput" maxlength="11" placeholder="Ingrese el número de remito" autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label for="fotoRemitoInput">Adjuntar Foto del Remito</label>
+                        <input type="file" class="form-control" id="fotoRemitoInput" accept="image/*" capture="camera">
+                    </div>
+                    <div id="uploadProgress" class="progress" style="display: none;">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-info" onclick="subirFoto()">Subir Foto</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- FIN Modal para escanear remito y adjuntar foto -->
 
     <!-- Modal para Logística BsAr-StaFe -->
     <div class="modal fade" id="bsarStaFeModal" tabindex="-1" aria-labelledby="bsarStaFeModalLabel" aria-hidden="true">
@@ -349,6 +386,7 @@
     <!-- Scripts Firebase-->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 
     <!-- Scripts Bootstrap-->

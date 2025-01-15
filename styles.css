@@ -4622,3 +4622,11 @@ input[disabled] {
     border-color: #f5c6cb;
 }
 
+.progress {
+    height: 20px;
+    margin-top: 10px;
+}
+
+.progress-bar {
+    background-color: #17a2b8;
+}

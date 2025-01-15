@@ -1187,6 +1187,51 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
+function subirFoto() {
+    const remito = document.getElementById('remitoInput').value.trim();
+    const fotoInput = document.getElementById('fotoRemitoInput').files[0];
+
+    if (!remito) {
+        alert('Ingrese el número de remito');
+        return;
+    }
+
+    if (!fotoInput) {
+        alert('Adjunte una foto del remito');
+        return;
+    }
+
+    const storageRef = firebase.storage().ref();
+    const remitoFotoRef = storageRef.child(`remitos/${remito}.jpg`);
+    const uploadTask = remitoFotoRef.put(fotoInput);
+
+    uploadTask.on('state_changed', (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        const progressBar = document.querySelector('#uploadProgress .progress-bar');
+        progressBar.style.width = `${progress}%`;
+        progressBar.setAttribute('aria-valuenow', progress);
+        document.getElementById('uploadProgress').style.display = 'block';
+    }, (error) => {
+        console.error('Error al subir la foto:', error);
+        alert('Error al subir la foto');
+    }, () => {
+        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+            const remitoRef = firebase.database().ref(`DespachosLogisticos/${remito}`);
+            remitoRef.update({
+                fotoURL: downloadURL
+            }).then(() => {
+                alert('Foto subida y enlace guardado en Firebase');
+                document.getElementById('scanRemitoForm').reset();
+                document.getElementById('uploadProgress').style.display = 'none';
+                $('#scanRemitoModal').modal('hide');
+            }).catch((error) => {
+                console.error('Error al guardar el enlace en Firebase:', error);
+                alert('Error al guardar el enlace en Firebase');
+            });
+        });
+    });
+}
+
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;
 
