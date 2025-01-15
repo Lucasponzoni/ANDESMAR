@@ -2092,12 +2092,14 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         // Crear un enlace para abrir el PDF en una nueva ventana
         const pdfUrl = URL.createObjectURL(pdfBlob);
 
-        setTimeout(() => {
+                setTimeout(() => {
             spinner2.style.display = "none";
             // Ocultar el spinner y restaurar el botón
             spinner.style.display = "none";
             window.open(pdfUrl, '_blank');
-            button.innerHTML = '<i class="bi bi-file-text"></i> Etiqueta Novogar';
+            button.innerHTML = '<i class="bi bi-file-text"></i> Descargar Etiqueta Novogar';
+            button.classList.remove('btn-secondary');
+            button.classList.add('btn-success');
             button.disabled = false;
         }, 2000);
 
