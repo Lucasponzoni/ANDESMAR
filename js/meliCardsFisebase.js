@@ -2097,7 +2097,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             // Ocultar el spinner y restaurar el botón
             spinner.style.display = "none";
             window.open(pdfUrl, '_blank');
-            button.innerHTML = '<i class="bi bi-file-text"></i> Descargar Etiqueta Novogar';
+            button.innerHTML = '<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar';
             button.classList.remove('btn-secondary');
             button.classList.add('btn-success');
             button.disabled = false;
