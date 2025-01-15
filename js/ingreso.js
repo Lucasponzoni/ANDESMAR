@@ -1103,6 +1103,79 @@ document.getElementById('remitoLogisticaBsArStaFe').addEventListener('keypress',
     }
 });
 
+function toggleLogisticsInput() {
+    const button = document.getElementById('unknownLogisticsButton');
+    const inputContainer = document.getElementById('logisticsInputContainer');
+    const logisticsAlert = document.getElementById('logisticsAlert');
+
+    if (inputContainer.style.display === 'none') {
+        button.classList.remove('btn-danger');
+        button.classList.add('btn-secondary');
+        button.innerHTML = '<i class="bi bi-x-circle-fill"></i> Ocultar búsqueda de logística';
+        inputContainer.style.display = 'block';
+    } else {
+        button.classList.remove('btn-secondary');
+        button.classList.add('btn-danger');
+        button.innerHTML = '<i class="bi bi-question-circle-fill"></i> No conozco la logística del código postal';
+        inputContainer.style.display = 'none';
+        logisticsAlert.style.display = 'none';
+    }
+}
+
+document.getElementById('logisticsCpInput').addEventListener('input', function () {
+    const cp = this.value.trim();
+    const logisticsAlert = document.getElementById('logisticsAlert');
+
+    if (cp.length === 4) {
+        Promise.all([
+            db.ref('LogBsAs').once('value'),
+            db.ref('LogSantaFe').once('value'),
+            db.ref('LogRafaela').once('value')
+        ]).then(([bsAsSnapshot, staFeSnapshot, rafaelaSnapshot]) => {
+            let found = false;
+
+            if (bsAsSnapshot.hasChild(cp)) {
+                logisticsAlert.innerHTML = '<i class="bi bi-check-circle-fill"></i> Se encontró CP en <strong>LOGÍSTICA BUENOS AIRES</strong>';
+                logisticsAlert.classList.remove('Alert34');
+                logisticsAlert.classList.remove('Alert36');
+                logisticsAlert.classList.add('Alert35');
+                logisticsAlert.style.display = 'block';
+                found = true;
+            } else if (staFeSnapshot.hasChild(cp)) {
+                logisticsAlert.innerHTML = '<i class="bi bi-check-circle-fill"></i> Se encontró CP en <strong>LOGÍSTICA SANTA FE</strong>';
+                logisticsAlert.classList.remove('Alert34');
+                logisticsAlert.classList.remove('Alert36');
+                logisticsAlert.classList.add('Alert35');
+                logisticsAlert.style.display = 'block';
+                found = true;
+            } else if (rafaelaSnapshot.hasChild(cp)) {
+                logisticsAlert.innerHTML = '<i class="bi bi-check-circle-fill"></i> Se encontró CP en <strong>LOGÍSTICA RAFAELA</strong>';
+                logisticsAlert.classList.remove('Alert34');
+                logisticsAlert.classList.remove('Alert36');
+                logisticsAlert.classList.add('Alert35');
+                logisticsAlert.style.display = 'block';
+                found = true;
+            } else {
+                logisticsAlert.innerHTML = '<i class="bi bi-x-circle-fill"></i> No se encontró el CP en ninguna logística propia';
+                logisticsAlert.classList.remove('Alert34');
+                logisticsAlert.classList.remove('Alert35');
+                logisticsAlert.classList.add('Alert36');
+                logisticsAlert.style.display = 'block';
+            }
+
+            if (!found) {
+                logisticsAlert.innerHTML = '<i class="bi bi-x-circle-fill"></i> No se encontró el CP en ninguna logística propia';
+                logisticsAlert.style.display = 'block';
+            }
+        }).catch(error => {
+            logisticsAlert.innerHTML = '<i class="bi bi-x-circle-fill"></i> Error al buscar el CP: ' + error.message;
+            logisticsAlert.style.display = 'block';
+        });
+    } else {
+        logisticsAlert.style.display = 'none';
+    }
+});
+
 // Estilos para los botones
 const style = document.createElement('style');
 style.innerHTML = `

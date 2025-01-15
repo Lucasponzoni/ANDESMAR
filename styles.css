@@ -4597,3 +4597,28 @@ input[disabled] {
     background-color: #fff3cd;
     border-color: #ffeeba;
 }
+
+.Alert34 {
+    padding: 10px;
+    border-radius: 5px;
+    color: #004085;
+    background-color: #cce5ff;
+    border-color: #b8daff;
+}
+
+.Alert35 {
+    padding: 10px;
+    border-radius: 5px;
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.Alert36 {
+    padding: 10px;
+    border-radius: 5px;
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
