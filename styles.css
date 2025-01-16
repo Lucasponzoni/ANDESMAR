@@ -1519,11 +1519,17 @@ p.card-text{
     border: solid 1px #ff3b30;
 }
 
-.correo-novogar, .correo-santafe, .correo-rafaela {
+.correo-novogar, .correo-santafe, .correo-rafaela, .correo-sannicolas {
     background-color: green;
     color: white;
     border: solid 1px greenyellow;
     min-width: fit-content;
+}
+
+.logistica-propia-sweet-alert{
+    background-color: rgb(244, 244, 179);
+    padding: 10px;
+    border-radius: 20px;
 }
 
 .meli-box1{
@@ -4457,22 +4463,47 @@ input[disabled] {
     box-sizing: border-box;
     border: solid #ffff 1px;
 }
+
+.btn-group-cp > button{
+    font-size: 13px;
+}
+
 .mc-os-calendar .mc-os-day-red {
     background-color: red;
     color: white;
 }
+
 .mc-os-calendar .mc-os-day-blue {
-    background-color: orange;
-    color: black;
+    background-color: blue;
+    color: white;
 }
+
+.mc-os-calendar .mc-os-day-green {
+    background-color: green;
+    color: white;
+}
+
+.mc-os-calendar .mc-os-day-lila {
+    background-color: #800080;
+    color: white;
+}
+
 .mc-os-calendar .mc-os-day-red.past,
 .mc-os-calendar .mc-os-day-blue.past,
 .mc-os-calendar .mc-os-day-green.past,
+.mc-os-calendar .mc-os-day-lila.past,
 .mc-os-calendar .mc-os-day-all.past,
-.mc-os-calendar .mc-os-day-santafe-rafaela.past,
+.mc-os-calendar .mc-os-day-sannicolas-bsas-santafe-rafaela.past,
+.mc-os-calendar .mc-os-day-sannicolas-bsas-santafe.past,
+.mc-os-calendar .mc-os-day-sannicolas-bsas-rafaela.past,
+.mc-os-calendar .mc-os-day-sannicolas-santafe-rafaela.past,
+.mc-os-calendar .mc-os-day-bsas-santafe-rafaela.past,
+.mc-os-calendar .mc-os-day-sannicolas-bsas.past,
+.mc-os-calendar .mc-os-day-sannicolas-santafe.past,
+.mc-os-calendar .mc-os-day-sannicolas-rafaela.past,
+.mc-os-calendar .mc-os-day-bsas-santafe.past,
 .mc-os-calendar .mc-os-day-bsas-rafaela.past,
-.mc-os-calendar .mc-os-day-bsas-santafe.past
-{
+.mc-os-calendar .mc-os-day-santafe-rafaela.past {
     opacity: 0.5;
 }
 
@@ -4480,18 +4511,57 @@ input[disabled] {
     background-color: green;
 }
 
-.mc-os-day-green {
-    background-color: green;
-    color: white;
+.mc-os-circle-lila {
+    background-color: #800080; /* Lila */
 }
 
 .mc-os-day-all {
-    background: linear-gradient(to right, red 33.33%, orange 33.33% 66.66%, green 33.34%);
+    background: linear-gradient(to right, #800080 25%, red 25% 50%, blue 50% 75%, green 75%);
+    color: white;
+}
+
+.mc-os-day-sannicolas-bsas-santafe-rafaela {
+    background: linear-gradient(to right, #800080 25%, red 25% 50%, blue 50% 75%, green 75%);
+    color: white;
+}
+
+.mc-os-day-sannicolas-bsas-santafe {
+    background: linear-gradient(to right, #800080 33.33%, red 33.33% 66.66%, blue 66.66%);
+    color: white;
+}
+
+.mc-os-day-sannicolas-bsas-rafaela {
+    background: linear-gradient(to right, #800080 33.33%, red 33.33% 66.66%, green 66.66%);
+    color: white;
+}
+
+.mc-os-day-sannicolas-santafe-rafaela {
+    background: linear-gradient(to right, #800080 33.33%, blue 33.33% 66.66%, green 66.66%);
+    color: white;
+}
+
+.mc-os-day-bsas-santafe-rafaela {
+    background: linear-gradient(to right, red 33.33%, blue 33.33% 66.66%, green 66.66%);
+    color: white;
+}
+
+.mc-os-day-sannicolas-bsas {
+    background: linear-gradient(to right, #800080 50%, red 50%);
+    color: white;
+}
+
+.mc-os-day-sannicolas-santafe {
+    background: linear-gradient(to right, #800080 50%, blue 50%);
+    color: white;
+}
+
+.mc-os-day-sannicolas-rafaela {
+    background: linear-gradient(to right, #800080 50%, green 50%);
     color: white;
 }
 
 .mc-os-day-bsas-santafe {
-    background: linear-gradient(to right, red 50%, orange 50%);
+    background: linear-gradient(to right, red 50%, blue 50%);
     color: white;
 }
 
@@ -4501,9 +4571,10 @@ input[disabled] {
 }
 
 .mc-os-day-santafe-rafaela {
-    background: linear-gradient(to right, green 50%, orange 50%);
+    background: linear-gradient(to right, blue 50%, green 50%);
     color: white;
 }
+
 .mc-os-btn {
     background-color: #007bff;
     color: white;

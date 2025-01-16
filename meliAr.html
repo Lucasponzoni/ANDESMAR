@@ -113,15 +113,18 @@
                     <i class="bi bi-info-circle-fill"></i> Seleccione el tipo de logística para continuar
                 </div>
                 <div class="d-flex justify-content-center mb-3">
-                    <div class="btn-group" role="group" aria-label="Basic outlined example">
+                    <div class="btn-group btn-group-cp" role="group" aria-label="Basic outlined example">
                         <button id="logisticaSantaFeButton" class="btn btn-outline-primary">
-                            <i class="bi bi-lightning-charge-fill"></i> Logística 34 Santa Fe
+                            <i class="bi bi-lightning-charge-fill"></i> Logística 34 <strong>Santa Fe</strong> 
                         </button>
                         <button id="logisticaBsAsButton" class="btn btn-outline-primary">
-                            <i class="bi bi-lightning-charge-fill"></i> Logística 35 Buenos Aires
+                            <i class="bi bi-lightning-charge-fill"></i> Logística 35 <strong>Buenos Aires</strong>
                         </button>
                         <button id="logisticaRafaelaButton" class="btn btn-outline-primary">
-                            <i class="bi bi-lightning-charge-fill"></i> Logística 36 Rafaela
+                            <i class="bi bi-lightning-charge-fill"></i> Logística 36 <strong>Rafaela</strong>
+                        </button>
+                        <button id="logisticaSanNicolasButton" class="btn btn-outline-primary">
+                            <i class="bi bi-lightning-charge-fill"></i> Logística 35 <strong>San Nicolás</strong>
                         </button>
                     </div>
                 </div>
@@ -164,51 +167,65 @@
             <div class="modal-body mc-os-modal-body">
                 <div id="logisticaAlertContainer" class="mc-os-alert-container" style="display: none;"></div>
 
-<hr class="my-2">
-<p class="mt-2 mb-1 text-center"><strong>Dias predeterminados para logistica Novogar</strong></p>
+                <hr class="my-2">
+                <p class="mt-2 mb-1 text-center"><strong>Dias predeterminados para logistica Novogar</strong></p>
 
-<div class="modal-select-logistica">
-    <div class="div">
-        <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-red"></span> Buenos Aires</p>
-    <select id="logistica-bsas" class="form-control mc-os-select">
-        <option value="">Sin día predeterminado</option>
-        <option value="lunes">Lunes</option>
-        <option value="martes">Martes</option>
-        <option value="miercoles">Miércoles</option>
-        <option value="jueves">Jueves</option>
-        <option value="viernes">Viernes</option>
-        <option value="sabado">Sábado</option>
-        <option value="domingo">Domingo</option>
-    </select>
-    </div>
-    <div class="div">
-        <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-blue"></span> Santa Fe</p>
-    <select id="logistica-santafe" class="form-control mc-os-select">
-        <option value="">Sin día predeterminado</option>
-        <option value="lunes">Lunes</option>
-        <option value="martes">Martes</option>
-        <option value="miercoles">Miércoles</option>
-        <option value="jueves">Jueves</option>
-        <option value="viernes">Viernes</option>
-        <option value="sabado">Sábado</option>
-        <option value="domingo">Domingo</option>
-    </select>
-    </div>
-    <div class="div">
-        <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-green"></span> Rafaela</p>
-    <select id="logistica-rafaela" class="form-control mc-os-select">
-        <option value="">Sin día predeterminado</option>
-        <option value="lunes">Lunes</option>
-        <option value="martes">Martes</option>
-        <option value="miercoles">Miércoles</option>
-        <option value="jueves">Jueves</option>
-        <option value="viernes">Viernes</option>
-        <option value="sabado">Sábado</option>
-        <option value="domingo">Domingo</option>
-    </select>
-    </div>
+                <div class="modal-select-logistica row">
+                    <div class="logistica-item col-md-6 mb-2">
+                        <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-lila"></span> San Nicolás</p>
+                        <select id="logistica-sannicolas" class="form-control mc-os-select">
+                            <option value="">Sin día predeterminado</option>
+                            <option value="lunes">Lunes</option>
+                            <option value="martes">Martes</option>
+                            <option value="miercoles">Miércoles</option>
+                            <option value="jueves">Jueves</option>
+                            <option value="viernes">Viernes</option>
+                            <option value="sabado">Sábado</option>
+                            <option value="domingo">Domingo</option>
+                        </select>
+                    </div>
+                    <div class="logistica-item col-md-6 mb-2">
+                        <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-red"></span> Buenos Aires</p>
+                        <select id="logistica-bsas" class="form-control mc-os-select">
+                            <option value="">Sin día predeterminado</option>
+                            <option value="lunes">Lunes</option>
+                            <option value="martes">Martes</option>
+                            <option value="miercoles">Miércoles</option>
+                            <option value="jueves">Jueves</option>
+                            <option value="viernes">Viernes</option>
+                            <option value="sabado">Sábado</option>
+                            <option value="domingo">Domingo</option>
+                        </select>
+                    </div>
+                    <div class="logistica-item col-md-6">
+                        <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-green"></span> Rafaela</p>
+                        <select id="logistica-rafaela" class="form-control mc-os-select">
+                            <option value="">Sin día predeterminado</option>
+                            <option value="lunes">Lunes</option>
+                            <option value="martes">Martes</option>
+                            <option value="miercoles">Miércoles</option>
+                            <option value="jueves">Jueves</option>
+                            <option value="viernes">Viernes</option>
+                            <option value="sabado">Sábado</option>
+                            <option value="domingo">Domingo</option>
+                        </select>
+                    </div>
+                    <div class="logistica-item col-md-6">
+                        <p class="mc-os-dia"><span class="mc-os-circle mc-os-circle-blue"></span> Santa Fe</p>
+                        <select id="logistica-santafe" class="form-control mc-os-select">
+                            <option value="">Sin día predeterminado</option>
+                            <option value="lunes">Lunes</option>
+                            <option value="martes">Martes</option>
+                            <option value="miercoles">Miércoles</option>
+                            <option value="jueves">Jueves</option>
+                            <option value="viernes">Viernes</option>
+                            <option value="sabado">Sábado</option>
+                            <option value="domingo">Domingo</option>
+                        </select>
+                    </div>
+                </div>
 
-</div>                <div class="text-center mb-3">
+                <div class="text-center mb-3">
                     <h6 id="current-month" class="mc-os-month"></h6>
                 </div>
                 <div id="calendar" class="mc-os-calendar"></div>
@@ -230,6 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const calendar = document.getElementById('calendar');
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
+    const logisticaSanNicolasSelect = document.getElementById('logistica-sannicolas');
     const logisticaBsAsSelect = document.getElementById('logistica-bsas');
     const logisticaSantaFeSelect = document.getElementById('logistica-santafe');
     const logisticaRafaelaSelect = document.getElementById('logistica-rafaela');
@@ -243,6 +261,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function loadDefaultDays() {
+        database.ref('DiaPredeterminadoSanNicolas').once('value').then(snapshot => {
+            if (snapshot.exists()) {
+                logisticaSanNicolasSelect.value = snapshot.val();
+            } else {
+                logisticaSanNicolasSelect.value = '';
+            }
+            renderCalendar(); // Renderizar el calendario después de cargar el día predeterminado
+        });
+
         database.ref('DiaPredeterminadoBsAs').once('value').then(snapshot => {
             if (snapshot.exists()) {
                 logisticaBsAsSelect.value = snapshot.val();
@@ -272,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateDefaultDay(location, day) {
-        const ref = location === 'BsAs' ? 'DiaPredeterminadoBsAs' : location === 'StaFe' ? 'DiaPredeterminadoStaFe' : 'DiaPredeterminadoRafaela';
+        const ref = location === 'SanNicolas' ? 'DiaPredeterminadoSanNicolas' : location === 'BsAs' ? 'DiaPredeterminadoBsAs' : location === 'StaFe' ? 'DiaPredeterminadoStaFe' : 'DiaPredeterminadoRafaela';
         database.ref(ref).once('value').then(snapshot => {
             const previousDay = snapshot.exists() ? snapshot.val() : 'Sin día predeterminado';
             if (day === previousDay) {
@@ -281,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             database.ref(ref).set(day).then(() => {
-                const message = `Día de entrega en Logistica ${location === 'BsAs' ? 'Buenos Aires' : location === 'StaFe' ? 'Santa Fe' : 'Rafaela'} cambiado de ${previousDay} a ${day}`;
+                const message = `Día de entrega en Logistica ${location === 'SanNicolas' ? 'San Nicolás' : location === 'BsAs' ? 'Buenos Aires' : location === 'StaFe' ? 'Santa Fe' : 'Rafaela'} cambiado de ${previousDay} a ${day}`;
                 mostrarLogisticaAlert(message, 'info');
                 renderCalendar(); // Renderizar el calendario después de actualizar el día predeterminado
             }).catch(error => {
@@ -290,6 +317,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    logisticaSanNicolasSelect.addEventListener('change', function () {
+        const selectedDay = this.value;
+        updateDefaultDay('SanNicolas', selectedDay);
+    });
 
     logisticaBsAsSelect.addEventListener('change', function () {
         const selectedDay = this.value;
@@ -351,6 +383,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function markDays() {
+        const sanNicolasDay = logisticaSanNicolasSelect.value;
         const bsAsDay = logisticaBsAsSelect.value;
         const santaFeDay = logisticaSantaFeSelect.value;
         const rafaelaDay = logisticaRafaelaSelect.value;
@@ -361,12 +394,27 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isNaN(dayNumber)) {
                 const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNumber);
                 const dayOfWeek = dayDate.getDay();
+                const isSanNicolasDay = dayOfWeek === getDayNumber(sanNicolasDay);
                 const isBsAsDay = dayOfWeek === getDayNumber(bsAsDay);
                 const isSantaFeDay = dayOfWeek === getDayNumber(santaFeDay);
                 const isRafaelaDay = dayOfWeek === getDayNumber(rafaelaDay);
 
-                if (isBsAsDay && isSantaFeDay && isRafaelaDay) {
+                if (isSanNicolasDay && isBsAsDay && isSantaFeDay && isRafaelaDay) {
                     day.classList.add('mc-os-day-all');
+                } else if (isSanNicolasDay && isBsAsDay && isSantaFeDay) {
+                    day.classList.add('mc-os-day-sannicolas-bsas-santafe');
+                } else if (isSanNicolasDay && isBsAsDay && isRafaelaDay) {
+                    day.classList.add('mc-os-day-sannicolas-bsas-rafaela');
+                } else if (isSanNicolasDay && isSantaFeDay && isRafaelaDay) {
+                    day.classList.add('mc-os-day-sannicolas-santafe-rafaela');
+                } else if (isBsAsDay && isSantaFeDay && isRafaelaDay) {
+                    day.classList.add('mc-os-day-bsas-santafe-rafaela');
+                } else if (isSanNicolasDay && isBsAsDay) {
+                    day.classList.add('mc-os-day-sannicolas-bsas');
+                } else if (isSanNicolasDay && isSantaFeDay) {
+                    day.classList.add('mc-os-day-sannicolas-santafe');
+                } else if (isSanNicolasDay && isRafaelaDay) {
+                    day.classList.add('mc-os-day-sannicolas-rafaela');
                 } else if (isBsAsDay && isSantaFeDay) {
                     day.classList.add('mc-os-day-bsas-santafe');
                 } else if (isBsAsDay && isRafaelaDay) {
@@ -374,6 +422,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (isSantaFeDay && isRafaelaDay) {
                     day.classList.add('mc-os-day-santafe-rafaela');
                 } else {
+                    if (isSanNicolasDay) {
+                        day.classList.add('mc-os-day-lila');
+                    }
                     if (isBsAsDay) {
                         day.classList.add('mc-os-day-red');
                     }
@@ -413,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function() {
     renderCalendar();
 });
 </script>
-<!-- FIN MODAL CALENDARIO -->     
+<!-- FIN MODAL CALENDARIO --> 
 
             </div>
         </div>
@@ -463,7 +514,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
     </div>
-</div>
+</div> 
 
         <!-- Fin ModalQuey -->
     
@@ -507,8 +558,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="./js/features.js"></script>
-    <script src="./js/meliCardsFisebase.js"></script>
     <script src="./js/ciudades.js"></script>
+    <script src="./js/meliCardsFisebase.js"></script>
     <script src="./js/emailSender.js"></script>
     <script src="./js/emailTemplate.js"></script>
     
