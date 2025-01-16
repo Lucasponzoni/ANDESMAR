@@ -400,13 +400,15 @@ function renderCards(data) {
         } else {
             // Si el operador logístico es "Logística Novogar"
             if (item.operadorLogistico === "Logística Novogar") {
-                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
             } else if (item.operadorLogistico === "Logística Novogar StaFe") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
             } else if (item.operadorLogistico === "Logística Novogar Rafaela") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
             } else if (item.operadorLogistico === "Logística Novogar BsAs") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
+            } else if (item.operadorLogistico === "Logística Novogar SanNicolas") {
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> San Nicolás</button>`;
             } else {
                 operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
             }
@@ -484,6 +486,8 @@ async function generarPDF(remito, cliente, fechaEntrega, operadorLogistico, butt
         logoSrc = './Img/Camion-Santa-fe-Novogar.png';
     } else if (operadorLogistico === 'Logística Novogar Rafaela') {
         logoSrc = './Img/Camion-Rafaela-Novogar.png';
+    } else if (operadorLogistico === 'Logística Novogar SanNicolas') {
+        logoSrc = './Img/Camion-SNicolas-Novogar.png';
     }
 
     // Contenido HTML
@@ -590,7 +594,7 @@ async function generarPDF(remito, cliente, fechaEntrega, operadorLogistico, butt
             </div>
             <div class="campo">
                 <i class="bi bi-calendar-check"></i>
-                <span>Vencimiento: ${fechaEntrega}</span>
+                <span>Vence: ${fechaEntrega}</span>
             </div>
           <div class="campo">
                 <i class="bi bi-telephone-outbound-fill"></i>
@@ -640,6 +644,8 @@ async function generarPDF(remito, cliente, fechaEntrega, operadorLogistico, butt
                 buttonText = 'Santa Fé';
             } else if (operadorLogistico === 'Logística Novogar Rafaela') {
                 buttonText = 'Rafaela';
+            } else if (operadorLogistico === 'Logística Novogar SanNicolas') {
+                buttonText = 'San Nicolás';
             }
         
         }, 2000); // Retraso de 2000 ms (2 segundos)
