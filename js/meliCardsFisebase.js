@@ -1791,6 +1791,9 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     let spinner = document.getElementById(`spinnerLogPropia${id}`);
     let spinner2 = document.getElementById("spinner2");
 
+    // Obtener la fecha actual al inicio
+    const fechaActual = new Date();
+
     // Mostrar en consola los parámetros recibidos
     console.log('Parámetros recibidos por generarPDF:');
     console.log({ email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia });
@@ -1802,33 +1805,79 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 
     const { jsPDF } = window.jspdf;
 
+    // Obtener los días predeterminados desde Firebase
+    const diaPredeterminadoBsAs = await database.ref('DiaPredeterminadoBsAs').once('value').then(snapshot => snapshot.val());
+    const diaPredeterminadoStaFe = await database.ref('DiaPredeterminadoStaFe').once('value').then(snapshot => snapshot.val());
+    const diaPredeterminadoRafaela = await database.ref('DiaPredeterminadoRafaela').once('value').then(snapshot => snapshot.val());
+    const diaPredeterminadoSanNicolas = await database.ref('DiaPredeterminadoSanNicolas').once('value').then(snapshot => snapshot.val());
+
+    function obtenerProximoDia(fecha, dia) {
+        const diasDeLaSemana = {
+            'lunes': 1,
+            'martes': 2,
+            'miercoles': 3,
+            'jueves': 4,
+            'viernes': 5,
+            'sabado': 6,
+            'domingo': 0
+        };
+        
+        const diaActual = fecha.getDay();
+        let diasParaSumar = (diasDeLaSemana[dia] - diaActual + 7) % 7;
+        if (diasParaSumar === 0) diasParaSumar = 7; // Si es hoy, sumar 7 días
+        const fechaProximoDia = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar);
+        const esManana = diasParaSumar === 1;
+        return { fechaProximoDia, esManana };
+    }
+
     // Determinar la logística según el CP
     const logistica = logBsCps.includes(Number(Cp)) ? 'Buenos Aires' :
-    logStaFeCps.includes(Number(Cp)) ? 'Santa Fe' :
-    logRafaelaCps.includes(Number(Cp)) ? 'Rafaela' :
-    logSanNicolasCps.includes(Number(Cp)) ? 'San Nicolás' :
-    'logística Propia';
+                      logStaFeCps.includes(Number(Cp)) ? 'Santa Fe' :
+                      logRafaelaCps.includes(Number(Cp)) ? 'Rafaela' :
+                      logSanNicolasCps.includes(Number(Cp)) ? 'San Nicolás' :
+                      'logística Propia';
 
-    // Preguntar al usuario si es mañana
-    const { value: incluirMañana } = await Swal.fire({
-        title: '¿Sale en el camión de mañana?',
-        html: `
-            <p class="logistica-propia-sweet-alert">
-                <i class="bi bi-truck" style="font-size: 24px; color: #007bff;"></i>
-                Hay programado un camión con Logística Propia a <strong style="color: #28a745;">${logistica}</strong> para el día de mañana.
-            </p>
-            <p>
-                Si desea incluir el envío, presione <strong style="color: #28a745;">SÍ</strong>. De lo contrario, presione <strong style="color: #FF0000FF;">NO</strong> y se calculará para la próxima semana.
-            </p>
-        `,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sí',
-        cancelButtonText: 'No'
-    });
+    let diaPredeterminado;
+    if (logistica === 'Buenos Aires') {
+        diaPredeterminado = diaPredeterminadoBsAs;
+    } else if (logistica === 'Santa Fe') {
+        diaPredeterminado = diaPredeterminadoStaFe;
+    } else if (logistica === 'Rafaela') {
+        diaPredeterminado = diaPredeterminadoRafaela;
+    } else if (logistica === 'San Nicolás') {
+        diaPredeterminado = diaPredeterminadoSanNicolas;
+    }
 
-    // Determinar la cantidad de días a sumar
-    let diasParaSumar = incluirMañana ? 1 : 7; // Usar la respuesta directamente
+    const { fechaProximoDia, esManana } = obtenerProximoDia(fechaActual, diaPredeterminado);
+
+    let diasParaSumar = 0; // Inicializar la variable
+    if (esManana) {
+        // Preguntar al usuario si es mañana
+        const { value: incluirMañana } = await Swal.fire({
+            title: '¿Sale en el camión de mañana?',
+            html: `
+                <p class="logistica-propia-sweet-alert">
+                    <i class="bi bi-truck" style="font-size: 24px; color: #007bff;"></i>
+                    Hay programado un camión con Logística Propia a <strong style="color: #28a745;">${logistica}</strong> para el día de mañana.
+                </p>
+                <p>
+                    Si desea incluir el envío, presione <strong style="color: #28a745;">SÍ</strong>. De lo contrario, presione <strong style="color: #FF0000FF;">NO</strong> y se calculará para la próxima semana.
+                </p>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'No'
+        });
+
+        // Determinar la cantidad de días a sumar
+        diasParaSumar = incluirMañana ? 1 : 7; // Usar la respuesta directamente
+    } else {
+        diasParaSumar = 7; // Si no es mañana, sumar 7 días
+    }
+
+    const fechaProgramada = sumarDiasHabiles(fechaActual, diasParaSumar); // Usar la función de sumar días hábiles
+    const diaFormateado = fechaProgramada.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
 
     spinner2.style.display = "flex";
 
@@ -1856,25 +1905,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         return nuevaFecha;
     }
 
-    function obtenerProximoDia(fecha, dia) {
-        const diasDeLaSemana = {
-            'lunes': 1,
-            'martes': 2,
-            'miercoles': 3,
-            'jueves': 4,
-            'viernes': 5,
-            'sabado': 6,
-            'domingo': 0
-        };
-        
-        const diaActual = fecha.getDay();
-        let diasParaSumar = (diasDeLaSemana[dia] - diaActual + 7) % 7;
-        if (diasParaSumar === 0) diasParaSumar = 7; // Si es hoy, sumar 7 días
-        return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar); // Retornar solo la fecha
-    }
-
     // Obtener la fecha actual
-    const fechaActual = new Date();
     const fechaFormateada = `${fechaActual.getDate().toString().padStart(2, '0')}-${(fechaActual.getMonth() + 1).toString().padStart(2, '0')}-${fechaActual.getFullYear().toString().slice(-2)}`;
     const fechaVencimiento = sumarDiasHabiles(fechaActual, 3);
     const fechaVencimientoFormateada = `${fechaVencimiento.getDate().toString().padStart(2, '0')}-${(fechaVencimiento.getMonth() + 1).toString().padStart(2, '0')}-${fechaVencimiento.getFullYear().toString().slice(-2)}`;    
@@ -1890,12 +1921,6 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     } else if (logSanNicolasCps.includes(Number(Cp))) {
         logoSrc = './Img/Camion-SNicolas-Novogar.png';
     }
-
-    // Obtener los días predeterminados desde Firebase
-    const diaPredeterminadoBsAs = await database.ref('DiaPredeterminadoBsAs').once('value').then(snapshot => snapshot.val());
-    const diaPredeterminadoStaFe = await database.ref('DiaPredeterminadoStaFe').once('value').then(snapshot => snapshot.val());
-    const diaPredeterminadoRafaela = await database.ref('DiaPredeterminadoRafaela').once('value').then(snapshot => snapshot.val());
-    const diaPredeterminadoSanNicolas = await database.ref('DiaPredeterminadoSanNicolas').once('value').then(snapshot => snapshot.val());   
     
     // Contenido HTML
     let contenido = `
@@ -2008,21 +2033,8 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 <span>Teléfono: ${telefonoDestinatario}</span>
             </div>`;
 
-    // Determinar la fecha de envío según el CP
-    const fechaProgramada = sumarDiasHabiles(fechaActual, diasParaSumar); // Usar la función de sumar días hábiles
-    const diaFormateado = fechaProgramada.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
-    
-    if (logBsCps.includes(Number(Cp))) {
-        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
-    } else if (logStaFeCps.includes(Number(Cp))) {
-        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
-    } else if (logRafaelaCps.includes(Number(Cp))) {
-        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
-    } else if (logSanNicolasCps.includes(Number(Cp))) {
-        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
-    } else {
-        contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Vencimiento: ${fechaFormateada} al ${fechaVencimientoFormateada}</span></div>`;
-    }
+    // Agregar información sobre el camión
+    contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
 
     const idOperacionsSinMe1 = idOperacion.replace(/ME1$/, '');
 
@@ -2057,13 +2069,14 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
         NroEnvio.innerHTML = `Logistica Propia`;
 
+        let trackingMessage = ''; // Inicializar la variable
+
+        // Generar el mensaje de seguimiento basado en la logística
         if (logBsCps.includes(Number(Cp))) {
-            const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoBsAs);
-            const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
-            
+            const diaFormateadoBsAs = diaFormateado; // Usar la variable ya calculada
             trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
         
-            Queremos informarte que vamos a visitarte el ${diaFormateado}.
+            Queremos informarte que vamos a visitarte el ${diaFormateadoBsAs}.
                 
             Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
         
@@ -2074,12 +2087,10 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             ENVIO CON LOGISTICA BUENOS AIRES`;
 
         } else if (logStaFeCps.includes(Number(Cp))) {
-            const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoStaFe);
-            const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
-            
+            const diaFormateadoStaFe = diaFormateado; // Usar la variable ya calculada
             trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
         
-            Queremos informarte que vamos a visitarte el ${diaFormateado}.
+            Queremos informarte que vamos a visitarte el ${diaFormateadoStaFe}.
         
             Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
         
@@ -2089,12 +2100,10 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             
             ENVIO CON LOGISTICA SANTA FE`;
         } else if (logSanNicolasCps.includes(Number(Cp))) {
-            const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoSanNicolas);
-            const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
-            
+            const diaFormateadoSanNicolas = diaFormateado; // Usar la variable ya calculada
             trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
         
-            Queremos informarte que vamos a visitarte el ${diaFormateado}.
+            Queremos informarte que vamos a visitarte el ${diaFormateadoSanNicolas}.
         
             Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
         
@@ -2104,12 +2113,10 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             
             ENVIO CON LOGISTICA SAN NICOLAS`;
         } else if (logRafaelaCps.includes(Number(Cp))) {
-            const fechaProximoDia = obtenerProximoDia(fechaActual, diaPredeterminadoStaFe);
-            const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
-            
+            const diaFormateadoRafaela = diaFormateado; // Usar la variable ya calculada
             trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
         
-            Queremos informarte que vamos a visitarte el ${diaFormateado}.
+            Queremos informarte que vamos a visitarte el ${diaFormateadoRafaela}.
         
             Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
         
@@ -2118,8 +2125,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             Equipo Posventa Novogar
             
             ENVIO CON LOGISTICA RAFAELA`;
-            
-        }else {
+        } else {
             // Mensaje para otras zonas
             trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
         
@@ -2138,7 +2144,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         
             Equipo Posventa Novogar`;
         }
-        
+
         const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
     
         firebase.database().ref('envios/' + idOperacionSinME1).update({
@@ -2151,7 +2157,6 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         }).catch(error => {
             console.error('Error al actualizar en Firebase:', error);
         });    
-
 
         // Crear un enlace para abrir el PDF en una nueva ventana
         const pdfUrl = URL.createObjectURL(pdfBlob);
