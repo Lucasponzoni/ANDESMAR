@@ -4629,6 +4629,12 @@ input[disabled] {
     }
 }
 
+@media (max-width: 1200px) {
+    .estado-column {
+        min-width: 400px;
+    }
+}
+
 .Alert35 {
     padding: 10px;
     border-radius: 5px;
