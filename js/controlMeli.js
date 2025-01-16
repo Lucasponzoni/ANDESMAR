@@ -934,7 +934,19 @@ function buscarCodigoEscaneo2(codigo) {
                     }).then(() => {
                         console.log('Estado actualizado a preparado en Firebase.');
                         mostrarNotificacion(`Se ha marcado como preparado el ID ${shippingId} en fila ${index + 1}`);
-                        actualizarContadores(); // Actualizar contadores después de marcar como preparado
+                        
+                        // Restar 1 al contador de "Sin Preparar"
+                        const totalSinPrepararElement = document.getElementById('totalSinPreparar');
+                        let totalSinPreparar = parseInt(totalSinPrepararElement.innerText);
+                        totalSinPreparar = totalSinPreparar - 1;
+                        totalSinPrepararElement.innerText = totalSinPreparar;
+
+                        // Sumar 1 al contador de "Preparados"
+                        const totalPreparadosElement = document.getElementById('totalPreparados');
+                        let totalPreparados = parseInt(totalPreparadosElement.innerText);
+                        totalPreparados = totalPreparados + 1;
+                        totalPreparadosElement.innerText = totalPreparados;
+
                     }).catch(error => {
                         console.error("Error al actualizar el estado en Firebase: ", error);
                     });
