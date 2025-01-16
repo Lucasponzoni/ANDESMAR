@@ -3286,8 +3286,21 @@ div .form-check {
     font-size: 1.1rem;
 }
 
+.table td, .table th{
+    padding: .50rem !important;
+}
+
 .subdato-texto1{
     background-color: orange;
+    color: white;
+    padding: 3px;
+    border-radius: 5px;
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+.subdato-texto3{
+    background-color: green;
     color: white;
     padding: 3px;
     border-radius: 5px;
@@ -4604,6 +4617,16 @@ input[disabled] {
     color: #004085;
     background-color: #cce5ff;
     border-color: #b8daff;
+}
+
+.custom-spinner {
+    border-width: 0.6em;
+}
+
+@media (max-width: 768px) {
+    .estado-column {
+        min-width: 300px;
+    }
 }
 
 .Alert35 {

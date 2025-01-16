@@ -383,9 +383,9 @@ function renderCards(data) {
         let operadorLogistico = '';
 
         if (item.numeroDeEnvio) {
-                    const numeroDeEnvio = item.numeroDeEnvio;
-                    let link, imgSrc;
-        
+            const numeroDeEnvio = item.numeroDeEnvio;
+            let link, imgSrc;
+
             // Verificar el formato del número de envío
             if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
                 (numeroDeEnvio.length === 15 && (numeroDeEnvio.startsWith('36') || numeroDeEnvio.startsWith('40')))) {
@@ -400,13 +400,13 @@ function renderCards(data) {
         } else {
             // Si el operador logístico es "Logística Novogar"
             if (item.operadorLogistico === "Logística Novogar") {
-                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}', this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
             } else if (item.operadorLogistico === "Logística Novogar StaFe") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
             } else if (item.operadorLogistico === "Logística Novogar Rafaela") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
             } else if (item.operadorLogistico === "Logística Novogar BsAs") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
             } else {
                 operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
             }
@@ -417,13 +417,26 @@ function renderCards(data) {
         const entregaEntreIcon = item.estado.startsWith("(se entrega entre") ? '<i class="bi bi-check-circle-fill icon-state-ios"></i>' : '';
 
         const comentarioClase = item.comentario ? 'btn-success' : 'btn-secondary';
-        const subdatoTexto = item.subdato ? 
-        `<br><span class="${item.subdato.startsWith('Pendiente de confirmar') ? 'subdato-texto1' : 'subdato-texto2'}">${item.subdato}</span>` : '';
+        let subdatoTexto = item.subdato ? 
+            `<br><span class="${item.subdato.startsWith('Pendiente de confirmar') ? 'subdato-texto1' : 'subdato-texto2'}">${item.subdato}</span>` : '';
+
+        // Verificar si existe item.fotoURL y crear el botón de descarga
+        let remitoColumna = remito;
+        if (item.fotoURL) {
+            const fileName = `Remito de entrega Cliente ${item.cliente} - Remito ${remito}`;
+            remitoColumna += `<br><button class="btn btn-primary btn-sm" onclick="abrirFoto('${item.fotoURL}')"><i class="bi bi-download"></i> Remito</button>`;
+            
+            // Si existe item.fotoURL y item.subdato, mostrar subdato específico
+            if (item.subdato) {
+                subdatoTexto = `<br><span class="subdato-texto3">Producto entregado, remito disponible</span>`;
+            }
+        }
+
         const row = `<tr>
             <td>${formattedDateTime}</td>
             <td class="${estadoClass} ${entregaEntreClass}">${alertIcon} ${entregaEntreIcon} ${item.estado} ${subdatoTexto} ${tiempoTexto}</td>
             <td>${item.cliente}</td>
-            <td class="remito-columna">${remito}</td>
+            <td class="remito-columna">${remitoColumna}</td>
             <td class="valor-columna">${item.valorDeclarado}</td>
             <td>${operadorLogistico}</td>
             <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
@@ -442,13 +455,15 @@ function renderCards(data) {
     }
 }
 
+// Función para abrir la foto en una nueva pestaña
+function abrirFoto(url) {
+    window.open(url, '_blank');
+}
+
 async function generarPDF(remito, cliente, fechaEntrega, operadorLogistico, button) {
 
     let spinner = document.getElementById("spinner2");
     spinner.style.display = "flex";
-    // Cambiar el contenido del botón a un spinner
-    button.innerHTML = '<i class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></i> Generando...';
-    button.disabled = true; // Desactivar el botón
 
     const { jsPDF } = window.jspdf;
 
@@ -627,8 +642,6 @@ async function generarPDF(remito, cliente, fechaEntrega, operadorLogistico, butt
                 buttonText = 'Rafaela';
             }
         
-            button.innerHTML = `<img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> ${buttonText}`; // Restaurar el texto del botón
-            button.disabled = false; // Reactivar el botón
         }, 2000); // Retraso de 2000 ms (2 segundos)
         
         document.body.removeChild(tempDiv); // Eliminar el elemento temporal
@@ -645,8 +658,6 @@ async function generarPDF(remito, cliente, fechaEntrega, operadorLogistico, butt
                 buttonText = 'Rafaela';
             }
         
-            button.innerHTML = `<img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> ${buttonText}`; // Restaurar el texto del botón en caso de error
-            button.disabled = false; // Reactivar el botón
         });
 }
 
@@ -1211,7 +1222,7 @@ function subirFoto() {
     const remitoRef = db.ref(`DespachosLogisticos/${remito}`);
     remitoRef.once('value', (snapshot) => {
         if (!snapshot.exists()) {
-            Swal.fire('Error', 'El remito no existe en DespachosLogisticos', 'error');
+            Swal.fire('Error', 'El remito no existe en Base de Datos', 'error');
             return;
         }
 
@@ -1220,8 +1231,8 @@ function subirFoto() {
 
         remitoFotoRef.getDownloadURL().then(() => {
             Swal.fire({
-                title: 'La foto ya existe',
-                text: "¿Desea sobreescribir la foto existente?",
+                title: 'El Remito ya existe',
+                text: "¿Desea sobreescribir el remito existente?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',

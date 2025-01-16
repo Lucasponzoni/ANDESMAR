@@ -93,8 +93,8 @@
                 <i class="bi bi-truck"></i> Interior
             </button>
             <!-- Botón para abrir el modal de escanear remito y adjuntar foto -->
-            <button class="btn btn-warning ml-2" id="scanRemitoBtn" data-toggle="modal" data-target="#scanRemitoModal">
-                <i class="bi bi-camera"></i>
+            <button class="btn btn-success ml-2" id="scanRemitoBtn" data-toggle="modal" data-target="#scanRemitoModal">
+                <i class="bi bi-camera2"></i>
             </button>
             <button class="btn btn-secondary ml-2" id="promedioBtn" title="Promedio Despacho: Xd Yh Zm">
                 <i class="bi bi-calculator"></i> Calculando Promedio...
@@ -135,7 +135,7 @@
         <thead>
             <tr>
                 <th><i class="bi bi-calendar-check-fill"></i> Fecha</th>
-                <th><i class="bi bi-geo-alt-fill"></i> Estado</th>
+                <th class="estado-column"><i class="bi bi-geo-alt-fill"></i> Estado</th>
                 <th><i class="bi bi-person-badge-fill"></i> Cliente</th>
                 <th><i class="bi bi-file-earmark-text-fill"></i> Remito</th>
                 <th><i class="bi bi-currency-dollar"></i> Valor</th>
@@ -214,11 +214,10 @@
                             <input type="file" class="form-control" id="fotoRemitoInput" accept="image/*" capture="camera">
                         </div>
 
-                            <div id="logisticsAlert" class="Alert34 text-center mt-2" style="display: none;"></div>
-
-                        <div id="loadingSpinner" class="spinner-border text-danger" role="status" style="display: none; width: 2rem; height: 2rem;">
-                            <span class="sr-only">Cargando...</span>
-                        </div>
+                            <div id="logisticsAlert" class="Alert35 text-center mt-2" style="display: none;"></div>
+                                <div id="loadingSpinner" class="spinner-border text-info custom-spinner" role="status" style="display: none; width: 3rem; height: 3rem;">
+                                    <span class="sr-only">Cargando...</span>
+                                </div>
                     </form>
                 </div>
                 <div class="modal-footer">
