@@ -1135,7 +1135,7 @@ function toggleLogisticsInput() {
 
 document.getElementById('logisticsCpInput').addEventListener('input', function () {
     const cp = this.value.trim();
-    const logisticsAlert = document.getElementById('logisticsAlert');
+    const logisticsAlert = document.getElementById('logisticsAlert33');
 
     if (cp.length === 4) {
         Promise.all([
@@ -1147,35 +1147,26 @@ document.getElementById('logisticsCpInput').addEventListener('input', function (
 
             if (bsAsSnapshot.hasChild(cp)) {
                 logisticsAlert.innerHTML = '<i class="bi bi-check-circle-fill"></i> Se encontró CP en <strong>LOGÍSTICA BUENOS AIRES</strong>';
-                logisticsAlert.classList.remove('Alert34');
-                logisticsAlert.classList.remove('Alert36');
+                logisticsAlert.classList.remove('Alert34', 'Alert36');
                 logisticsAlert.classList.add('Alert35');
                 logisticsAlert.style.display = 'block';
                 found = true;
             } else if (staFeSnapshot.hasChild(cp)) {
                 logisticsAlert.innerHTML = '<i class="bi bi-check-circle-fill"></i> Se encontró CP en <strong>LOGÍSTICA SANTA FE</strong>';
-                logisticsAlert.classList.remove('Alert34');
-                logisticsAlert.classList.remove('Alert36');
+                logisticsAlert.classList.remove('Alert34', 'Alert36');
                 logisticsAlert.classList.add('Alert35');
                 logisticsAlert.style.display = 'block';
                 found = true;
             } else if (rafaelaSnapshot.hasChild(cp)) {
                 logisticsAlert.innerHTML = '<i class="bi bi-check-circle-fill"></i> Se encontró CP en <strong>LOGÍSTICA RAFAELA</strong>';
-                logisticsAlert.classList.remove('Alert34');
-                logisticsAlert.classList.remove('Alert36');
+                logisticsAlert.classList.remove('Alert34', 'Alert36');
                 logisticsAlert.classList.add('Alert35');
                 logisticsAlert.style.display = 'block';
                 found = true;
             } else {
                 logisticsAlert.innerHTML = '<i class="bi bi-x-circle-fill"></i> No se encontró el CP en ninguna logística propia';
-                logisticsAlert.classList.remove('Alert34');
-                logisticsAlert.classList.remove('Alert35');
+                logisticsAlert.classList.remove('Alert34', 'Alert35');
                 logisticsAlert.classList.add('Alert36');
-                logisticsAlert.style.display = 'block';
-            }
-
-            if (!found) {
-                logisticsAlert.innerHTML = '<i class="bi bi-x-circle-fill"></i> No se encontró el CP en ninguna logística propia';
                 logisticsAlert.style.display = 'block';
             }
         }).catch(error => {
