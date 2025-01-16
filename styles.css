@@ -3640,6 +3640,11 @@ div .form-check {
     display: block !important;
 }
 
+.btn-group-logistica > button{
+    font-size: 14px;
+    font-weight: 600;
+}
+
 .btn-primary-2 {
     color: white;
     font-weight: 400;

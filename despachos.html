@@ -241,15 +241,18 @@
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-center mb-3">
-                        <div class="btn-group" role="group" aria-label="Basic outlined example">
+                        <div class="btn-group btn-group-logistica" role="group" aria-label="Basic outlined example">
+                            <button id="logisticaSanNicolasButton" class="btn btn-outline-primary" onclick="cargarDiaPredeterminado('SanNicolas')">
+                                <i class="bi bi-lightning-charge-fill"></i> San Nicolás
+                            </button>
                             <button id="logisticaBsAsButton" class="btn btn-outline-primary" onclick="cargarDiaPredeterminado('BsAs')">
                                 <i class="bi bi-lightning-charge-fill"></i> Buenos Aires
                             </button>
-                            <button id="logisticaSantaFeButton" class="btn btn-outline-primary" onclick="cargarDiaPredeterminado('StaFe')">
-                                <i class="bi bi-lightning-charge-fill"></i> Santa Fe
-                            </button>
                             <button id="logisticaRafaelaButton" class="btn btn-outline-primary" onclick="cargarDiaPredeterminado('Rafaela')">
                                 <i class="bi bi-lightning-charge-fill"></i> Rafaela
+                            </button>
+                            <button id="logisticaSantaFeButton" class="btn btn-outline-primary" onclick="cargarDiaPredeterminado('StaFe')">
+                                <i class="bi bi-lightning-charge-fill"></i> Santa Fe
                             </button>
                         </div>
                     </div>
@@ -263,7 +266,7 @@
                             <input type="text" class="form-control" id="remitoLogisticaBsArStaFe" maxlength="11" placeholder="Ingrese el número de remito" autofocus>
                         </div>
                         <div class="alert alert-danger text-center" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill"></i> Escaneo de remitos con reparto Buenos Aires, Santa Fe o Rafaela
+                            <i class="bi bi-exclamation-triangle-fill"></i> Escaneo de remitos con reparto Buenos Aires, Santa Fe, Rafaela o San Nicolás
                         </div>
                     </form>
     

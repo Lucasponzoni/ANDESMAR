@@ -950,7 +950,10 @@ $('#bsarStaFeModal').on('hidden.bs.modal', function () {
 });
 
 function cargarDiaPredeterminado(logistica) {
-    const ref = logistica === 'BsAs' ? 'DiaPredeterminadoBsAs' : logistica === 'StaFe' ? 'DiaPredeterminadoStaFe' : 'DiaPredeterminadoRafaela';
+    const ref = logistica === 'BsAs' ? 'DiaPredeterminadoBsAs' : 
+                 logistica === 'StaFe' ? 'DiaPredeterminadoStaFe' : 
+                 logistica === 'Rafaela' ? 'DiaPredeterminadoRafaela' : 
+                 'DiaPredeterminadoSanNicolas';
     db.ref(ref).once('value').then(snapshot => {
         diaPredeterminado[logistica] = snapshot.val();
         actualizarBotones(logistica);
@@ -966,7 +969,8 @@ function actualizarBotones(logistica) {
     const botones = {
         BsAs: 'logisticaBsAsButton',
         StaFe: 'logisticaSantaFeButton',
-        Rafaela: 'logisticaRafaelaButton'
+        Rafaela: 'logisticaRafaelaButton',
+        SanNicolas: 'logisticaSanNicolasButton'
     };
 
     Object.keys(botones).forEach(key => {
@@ -981,7 +985,7 @@ function actualizarBotones(logistica) {
             buttonElement.classList.remove('btn-primary');
             buttonElement.style.color = 'green';
             buttonElement.style.borderColor = 'green';
-            buttonElement.innerHTML = `<i class="bi bi-arrow-repeat"></i> Cambiar a ${key}`;
+            buttonElement.innerHTML = `<i class="bi bi-arrow-repeat"></i> ${key}`;
         }
     });
 }
@@ -1117,7 +1121,7 @@ document.getElementById('remitoLogisticaBsArStaFe').addEventListener('keypress',
 function toggleLogisticsInput() {
     const button = document.getElementById('unknownLogisticsButton');
     const inputContainer = document.getElementById('logisticsInputContainer');
-    const logisticsAlert = document.getElementById('logisticsAlert');
+    const logisticsAlert = document.getElementById('logisticsAlert33');
 
     if (inputContainer.style.display === 'none') {
         button.classList.remove('btn-danger');
@@ -1141,8 +1145,9 @@ document.getElementById('logisticsCpInput').addEventListener('input', function (
         Promise.all([
             db.ref('LogBsAs').once('value'),
             db.ref('LogSantaFe').once('value'),
-            db.ref('LogRafaela').once('value')
-        ]).then(([bsAsSnapshot, staFeSnapshot, rafaelaSnapshot]) => {
+            db.ref('LogRafaela').once('value'),
+            db.ref('LogSanNicolas').once('value')
+        ]).then(([bsAsSnapshot, staFeSnapshot, rafaelaSnapshot, sanNicolasSnapshot]) => {
             let found = false;
 
             if (bsAsSnapshot.hasChild(cp)) {
@@ -1159,6 +1164,12 @@ document.getElementById('logisticsCpInput').addEventListener('input', function (
                 found = true;
             } else if (rafaelaSnapshot.hasChild(cp)) {
                 logisticsAlert.innerHTML = '<i class="bi bi-check-circle-fill"></i> Se encontró CP en <strong>LOGÍSTICA RAFAELA</strong>';
+                logisticsAlert.classList.remove('Alert34', 'Alert36');
+                logisticsAlert.classList.add('Alert35');
+                logisticsAlert.style.display = 'block';
+                found = true;
+            } else if (sanNicolasSnapshot.hasChild(cp)) {
+                logisticsAlert.innerHTML = '<i class="bi bi-check-circle-fill"></i> Se encontró CP en <strong>LOGÍSTICA SAN NICOLÁS</strong>';
                 logisticsAlert.classList.remove('Alert34', 'Alert36');
                 logisticsAlert.classList.add('Alert35');
                 logisticsAlert.style.display = 'block';
