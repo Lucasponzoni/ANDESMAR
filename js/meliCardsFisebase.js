@@ -1810,33 +1810,55 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     const diaPredeterminadoStaFe = await database.ref('DiaPredeterminadoStaFe').once('value').then(snapshot => snapshot.val());
     const diaPredeterminadoRafaela = await database.ref('DiaPredeterminadoRafaela').once('value').then(snapshot => snapshot.val());
     const diaPredeterminadoSanNicolas = await database.ref('DiaPredeterminadoSanNicolas').once('value').then(snapshot => snapshot.val());
-
+    
     function obtenerProximoDia(fecha, dia) {
         const diasDeLaSemana = {
             'lunes': 1,
             'martes': 2,
-            'miercoles': 3,
+            'miércoles': 3,
             'jueves': 4,
             'viernes': 5,
-            'sabado': 6,
+            'sábado': 6,
             'domingo': 0
         };
         
         const diaActual = fecha.getDay();
-        let diasParaSumar = (diasDeLaSemana[dia] - diaActual + 7) % 7;
+        let diasParaSumar = (diasDeLaSemana[dia.toLowerCase()] - diaActual + 7) % 7;
         if (diasParaSumar === 0) diasParaSumar = 7; // Si es hoy, sumar 7 días
         const fechaProximoDia = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar);
         const esManana = diasParaSumar === 1;
-        return { fechaProximoDia, esManana };
+        return { fechaProximoDia, esManana, diasParaSumar };
     }
-
+    
+    function sumarDiasHabiles(fecha, dias) {
+        let diasAgregados = 0;
+        let nuevaFecha = new Date(fecha);
+    
+        while (diasAgregados < dias) {
+            nuevaFecha.setDate(nuevaFecha.getDate() + 1);
+            // Si no es domingo, sumar un día hábil
+            if (nuevaFecha.getDay() !== 0) {
+                diasAgregados++;
+            }
+        }
+    
+        return nuevaFecha;
+    }
+    
+    function obtenerProximoSabado(fecha) {
+        const diaActual = fecha.getDay();
+        const diasParaSumar = (6 - diaActual + 7) % 7;
+        const fechaProximoSabado = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar);
+        return fechaProximoSabado;
+    }
+    
     // Determinar la logística según el CP
     const logistica = logBsCps.includes(Number(Cp)) ? 'Buenos Aires' :
                       logStaFeCps.includes(Number(Cp)) ? 'Santa Fe' :
                       logRafaelaCps.includes(Number(Cp)) ? 'Rafaela' :
                       logSanNicolasCps.includes(Number(Cp)) ? 'San Nicolás' :
                       'logística Propia';
-
+    
     let diaPredeterminado;
     if (logistica === 'Buenos Aires') {
         diaPredeterminado = diaPredeterminadoBsAs;
@@ -1847,37 +1869,54 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     } else if (logistica === 'San Nicolás') {
         diaPredeterminado = diaPredeterminadoSanNicolas;
     }
-
-    const { fechaProximoDia, esManana } = obtenerProximoDia(fechaActual, diaPredeterminado);
-
-    let diasParaSumar = 0; // Inicializar la variable
-    if (esManana) {
-        // Preguntar al usuario si es mañana
-        const { value: incluirMañana } = await Swal.fire({
-            title: '¿Sale en el camión de mañana?',
-            html: `
-                <p class="logistica-propia-sweet-alert">
-                    <i class="bi bi-truck" style="font-size: 24px; color: #007bff;"></i>
-                    Hay programado un camión con Logística Propia a <strong style="color: #28a745;">${logistica}</strong> para el día de mañana.
-                </p>
-                <p>
-                    Si desea incluir el envío, presione <strong style="color: #28a745;">SÍ</strong>. De lo contrario, presione <strong style="color: #FF0000FF;">NO</strong> y se calculará para la próxima semana.
-                </p>
-            `,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Sí',
-            cancelButtonText: 'No'
-        });
-
-        // Determinar la cantidad de días a sumar
-        diasParaSumar = incluirMañana ? 1 : 7; // Usar la respuesta directamente
+    
+    let diaFormateado;
+    const cp = Number(Cp);
+    if (cp === 2132 || cp === 2131 || cp === 2134) {
+        // Si el CP es de Funes, Roldán o Pérez, calcular el próximo sábado
+        const fechaProximoSabado = obtenerProximoSabado(new Date());
+        diaFormateado = fechaProximoSabado.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        console.log(`CP ${cp} es de Funes, Roldán o Pérez. Próximo sábado: ${diaFormateado}`);
+    } else if (logistica !== 'logística Propia') {
+        const { fechaProximoDia, esManana, diasParaSumar } = obtenerProximoDia(new Date(), diaPredeterminado);
+        console.log(`CP ${cp} pertenece a la logística ${logistica}. Día predeterminado: ${diaPredeterminado}. Próximo día: ${fechaProximoDia}`);
+    
+        let diasParaSumarFinal = diasParaSumar; // Inicializar la variable
+        if (esManana) {
+            // Preguntar al usuario si es mañana
+            const { value: incluirMañana } = await Swal.fire({
+                title: '¿Sale en el camión de mañana?',
+                html: `
+                    <p class="logistica-propia-sweet-alert">
+                        <i class="bi bi-truck" style="font-size: 24px; color: #007bff;"></i>
+                        Hay programado un camión con Logística Propia a <strong style="color: #28a745;">${logistica}</strong> para el día de mañana.
+                    </p>
+                    <p>
+                        Si desea incluir el envío, presione <strong style="color: #28a745;">SÍ</strong>. De lo contrario, presione <strong style="color: #FF0000FF;">NO</strong> y se calculará para la próxima semana.
+                    </p>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No'
+            });
+    
+            // Determinar la cantidad de días a sumar
+            diasParaSumarFinal = incluirMañana ? 1 : diasParaSumar; // Usar la respuesta directamente
+        }
+    
+        const fechaProgramada = new Date(new Date().setDate(new Date().getDate() + diasParaSumarFinal)); // Sumar días directamente
+        diaFormateado = fechaProgramada.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        console.log(`Fecha programada: ${diaFormateado}`);
     } else {
-        diasParaSumar = 7; // Si no es mañana, sumar 7 días
+        // Si no está en ninguna de las logísticas, sumar 3 días hábiles
+        const fechaInicio = sumarDiasHabiles(new Date(), 1);
+        const fechaEntrega = sumarDiasHabiles(fechaInicio, 3);
+        const fechaInicioFormateada = fechaInicio.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        const fechaEntregaFormateada = fechaEntrega.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        diaFormateado = `Entre ${fechaInicioFormateada} y ${fechaEntregaFormateada}`;
+        console.log(`CP ${cp} no pertenece a ninguna logística específica. Fecha inicio: ${fechaInicioFormateada}, Fecha entrega: ${fechaEntregaFormateada}`);
     }
-
-    const fechaProgramada = sumarDiasHabiles(fechaActual, diasParaSumar); // Usar la función de sumar días hábiles
-    const diaFormateado = fechaProgramada.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
 
     spinner2.style.display = "flex";
 
@@ -2034,7 +2073,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             </div>`;
 
     // Agregar información sobre el camión
-    contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Camión de ${diaFormateado}</span></div>`;
+    contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Vence: ${diaFormateado}</span></div>`;
 
     const idOperacionsSinMe1 = idOperacion.replace(/ME1$/, '');
 
@@ -2127,14 +2166,15 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             ENVIO CON LOGISTICA RAFAELA`;
         } else {
             // Mensaje para otras zonas
+            const diaFormateadoLocal = diaFormateado;
             trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
         
-            ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
+            ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística: ${diaFormateadoLocal}. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
             
             DETALLES DE ENTREGA:
             .Rosario: Entregas en 48 horas.
             .Villa Gobernador Gálvez, Arroyo Seco, San Lorenzo, Baigorria, Capitán Bermúdez: Lunes, miércoles y viernes.
-            .Funes, Roldán y Pérez: Sábados.
+            .Funes, Roldán y Pérez: Sábados. (Sin excepción)
         
             Si tienes alguna duda, no dudes en consultarnos por WhatsApp al 341 2010598.
         
