@@ -4625,7 +4625,7 @@ input[disabled] {
 
 @media (max-width: 768px) {
     .estado-column {
-        min-width: 300px;
+        min-width: 300px !important;
     }
 }
 
