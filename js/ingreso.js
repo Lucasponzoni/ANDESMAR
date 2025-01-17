@@ -1297,6 +1297,154 @@ function uploadFile(remitoFotoRef, fotoInput, remito) {
     });
 }
 
+// PANEL DE CONTROL
+document.getElementById('controlPanelBtn').addEventListener('click', function () {
+    const loadingSpinner = document.getElementById('custom-spinner333'); // ID cambiado
+    const controlPanelContent = document.getElementById('controlPanelContent');
+    const historialFechas = document.getElementById('historialFechas');
+    const operacionesList = document.getElementById('operacionesList');
+    const backToHistorialBtn = document.getElementById('backToHistorialBtn');
+    const backToFechasBtn = document.getElementById('backToFechasBtn');
+
+    // Resetear la visibilidad de los elementos
+    console.log("Mostrando spinner...");
+    loadingSpinner.classList.remove('hidden'); // Mostrar el spinner
+    controlPanelContent.style.display = 'none';
+    historialFechas.style.display = 'none';
+    operacionesList.style.display = 'none';
+    backToHistorialBtn.style.display = 'none';
+    backToFechasBtn.style.display = 'none';
+
+    // Consultar Firebase
+    fetch('https://despachos-meli-novogar-default-rtdb.firebaseio.com/DespachosLogisticos.json')
+        .then(response => {
+            console.log("Respuesta recibida de Firebase");
+            return response.json();
+        })
+        .then(data => {
+            console.log("Datos obtenidos:", data);
+
+            // Ocultar el spinner y mostrar el contenido del panel de control
+            loadingSpinner.classList.add('hidden'); // Ocultar el spinner
+            console.log("Ocultando spinner y mostrando contenido del panel de control");
+            controlPanelContent.style.display = 'block';
+
+            const historialStaFeBtn = document.getElementById('historialStaFeBtn');
+            const historialRafaelaBtn = document.getElementById('historialRafaelaBtn');
+            const historialBsAsBtn = document.getElementById('historialBsAsBtn');
+            const historialSanNicolasBtn = document.getElementById('historialSanNicolasBtn');
+            const fechasList = document.getElementById('fechasList');
+            const operacionesListGroup = document.getElementById('operacionesListGroup');
+
+            const operadoresLogisticos = {
+                'Logística Novogar StaFe': 'SANTA FE',
+                'Logística Novogar BsAs': 'Buenos Aires',
+                'Logística Novogar Rafaela': 'RAFAELA',
+                'Logística Novogar SanNicolas': 'San Nicolás'
+            };
+
+            function extraerFecha(estado) {
+                const match = estado.match(/Se entrega el día (.+)/);
+                return match ? match[1] : 'Fecha no disponible';
+            }
+
+            function mostrarFechas(operadorLogistico) {
+                fechasList.innerHTML = '';
+                const fechas = {};
+
+                for (const key in data) {
+                    if (data.hasOwnProperty(key) && /^\d+$/.test(key)) {
+                        const item = data[key];
+                        if (item.operadorLogistico === operadorLogistico) {
+                            const fecha = extraerFecha(item.estado);
+                            if (!fechas[fecha]) {
+                                fechas[fecha] = [];
+                            }
+                            fechas[fecha].push(item);
+                        }
+                    }
+                }
+
+                for (const fecha in fechas) {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.textContent = fecha;
+                    li.addEventListener('click', () => mostrarOperaciones(fechas[fecha]));
+                    fechasList.appendChild(li);
+                }
+
+                historialFechas.style.display = 'block';
+                backToHistorialBtn.style.display = 'block';
+                operacionesList.style.display = 'none';
+                console.log("Fechas mostradas para el operador:", operadorLogistico);
+            }
+
+            function mostrarOperaciones(operaciones) {
+                operacionesListGroup.innerHTML = '';
+
+                operaciones.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'historial-list-group-item list-group-item d-flex justify-content-between align-items-start';
+                    
+                    const div = document.createElement('div');
+                    div.className = 'historial-ms-2 historial-me-auto';
+                    
+                    const subheading = document.createElement('div');
+                    subheading.className = 'historial-fw-bold';
+                    subheading.textContent = item.remitoVBA;
+                    
+                    div.appendChild(subheading);
+                    div.innerHTML += `Preparado: ${item.fechaHora} - Cliente <strong class="historial-strong">${item.cliente}</strong> / Declarado: ${item.valorDeclarado}`;
+                    
+                    li.appendChild(div);
+
+                    const badge = document.createElement('span');
+                    badge.className = 'badge rounded-pill';
+                    if (item.fotoURL) {
+                        badge.classList.add('text-bg-primary');
+                        badge.textContent = 'Remito disponible';
+                        badge.addEventListener('click', () => window.open(item.fotoURL, '_blank'));
+                    } else {
+                        badge.classList.add('text-bg-danger');
+                        badge.classList.add('disabled')
+                        badge.textContent = 'El remito no retorno';
+                    }
+                    li.appendChild(badge);
+                    operacionesListGroup.appendChild(li);
+                });
+
+                operacionesList.style.display = 'block';
+                backToFechasBtn.style.display = 'block';
+                historialFechas.style.display = 'none';
+                console.log("Operaciones mostradas:", operaciones);
+            }
+
+            historialStaFeBtn.addEventListener('click', () => mostrarFechas('Logística Novogar StaFe'));
+            historialRafaelaBtn.addEventListener('click', () => mostrarFechas('Logística Novogar Rafaela'));
+            historialBsAsBtn.addEventListener('click', () => mostrarFechas('Logística Novogar BsAs'));
+            historialSanNicolasBtn.addEventListener('click', () => mostrarFechas('Logística Novogar SanNicolas'));
+
+            backToHistorialBtn.addEventListener('click', () => {
+                historialFechas.style.display = 'none';
+                backToHistorialBtn.style.display = 'none';
+                controlPanelContent.style.display = 'block';
+                console.log("Volviendo al historial...");
+            });
+
+            backToFechasBtn.addEventListener('click', () => {
+                operacionesList.style.display = 'none';
+                backToFechasBtn.style.display = 'none';
+                historialFechas.style.display = 'block';
+                console.log("Volviendo a las fechas...");
+            });
+        })
+        .catch(error => {
+            loadingSpinner.classList.add('hidden'); // Ocultar el spinner en caso de error
+            console.error("Error al consultar Firebase:", error);
+        });
+});
+// FIN PANEL DE CONTROL
+
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;
 

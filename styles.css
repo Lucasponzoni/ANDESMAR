@@ -3640,6 +3640,12 @@ div .form-check {
     display: block !important;
 }
 
+.pill-primary{
+    background-color: #34C759;
+    color: white;
+    padding: 10px;
+}
+
 .btn-group-logistica > button{
     font-size: 14px;
     font-weight: 600;
@@ -4735,3 +4741,104 @@ input[disabled] {
 .progress-bar {
     background-color: #17a2b8;
 }
+
+.custom-spinner333 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.hidden {
+    display: none; /* Oculta el elemento */
+}
+
+.historial-list-group-item {
+    background-color: #007bff;
+    color: white;
+    border-radius: 0;
+    padding: 10px 15px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.historial-list-group-item:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.text-bg-primary {
+    padding: 10px;
+    background-color: green;
+    color: white;
+}
+
+.text-bg-primary:hover {
+    padding: 10px;
+    background-color: #155724;
+    color: white;
+}
+
+.text-bg-danger {
+    padding: 10px;
+    background-color: orangered;
+    color: white;
+}
+
+.historial-list-group-item {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    padding: 10px 15px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.historial-list-group-item:hover {
+    background-color: #e0f7fa;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.historial-fw-bold {
+    background-color: cornflowerblue;
+    padding: 5px;
+    border-radius: 5px;
+    color: whitesmoke !important;
+    width: fit-content;
+    font-weight: bold;
+}
+
+.historial-ms-2 {
+    margin-left: 0.5rem;
+}
+
+.historial-me-auto {
+    margin-right: auto;
+}
+
+.historial-strong {
+    color: #007aff;
+}
+
+.historial-list-group-item div {
+    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+#fechasList .list-group-item{
+    font-size: 13px;
+}
+
+#fechasList .list-group-item:nth-child(1){
+    font-weight: 700;
+    background-color: pink;
+}
+
+#fechasList .list-group-item:nth-child(1)::after {
+    content: "Último";
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin-left: 10px;
+    display: inline-block;
+}
+
