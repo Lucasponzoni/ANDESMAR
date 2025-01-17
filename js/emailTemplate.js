@@ -1,7 +1,7 @@
 const emailTemplateAndesmar = (Name, Subject, templateName, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio) => `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f0f0f5; padding: 20px;">
     <div style="max-width: 600px; background-color: #ffffff; border-radius: 16px; padding: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); margin: auto;">
-        <div style="text-align: center;"><a href="http://www.novogar.com.ar" target="_blank" rel="noopener noreferrer"><img src="https://i.ibb.co/3cFWspq/Novogar-logo.png" style="width: 100%; max-width: 400px;" alt="Logo"></a>
+        <div style="text-align: center;"><a href="http://www.novogar.com.ar" target="_blank" rel="noopener noreferrer"><img src="https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Novogar%2FNovogar-logo.png?alt=media&token=9f534184-2944-4b2c-a4be-6e763ee59bc1" style="width: 100%; max-width: 400px;" alt="Logo"></a>
             <hr style="border: 1px solid #e0e0e0; margin: 20px 0;">
             <h2 style="color: #333; font-size: 28px; margin: 0;">&iexcl;Hola ${nombre}!</h2>
             <p style="color: #555; font-size: 16px; margin: 10px 0;">Referente al Pedido del usuario: <u><a href="mailto:${email}" target="_blank" style="color: #007aff;">${email}</a></u></p>
@@ -35,7 +35,7 @@ const emailTemplateAndesmar = (Name, Subject, templateName, nombre, email, remit
 const emailTemplateAndreani = (Name, Subject, templateName, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio) => `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f0f0f5; padding: 20px;">
     <div style="max-width: 600px; background-color: #ffffff; border-radius: 16px; padding: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); margin: auto;">
-        <div style="text-align: center;"><a href="http://www.novogar.com.ar" target="_blank" rel="noopener noreferrer"><img src="https://i.ibb.co/3cFWspq/Novogar-logo.png" style="width: 100%; max-width: 400px;" alt="Logo"></a>
+        <div style="text-align: center;"><a href="http://www.novogar.com.ar" target="_blank" rel="noopener noreferrer"><img src="https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Novogar%2FNovogar-logo.png?alt=media&token=9f534184-2944-4b2c-a4be-6e763ee59bc1" style="width: 100%; max-width: 400px;" alt="Logo"></a>
             <hr style="border: 1px solid #e0e0e0; margin: 20px 0;">
             <h2 style="color: #333; font-size: 28px; margin: 0;">&iexcl;Hola ${nombre}!</h2>
             <p style="color: #555; font-size: 16px; margin: 10px 0;">Referente al Pedido del usuario: <u><a href="mailto:${email}" target="_blank" style="color: #007aff;">${email}</a></u></p>
@@ -69,7 +69,7 @@ const emailTemplateAndreani = (Name, Subject, templateName, nombre, email, remit
 const emailTemplateLogPropia = (Name, Subject, templateName, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio) => `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f0f0f5; padding: 20px;">
     <div style="max-width: 600px; background-color: #ffffff; border-radius: 16px; padding: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); margin: auto;">
-        <div style="text-align: center;"><a href="http://www.novogar.com.ar" target="_blank" rel="noopener noreferrer"><img src="https://i.ibb.co/3cFWspq/Novogar-logo.png" style="width: 100%; max-width: 400px;" alt="Logo"></a>
+        <div style="text-align: center;"><a href="http://www.novogar.com.ar" target="_blank" rel="noopener noreferrer"><img src="https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Novogar%2FNovogar-logo.png?alt=media&token=9f534184-2944-4b2c-a4be-6e763ee59bc1" style="width: 100%; max-width: 400px;" alt="Logo"></a>
             <hr style="border: 1px solid #e0e0e0; margin: 20px 0;">
             <h2 style="color: #333; font-size: 28px; margin: 0;">&iexcl;Hola ${nombre}!</h2>
             <p style="color: #555; font-size: 16px; margin: 10px 0;">Referente al Pedido del usuario: <u><a href="mailto:${email}" target="_blank" style="color: #007aff;">${email}</a></u></p>
