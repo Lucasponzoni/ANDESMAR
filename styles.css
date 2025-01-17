@@ -4796,6 +4796,10 @@ input[disabled] {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+#current-month{
+    margin-top: -0px;
+}
+
 .historial-fw-bold {
     background-color: cornflowerblue;
     padding: 5px;
@@ -4803,6 +4807,10 @@ input[disabled] {
     color: whitesmoke !important;
     width: fit-content;
     font-weight: bold;
+}
+
+.list-group-item-primary{
+    border-radius: 0;
 }
 
 .historial-ms-2 {

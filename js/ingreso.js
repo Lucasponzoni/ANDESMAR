@@ -1365,13 +1365,21 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
                     }
                 }
 
-                for (const fecha in fechas) {
+                // Convertir el objeto de fechas a un array y ordenarlas
+                const fechasArray = Object.keys(fechas).map(fecha => {
+                    return { fecha, items: fechas[fecha] };
+                });
+
+                fechasArray.sort((a, b) => new Date(b.fecha) - new Date(a.fecha)); // Ordenar de más nuevo a más viejo
+
+                // Mostrar las fechas ordenadas
+                fechasArray.forEach(({ fecha }) => {
                     const li = document.createElement('li');
                     li.className = 'list-group-item';
                     li.textContent = fecha;
                     li.addEventListener('click', () => mostrarOperaciones(fechas[fecha]));
                     fechasList.appendChild(li);
-                }
+                });
 
                 historialFechas.style.display = 'block';
                 backToHistorialBtn.style.display = 'block';
@@ -1406,7 +1414,7 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
                         badge.addEventListener('click', () => window.open(item.fotoURL, '_blank'));
                     } else {
                         badge.classList.add('text-bg-danger');
-                        badge.classList.add('disabled')
+                        badge.classList.add('disabled');
                         badge.textContent = 'El remito no retorno';
                     }
                     li.appendChild(badge);
