@@ -1074,12 +1074,12 @@ function confirmarLogistica() {
                     }
                 }
 
-                const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
-
+                const diaFormateado = fechaProximoDia.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
+                
                 const estado = `Se entrega el día ${diaFormateado}`;
                 const subdato = `Pendiente de confirmar en CAMION ${logisticaSeleccionada.toUpperCase()}`;
                 const operadorLogistico = `Logística Novogar ${logisticaSeleccionada.charAt(0).toUpperCase() + logisticaSeleccionada.slice(1)}`;
-
+                
                 // Actualizar el estado en Firebase
                 childSnapshot.ref.update({
                     estado,
@@ -1345,13 +1345,60 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
 
             function extraerFecha(estado) {
                 const match = estado.match(/Se entrega el día (.+)/);
+                console.log(`Estado: ${estado}, Fecha extraída: ${match ? match[1] : 'Fecha no disponible'}`);
                 return match ? match[1] : 'Fecha no disponible';
+            }
+
+            function convertirTextoAFecha(texto, referenciaFechaHora) {
+                console.log(`Texto a convertir: ${texto}`);
+                const partes = texto.match(/(\d{1,2}) DE (\w+)(?: DE (\d{4}))?/);
+                if (!partes) {
+                    console.log(`No se pudo convertir el texto: ${texto}`);
+                    return new Date(NaN); // Fecha inválida
+                }
+                const dia = parseInt(partes[1]);
+                const mes = partes[2].toUpperCase();
+                let anio = partes[3] ? parseInt(partes[3]) : null;
+
+                const meses = {
+                    'ENERO': 0,
+                    'FEBRERO': 1,
+                    'MARZO': 2,
+                    'ABRIL': 3,
+                    'MAYO': 4,
+                    'JUNIO': 5,
+                    'JULIO': 6,
+                    'AGOSTO': 7,
+                    'SEPTIEMBRE': 8,
+                    'OCTUBRE': 9,
+                    'NOVIEMBRE': 10,
+                    'DICIEMBRE': 11
+                };
+
+                if (!anio) {
+                    const referenciaFecha = new Date(referenciaFechaHora);
+                    anio = referenciaFecha.getFullYear();
+                    if (meses[mes] < referenciaFecha.getMonth() || (meses[mes] === referenciaFecha.getMonth() && dia < referenciaFecha.getDate())) {
+                        anio += 1;
+                    }
+                }
+
+                const dateObj = new Date(anio, meses[mes], dia);
+                console.log(`Fecha convertida: ${dateObj}`);
+                return dateObj;
+            }
+
+            function formatearFecha(dateObj) {
+                const dia = String(dateObj.getDate()).padStart(2, '0');
+                const mes = String(dateObj.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript son 0-indexados
+                const anio = dateObj.getFullYear().toString().slice(-2); // Obtener los últimos dos dígitos del año
+                return `CAMION de ${dia}/${mes}/${anio}`;
             }
 
             function mostrarFechas(operadorLogistico) {
                 fechasList.innerHTML = '';
                 const fechas = {};
-            
+
                 for (const key in data) {
                     if (data.hasOwnProperty(key) && /^\d+$/.test(key)) {
                         const item = data[key];
@@ -1364,29 +1411,34 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
                         }
                     }
                 }
-            
-                // Convertir el objeto de fechas a un array y ordenarlas
+
+                // Convertir el objeto de fechas a un array y ordenarlas por la fecha convertida
                 const fechasArray = Object.keys(fechas).map(fecha => {
-                    return { fecha, items: fechas[fecha], dateObj: new Date(fecha) }; // Crear un objeto de fecha
+                    const items = fechas[fecha];
+                    const lastItem = items[items.length - 1];
+                    const dateObj = convertirTextoAFecha(fecha, lastItem.fechaHora);
+                    console.log(`Fecha: ${fecha}, DateObj: ${dateObj}`);
+                    return { fecha: formatearFecha(dateObj), items, dateObj }; // Convertir el texto de la fecha a un objeto de fecha y formatear
                 });
-            
+
                 // Ordenar de más nuevo a más viejo
                 fechasArray.sort((a, b) => b.dateObj - a.dateObj);
-            
+
                 // Mostrar las fechas ordenadas
-                fechasArray.forEach(({ fecha }) => {
+                fechasArray.forEach(({ fecha, items }) => {
+                    console.log(`Fecha ordenada: ${fecha}`);
                     const li = document.createElement('li');
                     li.className = 'list-group-item';
                     li.textContent = fecha;
-                    li.addEventListener('click', () => mostrarOperaciones(fechas[fecha]));
+                    li.addEventListener('click', () => mostrarOperaciones(items));
                     fechasList.appendChild(li);
                 });
-            
+
                 historialFechas.style.display = 'block';
                 backToHistorialBtn.style.display = 'block';
                 operacionesList.style.display = 'none';
                 console.log("Fechas mostradas para el operador:", operadorLogistico);
-            }            
+            }
 
             function mostrarOperaciones(operaciones) {
                 operacionesListGroup.innerHTML = '';
@@ -1456,4 +1508,3 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
 
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;
-
