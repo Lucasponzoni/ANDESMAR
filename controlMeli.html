@@ -88,13 +88,16 @@
 
             <div class="col-md-3 mb-3 d-flex justify-content-end botonesMeli">
                 <!-- Aca van los botones -->
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#etiquetasModal">
+                    <i class="bi bi-tag-fill"></i> Etiquetas
+                </button>
                 <button type="button" class="btn btn-danger me-2" data-toggle="modal" data-target="#escaneoColecta">
                     <i class="bi bi-1-circle-fill"></i> Ingreso
                 </button>
                 <button type="button" class="btn btn-secondary me-2" data-toggle="modal" data-target="#escaneoColecta2">
                     <i class="bi bi-2-circle-fill"></i> Egreso
                 </button>
-                <button type="button" id="cerrarButton" class="btn btn-success" data-toggle="modal" data-target="#queryModal">
+                <button type="button" id="cerrarButton" class="btn btn-success me-2" data-toggle="modal" data-target="#queryModal">
                     <i class="bi bi-x-lg"></i> Cerrar
                 </button>
             </div>
@@ -145,6 +148,39 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Modal de Etiquetas -->
+    <div class="modal fade" id="etiquetasModal" tabindex="-1" aria-labelledby="etiquetasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="etiquetasModalLabel">Etiquetas Mercado Libre</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="file" id="fileInput" accept=".txt" class="form-control mb-3">
+                    <button type="button" class="btn btn-secondary mb-3" id="backButton" style="display: none;">
+                        <i class="bi bi-arrow-left"></i> Atrás
+                    </button>
+                    <div class="d-flex justify-content-center my-3 contenedor-spinner33">
+                        <div id="spinner33"class="spinner-border text-info" role="status">
+                            <span class="visually-hidden"></span>
+                          </div>
+                    </div>
+                    <ol class="list-group list-group-numbered etiquetaList" id="folderList"></ol>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cerrar
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="uploadFile()">
+                        <i class="bi bi-upload"></i> Subir
+                    </button>                </div>
+            </div>
         </div>
     </div>
     
@@ -270,6 +306,7 @@
         <!-- Scripts Firebase-->
         <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     
         <!-- SweetAlert JS -->

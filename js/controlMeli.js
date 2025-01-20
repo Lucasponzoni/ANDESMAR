@@ -9,7 +9,11 @@ const firebaseConfig = {
     measurementId: "G-E0E9K4TEDW"
 };
 
+// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
+
+// Obtener referencia a Firebase Storage
+const storage = firebase.storage();
 const database = firebase.database();
 
 $(document).ready(function() {
@@ -1120,7 +1124,338 @@ $('#escaneoColecta2').on('hidden.bs.modal', function () {
     }, 300); 
 });
 
+function uploadFile() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
 
+    if (!file) {
+        alert('Por favor, seleccione un archivo.');
+        return;
+    }
 
+    const today = new Date();
+    const dateString = today.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    const folderPath = `Etiquetas/${dateString}`;
 
+    // Obtener el número de archivos en la carpeta de la fecha actual
+    const folderRef = storage.ref(folderPath);
+    folderRef.listAll().then(result => {
+        const fileCount = result.items.length + 1; // Contar los archivos existentes y sumar 1
+        const fileName = `TANDA ${fileCount}.txt`;
+        const fileRef = folderRef.child(fileName);
 
+        // Subir el archivo a Firebase Storage
+        fileRef.put(file).then(() => {
+            alert('Archivo subido exitosamente.');
+            fileInput.value = ''; // Limpiar el input de archivo
+        }).catch(error => {
+            console.error('Error al subir el archivo:', error);
+            alert('Error al subir el archivo.');
+        });
+    }).catch(error => {
+        console.error('Error al listar archivos en la carpeta:', error);
+        alert('Error al listar archivos en la carpeta.');
+    });
+}
+
+// UPLOAD ETIQUETAS MELI
+let currentFolderPath = 'Etiquetas';
+const folderStack = [];
+
+function showSpinner(show) {
+    const spinner = document.getElementById('spinner33');
+    if (show) {
+        spinner.classList.remove('hidden');
+    } else {
+        spinner.classList.add('hidden');
+    }
+}
+
+function formatDate(date) {
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Los meses son indexados desde 0
+    const year = date.getFullYear();
+    return `Etiquetas ${day}-${month}-${year}`;
+}
+
+function formatTime(date) {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+}
+
+function countLabels(content) {
+    const startTag = /\^XA/g;
+    const endTag = /\^XZ/g;
+    const startCount = (content.match(startTag) || []).length;
+    const endCount = (content.match(endTag) || []).length;
+    return Math.min(startCount, endCount);
+}
+
+function extractSalesNumbers(content) {
+    const labelRegex = /\^XA[\s\S]*?\^XZ/g;
+    const saleRegex = /\^FO120,120\^A0N,24,24\^FD(Venta|Pack ID): (\d+)\^FS[\s\S]*?\^FO(\d+),117\^A0N,27,27\^FD(\d+)\^FS/g;
+    const matches = [];
+    let labelMatch;
+    while ((labelMatch = labelRegex.exec(content)) !== null) {
+        const labelContent = labelMatch[0];
+        let saleMatch;
+        while ((saleMatch = saleRegex.exec(labelContent)) !== null) {
+            matches.push(`${saleMatch[1]}: ${saleMatch[2]} ${saleMatch[4]}`);
+        }
+    }
+    return matches;
+}
+
+function generateBillingFile(content) {
+    const salesNumbers = extractSalesNumbers(content);
+    let billingContent = '';
+    salesNumbers.forEach((number, index) => {
+        // Eliminar todos los espacios entre los números
+        const cleanedNumber = number.replace(/(\d)\s+(\d)/g, '$1$2');
+        billingContent += `${index + 1}- ${cleanedNumber}\n`;
+    });
+    return billingContent;
+}
+
+function downloadBillingFile(content, fileName) {
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function loadFolder(folderPath) {
+    showSpinner(true);
+    const folderRef = storage.ref(folderPath);
+    folderRef.listAll().then(result => {
+        showSpinner(false);
+
+        const folderList = document.getElementById('folderList');
+        folderList.innerHTML = '';
+
+        result.prefixes.forEach(folderRef => {
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item d-flex justify-content-between align-items-start';
+            listItem.innerHTML = `
+                <div class="ms-2 me-auto">
+                    <div class="fw-bold">${folderRef.name}</div>
+                </div>
+                <span class="badge text-bg-primary rounded-pill">Cargando...</span>
+            `;
+            folderList.appendChild(listItem);
+
+            folderRef.listAll().then(subResult => {
+                const fileCount = subResult.items.length;
+                const tandaText = fileCount === 1 ? 'tanda' : 'tandas';
+                listItem.querySelector('.badge').textContent = `${fileCount} ${tandaText}`;
+                listItem.addEventListener('click', () => {
+                    folderStack.push(currentFolderPath);
+                    currentFolderPath = folderRef.fullPath;
+                    loadFolder(currentFolderPath);
+                });
+            });
+        });
+
+        const items = [];
+
+        result.items.forEach(fileRef => {
+            showSpinner(true);
+            fileRef.getMetadata().then(metadata => {
+                const uploadTime = new Date(metadata.timeCreated);
+                const formattedTime = formatTime(uploadTime);
+
+                fileRef.getDownloadURL().then(url => {
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(content => {
+                            const labelCount = countLabels(content);
+                            const tandaNumber = parseInt(fileRef.name.match(/\d+/)[0], 10);
+                            const listItem = document.createElement('li');
+                            listItem.className = 'list-group-item d-flex justify-content-between align-items-start';
+                            listItem.innerHTML = `
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">${fileRef.name}</div>
+                                    <small class="time-etiquetas-container"><i class="bi bi-clock"></i> Hora de carga: ${formattedTime}</small>
+                                </div>
+                                <span class="badge text-bg-primary rounded-pill">Archivo (${labelCount} etiquetas)</span>
+                                <button class="btn btn-danger btn-sm delete-btn fixed-size" data-ref="${fileRef.fullPath}" id="delete-tanda${tandaNumber}">
+                                    <i class="bi bi-trash" style="width: 19.2px; height: 19.2px;"></i>
+                                </button>
+                                <button class="btn btn-primary btn-sm generate-btn fixed-size" data-url="${url}" data-name="${fileRef.name}" id="generar-tanda${tandaNumber}">
+                                    <i class="bi bi-file-earmark-arrow-down" style="width: 19.2px; height: 19.2px;"></i>
+                                </button>
+                            `;
+                            listItem.querySelector('.badge').addEventListener('click', (event) => {
+                                event.stopPropagation(); // Evitar que el evento de clic se propague al elemento de la lista
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = fileRef.name;
+                                a.target = '_blank'; // Forzar la descarga en una nueva pestaña
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                            });
+                            items.push({ listItem, tandaNumber });
+
+                            // Ordenar los elementos por el número de tanda en orden descendente
+                            items.sort((a, b) => b.tandaNumber - a.tandaNumber);
+
+                            // Limpiar la lista y agregar los elementos ordenados
+                            folderList.innerHTML = '';
+                            items.forEach(item => {
+                                folderList.appendChild(item.listItem);
+                                showSpinner(false);
+                            });
+
+                            // Agregar evento de eliminación a los botones
+                            document.querySelectorAll('.delete-btn').forEach(button => {
+                                button.addEventListener('click', (event) => {
+                                    event.stopPropagation();
+                                    const fileRefPath = button.getAttribute('data-ref');
+                                    Swal.fire({
+                                        title: '¿Está seguro de que desea eliminar la tanda?',
+                                        text: "Esta acción no se puede deshacer.",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#d33',
+                                        cancelButtonColor: '#3085d6',
+                                        confirmButtonText: 'Sí, eliminar',
+                                        cancelButtonText: 'Cancelar'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            const fileRef = storage.ref(fileRefPath);
+                                            fileRef.delete().then(() => {
+                                                button.closest('li').remove();
+                                                Swal.fire('Eliminado!', 'El archivo ha sido eliminado.', 'success');
+                                            }).catch(error => {
+                                                Swal.fire('Error', `Error al eliminar el archivo: ${error}`, 'error');
+                                            });
+                                        }
+                                    });
+                                });
+                            });
+
+                            // Agregar evento de generación de archivo de facturación a los botones
+                            document.querySelectorAll('.generate-btn').forEach(button => {
+                                button.removeEventListener('click', handleGenerateClick); // Eliminar cualquier evento previo
+                                button.addEventListener('click', handleGenerateClick);
+                            });
+                        });
+                }).catch(error => {
+                    console.error('Error al obtener el contenido del archivo:', error);
+                    Swal.fire('Error', 'Error al obtener el contenido del archivo.', 'error');
+                });
+            });
+        });
+
+        document.getElementById('backButton').style.display = folderStack.length > 0 ? 'block' : 'none';
+    }).catch(error => {
+        showSpinner(false);
+        console.error('Error al listar archivos en la carpeta:', error);
+        Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
+    });
+}
+
+function handleGenerateClick(event) {
+    event.stopPropagation();
+    const button = event.currentTarget;
+    const url = button.getAttribute('data-url');
+    const fileName = button.getAttribute('data-name');
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    button.classList.add('btn-secondary', 'fixed-size');
+    button.classList.remove('btn-primary');
+    button.disabled = true;
+    setTimeout(() => {
+        fetch(url)
+            .then(response => response.text())
+            .then(content => {
+                const billingContent = generateBillingFile(content);
+                const billingFileName = `Facturacion_${fileName}.txt`;
+                downloadBillingFile(billingContent, billingFileName);
+                button.innerHTML = '<i class="bi bi-check-all"></i>';
+                button.classList.add('btn-success');
+                button.classList.remove('btn-secondary');
+                button.disabled = false;
+            }).catch(error => {
+                showSpinner(false);
+                console.error('Error al generar el archivo de facturación:', error);
+                Swal.fire('Error', 'Error al generar el archivo de facturación.', 'error');
+            });
+    }, 2000);
+}
+
+document.getElementById('backButton').addEventListener('click', () => {
+    if (folderStack.length > 0) {
+        currentFolderPath = folderStack.pop();
+        loadFolder(currentFolderPath);
+    }
+});
+
+$('#etiquetasModal').on('shown.bs.modal', function () {
+    loadFolder(currentFolderPath);
+});
+
+function uploadFile() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        Swal.fire('Error', 'Por favor, seleccione un archivo.', 'error');
+        return;
+    }
+
+    const today = new Date();
+    const dateString = formatDate(today); // Formato Etiquetas DD-MM-YYYY
+    const folderPath = `Etiquetas/${dateString}`;
+
+    // Obtener el contenido del archivo seleccionado
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const newFileContent = event.target.result;
+
+        // Obtener el número de archivos en la carpeta de la fecha actual
+        const folderRef = storage.ref(folderPath);
+        folderRef.listAll().then(result => {
+            const filePromises = result.items.map(fileRef => {
+                return fileRef.getDownloadURL().then(url => {
+                    return fetch(url)
+                        .then(response => response.text())
+                        .then(content => {
+                            if (content === newFileContent) {
+                                throw new Error('El archivo ya existe en las tandas de hoy.');
+                            }
+                        });
+                });
+            });
+
+            Promise.all(filePromises).then(() => {
+                const fileCount = result.items.length + 1; // Contar los archivos existentes y sumar 1
+                const fileName = `TANDA ${fileCount}.txt`;
+                const fileRef = folderRef.child(fileName);
+
+                // Subir el archivo a Firebase Storage
+                fileRef.put(file).then(() => {
+                    Swal.fire('Subido!', 'El archivo ha sido subido exitosamente.', 'success');
+                    fileInput.value = ''; // Limpiar el input de archivo
+                    loadFolder(currentFolderPath); // Recargar la carpeta actual
+                }).catch(error => {
+                    console.error('Error al subir el archivo:', error);
+                    Swal.fire('Error', 'Error al subir el archivo.', 'error');
+                });
+            }).catch(error => {
+                console.error('Error al verificar el archivo:', error);
+                Swal.fire('Error', error.message, 'error');
+            });
+        }).catch(error => {
+            console.error('Error al listar archivos en la carpeta:', error);
+            Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
+        });
+    };
+    reader.readAsText(file);
+}

@@ -4801,7 +4801,7 @@ input[disabled] {
 }
 
 .historial-fw-bold {
-    background-color: cornflowerblue;
+    background-color: #6841ea;
     padding: 5px;
     border-radius: 5px;
     color: whitesmoke !important;
@@ -4845,6 +4845,34 @@ input[disabled] {
     background-color: #FF69B4;
 }
 
+.etiquetaList .list-group-item:nth-child(1) > .badge {
+    background-color: orangered;
+}
+
+.etiquetaList .list-group-item:nth-child(1) {
+    background-color: #fed4cf;
+}
+
+.fixed-size {
+    width: 38.8px;
+    height: 37.2px;
+}
+
+.fixed-size i, .fixed-size .spinner-border {
+    width: 19.2px; 
+    height: 19.2px; 
+}
+
+.etiquetaList > .list-group-item > .btn > i{
+    width: 19.2px; 
+    height: 19.2px; 
+}
+
+.etiquetaList .list-group-item:nth-child(1):hover {
+    background-color: #fdb1d3;
+    color: black;
+}
+
 #fechasList .list-group-item:nth-child(1)::after {
     content: "Último";
     background-color: red;
@@ -4855,4 +4883,75 @@ input[disabled] {
     margin-left: 10px;
     display: inline-block;
 }
+
+.loader33 {
+    color: #3c44ff;
+    font-size: 10px;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    position: absolute;
+    text-indent: -9999em;
+    z-index: 100000;
+    animation: mulShdSpin 1.3s infinite linear;
+    transform: translateZ(0);
+  }
+  
+  @keyframes mulShdSpin {
+    0%,
+    100% {
+      box-shadow: 0 -3em 0 0.2em, 
+      2em -2em 0 0em, 3em 0 0 -1em, 
+      2em 2em 0 -1em, 0 3em 0 -1em, 
+      -2em 2em 0 -1em, -3em 0 0 -1em, 
+      -2em -2em 0 0;
+    }
+    12.5% {
+      box-shadow: 0 -3em 0 0, 2em -2em 0 0.2em, 
+      3em 0 0 0, 2em 2em 0 -1em, 0 3em 0 -1em, 
+      -2em 2em 0 -1em, -3em 0 0 -1em, 
+      -2em -2em 0 -1em;
+    }
+    25% {
+      box-shadow: 0 -3em 0 -0.5em, 
+      2em -2em 0 0, 3em 0 0 0.2em, 
+      2em 2em 0 0, 0 3em 0 -1em, 
+      -2em 2em 0 -1em, -3em 0 0 -1em, 
+      -2em -2em 0 -1em;
+    }
+    37.5% {
+      box-shadow: 0 -3em 0 -1em, 2em -2em 0 -1em,
+       3em 0em 0 0, 2em 2em 0 0.2em, 0 3em 0 0em, 
+       -2em 2em 0 -1em, -3em 0em 0 -1em, -2em -2em 0 -1em;
+    }
+    50% {
+      box-shadow: 0 -3em 0 -1em, 2em -2em 0 -1em,
+       3em 0 0 -1em, 2em 2em 0 0em, 0 3em 0 0.2em, 
+       -2em 2em 0 0, -3em 0em 0 -1em, -2em -2em 0 -1em;
+    }
+    62.5% {
+      box-shadow: 0 -3em 0 -1em, 2em -2em 0 -1em,
+       3em 0 0 -1em, 2em 2em 0 -1em, 0 3em 0 0, 
+       -2em 2em 0 0.2em, -3em 0 0 0, -2em -2em 0 -1em;
+    }
+    75% {
+      box-shadow: 0em -3em 0 -1em, 2em -2em 0 -1em, 
+      3em 0em 0 -1em, 2em 2em 0 -1em, 0 3em 0 -1em, 
+      -2em 2em 0 0, -3em 0em 0 0.2em, -2em -2em 0 0;
+    }
+    87.5% {
+      box-shadow: 0em -3em 0 0, 2em -2em 0 -1em, 
+      3em 0 0 -1em, 2em 2em 0 -1em, 0 3em 0 -1em, 
+      -2em 2em 0 0, -3em 0em 0 0, -2em -2em 0 0.2em;
+    }
+  }
+
+.time-etiquetas-container{
+    background-color: cornflowerblue;
+    padding: 5px;
+    font-weight: 400;
+    border-radius: 5px;
+    color: white;
+}
+
 
