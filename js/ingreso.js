@@ -1305,6 +1305,17 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
     const operacionesList = document.getElementById('operacionesList');
     const backToHistorialBtn = document.getElementById('backToHistorialBtn');
     const backToFechasBtn = document.getElementById('backToFechasBtn');
+    const imprimirCamionBtn = document.createElement('button'); // Crear botón "Imprimir Camión"
+
+    // Configurar el botón "Volver"
+    backToFechasBtn.innerHTML = '<i class="bi bi-arrow-left"></i> Volver';
+
+    // Configurar el botón "Imprimir Camión"
+    imprimirCamionBtn.id = 'imprimirCamionBtn';
+    imprimirCamionBtn.className = 'btn btn-danger mb-2';
+    imprimirCamionBtn.innerHTML = '<i class="bi bi-printer"></i> Imprimir Camión';
+    imprimirCamionBtn.style.display = 'none'; // Ocultar inicialmente
+    backToFechasBtn.parentNode.insertBefore(imprimirCamionBtn, backToFechasBtn.nextSibling); // Insertar el botón después de "Volver"
 
     // Resetear la visibilidad de los elementos
     console.log("Mostrando spinner...");
@@ -1476,6 +1487,7 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
 
                 operacionesList.style.display = 'block';
                 backToFechasBtn.style.display = 'block';
+                imprimirCamionBtn.style.display = 'block'; // Mostrar el botón "Imprimir Camión"
                 historialFechas.style.display = 'none';
                 console.log("Operaciones mostradas:", operaciones);
             }
@@ -1495,8 +1507,28 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
             backToFechasBtn.addEventListener('click', () => {
                 operacionesList.style.display = 'none';
                 backToFechasBtn.style.display = 'none';
+                imprimirCamionBtn.style.display = 'none'; // Ocultar el botón "Imprimir Camión"
                 historialFechas.style.display = 'block';
                 console.log("Volviendo a las fechas...");
+            });
+
+            imprimirCamionBtn.addEventListener('click', () => {
+                const printContent = operacionesList.innerHTML;
+                const printWindow = window.open('', '', 'height=800,width=600');
+                printWindow.document.write('<html><head><title>Imprimir Camión</title>');
+                printWindow.document.write('<style>');
+                printWindow.document.write('@media print { body { width: 210mm; height: 297mm; } }');
+                printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
+                printWindow.document.write('h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; }');
+                printWindow.document.write('table { width: 100%; border-collapse: collapse; }');
+                printWindow.document.write('table, th, td { border: 1px solid black; }');
+                printWindow.document.write('th, td { padding: 8px; text-align: left; }');
+                printWindow.document.write('</style>');
+                printWindow.document.write('</head><body>');
+                printWindow.document.write(printContent);
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                printWindow.print();
             });
         })
         .catch(error => {

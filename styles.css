@@ -4839,6 +4839,12 @@ input[disabled] {
     background-color: pink;
 }
 
+#fechasList .list-group-item:nth-child(1):hover{
+    font-weight: 700;
+    color: white;
+    background-color: #FF69B4;
+}
+
 #fechasList .list-group-item:nth-child(1)::after {
     content: "Último";
     background-color: red;
