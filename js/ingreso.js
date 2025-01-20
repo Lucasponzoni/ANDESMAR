@@ -1351,7 +1351,7 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
             function mostrarFechas(operadorLogistico) {
                 fechasList.innerHTML = '';
                 const fechas = {};
-
+            
                 for (const key in data) {
                     if (data.hasOwnProperty(key) && /^\d+$/.test(key)) {
                         const item = data[key];
@@ -1364,14 +1364,15 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
                         }
                     }
                 }
-
+            
                 // Convertir el objeto de fechas a un array y ordenarlas
                 const fechasArray = Object.keys(fechas).map(fecha => {
-                    return { fecha, items: fechas[fecha] };
+                    return { fecha, items: fechas[fecha], dateObj: new Date(fecha) }; // Crear un objeto de fecha
                 });
-
-                fechasArray.sort((a, b) => new Date(b.fecha) - new Date(a.fecha)); // Ordenar de más nuevo a más viejo
-
+            
+                // Ordenar de más nuevo a más viejo
+                fechasArray.sort((a, b) => b.dateObj - a.dateObj);
+            
                 // Mostrar las fechas ordenadas
                 fechasArray.forEach(({ fecha }) => {
                     const li = document.createElement('li');
@@ -1380,12 +1381,12 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
                     li.addEventListener('click', () => mostrarOperaciones(fechas[fecha]));
                     fechasList.appendChild(li);
                 });
-
+            
                 historialFechas.style.display = 'block';
                 backToHistorialBtn.style.display = 'block';
                 operacionesList.style.display = 'none';
                 console.log("Fechas mostradas para el operador:", operadorLogistico);
-            }
+            }            
 
             function mostrarOperaciones(operaciones) {
                 operacionesListGroup.innerHTML = '';
