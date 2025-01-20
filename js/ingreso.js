@@ -1463,7 +1463,11 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
                     
                     const subheading = document.createElement('div');
                     subheading.className = 'historial-fw-bold';
-                    subheading.textContent = item.remitoVBA;
+                    
+                    const remitoStrong = document.createElement('strong');
+                    remitoStrong.textContent = item.remitoVBA;
+                    
+                    subheading.appendChild(remitoStrong);
                     
                     div.appendChild(subheading);
                     div.innerHTML += `Preparado: ${item.fechaHora} - Cliente <strong class="historial-strong">${item.cliente}</strong> / Declarado: ${item.valorDeclarado}`;
