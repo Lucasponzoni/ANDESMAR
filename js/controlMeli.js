@@ -1250,15 +1250,20 @@ function loadFolder(folderPath) {
             `;
             folderList.appendChild(listItem);
 
+            listItem.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    Swal.fire('No disponible', 'No está disponible la descarga de tandas en Mobile, intente en Desktop', 'info');
+                    return;
+                }
+                folderStack.push(currentFolderPath);
+                currentFolderPath = folderRef.fullPath;
+                loadFolder(currentFolderPath);
+            });
+
             folderRef.listAll().then(subResult => {
                 const fileCount = subResult.items.length;
                 const tandaText = fileCount === 1 ? 'tanda' : 'tandas';
                 listItem.querySelector('.badge').textContent = `${fileCount} ${tandaText}`;
-                listItem.addEventListener('click', () => {
-                    folderStack.push(currentFolderPath);
-                    currentFolderPath = folderRef.fullPath;
-                    loadFolder(currentFolderPath);
-                });
             }).catch(error => {
                 console.error('Error al listar subcarpetas:', error);
                 showSpinner(false);
