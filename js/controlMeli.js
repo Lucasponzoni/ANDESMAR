@@ -1251,10 +1251,6 @@ function loadFolder(folderPath) {
             folderList.appendChild(listItem);
 
             listItem.addEventListener('click', () => {
-                if (window.innerWidth < 768) {
-                    Swal.fire('No disponible', 'No está disponible la descarga de tandas en Mobile, intente en Desktop', 'info');
-                    return;
-                }
                 folderStack.push(currentFolderPath);
                 currentFolderPath = folderRef.fullPath;
                 loadFolder(currentFolderPath);
@@ -1280,86 +1276,90 @@ function loadFolder(folderPath) {
                 const formattedTime = formatTime(uploadTime);
 
                 fileRef.getDownloadURL().then(url => {
-                    fetch(url)
-                        .then(response => response.text())
-                        .then(content => {
-                            const labelCount = countLabels(content);
-                            const tandaNumber = parseInt(fileRef.name.match(/\d+/)[0], 10);
-                            const listItem = document.createElement('li');
-                            listItem.className = 'list-group-item d-flex justify-content-between align-items-start';
-                            listItem.innerHTML = `
-                                <div class="ms-2 me-auto">
-                                    <div class="fw-bold">${fileRef.name}</div>
-                                    <small class="time-etiquetas-container"><i class="bi bi-clock"></i> Registro: ${formattedTime}</small>
-                                </div>
-                                <span class="badge text-bg-primary rounded-pill">Archivo (${labelCount} etiquetas)</span>
-                                <button class="btn btn-danger btn-sm delete-btn fixed-size" data-ref="${fileRef.fullPath}" id="delete-tanda${tandaNumber}">
-                                    <i class="bi bi-trash" style="width: 19.2px; height: 19.2px;"></i>
-                                </button>
-                                <button class="btn btn-primary btn-sm generate-btn fixed-size" data-url="${url}" data-name="${fileRef.name}" id="generar-tanda${tandaNumber}">
-                                    <i class="bi bi-file-earmark-arrow-down" style="width: 19.2px; height: 19.2px;"></i>
-                                </button>
-                            `;
-                            listItem.querySelector('.badge').addEventListener('click', (event) => {
-                                event.stopPropagation(); // Evitar que el evento de clic se propague al elemento de la lista
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = fileRef.name;
-                                a.target = '_blank'; // Forzar la descarga en una nueva pestaña
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                            });
-                            items.push({ listItem, tandaNumber });
+                    fetch(`https://proxy.cors.sh/${url}`, {
+                        headers: {
+                            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(content => {
+                        const labelCount = countLabels(content);
+                        const tandaNumber = parseInt(fileRef.name.match(/\d+/)[0], 10);
+                        const listItem = document.createElement('li');
+                        listItem.className = 'list-group-item d-flex justify-content-between align-items-start';
+                        listItem.innerHTML = `
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">${fileRef.name}</div>
+                                <small class="time-etiquetas-container"><i class="bi bi-clock"></i> Registro: ${formattedTime}</small>
+                            </div>
+                            <span class="badge text-bg-primary rounded-pill">Archivo (${labelCount} etiquetas)</span>
+                            <button class="btn btn-danger btn-sm delete-btn fixed-size" data-ref="${fileRef.fullPath}" id="delete-tanda${tandaNumber}">
+                                <i class="bi bi-trash" style="width: 19.2px; height: 19.2px;"></i>
+                            </button>
+                            <button class="btn btn-primary btn-sm generate-btn fixed-size" data-url="${url}" data-name="${fileRef.name}" id="generar-tanda${tandaNumber}">
+                                <i class="bi bi-file-earmark-arrow-down" style="width: 19.2px; height: 19.2px;"></i>
+                            </button>
+                        `;
+                        listItem.querySelector('.badge').addEventListener('click', (event) => {
+                            event.stopPropagation(); // Evitar que el evento de clic se propague al elemento de la lista
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = fileRef.name;
+                            a.target = '_blank'; // Forzar la descarga en una nueva pestaña
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                        });
+                        items.push({ listItem, tandaNumber });
 
-                            // Ordenar los elementos por el número de tanda en orden descendente
-                            items.sort((a, b) => b.tandaNumber - a.tandaNumber);
+                        // Ordenar los elementos por el número de tanda en orden descendente
+                        items.sort((a, b) => b.tandaNumber - a.tandaNumber);
 
-                            // Limpiar la lista y agregar los elementos ordenados
-                            folderList.innerHTML = '';
-                            items.forEach(item => {
-                                folderList.appendChild(item.listItem);
-                                showSpinner(false);
-                            });
+                        // Limpiar la lista y agregar los elementos ordenados
+                        folderList.innerHTML = '';
+                        items.forEach(item => {
+                            folderList.appendChild(item.listItem);
+                            showSpinner(false);
+                        });
 
-                            // Agregar evento de eliminación a los botones
-                            document.querySelectorAll('.delete-btn').forEach(button => {
-                                button.addEventListener('click', (event) => {
-                                    event.stopPropagation();
-                                    const fileRefPath = button.getAttribute('data-ref');
-                                    Swal.fire({
-                                        title: '¿Está seguro de que desea eliminar la tanda?',
-                                        text: "Esta acción no se puede deshacer.",
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonColor: '#d33',
-                                        cancelButtonColor: '#3085d6',
-                                        confirmButtonText: 'Sí, eliminar',
-                                        cancelButtonText: 'Cancelar'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            const fileRef = storage.ref(fileRefPath);
-                                            fileRef.delete().then(() => {
-                                                button.closest('li').remove();
-                                                Swal.fire('Eliminado!', 'El archivo ha sido eliminado.', 'success');
-                                            }).catch(error => {
-                                                Swal.fire('Error', `Error al eliminar el archivo: ${error}`, 'error');
-                                            });
-                                        }
-                                    });
+                        // Agregar evento de eliminación a los botones
+                        document.querySelectorAll('.delete-btn').forEach(button => {
+                            button.addEventListener('click', (event) => {
+                                event.stopPropagation();
+                                const fileRefPath = button.getAttribute('data-ref');
+                                Swal.fire({
+                                    title: '¿Está seguro de que desea eliminar la tanda?',
+                                    text: "Esta acción no se puede deshacer.",
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#d33',
+                                    cancelButtonColor: '#3085d6',
+                                    confirmButtonText: 'Sí, eliminar',
+                                    cancelButtonText: 'Cancelar'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        const fileRef = storage.ref(fileRefPath);
+                                        fileRef.delete().then(() => {
+                                            button.closest('li').remove();
+                                            Swal.fire('Eliminado!', 'El archivo ha sido eliminado.', 'success');
+                                        }).catch(error => {
+                                            Swal.fire('Error', `Error al eliminar el archivo: ${error}`, 'error');
+                                        });
+                                    }
                                 });
                             });
-
-                            // Agregar evento de generación de archivo de facturación a los botones
-                            document.querySelectorAll('.generate-btn').forEach(button => {
-                                button.removeEventListener('click', handleGenerateClick); // Eliminar cualquier evento previo
-                                button.addEventListener('click', handleGenerateClick);
-                            });
-                        }).catch(error => {
-                            console.error('Error al obtener el contenido del archivo:', error);
-                            showSpinner(false);
-                            Swal.fire('Error', 'Error al obtener el contenido del archivo.', 'error');
                         });
+
+                        // Agregar evento de generación de archivo de facturación a los botones
+                        document.querySelectorAll('.generate-btn').forEach(button => {
+                            button.removeEventListener('click', handleGenerateClick); // Eliminar cualquier evento previo
+                            button.addEventListener('click', handleGenerateClick);
+                        });
+                    }).catch(error => {
+                        console.error('Error al obtener el contenido del archivo:', error);
+                        showSpinner(false);
+                        Swal.fire('Error', 'Error al obtener el contenido del archivo.', 'error');
+                    });
                 }).catch(error => {
                     console.error('Error al obtener los metadatos del archivo:', error);
                     showSpinner(false);
@@ -1379,7 +1379,6 @@ function loadFolder(folderPath) {
         Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
     });
 }
-
 function handleGenerateClick(event) {
     event.stopPropagation();
     const button = event.currentTarget;
@@ -1442,13 +1441,17 @@ function uploadFile() {
         folderRef.listAll().then(result => {
             const filePromises = result.items.map(fileRef => {
                 return fileRef.getDownloadURL().then(url => {
-                    return fetch(url)
-                        .then(response => response.text())
-                        .then(content => {
-                            if (content === newFileContent) {
-                                throw new Error('El archivo ya existe en las tandas de hoy.');
-                            }
-                        });
+                    return fetch(`https://proxy.cors.sh/${url}`, {
+                        headers: {
+                            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(content => {
+                        if (content === newFileContent) {
+                            throw new Error('El archivo ya existe en las tandas de hoy.');
+                        }
+                    });
                 });
             });
 
