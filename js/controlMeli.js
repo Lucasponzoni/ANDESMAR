@@ -1124,6 +1124,15 @@ $('#escaneoColecta2').on('hidden.bs.modal', function () {
     }, 300); 
 });
 
+$('#etiquetasModal').on('hidden.bs.modal', function () {
+    setTimeout(() => {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        $('body').css('overflow', 'auto'); 
+        window.scrollTo(0, 0); 
+    }, 300); 
+});
+
 function uploadFile() {
     const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
@@ -1442,6 +1451,8 @@ function loadFolder(folderPath) {
                         const listItem = document.createElement('li');
                         listItem.className = 'list-group-item d-flex justify-content-between align-items-start';
                         
+                        // ...existing code...
+                        
                         listItem.innerHTML = `
                             <div class="ms-2 me-auto">
                                 <div class="fw-bold">${fileRef.name}</div>
@@ -1461,7 +1472,7 @@ function loadFolder(folderPath) {
                         
                         // Verificar si ya existe un comentario y actualizar el botón
                         const commentButton = listItem.querySelector(`#comment-tanda${tandaNumber}`);
-                        const sanitizedPath = fileRef.fullPath.replace(/[.#$[\]]/g, '_'); 
+                        const sanitizedPath = fileRef.fullPath.replace(/[.#$[\]]/g, '_'); // Reemplazar caracteres no permitidos
                         const commentRef = database.ref(`/comments/${sanitizedPath}`);
                         
                         commentRef.once('value').then(snapshot => {
@@ -1481,7 +1492,7 @@ function loadFolder(folderPath) {
                             button.addEventListener('click', async (event) => {
                                 event.stopPropagation();
                                 const fileRefPath = button.getAttribute('data-ref');
-                                const sanitizedPath = fileRefPath.replace(/[.#$[\]]/g, '_'); 
+                                const sanitizedPath = fileRefPath.replace(/[.#$[\]]/g, '_'); // Reemplazar caracteres no permitidos
                                 const commentRef = database.ref(`/comments/${sanitizedPath}`);
                         
                                 // Obtener el comentario existente
@@ -1498,6 +1509,10 @@ function loadFolder(folderPath) {
                                 // Cerrar el modal de Bootstrap
                                 $('#etiquetasModal').modal('hide');
                         
+                                // Forzar el cierre completo del modal y el fondo
+                                $('body').removeClass('modal-open');
+                                $('.modal-backdrop').remove();
+                        
                                 // Mostrar SweetAlert para ingresar o editar el comentario
                                 Swal.fire({
                                     title: 'Comentario',
@@ -1507,8 +1522,8 @@ function loadFolder(folderPath) {
                                     showCancelButton: true,
                                     confirmButtonText: 'Guardar',
                                     cancelButtonText: 'Cancelar',
-                                    allowOutsideClick: false, 
-                                    backdrop: true,
+                                    allowOutsideClick: false, // Permitir clics fuera del SweetAlert
+                                    backdrop: true, // Mostrar el fondo del SweetAlert
                                     preConfirm: (comment) => {
                                         if (comment) {
                                             return comment;
@@ -1533,6 +1548,8 @@ function loadFolder(folderPath) {
                                 });
                             });
                         });
+                        
+                        // ...existing code...
                         
                             listItem.querySelector('.badge').addEventListener('click', (event) => {
                             event.stopPropagation(); // Evitar que el evento de clic se propague al elemento de la lista
