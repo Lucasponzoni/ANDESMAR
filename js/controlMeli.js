@@ -1456,7 +1456,7 @@ function loadFolder(folderPath) {
                         listItem.innerHTML = `
                             <div class="ms-2 me-auto">
                                 <div class="fw-bold">${fileRef.name}</div>
-                                <small class="time-etiquetas-container"><i class="bi bi-clock"></i> Registro: ${formattedTime}</small>
+                                <small class="time-etiquetas-container"><i class="bi bi-clock"></i> ${formattedTime}</small>
                             </div>
                             <span class="badge text-bg-primary rounded-pill">Archivo (${labelCount} etiquetas)</span>
                             <button class="btn btn-danger btn-sm delete-btn fixed-size" data-ref="${fileRef.fullPath}" id="delete-tanda${tandaNumber}">
