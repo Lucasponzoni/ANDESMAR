@@ -1272,6 +1272,17 @@ async function buscarEnFirebase(codigoNumerico) {
     return snapshot.exists() ? snapshot.val() : null;
 }
 
+function logMessage(message) {
+    const logContainer = document.getElementById('logContainer');
+    if (logContainer) {
+        logContainer.style.display = 'block';
+        logContainer.innerHTML += `<div>${message}</div>`;
+        logContainer.scrollTop = logContainer.scrollHeight; // Scroll to the bottom
+    } else {
+        console.error('logContainer element not found');
+    }
+}
+
 async function generateBillingFile(content) {
     const salesNumbers = extractSalesNumbers(content);
     let billingContent = '';
@@ -1286,11 +1297,11 @@ async function generateBillingFile(content) {
 
         if (ventaMatch) {
             const ventaId = ventaMatch[1];
-            console.log(`Buscando en Firebase el ID de Venta: ${ventaId}...`);
+            logMessage(`Buscando en Mercado Libre el ID de Venta: ${ventaId}...`);
             try {
                 data = await buscarEnFirebase(ventaId);
                 if (data) {
-                    console.log(`Encontrado en Firebase: ${JSON.stringify(data)}`);
+                    logMessage(`Encontrado con Exito`);
                     const additionalInfo = data.client?.billing_info?.additional_info || [];
                     const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "jujuy");
                     const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "tierra del fuego");
@@ -1305,20 +1316,20 @@ async function generateBillingFile(content) {
                         billingContent += `${index + 1}- ${number} ---- Control Ok.\n`;
                     }
                 } else {
-                    console.log(`No se logró encontrar el ID de Venta: ${ventaId} en Firebase.`);
-                    billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+                    logMessage(`No se logró encontrar el ID de Venta: ${ventaId} en Mercado Lubre, Verifique Manualmente.`);
+                    billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
                 }
             } catch (error) {
-                console.error(`Error al buscar el ID de Venta: ${ventaId}`, error);
-                billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+                logMessage(`Error al buscar el ID de Venta: ${ventaId}`);
+                billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
             }
         } else if (packIdMatch && vMatch) {
             const ventaId = vMatch[1];
-            console.log(`Buscando en Firebase el ID de Venta para Pack ID: ${ventaId}...`);
+            logMessage(`Buscando en Mercado Libre el ID de Venta para Pack ID: ${ventaId}...`);
             try {
                 data = await buscarEnFirebase(ventaId);
                 if (data) {
-                    console.log(`Encontrado en Firebase: ${JSON.stringify(data)}`);
+                    logMessage(`Encontrado con Exito`);
                     const additionalInfo = data.client?.billing_info?.additional_info || [];
                     const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "jujuy");
                     const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "tierra del fuego");
@@ -1333,22 +1344,28 @@ async function generateBillingFile(content) {
                         billingContent += `${index + 1}- ${number} ---- Control Ok.\n`;
                     }
                 } else {
-                    console.log(`No se logró encontrar el ID de Venta para Pack ID: ${ventaId} en Firebase.`);
-                    billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+                    logMessage(`No se logró encontrar el ID de Venta para Pack ID: ${ventaId} en Mercado Libre.`);
+                    billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
                 }
             } catch (error) {
-                console.error(`Error al buscar el ID de Venta para Pack ID: ${ventaId}`, error);
-                billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+                logMessage(`Error al buscar el ID de Venta para Pack ID: ${ventaId}`);
+                billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
             }
         } else if (shippingIdMatch) {
             const shippingId = shippingIdMatch[1];
-            console.log(`Buscando en Firebase el ShippingID: ${shippingId}...`);
+            logMessage(`Buscando en Mercado Libre el ShippingID: ${shippingId}...`);
             // Aquí puedes agregar la lógica para buscar por shippingId si es necesario
             // Por ahora, solo se busca por ID de venta.
-            billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+            billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
         } else {
-            billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+            billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
         }
+    }
+
+    // Ocultar el logContainer al finalizar
+    const logContainer = document.getElementById('logContainer');
+    if (logContainer) {
+        logContainer.style.display = 'none';
     }
 
     return billingContent;

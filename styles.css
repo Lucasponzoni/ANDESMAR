@@ -9,6 +9,7 @@
     src: url('./fonts/modica.otf'),
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Signika:wght@300..700&display=swap');
 
 *::selection {
@@ -4968,4 +4969,35 @@ input[disabled] {
     }
 }
 
+#logContainer {
+    margin-top: -20px;
+    border-radius: 10px;
+    background-color: #1a1a1a;
+    color: #00ff00;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    display: none;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    position: relative;
+}
 
+#logContainer div {
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+#logContainer div:nth-child(odd) {
+    background-color: rgba(0, 255, 0, 0.05);
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#logContainer div:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 5px;
+    border-radius: 5px;
+}

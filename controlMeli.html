@@ -7,7 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Signika:wght@300..700&family=Titan+One&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=lock_open" />
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -151,39 +152,40 @@
         </div>
     </div>
 
-    <!-- Modal de Etiquetas -->
-    <div class="modal fade" id="etiquetasModal" tabindex="-1" aria-labelledby="etiquetasModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="etiquetasModalLabel">Etiquetas Mercado Libre</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="file" id="fileInput" accept=".txt" class="form-control mb-3">
-                    <button type="button" class="btn btn-secondary mb-3" id="backButton" style="display: none;">
-                        <i class="bi bi-arrow-left"></i> Atrás
-                    </button>
-                    <div class="d-flex justify-content-center my-3 contenedor-spinner33">
-                        <div id="spinner33" class="spinner-border text-info spinner-large" role="status">
-                            <span class="visually-hidden"></span>
-                        </div>
+<!-- Modal de Etiquetas -->
+<div class="modal fade" id="etiquetasModal" tabindex="-1" aria-labelledby="etiquetasModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="etiquetasModalLabel">Etiquetas Mercado Libre</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="file" id="fileInput" accept=".txt" class="form-control mb-3">
+                <button type="button" class="btn btn-secondary mb-3" id="backButton" style="display: none;">
+                    <i class="bi bi-arrow-left"></i> Atrás
+                </button>
+                <div class="d-flex justify-content-center my-3 contenedor-spinner33">
+                    <div id="spinner33" class="spinner-border text-info spinner-large" role="status">
+                        <span class="visually-hidden"></span>
                     </div>
-                    <ol class="list-group list-group-numbered etiquetaList" id="folderList"></ol>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">
-                        <i class="bi bi-x-circle"></i> Cerrar
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="uploadFile()">
-                        <i class="bi bi-upload"></i> Subir
-                    </button>
-                </div>
+                <div id="logContainer" class="p-2 mb-3"></div>
+                <ol class="list-group list-group-numbered etiquetaList" id="folderList"></ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cerrar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="uploadFile()">
+                    <i class="bi bi-upload"></i> Subir
+                </button>
             </div>
         </div>
     </div>
+</div>
     
     <!-- Modal para escanear -->
     <div class="modal fade" id="escaneoColecta" tabindex="-1" role="dialog" aria-labelledby="escaneoColectaLabel" aria-hidden="true">
