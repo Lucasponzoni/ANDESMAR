@@ -1747,7 +1747,7 @@ div.card-body > p > i{
 
 #spinner {
     margin-bottom: 1.5rem;
-    color: cornflowerblue;
+    color: red;
     display: flex; /* Mostrar el spinner al cargar */
     justify-content: center;
     align-items: center;
@@ -1768,9 +1768,9 @@ div.card-body > p > i{
 }
 
 .spinner-border {
-    width: 1.5rem;
-    height: 1.5rem;
-    border-width: 0.2em;
+    width: 4rem;
+    height: 4rem;
+    border-width: 0.5em;
 }
 
 .text-purple {
@@ -5082,3 +5082,19 @@ input[disabled] {
     color: white;
     font-weight: 700;
 }
+
+.spinner-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px; 
+    transform: translate(-50%, -50%); 
+    z-index: 1; 
+    pointer-events: none; 
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
