@@ -4854,6 +4854,7 @@ input[disabled] {
 }
 
 .fixed-size {
+    margin-left: 2px;
     width: 38.8px;
     height: 37.2px;
 }

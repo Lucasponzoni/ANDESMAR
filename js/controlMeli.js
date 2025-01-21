@@ -1230,16 +1230,7 @@ function downloadBillingFile(content, fileName) {
     URL.revokeObjectURL(url);
 }
 
-function isMobile() {
-    return /Mobi|Android/i.test(navigator.userAgent);
-}
-
 function loadFolder(folderPath) {
-    if (isMobile()) {
-        showMobileAlert();
-        return;
-    }
-
     showSpinner(true);
     const folderRef = storage.ref(folderPath);
     folderRef.listAll().then(result => {
@@ -1294,7 +1285,7 @@ function loadFolder(folderPath) {
                             listItem.innerHTML = `
                                 <div class="ms-2 me-auto">
                                     <div class="fw-bold">${fileRef.name}</div>
-                                    <small class="time-etiquetas-container"><i class="bi bi-clock"></i> Hora de carga: ${formattedTime}</small>
+                                    <small class="time-etiquetas-container"><i class="bi bi-clock"></i> Horario: ${formattedTime}</small>
                                 </div>
                                 <span class="badge text-bg-primary rounded-pill">Archivo (${labelCount} etiquetas)</span>
                                 <button class="btn btn-danger btn-sm delete-btn fixed-size" data-ref="${fileRef.fullPath}" id="delete-tanda${tandaNumber}">
@@ -1382,16 +1373,6 @@ function loadFolder(folderPath) {
         showSpinner(false);
         Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
     });
-}
-
-function showMobileAlert() {
-    const folderList = document.getElementById('folderList');
-    folderList.innerHTML = `
-        <div class="alert alert-warning text-center" role="alert">
-            <i class="bi bi-exclamation-triangle" style="font-size: 2rem;"></i>
-            <p>No está disponible la descarga de etiquetas en mobile, intente en desktop.</p>
-        </div>
-    `;
 }
 
 function handleGenerateClick(event) {
