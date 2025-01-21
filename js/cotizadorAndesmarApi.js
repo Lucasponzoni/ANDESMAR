@@ -1,7 +1,7 @@
 // Función para mostrar el spinner
 function mostrarSpinner() {
     const spinner = document.createElement('div');
-    spinner.className = 'spinner-border text-success';
+    spinner.className = 'spinner-border spinner-border2 text-success';
     spinner.role = 'status';
     
     const spinnerContainer = document.createElement('div');

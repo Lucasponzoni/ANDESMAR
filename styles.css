@@ -1768,6 +1768,18 @@ div.card-body > p > i{
 }
 
 .spinner-border {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-width: 0.5em;
+}
+
+.spinner-border2 {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-width: 0.5em;
+}
+
+.spinner-border37892 {
     width: 4rem;
     height: 4rem;
     border-width: 0.5em;

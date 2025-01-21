@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Crear el spinner de Bootstrap con texto "Esperando..."
     const spinner = document.createElement('div');
-    spinner.className = 'spinner-border text-danger';
+    spinner.className = 'spinner-border spinner-border2 text-danger';
     spinner.role = 'status';
     spinner.innerHTML = '<span class="visually-hidden">Cargando...</span>';
     

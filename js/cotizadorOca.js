@@ -30,7 +30,7 @@ function actualizarCantidadBultos() {
     
     // Spinner
     const spinnerOCA = document.createElement('div');
-    spinnerOCA.className = 'spinner-border text-purple';
+    spinnerOCA.className = 'spinner-border spinner-border2 text-purple';
     spinnerOCA.role = 'status';
     spinnerOCA.innerHTML = '<span class="visually-hidden">Cargando...</span>';
     

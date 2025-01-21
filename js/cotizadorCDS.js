@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Spinner
     const spinnerCDS = document.createElement('div');
-    spinnerCDS.className = 'spinner-border';
+    spinnerCDS.className = 'spinner-border spinner-border2';
     spinnerCDS.role = 'status';
     spinnerCDS.innerHTML = '<span class="visually-hidden">Cargando...</span>';
 
