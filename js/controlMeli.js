@@ -107,7 +107,7 @@ $(document).ready(function() {
 function verificarActualizacionBaseDeDatos() {
     const ultimaActualizacion = localStorage.getItem('ultimaActualizacion');
     const ahora = new Date().getTime();
-    const unaHora = 60 * 60 * 1000; // Una hora
+    const unaHora = 1000; // Una hora
     let intervalo;
 
     if (!ultimaActualizacion || (ahora - ultimaActualizacion > unaHora)) {
@@ -120,7 +120,7 @@ function verificarActualizacionBaseDeDatos() {
 
         // Mostrar el spinner por al menos 3 segundos
         setTimeout(() => {
-            descargarDatosDesdeFirebase(1000).then(() => {
+            descargarDatosDesdeFirebase(1200).then(() => {
                 const fechaActual = new Date().toLocaleString('es-AR', {
                     day: '2-digit',
                     month: '2-digit',
@@ -277,11 +277,16 @@ setTimeout(() => {
                                                                                                                             $('.lookBase').text('Buscando en últimas 10.000 ventas...').show();
                                                                                                                             return buscarEnFirebase(codigoNumerico, 10000).then(encontrado => {
                                                                                                                                 if (!encontrado) {
-                                                                                                                                    $('#spinner4').hide(); // Ocultar spinner
-                                                                                                                                    $('.lookBase').html(`NO se encontró etiqueta: <span class="redStrong">${codigoNumerico}</span> en <span style="color: #FF8C00; font-weight: bold;">Firebase <i class="bi bi-fire"></i></span> en las últimas 10.000 ventas. <span class="redStrong4"><i class="bi bi-search"></i> Verifica la fecha en Mercado Libre: <a href="https://www.mercadolibre.com.ar/ventas/omni/listado?filters=&startPeriod=WITH_DATE_CLOSED_6M_OLD&sort=DATE_CLOSED_DESC&subFilters=&search=${codigoNumerico}&limit=50&offset=0" target="_blank" style="color: #007bff; text-decoration: underline;">CLICK AQUÍ <i class="bi bi-box-arrow-up-right"></i></a></span>`).show();
+                                                                                                                                    $('.lookBase').text('Buscando en toda la base de datos...').show();
+                                                                                                                                    return buscarEnFirebase(codigoNumerico, null).then(encontrado => {
+                                                                                                                                        if (!encontrado) {
+                                                                                                                                            $('#spinner4').hide(); // Ocultar spinner
+                                                                                                                                            $('.lookBase').html(`NO se encontró etiqueta: <span class="redStrong">${codigoNumerico}</span> en <span style="color: #FF8C00; font-weight: bold;">Firebase <i class="bi bi-fire"></i></span> en las últimas 10.000 ventas. <span class="redStrong4"><i class="bi bi-search"></i> Verifica la fecha en Mercado Libre: <a href="https://www.mercadolibre.com.ar/ventas/omni/listado?filters=&startPeriod=WITH_DATE_CLOSED_6M_OLD&sort=DATE_CLOSED_DESC&subFilters=&search=${codigoNumerico}&limit=50&offset=0" target="_blank" style="color: #007bff; text-decoration: underline;">CLICK AQUÍ <i class="bi bi-box-arrow-up-right"></i></a></span>`).show();
 
-                                                                                                                                    // Limpiar el input
-                                                                                                                                    $('#codigoInput').val(''); // Limpiar el input
+                                                                                                                                            // Limpiar el input
+                                                                                                                                            $('#codigoInput').val(''); // Limpiar el input
+                                                                                                                                        }
+                                                                                                                                    });
                                                                                                                                 }
                                                                                                                             });
                                                                                                                         }
@@ -1275,7 +1280,7 @@ async function handleGenerateClick(event) {
     }, 2000);
 }
 
-async function buscarEnFirebase(codigoNumerico) {
+async function buscarEnFirebase2(codigoNumerico) {
     const ref = database.ref('/envios').child(codigoNumerico);
     const snapshot = await ref.once('value');
     return snapshot.exists() ? snapshot.val() : null;
@@ -1308,7 +1313,7 @@ async function generateBillingFile(content) {
             const ventaId = ventaMatch[1];
             logMessage(`Buscando en Mercado Libre el ID de Venta: ${ventaId}...`);
             try {
-                data = await buscarEnFirebase(ventaId);
+                data = await buscarEnFirebase2(ventaId);
                 if (data) {
                     logMessage(`Encontrado con Exito`);
                     const additionalInfo = data.client?.billing_info?.additional_info || [];
@@ -1336,7 +1341,7 @@ async function generateBillingFile(content) {
             const ventaId = vMatch[1];
             logMessage(`Buscando en Mercado Libre el ID de Venta para Pack ID: ${ventaId}...`);
             try {
-                data = await buscarEnFirebase(ventaId);
+                data = await buscarEnFirebase2(ventaId);
                 if (data) {
                     logMessage(`Encontrado con Exito`);
                     const additionalInfo = data.client?.billing_info?.additional_info || [];
