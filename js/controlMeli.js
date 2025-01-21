@@ -1194,27 +1194,163 @@ function countLabels(content) {
 
 function extractSalesNumbers(content) {
     const labelRegex = /\^XA[\s\S]*?\^XZ/g;
-    const saleRegex = /\^FO120,120\^A0N,24,24\^FD(Venta|Pack ID): (\d+)\^FS[\s\S]*?\^FO(\d+),117\^A0N,27,27\^FD(\d+)\^FS/g;
+    const saleRegex = /(?:\^FO120,120\^A0N,24,24\^FD(Venta|Pack ID): (\d+)\^FS[\s\S]*?\^FO(\d+),117\^A0N,27,27\^FD(\d+)\^FS)/g;
+    const idRegex = /"id":"(\d+)"/g; // Regex para buscar el ID
+    const ventaRegex = /\^FO40,245\^A0N,28,28\^FH\^FDVenta:\^FS[\s\S]*?\^FO124,249\^A0N,25,25\^FD(\d+)\^FS[\s\S]*?\^FO188,245\^A0N,30,30\^FD(\d+)\^FS/g; // Regex para buscar el número de venta
     const matches = [];
-    let labelMatch;
-    while ((labelMatch = labelRegex.exec(content)) !== null) {
-        const labelContent = labelMatch[0];
-        let saleMatch;
-        while ((saleMatch = saleRegex.exec(labelContent)) !== null) {
-            matches.push(`${saleMatch[1]}: ${saleMatch[2]} ${saleMatch[4]}`);
-        }
+    
+    const labels = content.match(labelRegex); // Obtener todas las etiquetas
+    if (labels) {
+        labels.forEach(labelContent => {
+            let idMatch = idRegex.exec(labelContent); // Buscar el ID en el contenido de la etiqueta
+            let saleMatch;
+            while ((saleMatch = saleRegex.exec(labelContent)) !== null) {
+                const saleType = saleMatch[1]; // "Venta" o "Pack ID"
+                const saleNumber = saleMatch[2]; // Número asociado
+                const additionalNumber = saleMatch[4]; // El número adicional que sigue
+                const shippingId = idMatch ? idMatch[1] : 'No ID'; // Obtener el ID o usar 'No ID' si no se encuentra
+                
+                // Concatenar el número de venta o Pack ID con el número adicional
+                const fullSaleNumber = `${saleNumber}${additionalNumber}`; // Formar el número completo
+                
+                let ventaNumber = 'No ID';
+                if (saleType === "Pack ID") {
+                    const ventaMatch = labelContent.match(/\^FO124,249\^A0N,25,25\^FD(\d+)\^FS[\s\S]*?\^FO188,245\^A0N,30,30\^FD(\d+)\^FS/);
+                    if (ventaMatch) {
+                        ventaNumber = `${ventaMatch[1]}${ventaMatch[2]}`;
+                    }
+                }
+                
+                if (saleType === "Pack ID") {
+                    matches.push(`${saleType}: ${fullSaleNumber} / V: ${ventaNumber} ---- ShippingID: ${shippingId}`);
+                } else {
+                    matches.push(`${saleType}: ${fullSaleNumber} ---- ShippingID: ${shippingId}`);
+                }
+                
+                idMatch = idRegex.exec(labelContent); // Avanzar al siguiente ID en la misma etiqueta
+            }
+        });
     }
     return matches;
 }
 
-function generateBillingFile(content) {
+async function handleGenerateClick(event) {
+    event.stopPropagation();
+    const button = event.currentTarget;
+    const url = button.getAttribute('data-url');
+    const fileName = button.getAttribute('data-name');
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    button.classList.add('btn-secondary', 'fixed-size');
+    button.classList.remove('btn-primary');
+    button.disabled = true;
+    setTimeout(async () => {
+        try {
+            const response = await fetch(`https://proxy.cors.sh/${url}`, {
+                headers: {
+                    'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+                }
+            });
+            const content = await response.text();
+            const billingContent = await generateBillingFile(content);
+            const billingFileName = `Facturacion_${fileName}.txt`;
+            downloadBillingFile(billingContent, billingFileName);
+            button.innerHTML = '<i class="bi bi-check-all"></i>';
+            button.classList.add('btn-success');
+            button.classList.remove('btn-secondary');
+            button.disabled = false;
+        } catch (error) {
+            showSpinner(false);
+            console.error('Error al generar el archivo de facturación:', error);
+            Swal.fire('Error', 'Error al generar el archivo de facturación.', 'error');
+        }
+    }, 2000);
+}
+
+async function buscarEnFirebase(codigoNumerico) {
+    const ref = database.ref('/envios').child(codigoNumerico);
+    const snapshot = await ref.once('value');
+    return snapshot.exists() ? snapshot.val() : null;
+}
+
+async function generateBillingFile(content) {
     const salesNumbers = extractSalesNumbers(content);
     let billingContent = '';
-    salesNumbers.forEach((number, index) => {
-        // Eliminar todos los espacios entre los números
-        const cleanedNumber = number.replace(/\s+/g, '');
-        billingContent += `${index + 1}- ${cleanedNumber}\n`;
-    });
+
+    for (const [index, number] of salesNumbers.entries()) {
+        const shippingIdMatch = number.match(/ShippingID: (\d+)/);
+        const ventaMatch = number.match(/Venta: (\d+)/);
+        const packIdMatch = number.match(/Pack ID: (\d+)/);
+        const vMatch = number.match(/V: (\d+)/);
+        
+        let data = null;
+
+        if (ventaMatch) {
+            const ventaId = ventaMatch[1];
+            console.log(`Buscando en Firebase el ID de Venta: ${ventaId}...`);
+            try {
+                data = await buscarEnFirebase(ventaId);
+                if (data) {
+                    console.log(`Encontrado en Firebase: ${JSON.stringify(data)}`);
+                    const additionalInfo = data.client?.billing_info?.additional_info || [];
+                    const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "jujuy");
+                    const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "tierra del fuego");
+
+                    if (estadoJujuy) {
+                        billingContent += `${index + 1}- ${number} ---- NO FACTURAR JUJUY\n`;
+                    } else if (estadoTierraDelFuego) {
+                        billingContent += `${index + 1}- ${number} ---- NO FACTURAR TIERRA DEL FUEGO\n`;
+                    } else if (data.Provincia.toLowerCase() === 'jujuy' || data.Provincia.toLowerCase() === 'tierra del fuego') {
+                        billingContent += `${index + 1}- ${number} ---- NO FACTURAR ${data.Provincia.toUpperCase()}\n`;
+                    } else {
+                        billingContent += `${index + 1}- ${number} ---- Control Ok.\n`;
+                    }
+                } else {
+                    console.log(`No se logró encontrar el ID de Venta: ${ventaId} en Firebase.`);
+                    billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+                }
+            } catch (error) {
+                console.error(`Error al buscar el ID de Venta: ${ventaId}`, error);
+                billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+            }
+        } else if (packIdMatch && vMatch) {
+            const ventaId = vMatch[1];
+            console.log(`Buscando en Firebase el ID de Venta para Pack ID: ${ventaId}...`);
+            try {
+                data = await buscarEnFirebase(ventaId);
+                if (data) {
+                    console.log(`Encontrado en Firebase: ${JSON.stringify(data)}`);
+                    const additionalInfo = data.client?.billing_info?.additional_info || [];
+                    const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "jujuy");
+                    const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "tierra del fuego");
+
+                    if (estadoJujuy) {
+                        billingContent += `${index + 1}- ${number} ---- NO FACTURAR JUJUY\n`;
+                    } else if (estadoTierraDelFuego) {
+                        billingContent += `${index + 1}- ${number} ---- NO FACTURAR TIERRA DEL FUEGO\n`;
+                    } else if (data.Provincia.toLowerCase() === 'jujuy' || data.Provincia.toLowerCase() === 'tierra del fuego') {
+                        billingContent += `${index + 1}- ${number} ---- NO FACTURAR ${data.Provincia.toUpperCase()}\n`;
+                    } else {
+                        billingContent += `${index + 1}- ${number} ---- Control Ok.\n`;
+                    }
+                } else {
+                    console.log(`No se logró encontrar el ID de Venta para Pack ID: ${ventaId} en Firebase.`);
+                    billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+                }
+            } catch (error) {
+                console.error(`Error al buscar el ID de Venta para Pack ID: ${ventaId}`, error);
+                billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+            }
+        } else if (shippingIdMatch) {
+            const shippingId = shippingIdMatch[1];
+            console.log(`Buscando en Firebase el ShippingID: ${shippingId}...`);
+            // Aquí puedes agregar la lógica para buscar por shippingId si es necesario
+            // Por ahora, solo se busca por ID de venta.
+            billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+        } else {
+            billingContent += `${index + 1}- ${number} ---- VERIFICAR MANUALMENTE\n`;
+        }
+    }
+
     return billingContent;
 }
 
@@ -1381,38 +1517,6 @@ function loadFolder(folderPath) {
     });
 }
 
-function handleGenerateClick(event) {
-    event.stopPropagation();
-    const button = event.currentTarget;
-    const url = button.getAttribute('data-url');
-    const fileName = button.getAttribute('data-name');
-    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-    button.classList.add('btn-secondary', 'fixed-size');
-    button.classList.remove('btn-primary');
-    button.disabled = true;
-    setTimeout(() => {
-        fetch(`https://proxy.cors.sh/${url}`, {
-            headers: {
-                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
-            }
-        })
-        .then(response => response.text())
-        .then(content => {
-            const billingContent = generateBillingFile(content);
-            const billingFileName = `Facturacion_${fileName}.txt`;
-            downloadBillingFile(billingContent, billingFileName);
-            button.innerHTML = '<i class="bi bi-check-all"></i>';
-            button.classList.add('btn-success');
-            button.classList.remove('btn-secondary');
-            button.disabled = false;
-        }).catch(error => {
-            showSpinner(false);
-            console.error('Error al generar el archivo de facturación:', error);
-            Swal.fire('Error', 'Error al generar el archivo de facturación.', 'error');
-        });
-    }, 2000);
-    }
-
 document.getElementById('backButton').addEventListener('click', () => {
     if (folderStack.length > 0) {
         currentFolderPath = folderStack.pop();
@@ -1434,8 +1538,27 @@ function uploadFile() {
     }
 
     const today = new Date();
-    const dateString = formatDate(today); // Formato Etiquetas DD-MM-YYYY
+    let uploadDate = new Date(today);
+
+    // Ajustar la fecha según las condiciones especificadas
+    const dayOfWeek = today.getDay();
+    const hourOfDay = today.getHours();
+
+    if (hourOfDay >= 17 || (dayOfWeek === 6 && hourOfDay >= 11) || dayOfWeek === 0) {
+        // Si es después de las 17:00 o después de las 11:00 del sábado o cualquier hora del domingo
+        uploadDate.setDate(today.getDate() + 1);
+    }
+
+    // Si la nueva fecha es domingo, ajustar al lunes
+    if (uploadDate.getDay() === 0) {
+        uploadDate.setDate(uploadDate.getDate() + 1);
+    }
+
+    const dateString = formatDate(uploadDate); // Formato Etiquetas DD-MM-YYYY
     const folderPath = `Etiquetas/${dateString}`;
+
+    // Mostrar el spinner
+    showSpinner(true);
 
     // Obtener el contenido del archivo seleccionado
     const reader = new FileReader();
@@ -1471,17 +1594,21 @@ function uploadFile() {
                     Swal.fire('Subido!', 'El archivo ha sido subido exitosamente.', 'success');
                     fileInput.value = ''; // Limpiar el input de archivo
                     loadFolder(currentFolderPath); // Recargar la carpeta actual
+                    showSpinner(false); // Ocultar el spinner después del alert de éxito
                 }).catch(error => {
                     console.error('Error al subir el archivo:', error);
                     Swal.fire('Error', 'Error al subir el archivo.', 'error');
+                    showSpinner(false); // Ocultar el spinner en caso de error
                 });
             }).catch(error => {
                 console.error('Error al verificar el archivo:', error);
                 Swal.fire('Error', error.message, 'error');
+                showSpinner(false); // Ocultar el spinner en caso de error
             });
         }).catch(error => {
             console.error('Error al listar archivos en la carpeta:', error);
             Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
+            showSpinner(false); // Ocultar el spinner en caso de error
         });
     };
     reader.readAsText(file);
