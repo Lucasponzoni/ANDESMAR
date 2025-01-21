@@ -1506,45 +1506,47 @@ function loadFolder(folderPath) {
                                 $('#etiquetasModal').modal('hide');
                         
                                 // Forzar el cierre completo del modal y el fondo
-                                $('body').removeClass('modal-open');
-                                $('.modal-backdrop').remove();
+                                setTimeout(() => {
+                                    $('body').removeClass('modal-open');
+                                    $('.modal-backdrop').remove();
                         
-                                // Mostrar SweetAlert para ingresar o editar el comentario
-                                Swal.fire({
-                                    title: 'Comentario',
-                                    input: 'textarea',
-                                    inputLabel: 'Ingrese su comentario:',
-                                    inputValue: existingComment,
-                                    showCancelButton: true,
-                                    confirmButtonText: 'Guardar',
-                                    cancelButtonText: 'Cancelar',
-                                    allowOutsideClick: false, // Permitir clics fuera del SweetAlert
-                                    backdrop: true, // Mostrar el fondo del SweetAlert
-                                    preConfirm: (comment) => {
-                                        if (comment) {
-                                            return comment;
-                                        } else {
-                                            Swal.showValidationMessage('El comentario no puede estar vacío');
+                                    // Mostrar SweetAlert para ingresar o editar el comentario
+                                    Swal.fire({
+                                        title: 'Comentario',
+                                        input: 'textarea',
+                                        inputLabel: 'Ingrese su comentario:',
+                                        inputValue: existingComment,
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Guardar',
+                                        cancelButtonText: 'Cancelar',
+                                        allowOutsideClick: false, // Permitir clics fuera del SweetAlert
+                                        backdrop: true, // Mostrar el fondo del SweetAlert
+                                        preConfirm: (comment) => {
+                                            if (comment) {
+                                                return comment;
+                                            } else {
+                                                Swal.showValidationMessage('El comentario no puede estar vacío');
+                                            }
                                         }
-                                    }
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        commentRef.set(result.value).then(() => {
-                                            Swal.fire('Comentario guardado!', 'Su comentario ha sido guardado exitosamente.', 'success');
-                                            button.classList.remove('btn-primary');
-                                            button.classList.add('btn-success');
-                                            button.innerHTML = '<i class="bi bi-chat-dots-fill" style="width: 19.2px; height: 19.2px;"></i>';
-                                        }).catch(error => {
-                                            Swal.fire('Error', `Error al guardar el comentario: ${error}`, 'error');
-                                        });
-                                    }
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            commentRef.set(result.value).then(() => {
+                                                Swal.fire('Comentario guardado!', 'Su comentario ha sido guardado exitosamente.', 'success');
+                                                button.classList.remove('btn-primary');
+                                                button.classList.add('btn-success');
+                                                button.innerHTML = '<i class="bi bi-chat-dots-fill" style="width: 19.2px; height: 19.2px;"></i>';
+                                            }).catch(error => {
+                                                Swal.fire('Error', `Error al guardar el comentario: ${error}`, 'error');
+                                            });
+                                        }
                         
-                                    // Reabrir el modal de Bootstrap
-                                    $('#etiquetasModal').modal('show');
-                                });
+                                        // Reabrir el modal de Bootstrap
+                                        $('#etiquetasModal').modal('show');
+                                    });
+                                }, 500); 
                             });
-                        });
-                        
+                        });  
+                                              
                             listItem.querySelector('.badge').addEventListener('click', (event) => {
                             event.stopPropagation(); // Evitar que el evento de clic se propague al elemento de la lista
                             const a = document.createElement('a');
