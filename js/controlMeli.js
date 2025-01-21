@@ -1451,8 +1451,6 @@ function loadFolder(folderPath) {
                         const listItem = document.createElement('li');
                         listItem.className = 'list-group-item d-flex justify-content-between align-items-start';
                         
-                        // ...existing code...
-                        
                         listItem.innerHTML = `
                             <div class="ms-2 me-auto">
                                 <div class="fw-bold">${fileRef.name}</div>
@@ -1484,8 +1482,6 @@ function loadFolder(folderPath) {
                         }).catch(error => {
                             console.error('Error al verificar el comentario:', error);
                         });
-                        
-                        // ...existing code...
                         
                         // Agregar evento de comentario a los botones
                         document.querySelectorAll('.comment-btn').forEach(button => {
@@ -1548,8 +1544,6 @@ function loadFolder(folderPath) {
                                 });
                             });
                         });
-                        
-                        // ...existing code...
                         
                             listItem.querySelector('.badge').addEventListener('click', (event) => {
                             event.stopPropagation(); // Evitar que el evento de clic se propague al elemento de la lista
@@ -1791,8 +1785,8 @@ function uploadFile() {
                         { email: "esperanza.toffalo@novogar.com.ar", nombre: "Esperanza" },
                         { email: "posventa@novogar.com.ar", nombre: "Posventa" },
                         { email: "marina.braidotti@novogar.com.ar", nombre: "Marina" },
-                        { email: "agustina.benedetto@novogar.com.ar", nombre: "Natalia" },
-                        { email: "natalia.rodriguez@novogar.com.ar", nombre: "Agistina" },
+                        { email: "agustina.benedetto@novogar.com.ar", nombre: "Agustina" },
+                        { email: "natalia.rodriguez@novogar.com.ar", nombre: "Natalita" },
                         { email: "mauricio.villan@novogar.com.ar", nombre: "Mauricio" }
                     ];
 
