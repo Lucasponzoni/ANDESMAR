@@ -1391,23 +1391,27 @@ function handleGenerateClick(event) {
     button.classList.remove('btn-primary');
     button.disabled = true;
     setTimeout(() => {
-        fetch(url)
-            .then(response => response.text())
-            .then(content => {
-                const billingContent = generateBillingFile(content);
-                const billingFileName = `Facturacion_${fileName}.txt`;
-                downloadBillingFile(billingContent, billingFileName);
-                button.innerHTML = '<i class="bi bi-check-all"></i>';
-                button.classList.add('btn-success');
-                button.classList.remove('btn-secondary');
-                button.disabled = false;
-            }).catch(error => {
-                showSpinner(false);
-                console.error('Error al generar el archivo de facturación:', error);
-                Swal.fire('Error', 'Error al generar el archivo de facturación.', 'error');
-            });
+        fetch(`https://proxy.cors.sh/${url}`, {
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+            }
+        })
+        .then(response => response.text())
+        .then(content => {
+            const billingContent = generateBillingFile(content);
+            const billingFileName = `Facturacion_${fileName}.txt`;
+            downloadBillingFile(billingContent, billingFileName);
+            button.innerHTML = '<i class="bi bi-check-all"></i>';
+            button.classList.add('btn-success');
+            button.classList.remove('btn-secondary');
+            button.disabled = false;
+        }).catch(error => {
+            showSpinner(false);
+            console.error('Error al generar el archivo de facturación:', error);
+            Swal.fire('Error', 'Error al generar el archivo de facturación.', 'error');
+        });
     }, 2000);
-}
+    }
 
 document.getElementById('backButton').addEventListener('click', () => {
     if (folderStack.length > 0) {
