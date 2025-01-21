@@ -4157,76 +4157,116 @@ input[disabled] {
     text-align: center;
     margin-top: 20px;
 }
-.counter {
-    width: 300px;
-    font-weight: 600;
-    width: fit-content;
-    background-color: #FF4C4C; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    text-shadow: 1px 0px 4px rgba(0, 0, 0, 0.359); /* Sombra del texto */
-    color: white; 
-    padding: 20px; 
-    border-radius: 10px;
-    text-align: center; 
-    font-size: 24px; 
-    transition: transform 0.3s; 
-    
-}
+
 
 .contadores{
     display: flex;
 }
 
-.counterfila{
+.counter {
+    width: fit-content;
+    font-weight: 600;
+    background-color: #007aff; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); 
+    color: white; 
+    padding: 20px; 
+    border-radius: 12px; 
+    text-align: center; 
+    font-size: 24px; 
+    transition: transform 0.3s, box-shadow 0.3s; 
+}
+
+.counter:hover {
+    transform: scale(1.05); 
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); 
+    cursor: pointer;
+}
+
+.counterfila {
     margin-left: 5px;
-    background-color: orange; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    text-shadow: 1px 0px 4px rgba(0, 0, 0, 0.359); /* Sombra del texto */
+    background-color: #34c759; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 24px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.counterfila:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
 }
 
 .fixed-counter {
     font-weight: 600;
     width: 300px;
-    background-color: #FF4C4C; 
+    background-color: #007aff; 
     color: white; 
     padding: 20px; 
-    border-radius: 10px;
+    border-radius: 12px;
     text-align: center; 
     font-size: 24px; 
-    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.553); 
-    text-shadow: 1px 0px 4px rgba(0, 0, 0, 0.359); /* Sombra del texto */
-    transition: transform 0.3s; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); 
+    transition: transform 0.3s, box-shadow 0.3s; 
     position: fixed;
     bottom: 20px;
     left: 150px; 
     z-index: 1000; 
 }
 
+.fixed-counter:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
 .fixed-counter2 {
     font-weight: 600;
     width: 300px;
-    background-color: orange; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    text-shadow: 1px 0px 4px rgba(0, 0, 0, 0.359); /* Sombra del texto */
+    background-color: #34c759; 
     color: white; 
     padding: 20px; 
-    border-radius: 10px;
+    border-radius: 12px;
     text-align: center; 
     font-size: 24px; 
-    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.553); 
-    transition: transform 0.3s; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); 
+    transition: transform 0.3s, box-shadow 0.3s; 
     position: fixed;
     bottom: 100px;
     left: 145px; 
     z-index: 1000; 
 }
 
+.fixed-counter2:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
 
-#cantidad-control-Meli{
-    background-color: #FF4C4C;
-    color: yellow;
+#cantidad-control-Meli {
+    background-color: #4a90e2;
+    color: #ffffff; /* Texto blanco */
     font-size: large;
     font-weight: 800;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); 
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#cantidad-control-Meli:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    color: yellow;
+    font-size: xx-large;
 }
 
 #sku-control-Meli{
@@ -4971,33 +5011,74 @@ input[disabled] {
 
 #logContainer {
     margin-top: 0px;
-    border-radius: 10px;
-    background-color: #1a1a1a;
-    color: #00ff00;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    border-radius: 12px; 
+    background-color: #f0f0f5; 
+    color: #333333; 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Fuente más moderna */
     display: none;
     max-height: 150px;
     overflow-y: auto;
     padding: 10px;
-    border: 1px solid #00ff00;
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    border: 1px solid #d1d1d6; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
     position: relative;
 }
 
 #logContainer div {
     white-space: pre-wrap;
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.6; 
 }
 
 #logContainer div:nth-child(odd) {
-    background-color: rgba(0, 255, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.05); 
     padding: 5px;
-    border-radius: 5px;
+    border-radius: 8px; 
 }
 
 #logContainer div:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(0, 0, 0, 0.02);
     padding: 5px;
-    border-radius: 5px;
+    border-radius: 8px; 
+}
+
+#commentDiv {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000000;
+}
+
+.comment-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.comment-container {
+    width: 85%;
+    max-width: 500px;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    border: 2px dashed #007bff;
+    padding: 1rem;
+    margin-right: 10px;
+    border-radius: 15px;
+    box-shadow: 0 0px 12px rgba(0, 0, 0, 0.5); /* Sombra negra */
+}
+
+#commentTextarea {
+    background-color: white;
+}
+
+.comentario-meli-titulo{
+    background-color: cornflowerblue;
+    padding: 5px;
+    border-radius: 10px;
+    width: fit-content;
+    color: white;
+    font-weight: 700;
 }

@@ -909,6 +909,7 @@ comentarioInput.addEventListener('input', () => {
 
 // FIN MODAL COMENTARIO
 
+/*
 // NOTIFICADOR DE COMENTARIO EN FACTURACION
 document.addEventListener("DOMContentLoaded", function() {
     const statusCard = document.getElementById('statusCard');
@@ -936,6 +937,7 @@ document.addEventListener("DOMContentLoaded", function() {
         statusCard.style.display = 'none';
     };
 });
+*/
 
 // MODAL LOGISTICA BS AS - RAFAELA - SANTA FE
 let diaPredeterminado = {

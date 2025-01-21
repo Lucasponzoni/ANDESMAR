@@ -182,6 +182,22 @@
                 <button type="button" class="btn btn-primary" onclick="uploadFile()">
                     <i class="bi bi-upload"></i> Subir
                 </button>
+
+                <!-- Fin Div de Comentario -->
+                <div id="commentDiv">
+                    <div class="comment-overlay">
+        <div class="comment-container">
+            <h5 class="mb-3 comentario-meli-titulo"><i class="bi bi-chat-quote-fill"></i> Comentario</h5>
+            <textarea id="commentTextarea" class="form-control mb-3" rows="5" placeholder="Ingrese su comentario..."></textarea>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary mr-2" id="cancelCommentButton">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveCommentButton">Guardar</button>
+            </div>
+        </div>
+                    </div>
+                </div>
+                <!-- Fin Div de Comentario -->
+
             </div>
         </div>
     </div>
@@ -292,6 +308,12 @@
     </div>
 </div>
 <!-- Fin Comentarios Alert -->
+
+<!-- Spinner -->
+
+<div id="spinner" class="spinner-container" style="display:none;">
+    <div class="spinner"></div>
+</div>
 
                 <!-- Botón de flecha hacia arriba -->
                 <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">

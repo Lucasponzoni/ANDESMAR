@@ -1331,7 +1331,7 @@ document.getElementById('estadoFilter').addEventListener('change', function() {
     loadTable2(selectedValue); // Pasamos el valor seleccionado como argumento
 });
 
-
+/*
 // NOTIFICADOR DE COMENTARIO EN FACTURACION
 document.addEventListener("DOMContentLoaded", function() {
     const statusCard = document.getElementById('statusCard');
@@ -1360,3 +1360,4 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 });
 // FIN NOTIFICADOR DE COMENTARIO EN FACTURACION
+*/

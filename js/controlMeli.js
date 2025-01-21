@@ -107,7 +107,7 @@ $(document).ready(function() {
 function verificarActualizacionBaseDeDatos() {
     const ultimaActualizacion = localStorage.getItem('ultimaActualizacion');
     const ahora = new Date().getTime();
-    const unaHora = 1000; // Una hora
+    const unaHora = 3600000; // Una hora en milisegundos (1000 ms * 60 s * 60 min)
     let intervalo;
 
     if (!ultimaActualizacion || (ahora - ultimaActualizacion > unaHora)) {
@@ -872,6 +872,7 @@ function updateAlertPositions() {
     });
 }
 
+/*
 // NOTIFICADOR DE COMENTARIO EN FACTURACION
 document.addEventListener("DOMContentLoaded", function() {
     const statusCard = document.getElementById('statusCard2');
@@ -900,6 +901,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 });
 // FIN NOTIFICADOR DE COMENTARIO EN FACTURACION
+*/
 
 $(document).ready(function() {
     // Evento para el input del segundo escaneo
@@ -1488,12 +1490,18 @@ function loadFolder(folderPath) {
                             console.error('Error al verificar el comentario:', error);
                         });
                         
-                        // Agregar evento de comentario a los botones
-                        document.querySelectorAll('.comment-btn').forEach(button => {
-                            button.addEventListener('click', async (event) => {
-                                event.stopPropagation();
+                        // Delegación de eventos para manejar los clics en los botones de comentario
+                        document.getElementById('folderList').addEventListener('click', async (event) => {
+                            if (event.target.closest('.comment-btn')) {
+                                const button = event.target.closest('.comment-btn');
+                                console.log('Botón de comentario clickeado:', button);
+                        
                                 const fileRefPath = button.getAttribute('data-ref');
+                                console.log('fileRefPath:', fileRefPath);
+                        
                                 const sanitizedPath = fileRefPath.replace(/[.#$[\]]/g, '_'); // Reemplazar caracteres no permitidos
+                                console.log('sanitizedPath:', sanitizedPath);
+                        
                                 const commentRef = database.ref(`/comments/${sanitizedPath}`);
                         
                                 // Obtener el comentario existente
@@ -1507,50 +1515,42 @@ function loadFolder(folderPath) {
                                     console.error('Error al obtener el comentario:', error);
                                 }
                         
-                                // Cerrar el modal de Bootstrap
-                                $('#etiquetasModal').modal('hide');
+                                // Mostrar el div de comentario
+                                const commentDiv = document.getElementById('commentDiv');
+                                if (commentDiv) {
+                                    commentDiv.style.display = 'block';
+                                    const commentTextarea = document.getElementById('commentTextarea');
+                                    commentTextarea.value = existingComment;
+                                    commentTextarea.focus(); // Hacer foco en el textarea
+                                    console.log('Div de comentario mostrado y foco en textarea');
+                                } else {
+                                    console.error('Div de comentario no encontrado');
+                                }
                         
-                                // Forzar el cierre completo del modal y el fondo
-                                setTimeout(() => {
-                                    $('body').removeClass('modal-open');
-                                    $('.modal-backdrop').remove();
+                                // Guardar el comentario
+                                document.getElementById('saveCommentButton').onclick = () => {
+                                    const comment = document.getElementById('commentTextarea').value;
+                                    if (comment) {
+                                        commentRef.set(comment).then(() => {
+                                            Swal.fire('Comentario guardado!', 'Su comentario ha sido guardado exitosamente.', 'success');
+                                            button.classList.remove('btn-primary');
+                                            button.classList.add('btn-success');
+                                            button.innerHTML = '<i class="bi bi-chat-dots-fill" style="width: 19.2px; height: 19.2px;"></i>';
+                                            commentDiv.style.display = 'none';
+                                        }).catch(error => {
+                                            Swal.fire('Error', `Error al guardar el comentario: ${error}`, 'error');
+                                        });
+                                    } else {
+                                        Swal.fire('Error', 'El comentario no puede estar vacío', 'error');
+                                    }
+                                };
                         
-                                    // Mostrar SweetAlert para ingresar o editar el comentario
-                                    Swal.fire({
-                                        title: 'Comentario',
-                                        input: 'textarea',
-                                        inputLabel: 'Ingrese su comentario:',
-                                        inputValue: existingComment,
-                                        showCancelButton: true,
-                                        confirmButtonText: 'Guardar',
-                                        cancelButtonText: 'Cancelar',
-                                        allowOutsideClick: false, // Permitir clics fuera del SweetAlert
-                                        backdrop: true, // Mostrar el fondo del SweetAlert
-                                        preConfirm: (comment) => {
-                                            if (comment) {
-                                                return comment;
-                                            } else {
-                                                Swal.showValidationMessage('El comentario no puede estar vacío');
-                                            }
-                                        }
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            commentRef.set(result.value).then(() => {
-                                                Swal.fire('Comentario guardado!', 'Su comentario ha sido guardado exitosamente.', 'success');
-                                                button.classList.remove('btn-primary');
-                                                button.classList.add('btn-success');
-                                                button.innerHTML = '<i class="bi bi-chat-dots-fill" style="width: 19.2px; height: 19.2px;"></i>';
-                                            }).catch(error => {
-                                                Swal.fire('Error', `Error al guardar el comentario: ${error}`, 'error');
-                                            });
-                                        }
-                        
-                                        // Reabrir el modal de Bootstrap
-                                        $('#etiquetasModal').modal('show');
-                                    });
-                                }, 500); 
-                            });
-                        });  
+                                // Cancelar el comentario
+                                document.getElementById('cancelCommentButton').onclick = () => {
+                                    commentDiv.style.display = 'none';
+                                };
+                            }
+                        });
                                               
                             listItem.querySelector('.badge').addEventListener('click', (event) => {
                             event.stopPropagation(); // Evitar que el evento de clic se propague al elemento de la lista
