@@ -1720,3 +1720,4 @@ function uploadFile() {
     };
     reader.readAsText(file);
 }
+// FIN UPLOAD ETIQUETAS MELI
