@@ -4953,12 +4953,19 @@ input[disabled] {
     }
   }
 
-.time-etiquetas-container{
+.time-etiquetas-container {
     background-color: cornflowerblue;
     padding: 5px;
     font-weight: 400;
     border-radius: 5px;
     color: white;
+}
+
+/* Media query para dispositivos móviles */
+@media (max-width: 768px) {
+    .time-etiquetas-container {
+        font-size: 0.5em;
+    }
 }
 
 

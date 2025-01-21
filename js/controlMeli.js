@@ -1235,11 +1235,12 @@ function loadFolder(folderPath) {
     const folderRef = storage.ref(folderPath);
     folderRef.listAll().then(result => {
         showSpinner(false);
-
+    
         const folderList = document.getElementById('folderList');
         folderList.innerHTML = '';
-
-        result.prefixes.forEach(folderRef => {
+    
+        // Invertir el listado de carpetas
+        result.prefixes.reverse().forEach(folderRef => {
             const listItem = document.createElement('li');
             listItem.className = 'list-group-item d-flex justify-content-between align-items-start';
             listItem.innerHTML = `
@@ -1249,13 +1250,13 @@ function loadFolder(folderPath) {
                 <span class="badge text-bg-primary rounded-pill">Cargando...</span>
             `;
             folderList.appendChild(listItem);
-
+    
             listItem.addEventListener('click', () => {
                 folderStack.push(currentFolderPath);
                 currentFolderPath = folderRef.fullPath;
                 loadFolder(currentFolderPath);
             });
-
+    
             folderRef.listAll().then(subResult => {
                 const fileCount = subResult.items.length;
                 const tandaText = fileCount === 1 ? 'tanda' : 'tandas';
@@ -1266,7 +1267,7 @@ function loadFolder(folderPath) {
                 Swal.fire('Error', 'Error al listar subcarpetas.', 'error');
             });
         });
-
+    
         const items = [];
 
         result.items.forEach(fileRef => {
@@ -1379,6 +1380,7 @@ function loadFolder(folderPath) {
         Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
     });
 }
+
 function handleGenerateClick(event) {
     event.stopPropagation();
     const button = event.currentTarget;
