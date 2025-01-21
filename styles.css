@@ -2306,6 +2306,12 @@ div.card-body > p > i{
     gap: 5px;
 }
 
+.spinner-large {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3em;
+}
+
 .em-circle-state5 {
     font-weight: 600;
     font-family: "Helvetica Neue", Arial, sans-serif;
