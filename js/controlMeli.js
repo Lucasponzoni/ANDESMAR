@@ -1441,6 +1441,7 @@ function loadFolder(folderPath) {
                         const tandaNumber = parseInt(fileRef.name.match(/\d+/)[0], 10);
                         const listItem = document.createElement('li');
                         listItem.className = 'list-group-item d-flex justify-content-between align-items-start';
+                        
                         listItem.innerHTML = `
                             <div class="ms-2 me-auto">
                                 <div class="fw-bold">${fileRef.name}</div>
@@ -1450,11 +1451,90 @@ function loadFolder(folderPath) {
                             <button class="btn btn-danger btn-sm delete-btn fixed-size" data-ref="${fileRef.fullPath}" id="delete-tanda${tandaNumber}">
                                 <i class="bi bi-trash" style="width: 19.2px; height: 19.2px;"></i>
                             </button>
+                            <button class="btn btn-primary btn-sm comment-btn fixed-size" data-ref="${fileRef.fullPath}" id="comment-tanda${tandaNumber}">
+                                <i class="bi bi-chat" style="width: 19.2px; height: 19.2px;"></i>
+                            </button>
                             <button class="btn btn-primary btn-sm generate-btn fixed-size" data-url="${url}" data-name="${fileRef.name}" id="generar-tanda${tandaNumber}">
                                 <i class="bi bi-file-earmark-arrow-down" style="width: 19.2px; height: 19.2px;"></i>
                             </button>
                         `;
-                        listItem.querySelector('.badge').addEventListener('click', (event) => {
+                        
+                        // Verificar si ya existe un comentario y actualizar el botón
+                        const commentButton = listItem.querySelector(`#comment-tanda${tandaNumber}`);
+                        const sanitizedPath = fileRef.fullPath.replace(/[.#$[\]]/g, '_'); 
+                        const commentRef = database.ref(`/comments/${sanitizedPath}`);
+                        
+                        commentRef.once('value').then(snapshot => {
+                            if (snapshot.exists()) {
+                                commentButton.classList.remove('btn-primary');
+                                commentButton.classList.add('btn-success');
+                                commentButton.innerHTML = '<i class="bi bi-chat-dots-fill" style="width: 19.2px; height: 19.2px;"></i>';
+                            }
+                        }).catch(error => {
+                            console.error('Error al verificar el comentario:', error);
+                        });
+                        
+                        // ...existing code...
+                        
+                        // Agregar evento de comentario a los botones
+                        document.querySelectorAll('.comment-btn').forEach(button => {
+                            button.addEventListener('click', async (event) => {
+                                event.stopPropagation();
+                                const fileRefPath = button.getAttribute('data-ref');
+                                const sanitizedPath = fileRefPath.replace(/[.#$[\]]/g, '_'); 
+                                const commentRef = database.ref(`/comments/${sanitizedPath}`);
+                        
+                                // Obtener el comentario existente
+                                let existingComment = '';
+                                try {
+                                    const snapshot = await commentRef.once('value');
+                                    if (snapshot.exists()) {
+                                        existingComment = snapshot.val();
+                                    }
+                                } catch (error) {
+                                    console.error('Error al obtener el comentario:', error);
+                                }
+                        
+                                // Cerrar el modal de Bootstrap
+                                $('#etiquetasModal').modal('hide');
+                        
+                                // Mostrar SweetAlert para ingresar o editar el comentario
+                                Swal.fire({
+                                    title: 'Comentario',
+                                    input: 'textarea',
+                                    inputLabel: 'Ingrese su comentario:',
+                                    inputValue: existingComment,
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Guardar',
+                                    cancelButtonText: 'Cancelar',
+                                    allowOutsideClick: false, 
+                                    backdrop: true,
+                                    preConfirm: (comment) => {
+                                        if (comment) {
+                                            return comment;
+                                        } else {
+                                            Swal.showValidationMessage('El comentario no puede estar vacío');
+                                        }
+                                    }
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        commentRef.set(result.value).then(() => {
+                                            Swal.fire('Comentario guardado!', 'Su comentario ha sido guardado exitosamente.', 'success');
+                                            button.classList.remove('btn-primary');
+                                            button.classList.add('btn-success');
+                                            button.innerHTML = '<i class="bi bi-chat-dots-fill" style="width: 19.2px; height: 19.2px;"></i>';
+                                        }).catch(error => {
+                                            Swal.fire('Error', `Error al guardar el comentario: ${error}`, 'error');
+                                        });
+                                    }
+                        
+                                    // Reabrir el modal de Bootstrap
+                                    $('#etiquetasModal').modal('show');
+                                });
+                            });
+                        });
+                        
+                            listItem.querySelector('.badge').addEventListener('click', (event) => {
                             event.stopPropagation(); // Evitar que el evento de clic se propague al elemento de la lista
                             const a = document.createElement('a');
                             a.href = url;
@@ -1643,7 +1723,7 @@ function uploadFile() {
     if (hourOfDay >= 12 || (dayOfWeek === 6 && hourOfDay >= 11) || dayOfWeek === 0) {
         uploadDate.setDate(today.getDate() + 1);
     }
-
+    
     if (uploadDate.getDay() === 0) {
         uploadDate.setDate(uploadDate.getDate() + 1);
     }
