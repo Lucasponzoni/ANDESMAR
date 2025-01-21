@@ -4970,7 +4970,7 @@ input[disabled] {
 }
 
 #logContainer {
-    margin-top: -20px;
+    margin-top: 0px;
     border-radius: 10px;
     background-color: #1a1a1a;
     color: #00ff00;

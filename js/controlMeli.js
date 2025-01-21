@@ -1545,6 +1545,86 @@ $('#etiquetasModal').on('shown.bs.modal', function () {
     loadFolder(currentFolderPath);
 });
 
+async function enviarCorreoTanda(destinatarioEmail, nombreDestinatario, nombreTanda, horaSubida) {
+    const fecha2 = new Date().toLocaleDateString('es-AR'); 
+    const emailBody = `
+        <html>
+        <body style="font-family: 'Arial', sans-serif; background-color: #f4f4f4; padding: 20px;">
+            <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                <div style="text-align: center;">
+                    <a href="http://www.novogar.com.ar" target="_blank" rel="noopener noreferrer">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Novogar%2FNovogar-logo.png?alt=media&token=9f534184-2944-4b2c-a4be-6e763ee59bc1" style="width: 100%; max-width: 400px;" alt="Logo">
+                    </a>
+                </div>
+                <h2 style="color: #333333;">Hola ${nombreDestinatario},</h2>
+                <p style="color: #333333;">Tienes disponible una nueva tanda de facturación.</p>
+                <p style="color: #333333;">Nombre de la tanda: <strong>${nombreTanda}</strong></p>
+                <p style="color: #333333;">Hora de subida: <strong>${horaSubida}</strong></p>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="https://lucasponzoni.github.io/ANDESMAR/despachos.html" style="background-color: #ff0000; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Descargar Tanda</a>
+                </div>
+                <p style="color: #333333;">Saludos,</p>
+                <p style="color: #333333;">Equipo de Posventa Novogar</p>
+            </div>
+        </body>
+        </html>
+    `;
+    const fecha = new Date().toLocaleDateString();
+    const Subject = `Nueva Tanda de Facturación - ${nombreTanda} - ${fecha}`;
+    const smtpU = 's154745_3';
+    const smtpP = 'QbikuGyHqJ';
+
+    const emailData = {
+        "Html": {
+            "DocType": null,
+            "Head": null,
+            "Body": emailBody,
+            "BodyTag": "<body>"
+        },
+        "Text": "",
+        "Subject": Subject,
+        "From": {
+            "Name": "Posventa Novogar",
+            "Email": "posventa@novogar.com.ar"
+        },
+        "To": [
+            {
+                "Name": nombreDestinatario,
+                "Email": destinatarioEmail
+            }
+        ],
+        "Cc": [],
+        "Bcc": ["webnovagar@gmail.com", "posventa@novogar.com.ar"],
+        "CharSet": "utf-8",
+        "User": {
+            "Username": smtpU,
+            "Secret": smtpP,
+        }
+    };
+
+    try {
+        const response = await fetch('https://proxy.cors.sh/https://send.mailup.com/API/v2.0/messages/sendmessage', {
+            method: 'POST',
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(emailData)
+        });
+
+        const result = await response.json();
+        if (result.Status === 'done') {
+            console.log (`Email enviado a ${destinatarioEmail} a las ${horaSubida}`);
+        } else {
+            console.log(`Error al enviar el email: ${result.Message}`);
+            showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${horaSubida}`);
+        }
+    } catch (error) {
+        console.error('Error al enviar el email:', error);
+        showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${horaSubida}`);
+    }
+}
+
 function uploadFile() {
     const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
@@ -1557,32 +1637,26 @@ function uploadFile() {
     const today = new Date();
     let uploadDate = new Date(today);
 
-    // Ajustar la fecha según las condiciones especificadas
     const dayOfWeek = today.getDay();
     const hourOfDay = today.getHours();
 
     if (hourOfDay >= 17 || (dayOfWeek === 6 && hourOfDay >= 11) || dayOfWeek === 0) {
-        // Si es después de las 17:00 o después de las 11:00 del sábado o cualquier hora del domingo
         uploadDate.setDate(today.getDate() + 1);
     }
 
-    // Si la nueva fecha es domingo, ajustar al lunes
     if (uploadDate.getDay() === 0) {
         uploadDate.setDate(uploadDate.getDate() + 1);
     }
 
-    const dateString = formatDate(uploadDate); // Formato Etiquetas DD-MM-YYYY
+    const dateString = formatDate(uploadDate);
     const folderPath = `Etiquetas/${dateString}`;
 
-    // Mostrar el spinner
     showSpinner(true);
 
-    // Obtener el contenido del archivo seleccionado
     const reader = new FileReader();
     reader.onload = function(event) {
         const newFileContent = event.target.result;
 
-        // Obtener el número de archivos en la carpeta de la fecha actual
         const folderRef = storage.ref(folderPath);
         folderRef.listAll().then(result => {
             const filePromises = result.items.map(fileRef => {
@@ -1602,30 +1676,46 @@ function uploadFile() {
             });
 
             Promise.all(filePromises).then(() => {
-                const fileCount = result.items.length + 1; // Contar los archivos existentes y sumar 1
+                const fileCount = result.items.length + 1;
                 const fileName = `TANDA ${fileCount}.txt`;
                 const fileRef = folderRef.child(fileName);
 
-                // Subir el archivo a Firebase Storage
                 fileRef.put(file).then(() => {
+                    const horaSubida = new Date().toLocaleTimeString();
                     Swal.fire('Subido!', 'El archivo ha sido subido exitosamente.', 'success');
-                    fileInput.value = ''; // Limpiar el input de archivo
-                    loadFolder(currentFolderPath); // Recargar la carpeta actual
-                    showSpinner(false); // Ocultar el spinner después del alert de éxito
+                    fileInput.value = '';
+                    loadFolder(currentFolderPath);
+                    showSpinner(false);
+
+                    const destinatarios = [
+                        { email: "lucasponzoninovogar@gmail.com", nombre: "Lucas" },
+                        { email: "lucas.ponzoni@novogar.com.ar", nombre: "Lucas" },
+                        { email: "mauricio.daffonchio@novogar.com.ar", nombre: "Mauricio" },
+                        { email: "esperanza.toffalo@novogar.com.ar", nombre: "Esperanza" },
+                        { email: "posventa@novogar.com.ar", nombre: "Posventa" },
+                        { email: "marina.braidotti@novogar.com.ar", nombre: "Marina" },
+                        { email: "agustina.benedetto@novogar.com.ar", nombre: "Natalia" },
+                        { email: "natalia.rodriguez@novogar.com.ar", nombre: "Agistina" },
+                        { email: "mauricio.villan@novogar.com.ar", nombre: "Mauricio" }
+                    ];
+
+                    destinatarios.forEach(destinatario => {
+                        enviarCorreoTanda(destinatario.email, destinatario.nombre, fileName, horaSubida);
+                    });
                 }).catch(error => {
                     console.error('Error al subir el archivo:', error);
                     Swal.fire('Error', 'Error al subir el archivo.', 'error');
-                    showSpinner(false); // Ocultar el spinner en caso de error
+                    showSpinner(false);
                 });
             }).catch(error => {
                 console.error('Error al verificar el archivo:', error);
                 Swal.fire('Error', error.message, 'error');
-                showSpinner(false); // Ocultar el spinner en caso de error
+                showSpinner(false);
             });
         }).catch(error => {
             console.error('Error al listar archivos en la carpeta:', error);
             Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
-            showSpinner(false); // Ocultar el spinner en caso de error
+            showSpinner(false);
         });
     };
     reader.readAsText(file);
