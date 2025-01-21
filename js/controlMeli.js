@@ -1212,7 +1212,7 @@ function generateBillingFile(content) {
     let billingContent = '';
     salesNumbers.forEach((number, index) => {
         // Eliminar todos los espacios entre los números
-        const cleanedNumber = number.replace(/(\d)\s+(\d)/g, '$1$2');
+        const cleanedNumber = number.replace(/\s+/g, '');
         billingContent += `${index + 1}- ${cleanedNumber}\n`;
     });
     return billingContent;
@@ -1259,6 +1259,10 @@ function loadFolder(folderPath) {
                     currentFolderPath = folderRef.fullPath;
                     loadFolder(currentFolderPath);
                 });
+            }).catch(error => {
+                console.error('Error al listar subcarpetas:', error);
+                showSpinner(false);
+                Swal.fire('Error', 'Error al listar subcarpetas.', 'error');
             });
         });
 
@@ -1346,18 +1350,27 @@ function loadFolder(folderPath) {
                                 button.removeEventListener('click', handleGenerateClick); // Eliminar cualquier evento previo
                                 button.addEventListener('click', handleGenerateClick);
                             });
+                        }).catch(error => {
+                            console.error('Error al obtener el contenido del archivo:', error);
+                            showSpinner(false);
+                            Swal.fire('Error', 'Error al obtener el contenido del archivo.', 'error');
                         });
                 }).catch(error => {
-                    console.error('Error al obtener el contenido del archivo:', error);
-                    Swal.fire('Error', 'Error al obtener el contenido del archivo.', 'error');
+                    console.error('Error al obtener los metadatos del archivo:', error);
+                    showSpinner(false);
+                    Swal.fire('Error', 'Error al obtener los metadatos del archivo.', 'error');
                 });
+            }).catch(error => {
+                console.error('Error al listar archivos en la carpeta:', error);
+                showSpinner(false);
+                Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
             });
         });
 
         document.getElementById('backButton').style.display = folderStack.length > 0 ? 'block' : 'none';
     }).catch(error => {
-        showSpinner(false);
         console.error('Error al listar archivos en la carpeta:', error);
+        showSpinner(false);
         Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
     });
 }
