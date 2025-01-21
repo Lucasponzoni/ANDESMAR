@@ -1640,7 +1640,7 @@ function uploadFile() {
     const dayOfWeek = today.getDay();
     const hourOfDay = today.getHours();
 
-    if (hourOfDay >= 17 || (dayOfWeek === 6 && hourOfDay >= 11) || dayOfWeek === 0) {
+    if (hourOfDay >= 12 || (dayOfWeek === 6 && hourOfDay >= 11) || dayOfWeek === 0) {
         uploadDate.setDate(today.getDate() + 1);
     }
 
