@@ -1,20 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const firebaseConfigCDS = {
-        apiKey: "AIzaSyBPw7ElqCPC92nag2oFW57aLD9t018FvC4",
-        authDomain: "emails-novogar.firebaseapp.com",
-        databaseURL: "https://emails-novogar-default-rtdb.firebaseio.com",
-        projectId: "emails-novogar",
-        storageBucket: "emails-novogar.appspot.com",
-        messagingSenderId: "1085815449583",
-        appId: "1:1085815449583:web:72f836c378bd971fb8b81a",
-        measurementId: "G-BW9ML8LVV6"
-    };
 
-    // Inicializar Firebase
-    const appCDS = firebase.initializeApp(firebaseConfigCDS, "appCDS");
-    const dbCDS = appCDS.database();
-
-    // Variables Cruz del Sur
     const cpDestinoCDS = document.getElementById('codigoPostalDestinatario');
     const valorDeclaradoCDS = document.getElementById('valorDeclarado');
     const volumenTotalElementCDS = document.getElementById('volumenTotalcm');
@@ -24,8 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let idCDS, usuarioCDS, passCDS;
 
-    // Obtener credenciales de Firebase
-    dbCDS.ref('LogiPaq').once('value')
+    window.dbCDS.ref('LogiPaq').once('value')
         .then(snapshot => {
             const data = snapshot.val();
             idCDS = data[3];

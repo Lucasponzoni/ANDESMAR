@@ -1,9 +1,28 @@
+let idCDS, usuarioCDS, passCDS;
+
+const obtenerCredencialesCDS = async () => {
+    try {
+        const snapshot = await window.dbCDS.ref('LogiPaq').once('value');
+        const data = snapshot.val();
+        idCDS = data[3];
+        usuarioCDS = data[4];
+        passCDS = data[5];
+    } catch (error) {
+        console.error('Error al obtener credenciales de Firebase:', error);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await obtenerCredencialesCDS();
+});
+
+
 async function enviarSolicitudCDS() {
     if (!validarFormulario()) {
-        return; // Si la validación falla, no continúa con la solicitud
+        return; 
     }
     
-    console.log("Iniciando Generación de Etiqueta CDS:"); // Para depuración
+    console.log("Iniciando Generación de Etiqueta CDS:");
 
     // Obtener valores de los elementos del DOM
     const volumenTotalcds = parseFloat(document.getElementById("volumenTotalcm").innerText) || 0;
@@ -28,9 +47,9 @@ async function enviarSolicitudCDS() {
 
     const referenciaCds = document.getElementById("nroRemito").value;
 
-    document.getElementById("descargaCruzDelSur").style.display = 'block'; // Mostrar la sección de descarga
+    document.getElementById("descargaCruzDelSur").style.display = 'block'; 
 
-    const urlCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=87231e4b-b414-47c0-882b-ef98adb94fe4&ulogin=necommerce&uclave=novogar71!&volumen=${volumenTotalcds}&peso=${pesoCds}&codigopostal=${codigoPostalCds}&localidad=${localidadCds}&valor=${valorCds}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${documentoCds}&nombre=${nombreCds}&telefono=${telefonoCds}&email=${emailCds}&domicilio=${domicilioCds}&bultos=${totalBultosCds}&referencia=${referenciaCds}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
+    const urlCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenTotalcds}&peso=${pesoCds}&codigopostal=${codigoPostalCds}&localidad=${localidadCds}&valor=${valorCds}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${documentoCds}&nombre=${nombreCds}&telefono=${telefonoCds}&email=${emailCds}&domicilio=${domicilioCds}&bultos=${totalBultosCds}&referencia=${referenciaCds}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
 
     const optionsCds = {
         method: 'GET',
@@ -118,7 +137,7 @@ if (titleCruzDelSurElement) {
 }
 
 async function descargarEtiqueta(numeroCotizacionCds, nicCds) {
-    const urlEtiquetaCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=87231e4b-b414-47c0-882b-ef98adb94fe4&ulogin=necommerce&uclave=novogar71!&id=${numeroCotizacionCds}&tamanioHoja=1&posicionArrancar=1&textoEspecialPorEtiqueta=`;
+    const urlEtiquetaCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&id=${numeroCotizacionCds}&tamanioHoja=1&posicionArrancar=1&textoEspecialPorEtiqueta=`;
 
     const optionsEtiquetaCds = {
         method: 'GET',
