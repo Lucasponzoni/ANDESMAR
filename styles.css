@@ -1116,10 +1116,31 @@ footer > a:hover{
     transition: transform 0.2s;
 }
 
+#descargaCruzDelSur {
+    background-color: #c0c7ff7c; 
+    padding: .5rem;
+    border-radius: 15px;
+    border: 2px dashed #16213e;
+    transition: transform 0.2s;
+    color: white; 
+}
+
+#apiResponseCruzDelSur{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 #descargaAndreani:hover {
     transform: scale(1.03);
     cursor: pointer;
 }
+
+#descargaCruzDelSur:hover {
+    transform: scale(1.03);
+    cursor: pointer;
+}
+
 #descargaAndesmar{
     background-color: rgb(228, 237, 255);
     padding: .5rem;
@@ -1131,6 +1152,17 @@ footer > a:hover{
 #descargaAndesmar:hover {
     transform: scale(1.03);
     cursor: pointer;
+}
+
+#titleCruzDelSur{
+    background-color: white;
+    border: 2px dashed #16213e;
+    border-radius: 10px;
+    Color: #16213e;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    padding: .2rem;
+    font-weight: 600;
 }
 
 #titleAndreani{
@@ -1163,6 +1195,28 @@ footer > a:hover{
     font-family: "Chakra Petch", sans-serif;
     font-weight: 400;
     font-style: normal;
+}
+
+#descargaCruzDelSur .btn-dark-blue {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    background-color: #0f3460; 
+    border: none;
+    margin-bottom: -17px;
+    height: 40px;
+}
+
+.btn-dark-blue > i{
+    font-size: 19px;
+}
+
+.btn-dark-blue > span{
+    margin-right: 5px;
+}
+
+#descargaCruzDelSur .btn-dark-blue:hover {
+    background-color: #0d2c54; 
 }
 
 .btn-danger >i, .btn-primary >i{
@@ -5108,5 +5162,58 @@ input[disabled] {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
+}
+
+.btn-dark-blue {
+    background-color: #003366; 
+    color: white;
+    border: none;
+}
+
+.btn-dark-blue:hover {
+    background-color: #03284d; 
+    color: white;
+}
+
+.button-icon {
+    width: 25px; 
+    height: 25px; 
+    margin-right: 8px; 
+    vertical-align: middle;
+}
+
+.correo-mini{
+    border: 1px solid grey;
+    background-color: #2f399b;
+    padding: 5px;
+    border-radius: 5px;
+    width: fit-content;
+}
+
+.correo-mini > img{
+    width: 40px;
+}
+
+.select-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 10px;
+    background: linear-gradient(180deg, #a9c8ff, #f0f0f5); 
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #688bf3;
+}
+
+.select-item {
+    display: flex;
+    flex-direction: column;
 }
 

@@ -292,19 +292,47 @@
         
         <input type="number" id="m3" name="M3" step="0.001" value="0.1" style="display:none;">
 
-        <label for="modalidadEntrega">Modalidad de Entrega Andesmar:</label>
-        <select id="modalidadEntrega" required>
-            <option value="Terminal-Terminal">Terminal a Terminal</option>
-            <option selected value="Puerta-Puerta">Puerta a Puerta</option>
-            <option value="Terminal-Puerta">Terminal a Puerta</option>
-            <option value="Puerta-Terminal">Puerta a Terminal</option>
+        <hr>
+        
+        <div class="select-container">
+
+            <div class="correo-mini">
+                <img src="./Img/andesmar-tini.png" alt="Andreani">
+            </div>
+
+            <div class="select-item">
+                <label for="modalidadEntrega">Modalidad:</label>
+                <select id="modalidadEntrega" required>
+                    <option value="Terminal-Terminal">Terminal a Terminal</option>
+                    <option selected value="Puerta-Puerta">Puerta a Puerta</option>
+                    <option value="Terminal-Puerta">Terminal a Puerta</option>
+                    <option value="Puerta-Terminal">Puerta a Terminal</option>
+                </select>
+            </div>
+            <div class="select-item">
+                <label for="unidadVenta">Unidad: (Solo Andesmar)</label>
+                <select id="unidadVenta" name="UnidadVenta" required>
+                    <option value="express rto conformado">PAQUETERIA EXPRESS (-30Kg)</option>
+                    <option value="cargas remito conformado" selected>CARGA PESADA (+30Kg)</option>
+                </select>
+            </div>
+        </div>
+        
+        <hr>
+
+        <div class="select-container">
+        <div class="correo-mini">
+            <img src="./Img/Cruz-del-Sur-tini.png" alt="Andreani">
+        </div>
+        
+        
+        <label for="tipoEntregaCruzDelSur">Entrega:</label>
+        <select id="tipoEntregaCruzDelSur" name="TipoEntregaCruzDelSur" required>
+            <option value="E" selected>Domicilio</option>
+            <option value="R">Retiro en sucursal</option>
         </select>
 
-        <label for="unidadVenta">Unidad de Venta: (Solo Andesmar)</label>
-        <select id="unidadVenta" name="UnidadVenta" required>
-            <option value="express rto conformado">ANDESMAR PAQUETERIA EXPRESS (-30Kg)</option>
-            <option value="cargas remito conformado" selected>ANDESMAR CARGA PESADA (+30Kg)</option>
-        </select>
+    </div>
 
         <label for="esFletePagoDestino"></label>
         <select id="esFletePagoDestino" name="EsFletePagoDestino" required>
@@ -319,7 +347,7 @@
         </select>
 
 <!-- Botón principal para generar ambas etiquetas -->
-<button type="button" class="btn btn-success" onclick="enviarSolicitud(); enviarSolicitudAndreani();">
+<button type="button" class="btn btn-success" onclick="enviarSolicitud(); enviarSolicitudAndreani(); enviarSolicitudCDS();">
     <i class="bi bi-printer"></i> Generar Etiquetas
 </button>
 
@@ -330,12 +358,17 @@
 
 <!-- Contenedor colapsable con los dos botones ocultos -->
 <div class="collapse mt-2" id="etiquetasCollapse">
-    <button type="button" class="btn btn-primary mt-2 mb-1" onclick="enviarSolicitud()">
-        <i class="bi bi-file-earmark-text"></i> Generar Etiqueta Andesmar
-    </button>
-    <button type="button" class="btn btn-danger mt-2 mb-1" onclick="enviarSolicitudAndreani()">
-        <i class="bi bi-file-earmark-text"></i> Generar Etiqueta Andreani
-    </button>
+        <div class="button-container">
+            <button type="button" class="btn btn-primary mt-0" onclick="enviarSolicitud()">
+                <img src="./Img/andesmar-tini.png" alt="Andesmar" class="button-icon"> Generar Etiqueta <strong>Andesmar</strong>
+            </button>
+            <button type="button" class="btn btn-danger mt-1" onclick="enviarSolicitudAndreani()">
+                <img src="./Img/andreani-tini.png" alt="Andreani" class="button-icon"> Generar Etiqueta <strong>Andreani</strong>
+            </button>
+            <button type="button" class="btn btn-dark-blue mt-1" onclick="enviarSolicitudCDS()">
+                <img src="./Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur" class="button-icon"> Generar Etiqueta <strong>Cruz del Sur</strong>
+            </button>
+        </div>
     <hr class="my-2">
     <p class="mt-2 mb-1"><strong>Opciones para desarrollador</strong></p>
     <button type="button" class="btn btn-warning mt-2 mb-1" id="tokenButton" onclick="obtenerTokenAndreaniV2()">
@@ -360,26 +393,25 @@
         </div>
     </div>
 
-        <div class="col-12 text-center" id="apiResponse">
-            <button class="btn btn-danger" type="button" disabled>
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Cargando Etiqueta...
-            </button>
-        </div>
+    <div class="col-12 text-center" id="apiResponse">
+        <button class="btn btn-danger" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Cargando Etiqueta...
+        </button>
+    </div>
 
-        <div class="row mt-3">
-            <div class="col-12 text-center" id="errorResponse" style="color: red;"></div>
-        </div>
-
+    <div class="row mt-3">
+        <div class="col-12 text-center" id="errorResponse" style="color: red;"></div>
     </div>
 </div>
+ <!-- FIN DESCARGA ANDREANI -->
 
-        <!-- DESCARGA ANDESMAR -->
+<!-- DESCARGA ANDESMAR -->
 <div class="container mt-4" id="descargaAndesmar" style="display: none;">
     <!-- Parte superior -->
     <div class="row">
         <div class="col-12">
-            <h3 id="titleAndesmar" class="text-center"><span><img class="surprise" src="./Img/download-file.gif"></span></h3>
+            <h3 id="titleAndesmar" class="text-center"><span><img class="surprise" src="./Img/download-file.gif"> ANDESMAR </span></h3>
         </div>
         <div class="col-12">
             <h4 id="titleAndesmarName" class="text-center" style="display: none;"></h4>
@@ -395,6 +427,36 @@
         </div>
     </div>
 </div>
+<!-- FIN DESCARGA ANDESMAR -->
+
+<!-- DESCARGA CRUZ DEL SUR -->
+<div class="container mt-4" id="descargaCruzDelSur" style="display: none;">
+    <div class="row">
+        <div class="col-12">
+            <h3 id="titleCruzDelSur" class="text-center">
+                <span><img class="surprise" src="./Img/download-file.gif"> CRUZ DEL SUR <span id="numeroDeEnvioCruzDelSur"></span></span>
+            </h3>
+        </div> 
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            <h4 id="nombreCruzDelSur" class="text-center" style="display: none;"></h4> <!-- Aquí se mostrará el nombre -->
+        </div>
+    </div>
+
+    <div class="col-12 text-center" id="apiResponseCruzDelSur">
+        <button class="btn btn-dark-blue" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 8px;"></span>
+            Cargando Etiqueta...
+        </button>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12 text-center" id="errorResponseCruzDelSur" style="color: #0f3460;"></div>
+    </div>
+</div>
+
+<!-- FIN DESCARGA CRUZ DEL SUR -->
 
         <h3 class="ultimasEtiquetasTitulo">Últimas Etiquetas Generadas ANDESMAR:</h3>
         <div id="ultimasEtiquetas"></div>   
@@ -410,12 +472,25 @@
         <!--<div class="spinner"></div>-->
     <!--</div>-->
 
+                <!-- Botón de flecha hacia arriba -->
+                <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
+                    <i class="fas fa-arrow-up"></i>
+                </a>
+        
+        <footer class="center">
+            <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
+            <a class="www" href="https://novogar.com.ar/" target="_blank" >NOVOGAR</a>
+            <a href="https://novogar.com.ar/info/empresa" target="_blank" >Quienes somos</a>
+            <a href="https://novogar.com.ar/info/Sucursales" target="_blank" >Sucursales</a>
+            <a href="https://novogar.com.ar/info/ventaTelefonica" target="_blank" >Atención al cliente</a>
+        </footer>
         
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="./js/formulario-andesmar.js"></script>
+    <script src="./js/formulario-cds.js"></script>
     <script src="./js/cotizadorCDS.js"></script>
     <script src="./js/cotizadorAndesmar.js"></script>
     <script src="./js/cotizadorAndreani.js" defer></script>
@@ -437,13 +512,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-    <footer class="center">
-        <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
-        <a class="www" href="https://novogar.com.ar/" target="_blank" >NOVOGAR</a>
-        <a href="https://novogar.com.ar/info/empresa" target="_blank" >Quienes somos</a>
-        <a href="https://novogar.com.ar/info/Sucursales" target="_blank" >Sucursales</a>
-        <a href="https://novogar.com.ar/info/ventaTelefonica" target="_blank" >Atención al cliente</a>
-    </footer>
 
 </body>
 </html>
