@@ -1,5 +1,9 @@
 async function enviarSolicitudCDS() {
-    console.log("Iniciando Generacion de Etiqueta CDS:"); // Para depuración
+    if (!validarFormulario()) {
+        return; // Si la validación falla, no continúa con la solicitud
+    }
+    
+    console.log("Iniciando Generación de Etiqueta CDS:"); // Para depuración
 
     // Obtener valores de los elementos del DOM
     const volumenTotalcds = parseFloat(document.getElementById("volumenTotalcm").innerText) || 0;
@@ -54,27 +58,58 @@ async function enviarSolicitudCDS() {
             const nicCds = dataCds.Respuesta[0].NIC;
 
             // Actualizar el título y el botón
-            document.getElementById("numeroDeEnvioCruzDelSur").innerText = `NIC-${nicCds}`;
-            document.getElementById("titleCruzDelSur").innerHTML = `
-                <span><img class="surprise" src="./Img/download-file.gif"> CRUZ DEL SUR NIC-${nicCds}<span id="numeroDeEnvioCruzDelSur"></span></span>
-            `;
-            document.getElementById("nombreCruzDelSur").innerText = nombreCds;
-            document.getElementById("nombreCruzDelSur").style.display = 'none'; // Mostrar el nombre
+            const numeroDeEnvioElement = document.getElementById("numeroDeEnvioCruzDelSur");
+            if (numeroDeEnvioElement) {
+                numeroDeEnvioElement.innerText = `NIC-${nicCds}`;
+            } else {
+                console.error("Elemento 'numeroDeEnvioCruzDelSur' no encontrado.");
+            }
+
+            const titleCruzDelSurElement = document.getElementById("titleCruzDelSur");
+            if (titleCruzDelSurElement) {
+                titleCruzDelSurElement.innerHTML = `
+                    <span><img class="surprise" src="./Img/download-file.gif"> CRUZ DEL SUR NIC-${nicCds}<span id="numeroDeEnvioCruzDelSur"></span></span>
+                `;
+            }
 
             // Llamar a la API para descargar la etiqueta
-            await descargarEtiqueta(numeroCotizacionCds);
+            await descargarEtiqueta(numeroCotizacionCds, nicCds);
         } else if (dataCds.Respuesta[0].Estado === 25) {
             // Manejo de duplicados
             const duplicadoNicCds = dataCds.Respuesta[0].NIC;
-            document.getElementById("numeroDeEnvioCruzDelSur").innerText = duplicadoNicCds;
-            document.getElementById("titleCruzDelSur").innerHTML = `
-                <img class="surprise" src="./Img/404.gif"> CRUZ DEL SUR - DUPLICA REMITO EN SERVIDOR
-            `;
-            document.getElementById("apiResponseCruzDelSur").innerHTML = `
-                <button class="btn btn-dark-blue" type="button">
-                <i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px;"></i> El Remito ya fue utilizado en NIC-${duplicadoNicCds}
-                </button>
-            `;
+
+            // Limpiar contenido anterior
+            const apiResponseElement = document.getElementById("apiResponseCruzDelSur");
+
+                        if (apiResponseElement) {
+                apiResponseElement.innerHTML = `
+                        <div class="mt-2 text-center corrija-remito">
+                        <button class="btn" type="button" style="color: #0d2c54;">
+                            <i class="bi bi-pencil-square" style="margin-right: 8px;"></i> Corrija el remito y vuelva a presionar "Generar etiqueta"
+                        </button>
+                    </div>
+                    <button class="btn btn-dark-blue" type="button">
+                        <i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px; margin-top: 3px;"></i> El Remito ya fue utilizado en NIC-${duplicadoNicCds}
+                    </button>
+                `;
+            }
+        } else if (dataCds.Respuesta[0].Estado === 101) {
+            // Manejo del estado 101
+            const apiResponseElement = document.getElementById("apiResponseCruzDelSur");
+if (apiResponseElement) {
+    apiResponseElement.innerHTML = `
+        <button class="btn btn-dark-blue" type="button">
+            <i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px;"></i> Consultar con comercial de cuenta
+        </button>
+    `;
+}
+
+const titleCruzDelSurElement = document.getElementById("titleCruzDelSur");
+if (titleCruzDelSurElement) {
+    titleCruzDelSurElement.innerHTML = `
+        <span><img class="surprise" src="./Img/download-file.gif"> CONTRATO SIN HABILITAR<span id="numeroDeEnvioCruzDelSur"></span></span>
+    `;
+}
         }
     } catch (error) {
         console.error("Error al crear la cotización:", error);
@@ -82,7 +117,7 @@ async function enviarSolicitudCDS() {
     }
 }
 
-async function descargarEtiqueta(numeroCotizacionCds) {
+async function descargarEtiqueta(numeroCotizacionCds, nicCds) {
     const urlEtiquetaCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=87231e4b-b414-47c0-882b-ef98adb94fe4&ulogin=necommerce&uclave=novogar71!&id=${numeroCotizacionCds}&tamanioHoja=1&posicionArrancar=1&textoEspecialPorEtiqueta=`;
 
     const optionsEtiquetaCds = {
@@ -97,12 +132,19 @@ async function descargarEtiqueta(numeroCotizacionCds) {
         const blobCds = await responseEtiquetaCds.blob();
         const urlCds = window.URL.createObjectURL(blobCds);
 
-        // Actualizar el botón para descargar el PDF
-        document.getElementById("apiResponseCruzDelSur").innerHTML = `
-            <a class="btn btn-dark-blue" href="${urlCds}" target="_blank">
-                <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar Etiqueta PDF
-            </a>
+        // Crear un enlace temporal para descargar el archivo con el nombre del NIC
+        const link = document.createElement('a');
+        link.href = urlCds;
+        link.download = `Etiqueta NIC-${nicCds}.pdf`;
+        link.target = '_blank';
+        link.className = 'btn btn-dark-blue';
+        link.innerHTML = `
+            <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar Etiqueta PDF
         `;
+
+        // Actualizar el contenido del botón
+        document.getElementById("apiResponseCruzDelSur").innerHTML = '';
+        document.getElementById("apiResponseCruzDelSur").appendChild(link);
     } catch (error) {
         console.error("Error al descargar la etiqueta:", error);
         document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al descargar la etiqueta. Por favor, intenta nuevamente.";

@@ -1129,6 +1129,11 @@ footer > a:hover{
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+}
+
+.corrija-remito{
+    margin-top: -10px !important;
 }
 
 #descargaAndreani:hover {
