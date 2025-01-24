@@ -102,7 +102,7 @@ async function enviarSolicitudCDS() {
 
                         if (apiResponseElement) {
                 apiResponseElement.innerHTML = `
-                        <div class="mt-2 text-center corrija-remito">
+                        <div class="mt-2 text-center corrija-remito disabled">
                         <button class="btn" type="button" style="color: #0d2c54;">
                             <i class="bi bi-pencil-square" style="margin-right: 8px;"></i> Corrija el remito y vuelva a presionar "Generar etiqueta"
                         </button>
@@ -137,7 +137,8 @@ if (titleCruzDelSurElement) {
 }
 
 async function descargarEtiqueta(numeroCotizacionCds, nicCds) {
-    const urlEtiquetaCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&id=${numeroCotizacionCds}&tamanioHoja=1&posicionArrancar=1&textoEspecialPorEtiqueta=`;
+    const urlEtiquetaCds1 = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&id=${numeroCotizacionCds}&tamanioHoja=1&posicionArrancar=1&textoEspecialPorEtiqueta=`;
+    const urlEtiquetaCds2 = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&id=${numeroCotizacionCds}&tamanioHoja=2&posicionArrancar=1&textoEspecialPorEtiqueta=`;
 
     const optionsEtiquetaCds = {
         method: 'GET',
@@ -147,23 +148,42 @@ async function descargarEtiqueta(numeroCotizacionCds, nicCds) {
     };
 
     try {
-        const responseEtiquetaCds = await fetch(urlEtiquetaCds, optionsEtiquetaCds);
-        const blobCds = await responseEtiquetaCds.blob();
-        const urlCds = window.URL.createObjectURL(blobCds);
+        // Consultar el primer endpoint
+        const responseEtiquetaCds1 = await fetch(urlEtiquetaCds1, optionsEtiquetaCds);
+        const blobCds1 = await responseEtiquetaCds1.blob();
+        const urlCds1 = window.URL.createObjectURL(blobCds1);
 
         // Crear un enlace temporal para descargar el archivo con el nombre del NIC
-        const link = document.createElement('a');
-        link.href = urlCds;
-        link.download = `Etiqueta NIC-${nicCds}.pdf`;
-        link.target = '_blank';
-        link.className = 'btn btn-dark-blue';
-        link.innerHTML = `
+        const link1 = document.createElement('a');
+        link1.href = urlCds1;
+        link1.download = `Etiqueta NIC-${nicCds}.pdf`;
+        link1.target = '_blank';
+        link1.className = 'btn btn-dark-blue';
+        link1.innerHTML = `
             <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar Etiqueta PDF
         `;
 
+        // Consultar el segundo endpoint
+        const responseEtiquetaCds2 = await fetch(urlEtiquetaCds2, optionsEtiquetaCds);
+        const blobCds2 = await responseEtiquetaCds2.blob();
+        const urlCds2 = window.URL.createObjectURL(blobCds2);
+
+        // Crear un enlace temporal para descargar el archivo con el nombre del NIC
+        const link2 = document.createElement('a');
+        link2.href = urlCds2;
+        link2.download = `Etiqueta 10x7cm NIC-${nicCds}.pdf`;
+        link2.target = '_blank';
+        link2.className = 'btn corrija-remito';
+        link2.style.color = '#0d2c54';
+        link2.innerHTML = `
+            <i class="bi bi-box-arrow-in-down-right"></i> Opción de Descarga etiqueta 10x7cm CLICK AQUI
+        `;
+
         // Actualizar el contenido del botón
-        document.getElementById("apiResponseCruzDelSur").innerHTML = '';
-        document.getElementById("apiResponseCruzDelSur").appendChild(link);
+        const apiResponseElement = document.getElementById("apiResponseCruzDelSur");
+        apiResponseElement.innerHTML = '';
+        apiResponseElement.appendChild(link2);
+        apiResponseElement.appendChild(link1);
     } catch (error) {
         console.error("Error al descargar la etiqueta:", error);
         document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al descargar la etiqueta. Por favor, intenta nuevamente.";

@@ -1134,6 +1134,14 @@ footer > a:hover{
 
 .corrija-remito{
     margin-top: -10px !important;
+    transition: .5s;
+}
+
+.corrija-remito:hover{
+    margin-top: -10px !important;
+    cursor: pointer;
+    background-color: #3c42ff23;
+    color: white;
 }
 
 #descargaAndreani:hover {
