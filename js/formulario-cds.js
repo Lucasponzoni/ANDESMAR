@@ -160,7 +160,7 @@ async function descargarEtiqueta(numeroCotizacionCds, nicCds) {
         link1.target = '_blank';
         link1.className = 'btn btn-dark-blue';
         link1.innerHTML = `
-            <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar Etiqueta PDF
+            <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar Etiqueta PDF A4
         `;
 
         // Consultar el segundo endpoint
