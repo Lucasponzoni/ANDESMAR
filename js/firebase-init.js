@@ -1,4 +1,3 @@
-// firebase-init.js
 const firebaseConfigCDS = {
     apiKey: "AIzaSyBPw7ElqCPC92nag2oFW57aLD9t018FvC4",
     authDomain: "emails-novogar.firebaseapp.com",
@@ -10,9 +9,7 @@ const firebaseConfigCDS = {
     measurementId: "G-BW9ML8LVV6"
 };
 
-// Inicializar Firebase
 const appCDS = firebase.initializeApp(firebaseConfigCDS, "appCDS");
-const dbCDS = appCDS.database(); // Aquí creamos la conexión a la base de datos
+const dbCDS = appCDS.database();
 
-// Exportar la base de datos para usarla en otros archivos
-window.dbCDS = dbCDS; // Esto hace que dbCDS esté disponible globalmente
+window.dbCDS = dbCDS;
