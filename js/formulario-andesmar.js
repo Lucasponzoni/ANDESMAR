@@ -368,49 +368,62 @@ function enviarSolicitud() {
 function mostrarRespuesta(data) {
     let respuestaElemento = document.getElementById("respuesta");
 
-    // Limpiar cualquier contenido existente o crear el elemento si no existe
+    // Si el elemento no existe, lo creamos
     if (!respuestaElemento) {
         respuestaElemento = document.createElement("div");
         respuestaElemento.id = "respuesta";
         document.body.appendChild(respuestaElemento);
     } else {
-        respuestaElemento.innerHTML = "";
+        respuestaElemento.innerHTML = ""; 
     }
 
-    const descargaAndesmar = document.getElementById("descargaAndesmar");
+    // Obtener el contenedor de descarga
+    let descargaAndesmar = document.getElementById("descargaAndesmar");
+
+    if (!descargaAndesmar) {
+        console.error("Elemento 'descargaAndesmar' no encontrado.");
+        return;
+    }
+
+    const titleAndesmar = document.getElementById("titleAndesmar");
+    const titleAndesmarName = document.getElementById("titleAndesmarName");
 
     if ((data.Message && data.Message === "ERRORNo es posible realizar el envío hacia el destino seleccionado.") || data.NroPedido === undefined) {
         const nombreApellidoDestinatario = document.getElementById("nombreApellidoDestinatario").value.toUpperCase();
 
         // Actualizar el contenedor de descarga
-        document.getElementById("titleAndesmar").innerHTML = `<img class="surprise" src="./Img/404.gif"> ANDESMAR NO DISPONIBLE`;
-        document.getElementById("titleAndesmarName").innerText = nombreApellidoDestinatario;
+        if (titleAndesmar) {
+            titleAndesmar.innerHTML = `<img class="surprise" src="./Img/404.gif"> ANDESMAR NO DISPONIBLE`;
+        }
 
         const botonDescarga = document.querySelector("#descargaAndesmar .btn");
-        botonDescarga.classList.add("disabled");
-        botonDescarga.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Envío No Disponible`;
+        if (botonDescarga) {
+            botonDescarga.classList.add("disabled");
+            botonDescarga.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Envío No Disponible`;
+        }
 
         descargaAndesmar.style.display = "block"; // Mostrar sección de descarga
-        respuestaElemento.appendChild(descargaAndesmar); // Añadir el contenedor de descarga al elemento de respuesta
     } else {
         const nombreApellidoDestinatario = document.getElementById("nombreApellidoDestinatario").value.toUpperCase();
         const numeroRemito = data.NroPedido;
 
         // Actualizar el contenedor de descarga
-        document.getElementById("titleAndesmar").innerHTML = `<img class="surprise" src="./Img/download-file.gif"> ANDESMAR ${document.getElementById("nroRemito").value}`;
-        document.getElementById("titleAndesmarName").innerText = nombreApellidoDestinatario;
+        if (titleAndesmar) {
+            titleAndesmar.innerHTML = `<img class="surprise" src="./Img/download-file.gif"> ANDESMAR ${document.getElementById("nroRemito").value}`;
+        }
 
         const botonDescarga = document.querySelector("#descargaAndesmar .btn");
-        botonDescarga.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PDF ${numeroRemito}`;
+        if (botonDescarga) {
+            botonDescarga.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PDF ${numeroRemito}`;
 
-        // Agregar evento al botón de descarga
-        botonDescarga.addEventListener("click", function (event) {
-            event.preventDefault(); // Evitar que se recargue la página
-            window.open(data.Link, "_blank");
-        });
+            // Agregar evento al botón de descarga
+            botonDescarga.addEventListener("click", function (event) {
+                event.preventDefault(); // Evitar que se recargue la página
+                window.open(data.Link, "_blank");
+            });
+        }
 
         descargaAndesmar.style.display = "block"; // Mostrar sección de descarga
-        respuestaElemento.appendChild(descargaAndesmar); // Añadir el contenedor de descarga al elemento de respuesta
 
         // Guardar la información en el almacenamiento local
         if (data.NroPedido !== undefined) {
