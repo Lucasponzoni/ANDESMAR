@@ -101,17 +101,24 @@ async function enviarSolicitudCDS() {
             const apiResponseElement = document.getElementById("apiResponseCruzDelSur");
 
                         if (apiResponseElement) {
-                apiResponseElement.innerHTML = `
-                        <div class="mt-2 text-center corrija-remito disabled">
-                        <button class="btn" type="button" style="color: #0d2c54;">
-                            <i class="bi bi-pencil-square" style="margin-right: 8px;"></i> Corrija el remito y vuelva a presionar "Generar etiqueta"
-                        </button>
-                    </div>
-                    <button class="btn btn-dark-blue" type="button">
-                        <i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px; margin-top: 3px;"></i> El Remito ya fue utilizado en NIC-${duplicadoNicCds}
-                    </button>
-                `;
-            }
+                            apiResponseElement.innerHTML = `
+                                <div class="mt-2 text-center corrija-remito disabled">
+                                    <button class="btn" type="button" style="color: #0d2c54;">
+                                        <i class="bi bi-pencil-square" style="margin-right: 8px;"></i> Corrija el remito y vuelva a presionar "Generar etiqueta"
+                                    </button>
+                                </div>
+                                <button class="btn btn-dark-blue" type="button">
+                                    <i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px; margin-top: 3px;"></i> El Remito ya fue utilizado en NIC-${duplicadoNicCds}
+                                </button>
+                            `;
+                        }
+                        
+                        const titleCruzDelSurElement = document.getElementById("titleCruzDelSur");
+                        if (titleCruzDelSurElement) {
+                            titleCruzDelSurElement.innerHTML = `
+                                <span><img class="surprise" src="./Img/404.gif"> REMITO ${documentoCds} DUPLICADO EN SERVIDOR</span>
+                            `;
+                        }
         } else if (dataCds.Respuesta[0].Estado === 101) {
             // Manejo del estado 101
             const apiResponseElement = document.getElementById("apiResponseCruzDelSur");
@@ -126,7 +133,7 @@ if (apiResponseElement) {
 const titleCruzDelSurElement = document.getElementById("titleCruzDelSur");
 if (titleCruzDelSurElement) {
     titleCruzDelSurElement.innerHTML = `
-        <span><img class="surprise" src="./Img/download-file.gif"> CONTRATO SIN HABILITAR<span id="numeroDeEnvioCruzDelSur"></span></span>
+        <span><img class="surprise" src="./Img/404.gif"> CONTRATO SIN HABILITAR<span id="numeroDeEnvioCruzDelSur"></span></span>
     `;
 }
         }
@@ -163,27 +170,34 @@ async function descargarEtiqueta(numeroCotizacionCds, nicCds) {
             <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar Etiqueta PDF A4
         `;
 
+        // Actualizar el contenido del botón
+        const apiResponseElement = document.getElementById("apiResponseCruzDelSur");
+        apiResponseElement.innerHTML = '';
+        apiResponseElement.appendChild(link1);
+
+        // Crear un enlace temporal para descargar el archivo con el nombre del NIC
+        const link2 = document.createElement('a');
+        link2.className = 'btn corrija-remito';
+        link2.style.color = '#0d2c54';
+        link2.innerHTML = `
+            <i class="bi bi-alarm-fill"></i> Generando etiqueta para Zebra...
+        `;
+
+        apiResponseElement.prepend(link2);
+
         // Consultar el segundo endpoint
         const responseEtiquetaCds2 = await fetch(urlEtiquetaCds2, optionsEtiquetaCds);
         const blobCds2 = await responseEtiquetaCds2.blob();
         const urlCds2 = window.URL.createObjectURL(blobCds2);
 
-        // Crear un enlace temporal para descargar el archivo con el nombre del NIC
-        const link2 = document.createElement('a');
         link2.href = urlCds2;
         link2.download = `Etiqueta 10x7cm NIC-${nicCds}.pdf`;
         link2.target = '_blank';
-        link2.className = 'btn corrija-remito';
-        link2.style.color = '#0d2c54';
         link2.innerHTML = `
             <i class="bi bi-box-arrow-in-down-right"></i> Opción de Descarga etiqueta 10x7cm CLICK AQUI
         `;
 
-        // Actualizar el contenido del botón
-        const apiResponseElement = document.getElementById("apiResponseCruzDelSur");
-        apiResponseElement.innerHTML = '';
-        apiResponseElement.appendChild(link2);
-        apiResponseElement.appendChild(link1);
+
     } catch (error) {
         console.error("Error al descargar la etiqueta:", error);
         document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al descargar la etiqueta. Por favor, intenta nuevamente.";
