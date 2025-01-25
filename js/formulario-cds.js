@@ -108,7 +108,7 @@ async function enviarSolicitudCDS() {
                                     </button>
                                 </div>
                                 <button class="btn btn-dark-blue" type="button">
-                                    <i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px; margin-top: 3px;"></i> El Remito ya fue utilizado en NIC-${duplicadoNicCds}
+                                    <i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px; margin-top: 3px;"></i> El Remito utilizado en NIC-${duplicadoNicCds}
                                 </button>
                             `;
                         }
