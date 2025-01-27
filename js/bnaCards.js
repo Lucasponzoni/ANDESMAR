@@ -1833,9 +1833,15 @@ function marcarFacturado2(id) {
     } else if (clave === '1113') {
         contenidoBoton = `Facturado Automata Mauricio ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = 'Facturado ✅';
+    } else if (clave === '1114') {
+        contenidoBoton = `Facturado Automata Nicolas D. ${horaFormateada} ${fechaFormateada}`;
+        mensajeFactura = 'Facturado ✅';
+    } else if (clave === '1115') {
+        contenidoBoton = `Facturado Automata Julian l. ${horaFormateada} ${fechaFormateada}`;
+        mensajeFactura = 'Facturado ✅';
     } else {
         Swal.fire('Clave incorrecta', '', 'error');
-        return; // Salir si la clave es incorrecta
+        return; 
     }
 
     // Cambiar el contenido del botón y deshabilitarlo
@@ -1852,7 +1858,10 @@ function marcarFacturado2(id) {
 
 // Pushear en Firebase
 const refEnvios = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
-const refFacturacion = firebase.database().ref(`facturacionBna/${id}`);
+
+// Obtener el order_id para usarlo como ID del nodo
+const orderId = document.getElementById(`order_id_${id}`)?.value;
+const refFacturacion = firebase.database().ref(`facturacionBna/${orderId}`);
 
 // Obtener el SKU desde ambos campos
 const skuInput = document.getElementById(`sku_${id}`);
