@@ -107,7 +107,7 @@ $(document).ready(function() {
 function verificarActualizacionBaseDeDatos() {
     const ultimaActualizacion = localStorage.getItem('ultimaActualizacion');
     const ahora = new Date().getTime();
-    const unaHora = 3600000; // Una hora en milisegundos (1000 ms * 60 s * 60 min)
+    const unaHora = 3600000;
     let intervalo;
 
     if (!ultimaActualizacion || (ahora - ultimaActualizacion > unaHora)) {
@@ -118,9 +118,12 @@ function verificarActualizacionBaseDeDatos() {
         // Eliminar el localStorage actual antes de descargar nuevos datos
         localStorage.removeItem('envios');
 
+        // Borrar el localStorage antes de mostrar el spinner y descargar los datos
+        localStorage.clear();
+        
         // Mostrar el spinner por al menos 3 segundos
         setTimeout(() => {
-            descargarDatosDesdeFirebase(600).then(() => {
+            descargarDatosDesdeFirebase(1000).then(() => {
                 const fechaActual = new Date().toLocaleString('es-AR', {
                     day: '2-digit',
                     month: '2-digit',
@@ -152,7 +155,6 @@ function verificarActualizacionBaseDeDatos() {
             minute: '2-digit',
             hour12: false
         });
-
         const actualizarTemporizador = () => {
             const ahora = new Date().getTime();
             const tiempoRestante = unaHora - (ahora - ultimaActualizacion);
@@ -192,9 +194,10 @@ function descargarDatosDesdeFirebase(limite) {
         const datosAlmacenados = {};
         snapshot.forEach(childSnapshot => {
             const data = childSnapshot.val();
-            datosAlmacenados[data.shippingId] = data; // Guardar datos en un objeto
+            const { attributes, ...filteredData } = data; // Excluir el objeto attributes
+            datosAlmacenados[filteredData.shippingId] = filteredData; 
         });
-        localStorage.setItem('envios', JSON.stringify(datosAlmacenados)); // Guardar en localStorage
+        localStorage.setItem('envios', JSON.stringify(datosAlmacenados)); 
     });
 }
 
