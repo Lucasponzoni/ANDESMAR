@@ -25,6 +25,24 @@ const firebaseConfig2 = {
     measurementId: "G-64DDP7D6Q2"
 };
 
+let idCDS, usuarioCDS, passCDS;
+
+const obtenerCredencialesCDS = async () => {
+    try {
+        const snapshot = await window.dbCDS.ref('LogiPaq').once('value');
+        const data = snapshot.val();
+        idCDS = data[3];
+        usuarioCDS = data[4];
+        passCDS = data[5];
+    } catch (error) {
+        console.error('Error al obtener credenciales de Firebase:', error);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await obtenerCredencialesCDS();
+});
+
 // MODAL MELI LOCALIDADES
 document.getElementById('logisticaBsAsButton').addEventListener('click', () => {
     loadPostalCodes('LogBsAs');
@@ -360,7 +378,8 @@ function cargarDatos() {
                     trackingLink: data.trackingLink,
                     estadoFacturacion: data.estadoFacturacion,
                     andesmarId: data.andesmarId,
-                    shippingId: data.shippingId
+                    shippingId: data.shippingId,
+                    cotizacion: data.cotizacionCDS
                 });
             });
 
@@ -434,6 +453,7 @@ function crearCard(data) {
     cardDiv.className = 'col-md-4';
 
     // Verificar si transportCompany
+    const isCDS = data.transportCompany === "Cruz del Sur";
     const isAndesmar = data.transportCompany === "Andesmar";
     const isAndreani = data.transportCompany === "Andreani"
     const isLogPropia = data.transportCompany === "Novogar"
@@ -494,8 +514,8 @@ function crearCard(data) {
             </div>
 
             
-        <div id="estadoEnvio${data.idOperacion}" class="${isAndesmar || isAndreani || isLogPropia ? 'em-circle-state2' : 'em-circle-state'}">
-        ${isAndesmar || isAndreani || isLogPropia ? 'Envio Preparado' : 'Envio pendiente'}
+        <div id="estadoEnvio${data.idOperacion}" class="${isAndesmar || isAndreani || isCDS || isLogPropia ? 'em-circle-state2' : 'em-circle-state'}">
+        ${isAndesmar || isAndreani || isCDS || isLogPropia ? 'Envio Preparado' : 'Envio pendiente'}
         </div>
 
             <div class="card-body-meli">
@@ -562,6 +582,8 @@ function crearCard(data) {
                 'Logística Propia' : 
                 isAndesmar ? 
                 `<a href="${data.trackingLink}" target="_blank">Andesmar: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                isCDS ? 
+                `<a href="${data.trackingLink}" target="_blank">CDS: NIC-${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
                 isAndreani ? 
                 `<a href="${data.trackingLink}" target="_blank">Andreani: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
                 'Número Pendiente'}
@@ -620,43 +642,59 @@ function crearCard(data) {
                     <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.idOperacion}" onclick="editarDatos('${data.idOperacion}')">Editar datos</button>
                 </div>
 
-                <!-- Botón Andesmar --> 
-                <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} btnAndesmarMeli" 
-                id="andesmarButton${data.idOperacion}" 
-                ${isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
-                ${isBlocked ? 'disabled' : ''} 
-                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${data.Recibe}')`}">
-                <span id="andesmarText${data.idOperacion}">
-                ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>'}
-                </span>
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.idOperacion}"></span>
-                </button>
-                <!-- Botón Andesmar --> 
-                
-                <!-- Botón Andreani -->
-                <button class="btn ${isAndreani ? 'btn-success' : 'btn-danger'} btnAndreaniMeli" 
-                id="andreaniButton${data.idOperacion}" 
-                ${isAndesmar || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
-                ${isBlocked ? 'disabled' : ''} 
-                onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.Recibe}')`}">
-                <span id="andreaniText${data.idOperacion}">
-                ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
-                </span>
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.idOperacion}" style="display:none;"></span>
-                </button>
-                <!-- Botón Andreani -->
-                
-                <!-- Botón Logística Propia --> 
-                <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
-                id="LogPropiaMeliButton${data.idOperacion}" 
-                ${isBlocked ? 'disabled' : ''} 
-                onclick="generarPDF('${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}')">
-                <span>
-                ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
-                </span>
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data.idOperacion}" style="display:none;"></span>
-                </button>
-                <!-- Botón Logística Propia --> 
+                <div class="conjuntoDeBotonesMeli" style="display: flex; flex-direction: column;">
+    <!-- Botón Cruz del Sur -->
+        <button class="btn ${isCDS ? 'btn-success' : 'btn-dark-blue'} btnCDSMeli" 
+        id="CDSButton${data.idOperacion}" 
+        ${isAndesmar || isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
+        ${isBlocked ? 'disabled' : ''} 
+        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.Recibe}')`}">
+        <span id="CDSText${data.idOperacion}">
+        ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
+        </span>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerCDS${data.idOperacion}" style="display:none;"></span>
+        </button>
+    <!-- Botón Cruz del Sur -->
+
+
+    <!-- Botón Andesmar --> 
+    <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} btnAndesmarMeli" 
+        id="andesmarButton${data.idOperacion}" 
+        ${isAndreani || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
+        ${isBlocked ? 'disabled' : ''} 
+        ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${data.Recibe}')`}">
+        <span id="andesmarText${data.idOperacion}">
+            ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>'}
+        </span>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.idOperacion}"></span>
+    </button>
+    <!-- Botón Andesmar --> 
+    
+    <!-- Botón Andreani -->
+    <button class="btn ${isAndreani ? 'btn-success' : 'btn-danger'} btnAndreaniMeli" 
+        id="andreaniButton${data.idOperacion}" 
+        ${isAndesmar || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
+        ${isBlocked ? 'disabled' : ''} 
+        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.Recibe}')`}">
+        <span id="andreaniText${data.idOperacion}">
+            ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
+        </span>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.idOperacion}" style="display:none;"></span>
+    </button>
+    <!-- Botón Andreani -->
+    
+    <!-- Botón Logística Propia --> 
+    <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
+        id="LogPropiaMeliButton${data.idOperacion}" 
+        ${isBlocked ? 'disabled' : ''} 
+        onclick="generarPDF('${data.email !== undefined ? data.email : 'webnovogar@gmail.com'}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${data.Producto}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}')">
+        <span>
+            ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
+        </span>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data.idOperacion}" style="display:none;"></span>
+    </button>
+    <!-- Botón Logística Propia --> 
+</div>
                 
                 <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'background-color: #d0ffd1;' : ''}">
                     ${isBlocked ? '<i class="bi bi-info-square-fill"></i> Despacho Bloqueado por Facturación, separar remito para realizar circuito' : ''}
@@ -826,8 +864,208 @@ async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
         document.body.appendChild(a);
         a.click(); // Simular clic en el enlace
         document.body.removeChild(a); // Eliminar el enlace del DOM
+        buttonCDS.onclick = () => window.open(pdfUrl, '_blank');
     } catch (error) {
         console.error('Error al obtener la etiqueta:', error);
+    }
+}
+
+async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe) {
+
+    console.log('Parámetros enviados a enviarDatosCDS:');
+    console.log({
+        id,
+        NombreyApellido,
+        Cp,
+        localidad,
+        Provincia,
+        idOperacion,
+        calleDestinatario,
+        alturaDestinatario,
+        telefonoDestinatario,
+        observaciones,
+        peso,
+        volumenCM3,
+        cantidad,
+        medidas,
+        Producto,
+        email,
+        recibe
+    });
+    console.log("Iniciando Generación de Etiqueta CDS:");
+
+    // Obtener los valores necesarios
+    const volumenTotalcds = volumenCM3 || 0;
+    const pesoCds = peso;
+    const codigoPostalCds = Cp;
+    const localidadCds = localidad;
+    const valorCds = 999999;
+    const queEntregaCds = "E";
+    const documentoCds = id + 'Z';
+    const nombreCds = NombreyApellido;
+    const telefonoCds = telefonoDestinatario;
+    const emailCds = email;
+    const domicilioCds = calleDestinatario + ' ' + alturaDestinatario;
+
+    let totalBultosCds = cantidad; // Asumiendo que cantidad es total de bultos
+
+    const buttonCDS = document.getElementById(`CDSButton${id}`);
+    const spinner = document.getElementById(`spinnerCDS${id}`);
+    const text = document.getElementById(`CDSText${id}`);
+    const resultadoDiv = document.getElementById(`resultado${id}`);
+    const envioStateCDS = document.getElementById(`estadoEnvio${id}`);
+    const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
+
+    // Mostrar spinner y cambiar texto
+    spinner.style.display = 'inline-block';
+    text.innerText = 'Generando Etiqueta...';
+
+    buttonCDS.disabled = true;
+
+    const referenciaCds = documentoCds;
+    const buttonId = `CDSButton${id}`;
+
+    const urlCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenTotalcds}&peso=${pesoCds}&codigopostal=${codigoPostalCds}&localidad=${localidadCds}&valor=${valorCds}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${documentoCds}&nombre=${nombreCds}&telefono=${telefonoCds}&email=${emailCds}&domicilio=${domicilioCds}&bultos=${totalBultosCds}&referencia=${referenciaCds}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
+
+    const optionsCds = {
+        method: 'GET',
+        headers: {
+            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+        }
+    };
+
+    try {
+        const responseCds = await fetch(urlCds, optionsCds);
+        const dataCds = await responseCds.json();
+        console.log(dataCds); // Para depuración
+
+        // Manejo de la respuesta
+        if (dataCds.Respuesta[0].Estado === 0) {
+            const numeroCotizacionCds = dataCds.Respuesta[0].NumeroCotizacion;
+            const nicCds = dataCds.Respuesta[0].NIC;
+
+            // Actualizar el botón con el NIC
+            const buttonElement = document.getElementById(buttonId);
+            if (buttonElement) {
+                buttonElement.innerHTML = `
+                    Orden NIC-${nicCds} <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                `;
+                buttonElement.disabled = true; // Mantener el botón deshabilitado
+                buttonCDS.classList.remove('btn-dark-blue');
+                buttonCDS.classList.add('btn-secondary');
+            }
+
+            // Llamar a la API para descargar la etiqueta
+            await descargarEtiqueta(numeroCotizacionCds, nicCds, buttonId);
+            buttonCDS.classList.remove('btn-secondary');
+            buttonCDS.classList.add('btn-success');
+
+            const trackingLink = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${nicCds}`;
+            NroEnvio.innerHTML = `<a href="${trackingLink}" target="_blank">CDS: NIC-${nicCds} <i class="bi bi-box-arrow-up-right"></i></a>`;
+
+            // Cambiar el estado del envío
+            if (envioStateCDS) {
+                envioStateCDS.className = 'em-circle-state2';
+                envioStateCDS.innerHTML = `Envio Preparado`;
+            }
+
+            // Guardar en Firebase
+    const trackingMessage = `¡Hola, ${NombreyApellido || recibe}!
+
+    ¡Buenas noticias! 🎉  Tu producto ya está listo para ser enviado con CRUZ DEL SUR. 📦  
+
+    Recordá que la fecha de entrega es aproximada, así que puede que lo recibas antes. 🚚📲 Estate atento a tu teléfono ya que estaremos en contacto para asegurarnos de que la entrega sea exitosa.
+
+    ✅ Acá te dejamos tu número de seguimiento: ${trackingLink}.  
+
+    ¡Esperamos que disfrutes tu compra!
+
+    Estamos a tu disposición.
+
+    Equipo Posventa Novogar`;
+
+        const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
+    
+        firebase.database().ref('envios/' + idOperacionSinME1).update({
+            trackingNumber: nicCds,
+            trackingLink: trackingLink,
+            trackingMessage: trackingMessage,
+            transportCompany: "Cruz del Sur",
+            cotizacionCDS: numeroCotizacionCds
+        }).then(() => {
+            console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
+        }).catch(error => {
+            console.error('Error al actualizar en Firebase:', error);
+        });    
+        } else {
+            // Manejo de otros estados de error
+            console.error("Error en la respuesta:", dataCds);
+            buttonCDS.classList.remove('btn-dark-blue');
+            buttonCDS.classList.add('btn-danger', 'disabled');
+            spinner.style.display = 'none';
+            text.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Error al generar Etiqueta';
+            resultadoDiv.innerText = `Error: ${dataCds.Respuesta[0].Descripcion}`; 
+        }
+    } catch (error) {
+        console.error("Error al crear la cotización:", error);
+        document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al crear la cotización. Por favor, intenta nuevamente.";
+        buttonCDS.classList.remove('btn-dark-blue');
+        buttonCDS.classList.add('btn-danger', 'disabled');
+        spinner.style.display = 'none';
+        text.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Error al generar Etiqueta';
+        resultadoDiv.innerText = `Error: ${error.message}`;
+    }
+}
+
+async function descargarEtiqueta(numeroCotizacionCds, nicCds, buttonId) {
+    console.log("Parámetros enviados a descargarEtiqueta:");
+    console.log("Cotización CDS:", numeroCotizacionCds);
+    console.log("Número de seguimiento:", nicCds);
+    console.log("ID de operación:", buttonId);
+
+    const urlEtiquetaCds2 = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&id=${numeroCotizacionCds}&tamanioHoja=2&posicionArrancar=1&textoEspecialPorEtiqueta=`;
+
+    const optionsEtiquetaCds = {
+        method: 'GET',
+        headers: {
+            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+        }
+    };
+
+    try {
+        const responseEtiquetaCds2 = await fetch(urlEtiquetaCds2, optionsEtiquetaCds);
+        if (!responseEtiquetaCds2.ok) throw new Error('Error en la respuesta de la API');
+
+        const blobCds2 = await responseEtiquetaCds2.blob();
+        const urlCds2 = window.URL.createObjectURL(blobCds2);
+
+        // Crear un enlace temporal para descargar el archivo con el nombre correcto
+        const a = document.createElement('a');
+        a.href = urlCds2;
+        a.download = `Etiqueta NIC-${nicCds}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(urlCds2);
+
+        // Actualizar el botón para indicar que la etiqueta está lista para descargar
+        if (buttonElement) {
+            buttonElement.innerHTML = `
+                <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar PDF NIC-${nicCds}
+            `;
+            buttonElement.disabled = false; // Habilitar el botón
+            buttonElement.onclick = () => descargarEtiqueta(numeroCotizacionCds, nicCds, buttonId); // Reasignar el onclick
+        }
+
+    } catch (error) {
+        console.error("Error al descargar la etiqueta:", error);
+        if (document.getElementById("errorResponseCruzDelSur")) {
+            document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al descargar la etiqueta. Por favor, intenta nuevamente.";
+        }
+        // Volver a habilitar el botón en caso de error
+        if (buttonElement) {
+            buttonElement.disabled = false;
+        }
     }
 }
 
@@ -1084,7 +1322,9 @@ async function getAuthToken() {
     }
 }
 
-async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe) {    const buttonAndr = document.getElementById(`andreaniButton${id}`);
+async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe) 
+{    
+    const buttonAndr = document.getElementById(`andreaniButton${id}`);
     const spinnerAndr = document.getElementById(`spinnerAndreani${id}`);
     const textAndr = document.getElementById(`andreaniText${id}`);
     const resultadoDivAndr = document.getElementById(`resultado${id}`);

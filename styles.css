@@ -162,10 +162,14 @@ h1 {
     margin-top: 22px; /* Espacio adicional para separar del input */
 }
 
-.AndesmarMeli , .AndreaniMeli , .NovogarMeli{
+.AndesmarMeli , .AndreaniMeli , .NovogarMeli, .CDSMeli{
     align-items: center;
     justify-content: center;
     width: 20px;
+}
+
+.conjuntoDeBotonesMeli > button{
+    width: fit-content;
 }
 
 .NovogarMeli2 {
@@ -2619,6 +2623,10 @@ div.card-body > p > i{
 
 .btnAndreaniMeli{
     margin-bottom: 0px !important;
+}
+
+.btnCDSMeli{
+    margin-bottom: 5px;
 }
 
 .errorMeli{
