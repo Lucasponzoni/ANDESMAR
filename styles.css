@@ -89,6 +89,19 @@ h1 {
     width: 50px;
 }
 
+.bg-Hr-primary{
+    margin-top: -5px;
+    border-bottom: 1px dashed grey;
+}
+
+.bg-Hr-primary > p{
+    color: grey;
+    margin-top: 5px;
+    margin-bottom: 0px;
+    font-weight: 400;
+    font-size: small;
+}
+
 .mac-buttons {
     background-color: cornflowerblue;
     padding: 5px;

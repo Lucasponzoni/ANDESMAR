@@ -643,6 +643,11 @@ function crearCard(data) {
                 </div>
 
                 <div class="conjuntoDeBotonesMeli" style="display: flex; flex-direction: column;">
+    
+    <div class="bg-Hr-primary mb-1">
+    <p><i class="bi bi-tags-fill"></i> Logistica Privada</p>
+    </div>
+
     <!-- Botón Cruz del Sur -->
         <button class="btn ${isCDS ? 'btn-success' : 'btn-dark-blue'} btnCDSMeli" 
         id="CDSButton${data.idOperacion}" 
@@ -682,7 +687,11 @@ function crearCard(data) {
         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.idOperacion}" style="display:none;"></span>
     </button>
     <!-- Botón Andreani -->
-    
+
+    <div class="bg-Hr-primary">
+    <p><i class="bi bi-tags-fill"></i> Logistica Propia</p>
+    </div>
+
     <!-- Botón Logística Propia --> 
     <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
@@ -901,7 +910,7 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
     const localidadCds = localidad;
     const valorCds = 999999;
     const queEntregaCds = "E";
-    const documentoCds = id + 'Z';
+    const documentoCds = id + 'X';
     const nombreCds = NombreyApellido;
     const telefonoCds = telefonoDestinatario;
     const emailCds = email;
@@ -1022,6 +1031,8 @@ async function descargarEtiqueta(numeroCotizacionCds, nicCds, buttonId) {
     console.log("Cotización CDS:", numeroCotizacionCds);
     console.log("Número de seguimiento:", nicCds);
     console.log("ID de operación:", buttonId);
+
+    const buttonElement = document.getElementById(buttonId);
 
     const urlEtiquetaCds2 = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&id=${numeroCotizacionCds}&tamanioHoja=2&posicionArrancar=1&textoEspecialPorEtiqueta=`;
 
