@@ -3530,6 +3530,11 @@ div .form-check {
     color: white; 
 }
 
+.btn-cds {
+    background: linear-gradient(135deg, #0055a9, #03284d); 
+    color: white; 
+}
+
 .btn-novogar {
     background: linear-gradient(135deg, #717171, #323232); 
     color: white; 

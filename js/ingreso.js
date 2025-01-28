@@ -392,6 +392,16 @@ function renderCards(data) {
                 link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
                 imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
+            } else if (numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) {
+                // Eliminar el último dígito si el número de envío tiene 10 caracteres y comienza con '1'
+                const numeroDeEnvioCorto = numeroDeEnvio.slice(0, -1);
+                link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvioCorto}`;
+                imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
+            } else if (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1')) {
+                link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvio}`;
+                imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
             } else {
                 link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=remito`;
                 imgSrc = './Img/andesmar-mini.png'; // Ruta de la imagen
