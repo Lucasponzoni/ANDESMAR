@@ -935,7 +935,7 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
     const localidadCds = localidad;
     const valorCds = 999999;
     const queEntregaCds = "E";
-    const documentoCds = id + 'X';
+    const documentoCds = id;
     const nombreCds = NombreyApellido;
     const telefonoCds = telefonoDestinatario;
     const emailCds = email;
