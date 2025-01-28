@@ -146,6 +146,7 @@ let logBsCps = []; // Array para almacenar los CPs de LogBsAs
 let logStaFeCps = []; // Array para almacenar los CPs de LogSantaFe
 let logRafaelaCps = []; // Array para almacenar los CPs de LogRafaela
 let logSanNicolasCps = []; // Array para almacenar los CPs de LogSanNicolas
+let logCDSCps = []; // Array para almacenar los CPs de Cruz del Sur
 
 // Función para cargar los CPs de LogBsAs
 function cargarCpsLogBsAs() {
@@ -187,10 +188,27 @@ function cargarCpsLogSanNicolas() {
     });
 }
 
+// Función para cargar los CPs de LogCDS
+function cargarCpsLogCDS() {
+    return database.ref('LogCDS').once('value').then(snapshot => {
+        const logCDSData = snapshot.val();
+        if (logCDSData) {
+            logCDSCps = Object.keys(logCDSData).map(cp => Number(cp));
+        }
+    });
+}
+
 // Llamar a las funciones para cargar los CPs antes de cargar los datos
-Promise.all([cargarCpsLogBsAs(), cargarCpsLogStaFe(), cargarCpsLogRafaela(), cargarCpsLogSanNicolas()]).then(() => {
+Promise.all([
+    cargarCpsLogBsAs(),
+    cargarCpsLogStaFe(),
+    cargarCpsLogRafaela(),
+    cargarCpsLogSanNicolas(),
+    cargarCpsLogCDS() // Agregada la carga de CPs de LogCDS
+]).then(() => {
     cargarDatos(); 
 });
+
 
 // QUERY DE DATOS
 
@@ -525,20 +543,22 @@ function crearCard(data) {
                 <div class="meli-box1"> 
                     <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> ${data.Cp}, ${data.localidad}, ${data.Provincia}</p>
 
-                    <p class="card-text correo-meli ${logBsCps.includes(Number(data.Cp)) ? 'correo-novogar' : (logStaFeCps.includes(Number(data.Cp)) ? 'correo-santafe' : (logRafaelaCps.includes(Number(data.Cp)) ? 'correo-rafaela' : (logSanNicolasCps.includes(Number(data.Cp)) ? 'correo-sannicolas' : (cpsAndesmar.includes(Number(data.Cp)) ? 'correo-andesmar' : 'correo-andreani'))))}">
+                    <p class="card-text correo-meli ${logBsCps.includes(Number(data.Cp)) ? 'correo-novogar' : (logStaFeCps.includes(Number(data.Cp)) ? 'correo-santafe' : (logRafaelaCps.includes(Number(data.Cp)) ? 'correo-rafaela' : (logSanNicolasCps.includes(Number(data.Cp)) ? 'correo-sannicolas': (logCDSCps.includes(Number(data.Cp)) ? 'correo-cds' : (cpsAndesmar.includes(Number(data.Cp)) ? 'correo-andesmar' : 'correo-andreani')))))}">
                         ${logBsCps.includes(Number(data.Cp)) ? 
                             '<img src="Img/novogar-tini.png" alt="Logística Novogar" width="20" height="20">Buenos Aires' : 
                             (logStaFeCps.includes(Number(data.Cp)) ? 
                             '<img src="Img/novogar-tini.png" alt="Logística Santa Fe" width="20" height="20">Santa Fe' : 
                             (logRafaelaCps.includes(Number(data.Cp)) ? 
-                            '<img src="Img/novogar-tini.png" alt="Logística Rafaela" width="20" height="20">Rafaela' : 
+                            '<img src="Img/novogar-tini.png" alt="Logística Santa Fe" width="20" height="20">Santa Fe' : 
+                            (logCDSCps.includes(Number(data.Cp)) ? 
+                            '<img src="Img/Cruz-del-Sur-tini.png" alt="Logística Cruz del Sur" width="20" height="20">' : 
                             (logSanNicolasCps.includes(Number(data.Cp)) ? 
                             '<img src="Img/novogar-tini.png" alt="Logística San Nicolás" width="20" height="20">San Nicolás' : 
                             (cpsAndesmar.includes(Number(data.Cp)) ? 
                             '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
                             '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">' 
                             )
-                        ))
+                        )))
                     )}
                     </p>
 

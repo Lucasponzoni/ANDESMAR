@@ -1606,6 +1606,12 @@ p.card-text{
     border: solid 1px #007aff;
 }
 
+.correo-cds {
+    background-color: #003366;
+    color: white;
+    border: solid 1px #03284d;
+}
+
 .correo-andreani {
     background-color: #ff3b30;
     color: white;
