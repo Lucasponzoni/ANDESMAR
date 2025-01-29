@@ -376,13 +376,33 @@ function renderCards(data) {
         return dateB - dateA;
     });
 
+    // Calcular el promedio de todos los elementos antes de la paginación
+    let totalTiempo = 0; // Variable para acumular el tiempo total
+    let count = 0; // Contador de elementos con tiempo transcurrido
+
+    data.forEach(item => {
+        if (item.estado === "Pendiente de despacho") {
+            const tiempoTranscurrido = calcularTiempoTranscurrido(item.fechaHora);
+            if (tiempoTranscurrido) {
+                totalTiempo += tiempoTranscurrido.totalMs;
+                count++;
+            }
+        }
+    });
+
+    // Calcular el promedio si hay tiempos
+    if (count > 0) {
+        const promedioTexto = formatearTiempoPromedio(totalTiempo / count, count);
+        document.getElementById('promedioBtn').innerHTML = `<i class="bi bi-alarm-fill"></i> Promedio: ${promedioTexto}`;
+    } else {
+        document.getElementById('promedioBtn').innerHTML = `<i class="bi bi-alarm-fill"></i> Promedio: -`;
+    }
+
     const tableBody = document.querySelector('#data-table tbody');
     tableBody.innerHTML = '';
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, data.length);
-    let totalTiempo = 0; // Variable para acumular el tiempo total
-    let count = 0; // Contador de elementos con tiempo transcurrido
 
     for (let i = startIndex; i < endIndex; i++) {
         const item = data[i];
@@ -397,12 +417,6 @@ function renderCards(data) {
         const formattedDateTime = formatDateTime(item.fechaHora);
         const tiempoTranscurrido = item.estado === "Pendiente de despacho" ? 
         calcularTiempoTranscurrido(item.fechaHora) : null;    
-
-        // Sumar el tiempo si está pendiente de despacho
-        if (tiempoTranscurrido) {
-            totalTiempo += tiempoTranscurrido.totalMs;
-            count++;
-        }
 
         const tiempoTexto = tiempoTranscurrido ? 
             `<span class="tiempo-transcurrido"><i class="bi bi-clock icono-tiempo"></i>${tiempoTranscurrido.dias}d ${tiempoTranscurrido.horas}h ${tiempoTranscurrido.minutos}m</span>` : '';
@@ -483,14 +497,6 @@ function renderCards(data) {
         </tr>`;
 
         tableBody.insertAdjacentHTML('beforeend', row);
-    }
-
-    // Calcular el promedio si hay tiempos
-    if (count > 0) {
-        const promedioTexto = formatearTiempoPromedio(totalTiempo / count, count);
-        document.getElementById('promedioBtn').innerHTML = `<i class="bi bi-alarm-fill"></i> Promedio: ${promedioTexto}`;
-    } else {
-        document.getElementById('promedioBtn').innerHTML = `<i class="bi bi-alarm-fill"></i> Promedio: -`;
     }
 }
 
