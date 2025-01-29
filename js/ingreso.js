@@ -203,17 +203,13 @@ searchInput.disabled = true;
             allData.push(data); // Almacenar datos en allData
         });
 
-        // Invertir el orden de allData
         allData.reverse();
 
-        // Renderizar la primera página de datos
         renderCards(allData);
 
-        // Actualizar la paginación
-        updatePagination(allData.length);
-        
-        // Calcular porcentajes de Andesmar y Andreani en base a todos los datos
         calcularPorcentajes(allData);
+
+        updatePagination(allData.length);
         
         // Ocultar el spinner al cargar los datos
         document.getElementById('spinner').style.display = 'none';
