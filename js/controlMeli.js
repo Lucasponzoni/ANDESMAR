@@ -1412,7 +1412,11 @@ function loadFolder(folderPath) {
         folderList.innerHTML = '';
     
         // Invertir el listado de carpetas
-        result.prefixes.reverse().forEach(folderRef => {
+        const maxItemsToShow = 5;
+        let itemsToShow = maxItemsToShow;
+        const items = [];
+        
+        result.prefixes.reverse().forEach((folderRef, index) => {
             const listItem = document.createElement('li');
             listItem.className = 'list-group-item d-flex justify-content-between align-items-start';
             listItem.innerHTML = `
@@ -1421,14 +1425,14 @@ function loadFolder(folderPath) {
                 </div>
                 <span class="badge text-bg-primary rounded-pill">Cargando...</span>
             `;
-            folderList.appendChild(listItem);
-    
+            items.push(listItem);
+        
             listItem.addEventListener('click', () => {
                 folderStack.push(currentFolderPath);
                 currentFolderPath = folderRef.fullPath;
                 loadFolder(currentFolderPath);
             });
-    
+        
             folderRef.listAll().then(subResult => {
                 const fileCount = subResult.items.length;
                 const tandaText = fileCount === 1 ? 'tanda' : 'tandas';
@@ -1439,8 +1443,22 @@ function loadFolder(folderPath) {
                 Swal.fire('Error', 'Error al listar subcarpetas.', 'error');
             });
         });
-    
-        const items = [];
+        
+        // Mostrar los primeros 5 elementos
+        items.slice(0, itemsToShow).forEach(item => folderList.appendChild(item));
+        
+        // Agregar botón "Ver más" si hay más de 5 elementos
+        if (items.length > maxItemsToShow) {
+            const showMoreButton = document.createElement('button');
+            showMoreButton.className = 'btn btn-primary mt-2';
+            showMoreButton.innerHTML = 'Ver más <i class="bi bi-chevron-down" style="margin-right: 8px;"></i>';
+            showMoreButton.addEventListener('click', () => {
+                // Mostrar todos los elementos
+                items.slice(itemsToShow).forEach(item => folderList.appendChild(item));
+                showMoreButton.style.display = 'none'; // Ocultar el botón "Ver más"
+            });
+            folderList.appendChild(showMoreButton);
+        }
 
         result.items.forEach(fileRef => {
             showSpinner(true);
