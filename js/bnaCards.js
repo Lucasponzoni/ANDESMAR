@@ -1692,7 +1692,13 @@ function marcarFacturado(id) {
                 mensajeFactura = 'Facturado ✅';
                 facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
                 facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
-            } else {
+            } else if (clave === '1114') {
+                contenidoBoton = `Facturado Automata Nicolas D. ${horaFormateada} ${fechaFormateada}`;
+                mensajeFactura = 'Facturado ✅';
+            } else if (clave === '1115') {
+                contenidoBoton = `Facturado Automata Julian L. ${horaFormateada} ${fechaFormateada}`;
+                mensajeFactura = 'Facturado ✅';
+            }else {
                 Swal.fire('Clave incorrecta', '', 'error');
                 return; // Salir si la clave es incorrecta
             }
@@ -1762,6 +1768,14 @@ function marcarCancelado2(id) {
         case '1113':
             nombreFacturador = 'Leo';
             contenidoBoton = `Cancelado Leo ${horaFormateada} ${fechaFormateada}`;
+            break;
+        case '1114':
+            nombreFacturador = 'Nicolas D.';
+            contenidoBoton = `Cancelado Nicolas ${horaFormateada} ${fechaFormateada}`;
+            break;
+        case '1115':
+            nombreFacturador = 'Julian L.';
+            contenidoBoton = `Cancelado JUlian L. ${horaFormateada} ${fechaFormateada}`;
             break;
         default:
             Swal.fire('Clave incorrecta', '', 'error');
@@ -1837,7 +1851,7 @@ function marcarFacturado2(id) {
         contenidoBoton = `Facturado Automata Nicolas D. ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = 'Facturado ✅';
     } else if (clave === '1115') {
-        contenidoBoton = `Facturado Automata Julian l. ${horaFormateada} ${fechaFormateada}`;
+        contenidoBoton = `Facturado Automata Julian L. ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = 'Facturado ✅';
     } else {
         Swal.fire('Clave incorrecta', '', 'error');
@@ -2421,7 +2435,7 @@ if (isSplit) {
 }
 
 // Ajustar la cantidad de bultos
-const cantidadBultos = isSplit ? (cantidad * 1) + cantidadKitsParsed : cantidad;
+const cantidadBultos = isSplit ? cantidad : cantidad;
 const VolumenTotalFinal = isSplit ? volumenCm3 / 2 : volumenCm3 / cantidad;
 
 // Inicializar arreglos para las medidas
@@ -2478,6 +2492,24 @@ if (isSplit) {
                 { "meta": "detalle", "contenido": "Unidad Interior" }, // Detalle de la unidad interior
                 { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
                 { "meta": "observaciones", "contenido": `${calle}, Telefono: ${telefono} Unidad Interior: ${producto_nombre}` }
+            ]
+        });
+    }
+
+    // Agregar bultos de kits de instalación
+    for (let i = 0; i < cantidadKitsParsed; i++) {
+        bultos.push({
+            "kilos": 5, // Peso estimado del kit de instalación
+            "largoCm": 40,
+            "altoCm": 40,
+            "anchoCm": 40,
+            "volumenCm": 40 * 40 * 40, // Volumen del kit de instalación
+            "valorDeclaradoSinImpuestos": precioSinIVA,
+            "valorDeclaradoConImpuestos": precioVentaRedondeado,
+            "referencias": [
+                { "meta": "detalle", "contenido": "Kit de Instalación" }, // Detalle del kit de instalación
+                { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
+                { "meta": "observaciones", "contenido": `${calle}, Telefono: ${telefono} Kit de Instalación: ${producto_nombre}` }
             ]
         });
     }
