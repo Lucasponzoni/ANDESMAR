@@ -3490,7 +3490,7 @@ div .form-check {
     padding: 0.4rem 0.8rem; 
     transition: background-color 0.3s ease, box-shadow 0.3s ease; 
     white-space: nowrap; 
-    z-index: 10000;
+    z-index: 1000;
 }
 
 /* TRANSPORTE EN TABLAS */
@@ -5270,7 +5270,7 @@ input[disabled] {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 100000;
+    z-index: 1000;
 }
 
 #badge-danger-porcentaje {
