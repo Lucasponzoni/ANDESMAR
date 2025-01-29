@@ -1280,6 +1280,10 @@ document.getElementById('remitoInput').addEventListener('keydown', function(even
     }
 });
 
+document.getElementById('fotoRemitoInput').addEventListener('change', function() {
+    document.querySelector('.btn-info[onclick="subirFoto()"]').click();
+});
+
 function uploadFile(remitoFotoRef, fotoInput, remito) {
     const uploadTask = remitoFotoRef.put(fotoInput);
     const loadingSpinner = document.getElementById('loadingSpinner');
