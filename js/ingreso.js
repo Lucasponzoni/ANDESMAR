@@ -231,59 +231,84 @@ searchInput.disabled = true;
 function calcularPorcentajes(data) {
     let countAndreani = 0;
     let countAndesmar = 0;
+    let countCruzDelSur = 0;
     let countPendientes = 0;
 
-    data.forEach(item => {
-        if (item.numeroDeEnvio) {
-            const numeroDeEnvio = item.numeroDeEnvio;
-            // Contar envíos de Andreani
-            if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
-                (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) {
-                countAndreani++;
-            } else {
-                countAndesmar++;
-            }
-        }
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000)); // Fecha de hace 30 días
 
-        // Contar los pendientes de despacho
-        if (item.estado === "Pendiente de despacho") {
-            countPendientes++;
+    data.forEach(item => {
+        const [day, month, year] = item.fechaHora.split(',')[0].split('/');
+        const itemDate = new Date(`${year}-${month}-${day}`);
+
+        if (itemDate >= thirtyDaysAgo) {
+            if (item.numeroDeEnvio) {
+                const numeroDeEnvio = item.numeroDeEnvio;
+                // Contar envíos de Andreani
+                if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
+                    (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) {
+                    countAndreani++;
+                } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) || 
+                           (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1'))) {
+                    countCruzDelSur++;
+                } else {
+                    countAndesmar++;
+                }
+            }
+
+            // Contar los pendientes de despacho
+            if (item.estado === "Pendiente de despacho") {
+                countPendientes++;
+            }
         }
     });
 
-    const totalEnvios = countAndreani + countAndesmar;
+    const totalEnvios = countAndreani + countAndesmar + countCruzDelSur;
 
     // Calcular porcentajes
     const andreaniPorcentaje = totalEnvios > 0 ? ((countAndreani / totalEnvios) * 100).toFixed(2) : 0;
     const andesmarPorcentaje = totalEnvios > 0 ? ((countAndesmar / totalEnvios) * 100).toFixed(2) : 0;
+    const cruzDelSurPorcentaje = totalEnvios > 0 ? ((countCruzDelSur / totalEnvios) * 100).toFixed(2) : 0;
 
     // Actualizar el HTML
     document.getElementById('andreaniPorcentaje').innerHTML = `
+    <img src="./Img/andreani-mini.png" alt="Andreani" class="gray-filter"> 
     <div class="d-flex align-items-center flex-wrap">
-        <i class="bi bi-truck-front-fill icono-tiempo"></i>
         <span class="ml-1" style="font-weight: bold;">Andreani: ${andreaniPorcentaje}%</span>
     </div>
+    <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countAndreani} despachos)</span>
+    <div class="pie-chart" style="--percentage: ${andreaniPorcentaje}; --color: #dc3545;"></div>
     `;
-
+    
     document.getElementById('andesmarPorcentaje').innerHTML = `
+    <img src="./Img/andesmar-mini.png" alt="Andesmar" class="gray-filter">  
     <div class="d-flex align-items-center flex-wrap">
-        <i class="bi bi-truck-front-fill icono-tiempo"></i>
         <span class="ml-1" style="font-weight: bold;">Andesmar: ${andesmarPorcentaje}%</span>
     </div>
+        <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countAndesmar} despachos)</span>
+        <div class="pie-chart" style="--percentage: ${andesmarPorcentaje}; --color: #007bff;"></div>
+
     `;
 
-    document.getElementById('SinDespacharPorcentaje').innerHTML = `
+    document.getElementById('cruzDelSurPorcentaje').innerHTML = `
+    <img src="./Img/cds-mini.png" alt="Cruz del Sur" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i>
-        <span class="ml-1" style="font-weight: bold;">Pendientes:</span>
-        <span class="badge badge-danger mx-2" style="font-size: 0.9em; border-radius: 8px; padding: 12px 0.5em;">
-            ${countPendientes} en preparación <i class="bi bi-asterisk"></i>
+        <span class="ml-1" style="font-weight: bold;">Cruz del Sur: ${cruzDelSurPorcentaje}%</span>
+    </div>
+        <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countCruzDelSur} despachos)</span>
+        <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #003366;"></div>
+
+    `;
+    
+    document.getElementById('SinDespacharPorcentaje').innerHTML = `
+    <div class="macos-button-porcentaje">
+        <span class="ml-1"><i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i> Pendientes:</span>
+        <span class="badge badge-danger badge-danger-porcentaje;" id="badge-danger-porcentaje">
+            ${countPendientes} en preparación
         </span>
     </div>
     `;
-}
-
-function eliminarFila(button) {
+}function eliminarFila(button) {
     const row = button.closest('tr');
     
     Swal.fire({
