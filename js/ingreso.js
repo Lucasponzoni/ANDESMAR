@@ -1275,8 +1275,8 @@ function subirFoto() {
 
 document.getElementById('remitoInput').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
-        event.preventDefault(); // Prevenir el comportamiento por defecto del Enter
-        document.getElementById('fotoRemitoInput').click(); // Simular clic en el input de archivo
+        event.preventDefault(); 
+        document.getElementById('fotoRemitoInput').click(); 
     }
 });
 
