@@ -5289,7 +5289,7 @@ input[disabled] {
 }
 
 .percentage-card {
-    background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+    background: linear-gradient(to bottom, #fff, #c2d3e9); 
     border: 1px solid #d0d0d0;
     border-radius: 12px;
     padding: 10px;
