@@ -308,7 +308,9 @@ function calcularPorcentajes(data) {
         </span>
     </div>
     `;
-}function eliminarFila(button) {
+}
+
+function eliminarFila(button) {
     const row = button.closest('tr');
     
     Swal.fire({
