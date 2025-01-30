@@ -1591,6 +1591,7 @@ p.card-text{
     text-wrap: wrap !important;
 }
 .cpLocalidadBna {
+    max-width: 70%;
     font-family: "Chakra Petch", sans-serif !important;
     padding: 6px 12px !important;
     font-size: 0.85rem;
@@ -1635,18 +1636,24 @@ p.card-text{
 }
 
 .correo-andesmar {
+    min-width: 30px;
+    min-height: 30px;
     background-color: #007aff;
     color: white;
     border: solid 1px #007aff;
 }
 
 .correo-cds {
+    min-width: 30px;
+    min-height: 30px;
     background-color: #003366;
     color: white;
     border: solid 1px #03284d;
 }
 
 .correo-andreani {
+    min-width: 30px;
+    min-height: 30px;
     background-color: #ff3b30;
     color: white;
     border: solid 1px #ff3b30;
@@ -1761,6 +1768,7 @@ p.card-text:nth-child(9){
     background-color: red;
     width: fit-content;
     border-radius:5px;
+    margin-bottom: 5px;
     padding: .2rem;
 }
 
