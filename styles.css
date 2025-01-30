@@ -3011,11 +3011,12 @@ div.card-body > p > i{
 
 /* FIN MODAL ANDESMAR */
 
-.import-container{
+.import-container {
     margin-bottom: 1rem;
     padding: 1rem;
-    border: cornflowerblue 2px dashed;
+    border-bottom: cornflowerblue 2px solid;
     border-radius: 15px;
+    background: linear-gradient(to top, rgb(183, 207, 250), rgb(221, 232, 252),white, white);
 }
 
 .icon-gray {
