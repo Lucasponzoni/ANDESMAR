@@ -480,7 +480,7 @@ searchInput.addEventListener("input", function() {
     
     // Restablecer la paginación a la primera página
     currentPage = 1;
-    currentPageGroup = 0;  // También restablecemos el grupo de páginas
+    currentPageGroup = 0; 
 
     // Filtrar los datos
     const filteredData = allData.filter(item => {
@@ -489,9 +489,13 @@ searchInput.addEventListener("input", function() {
         );
     });
     
+    // Limpiar el contenedor de tarjetas antes de renderizar las nuevas tarjetas
+    const cardsContainer = document.getElementById("meli-cards");
+    cardsContainer.innerHTML = '';
+
     // Si no se encuentra ningún resultado, mostrar una imagen de error
     if (filteredData.length === 0) {
-        document.getElementById("meli-cards").innerHTML = `
+        cardsContainer.innerHTML = `
             <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
                 <p class="errorp">No se encontraron resultados para "${searchTerm}"</p>
                 <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
