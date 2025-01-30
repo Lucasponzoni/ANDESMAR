@@ -997,8 +997,10 @@ const isSkuIncluded = skusList.includes(data[i].sku);
     })()}
 </div>
 
-                            <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isCDS|| isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
-                            ${(isAndreani || isAndesmar || isCDS || isLogPropia) ? 'Preparado' : 'Pendiente'}
+                            <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isCDS || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
+                                ${(isAndreani || isAndesmar || isCDS || isLogPropia) ? 
+                                    '<i class="bi bi-check-circle-fill margen-icon"></i> Preparado' : 
+                                    '<i class="bi bi-stopwatch-fill margen-icon"></i> Pendiente'}
                             </div>
 
                             <div class="em-state-bna"><img id="TiendaBNA" src="./Img/bna-logo.png"></div>
@@ -1088,22 +1090,10 @@ const isSkuIncluded = skusList.includes(data[i].sku);
     </div>
 </div>
 
-
-                            <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
-                                ${isLogPropia ? 
-                                'Logística Propia' : 
-                                (isCDS ? 
-                                `<a href="${data[i].trackingLink}" target="_blank">CDS: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                (isAndreani ? 
-                                `<a href="${data[i].trackingLink}" target="_blank">Andreani: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                (isAndesmar ?
-                                `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                'Número de Envío Pendiente')))}
-                            </p>
-
                             <div class="factura-status em-circle-state-time ${isParaFacturar ? 'facturable' : ''}" id="factura-status-${data[i].id}">
                                 ${mensajeFactura}
                             </div>
+
 
                             <!-- Botón para mostrar/ocultar el detalle del producto -->
                             <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleProducto-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleProducto-${data[i].id}">
@@ -1181,7 +1171,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             <!-- Contenido del colapso -->
                             <div class="collapse" id="collapseDetallePago-${data[i].id}">
                                 <div class="pago p-2 mt-2 mb-2"">
-                                    <p class="card-text-pago"><strong>Entidad: ${data[i].brand_name || 'N/A'}</p>
+                                    <p class="card-text-pago"><strong>Entidad:</strong> ${data[i].brand_name || 'N/A'}</p>
                                     <p class="card-text-pago"><strong>Cuotas:</strong> ${data[i].cuotas || 'N/A'}</p>
                                     <p class="card-text-pago"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
                                     
@@ -1217,7 +1207,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
 </p>
 
                             <!-- Contenedor gris con CUPON y AUTORIZACION -->
-                            <div class="bg-light p-3 mb-2 rounded" style="border: solid 1px #dc3545;">
+                            <div class="contenedor-pago bg-light p-3 mb-2 rounded" style="border-bottom: solid 2px #dc3545;">
                             <div class="mb-3 text-center">
                             <strong class="text-primary">CUPON:</strong>
                             <div class="d-flex justify-content-center align-items-center">
@@ -1260,7 +1250,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                                 </div>
                             </div>
         
-                            <button class="btn btn-secondary btn-sm w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
+                            <button class="btn btn-secondary btn-sm w-100 mb-1 observaciones-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
                                 <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
                             </button>
                             <div class="collapse" id="collapseObservaciones-${data[i].id}">
@@ -1277,7 +1267,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             </div>
 
                     <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
-                        <option value="">Seleccione un producto</option>
+                        <option value="">Seleccione un producto ⤵</option>
                         <option value="heladera">Heladera</option>
                         <option value="cocina">Cocina</option>
                         <option value="hornoEmpotrable">Horno Empotrable</option>
@@ -1319,7 +1309,20 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                         <option value="bulto30">Bulto Pequeño 30x30</option>
                         <option value="bulto40">Bulto Pequeño 40x40</option>
                         <option value="bulto50">Bulto Pequeño 50x50</option>
-                    </select>     
+                    </select>   
+                    
+                    
+                            <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
+                                ${isLogPropia ? 
+                                'Logística Propia' : 
+                                (isCDS ? 
+                                `<a href="${data[i].trackingLink}" target="_blank">CDS: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                (isAndreani ? 
+                                `<a href="${data[i].trackingLink}" target="_blank">Andreani: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                (isAndesmar ?
+                                `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                'Número de Envío Pendiente')))}
+                            </p>
         
                             <div class="medidas"></div> <!-- Div para las medidas -->
 

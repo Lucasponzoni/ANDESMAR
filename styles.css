@@ -773,13 +773,47 @@ button:hover {
     margin-bottom: 10px;
 }
 
-.tipoElectrodomesticoBna{
+
+.tipoElectrodomesticoBna {
     font-family: "Roboto", sans-serif;
-    color: grey;
-    border: 1px solid grey;
-    border-radius: 4px;
-    font-weight: 600;
-    margin-bottom: 5px;
+    color: #333;
+    font-weight: 600 !important;
+    background-color: #e6f7ff; 
+    border: 1px solid #66b2ff;
+    border-radius: 12px !important;
+    padding: 8;
+    font-weight: 500;
+    margin-bottom: 5px !important;
+    appearance: none; 
+    -webkit-appearance: none; 
+    -moz-appearance: none; 
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    width: 100%; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+}
+
+.tipoElectrodomesticoBna:hover {
+    background-color: #cceeff; 
+    border-color: #3399ff; 
+}
+
+.tipoElectrodomesticoBna:focus {
+    outline: none;
+    border-color: #0056b3; 
+    background-color: #b3e0ff; 
+}
+
+.tipoElectrodomesticoBna::after {
+    content: '\25BC'; /* Down arrow */
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 12px;
+    color: #333;
 }
 
 .mb-2{
@@ -1695,15 +1729,30 @@ p.card-text:nth-child(9){
 .pago{
     background-color: white;
     border-radius: 10px;
-    border: dashed 2px cornflowerblue;
+    border-bottom: solid 2px cornflowerblue;
     padding: .5rem;
+    font-size: 14px !important;
+}
+
+.pago > p{
+    font-size: 14px !important;
+}
+
+.contenedor-pago{
+    background-color: rgb(255, 231, 231) !important;
 }
 
 .facturacion{
     background-color: white;
     border-radius: 10px;
-    border: dashed 2px cornflowerblue;
+    border-bottom: solid 2px cornflowerblue;
     padding: .5rem;
+}
+
+
+.facturacion > p{
+    font-size: 14px !important;
+    margin-bottom: -5px;
 }
 
 .facturacion p:nth-child(1){
@@ -1722,7 +1771,8 @@ p.card-text:nth-child(9){
 .strong-costo{
     font-weight: 900;
     color: green;
-    border: dashed 1px green;
+    border-bottom: solid 1px green;
+    background-color: rgb(225, 255, 225);
     padding: 5px;
     border-radius: 5px;
 }
@@ -1732,12 +1782,13 @@ p.card-text:nth-child(9){
     color: green;
 }
 
-.pago p:nth-child(7){
+.pago p:nth-child(8){
     color: white;
     font-weight: 800;
     background-color: red;
     width: fit-content;
     border-radius:5px;
+    font-size: 16px !important;
     padding: .2rem;
 }
 
@@ -2298,7 +2349,7 @@ div.card-body > p > i{
     font-weight: 800;
     font-size: .9rem;
     padding: 8px 10px;
-    border-radius: 5px; 
+    border-radius: 0 0 15px 15px; 
     position: relative; 
     background-color: #007AFF; 
     margin-bottom: 5px;
@@ -2315,7 +2366,7 @@ div.card-body > p > i{
     font-size: .9rem;
     margin-bottom: 5px;
     padding: 8px 10px; 
-    border-radius: 5px; 
+    border-radius: 0 0 15px 15px; 
     position: relative; 
     background-color: #34C759; 
     text-transform: uppercase;
@@ -2375,46 +2426,54 @@ div.card-body > p > i{
     margin-right: 3px;
 }
 
-.em-circle-state3{
+.em-circle-state3 {
     font-family: "Reddit Sans Condensed", sans-serif;
     font-weight: 900;
-    font-size: .8rem;
+    font-size: 1rem;
     padding-inline: 5px;
-    padding: 5px;
-    border-radius: 10px;
+    padding: 10px;
+    border-radius: 15px 0 15px 0;
     position: absolute;
-    top: -15px; 
-    right: 90px;
-    background-color: orangered;
+    bottom: 0; 
+    right: 0;
     text-transform: uppercase;
-    color: white;
+    color: rgb(243, 243, 243);
+    border-top: 1px solid rgb(251, 92, 34);
+    background-color: orangered;
     display: flex; 
     align-items: center; 
     justify-content: center;
     height: 30px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .em-circle-state4{
-    font-weight: 900;
     font-family: "Reddit Sans Condensed", sans-serif;
-    font-size: .8rem;
+    font-weight: 900;
+    font-size: 1rem;
     padding-inline: 5px;
-    padding: 5px;
-    border-radius: 10px;
+    padding: 10px;
+    border-radius: 15px 0 15px 0;
     position: absolute;
-    top: -15px; 
-    right: 90px;
-    background-color: green;
+    bottom: 0; 
+    right: 0;
     text-transform: uppercase;
-    color: white;
+    background-color: green;
+    color: rgb(243, 243, 243);
+    border-top: 1px solid greenyellow;
     display: flex; 
     align-items: center; 
     justify-content: center;
     height: 30px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .botonesMeli{
     gap: 5px;
+}
+
+.margen-icon{
+    margin-right: 5px;
 }
 
 .spinner-large {
@@ -2555,12 +2614,12 @@ div.card-body > p > i{
     font-size: 1rem;
     height: 30px;
     padding-inline: 5px;
-    padding: 5px;
-    border-radius: 10px;
+    padding: 10px;
+    border-radius: 0 15px 0 15px;
     position: absolute;
-    top: -15px; 
-    right: 10px;
-    border: solid 1px #ccc;
+    top: 0px; 
+    right: 0px;
+    border-bottom: solid 2px #ccc;
     background-color: white;
     display: flex; 
     align-items: center; 
@@ -2994,7 +3053,24 @@ div.card-body > p > i{
 /* FIN SUGERENCIAS BNA */
 
 .btn-bna-collapse{
+    min-height: 35px;
+    font-weight: 600;
+    font-size: .8rem;
     margin-top: 0 !important;
+    border-radius: 15px;
+}
+
+.observaciones-btn{
+    border-radius: 15px;
+    min-height: 35px;
+    font-weight: 600;
+    font-size: .8rem;
+}
+
+.btn-bna-collapse:hover{
+    color: whitesmoke !important;
+    background-color: #007AFF !important;
+    border: 1px solid #0052ab !important;
 }
 
 .ios-card-text {
@@ -4252,12 +4328,11 @@ input[disabled] {
     align-items: center;
     background-color: white; /* Color de fondo claro */
     border: 1px solid #ccc; /* Borde gris claro */
-    border-radius: 0 0 15px 15px; /* Bordes redondeados */
+    border-radius: 0 0 0px 0px; /* Bordes redondeados */
     padding: 15px; /* Espaciado interno */
     padding-top: 2px;
-    padding-bottom: 2px;
+    padding-bottom: 0px;
     margin-top: -5px !important;
-    margin-bottom: 5px;
 }
 
 .contenedor-switches div{
