@@ -674,7 +674,7 @@ function crearCard(data) {
     </div>
 
     <!-- Botón Cruz del Sur -->
-        <button class="btn ${isCDS ? 'btn-success' : 'btn-dark-blue'} btnCDSMeli" 
+        <button class="btn mb-1 ${isCDS ? 'btn-success' : 'btn-dark-blue'} btnCDSMeli" 
         id="CDSButton${data.idOperacion}" 
         ${isAndesmar || isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
