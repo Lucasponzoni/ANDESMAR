@@ -2380,48 +2380,54 @@ async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, call
     textCDS.innerText = 'Generando Etiqueta...';
     button.disabled = true
 
-    // Inicializar el array de bultos
-const bultos = [];
 
 // Verificar si el tipo de electrodoméstico es uno de los splits
 const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; 
 const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
 const isSplit = splitTypes.includes(tipoElectrodomestico);
 
-// Inicializar cantidadKits
-let cantidadKitsParsed = 0;
+    // Inicializar cantidadKits
+    let cantidadKitsParsed = 0;
 
-// Preguntar si incluye kit de instalación solo si es un split
-if (isSplit) {
-    const { value: incluyeKit } = await Swal.fire({
-        title: '¿Incluye kit de instalación?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sí',
-        cancelButtonText: 'No'
-    });
+    // Calcular la cantidad de bultos
+    let bultos = cantidad;
 
-    if (incluyeKit) {
-        const { value: cantidadKits } = await Swal.fire({
-            title: 'Cantidad de kits de instalación',
-            input: 'number',
-            inputLabel: 'Ingrese la cantidad de kits',
-            inputAttributes: {
-                min: 1,
-                max: 100
-            },
+    if (isSplit) {
+        // Preguntar si incluye kit de instalación solo si es un split
+        const { value: incluyeKit } = await Swal.fire({
+            title: '¿Incluye kit de instalación?',
+            icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar'
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'No'
         });
 
-        if (cantidadKits === null) {
-            return; // Si el usuario cancela, salir de la función
+        if (incluyeKit) {
+            // Preguntar la cantidad de kits de instalación
+            const { value: cantidadKits } = await Swal.fire({
+                title: 'Cantidad de kits de instalación',
+                input: 'number',
+                inputLabel: 'Ingrese la cantidad de kits',
+                inputAttributes: {
+                    min: 1,
+                    max: 100
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (cantidadKits === null) {
+                // Si el usuario cancela, salir de la función
+                return;
+            }
+
+            cantidadKitsParsed = parseInt(cantidadKits) || 1; // Usar 1 si no es un número válido
+            bultos = (cantidad * 2) + cantidadKitsParsed; // Duplicar bultos si es un split y sumar los kits
+        } else {
+            bultos *= 2; // Duplicar bultos si es un split y no incluye kit
         }
-
-        cantidadKitsParsed = parseInt(cantidadKits) || 1; // Usar 1 si no es un número válido
-    }}
-
+    }
 
     console.log(`Enviando datos a Cruz del Sur:
         Volumen en m³: ${volumenM3}, Alto: ${altoA}, Ancho: ${anchoA}, Largo: ${largoA}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
@@ -2429,7 +2435,7 @@ if (isSplit) {
         Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
     `);
 
-    const urlCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenCm3}&peso=${peso}&codigopostal=${cp}&localidad=${localidad}&valor=${precio_venta}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${remito}&nombre=${nombre}&telefono=${telefono}&email=${email}&domicilio=${calle}&bultos=1&referencia=${remito}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
+    const urlCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenCm3}&peso=${peso}&codigopostal=${cp}&localidad=${localidad}&valor=${precio_venta}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${remito}&nombre=${nombre}&telefono=${telefono}&email=${email}&domicilio=${calle}&bultos=${bultos}&referencia=${remito}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
 
     const optionsCds = {
         method: 'GET',
