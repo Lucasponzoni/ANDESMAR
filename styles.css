@@ -1776,6 +1776,10 @@ p.card-text:nth-child(9){
     font-family: "Reddit Sans Condensed", sans-serif;
 }
 
+input[disabled] {
+    border: none !important;
+}
+
 .strong-costo{
     font-weight: 900;
     color: green;
