@@ -13,6 +13,25 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+let idCDS, usuarioCDS, passCDS;
+
+const obtenerCredencialesCDS = async () => {
+    try {
+        const snapshot = await window.dbCDS.ref('LogiPaq').once('value');
+        const data = snapshot.val();
+        idCDS = data[3];
+        usuarioCDS = data[4];
+        passCDS = data[5];
+        console.log(`CDS Credentials OK`);
+    } catch (error) {
+        console.error('Error al obtener credenciales de Firebase:', error);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await obtenerCredencialesCDS();
+});
+
 // CARGA SKU
 // Función para cargar SKU desde Firebase
 function cargarSKUs() {
@@ -347,7 +366,7 @@ function loadEnviosFromFirebase() {
     // Cargar SKUs desde Firebase
     firebase.database().ref('imei/').once('value')
         .then(skuSnapshot => {
-            skusList = []; // Reiniciar skusList
+            skusList = [];
             skuSnapshot.forEach(childSnapshot => {
                 skusList.push(childSnapshot.val().sku);
             });
@@ -356,8 +375,8 @@ function loadEnviosFromFirebase() {
             return firebase.database().ref('enviosBNA').once('value');
         })
         .then(snapshot => {
-            allData = []; // Asegúrate de reiniciar allData
-            let sinPrepararCount = 0; // Contador para las tarjetas sin preparar
+            allData = []; 
+            let sinPrepararCount = 0; 
             let sinFacturarCount = 0;
 
         snapshot.forEach(function(childSnapshot) {
@@ -383,6 +402,8 @@ function loadEnviosFromFirebase() {
                 orden_publica_: (data.orden_publica_),
                 brand_name: capitalizeWords(data.brand_name),
                 cuotas: (data.cuotas),
+                cotizacion: (data.cotizacion),
+                trackingNumber: (data.trackingNumber),
                 precio_venta: (data.precio_venta),
                 suborden_total: (data.suborden_total),
                 numeros_tarjeta: (data.numeros_tarjeta),
@@ -513,6 +534,7 @@ function renderCards(data) {
         card.className = 'col-md-4 mb-3';
 
         // Verificar si transportCompany es "Andesmar"
+        const isCDS = data[i].transportCompany === "Cruz del Sur";
         const isAndesmar = data[i].transportCompany === "Andesmar";
         const isAndreani = data[i].transportCompany === "Andreani"
         const isLogPropia = data[i].transportCompany === "Logistica Propia"
@@ -922,19 +944,19 @@ const isSkuIncluded = skusList.includes(data[i].sku);
        ${data[i].datoFacturacion ? 'disabled' : ''} 
        value="${data[i].datoFacturacion || ''}" />
 
-<div class="button-container">
+<div class="button-container-cds">
     <button id="facturar-automata-${data[i].id}" 
             class="btn ${data[i].cancelado ? 'btn-secondary' : (data[i].datoFacturacion ? 'btn-success' : 'btn-primary')}" 
             onclick="marcarFacturado2('${data[i].id}')"
             ${data[i].cancelado ? 'disabled' : (data[i].datoFacturacion ? 'disabled' : '')}>
-        ${data[i].cancelado ? '<i class="bi bi-x-octagon"></i> Sin facturar Cancelado' : (data[i].datoFacturacion ? '<i class="bi bi-check2-circle"></i> Producto ya Facturado' : '<i class="bi bi-check-circle-fill"></i> Facturar Automata')}
+        ${data[i].cancelado ? '<i class="bi bi-x-octagon"></i> Sin facturar Cancelado' : (data[i].datoFacturacion ? '<i class="bi bi-check2-circle"></i> Ya Facturado' : '<i class="bi bi-robot"></i> Facturar')}
     </button>
 
     <button id="cancelar-venta-${data[i].id}" 
         class="btn ${data[i].cancelado ? 'btn-success' : (data[i].datoFacturacion ? 'btn-secondary' : 'btn-danger')}" 
         onclick="marcarCancelado2('${data[i].id}')"
         ${data[i].datoFacturacion ? 'disabled' : ''}>
-    ${data[i].cancelado ? '<i class="bi bi-check2-circle"></i> Venta Cancelada' : '<i class="bi bi-x-square-fill"></i> Cancelar Venta'}
+    ${data[i].cancelado ? '<i class="bi bi-check2-circle"></i> Venta Cancelada' : '<i class="bi bi-x-square-fill"></i> Cancelar'}
     </button>
 
     <button type="button" 
@@ -957,7 +979,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
 
 
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body card-body-bna">
 
 <div class="em-circle-state5">
     ${(() => {
@@ -975,24 +997,24 @@ const isSkuIncluded = skusList.includes(data[i].sku);
     })()}
 </div>
 
-                            <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
-                            ${(isAndreani || isAndesmar || isLogPropia) ? 'Preparado' : 'Pendiente'}
+                            <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isCDS|| isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
+                            ${(isAndreani || isAndesmar || isCDS || isLogPropia) ? 'Preparado' : 'Pendiente'}
                             </div>
 
                             <div class="em-state-bna"><img id="TiendaBNA" src="./Img/bna-logo.png"></div>
                             <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
                                                 <div class="d-flex align-items-center">
                             
-                            
+
+                            <p class="card-text cpLocalidadBna mb-0 me-2">
+                            ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}
+                            </p>
+
                             <p class="card-text correo-meli ${cpsAndesmar.includes(Number(data[i].cp)) ? 'correo-andesmar' : 'correo-andreani'}">
                             ${cpsAndesmar.includes(Number(data[i].cp)) ? 
                             '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
                             '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
                             }
-                            </p>
-
-                            <p class="card-text cpLocalidadBna mb-0 me-2">
-                            ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}
                             </p>
 
                             <button class="btn btn-sm btn-" style="color: #007bff;" id="edit-localidad-${data[i].id}">
@@ -1009,16 +1031,16 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                 <div id="direccion-bna" class="ios-card">
                     
                     <p class="ios-card-text">
-                        <i class="bi bi-house ios-icon"></i> Calle: 
-                                         <span class="text-content">${data[i].calle2}</span>
+                        <i class="bi bi-house ios-icon"></i>
+                                         <span class="text-content"> ${data[i].calle2}</span>
                         <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].calle2}')">
                             <i class="bi bi-clipboard icon-gray"></i>
                         </button>
                     </p>
 
                     <p class="ios-card-text">
-                        <i class="bi bi-telephone ios-icon"></i> Teléfono: 
-                        <span class="text-content">${data[i].telefono}</span>
+                        <i class="bi bi-telephone ios-icon"></i>  
+                        <span class="text-content"> ${data[i].telefono}</span>
                         <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].telefono}')">
                             <i class="bi bi-clipboard icon-gray"></i>
                         </button>
@@ -1026,7 +1048,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
 
                     <p class="ios-card-text email-container">
                         <i class="bi bi-envelope ios-icon"></i> 
-                        <span class="text-content">${data[i].email}</span>
+                        <span class="text-content"> ${data[i].email}</span>
                         <button class="btn btn-link" onclick="navigator.clipboard.writeText('${data[i].email}')">
                                                <i class="bi bi-clipboard icon-gray"></i>
                                            </button>
@@ -1070,11 +1092,13 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
                                 ${isLogPropia ? 
                                 'Logística Propia' : 
+                                (isCDS ? 
+                                `<a href="${data[i].trackingLink}" target="_blank">CDS: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
                                 (isAndreani ? 
                                 `<a href="${data[i].trackingLink}" target="_blank">Andreani: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                (isAndesmar ? 
+                                (isAndesmar ?
                                 `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                'Número de Envío Pendiente'))}
+                                'Número de Envío Pendiente')))}
                             </p>
 
                             <div class="factura-status em-circle-state-time ${isParaFacturar ? 'facturable' : ''}" id="factura-status-${data[i].id}">
@@ -1299,15 +1323,19 @@ const isSkuIncluded = skusList.includes(data[i].sku);
         
                             <div class="medidas"></div> <!-- Div para las medidas -->
 
-                            <!-- Botón Logística Propia --> 
-                            <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
-                            id="LogPropiaMeliButton${data[i].id}" 
-                            ${data[i].cancelado ? 'disabled' : ''} 
-                            onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
-                            <span>
-                            ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
-                            </span>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
+                            <div class="bg-Hr-primary mb-1">
+                            <p><i class="bi bi-tags-fill"></i> Logistica Privada</p>
+                            </div>
+
+                            <!-- Botón Cruz del Sur --> 
+                            <button class="mt-1 btn btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'}"
+                                id="CDSButton${data[i].id}" 
+                                ${isAndreani || isAndesmar || data[i].cancelado ? 'disabled' : ''}
+                                onclick="${isCDS ? `descargarEtiquetaCDS('${data[i].cotizacion}', '${data[i].trackingNumber}', '${data[i].id}')` : `enviarDatosCDS('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
+                                <span id="CDSText${data[i].id}">
+                                ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
+                                </span>
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerCDS${data[i].id}" style="display:none;"></span>
                             </button>
 
                             <!-- Botón Andesmar -->          
@@ -1316,7 +1344,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             ${isAndreani || data[i].cancelado ? 'disabled' : ''} 
                             ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
                             <span id="andesmarText${data[i].id}">
-                            ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
+                            ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
                             </span>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
                             </button>
@@ -1327,9 +1355,24 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             ${isAndesmar || data[i].cancelado ? 'disabled' : ''} 
                             onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
                             <span id="andreaniText${data[i].id}">
-                            ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
+                            ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
                             </span>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
+                            </button>
+
+                            <div class="bg-Hr-primary">
+                            <p><i class="bi bi-tags-fill"></i> Logistica Propia</p>
+                            </div>
+
+                            <!-- Botón Logística Propia --> 
+                            <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
+                            id="LogPropiaMeliButton${data[i].id}" 
+                            ${data[i].cancelado ? 'disabled' : ''} 
+                            onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
+                            <span>
+                            ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
+                            </span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
                             </button>
 
                            <div id="resultado${data[i].id}" class="mt-2 errorMeliBna">
@@ -2164,7 +2207,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             const linkSeguimiento2 = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}&tipo=remito&cod=`;
 
             // Actualizar el texto del botón
-            text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
+            text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${data.NroPedido}`;
             button.classList.remove('btn-primary');
             button.classList.add('btn-success');
             button.onclick = () => window.open(linkEtiqueta, '_blank');
@@ -2252,6 +2295,292 @@ function addUpdateObservacionesEvent() {
         });
     });
 }
+
+// BOTON CRUZ DEL SUR
+async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
+    
+    // Redondear el precio_venta y convertirlo a un entero
+    const precioVentaRedondeado = Math.round(precio_venta);
+
+    // Calcular el precio sin IVA (suponiendo un IVA del 21%)
+    const tasaIVA = 0.21;
+    const precioSinIVA = parseFloat((precioVentaRedondeado / (1 + tasaIVA)).toFixed(2)); 
+
+    console.log(`Precio con IVA: ${precioVentaRedondeado}, Precio sin IVA: ${precioSinIVA}`);
+
+    // Obtener los elementos de volumen
+    const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
+    const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
+
+    // Comprobar si los elementos existen
+    if (!volumenCm3Elemento || !volumenM3Elemento) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'Debe seleccionar un producto del listado.',
+            confirmButtonText: 'OK'
+        });
+        return; // Salir de la función si no se seleccionó un producto
+    }
+
+    // Obtener los valores de texto
+    const volumenCm3Texto = volumenCm3Elemento.textContent;
+    const volumenM3Texto = volumenM3Elemento.textContent;
+
+    const altoA = document.getElementById(`alto-${id}`).value;
+    const anchoA = document.getElementById(`ancho-${id}`).value;
+    const largoA = document.getElementById(`largo-${id}`).value;
+    const cantidad = document.getElementById(`cantidad-${id}`).value;
+    const peso = document.getElementById(`peso-${id}`).value;
+
+    // Comprobar si los elementos existen y asignar null si no existen
+    const altoInterior = document.getElementById(`altoInterior-${id}`) ? document.getElementById(`altoInterior-${id}`).value : null;
+    const anchoInterior = document.getElementById(`anchoInterior-${id}`) ? document.getElementById(`anchoInterior-${id}`).value : null;
+    const largoInterior = document.getElementById(`largoInterior-${id}`) ? document.getElementById(`largoInterior-${id}`).value : null;
+
+    const observaciones = document.getElementById(`observaciones-${id}`).value;
+
+    // Extraer los números de los textos (eliminar 'cm³' y 'm³')
+    const volumenCm3 = parseInt(volumenCm3Texto.replace(' cm³', ''));
+    const volumenM3 = parseFloat(volumenM3Texto.replace(' m³', ''));
+
+    const button = document.getElementById(`CDSButton${id}`);
+    const buttonCDS = document.getElementById(`CDSButton${id}`);
+    const spinnerCDS = document.getElementById(`spinnerCDS${id}`);
+    const textCDS = document.getElementById(`CDSText${id}`);
+    const resultadoDiv = document.getElementById(`resultado${id}`);
+    const envioState = document.getElementById(`estadoEnvio${id}`);
+    const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
+    const queEntregaCds = "E";
+
+    // Verificar si los volúmenes son nulos o no válidos
+    if (isNaN(volumenCm3) || isNaN(volumenM3)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'Debe seleccionar un producto del listado.',
+            confirmButtonText: 'OK'
+        });
+        return; // Salir de la función si no se seleccionó un producto
+    }
+
+    console.log(`Enviando datos a Cruz del Sur:
+            Volumen en m³: ${volumenM3}, Alto: ${altoA}, Ancho: ${anchoA}, Largo: ${largoA}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
+            ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
+            Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
+        `);
+    
+    // Calcular el volumen total en m³ multiplicando los lados
+    const volumenTotalcds = (altoA * anchoA * largoA) / 1000000; 
+    
+    console.log(`Volumen Total en m³: ${volumenTotalcds}`);
+
+    // Mostrar spinner y cambiar texto
+    spinnerCDS.style.display = 'inline-block';
+    textCDS.innerText = 'Generando Etiqueta...';
+    button.disabled = true
+
+    // Inicializar el array de bultos
+const bultos = [];
+
+// Verificar si el tipo de electrodoméstico es uno de los splits
+const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; 
+const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
+const isSplit = splitTypes.includes(tipoElectrodomestico);
+
+// Inicializar cantidadKits
+let cantidadKitsParsed = 0;
+
+// Preguntar si incluye kit de instalación solo si es un split
+if (isSplit) {
+    const { value: incluyeKit } = await Swal.fire({
+        title: '¿Incluye kit de instalación?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No'
+    });
+
+    if (incluyeKit) {
+        const { value: cantidadKits } = await Swal.fire({
+            title: 'Cantidad de kits de instalación',
+            input: 'number',
+            inputLabel: 'Ingrese la cantidad de kits',
+            inputAttributes: {
+                min: 1,
+                max: 100
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (cantidadKits === null) {
+            return; // Si el usuario cancela, salir de la función
+        }
+
+        cantidadKitsParsed = parseInt(cantidadKits) || 1; // Usar 1 si no es un número válido
+    }}
+
+
+    console.log(`Enviando datos a Cruz del Sur:
+        Volumen en m³: ${volumenM3}, Alto: ${altoA}, Ancho: ${anchoA}, Largo: ${largoA}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
+        ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
+        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
+    `);
+
+    const urlCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenCm3}&peso=${peso}&codigopostal=${cp}&localidad=${localidad}&valor=${precio_venta}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${remito}&nombre=${nombre}&telefono=${telefono}&email=${email}&domicilio=${calle}&bultos=1&referencia=${remito}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
+
+    const optionsCds = {
+        method: 'GET',
+        headers: {
+            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+        }
+    };
+
+    try {
+        const responseCds = await fetch(urlCds, optionsCds);
+        const dataCds = await responseCds.json();
+        console.log(dataCds); // Para depuración
+
+        // Manejo de la respuesta
+        if (dataCds.Respuesta[0].Estado === 0) {
+            const numeroCotizacionCds = dataCds.Respuesta[0].NumeroCotizacion;
+            const nicCds = dataCds.Respuesta[0].NIC;
+
+            const buttonId = `CDSButton${id}`;
+
+            // Actualizar el botón con el NIC
+            const buttonElement = document.getElementById(buttonId);
+            if (buttonElement) {
+                buttonElement.innerHTML = `
+                    Orden NIC-${nicCds} <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                `;
+                buttonElement.disabled = true; // Mantener el botón deshabilitado
+                buttonCDS.classList.remove('btn-dark-blue');
+                buttonCDS.classList.add('btn-secondary');
+            }
+            
+            
+            // Llamar a la API para descargar la etiqueta
+            await descargarEtiquetaCDS(numeroCotizacionCds, nicCds, buttonId);
+            buttonCDS.classList.remove('btn-secondary');
+            buttonCDS.classList.add('btn-success');
+
+            const trackingLink = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${nicCds}`;
+            NroEnvio.innerHTML = `<a href="${trackingLink}" target="_blank">CDS: NIC-${nicCds} <i class="bi bi-box-arrow-up-right"></i></a>`;
+            const numeroDeEnvioCDS = `NIC-${nicCds}`;
+            trackingNumber = `${nicCds}`;
+
+                        // Pushear datos a Firebase
+                        const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
+                        const transportData = {
+                            transportCompany: "Cruz del Sur",
+                            trackingNumber: trackingNumber,
+                            trackingLink: trackingLink,
+                            cotizacion: numeroCotizacionCds,
+                            transportCompanyNumber: numeroDeEnvioCDS,
+                        };
+                        
+                          db.ref(`enviosBNA/${id}`).update(transportData)
+                            .then(() => {
+                                console.log("Datos actualizados en Firebase como Andreani:", transportData);
+                            })
+                            .catch((error) => {
+                                            console.error("Error al actualizar datos en Firebase:", error);
+                            });
+            
+            
+                        // Cambiar el estado del envío
+                        if (envioState) {
+                            envioState.className = 'em-circle-state4';
+                            envioState.innerHTML = `Preparado`;
+                        }
+
+                        const Name = `Confirmación de Envio BNA`;
+                        const Subject = `Tu compra BNA+ ${remito} ya fue preparada para despacho`;
+                        const template = "emailTemplateAndreani";
+                        const transporte = "Correo Cruz del Sur";
+                        const numeroDeEnvio = `NIC-${nicCds}`;
+                        const linkSeguimiento2 = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${nicCds}`;
+            
+                        // Enviar el email después de procesar el envío
+                        await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);            
+ 
+        } else {
+            // Manejo de otros estados de error
+            console.error("Error en la respuesta:", dataCds);
+            buttonCDS.classList.remove('btn-dark-blue');
+            buttonCDS.classList.add('btn-danger', 'disabled');
+            spinnerCDS.style.display = 'none';
+            textCDS.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Error al generar Etiqueta';
+            resultadoDiv.innerText = `Error: ${dataCds.Respuesta[0].Descripcion}`; 
+        }
+    } catch (error) {
+        console.error("Error al crear la cotización:", error);
+        document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al crear la cotización. Por favor, intenta nuevamente.";
+        buttonCDS.classList.remove('btn-dark-blue');
+        buttonCDS.classList.add('btn-danger', 'disabled');
+        spinnerCDS.style.display = 'none';
+        textCDS.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Error al generar Etiqueta';
+        resultadoDiv.innerText = `Error: ${error.message}`;
+    }
+}
+
+async function descargarEtiquetaCDS(numeroCotizacionCds, nicCds, buttonId) {
+    console.log("Parámetros enviados a descargarEtiqueta:");
+    console.log("Cotización CDS:", numeroCotizacionCds);
+    console.log("Número de seguimiento:", nicCds);
+    console.log("ID de operación:", buttonId);
+
+    const buttonElement = document.getElementById(buttonId);
+
+    const urlEtiquetaCds2 = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&id=${numeroCotizacionCds}&tamanioHoja=2&posicionArrancar=1&textoEspecialPorEtiqueta=`;
+
+    const optionsEtiquetaCds = {
+        method: 'GET',
+        headers: {
+            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+        }
+    };
+
+    try {
+        const responseEtiquetaCds2 = await fetch(urlEtiquetaCds2, optionsEtiquetaCds);
+        if (!responseEtiquetaCds2.ok) throw new Error('Error en la respuesta de la API');
+
+        const blobCds2 = await responseEtiquetaCds2.blob();
+        const urlCds2 = window.URL.createObjectURL(blobCds2);
+
+        // Crear un enlace temporal para descargar el archivo con el nombre correcto
+        const a = document.createElement('a');
+        a.href = urlCds2;
+        a.download = `Etiqueta NIC-${nicCds}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(urlCds2);
+
+        // Actualizar el botón para indicar que la etiqueta está lista para descargar
+        if (buttonElement) {
+            buttonElement.innerHTML = `
+                <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar NIC-${nicCds}
+            `;
+            buttonElement.disabled = false; // Habilitar el botón
+            buttonElement.onclick = () => descargarEtiqueta(numeroCotizacionCds, nicCds, buttonId); // Reasignar el onclick
+        }
+
+    } catch (error) {
+        console.error("Error al descargar la etiqueta:", error);
+        if (document.getElementById("errorResponseCruzDelSur")) {
+            document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al descargar la etiqueta. Por favor, intenta nuevamente.";
+        }
+        // Volver a habilitar el botón en caso de error
+        if (buttonElement) {
+            buttonElement.disabled = false;
+        }
+    }
+}
+// FIN BOTON CRUZ DEL SUR
 
 // Función para enviar datos a la API de Andreani
 const apiUrlLogin = 'https://apis.andreani.com/login';
@@ -2655,7 +2984,7 @@ async function obtenerEtiqueta(numeroDeEnvio, token, buttonAndr) {
 
         buttonAndr.disabled = false;
         buttonAndr.href = pdfUrl; 
-        buttonAndr.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${numeroDeEnvio}`;
+        buttonAndr.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${numeroDeEnvio}`;
         buttonAndr.classList.remove('btn-secondary');
         buttonAndr.classList.add('btn-success');
         buttonAndr.onclick = () => window.open(pdfUrl, '_blank');

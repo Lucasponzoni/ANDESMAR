@@ -1557,19 +1557,19 @@ p.card-text{
     text-wrap: wrap !important;
 }
 .cpLocalidadBna {
-    margin-left: 5px;
-    white-space: nowrap; /* Cambia text-wrap a white-space */
-    overflow: hidden; /* Agrega overflow para ocultar el texto que se sale */
-    text-overflow: ellipsis; /* Mantén esta propiedad */
-    font-family: "Reddit Sans Condensed", sans-serif;
-    text-transform: capitalize;
-    font-size: 0.8rem;
-    font-weight: 400;
-    max-width: 70%; /* Establece un ancho fijo según tus necesidades */
-    background-color: grey;
+    font-family: "Chakra Petch", sans-serif !important;
+    padding: 6px 12px !important;
+    font-size: 0.85rem;
+    font-weight: 400 !important;
+    width: fit-content;
+    background-color: cornflowerblue;
+    border: solid 1px #007aff;
     color: white;
-    border-radius: 8px;
-    padding: 5px;
+    border-radius: 18px;
+    margin-bottom: 8px !important;
+    overflow: hidden;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
 }
 
 .cpLocalidad-meli {
@@ -2428,17 +2428,20 @@ div.card-body > p > i{
     font-family: "Helvetica Neue", Arial, sans-serif;
     font-size: 0.7rem; 
     padding: 3px 8px; 
-    border-radius: 5px; 
-    position: absolute;
-    top: -10px; 
-    left: 10px;
-    background-color: #007AFF;
+    border-radius: 15px 0 15px 0; 
+    position: relative;
+    width: fit-content;
+    margin-bottom: -15px;
+    top: -20px; 
+    left: -20px;
+    right: -20px;
+    background-color: #007bffdd;
     text-transform: uppercase;
     color: white;
     display: flex; 
-    align-items: center; 
+    align-items: flex-end; 
     justify-content: center;
-    height: 24px; 
+    height: 25px; 
 }
 
 .em-circle-state-cliente{
@@ -2645,7 +2648,7 @@ div.card-body > p > i{
 }
 
 .btnCDSMeli{
-    margin-bottom: 5px;
+    height: 38px;
 }
 
 .errorMeli{
@@ -2995,13 +2998,21 @@ div.card-body > p > i{
 }
 
 .ios-card-text {
-    font-size: 16px;
+    font-size: 14px;
     color: #333;
     display: flex;
     align-items: center;
-    margin-bottom: -2px;
+    margin-bottom: -8px;
     width: 100%;
 }
+
+.ios-card-text:nth-child(3) {
+margin-bottom: -2px;
+}
+
+.ios-card-text:nth-child(1) {
+    margin-top: -8px;
+    }
 
 .text-content {
     flex-grow: 1;
@@ -5208,10 +5219,32 @@ input[disabled] {
     align-items: flex-start; 
 }
 
+.button-container-cds {
+    display: flex;
+    align-items: flex-start; 
+}
+
+.button-container-cds > button {
+    text-align: center;
+    text-align: center;
+    margin-right: 4px;
+    height: 48px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
 .btn-dark-blue {
     background-color: #003366; 
     color: white;
     border: none;
+}
+
+.btn-dark-blue:disabled {
+    background-color: #003366;
+    color: white;
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .btn-dark-blue:hover {
@@ -5370,4 +5403,3 @@ img.gray-filter {
     padding: 10px 20px;
     margin-bottom: -20px;
 }
-
