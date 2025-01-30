@@ -1075,7 +1075,20 @@ const isSkuIncluded = skusList.includes(data[i].sku);
     </button>
 
 </div>
-
+                            
+                            <!-- Fin Seguimiento -->
+                            <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
+                                ${isLogPropia ? 
+                                'Logística Propia' : 
+                                (isCDS ? 
+                                `<a href="${data[i].trackingLink}" target="_blank">CDS: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                (isAndreani ? 
+                                `<a href="${data[i].trackingLink}" target="_blank">Andreani: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                (isAndesmar ?
+                                `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                'Número de Envío Pendiente')))}
+                            </p>
+                            <!-- Fin Seguimiento -->
 
 <!-- Nuevo contenedor para los switches -->
 <div class="d-flex contenedor-switches mt-1 justify-content-between">
@@ -1311,18 +1324,6 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                         <option value="bulto50">Bulto Pequeño 50x50</option>
                     </select>   
                     
-                    
-                            <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
-                                ${isLogPropia ? 
-                                'Logística Propia' : 
-                                (isCDS ? 
-                                `<a href="${data[i].trackingLink}" target="_blank">CDS: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                (isAndreani ? 
-                                `<a href="${data[i].trackingLink}" target="_blank">Andreani: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                (isAndesmar ?
-                                `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                'Número de Envío Pendiente')))}
-                            </p>
         
                             <div class="medidas"></div> <!-- Div para las medidas -->
 
