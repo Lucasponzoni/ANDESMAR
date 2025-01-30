@@ -2394,7 +2394,7 @@ div.card-body > p > i{
     font-size: .9rem;
     margin-bottom: 5px;
     padding: 8px 10px; 
-    border-radius: 5px; 
+    border-radius: 0 0 15px 15px; 
     position: relative; 
     background-color: red; 
     text-transform: uppercase;
@@ -2737,7 +2737,7 @@ div.card-body > p > i{
 }
 
 .errorMeliBna{
-    width: 90%;
+    width: 70%;
     font-weight: 800;
     text-align: left;
     font-family: "Chakra Petch", sans-serif;
