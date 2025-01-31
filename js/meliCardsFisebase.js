@@ -397,7 +397,8 @@ function cargarDatos() {
                     estadoFacturacion: data.estadoFacturacion,
                     andesmarId: data.andesmarId,
                     shippingId: data.shippingId,
-                    cotizacion: data.cotizacionCDS
+                    cotizacion: data.cotizacionCDS,
+                    transactionAmount: data.payments?.[0]?.transaction_amount || 0
                 });
             });
 
@@ -500,6 +501,11 @@ function crearCard(data) {
         data.pictures.filter(picture => 
             picture.secure_url // Retener imágenes que tengan secure_url
         ) : [];
+
+    // Función para formatear números en pesos
+    function formatCurrency(amount) {
+    return `$ ${Number(amount).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
 
     // Crear el carrusel
     const carouselId = `carousel-${data.idOperacion}`;
@@ -662,6 +668,7 @@ function crearCard(data) {
                     <div><i class="bi bi-box"></i> Volumen M³: <span id="volumenM3-${data.idOperacion}">${data.VolumenM3}</span> m³</div>
                     <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.idOperacion}">${data.VolumenCM3}</span> cm³</div>
                     <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.idOperacion}">${data.Cantidad}</span></div>
+                    <div><i class="bi bi-currency-dollar"></i> Total: <span id="valor-${data.idOperacion}">${formatCurrency(data.transactionAmount)}</span></div>
                 </div>
 
                     <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.idOperacion}" onclick="editarDatos('${data.idOperacion}')">Editar datos</button>
@@ -705,7 +712,7 @@ function crearCard(data) {
         id="andreaniButton${data.idOperacion}" 
         ${isAndesmar || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
-        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.Recibe}')`}">
+        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.Recibe}', '${data.transactionAmount}')`}">
         <span id="andreaniText${data.idOperacion}">
             ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
         </span>
@@ -1370,7 +1377,7 @@ async function getAuthToken() {
     }
 }
 
-async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe) 
+async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe, valor) 
 {    
     const buttonAndr = document.getElementById(`andreaniButton${id}`);
     const spinnerAndr = document.getElementById(`spinnerAndreani${id}`);
@@ -1398,7 +1405,8 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
         medidas,
         Producto,
         email,
-        recibe
+        recibe,
+        valor,
     });
 
     // Eliminar el prefijo "200000" del idOperacion
@@ -1444,8 +1452,8 @@ for (let i = 0; i < cantidadFinal; i++) {
         "altoCm": altoAnd,
         "anchoCm": anchoAnd,
         "volumenCm": volumenTotal,
-        "valorDeclaradoSinImpuestos": 999999 / 1.21,
-        "valorDeclaradoConImpuestos": 999999,
+        "valorDeclaradoSinImpuestos": valor / 1.21,
+        "valorDeclaradoConImpuestos": valor,
         "referencias": [
             { "meta": "detalle", "contenido": Producto },
             { "meta": "idCliente", "contenido": (idOperacionFinalAndreani + "-MELI").toUpperCase() },
