@@ -1416,7 +1416,14 @@ function loadFolder(folderPath) {
         let itemsToShow = maxItemsToShow;
         const items = [];
         
-        result.prefixes.reverse().forEach((folderRef, index) => {
+        // Ordenar las carpetas por fecha
+        const sortedPrefixes = result.prefixes.sort((a, b) => {
+            const dateA = new Date(a.name.split('/').pop());
+            const dateB = new Date(b.name.split('/').pop());
+            return dateB - dateA; // Orden descendente
+        });
+
+        sortedPrefixes.forEach((folderRef, index) => {
             const listItem = document.createElement('li');
             listItem.className = 'list-group-item d-flex justify-content-between align-items-start';
             listItem.innerHTML = `

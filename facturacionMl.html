@@ -164,12 +164,20 @@
             </div>
             <!-- Fin Comentarios Alert -->
         
-            <div class="error-message" style="display: none;">
-                <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
-                    <p class="errorp">No se encontraron resultados para "<span id="search-term"></span>"</p>
-                    <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
-                </div>
-            </div>                      
+<!-- Agrega este contenedor para mostrar el mensaje de búsqueda -->
+<div id="search-status" class="alert-ios-ml" style="display: none;">
+    <span id="search-message"></span>
+    <span class="spinner-ios-ml" role="status" aria-hidden="true"></span>
+</div>
+
+<!-- Tu div de error existente -->
+<div class="error-message" style="display: none;">
+    <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
+        <p class="errorp">No se encontraron resultados para "<span id="search-term"></span>"</p>
+        <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
+    </div>
+</div>
+                    
     
     <div class="table-responsive">
         <table id="data-table" class="table table-striped">

@@ -16,7 +16,7 @@ const db = firebase.database();
 
 let allData = [];
 let currentPage = 1;
-let itemsPerPage = 200; // Número de elementos por página
+let itemsPerPage = 50; // Número de elementos por página
 let currentPageGroup = 0; // Grupo de páginas actuales
 const paginationContainer = document.getElementById('pagination');
 const searchInput = document.getElementById('searchDespachos');
@@ -64,7 +64,7 @@ db.ref('envios').orderByChild('shippingMode').equalTo('me1').once('value')
 
     // Obtener todos los datos y tomar los últimos 200
     const allData = Object.values(data);
-    const last200Data = allData.slice(-200); // Toma los últimos 200 registros
+    const last200Data = allData.slice(-800); // Toma los últimos 200 registros
 
     // Invertir el orden de los datos
     last200Data.reverse();
@@ -634,57 +634,88 @@ function updatePagination() {
 }
 
 // BUSCADOR
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchFacturacion');
-    const tableBody = document.querySelector('#data-table tbody');
-    const pagination = document.getElementById('pagination');
-    const errorContainer = document.querySelector('.error-message');
-    const searchTermDisplay = document.getElementById('search-term'); // Añade esta línea
+    const searchStatus = document.getElementById('search-status');
+    const searchMessage = document.getElementById('search-message');
+    const errorMessage = document.querySelector('.error-message');
+    const searchTermSpan = document.getElementById('search-term');
 
-    searchInput.addEventListener('input', () => {
-        const filter = searchInput.value.toLowerCase();
-        const rows = tableBody.getElementsByTagName('tr');
-        let hasVisibleRows = false;
+    // Evento para borrar el contenido del buscador al hacer clic y llevar a la página 1
+    searchInput.addEventListener('focus', function() {
+        searchInput.value = '';
+        searchTermSpan.textContent = '';
+        searchStatus.style.display = 'none';
+        searchMessage.textContent = '';
+        errorMessage.style.display = 'none';
+        currentPage = 1; // Llevar a la página 1
+        loadTable(allData); // Volver a cargar todos los datos
+    });
 
-        for (let i = 0; i < rows.length; i++) {
-            const cells = rows[i].getElementsByTagName('td');
-            let rowVisible = false;
+    searchInput.addEventListener('input', async function() {
+        const searchTerm = searchInput.value.toLowerCase();
+        searchTermSpan.textContent = searchTerm;
 
-            for (let j = 0; j < cells.length; j++) {
-                const cell = cells[j];
-                if (cell) {
-                    const cellText = cell.textContent || cell.innerText;
-                    if (cellText.toLowerCase().includes(filter)) {
-                        rowVisible = true;
-                        break;
-                    }
+        if (searchTerm === '') {
+            searchStatus.style.display = 'none';
+            searchMessage.textContent = '';
+            errorMessage.style.display = 'none';
+            currentPage = 1; // Llevar a la página 1
+            loadTable(allData); // Volver a cargar todos los datos
+            return;
+        }
+
+        const totalItems = allData.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        let foundMatch = false;
+
+        searchStatus.style.display = 'flex';
+
+        for (let page = 1; page <= totalPages; page++) {
+            currentPage = page;
+            searchMessage.textContent = `Estoy buscando en el contenido de la página ${page}...`;
+            searchStatus.querySelector('.spinner-ios-ml').style.display = 'block';
+            loadTable(allData);
+            
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            const tableRows = document.querySelectorAll('#data-table tbody tr');
+            const matches = [];
+
+            tableRows.forEach(row => {
+                const state = row.cells[0].textContent.toLowerCase();
+                const operationId = row.cells[2].textContent.toLowerCase();
+                const productName = row.cells[6].textContent.toLowerCase();
+                const paymentMethod = row.cells[7].textContent.toLowerCase();
+
+                if (
+                    state.includes(searchTerm) || 
+                    operationId.includes(searchTerm) || 
+                    productName.includes(searchTerm) || 
+                    paymentMethod.includes(searchTerm)
+                ) {
+                    row.style.display = '';
+                    matches.push(row);
+                } else {
+                    row.style.display = 'none';
                 }
-            }
+            });
 
-            if (rowVisible) {
-                rows[i].style.display = ""; // Muestra la fila
-                hasVisibleRows = true;
+            if (matches.length > 0) {
+                foundMatch = true;
+                searchMessage.innerHTML = `¡Coincidencia encontrada en la página ${page}! <i class="bi bi-check-circle-fill"></i>`;
+                searchStatus.querySelector('.spinner-ios-ml').style.display = 'none';
+                break;
             } else {
-                rows[i].style.display = "none"; // Oculta la fila
+                console.log(`No se encontraron coincidencias en la página ${page}.`);
             }
         }
 
-        // Manejo de la paginación
-        pagination.style.display = filter ? "none" : "";
-
-        // Manejo del mensaje de error
-        if (filter) {
-            if (!hasVisibleRows) {
-                searchTermDisplay.textContent = filter; // Actualiza el contenido del input en el mensaje de error
-                errorContainer.style.display = ''; // Mostrar mensaje de error
-                tableBody.parentElement.style.display = 'none'; // Ocultar la tabla
-            } else {
-                errorContainer.style.display = 'none'; // Ocultar mensaje de error
-                tableBody.parentElement.style.display = ''; // Mostrar la tabla
-            }
+        if (!foundMatch) {
+            searchStatus.style.display = 'none';
+            errorMessage.style.display = 'flex';
         } else {
-            errorContainer.style.display = 'none'; // Ocultar mensaje de error si el input está vacío
-            tableBody.parentElement.style.display = ''; // Mostrar la tabla
+            errorMessage.style.display = 'none';
         }
     });
 });
