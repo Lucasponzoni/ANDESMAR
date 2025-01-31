@@ -398,7 +398,11 @@ function cargarDatos() {
                     andesmarId: data.andesmarId,
                     shippingId: data.shippingId,
                     cotizacion: data.cotizacionCDS,
-                    transactionAmount: data.payments?.[0]?.transaction_amount || 0
+                    installment_amount: data.payments?.[0]?.installment_amount || 0,
+                    payment_method_id: data.payments?.[0]?.payment_method_id || 0,
+                    transactionAmount: data.payments?.[0]?.transaction_amount || 0,
+                    installments: data.payments?.[0]?.installments || 0,
+                    paymentType: data.payments?.[0]?.payment_type || ''
                 });
             });
 
@@ -506,6 +510,60 @@ function crearCard(data) {
     function formatCurrency(amount) {
     return `$ ${Number(amount).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
+
+    const payment = data.payments?.[0] || {};
+
+let paymentMethodImage = '';
+let paymentDetails = '';
+
+switch (data.payment_method_id) {
+    case 'consumer_credits':
+        paymentMethodImage = './Img/mercadocredito.png';
+        paymentDetails = '<strong>Crédito sin tarjeta</strong>';
+        break;
+    case 'account_money':
+        paymentMethodImage = './Img/mercadopago.png';
+        paymentDetails = '<strong>Dinero en Cuenta</strong>';
+        break;
+    case 'visa':
+    case 'debvisa':
+        paymentMethodImage = './Img/visa.png';
+        break;
+    case 'master':
+    case 'debmaster':
+        paymentMethodImage = './Img/master.png';
+        break;
+    case 'amex':
+        paymentMethodImage = './Img/amex.png';
+        break;
+    case 'naranja':
+        paymentMethodImage = './Img/naranja.png';
+        break;
+    case 'cabal':
+    case 'debcabal':
+        paymentMethodImage = './Img/cabal.png';
+        break;
+    case 'pagofacil':
+        paymentMethodImage = './Img/pagofacil.png';
+        paymentDetails = '<strong>PagoFacil Ticket</strong>';
+        break;
+    case 'rapipago':
+        paymentMethodImage = './Img/rapipago.png';
+        paymentDetails = '<strong>RapiPago Ticket</strong>';
+        break;
+}
+
+if (data.payment_method_id !== 'consumer_credits' && data.payment_method_id !== 'account_money' && data.payment_method_id !== 'pagofacil' && data.payment_method_id !== 'rapipago') {
+    const paymentType = data.paymentType === 'credit_card' ? '<strong>Crédito</strong>' : data.paymentType === 'debit_card' ? '<strong>Débito</strong>' : payment.paymentType;
+    paymentDetails = `${paymentType} en ${data.installments} cuota/s de ${formatCurrency(data.installment_amount)}`;
+}
+
+const paymentHTML = `
+    <div class="payment-cell">
+        <img src="${paymentMethodImage}" alt="${payment.payment_method_id}">
+        <span class="payment-details">${paymentDetails}</span>
+    </div>
+`;
 
     // Crear el carrusel
     const carouselId = `carousel-${data.idOperacion}`;
@@ -657,19 +715,26 @@ function crearCard(data) {
                         <strong style="color: #007bff;">Shipping ID:</strong> 
                         <span id="shippingID-${data.idOperacion}">${data.shippingId!== undefined ? data.shippingId : 'Sin ID es ME1'}</span>
                     </div>
+
                     <div style="border-top: 1px solid #ccc; padding-top: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px;">
                         <i class="bi bi-bag-fill"></i> 
                         <strong style="color: #007bff;">Producto:</strong> 
                         <span id="producto-${data.idOperacion}">${data.Producto}</span>
                     </div>
-                    <div><i class="bi bi-code-square"></i> <strong>SKU: </strong><span id="sku-${data.idOperacion}" style="color: #007bff;">${data.SKU}</span></div>
-                    <div><i class="bi bi-arrows-angle-expand"></i> Medidas: <span id="medidas-${data.idOperacion}">${data.medidas}</span></div>
-                    <div><i class="bi bi-box-arrow-in-down"></i> Peso: <span id="peso-${data.idOperacion}">${Math.round(data.Peso / 1000)}</span> kg</div>
-                    <div><i class="bi bi-box"></i> Volumen M³: <span id="volumenM3-${data.idOperacion}">${data.VolumenM3}</span> m³</div>
-                    <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.idOperacion}">${data.VolumenCM3}</span> cm³</div>
-                    <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.idOperacion}">${data.Cantidad}</span></div>
-                    <div><i class="bi bi-coin"></i> Total: <strong id="valor-${data.idOperacion}" style="color: green;">${formatCurrency(data.transactionAmount)}</strong></div>                
+
+                    <div style="border-top: 1px solid #ccc; padding-top: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px;">
+                        <div><i class="bi bi-coin"></i> Total: <strong id="valor-${data.idOperacion}" style="color: green;">${formatCurrency(data.transactionAmount)}</strong></div>
+                        ${paymentHTML}
                     </div>
+
+                        <div><i class="bi bi-code-square"></i> <strong>SKU: </strong><span id="sku-${data.idOperacion}" style="color: #007bff;">${data.SKU}</span></div>
+                        <div><i class="bi bi-arrows-angle-expand"></i> Medidas: <span id="medidas-${data.idOperacion}">${data.medidas}</span></div>
+                        <div><i class="bi bi-box-arrow-in-down"></i> Peso: <span id="peso-${data.idOperacion}">${Math.round(data.Peso / 1000)}</span> kg</div>
+                        <div><i class="bi bi-box"></i> Volumen M³: <span id="volumenM3-${data.idOperacion}">${data.VolumenM3}</span> m³</div>
+                        <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.idOperacion}">${data.VolumenCM3}</span> cm³</div>
+                        <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.idOperacion}">${data.Cantidad}</span></div>
+                    </div>
+
                     <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.idOperacion}" onclick="editarDatos('${data.idOperacion}')">Editar datos</button>
                 </div>
 
