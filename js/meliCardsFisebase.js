@@ -668,9 +668,8 @@ function crearCard(data) {
                     <div><i class="bi bi-box"></i> Volumen M³: <span id="volumenM3-${data.idOperacion}">${data.VolumenM3}</span> m³</div>
                     <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.idOperacion}">${data.VolumenCM3}</span> cm³</div>
                     <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.idOperacion}">${data.Cantidad}</span></div>
-                    <div><i class="bi bi-currency-dollar"></i> Total: <span id="valor-${data.idOperacion}">${formatCurrency(data.transactionAmount)}</span></div>
-                </div>
-
+                    <div><i class="bi bi-coin"></i> Total: <strong id="valor-${data.idOperacion}" style="color: green;">${formatCurrency(data.transactionAmount)}</strong></div>                
+                    </div>
                     <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.idOperacion}" onclick="editarDatos('${data.idOperacion}')">Editar datos</button>
                 </div>
 
