@@ -1418,8 +1418,14 @@ function loadFolder(folderPath) {
         
         // Ordenar las carpetas por fecha
         const sortedPrefixes = result.prefixes.sort((a, b) => {
-            const dateA = new Date(a.name.split('/').pop());
-            const dateB = new Date(b.name.split('/').pop());
+            const extractDate = (name) => {
+                const parts = name.split('/').pop().match(/(\d+)-(\d+)-(\d+)/);
+                return new Date(parts[3], parts[2] - 1, parts[1]); // Año, Mes (0-indexed), Día
+            };
+        
+            const dateA = extractDate(a.name);
+            const dateB = extractDate(b.name);
+        
             return dateB - dateA; // Orden descendente
         });
 
