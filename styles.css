@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Signika:wght@300..700&display=swap');
+
 *{
     font-family: "Roboto", sans-serif;
     font-weight: 500;
@@ -8,9 +11,6 @@
     font-family: 'Modica Oft';
     src: url('./fonts/modica.otf'),
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Signika:wght@300..700&display=swap');
 
 *::selection {
     color: #fce96b;
