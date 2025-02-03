@@ -253,34 +253,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchMercadoLibre');
     const spinner = document.getElementById('spinner');
     const cardsContainer = document.getElementById('meli-cards');
-    const pagination = document.getElementById('pagination'); // Suponiendo que este es el ID del elemento de paginación
+    const pagination = document.getElementById('pagination');
 
     // Guarda el contenido inicial de cardsContainer en localStorage
     if (!localStorage.getItem('initialContent')) {
         localStorage.setItem('initialContent', cardsContainer.innerHTML);
     }
 
-    // Evento para borrar el contenido al hacer clic y restaurar el contenido
     searchInput.addEventListener('click', function() {
-        searchInput.value = ''; // Borra el contenido del input
-
-        // Restaura el contenido inicial desde localStorage
+        searchInput.value = '';
         const initialContent = localStorage.getItem('initialContent');
         if (initialContent) {
             cardsContainer.innerHTML = initialContent;
-            pagination.style.display = 'none'; // Muestra la paginación
+            pagination.style.display = 'block'; 
+    
+            // Simular un clic en la página 1
+            const firstPageLink = document.querySelector('.pagination .page-item:first-child .page-link');
+            if (firstPageLink) {
+                firstPageLink.click();
+            }
         }
     });
-
+    
     searchInput.addEventListener('input', function() {
         const query = searchInput.value.trim();
-
+    
         if (query.length === 0) {
             // Restaura el contenido inicial y muestra la paginación si el input está vacío
             const initialContent = localStorage.getItem('initialContent');
             if (initialContent) {
                 cardsContainer.innerHTML = initialContent;
-                pagination.style.display = 'none'; 
+                pagination.style.display = 'block'; 
+    
+                // Simular un clic en la página 1
+                const firstPageLink = document.querySelector('.pagination .page-item:first-child .page-link');
+                if (firstPageLink) {
+                    firstPageLink.click();
+                }
             }
             return;
         }
@@ -301,13 +310,58 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(snapshot => {
                         const allData = snapshot.val(); 
             
-
                         if (allData) {
-                            // Mostrar los datos en la consola
-                            console.log("Datos completos del nodo:", allData);
-
-                            // Aquí puedes procesar los datos como necesites
-                            renderCards(Object.values(allData));
+                            // Procesar los datos y manejar payments
+                            const processedData = Object.values(allData).map(data => {
+                                const paymentData = Array.isArray(data.payments) && data.payments.length > 0 ? data.payments[0] : {};
+                                
+                                // Verifica si idOperacion está definido
+                                const id = data.idOperacion; 
+                                console.log("Mostrando datos del Nodo: ", allData)
+                                console.log("Operación Mercado Libre: ", id)
+                        
+                                return {
+                                    id: id,
+                                    idOperacion: id,
+                                    Altura: data.Altura,
+                                    Calle: data.Calle,
+                                    Cantidad: data.Cantidad,
+                                    Correosugerido: data.Correosugerido,
+                                    Cp: data.Cp,
+                                    Email: data.email,
+                                    NombreyApellido: data.NombreyApellido ? data.NombreyApellido.toLowerCase() : "sin nombre",
+                                    Observaciones: data.Observaciones,
+                                    Peso: data.Peso,
+                                    Producto: data.Producto,
+                                    Provincia: data.Provincia ? data.Provincia.toLowerCase() : "sin provincia",
+                                    Recibe: data.Recibe,
+                                    pictures: data.pictures,
+                                    SKU: data.SKU,
+                                    Telefono: data.Telefono,
+                                    VolumenCM3: data.VolumenCM3,
+                                    VolumenM3: data.VolumenM3,
+                                    localidad: data.localidad ? data.localidad.toLowerCase() : "sin localidad",
+                                    medidas: data.medidas,
+                                    permalink: data.permalink,
+                                    shippingMode: data.shippingMode,
+                                    nombreDeUsuario: data.nombreDeUsuario,
+                                    transportCompany: data.transportCompany,
+                                    trackingNumber: data.trackingNumber,
+                                    trackingLink: data.trackingLink,
+                                    estadoFacturacion: data.estadoFacturacion,
+                                    andesmarId: data.andesmarId,
+                                    shippingId: data.shippingId,
+                                    cotizacion: data.cotizacionCDS,
+                                    installment_amount: paymentData.installment_amount || 0,
+                                    payment_method_id: paymentData.payment_method_id || 0,
+                                    transactionAmount: paymentData.transaction_amount || 0,
+                                    installments: paymentData.installments || 0,
+                                    paymentType: paymentData.payment_type || ''
+                                };
+                            });
+                        
+                            // Renderizar tarjetas con los datos procesados
+                            renderCards(processedData);
                         } else {
                             console.log("No se encontraron datos para la consulta.");
                             cardsContainer.innerHTML = `
@@ -315,8 +369,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <p class="errorp">No se encontraron resultados para "${query}" en el servidor</p>
                                     <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
                                 </div>
-                            `; // Muestra el mensaje en lugar de restaurar el contenido inicial
-                        }
+                            `;
+                        }                        
 
                         spinner.style.display = 'none';
                     })
@@ -2535,8 +2589,6 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             .Rosario: Entregas en 48 horas.
             .Villa Gobernador Gálvez, Arroyo Seco, San Lorenzo, Baigorria, Capitán Bermúdez: Lunes, miércoles y viernes.
             .Funes, Roldán y Pérez: Sábados. (Sin excepción)
-        
-            Si tienes alguna duda, no dudes en consultarnos por WhatsApp al 341 2010598.
         
             Estamos a tu servicio.
         
