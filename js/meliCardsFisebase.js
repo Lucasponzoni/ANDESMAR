@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const initialContent = localStorage.getItem('initialContent');
         if (initialContent) {
             cardsContainer.innerHTML = initialContent;
-            pagination.style.display = 'block'; 
+            pagination.style.display = 'none'; 
     
             // Simular un clic en la página 1
             const firstPageLink = document.querySelector('.pagination .page-item:first-child .page-link');
@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const initialContent = localStorage.getItem('initialContent');
             if (initialContent) {
                 cardsContainer.innerHTML = initialContent;
-                pagination.style.display = 'block'; 
+                pagination.style.display = 'none'; 
     
                 // Simular un clic en la página 1
                 const firstPageLink = document.querySelector('.pagination .page-item:first-child .page-link');
