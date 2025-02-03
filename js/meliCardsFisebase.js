@@ -299,13 +299,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
             spinner.style.display = 'block';
             cardsContainer.innerHTML = '';
-            pagination.style.display = 'none'; // Oculta la paginación durante la búsqueda
+            pagination.style.display = 'none'; 
 
             if (!isNaN(queryNumber)) {
                 database.ref('envios')
                     .orderByChild('idOperacion')
                     .equalTo(queryNumber)
-                    .limitToLast(800) 
+                    .limitToLast(5000) 
                     .once('value')
                     .then(snapshot => {
                         const allData = snapshot.val(); 
