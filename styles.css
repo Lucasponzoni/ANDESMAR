@@ -2065,7 +2065,6 @@ div.card-body > p > i{
 }
 
 .card-body > button{
-    margin-top: 0px !important;
     height: 38px !important;
 }
 
@@ -5524,3 +5523,6 @@ img.gray-filter {
 }
 /* FIN ALERTA MERCADO LIBRE */
 
+.error-comment{
+    width: 40px;
+}

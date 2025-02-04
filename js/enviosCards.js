@@ -147,7 +147,7 @@ async function renderCards(data) {
                     </div>
 
                     <!-- Botón para abrir el modal -->
-                    <button class="btn btn-info mt-1 open-tracking" data-nropedido="${item.nroPedido}" data-clienteAndesmar="${item.nombreApellido}" data-bs-toggle="modal" data-bs-target="#trackingModal">
+                    <button class="btn btn-success open-tracking" data-nropedido="${item.nroPedido}" data-clienteAndesmar="${item.nombreApellido}" data-bs-toggle="modal" data-bs-target="#trackingModal">
                     <i class="bi bi-eye"></i>Track 
                     </button>
 
@@ -155,10 +155,12 @@ async function renderCards(data) {
 
                     <a href="https://andesmarcargas.com/seguimiento.html?numero=${item.remito}&tipo=remito&cod=" target="_blank" class="btn btn-secondary"><i class="bi bi-box-arrow-up-right"></i></a>
 
-                    <button class="btn btn-success btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${item.id}" aria-expanded="false" aria-controls="collapseObservaciones-${item.id}">
-                    <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
-                    </button>
+                    <br>
 
+                    <button class="btn ${item.observaciones ? 'btn-info' : 'btn-secondary'} btn-sm mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${item.id}" aria-expanded="false" aria-controls="collapseObservaciones-${item.id}">
+                        ${item.observaciones ? '<i class="bi bi-chevron-down"></i> Posee Notas <img class="error-comment" src="./Img/error-comment.gif" alt="Notas">' : '<i class="bi bi-chevron-down"></i> Sin Notas <i class="bi bi-sticky-fill"></i>'}
+                    </button>
+                    
                     <div class="collapse" id="collapseObservaciones-${item.id}">
                         <div class="mb-3 mt-2 divObs">
                             <label for="observaciones-${item.id}" class="form-label">Observaciones</label>
@@ -166,6 +168,7 @@ async function renderCards(data) {
                             <button class="btn btn-primary mt-1 update-observaciones" data-id="${item.id}">Actualizar Observaciones</button>
                         </div>
                     </div>
+
                 </div>
             </div>
         `;

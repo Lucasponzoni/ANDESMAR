@@ -1324,9 +1324,9 @@ const isSkuIncluded = skusList.includes(data[i].sku);
 
                                 </div>
                             </div>
-        
-                            <button class="btn btn-secondary btn-sm w-100 mb-1 observaciones-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
-                                <i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>
+
+                            <button class="btn ${data[i].observaciones ? 'btn-info' : 'btn-secondary'} btn-sm w-100 mb-1 observaciones-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObservaciones-${data[i].id}" aria-expanded="false" aria-controls="collapseObservaciones-${data[i].id}">
+                                ${data[i].observaciones ? '<i class="bi bi-chevron-down"></i> Posee Notas <img class="error-comment" src="./Img/error-comment.gif" alt="Notas">' : '<i class="bi bi-chevron-down"></i> Notas <i class="bi bi-sticky-fill"></i>'}
                             </button>
                             <div class="collapse" id="collapseObservaciones-${data[i].id}">
                                 <div class="mb-3 mt-2 divObs">
