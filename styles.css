@@ -5526,3 +5526,15 @@ img.gray-filter {
 .error-comment{
     width: 35px;
 }
+
+.btn-delete-bna{
+    position: absolute;
+    bottom: 35px;
+    right: 0;
+    border-radius: 15px 0 0 15px;
+    border: none;
+}
+
+.btn-delete-bna:hover{
+    color: yellow;
+}

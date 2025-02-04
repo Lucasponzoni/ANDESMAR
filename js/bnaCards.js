@@ -352,16 +352,21 @@ function lowercaseWords(str) {
 let skusList = [];
 
 // CARGAR DATOS DE FIREBASE
+// Función para cargar los envíos desde Firebase
 function loadEnviosFromFirebase() {
     const cardsContainer = document.getElementById('meli-cards');
     const spinner = document.getElementById('spinner');
-    cardsContainer.innerHTML = '';
+    if (cardsContainer) {
+        cardsContainer.innerHTML = '';
+    }
 
     // Deshabilitar el buscador al inicio
     searchInput.disabled = true;
     searchInput.value = "Aguardando que cargue la web ⏳";
 
-    spinner.style.display = 'block'; 
+    if (spinner) {
+        spinner.style.display = 'block';
+    }
 
     // Cargar SKUs desde Firebase
     firebase.database().ref('imei/').once('value')
@@ -375,91 +380,96 @@ function loadEnviosFromFirebase() {
             return firebase.database().ref('enviosBNA').once('value');
         })
         .then(snapshot => {
-            allData = []; 
-            let sinPrepararCount = 0; 
+            allData = [];
+            let sinPrepararCount = 0;
             let sinFacturarCount = 0;
 
-        snapshot.forEach(function(childSnapshot) {
-            const data = childSnapshot.val();
-            allData.push({ 
-                id: childSnapshot.key, 
-                altura: (data.altura),
-                cancelado: (data.cancelado),
-                nombreFacturacion: capitalizeWords(data.nombre),
-                apellidoFacturacion: capitalizeWords(data.apellido),
-                nombre: capitalizeWords(data.nombre_completo_envio), 
-                cp: (data.codigo_postal), 
-                localidad: capitalizeWords(data.ciudad),
-                provincia: capitalizeWords(data.provincia),
-                calle: (data.calle), 
-                calle2: capitalizeWords(data.direccion.replace(/"/g, '')), 
-                telefono: (data.telefono), 
-                telefono_facturacion: (data.telefono_facturacion), 
-                email: lowercaseWords(data.email), 
-                remito: (data.orden_),
-                carrito:(data.carritoCompra2),
-                observaciones: (data.observaciones),
-                orden_publica_: (data.orden_publica_),
-                brand_name: capitalizeWords(data.brand_name),
-                cuotas: (data.cuotas),
-                cotizacion: (data.cotizacion),
-                trackingNumber: (data.trackingNumber),
-                precio_venta: (data.precio_venta),
-                suborden_total: (data.suborden_total),
-                numeros_tarjeta: (data.numeros_tarjeta),
-                orden_publica: (data.orden_publica_),
-                sku: (data.sku_externo),
-                cantidad: (data.cantidad),
-                fechaDeCreacion: (data.fecha_creacion_orden),    
-                datoFacturacion: (data.datoFacturacion),
-                producto_nombre: capitalizeWords(data.producto_nombre),
-                tipoElectrodomesticoBna: (data.tipoElectrodomesticoBna),
-                datoFacturacion: (data.datoFacturacion),
-                trackingLink: (data.trackingLink),
-                transportCompany: (data.transportCompany),
-                transportCompanyNumber: (data.transportCompanyNumber),
-                razon_social: capitalizeWords(data.razon_social),
-                cuit: (data.cuit),
-                marcaEntregado: (data.marcaEntregado),
-                marcaPreparado: (data.marcaPreparado),
-                direccion_facturacion: capitalizeWords(data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '')),
-                ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
-                dni: (data.dni),
-                codigo_postal_facturacion: (data.codigo_postal_facturacion),
-                otros_comentarios_entrega: (data.otros_comentarios_entrega),
-                iva: (data.condicion_iva),
-                equivalencia_puntos_pesos: (data.equivalencia_puntos_pesos),
-                nombre_completo_envio: capitalizeWords(data.nombre_completo_envio),
-                monto_cobrado: (data.monto_cobrado)
+            snapshot.forEach(function(childSnapshot) {
+                const data = childSnapshot.val();
+                allData.push({
+                    id: childSnapshot.key,
+                    altura: (data.altura),
+                    cancelado: (data.cancelado),
+                    nombreFacturacion: capitalizeWords(data.nombre),
+                    apellidoFacturacion: capitalizeWords(data.apellido),
+                    nombre: capitalizeWords(data.nombre_completo_envio),
+                    cp: (data.codigo_postal),
+                    localidad: capitalizeWords(data.ciudad),
+                    provincia: capitalizeWords(data.provincia),
+                    calle: (data.calle),
+                    calle2: capitalizeWords(data.direccion.replace(/"/g, '')),
+                    telefono: (data.telefono),
+                    telefono_facturacion: (data.telefono_facturacion),
+                    email: lowercaseWords(data.email),
+                    remito: (data.orden_),
+                    carrito: (data.carritoCompra2),
+                    observaciones: (data.observaciones),
+                    orden_publica_: (data.orden_publica_),
+                    brand_name: capitalizeWords(data.brand_name),
+                    cuotas: (data.cuotas),
+                    cotizacion: (data.cotizacion),
+                    trackingNumber: (data.trackingNumber),
+                    precio_venta: (data.precio_venta),
+                    suborden_total: (data.suborden_total),
+                    numeros_tarjeta: (data.numeros_tarjeta),
+                    orden_publica: (data.orden_publica_),
+                    sku: (data.sku_externo),
+                    cantidad: (data.cantidad),
+                    fechaDeCreacion: (data.fecha_creacion_orden),
+                    datoFacturacion: (data.datoFacturacion),
+                    producto_nombre: capitalizeWords(data.producto_nombre),
+                    tipoElectrodomesticoBna: (data.tipoElectrodomesticoBna),
+                    datoFacturacion: (data.datoFacturacion),
+                    trackingLink: (data.trackingLink),
+                    transportCompany: (data.transportCompany),
+                    transportCompanyNumber: (data.transportCompanyNumber),
+                    razon_social: capitalizeWords(data.razon_social),
+                    cuit: (data.cuit),
+                    marcaEntregado: (data.marcaEntregado),
+                    marcaPreparado: (data.marcaPreparado),
+                    direccion_facturacion: capitalizeWords(data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '')),
+                    ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
+                    dni: (data.dni),
+                    codigo_postal_facturacion: (data.codigo_postal_facturacion),
+                    otros_comentarios_entrega: (data.otros_comentarios_entrega),
+                    iva: (data.condicion_iva),
+                    equivalencia_puntos_pesos: (data.equivalencia_puntos_pesos),
+                    nombre_completo_envio: capitalizeWords(data.nombre_completo_envio),
+                    monto_cobrado: (data.monto_cobrado)
+                });
+
+                // Incrementar el contador si tipoElectrodomesticoBna está vacío
+                if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
+                    sinPrepararCount++;
+                }
+
+                // Incrementar el contador si tipoElectrodomesticoBna está vacío
+                if (!data.datoFacturacion) {
+                    sinFacturarCount++;
+                }
             });
 
-            // Incrementar el contador si tipoElectrodomesticoBna está vacío
-            if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
-                sinPrepararCount++;
-            }
+            // Renderizar las tarjetas y la paginación
+            allData.reverse();
+            renderCards(allData);
+            updatePagination(allData.length);
 
-            // Incrementar el contador si tipoElectrodomesticoBna está vacío
-            if (!data.datoFacturacion) {
-                sinFacturarCount++;
+            // Habilitar el buscador después de cargar los datos
+            searchInput.disabled = false;
+            searchInput.value = "";
+
+            // Actualizar el contador en el botón
+            document.getElementById('contadorCards').innerText = sinPrepararCount;
+            // Actualizar el contador en el botón
+            document.getElementById('contadorCardsFacturar').innerText = sinFacturarCount;
+
+            if (spinner) {
+                spinner.remove(); // Ocultar spinner después de cargar los datos
             }
+        })
+        .catch(error => {
+            console.error("Error al cargar los envíos desde Firebase: ", error);
         });
-
-        // Renderizar las tarjetas y la paginación
-        allData.reverse();
-        renderCards(allData);
-        updatePagination(allData.length);
-
-        // Deshabilitar el buscador al inicio
-        searchInput.disabled = false;
-        searchInput.value = "";
-        
-        // Actualizar el contador en el botón
-        document.getElementById('contadorCards').innerText = sinPrepararCount;
-        // Actualizar el contador en el botón
-        document.getElementById('contadorCardsFacturar').innerText = sinFacturarCount;
-
-        spinner.remove(); // Ocultar spinner después de cargar los datos
-    });
 }
 
 // Función para obtener la URL
@@ -574,6 +584,7 @@ const cpsCDS = [
 ];
 
 function renderCards(data) {
+
     const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = ''; // Limpiar contenedor de tarjetas
 
@@ -1058,9 +1069,11 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                                     '<i class="bi bi-stopwatch-fill margen-icon"></i> Pendiente'}
                             </div>
 
+                            <button class="btn-delete-bna btn btn-outline-danger" onclick="eliminarNodo('${data[i].id}')"><i class="bi bi-trash3-fill"></i></button>
+
                             <div class="em-state-bna"><img id="TiendaBNA" src="./Img/bna-logo.png"></div>
                             <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
-                                                <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center">
                             
 
                             <p class="card-text cpLocalidadBna mb-0 me-2">
@@ -1453,7 +1466,6 @@ const isSkuIncluded = skusList.includes(data[i].sku);
 
                 `
                 ;
-
 
                 // Elimina Comillas en el nombre de los productos
                 function cleanString(value) {
@@ -2707,6 +2719,49 @@ async function getAuthToken() {
     } catch (error) {
         console.error('Error al obtener el token de autenticación:', error);
     }
+}
+
+// Función para eliminar el nodo de Firebase
+function eliminarNodo(id) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¡No podrás deshacer esto!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminarlo!',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            firebase.database().ref('enviosBNA/' + id).remove()
+                .then(() => {
+                    console.log(`Nodo con ID ${id} eliminado exitosamente.`);
+                    // Eliminar la tarjeta del DOM
+                    const cardElement = document.querySelector(`[data-id="${id}"]`);
+                    if (cardElement) {
+                        cardElement.remove();
+                    }
+                    Swal.fire(
+                        'Eliminado!',
+                        'El elemento ha sido eliminado.',
+                        'success'
+                    );
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error("Error al eliminar el nodo: ", error);
+                    Swal.fire(
+                        'Error',
+                        'Ocurrió un error al eliminar el elemento.',
+                        'error'
+                    );
+                });
+        }
+    });
 }
 
 async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
