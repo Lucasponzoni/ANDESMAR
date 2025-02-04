@@ -3619,6 +3619,53 @@ document.getElementById('btnFacturar').addEventListener('click', () => {
 });
 // FIN SIN FACTURAR BOTON
 
+//DUPLICADOS
+document.getElementById('duplicateButton').addEventListener('click', () => {
+    renderDuplicatedOrders();
+});
+
+// Función para verificar y renderizar duplicados en 'orden_publica'
+function renderDuplicatedOrders() {
+    let orderCount = {};
+    let duplicatedOrders = [];
+
+    // Contar cada 'orden_publica'
+    allData.forEach(item => {
+        const order = item.orden_publica;
+        if (order) {
+            if (orderCount[order]) {
+                orderCount[order]++;
+                if (orderCount[order] === 2) {
+                    duplicatedOrders.push(order); // Guardar el orden duplicado solo una vez
+                }
+            } else {
+                orderCount[order] = 1;
+            }
+        }
+    });
+
+    // Filtrar los datos duplicados
+    const duplicatedData = allData.filter(item => duplicatedOrders.includes(item.orden_publica));
+
+    // Limpiar el contenedor de tarjetas
+    const cardsContainer = document.getElementById('meli-cards');
+    cardsContainer.innerHTML = '';
+
+    // Ocultar la paginación
+    paginationContainer.style.display = 'none';
+
+    // Renderizar solo las tarjetas duplicadas
+    renderCards(duplicatedData);
+
+    // Crear botón de volver
+    createBackButton(() => {
+        // Mostrar la paginación nuevamente
+        paginationContainer.style.display = 'block';
+        renderCards(allData); // Regresar a todas las tarjetas
+    });
+}
+// FIN DUPLICADOS
+
 // SWITCH BOTÓN 2
 document.getElementById('btnSwitch').addEventListener('click', () => {
     const sinEntregarCards = allData
