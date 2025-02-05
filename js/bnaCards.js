@@ -1654,7 +1654,12 @@ function toggleEdit(id) {
         `cp_envio_${id}`,
         `telefono_envio_${id}`,
         `persona_autorizada_${id}`,
-        `otros_comentarios_entrega_${id}`
+        `otros_comentarios_entrega_${id}`,
+        // Campos de pago
+        `precio_item_${id}`,
+        `descuentos_${id}`,
+        `monto_envio_${id}`,
+        `monto_total_${id}`
     ].map(fieldId => document.getElementById(fieldId));
 
     const isEditing = editButton.textContent === "Guardar";
