@@ -2347,6 +2347,22 @@ div.card-body > p > i{
     justify-content: center;
 }
 
+.em-circle-state {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    text-transform: uppercase;
+    position: absolute;
+    font-size: 0.75rem;
+    top: -18px;
+    right: 10px;
+    border-radius: 50px;
+    padding: 6px 12px;
+    background-color: grey;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .em-circle-state::before {
     content: '\f017'; 
     font-family: "Font Awesome 5 Free"; 
@@ -2493,6 +2509,16 @@ div.card-body > p > i{
     border-width: 0.3em;
 }
 
+/*
+.card-body-bna {
+    border-radius: 15px;
+    background-image: url('./Img/bna-premia-back.png');
+    background-size: 100% auto; 
+    background-position: top; 
+    background-repeat: no-repeat; 
+}
+*/
+
 .em-circle-state5 {
     font-weight: 600;
     font-family: "Helvetica Neue", Arial, sans-serif;
@@ -2506,6 +2532,48 @@ div.card-body > p > i{
     left: -20px;
     right: -20px;
     background-color: #007bffdd;
+    text-transform: uppercase;
+    color: white;
+    display: flex; 
+    align-items: flex-end; 
+    justify-content: center;
+    height: 25px; 
+}
+
+.em-circle-state6 {
+    font-weight: 600;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.7rem; 
+    padding: 3px 8px; 
+    border-radius: 15px 0 15px 0; 
+    position: relative;
+    width: fit-content;
+    margin-bottom: -15px;
+    top: -20px; 
+    left: -20px;
+    right: -20px;
+    background-color: #ff448e;
+    text-transform: uppercase;
+    color: white;
+    display: flex; 
+    align-items: flex-end; 
+    justify-content: center;
+    height: 25px; 
+}
+
+.em-circle-state-unknown {
+    font-weight: 600;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.7rem; 
+    padding: 3px 8px; 
+    border-radius: 15px 0 15px 0; 
+    position: relative;
+    width: fit-content;
+    margin-bottom: -15px;
+    top: -20px; 
+    left: -20px;
+    right: -20px;
+    background-color: grey;
     text-transform: uppercase;
     color: white;
     display: flex; 

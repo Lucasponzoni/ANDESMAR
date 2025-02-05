@@ -1000,7 +1000,20 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                     <div class="card">
                         <div class="card-body card-body-bna">
 
-<div class="em-circle-state5">
+<div class="${(() => {
+    const shopCode = data[i].orden_publica_.split('-').pop(); 
+    switch (shopCode) {
+        case "2941":
+        case "2942":
+        case "2943":
+            return 'em-circle-state5';
+        case "1914":
+        case "1915":
+            return 'em-circle-state6';
+        default:
+            return 'em-circle-state-unknown'; 
+    }
+})()}">
     ${(() => {
         const shopCode = data[i].orden_publica_.split('-').pop(); 
         switch (shopCode) {
@@ -1013,12 +1026,11 @@ const isSkuIncluded = skusList.includes(data[i].sku);
             case "1914":
                 return 'Macro novogarmp';
             case "1915":
-                    return 'Macro novogarmppromo';
+                return 'Macro novogarmppromo';
             default:
                 return 'Shop Desconocido'; 
         }
     })()}
-
 </div>
 
                             <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isCDS || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
