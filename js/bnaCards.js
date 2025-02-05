@@ -198,10 +198,14 @@ document.getElementById('importButton').addEventListener('click', function() {
         reader.onload = function(e) {
             const content = e.target.result.trim();
             const data = content.split(/\r?\n/).map(row => {
-                return row.match(/(".*?"|[^,\r\n]+)(?=\s*,|\s*$)/g) || [];
+                // Usar expresión regular para dividir correctamente en comas
+                return row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => {
+                    // Limpiar espacios y manejar celdas vacías
+                    return cell.trim() === "" ? "" : cell.trim();
+                });
             });
 
-            const headers = data[0];
+            const headers = data[0].map(header => sanitizeHeader(header));
             const dataRows = data.slice(1);
             let importedCount = 0;
             let existingCount = 0; // Contador para registros existentes
@@ -210,103 +214,32 @@ document.getElementById('importButton').addEventListener('click', function() {
 
             dataRows.forEach(row => {
                 if (row.length > 0) {
-                    const orden = row[2] || null;
-                    const nombreCompletoEnvio = row[33] || null;
+                    const envioData = {};
 
-                    // Verificar si el campo nombre_completo_envio contiene números
-                    if (/\d/.test(nombreCompletoEnvio)) {
-                        skippedCount++; // Incrementar contador de registros omitidos
-                        return; // Saltar este registro y continuar con el siguiente
-                    }
+                    // Construir el objeto usando las cabeceras
+                    headers.forEach((header, index) => {
+                        envioData[header] = row[index] !== undefined ? sanitizeValue(row[index]) : ""; // Asignar cadena vacía si está vacío
+                    });
+
+                    const orden = envioData['orden_']; // Ajustar aquí según el nuevo nombre de la cabecera
 
                     // Verificar si ya existe en Firebase
                     const envioRef = firebase.database().ref('enviosBNA');
                     promises.push(
                         envioRef.orderByChild('orden_').equalTo(orden).once('value').then(snapshot => {
                             if (!snapshot.exists()) {
-                                const envioData = {
-                                    fecha_creacion_orden: row[0] || null,
-                                    fecha_pago: row[1] || null,
-                                    orden_: orden,
-                                    orden_publica_: row[3] || null,
-                                    suborden_: row[4] || null,
-                                    fabricante: row[6] || null,
-                                    cantidad: row[7] || null,
-                                    gp_sku: row[8] || null,
-                                    sku_externo: row[9] || null,
-                                    producto_nombre: row[10] || null,
-                                    variantes: row[11] || null,
-                                    apellido: row[12] || null,
-                                    nombre: row[13] || null,
-                                    email: row[14] || null,
-                                    dni: row[15] || null,
-                                    direccion: row[16] || null,
-                                    codigo_postal: row[17] || null,
-                                    telefono: row[18] || null,
-                                    ciudad: row[19] || null,
-                                    provincia: row[20] || null,
-                                    razon_social: row[21] || null,
-                                    cuit: row[22] || null,
-                                    email_facturacion: row[23] || null,
-                                    direccion_facturacion: row[24] || null,
-                                    codigo_postal_facturacion: row[25] || null,
-                                    telefono_facturacion: row[26] || null,
-                                    ciudad_facturacion: row[27] || null,
-                                    provincia_facturacion: row[28] || null,
-                                    suborden_total: row[29] || null,
-                                    precio_producto: row[30] || null,
-                                    precio_venta: row[31] || null,
-                                    cupon_nombre: null,
-                                    cupon_descuento: null,
-                                    nombre_completo_envio: nombreCompletoEnvio,
-                                    medio_de_envio: row[34] || null,
-                                    numero_de_seguimiento: row[35] || null,
-                                    monto_cobrado: row[36] || null,
-                                    tipo_del_envio: row[37] || null,
-                                    estado_fecha_actualizacion_tipo_de_envio: row[38] || null,
-                                    estado_del_envio: row[39] || null,
-                                    estado_fecha_actualizacion_envio: row[40] || null,
-                                    estado_del_producto: row[41] || null,
-                                    estado_fecha_actualizacion_producto: row[42] || null,
-                                    liquidado: row[43] || null,
-                                    id_cobis: row[44] || null,
-                                    total_puntos: row[45] || null,
-                                    total_dinero: row[46] || null,
-                                    total_con_tasas_1: row[47] || null,
-                                    total_con_tasas_2: row[48] || null,
-                                    cuotas: row[49] || null,
-                                    relacion_de_puntos: row[50] || null,
-                                    equivalencia_puntos_pesos: row[51] || null,
-                                    iva: row[52] || null,
-                                    relacion_de_puntos_sin_iva: row[53] || null,
-                                    equivalencia_puntos_sin_iva_pesos: row[54] || null,
-                                    brand_name: row[55] || null,
-                                    tipo_doc_pago: row[56] || null,
-                                    doc_pago: row[57] || null,
-                                    nombre_y_apellido_tarjeta: row[58] || null,
-                                    numeros_tarjeta: row[59] || null,
-                                    bin_tarjeta: row[60] || null,
-                                    cupon: row[61] || null,
-                                    cod_aut: row[62] || null,
-                                    tipo_doc_pago_2: row[63] || null,
-                                    doc_pago_2: row[64] || null,
-                                    nombre_y_apellido_tarjeta_2: row[65] || null,
-                                    numeros_tarjeta_2: row[66] || null,
-                                    bin_tarjeta_2: row[67] || null,
-                                    cupon_2: row[68] || null,
-                                    cod_aut_2: row[69] || null,
-                                    decidir_distributed: row[70] || null,
-                                    modo_distributed: row[71] || null                                                        
-                                };
-
                                 return envioRef.push().set(envioData).then(() => {
                                     importedCount++;
                                 });
                             } else {
                                 existingCount++;
                             }
+                        }).catch(error => {
+                            console.error('Error al verificar existencia en Firebase:', error);
                         })
                     );
+                } else {
+                    skippedCount++; // Incrementar si la fila está vacía
                 }
             });
 
@@ -315,7 +248,7 @@ document.getElementById('importButton').addEventListener('click', function() {
                 spinner.remove();
                 Swal.fire({
                     title: 'Importación completada',
-                    text: `Se han importado ${importedCount} ventas a la base de datos, ${existingCount} ya se encontraban en planilla, ${skippedCount} registros fueron omitidos por contener datos no válidos.`,
+                    text: `Se han importado ${importedCount} ventas a la base de datos, ${existingCount} ya se encontraban en planilla, ${skippedCount} registros fueron omitidos por estar vacíos.`,
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(() => {
@@ -337,22 +270,30 @@ document.getElementById('importButton').addEventListener('click', function() {
     }
 });
 
+// Función para sanitizar cabeceras
+function sanitizeHeader(header) {
+    return header.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[.#$\/\[\]]/g, ''); // Eliminar acentos y caracteres no permitidos
+}
+
+// Función para sanitizar valores
+function sanitizeValue(value) {
+    return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); // Eliminar acentos y convertir a minúsculas
+}
+
 function capitalizeWords(str) {
+    if (!str) return ''; // Retornar cadena vacía si str es undefined o null
     return str
-        .toLowerCase() // Convertir a minúsculas primero
-        .split(' ') // Separar en palabras
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar cada palabra
-        .join(' '); // Unir de nuevo las palabras
+        .toLowerCase()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
 }
 
 function lowercaseWords(str) {
-    return str.toLowerCase(); // Convertir toda la cadena a minúsculas
+    return str ? str.toLowerCase() : ''; // Retornar cadena vacía si str es undefined o null
 }
 
-let skusList = [];
-
 // CARGAR DATOS DE FIREBASE
-// Función para cargar los envíos desde Firebase
 function loadEnviosFromFirebase() {
     const cardsContainer = document.getElementById('meli-cards');
     const spinner = document.getElementById('spinner');
@@ -360,7 +301,6 @@ function loadEnviosFromFirebase() {
         cardsContainer.innerHTML = '';
     }
 
-    // Deshabilitar el buscador al inicio
     searchInput.disabled = true;
     searchInput.value = "Aguardando que cargue la web ⏳";
 
@@ -368,7 +308,6 @@ function loadEnviosFromFirebase() {
         spinner.style.display = 'block';
     }
 
-    // Cargar SKUs desde Firebase
     firebase.database().ref('imei/').once('value')
         .then(skuSnapshot => {
             skusList = [];
@@ -376,7 +315,6 @@ function loadEnviosFromFirebase() {
                 skusList.push(childSnapshot.val().sku);
             });
 
-            // Ahora cargar envíos
             return firebase.database().ref('enviosBNA').once('value');
         })
         .then(snapshot => {
@@ -388,55 +326,55 @@ function loadEnviosFromFirebase() {
                 const data = childSnapshot.val();
                 allData.push({
                     id: childSnapshot.key,
-                    altura: (data.altura),
-                    cancelado: (data.cancelado),
-                    nombreFacturacion: capitalizeWords(data.nombre),
-                    apellidoFacturacion: capitalizeWords(data.apellido),
+                    altura: data.altura,
+                    cancelado: data.cancelado,
+                    nombreFacturacion: capitalizeWords(data.nombre) || capitalizeWords(data.Nombre),
+                    apellidoFacturacion: capitalizeWords(data.apellido) || capitalizeWords(data.Apellido),
                     nombre: capitalizeWords(data.nombre_completo_envio),
-                    cp: (data.codigo_postal),
+                    cp: data.codigo_postal,
                     localidad: capitalizeWords(data.ciudad),
                     provincia: capitalizeWords(data.provincia),
-                    calle: (data.calle),
-                    calle2: capitalizeWords(data.direccion.replace(/"/g, '')),
-                    telefono: (data.telefono),
-                    telefono_facturacion: (data.telefono_facturacion),
+                    calle: data.calle,
+                    calle2: capitalizeWords(data.direccion ? data.direccion.replace(/"/g, '') : ''),
+                    telefono: data.telefono,
+                    telefono_facturacion: data.telefono_facturacion,
                     email: lowercaseWords(data.email),
-                    remito: (data.orden_),
-                    carrito: (data.carritoCompra2),
-                    observaciones: (data.observaciones),
-                    orden_publica_: (data.orden_publica_),
+                    remito: data.orden_,
+                    carrito: data.carritoCompra2,
+                    observaciones: data.observaciones,
+                    orden_publica_: data.orden_publica_,
                     brand_name: capitalizeWords(data.brand_name),
-                    cuotas: (data.cuotas),
-                    cotizacion: (data.cotizacion),
-                    trackingNumber: (data.trackingNumber),
-                    precio_venta: (data.precio_venta),
-                    suborden_total: (data.suborden_total),
-                    numeros_tarjeta: (data.numeros_tarjeta),
-                    orden_publica: (data.orden_publica_),
-                    sku: (data.sku_externo),
-                    cantidad: (data.cantidad),
-                    fechaDeCreacion: (data.fecha_creacion_orden),
-                    datoFacturacion: (data.datoFacturacion),
+                    cuotas: data.cuotas,
+                    cotizacion: data.cotizacion,
+                    trackingNumber: data.trackingNumber,
+                    precio_venta: data.precio_venta,
+                    suborden_total: data.suborden_total,
+                    numeros_tarjeta: data.numeros_tarjeta,
+                    orden_publica: data.orden_publica_,
+                    sku: data.sku_externo.toUpperCase(),
+                    cantidad: data.cantidad,
+                    fechaDeCreacion: data.fecha_creacion_orden,
+                    datoFacturacion: data.datoFacturacion,
                     producto_nombre: capitalizeWords(data.producto_nombre),
-                    tipoElectrodomesticoBna: (data.tipoElectrodomesticoBna),
-                    datoFacturacion: (data.datoFacturacion),
-                    trackingLink: (data.trackingLink),
-                    transportCompany: (data.transportCompany),
-                    transportCompanyNumber: (data.transportCompanyNumber),
+                    tipoElectrodomesticoBna: data.tipoElectrodomesticoBna,
+                    trackingLink: data.trackingLink,
+                    transportCompany: data.transportCompany,
+                    transportCompanyNumber: data.transportCompanyNumber,
                     razon_social: capitalizeWords(data.razon_social),
-                    cuit: (data.cuit),
-                    marcaEntregado: (data.marcaEntregado),
-                    marcaPreparado: (data.marcaPreparado),
-                    direccion_facturacion: capitalizeWords(data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '')),
+                    cuit: data.cuit,
+                    marcaEntregado: data.marcaEntregado,
+                    marcaPreparado: data.marcaPreparado,
+                    direccion_facturacion: capitalizeWords(data.direccion_facturacion ? data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '') : ''),
                     ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
-                    dni: (data.dni),
-                    codigo_postal_facturacion: (data.codigo_postal_facturacion),
-                    otros_comentarios_entrega: (data.otros_comentarios_entrega),
-                    iva: (data.condicion_iva),
-                    equivalencia_puntos_pesos: (data.equivalencia_puntos_pesos),
+                    dni: data.dni,
+                    codigo_postal_facturacion: data.codigo_postal_facturacion,
+                    otros_comentarios_entrega: data.otros_comentarios_entrega,
+                    iva: data.condicion_iva,
+                    equivalencia_puntos_pesos: data.equivalencia_puntos_pesos || data['equivalencia_puntos_-_pesos'],
                     nombre_completo_envio: capitalizeWords(data.nombre_completo_envio),
-                    monto_cobrado: (data.monto_cobrado)
+                    monto_cobrado: data.monto_cobrado
                 });
+
 
                 // Incrementar el contador si tipoElectrodomesticoBna está vacío
                 if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
@@ -635,8 +573,7 @@ function renderCards(data) {
 
         // Determinar el tipo de factura
         const cuit = data[i].cuit;
-        const tipoFactura = (cuit.length === 7 || cuit.length === 8) ? 'FACTURA B' : 'FACTURA A';
-
+        const tipoFactura = (!cuit || cuit.length === 7 || cuit.length === 8) ? 'FACTURA B' : 'FACTURA A';
         // Agregar el mensaje a la tarjeta
         const mensajeElement = document.createElement('p');
         mensajeElement.textContent = mensajeFactura;
@@ -852,11 +789,11 @@ const isSkuIncluded = skusList.includes(data[i].sku);
     <label for="condicion_iva_${data[i].id}">Condición IVA:</label>
     <select id="condicion_iva_${data[i].id}" disabled>
         <option value="IVA Responsable Inscripto" 
-            ${data[i].iva === 'IVA Responsable Inscripto' || (data[i].iva === undefined && data[i].cuit.length > 7) ? 'selected' : ''}>
+            ${data[i].iva === 'IVA Responsable Inscripto' || (!data[i].iva && (!data[i].cuit || data[i].cuit.length > 7)) ? 'selected' : ''}>
             IVA Responsable Inscripto
         </option>
         <option value="Consumidor Final" 
-            ${data[i].iva === 'Consumidor Final' || (data[i].iva === undefined && data[i].cuit.length <= 8) ? 'selected' : ''}>
+            ${data[i].iva === 'Consumidor Final' || (!data[i].iva && data[i].cuit && data[i].cuit.length <= 7) ? 'selected' : ''}>
             Consumidor Final
         </option>
         <option value="IVA Liberado - Ley N° 19.640" 
@@ -1052,11 +989,13 @@ const isSkuIncluded = skusList.includes(data[i].sku);
         const shopCode = data[i].orden_publica_.split('-').pop(); // Obtener los últimos 4 dígitos
         switch (shopCode) {
             case "2941":
-                return 'novogarbna';
+                return 'BNA novogarbna';
             case "2942":
-                return 'novogarbnapromo';
+                return 'BNA novogarbnapromo';
             case "2943":
-                return 'novogarbnapromo2';
+                return 'BNA novogarbnapromo2';
+            case "1914":
+                return 'Macro novogarmp';
             default:
                 return 'Shop Desconocido'; // Valor por defecto si no coincide
         }
