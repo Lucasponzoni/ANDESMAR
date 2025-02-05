@@ -1659,7 +1659,7 @@ function toggleEdit(id) {
 
     const isEditing = editButton.textContent === "Guardar";
 
-    // Habilitar o deshabilitar los campos de entrada
+    // Habilitar o deshabilitar los campos de entrada para Facturacion
     inputs.forEach(input => {
         if (input) {
             input.disabled = isEditing;
