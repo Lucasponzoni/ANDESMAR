@@ -521,7 +521,7 @@ const cpsCDS = [
     4518, 8340, 4612
 ];
 
-function renderCards(data) {
+    function renderCards(data) {
 
     const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = ''; // Limpiar contenedor de tarjetas
@@ -532,6 +532,20 @@ function renderCards(data) {
     // Obtener la hora actual en Argentina
     const ahora = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" });
     const fechaActual = new Date(ahora);
+
+    const getShopImage = (shopCode) => {
+        switch (shopCode) {
+            case "2941":
+            case "2942":
+            case "2943":
+                return '<img id="TiendaBNA" src="./Img/bna-logo.png" alt="BNA">';
+            case "1914":
+            case "1915":
+                return '<img id="TiendaMacro" src="./Img/premia-logo.png" alt="Macro">';
+            default:
+                return '';
+        }
+    };
 
     for (let i = startIndex; i < endIndex; i++) {
         const card = document.createElement('div');
@@ -546,7 +560,6 @@ function renderCards(data) {
         // Verificar si datoFacturacion existe
         const hasDatoFacturacion = data[i].datoFacturacion !== undefined && data[i].datoFacturacion !== null;
         const hasCancelado = data[i].cancelado !== undefined && data[i].cancelado !== null;
-
 
         // Lógica para calcular el estado de facturación
         const costoEnvio = (data[i].suborden_total - (data[i].precio_venta * data[i].cantidad)).toFixed(2);
@@ -591,6 +604,9 @@ function renderCards(data) {
 
         const total = (precioVenta * cantidad) + montoCobrado - equivalencia_puntos_pesos;
         const puntosBna = (data[i].equivalencia_puntos_pesos);
+
+        const shopCode = data[i].orden_publica_.split('-').pop();
+        const shopImage = getShopImage(shopCode);
 
         // Agregar la tarjeta al contenedor
         const carritoContenido = data[i].carrito ? `
@@ -986,7 +1002,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
 
 <div class="em-circle-state5">
     ${(() => {
-        const shopCode = data[i].orden_publica_.split('-').pop(); // Obtener los últimos 4 dígitos
+        const shopCode = data[i].orden_publica_.split('-').pop(); 
         switch (shopCode) {
             case "2941":
                 return 'BNA novogarbna';
@@ -996,10 +1012,13 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                 return 'BNA novogarbnapromo2';
             case "1914":
                 return 'Macro novogarmp';
+            case "1915":
+                    return 'Macro novogarmppromo';
             default:
-                return 'Shop Desconocido'; // Valor por defecto si no coincide
+                return 'Shop Desconocido'; 
         }
     })()}
+
 </div>
 
                             <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isCDS || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
@@ -1010,7 +1029,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
 
                             <button class="btn-delete-bna btn btn-outline-danger" onclick="eliminarNodo('${data[i].id}')"><i class="bi bi-trash3-fill"></i></button>
 
-                            <div class="em-state-bna"><img id="TiendaBNA" src="./Img/bna-logo.png"></div>
+                            <div class="em-state-bna">${shopImage}</div>
                             <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
                             <div class="d-flex align-items-center">
                             
