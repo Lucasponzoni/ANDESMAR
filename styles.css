@@ -2519,6 +2519,16 @@ div.card-body > p > i{
 }
 */
 
+.trio-de-botones-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-top: 20px; /* Añadir espacio para que el badge no se corte */
+}
+
+.badge-large {
+    z-index: 1; /* Asegura que el badge esté por encima del contenido */
+}
+
 .em-circle-state5 {
     font-weight: 600;
     font-family: "Helvetica Neue", Arial, sans-serif;
