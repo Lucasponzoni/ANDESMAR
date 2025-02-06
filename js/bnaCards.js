@@ -175,7 +175,7 @@ verificarRemitosDuplicados();
 
 let allData = [];
 let currentPage = 1;
-let itemsPerPage = 60; // Número de elementos por página
+let itemsPerPage = 100; // Número de elementos por página
 let currentPageGroup = 0;
 const paginationContainer = document.getElementById('pagination');
 const searchInput = document.getElementById("searchBna");
@@ -345,6 +345,8 @@ function loadEnviosFromFirebase() {
                     orden_publica_: data.orden_publica_,
                     brand_name: capitalizeWords(data.brand_name),
                     cuotas: data.cuotas,
+                    envio: data.medio_de_envio,
+                    numeroSeguimiento: data.numero_de_seguimiento,
                     cotizacion: data.cotizacion,
                     trackingNumber: data.trackingNumber,
                     precio_venta: data.precio_venta,
@@ -624,6 +626,22 @@ COMPRA CON USO DE PUNTOS BNA
 
 // Verificar si el SKU está incluido en el listado
 const isSkuIncluded = skusList.includes(data[i].sku);
+
+const storeCode = data[i].orden_publica_.split('-').pop();
+
+// Función para verificar si el storeCode es de Macro
+const isMacro = (storeCode) => {
+    const macroCodes = ["1914", "1915"];
+    return macroCodes.includes(storeCode);
+};
+
+// Función para verificar si el storeCode es de BNA
+const isBNA = (storeCode) => {
+    const bnaCodes = ["2941", "2942", "2943"];
+    return bnaCodes.includes(storeCode);
+};
+
+const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'card-body-macro' : '';
         
         // Agregar la tarjeta al contenedor
         cardsContainer.appendChild(card);
@@ -998,7 +1016,8 @@ const isSkuIncluded = skusList.includes(data[i].sku);
 
 
                     <div class="card">
-                        <div class="card-body card-body-bna">
+                        
+                        <div class="card-body ${cardBodyClass}">
 
 <div class="${(() => {
     const shopCode = data[i].orden_publica_.split('-').pop(); 
@@ -1050,18 +1069,22 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}
                             </p>
 
-                                                        <p class="card-text correo-meli ${
-                                cpsAndesmar.includes(Number(data[i].cp)) ? 'correo-andesmar' : 
-                                cpsCDS.includes(Number(data[i].cp)) ? 'correo-cds' : 
-                                'correo-andreani'
+                            
+                            <p class="card-text correo-meli ${
+                            isMacro(storeCode) ? 'correo-oca' :
+                            cpsAndesmar.includes(Number(data[i].cp)) ? 'correo-andesmar' : 
+                            cpsCDS.includes(Number(data[i].cp)) ? 'correo-cds' : 
+                            'correo-andreani'
                             }">
                                 ${
-                                    cpsAndesmar.includes(Number(data[i].cp)) ? 
-                                    '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
-                                    cpsCDS.includes(Number(data[i].cp)) ? 
-                                    '<img src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur" width="20" height="20">' : 
-                                    '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
-                                }
+                            isMacro(storeCode) ? 
+                            '<img src="Img/oca-tini.png" alt="OCA" width="20" height="20">' :
+                            cpsAndesmar.includes(Number(data[i].cp)) ? 
+                            '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
+                            cpsCDS.includes(Number(data[i].cp)) ? 
+                            '<img src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur" width="20" height="20">' : 
+                            '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
+                            }
                             </p>
 
                             <button class="btn btn-sm btn-" style="color: #007bff;" id="edit-localidad-${data[i].id}">
@@ -1125,20 +1148,22 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
                                 ${isLogPropia ? 
                                 'Logística Propia' : 
+                                (data[i].envio === 'oca' ? 
+                                `<a href="https://www.oca.com.ar/Busquedas/Envios" target="_blank">OCA: ${data[i].numeroSeguimiento} <i class="bi bi-box-arrow-up-right"></i></a>` : 
                                 (isCDS ? 
                                 `<a href="${data[i].trackingLink}" target="_blank">CDS: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
                                 (isAndreani ? 
                                 `<a href="${data[i].trackingLink}" target="_blank">Andreani: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
                                 (isAndesmar ?
                                 `<a href="${data[i].trackingLink}" target="_blank">Andesmar: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                                'Número de Envío Pendiente')))}
+                                'Número de Envío Pendiente'))))}
                             </p>
                             <!-- Fin Seguimiento -->
 
 <!-- Nuevo contenedor para los switches -->
 <div class="d-flex contenedor-switches mt-1 justify-content-between">
     <div class="form-check form-switch switch-ios"> 
-        <input class="form-check-input input-interruptor" type="checkbox" id="preparacion-${data[i].id}" ${data[i].marcaPreparado === 'Si' ? 'checked' : ''}>
+        <input class="form-check-input input-interruptor" type="checkbox" id="preparacion-${data[i].id}" ${data[i].envio === 'oca' ? 'checked' : ''}>
         <label class="form-check-label etiqueta-interruptor" for="preparacion-${data[i].id}"><strong>1</strong> Preparación</label>
     </div>
 
@@ -1332,61 +1357,110 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             <div class="alert alert-danger d-none" id="alert-${data[i].id}" role="alert">
                                 Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
                             </div>
+                    
+<select class="tipoElectrodomesticoBna ${isMacro(storeCode) ? 'hidden' : ''}" 
+        id="tipoElectrodomesticoBna-${data[i].id}" 
+        name="TipoElectrodomestico" 
+        onchange="rellenarMedidas(this, '${data[i].id}')">
+    <option value="">Seleccione un producto ⤵</option>
+    ${isMacro(storeCode) ? `
+        <option value="heladera">Heladera</option>
+        <option value="cocina">Cocina</option>
+        <option value="hornoEmpotrable">Horno Empotrable</option>
+        <option value="lavavajillas">Lavavajillas</option>
+        <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
+        <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
+        <option value="split2700">Split 2700W</option>
+        <option value="split3300">Split 3300W</option>
+        <option value="split4500">Split 4500W</option>
+        <option value="split5500">Split 5500W</option>
+        <option value="split6000">Split 6000W</option>
+        <option value="splitPisoTecho18000">Piso Techo 18000 Frigorías</option>
+        <option value="aireportatil">Aire Portatil</option>
+        <option value="ventiladordepared">Ventilador de Pared</option>
+        <option value="colchon80cm">Colchon 80cm</option>
+        <option value="colchon100cm">Colchon 100cm</option>
+        <option value="colchon140cm">Colchon 140cm</option>
+        <option value="colchon160cm">Colchon 160cm</option>
+        <option value="colchon200cm">Colchon 200cm</option>
+        <option value="termotanque50">Termotanque 50L</option>
+        <option value="termotanque80">Termotanque 80L</option>
+        <option value="termotanque110">Termotanque 110L</option>
+        <option value="termotanque150">Termotanque 150L</option>
+        <option value="termotanque180">Termotanque 180L</option>
+        <option value="termotanque255">Termotanque 255L COM255</option>
+        <option value="termotanque300">Termotanque 300L RHCTP300N</option>
+        <option value="smartTV32">Smart TV 32"</option>
+        <option value="smartTV40">Smart TV 40"</option>
+        <option value="smartTV43">Smart TV 43"</option>
+        <option value="smartTV50">Smart TV 50"</option>
+        <option value="smartTV58">Smart TV 58"</option>
+        <option value="smartTV65">Smart TV 65"</option>
+        <option value="smartTV70">Smart TV 70"</option>
+        <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
+        <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
+        <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
+        <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
+        <option value="bultoOca" selected>Bulto Oca Macro Premia</option>
+        <option value="bulto20">Bulto Pequeño 20x20</option>
+        <option value="bulto30">Bulto Pequeño 30x30</option>
+        <option value="bulto40">Bulto Pequeño 40x40</option>
+        <option value="bulto50">Bulto Pequeño 50x50</option>
+    ` : `
+        <option value="heladera">Heladera</option>
+        <option value="cocina">Cocina</option>
+        <option value="hornoEmpotrable">Horno Empotrable</option>
+        <option value="lavavajillas">Lavavajillas</option>
+        <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
+        <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
+        <option value="split2700">Split 2700W</option>
+        <option value="split3300">Split 3300W</option>
+        <option value="split4500">Split 4500W</option>
+        <option value="split5500">Split 5500W</option>
+        <option value="split6000">Split 6000W</option>
+        <option value="splitPisoTecho18000">Piso Techo 18000 Frigorías</option>
+        <option value="aireportatil">Aire Portatil</option>
+        <option value="ventiladordepared">Ventilador de Pared</option>
+        <option value="colchon80cm">Colchon 80cm</option>
+        <option value="colchon100cm">Colchon 100cm</option>
+        <option value="colchon140cm">Colchon 140cm</option>
+        <option value="colchon160cm">Colchon 160cm</option>
+        <option value="colchon200cm">Colchon 200cm</option>
+        <option value="termotanque50">Termotanque 50L</option>
+        <option value="termotanque80">Termotanque 80L</option>
+        <option value="termotanque110">Termotanque 110L</option>
+        <option value="termotanque150">Termotanque 150L</option>
+        <option value="termotanque180">Termotanque 180L</option>
+        <option value="termotanque255">Termotanque 255L COM255</option>
+        <option value="termotanque300">Termotanque 300L RHCTP300N</option>
+        <option value="smartTV32">Smart TV 32"</option>
+        <option value="smartTV40">Smart TV 40"</option>
+        <option value="smartTV43">Smart TV 43"</option>
+        <option value="smartTV50">Smart TV 50"</option>
+        <option value="smartTV58">Smart TV 58"</option>
+        <option value="smartTV65">Smart TV 65"</option>
+        <option value="smartTV70">Smart TV 70"</option>
+        <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
+        <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
+        <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
+        <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
+        <option value="bulto20">Bulto Pequeño 20x20</option>
+        <option value="bulto30">Bulto Pequeño 30x30</option>
+        <option value="bulto40">Bulto Pequeño 40x40</option>
+        <option value="bulto50">Bulto Pequeño 50x50</option>
+    `}
+</select>
 
-                    <select class="tipoElectrodomesticoBna" id="tipoElectrodomesticoBna-${data[i].id}" name="TipoElectrodomestico" onchange="rellenarMedidas(this, '${data[i].id}')">
-                        <option value="">Seleccione un producto ⤵</option>
-                        <option value="heladera">Heladera</option>
-                        <option value="cocina">Cocina</option>
-                        <option value="hornoEmpotrable">Horno Empotrable</option>
-                        <option value="lavavajillas">Lavavajillas</option>
-                        <option value="lavarropasCargaFrontal">Lavarropas Carga Frontal</option>
-                        <option value="lavarropasCargaSuperior">Lavarropas Carga Superior</option>
-                        <option value="split2700">Split 2700W</option>
-                        <option value="split3300">Split 3300W</option>
-                        <option value="split4500">Split 4500W</option>
-                        <option value="split5500">Split 5500W</option>
-                        <option value="split6000">Split 6000W</option>
-                        <option value="splitPisoTecho18000">Piso Techo 18000 Frigorías</option>
-                        <option value="aireportatil">Aire Portatil</option>
-                        <option value="ventiladordepared">Ventilador de Pared</option>
-                        <option value="colchon80cm">Colchon 80cm</option>
-                        <option value="colchon100cm">Colchon 100cm</option>
-                        <option value="colchon140cm">Colchon 140cm</option>
-                        <option value="colchon160cm">Colchon 160cm</option>
-                        <option value="colchon200cm">Colchon 200cm</option>
-                        <option value="termotanque50">Termotanque 50L</option>
-                        <option value="termotanque80">Termotanque 80L</option>
-                        <option value="termotanque110">Termotanque 110L</option>
-                        <option value="termotanque150">Termotanque 150L</option>
-                        <option value="termotanque180">Termotanque 180L</option>
-                        <option value="termotanque255">Termotanque 255L COM255</option>
-                        <option value="termotanque300">Termotanque 300L RHCTP300N</option>
-                        <option value="smartTV32">Smart TV 32"</option>
-                        <option value="smartTV40">Smart TV 40"</option>
-                        <option value="smartTV43">Smart TV 43"</option>
-                        <option value="smartTV50">Smart TV 50"</option>
-                        <option value="smartTV58">Smart TV 58"</option>
-                        <option value="smartTV65">Smart TV 65"</option>
-                        <option value="smartTV70">Smart TV 70"</option>
-                        <option value="calefactor2000">Calefactor a Gas 2000 Calorías</option>
-                        <option value="calefactor3000">Calefactor a Gas 3000 Calorías</option>
-                        <option value="calefactor5000">Calefactor a Gas 5000 Calorías</option>
-                        <option value="calefactor8000">Calefactor a Gas 8000 Calorías</option>
-                        <option value="bulto20">Bulto Pequeño 20x20</option>
-                        <option value="bulto30">Bulto Pequeño 30x30</option>
-                        <option value="bulto40">Bulto Pequeño 40x40</option>
-                        <option value="bulto50">Bulto Pequeño 50x50</option>
-                    </select>   
                     
         
-                            <div class="medidas"></div> <!-- Div para las medidas -->
+                            <div class="medidas ${isMacro(storeCode) ? 'hidden' : ''}"></div> <!-- Div para las medidas -->
 
-                            <div class="bg-Hr-primary mb-1">
-                            <p><i class="bi bi-tags-fill"></i> Logistica Privada</p>
+                            <div class="bg-Hr-primary mb-1 ${isMacro(storeCode) ? 'hidden' : ''}">
+                                <p><i class="bi bi-tags-fill"></i> Logistica Privada</p>
                             </div>
-
+                            
                             <!-- Botón Cruz del Sur --> 
-                            <button class="mt-1 btn btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'}"
+                            <button class="mt-1 btn btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'} ${isMacro(storeCode) ? 'hidden' : ''}"
                                 id="CDSButton${data[i].id}" 
                                 ${isAndreani || isAndesmar || data[i].cancelado ? 'disabled' : ''}
                                 onclick="${isCDS ? `descargarEtiquetaCDS('${data[i].cotizacion}', '${data[i].trackingNumber}', '${data[i].id}')` : `enviarDatosCDS('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
@@ -1395,29 +1469,28 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                                 </span>
                                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerCDS${data[i].id}" style="display:none;"></span>
                             </button>
-
+                            
                             <!-- Botón Andesmar -->          
-                            <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'}" 
-                            id="andesmarButton${data[i].id}" 
-                            ${isAndreani || data[i].cancelado ? 'disabled' : ''} 
-                            ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
-                            <span id="andesmarText${data[i].id}">
-                            ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
-                            </span>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
+                            <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'} ${isMacro(storeCode) ? 'hidden' : ''}" 
+                                id="andesmarButton${data[i].id}" 
+                                ${isAndreani || data[i].cancelado ? 'disabled' : ''} 
+                                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
+                                <span id="andesmarText${data[i].id}">
+                                ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
+                                </span>
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
                             </button>
-
+                            
                             <!-- Botón Andreani --> 
-                            <button class="mt-1 btn btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'}"
-                            id="andreaniButton${data[i].id}" 
-                            ${isAndesmar || data[i].cancelado ? 'disabled' : ''} 
-                            onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
-                            <span id="andreaniText${data[i].id}">
-                            ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
-                            </span>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
+                            <button class="mt-1 btn btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'} ${isMacro(storeCode) ? 'hidden' : ''}"
+                                id="andreaniButton${data[i].id}" 
+                                ${isAndesmar || data[i].cancelado ? 'disabled' : ''} 
+                                onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
+                                <span id="andreaniText${data[i].id}">
+                                ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
+                                </span>
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
                             </button>
-
                             <div class="bg-Hr-primary">
                             <p><i class="bi bi-tags-fill"></i> Logistica Propia</p>
                             </div>
@@ -3436,6 +3509,13 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
             largo = 30; 
             peso = 25; 
             valor = 450000;
+            break;
+        case "bultoOca":
+            alto = 20; 
+            ancho = 20; 
+            largo = 20; 
+            peso = 1; 
+            valor = 10000;
             break;
         case "bulto20":
             alto = 20; 

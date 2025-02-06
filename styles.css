@@ -1651,6 +1651,14 @@ p.card-text{
     border: solid 1px #03284d;
 }
 
+.correo-oca {
+    min-width: 30px;
+    min-height: 30px;
+    background-color: #8e24aa;
+    color: white;
+    border: solid 1px #761591;
+}
+
 .correo-andreani {
     min-width: 30px;
     min-height: 30px;
@@ -2509,7 +2517,6 @@ div.card-body > p > i{
     border-width: 0.3em;
 }
 
-/*
 .card-body-bna {
     border-radius: 15px;
     background-image: url('./Img/bna-premia-back.png');
@@ -2517,7 +2524,14 @@ div.card-body > p > i{
     background-position: top; 
     background-repeat: no-repeat; 
 }
-*/
+
+.card-body-macro {
+    border-radius: 15px;
+    background-image: url('./Img/macro-premia-back.png');
+    background-size: 100% auto; 
+    background-position: top; 
+    background-repeat: no-repeat; 
+}
 
 .trio-de-botones-container {
     overflow-x: auto;
@@ -3772,7 +3786,7 @@ div .form-check {
 .carrito {
 
     text-align: center;
-    background: linear-gradient(to bottom, #ffe4e3, white);
+    background: linear-gradient(to bottom, #ffe4e3, rgba(255, 255, 255, 0));
     color: #c62828; 
     padding: 12px 16px;
     border-top: 2px solid #ef5350; 
@@ -3788,7 +3802,7 @@ div .form-check {
 .puntos {
     text-align: center;
     font-size: small;
-    background: linear-gradient(to bottom, #deffa1, white);
+    background: linear-gradient(to bottom, #deffa1, rgba(255, 255, 255, 0));
     background-color: #deffa1;
     color: green; 
     padding: 12px 16px;
