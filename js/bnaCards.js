@@ -1821,10 +1821,30 @@ function marcarFacturado(id) {
                 Swal.fire('Error al guardar datos', '', 'error');
             });
 
+            // Actualizar los contadores de los badges
+            actualizarContadores(-1, 1); // Restar 1 a Facturar y sumar 1 a Preparar
+
             cerrarCollapseCard(id);
             cerrarModal(id)
         }
     });
+}
+
+function actualizarContadores(cambioFacturar, cambioPreparar) {
+    const contadorFacturar = document.getElementById('contadorCardsFacturar');
+    const contadorPreparar = document.getElementById('contadorCards');
+
+    // Obtener los valores actuales de los contadores
+    let valorFacturar = parseInt(contadorFacturar.textContent) || 0;
+    let valorPreparar = parseInt(contadorPreparar.textContent) || 0;
+
+    // Actualizar los valores de los contadores
+    valorFacturar = Math.max(0, valorFacturar + cambioFacturar); // Actualizar Facturar, asegurando que no sea negativo
+    valorPreparar = Math.max(0, valorPreparar + cambioPreparar); // Actualizar Preparar, asegurando que no sea negativo
+
+    // Establecer los nuevos valores en los badges
+    contadorFacturar.textContent = valorFacturar;
+    contadorPreparar.textContent = valorPreparar;
 }
 
 function marcarCancelado2(id) {
@@ -1907,6 +1927,9 @@ function marcarCancelado2(id) {
     }).catch((error) => {
         console.error("Error al pushear a Firebase:", error);
     });
+
+    // Actualizar los contadores de los badges
+    actualizarContadores(-1, -1); // Restar 1 a Facturar y Resta 1 a Preparar
 
     cerrarCollapseCard(id);
     cerrarModal(id)
@@ -2060,6 +2083,9 @@ refEnvios.set(contenidoBoton).then(() => {
     console.error('Error al guardar en Firebase:', error);
     Swal.fire('Error al guardar datos', '', 'error');
 });
+            
+// Actualizar los contadores de los badges
+actualizarContadores(-1, 1); // Restar 1 a Facturar y sumar 1 a Preparar
 
 cerrarCollapseCard(id);
 cerrarModal(id)
