@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 database.ref('envios')
                     .orderByChild('idOperacion')
                     .equalTo(queryNumber)
-                    .limitToLast(5000) 
+                    .limitToLast(50000) 
                     .once('value')
                     .then(snapshot => {
                         const allData = snapshot.val(); 
