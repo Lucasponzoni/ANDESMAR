@@ -1738,7 +1738,6 @@ async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
 }
 
 function marcarFacturado(id) {
-
     const facturaStatusDiv = document.getElementById(`factura-status-${id}`);
     Swal.fire({
         title: 'Clave de facturación 🔒',
@@ -1770,35 +1769,27 @@ function marcarFacturado(id) {
 
             if (clave === '1110') {
                 contenidoBoton = `Facturado Brisa ${horaFormateada} ${fechaFormateada}`;
-                mensajeFactura = 'Facturado ✅';
-                facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
-                facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
+                mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else if (clave === '1111') {
                 contenidoBoton = `Facturado Leo ${horaFormateada} ${fechaFormateada}`;
-                mensajeFactura = 'Facturado ✅';
-                facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
-                facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
+                mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else if (clave === '1112') {
                 contenidoBoton = `Facturado Julian ${horaFormateada} ${fechaFormateada}`;
-                mensajeFactura = 'Facturado ✅';
-                facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
-                facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
+                mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else if (clave === '1113') {
                 contenidoBoton = `Facturado Mauricio ${horaFormateada} ${fechaFormateada}`;
-                mensajeFactura = 'Facturado ✅';
-                facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
-                facturaStatusDiv.classList.add('em-circle-state-time-facturado'); 
+                mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else if (clave === '1114') {
                 contenidoBoton = `Facturado Automata Nicolas D. ${horaFormateada} ${fechaFormateada}`;
-                mensajeFactura = 'Facturado ✅';
+                mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else if (clave === '1115') {
                 contenidoBoton = `Facturado Automata Julian L. ${horaFormateada} ${fechaFormateada}`;
-                mensajeFactura = 'Facturado ✅';
-            }else {
+                mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
+            } else {
                 Swal.fire('Clave incorrecta', '', 'error');
                 return; // Salir si la clave es incorrecta
             }
-
+            
             // Cambiar el contenido del botón y deshabilitarlo
             const boton = document.getElementById(`marcar-facturado-${id}`);
             boton.textContent = contenidoBoton;
@@ -1807,9 +1798,12 @@ function marcarFacturado(id) {
             boton.disabled = true;
 
             // Cambiar el contenido y clase del div de estado de factura
-            const estadoFacturaDiv = document.getElementById(`factura-status-${id}`);
-            estadoFacturaDiv.textContent = mensajeFactura;
-            estadoFacturaDiv.classList.add('facturado-bna'); // Agregar la clase
+            facturaStatusDiv.innerHTML = mensajeFactura;
+            facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+            facturaStatusDiv.classList.remove('facturable'); 
+            facturaStatusDiv.classList.add('em-circle-state-time-facturado');
+
+            cerrarCollapseCard(id)
 
             // Pushear en Firebase
             const ref = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
@@ -1820,10 +1814,6 @@ function marcarFacturado(id) {
                 Swal.fire('Error al guardar datos', '', 'error');
             });
         }
-
-        setTimeout(() => {
-            location.reload();
-        }, 3000);
     });
 }
 
@@ -1871,14 +1861,14 @@ function marcarCancelado2(id) {
             break;
         case '1115':
             nombreFacturador = 'Julian L.';
-            contenidoBoton = `Cancelado JUlian L. ${horaFormateada} ${fechaFormateada}`;
+            contenidoBoton = `Cancelado Julian L. ${horaFormateada} ${fechaFormateada}`;
             break;
         default:
             Swal.fire('Clave incorrecta', '', 'error');
             return; // Salir si la clave es incorrecta
     }
 
-    mensajeCancelado = 'Cancelado ❌';
+    mensajeCancelado = '<i class="bi bi-x-circle" style="margin-right: 5px;"></i> Cancelado';
 
     // Cambiar el contenido del botón y deshabilitarlo
     const boton = document.getElementById(`cancelar-venta-${id}`);
@@ -1887,29 +1877,38 @@ function marcarCancelado2(id) {
     boton.classList.add('btn-secondary');
     boton.disabled = true;
 
-    // Asegúrate de definir estadoFacturaDiv correctamente
-    facturaStatusDiv.textContent = mensajeCancelado;
-    facturaStatusDiv.classList.add('cancelado-bna'); // Agregar la clase
+    // Cambiar el contenido y clase del div de estado de factura
+    facturaStatusDiv.innerHTML = mensajeCancelado;
+    facturaStatusDiv.classList.remove('facturable'); // Remover la clase facturable
+    facturaStatusDiv.classList.add('em-circle-state-time-cancelado'); // Agregar la clase cancelado
+    facturaStatusDiv.classList.add('cancelado-bna'); // Agregar la clase cancelado-bna
 
-// Pushear en Firebase
-const refEnvios = firebase.database().ref(`enviosBNA/${id}`);
-refEnvios.update({
-    marcaEntregado: "Si",
-    marcaPreparado:"Si",
-    tipoElectrodomesticoBna: "bulto20",
-    estado: "Cancelado",
-    datoFacturacion: `Cancelado ${nombreFacturador} ${horaFormateada} ${fechaFormateada}`,
-    cancelado: true
-}).then(() => {
-    console.log(`Venta cancelada y pusheada: ${nombreFacturador} ${horaFormateada} ${fechaFormateada}`);
-}).catch((error) => {
-    console.error("Error al pushear a Firebase:", error);
-});
+    cerrarCollapseCard(id)
 
-setTimeout(() => {
-    location.reload();
-}, 3000);
+    // Pushear en Firebase
+    const refEnvios = firebase.database().ref(`enviosBNA/${id}`);
+    refEnvios.update({
+        marcaEntregado: "Si",
+        marcaPreparado: "Si",
+        tipoElectrodomesticoBna: "bulto20",
+        estado: "Cancelado",
+        datoFacturacion: `Cancelado ${nombreFacturador} ${horaFormateada} ${fechaFormateada}`,
+        cancelado: true
+    }).then(() => {
+        console.log(`Venta cancelada y pusheada: ${nombreFacturador} ${horaFormateada} ${fechaFormateada}`);
+    }).catch((error) => {
+        console.error("Error al pushear a Firebase:", error);
+    });
+}
 
+function cerrarCollapseCard(id) {
+    const collapseElements = document.querySelectorAll(`#collapseDetalleProducto-${id}, #collapseDetalleFacturacion-${id}, #collapseDetallePago-${id}, #collapseObservaciones-${id}`);
+    collapseElements.forEach(element => {
+        const collapseInstance = new bootstrap.Collapse(element, {
+            toggle: false
+        });
+        collapseInstance.hide();
+    });
 }
 
 function marcarFacturado2(id) {
@@ -1933,22 +1932,22 @@ function marcarFacturado2(id) {
 
     if (clave === '1110') {
         contenidoBoton = `Facturado Automata Brisa ${horaFormateada} ${fechaFormateada}`;
-        mensajeFactura = 'Facturado ✅';
+        mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1111') {
         contenidoBoton = `Facturado Automata Leo ${horaFormateada} ${fechaFormateada}`;
-        mensajeFactura = 'Facturado ✅';
+        mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1112') {
         contenidoBoton = `Facturado Automata Marina ${horaFormateada} ${fechaFormateada}`;
-        mensajeFactura = 'Facturado ✅';
+        mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1113') {
         contenidoBoton = `Facturado Automata Mauricio ${horaFormateada} ${fechaFormateada}`;
-        mensajeFactura = 'Facturado ✅';
+        mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1114') {
         contenidoBoton = `Facturado Automata Nicolas D. ${horaFormateada} ${fechaFormateada}`;
-        mensajeFactura = 'Facturado ✅';
+        mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1115') {
         contenidoBoton = `Facturado Automata Julian L. ${horaFormateada} ${fechaFormateada}`;
-        mensajeFactura = 'Facturado ✅';
+        mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else {
         Swal.fire('Clave incorrecta', '', 'error');
         return; 
@@ -1961,10 +1960,13 @@ function marcarFacturado2(id) {
     boton.classList.add('btn-success');
     boton.disabled = true;
 
-    // Asegúrate de definir estadoFacturaDiv correctamente
-    const estadoFacturaDiv = document.getElementById(`factura-status-${id}`);
-    estadoFacturaDiv.textContent = mensajeFactura;
-    estadoFacturaDiv.classList.add('facturado-bna'); // Agregar la clase
+    cerrarCollapseCard(id)
+
+    // Cambiar el contenido y clase del div de estado de factura
+    facturaStatusDiv.innerHTML = mensajeFactura;
+    facturaStatusDiv.classList.remove('em-circle-state-time-facturado'); 
+    facturaStatusDiv.classList.remove('facturable'); 
+    facturaStatusDiv.classList.add('em-circle-state-time-facturado');
 
 // Pushear en Firebase
 const refEnvios = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
@@ -2048,9 +2050,6 @@ refEnvios.set(contenidoBoton).then(() => {
     Swal.fire('Error al guardar datos', '', 'error');
 });
 
-setTimeout(() => {
-    location.reload();
-}, 4000);
 }
 
 const usuario = "BOM6765";
