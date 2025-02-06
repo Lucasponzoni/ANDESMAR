@@ -1168,9 +1168,18 @@ const isSkuIncluded = skusList.includes(data[i].sku);
                             <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].sku}')">
                             <i class="bi bi-clipboard"></i>
                             </button>
+        
+
                             </p>
 
                                 <p class="card-text-pago"><i class="bi bi-card-text"></i> <strong>Descripción:</strong> ${data[i].producto_nombre}</p>
+
+                            <i class="bi bi-fire" style="color: orange;"></i>
+                            <strong>id:</strong> <strong>${data[i].id}</strong>
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].id}')">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                                
                              </div>
                             </div>
 
@@ -1803,8 +1812,6 @@ function marcarFacturado(id) {
             facturaStatusDiv.classList.remove('facturable'); 
             facturaStatusDiv.classList.add('em-circle-state-time-facturado');
 
-            cerrarCollapseCard(id)
-
             // Pushear en Firebase
             const ref = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
             ref.set(contenidoBoton).then(() => {
@@ -1813,6 +1820,9 @@ function marcarFacturado(id) {
                 console.error('Error al guardar en Firebase:', error);
                 Swal.fire('Error al guardar datos', '', 'error');
             });
+
+            cerrarCollapseCard(id);
+            cerrarModal(id)
         }
     });
 }
@@ -1883,8 +1893,6 @@ function marcarCancelado2(id) {
     facturaStatusDiv.classList.add('em-circle-state-time-cancelado'); // Agregar la clase cancelado
     facturaStatusDiv.classList.add('cancelado-bna'); // Agregar la clase cancelado-bna
 
-    cerrarCollapseCard(id)
-
     // Pushear en Firebase
     const refEnvios = firebase.database().ref(`enviosBNA/${id}`);
     refEnvios.update({
@@ -1899,6 +1907,9 @@ function marcarCancelado2(id) {
     }).catch((error) => {
         console.error("Error al pushear a Firebase:", error);
     });
+
+    cerrarCollapseCard(id);
+    cerrarModal(id)
 }
 
 function cerrarCollapseCard(id) {
@@ -1910,6 +1921,8 @@ function cerrarCollapseCard(id) {
         collapseInstance.hide();
     });
 }
+
+
 
 function marcarFacturado2(id) {
     const facturaStatusDiv = document.getElementById(`factura-status-${id}`);
@@ -1959,8 +1972,6 @@ function marcarFacturado2(id) {
     boton.classList.remove('btn-danger');
     boton.classList.add('btn-success');
     boton.disabled = true;
-
-    cerrarCollapseCard(id)
 
     // Cambiar el contenido y clase del div de estado de factura
     facturaStatusDiv.innerHTML = mensajeFactura;
@@ -2050,6 +2061,30 @@ refEnvios.set(contenidoBoton).then(() => {
     Swal.fire('Error al guardar datos', '', 'error');
 });
 
+cerrarCollapseCard(id);
+cerrarModal(id)
+
+}
+
+function cerrarModal(id) {
+    // Cerrar el modal utilizando jQuery si está disponible
+    if (typeof $ !== 'undefined') {
+        $(`#infoFacturacionModal${id}`).modal('hide');
+    } else {
+        // Alternativa sin jQuery
+        const modal = document.getElementById(`infoFacturacionModal${id}`);
+        if (modal) {
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+            modal.removeAttribute('aria-modal');
+            modal.style.display = 'none';
+
+            const modalBackdrop = document.querySelector('.modal-backdrop');
+            if (modalBackdrop) {
+                modalBackdrop.parentNode.removeChild(modalBackdrop);
+            }
+        }
+    }
 }
 
 const usuario = "BOM6765";
