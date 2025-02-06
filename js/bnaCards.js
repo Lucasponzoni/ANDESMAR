@@ -422,6 +422,10 @@ function getOrderUrl(ordenPublica) {
             return `https://api.avenida.com/manage/shops/2942/orders/${ordenPublica}`;
         case "2943":
             return `https://api.avenida.com/manage/shops/2943/orders/${ordenPublica}`;
+        case "1914":
+            return `https://api-macro.avenida.com/manage/shops/1914/orders/${ordenPublica}`;
+        case "1915":
+            return `https://api-macro.avenida.com/manage/shops/1915/orders/${ordenPublica}`;
         default:
             return '#'; // URL por defecto si no coincide
     }
