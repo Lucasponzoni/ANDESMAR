@@ -423,6 +423,7 @@ function loadEnviosFromFirebase() {
                     direccion_facturacion: capitalizeWords(data.direccion_facturacion ? data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '') : ''),
                     ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
                     dni: data.dni,
+                    estadoEnvio: data.estado_del_envio,
                     codigo_postal_facturacion: data.codigo_postal_facturacion,
                     otros_comentarios_entrega: data.otros_comentarios_entrega,
                     iva: data.condicion_iva,
@@ -430,7 +431,6 @@ function loadEnviosFromFirebase() {
                     nombre_completo_envio: capitalizeWords(data.nombre_completo_envio),
                     monto_cobrado: data.monto_cobrado
                 });
-
 
                 // Incrementar el contador si tipoElectrodomesticoBna está vacío
                 if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
@@ -1110,8 +1110,8 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
     })()}
 </div>
 
-                            <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isCDS || isAndesmar || isLogPropia) ? 'em-circle-state4' : 'em-circle-state3'}">
-                                ${(isAndreani || isAndesmar || isCDS || isLogPropia) ? 
+                            <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isCDS || isAndesmar || isLogPropia || data[i].envio === 'oca') ? 'em-circle-state4' : 'em-circle-state3'}">
+                                ${(isAndreani || isAndesmar || isCDS || isLogPropia || data[i].envio === 'oca') ? 
                                     '<i class="bi bi-check-circle-fill margen-icon"></i> Preparado' : 
                                     '<i class="bi bi-stopwatch-fill margen-icon"></i> Pendiente'}
                             </div>
@@ -1226,7 +1226,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
     </div>
 
     <div class="form-check form-switch switch-ios"> 
-        <input class="form-check-input input-interruptor" type="checkbox" id="entregado-${data[i].id}-1" ${data[i].marcaEntregado === 'Si' ? 'checked' : ''}>
+        <input class="form-check-input input-interruptor" type="checkbox" id="entregado-${data[i].id}-1" ${data[i].estadoEnvio === 'entregado' ? 'checked' : ''}>
         <label class="form-check-label etiqueta-interruptor" for="entregado-${data[i].id}-1"><strong>2</strong> Entregado</label>
     </div>
 </div>
