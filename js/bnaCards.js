@@ -208,21 +208,25 @@ document.getElementById('importButton').addEventListener('click', function() {
             const headers = data[0].map(header => sanitizeHeader(header));
             const dataRows = data.slice(1);
             let importedCount = 0;
-            let existingCount = 0; // Contador para registros existentes
-            let skippedCount = 0; // Contador para registros omitidos por manipulación
+            let existingCount = 0;
+            let skippedCount = 0;
+            let changedInfo = 0;
             const promises = [];
+
+            let spinner2 = document.getElementById("spinner2");
+            spinner2.style.display = "flex";
 
             dataRows.forEach(row => {
                 if (row.length > 0) {
                     const envioData = {};
-
+            
                     // Construir el objeto usando las cabeceras
                     headers.forEach((header, index) => {
                         envioData[header] = row[index] !== undefined ? sanitizeValue(row[index]) : ""; // Asignar cadena vacía si está vacío
                     });
-
-                    const orden = envioData['orden_']; // Ajustar aquí según el nuevo nombre de la cabecera
-
+            
+                    const orden = envioData['orden_']; 
+            
                     // Verificar si ya existe en Firebase
                     const envioRef = firebase.database().ref('enviosBNA');
                     promises.push(
@@ -233,38 +237,88 @@ document.getElementById('importButton').addEventListener('click', function() {
                                 });
                             } else {
                                 existingCount++;
+                                const existingData = snapshot.val();
+                                const existingKey = Object.keys(existingData)[0]; // Obtener la clave del primer registro encontrado
+            
+                                // Comprobar si los valores son diferentes y actualizar si es necesario
+                                const existingSeguimiento = existingData[existingKey].numero_de_seguimiento;
+                                const existingMedioEnvio = existingData[existingKey].medio_de_envio;
+                                const existingEstadoEnvio = existingData[existingKey].estado_del_envio;
+            
+                                // Verificar y actualizar los campos si son diferentes
+                                let needsUpdate = false;
+                                const updates = {};
+            
+                                if (existingSeguimiento !== envioData.numero_de_seguimiento) {
+                                    updates.numero_de_seguimiento = envioData.numero_de_seguimiento;
+                                    needsUpdate = true;
+                                }
+                                if (existingMedioEnvio !== envioData.medio_de_envio) {
+                                    updates.medio_de_envio = envioData.medio_de_envio;
+                                    needsUpdate = true;
+                                }
+                                if (existingEstadoEnvio !== envioData.estado_del_envio) {
+                                    updates.estado_del_envio = envioData.estado_del_envio;
+                                    needsUpdate = true;
+                                }
+            
+                                // Actualizar en Firebase si hay cambios
+                                if (needsUpdate) {
+                                    return envioRef.child(existingKey).update(updates).then(() => {
+                                        changedInfo++;
+                                    });
+                                }
                             }
                         }).catch(error => {
                             console.error('Error al verificar existencia en Firebase:', error);
                         })
                     );
                 } else {
-                    skippedCount++; // Incrementar si la fila está vacía
+                    skippedCount++;
                 }
             });
-
+            
             Promise.all(promises)
-            .then(() => {
-                spinner.remove();
-                Swal.fire({
-                    title: 'Importación completada',
-                    text: `Se han importado ${importedCount} ventas a la base de datos, ${existingCount} ya se encontraban en planilla, ${skippedCount} registros fueron omitidos por estar vacíos.`,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    location.reload();
-                });
-            })
-            .catch(error => {
-                spinner.remove();
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Ocurrió un error al importar los datos',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            });
-        };
+                .then(() => {
+                    spinner2.style.display = "none";
+                    Swal.fire({
+                        title: 'Importación completada',
+                        html: `
+                            <div style="text-align: left; font-size: 1.1em;">
+                                <p><span class="counter imported">${importedCount}</span> Ventas importadas a la base de datos.</p>
+                                <p><span class="counter existing">${existingCount}</span> Ya se encontraban en planilla.</p>
+                                <p><span class="counter skipped">${skippedCount}</span> Registros omitidos por estar vacíos.</p>
+                                <p><span class="counter changed">${changedInfo}</span> Registros de envíos actualizados.</p>
+                            </div>
+                        `,
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            popup: 'ios-style-popup',
+                            title: 'ios-style-title',
+                            content: 'ios-style-content',
+                            confirmButton: 'ios-style-confirm-button'
+                        }
+                    }).then(() => {
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    spinner2.style.display = "none";
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Ocurrió un error al importar los datos',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            popup: 'ios-style-popup',
+                            title: 'ios-style-title',
+                            content: 'ios-style-content',
+                            confirmButton: 'ios-style-confirm-button'
+                        }
+                    });
+                });            
+            };
 
         reader.readAsText(file);
     }

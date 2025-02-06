@@ -5654,3 +5654,59 @@ img.gray-filter {
 .btn-delete-bna:hover{
     color: yellow;
 }
+
+.ios-style-popup {
+    border-radius: 20px;
+    padding: 20px;
+    font-family: 'San Francisco', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.ios-style-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+}
+
+.ios-style-content {
+    font-size: 1.1em;
+    color: #666;
+}
+
+.ios-style-confirm-button {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.ios-style-confirm-button:hover {
+    background-color: #005bb5;
+}
+
+.counter {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+}
+
+.counter.imported {
+    background-color: #4caf50; /* Verde */
+}
+
+.counter.existing {
+    background-color: #ff9800; /* Naranja */
+}
+
+.counter.skipped {
+    background-color: #f44336; /* Rojo */
+}
+
+.counter.changed {
+    background-color: #2196f3; /* Azul */
+}
