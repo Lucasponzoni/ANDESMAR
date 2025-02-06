@@ -1207,7 +1207,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 ${isLogPropia ? 
                                 'Logística Propia' : 
                                 (data[i].envio === 'oca' ? 
-                                `<a href="https://www.oca.com.ar/Busquedas/Envios" target="_blank">OCA: ${data[i].numeroSeguimiento} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                `<a href="https://www.aftership.com/es/track/oca-ar/${data[i].numeroSeguimiento}" target="_blank">OCA: ${data[i].numeroSeguimiento} <i class="bi bi-box-arrow-up-right"></i></a>` : 
                                 (isCDS ? 
                                 `<a href="${data[i].trackingLink}" target="_blank">CDS: ${data[i].transportCompanyNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
                                 (isAndreani ? 
