@@ -1224,12 +1224,13 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                     <input class="form-check-input input-interruptor" type="checkbox" id="preparacion-${data[i].id}" ${data[i].marcaPreparado === 'Si' || data[i].envio === 'oca' ? 'checked' : ''}>
                                     <label class="form-check-label etiqueta-interruptor" for="preparacion-${data[i].id}"><strong>1</strong> Preparación</label>
                                 </div>
-                                                                                    
+
                                 <div class="form-check form-switch switch-ios"> 
                                     <input class="form-check-input input-interruptor" type="checkbox" id="entregado-${data[i].id}-1" ${data[i].marcaEntregado === 'Si' || data[i].estadoEnvio === 'entregado' ? 'checked' : ''}>
                                     <label class="form-check-label etiqueta-interruptor" for="entregado-${data[i].id}-1"><strong>2</strong> Entregado</label>
                                 </div>
                             </div>
+                            <!-- Fin contenedor para los switches -->
 
                             <div class="factura-status em-circle-state-time ${isParaFacturar ? 'facturable' : ''}" id="factura-status-${data[i].id}">
                                 ${mensajeFactura}
