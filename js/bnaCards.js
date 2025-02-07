@@ -1973,9 +1973,16 @@ function marcarFacturado(id) {
             actualizarContadores(-1, 1); // Restar 1 a Facturar y sumar 1 a Preparar
 
             cerrarCollapseCard(id);
-            clearSearchInput();
+
             cerrarModal(id);
-        }
+
+            // Limpiar el buscador y mostrar todas las tarjetas después de un retraso de 2 segundos
+            const searchInput = document.getElementById('searchBna');
+            setTimeout(() => {
+            searchInput.value = ''; 
+            searchInput.dispatchEvent(new Event('input'));
+            }, 2000);
+            }
     });
 }
 
@@ -2088,8 +2095,15 @@ function marcarCancelado2(id) {
     actualizarContadores(-1, -1); // Restar 1 a Facturar y Resta 1 a Preparar
 
     cerrarCollapseCard(id);
-    clearSearchInput();
+
     cerrarModal(id);   
+
+    // Limpiar el buscador y mostrar todas las tarjetas después de un retraso de 2 segundos
+    const searchInput = document.getElementById('searchBna');
+    setTimeout(() => {
+    searchInput.value = ''; 
+    searchInput.dispatchEvent(new Event('input'));
+    }, 2000);
 }
 
 function cerrarCollapseCard(id) {
@@ -2245,8 +2259,16 @@ refEnvios.set(contenidoBoton).then(() => {
 actualizarContadores(-1, 1); // Restar 1 a Facturar y sumar 1 a Preparar
 
 cerrarCollapseCard(id);
-clearSearchInput();
+
 cerrarModal(id);
+
+// Limpiar el buscador y mostrar todas las tarjetas después de un retraso de 2 segundos
+const searchInput = document.getElementById('searchBna');
+setTimeout(() => {
+searchInput.value = ''; 
+searchInput.dispatchEvent(new Event('input'));
+}, 2000);
+
 }
 
 function cerrarModal(id) {
