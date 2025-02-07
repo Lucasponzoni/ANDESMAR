@@ -724,7 +724,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="order_id_${data[i].id}">Order ID:</label>
-                                <input type="text" id="order_id_${data[i].id}" value="${data[i].remito}" disabled>
+                                <input type="text" id="order_id_${data[i].id}" value="${data[i].remito}${data[i].carrito ? '-' + Math.floor(Math.random() * 900 + 100) : ''}" disabled>
                             </div>
                             <div class="col">
                                 <label for="estado_${data[i].id}">Estado:</label>
