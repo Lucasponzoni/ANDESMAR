@@ -2450,6 +2450,17 @@ div.card-body > p > i{
     justify-content: center;
 }
 
+.em-circle-state-time-cancelado::before {
+    content: ""; 
+    font-family: 'Font Awesome 5 Free'; 
+    position: absolute;
+    left: 10px; 
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    color: white;
+}
+
 .button-container {
     display: flex;
     gap: 10px; 
