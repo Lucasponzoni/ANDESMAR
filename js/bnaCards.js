@@ -375,6 +375,8 @@ function loadEnviosFromFirebase() {
             allData = [];
             let sinPrepararCount = 0;
             let sinFacturarCount = 0;
+            let sinMarcar1Count = 0; 
+            let sinMarcar2Count = 0; 
 
             snapshot.forEach(function(childSnapshot) {
                 const data = childSnapshot.val();
@@ -432,12 +434,20 @@ function loadEnviosFromFirebase() {
                     monto_cobrado: data.monto_cobrado
                 });
 
+                if (!data.marcaPreparado) {
+                    sinMarcar1Count++;
+                }
+
+                if (!data.marcaEntregado) {
+                    sinMarcar2Count++;
+                }
+
                 // Incrementar el contador si tipoElectrodomesticoBna está vacío
                 if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
                     sinPrepararCount++;
                 }
 
-                // Incrementar el contador si tipoElectrodomesticoBna está vacío
+                // Incrementar el contador si datoFacturacion está vacío
                 if (!data.datoFacturacion) {
                     sinFacturarCount++;
                 }
@@ -448,14 +458,15 @@ function loadEnviosFromFirebase() {
             renderCards(allData);
             updatePagination(allData.length);
 
+            // Actualizar el contador en el botón
+            document.getElementById('contadorCards').innerText = sinPrepararCount;
+            document.getElementById('contadorCards1').innerText = sinMarcar1Count; 
+            document.getElementById('contadorCards2').innerText = sinMarcar2Count; 
+            document.getElementById('contadorCardsFacturar').innerText = sinFacturarCount;
+
             // Habilitar el buscador después de cargar los datos
             searchInput.disabled = false;
             searchInput.value = "";
-
-            // Actualizar el contador en el botón
-            document.getElementById('contadorCards').innerText = sinPrepararCount;
-            // Actualizar el contador en el botón
-            document.getElementById('contadorCardsFacturar').innerText = sinFacturarCount;
 
             if (spinner) {
                 spinner.remove(); // Ocultar spinner después de cargar los datos

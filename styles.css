@@ -3043,6 +3043,16 @@ div.card-body > p > i{
     z-index: 1;
 }
 
+.ios-badge {
+    background-color: #dc3545; 
+    color: white; 
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 9999px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
 .timeline-circle.last{
     position: absolute;
     left: -30px;
