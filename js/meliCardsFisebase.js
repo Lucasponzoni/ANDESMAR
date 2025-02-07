@@ -2531,7 +2531,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         
             Queremos informarte que vamos a visitarte el ${diaFormateadoBsAs}.
                 
-            Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
         
             Cualquier consulta, estamos a tu servicio. ¡Gracias!
             
@@ -2545,7 +2545,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         
             Queremos informarte que vamos a visitarte el ${diaFormateadoStaFe}.
         
-            Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
         
             Cualquier consulta, estamos a tu servicio. ¡Gracias!
             
@@ -2558,7 +2558,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         
             Queremos informarte que vamos a visitarte el ${diaFormateadoSanNicolas}.
         
-            Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
         
             Cualquier consulta, estamos a tu servicio. ¡Gracias!
             
@@ -2571,7 +2571,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         
             Queremos informarte que vamos a visitarte el ${diaFormateadoRafaela}.
         
-            Por favor, confírmanos un teléfono actualizado para poder contactarte. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
         
             Cualquier consulta, estamos a tu servicio. ¡Gracias!
             
