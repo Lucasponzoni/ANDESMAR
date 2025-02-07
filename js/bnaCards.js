@@ -1973,9 +1973,17 @@ function marcarFacturado(id) {
             actualizarContadores(-1, 1); // Restar 1 a Facturar y sumar 1 a Preparar
 
             cerrarCollapseCard(id);
-            cerrarModal(id)
+            clearSearchInput();
+            cerrarModal(id);
         }
     });
+}
+
+function clearSearchInput() {
+    const searchInput = document.getElementById('searchBna');
+    if (searchInput) {
+        searchInput.value = '';
+    }
 }
 
 function actualizarContadores(cambioFacturar, cambioPreparar) {
@@ -2080,7 +2088,8 @@ function marcarCancelado2(id) {
     actualizarContadores(-1, -1); // Restar 1 a Facturar y Resta 1 a Preparar
 
     cerrarCollapseCard(id);
-    cerrarModal(id)
+    clearSearchInput();
+    cerrarModal(id);   
 }
 
 function cerrarCollapseCard(id) {
@@ -2236,8 +2245,8 @@ refEnvios.set(contenidoBoton).then(() => {
 actualizarContadores(-1, 1); // Restar 1 a Facturar y sumar 1 a Preparar
 
 cerrarCollapseCard(id);
-cerrarModal(id)
-
+clearSearchInput();
+cerrarModal(id);
 }
 
 function cerrarModal(id) {
