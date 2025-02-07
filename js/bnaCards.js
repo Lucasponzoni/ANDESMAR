@@ -377,6 +377,7 @@ function loadEnviosFromFirebase() {
             let sinFacturarCount = 0;
             let sinMarcar1Count = 0; 
             let sinMarcar2Count = 0; 
+            let duplicados = 0; 
 
             snapshot.forEach(function(childSnapshot) {
                 const data = childSnapshot.val();
@@ -442,6 +443,10 @@ function loadEnviosFromFirebase() {
                     sinMarcar2Count++;
                 }
 
+                if (data.carritoCompra2) {
+                    duplicados++;
+                }
+
                 // Incrementar el contador si tipoElectrodomesticoBna está vacío
                 if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
                     sinPrepararCount++;
@@ -462,6 +467,7 @@ function loadEnviosFromFirebase() {
             document.getElementById('contadorCards').innerText = sinPrepararCount;
             document.getElementById('contadorCards1').innerText = sinMarcar1Count; 
             document.getElementById('contadorCards2').innerText = sinMarcar2Count; 
+            document.getElementById('contadorCards3').innerText = duplicados; 
             document.getElementById('contadorCardsFacturar').innerText = sinFacturarCount;
 
             // Habilitar el buscador después de cargar los datos
