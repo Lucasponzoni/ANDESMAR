@@ -9,6 +9,7 @@ async function sendEmail(Name, Subject, templateName, nombre, email, remito, lin
         "emailTemplateAndesmar": emailTemplateAndesmar,
         "emailTemplateAndreani": emailTemplateAndreani,
         "emailTemplateLogPropia": emailTemplateLogPropia,
+        "emailFacturacion": emailFacturacion,
     };
 
     // Obtener la función de plantilla basada en el nombre
@@ -81,7 +82,7 @@ async function sendEmail(Name, Subject, templateName, nombre, email, remito, lin
         const result = await response.json();
         if (result.Status === 'done') {
             console.log('Email enviado exitosamente');
-            showCustomAlert(`<i class="bi bi-envelope-check"></i> Email de Despacho enviado a ${emailData.To[0].Email} a las ${new Date().toLocaleTimeString()}`);
+            showCustomAlert(`<i class="bi bi-envelope-check"></i> Email enviado a ${emailData.To[0].Email} a las ${new Date().toLocaleTimeString()}`);
         } else {
             console.log(`Error al enviar el email: ${result.Message}`);
             showCustomAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${emailData.To[0].Email} a las ${new Date().toLocaleTimeString()}`);

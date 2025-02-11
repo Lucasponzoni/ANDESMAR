@@ -1058,7 +1058,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
 <div class="button-container-cds">
     <button id="facturar-automata-${data[i].id}" 
             class="btn ${data[i].cancelado ? 'btn-secondary' : (data[i].datoFacturacion ? 'btn-success' : 'btn-primary')}" 
-            onclick="marcarFacturado2('${data[i].id}')"
+            onclick="marcarFacturado2('${data[i].id}', '${data[i].email}', '${data[i].nombre}', '${data[i].remito}')"
             ${data[i].cancelado ? 'disabled' : (data[i].datoFacturacion ? 'disabled' : '')}>
         ${data[i].cancelado ? '<i class="bi bi-x-octagon"></i> Sin facturar Cancelado' : (data[i].datoFacturacion ? '<i class="bi bi-check2-circle"></i> Ya Facturado' : '<i class="bi bi-robot"></i> Facturar')}
     </button>
@@ -1404,7 +1404,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                     <button id="marcar-facturado-${data[i].id}" type="button" 
                                     class="btn ${data[i].cancelado ? 'btn-danger' : (hasDatoFacturacion ? 'btn-success' : 'btn-danger')} w-100 mb-1" 
                                     ${hasDatoFacturacion ? 'disabled' : ''} 
-                                    onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}')`}">
+                                    onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}', '${data[i].email}', '${data[i].nombre}', '${data[i].remito}')`}">
                                     ${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
                                     <i class="bi bi-lock-fill icono"></i>
                                     </button>
@@ -1894,7 +1894,7 @@ async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
     }
 }
 
-function marcarFacturado(id) {
+async function marcarFacturado(id, email, nombre, remito) {
     const facturaStatusDiv = document.getElementById(`factura-status-${id}`);
     Swal.fire({
         title: 'Clave de facturación 🔒',
@@ -1906,7 +1906,7 @@ function marcarFacturado(id) {
         inputAttributes: {
             maxlength: 4
         }
-    }).then((result) => {
+    }).then(async (result) => {
         if (result.isConfirmed) {
             const clave = result.value;
 
@@ -1962,12 +1962,22 @@ function marcarFacturado(id) {
 
             // Pushear en Firebase
             const ref = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
-            ref.set(contenidoBoton).then(() => {
+            await ref.set(contenidoBoton).then(() => {
                 Swal.fire('Datos guardados correctamente', '', 'success');
             }).catch((error) => {
                 console.error('Error al guardar en Firebase:', error);
                 Swal.fire('Error al guardar datos', '', 'error');
             });
+
+            const Name = `Confirmación de Compra Novogar`;
+            const Subject = `Tu compra ${remito} fue Facturada - Novogar`;
+            const template = "emailFacturacion";
+            const transporte = "Pendiente";
+            const numeroDeEnvio = `Pendiente`;
+            const linkSeguimiento2 = `Pendiente`;
+
+            // Enviar el email después de procesar el envío
+            await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);            
 
             // Actualizar los contadores de los badges
             actualizarContadores(-1, 1); // Restar 1 a Facturar y sumar 1 a Preparar
@@ -1977,12 +1987,11 @@ function marcarFacturado(id) {
             cerrarModal(id);
 
             // Limpiar el buscador y mostrar todas las tarjetas después de un retraso de 2 segundos
-            const searchInput = document.getElementById('searchBna');
             setTimeout(() => {
-            searchInput.value = ''; 
-            searchInput.dispatchEvent(new Event('input'));
+                clearSearchInput();
+                searchInput.dispatchEvent(new Event('input'));
             }, 2000);
-            }
+        }
     });
 }
 
@@ -2118,7 +2127,7 @@ function cerrarCollapseCard(id) {
 
 
 
-function marcarFacturado2(id) {
+async function marcarFacturado2(id, email, nombre, remito) {
     const facturaStatusDiv = document.getElementById(`factura-status-${id}`);
     const claveInput = document.getElementById(`clave-facturacion-${id}`);
     const clave = claveInput.value;
@@ -2254,6 +2263,16 @@ refEnvios.set(contenidoBoton).then(() => {
     console.error('Error al guardar en Firebase:', error);
     Swal.fire('Error al guardar datos', '', 'error');
 });
+
+const Name = `Confirmación de Compra Novogar`;
+const Subject = `Tu compra ${remito} fue Facturada - Novogar`;
+const template = "emailFacturacion";
+const transporte = "Pendiente";
+const numeroDeEnvio = `Pendiente`;
+const linkSeguimiento2 = `Pendiente`;
+
+// Enviar el email después de procesar el envío
+await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);       
             
 // Actualizar los contadores de los badges
 actualizarContadores(-1, 1); // Restar 1 a Facturar y sumar 1 a Preparar
