@@ -239,16 +239,16 @@ document.getElementById('importButton').addEventListener('click', function() {
                                 existingCount++;
                                 const existingData = snapshot.val();
                                 const existingKey = Object.keys(existingData)[0]; // Obtener la clave del primer registro encontrado
-            
+                    
                                 // Comprobar si los valores son diferentes y actualizar si es necesario
                                 const existingSeguimiento = existingData[existingKey].numero_de_seguimiento;
                                 const existingMedioEnvio = existingData[existingKey].medio_de_envio;
                                 const existingEstadoEnvio = existingData[existingKey].estado_del_envio;
-            
+                    
                                 // Verificar y actualizar los campos si son diferentes
                                 let needsUpdate = false;
                                 const updates = {};
-            
+                    
                                 if (existingSeguimiento !== envioData.numero_de_seguimiento) {
                                     updates.numero_de_seguimiento = envioData.numero_de_seguimiento;
                                     needsUpdate = true;
@@ -261,9 +261,19 @@ document.getElementById('importButton').addEventListener('click', function() {
                                     updates.estado_del_envio = envioData.estado_del_envio;
                                     needsUpdate = true;
                                 }
-            
+                    
                                 // Actualizar en Firebase si hay cambios
                                 if (needsUpdate) {
+                                    // Actualizar marcaEntregado si estado_del_envio es "Entregado"
+                                    if (envioData.estado_del_envio === "entregado") {
+                                        updates.marcaEntregado = "Si";
+                                    }
+                    
+                                    // Actualizar marcaPreparado si estado_del_envio no es "Sin despachar"
+                                    if (envioData.estado_del_envio !== "sin despachar") {
+                                        updates.marcaPreparado = "Si";
+                                    }
+                    
                                     return envioRef.child(existingKey).update(updates).then(() => {
                                         changedInfo++;
                                     });
@@ -274,10 +284,10 @@ document.getElementById('importButton').addEventListener('click', function() {
                         })
                     );
                 } else {
-                    skippedCount++;
+                    skippedCount++; // Incrementar si la fila está vacía
                 }
             });
-            
+
             Promise.all(promises)
                 .then(() => {
                     spinner2.style.display = "none";
@@ -318,7 +328,7 @@ document.getElementById('importButton').addEventListener('click', function() {
                         }
                     });
                 });            
-            };
+        };
 
         reader.readAsText(file);
     }
@@ -3117,7 +3127,7 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
                 link.click();
             };
 
-            const linkSeguimiento = `AFtership.com/es/track/oca-ar/${numeroEnvio}`;
+            const linkSeguimiento = `https://www.aftership.com/es/track/oca-ar/${numeroEnvio}`;
             const numeroDeEnvioOca = `${numeroEnvio}`;
 
             const envioState = document.getElementById(`estadoEnvio${id}`);
@@ -3132,6 +3142,7 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
                 trackingLink: linkSeguimiento,
                 numero_de_seguimiento: numeroDeEnvioOca,
                 tipoElectrodomesticoBna: "bultoOca",
+                marcaPreparado: "Si",
             };
             
               db.ref(`enviosBNA/${id}`).update(transportData)
