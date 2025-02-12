@@ -3174,12 +3174,14 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
             await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
             
         } else {
-            textOca.innerText = 'No se encontró la etiqueta';
+            textOca.innerText = '⚠️ No se encontró la etiqueta ';
+            button.classList.add('disabled', 'btn-secondary');
         }
 
     } catch (error) {
         console.error('Error al llamar a la API:', error);
-        textOca.innerText = 'Error al generar etiqueta';
+        textOca.innerText = '⚠️ Error al generar etiqueta';
+        button.classList.add('disabled');
     } finally {
         button.disabled = false;
         spinnerOca.style.display = 'none';
