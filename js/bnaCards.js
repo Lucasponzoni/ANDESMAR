@@ -3136,7 +3136,7 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
             const template = "emailTemplateOCA";
             const transporte = "OCA";
             const numeroDeEnvio = `${numeroEnvio}`;
-            const linkSeguimiento2 = `AFtership.com/es/track/oca-ar/${numeroEnvio}`;
+            const linkSeguimiento2 = `https://www.aftership.com/es/track/oca-ar/${numeroEnvio}`;
 
             await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
             
@@ -4210,7 +4210,7 @@ function realizarBusqueda() {
     const isNumeric = /^\d+$/.test(searchTerm);
     const isText = /^[a-zA-Z]+$/.test(searchTerm);
     
-    if (!manualSearch && ((isNumeric && searchTerm.length < 7) || (isText && searchTerm.length < 4))) {
+    if (!manualSearch && ((isNumeric && searchTerm.length < 7) || (isText && searchTerm.length < 5))) {
         return; // No realizar la búsqueda si no se cumplen las condiciones y no es una búsqueda manual
     }
     
