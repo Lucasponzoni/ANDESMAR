@@ -4185,13 +4185,20 @@ function createBackButton() {
 // FIN VOLVER ATRAS
 
 // BUSCADOR
-searchInput.addEventListener("input", function() {
-    const searchTerm = searchInput.value.toLowerCase();
+searchInput.addEventListener("input", function() { const searchTerm = searchInput.value.toLowerCase();
+    
+    // Verificar si el término de búsqueda es numérico y tiene al menos 7 caracteres
+    const isNumeric = /^\d+$/.test(searchTerm);
+    const isText = /^[a-zA-Z]+$/.test(searchTerm);
+    
+    if ((isNumeric && searchTerm.length < 7) || (isText && searchTerm.length < 5)) {
+        return; // No realizar la búsqueda si no se cumplen las condiciones
+    }
     
     // Restablecer la paginación a la primera página
     currentPage = 1;
     currentPageGroup = 0;  // También restablecemos el grupo de páginas
-
+    
     // Filtrar los datos
     const filteredData = allData.filter(item => {
         return Object.values(item).some(value => 
@@ -4212,7 +4219,7 @@ searchInput.addEventListener("input", function() {
         renderCards(filteredData);
         updatePagination(filteredData.length);
     }
-});
+}); 
 // FIN BUSCADOR
 
 // GENERAR ETIQUETA LOGISTICA PROPIA
