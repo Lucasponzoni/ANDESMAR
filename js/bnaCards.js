@@ -2505,7 +2505,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     const proxyUrl = "https://proxy.cors.sh/";
     const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
 
-    console.log(`Datos enviados a API Andesmar (BNA+ ${remito}):`, requestObj); // Mostrar request en consola
+    console.log(`Datos enviados a API Andesmar (${remito}):`, requestObj); // Mostrar request en consola
 
     try {
         const response = await fetch(proxyUrl + apiUrl, {
@@ -2518,11 +2518,11 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         });
 
         const data = await response.json();
-        console.log(`Datos Respuesta API Andesmar (BNA+ ${remito}):`, data); // Mostrar response en consola
+        console.log(`Datos Respuesta API Andesmar (${remito}):`, data); // Mostrar response en consola
 
         if (data.NroPedido) {
-            const Name = `Confirmación de Envio BNA`;
-            const Subject = `Tu compra BNA+ ${remito} ya fue preparada para despacho`;
+            const Name = `Confirmación de Envio Novogar`;
+            const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
             const template = "emailTemplateAndesmar";
             const transporte = "Andesmar Cargas";
             const linkEtiqueta = `https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
@@ -2561,7 +2561,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
                 cotizacion: `$${precio_venta - suborden_total}` 
             });
             console.log("Nueva entrada agregada a Firebase:", { nombre, nroPedido: data.NroPedido, cp, localidad, calle, telefono });
-    
+                
             // Actualizar estado de envío
             if (envioState) {
                 envioState.className = 'em-circle-state4';
@@ -2826,8 +2826,8 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
                             envioState.innerHTML = `Preparado`;
                         }
 
-                        const Name = `Confirmación de Envio BNA`;
-                        const Subject = `Tu compra BNA+ ${remito} ya fue preparada para despacho`;
+                        const Name = `Confirmación de Envio Novogar`;
+                        const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
                         const template = "emailTemplateAndreani";
                         const transporte = "Correo Cruz del Sur";
                         const numeroDeEnvio = `NIC-${nicCds}`;
@@ -3013,27 +3013,30 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
     const spinnerOca = document.getElementById(`spinnerOca${id}`);
     const textOca = document.getElementById(`OcaText${id}`);
     const button = document.getElementById(`ocaButton${id}`);
+    const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
 
-    // Verificar si los elementos existen
     if (!spinnerOca || !textOca || !button) {
         console.error('Elementos no encontrados:', { spinnerOca, textOca, button });
-        return; // Salir de la función si no se encuentran los elementos
+        return;
     }
 
-    // Mostrar spinner y cambiar texto
+    console.log(`Enviando datos a OCA:
+        Volumen en m³: ${volumenM3}, Alto: ${altoA}, Ancho: ${anchoA}, Largo: ${largoA}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
+        ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
+        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}, SubOrden: ${suborden}
+    `);
+
     spinnerOca.style.display = 'inline-block';
     textOca.innerText = 'Generando Etiqueta...';
     button.disabled = true;
 
-    // Obtener la fecha actual y la fecha de hace 30 días
     const fechaHasta = new Date();
     const fechaDesde = new Date();
     fechaDesde.setDate(fechaHasta.getDate() - 30);
 
-    // Formatear fechas a DD-MM-YYYY
     const formatFecha = (fecha) => {
         const dia = String(fecha.getDate()).padStart(2, '0');
-        const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexados
+        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
         const anio = fecha.getFullYear();
         return `${dia}-${mes}-${anio}`;
     };
@@ -3043,13 +3046,7 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
 
     const url = `https://proxy.cors.sh/http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/List_Envios?CUIT=30-68543701-1&FechaDesde=${fechaDesdeStr}&FechaHasta=${fechaHastaStr}`;
 
-    console.log(`Enviando datos a OCA:
-        FECHA: ${fechaHastaStr}, HECHA HASTA: ${fechaDesdeStr}, CUIT: 30-68543701-1, REMITO: ${suborden}
-    `);
-
     try {
-        console.log(`Realizando request a la URL: ${url}`);
-        
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -3059,12 +3056,9 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
         });
 
         const data = await response.text();
-        console.log(`Response recibido: ${data}`); // Muestra el response
-
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(data, "text/xml");
 
-        // Buscar el número de envío
         const productos = xmlDoc.getElementsByTagName("NroProducto");
         let numeroEnvio = null;
 
@@ -3075,9 +3069,78 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
             }
         }
 
-        // Actualizar el botón con el número de envío
         if (numeroEnvio) {
             textOca.innerText = `Etiqueta ${numeroEnvio}`;
+            button.classList.remove('btn-oca');
+            button.classList.add('btn-secondary');
+
+            // Llamada a la segunda API
+            const pdfUrl = `https://proxy.cors.sh/http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/GetPdfDeEtiquetasPorOrdenOrNumeroEnvioParaEtiquetadora?ordenRetiro=&numeroEnvio=${numeroEnvio}&logisticaInversa=`;
+            const pdfResponse = await fetch(pdfUrl, {
+                method: 'GET',
+                headers: {
+                    'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                    'Content-Type': 'application/xml'
+                }
+            });
+
+            const pdfData = await pdfResponse.text();
+            console.log('PDF Data:', pdfData);
+
+            const base64Data = pdfData.replace(/<\?xml.*?\?>/, '').replace(/<string.*?>/, '').replace(/<\/string>/, '');
+            const binaryString = atob(base64Data);
+            const binaryLen = binaryString.length;
+            const bytes = new Uint8Array(binaryLen);
+            for (let i = 0; i < binaryLen; i++) {
+                const ascii = binaryString.charCodeAt(i);
+                bytes[i] = ascii;
+            }
+            const pdfBlob = new Blob([bytes], { type: 'application/pdf' });
+            const pdfUrlBlob = URL.createObjectURL(pdfBlob);
+
+            button.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${numeroEnvio}`;
+            button.classList.remove('btn-secondary');
+            button.classList.add('btn-success');
+            button.onclick = () => {
+                const link = document.createElement('a');
+                link.href = pdfUrlBlob;
+                link.download = `OCA-${nombre}-${numeroEnvio}.pdf`;
+                link.click();
+            };
+
+            const linkSeguimiento = `AFtership.com/es/track/oca-ar/${numeroEnvio}`;
+            const numeroDeEnvioOca = `${numeroEnvio}`;
+
+            const envioState = document.getElementById(`estadoEnvio${id}`);
+            envioState.className = 'em-circle-state4';
+            envioState.innerHTML = `Preparado`;
+            NroEnvio.innerHTML = `<a href="${linkSeguimiento}" target="_blank">OCA: ${numeroEnvio} <i class="bi bi-box-arrow-up-right"></i></a>`;
+
+            // Pushear datos a Firebase
+            const db = firebase.database();
+            const transportData = {
+                medio_de_envio: "oca",
+                trackingLink: linkSeguimiento,
+                numero_de_seguimiento: numeroDeEnvioOca,
+            };
+            
+              db.ref(`enviosBNA/${id}`).update(transportData)
+                .then(() => {
+                    console.log("Datos actualizados en Firebase como Oca:", transportData);
+                })
+                .catch((error) => {
+                                console.error("Error al actualizar datos en Firebase:", error);
+                });
+
+            const Name = `Confirmación de Envio Novogar`;
+            const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
+            const template = "emailTemplateOCA";
+            const transporte = "OCA";
+            const numeroDeEnvio = `${numeroEnvio}`;
+            const linkSeguimiento2 = `AFtership.com/es/track/oca-ar/${numeroEnvio}`;
+
+            await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
+            
         } else {
             textOca.innerText = 'No se encontró la etiqueta';
         }
@@ -3341,7 +3404,7 @@ if (isSplit) {
         "bultos": bultos
     };
 
-    console.log(`Datos enviados a API ANDREANI (BNA+ ${remito}):`, requestData);
+    console.log(`Datos enviados a API ANDREANI (${remito}):`, requestData);
 
     try {
         const response = await fetch(apiUrlLabel, {
@@ -3358,10 +3421,10 @@ if (isSplit) {
             const data = await response.json();
             const numeroDeEnvio = data.bultos[0].numeroDeEnvio;
 
-            console.log(`Datos Respuesta API ANDREANI (BNA+ ${remito}):`, response);
+            console.log(`Datos Respuesta API ANDREANI (${remito}):`, response);
 
-            const Name = `Confirmación de Envio BNA`;
-            const Subject = `Tu compra BNA+ ${remito} ya fue preparada para despacho`;
+            const Name = `Confirmación de Envio Novogar`;
+            const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
             const template = "emailTemplateAndreani";
             const transporte = "Correo Andreani";
             const linkSeguimiento2 = `https://andreani.com/#!/informacionEnvio/${numeroDeEnvio}`;
@@ -3389,7 +3452,6 @@ if (isSplit) {
                 .catch((error) => {
                                 console.error("Error al actualizar datos en Firebase:", error);
                 });
-
 
             // Cambiar el estado del envío
             if (envioState) {
@@ -4161,8 +4223,8 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
 
     let spinner2 = document.getElementById("spinner2");
 
-    const Name = `Confirmación de Envio BNA`;
-    const Subject = `Tu compra BNA+ ${remito} ya fue preparada para despacho`;
+    const Name = `Confirmación de Envio Novogar`;
+    const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
     const template = "emailTemplateLogPropia";
     
     // Mostrar spinner y cambiar texto del botón

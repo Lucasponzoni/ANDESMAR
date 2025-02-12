@@ -10,6 +10,7 @@ async function sendEmail(Name, Subject, templateName, nombre, email, remito, lin
         "emailTemplateAndreani": emailTemplateAndreani,
         "emailTemplateLogPropia": emailTemplateLogPropia,
         "emailFacturacion": emailFacturacion,
+        "emailTemplateOCA": emailTemplateOCA,
     };
 
     // Obtener la función de plantilla basada en el nombre
