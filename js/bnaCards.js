@@ -1578,12 +1578,12 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 </span>
                                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
                             </button>
-                            <div class="bg-Hr-primary">
+                            <div class="bg-Hr-primary ${isMacro(storeCode) ? 'hidden' : ''}">
                             <p><i class="bi bi-tags-fill"></i> Logistica Propia</p>
                             </div>
 
                             <!-- Botón Logística Propia --> 
-                            <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
+                            <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'} ${isMacro(storeCode) ? 'hidden' : ''}"
                             id="LogPropiaMeliButton${data[i].id}" 
                             ${data[i].cancelado ? 'disabled' : ''} 
                             onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
@@ -1591,6 +1591,16 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
                             </span>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
+                            </button>
+
+                            <div class="bg-Hr-primary ${data[i].envio !== 'oca' ? 'hidden' : ''}">
+                            <p><i class="bi bi-info-circle-fill"></i> Generar reclamo</p>
+                            </div>
+
+                            <!-- Botón Formulario de Reclamo OCA -->
+                            <button class="mt-1 btn btn-danger ${data[i].envio !== 'oca' ? 'hidden' : ''}"
+                            onclick="window.open('https://int.oca.com.ar/soporteclientes/', '_blank')">
+                            <img class="OcaMeli" src="Img/oca-tini.png" alt="OCA"> Formulario de Reclamo <strong>OCA</strong>
                             </button>
 
                            <div id="resultado${data[i].id}" class="mt-2 errorMeliBna">
@@ -3121,6 +3131,7 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
                 medio_de_envio: "oca",
                 trackingLink: linkSeguimiento,
                 numero_de_seguimiento: numeroDeEnvioOca,
+                tipoElectrodomesticoBna: "bultoOca",
             };
             
               db.ref(`enviosBNA/${id}`).update(transportData)
