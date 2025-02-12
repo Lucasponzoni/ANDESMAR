@@ -1549,7 +1549,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             <button class="mt-1 btn btn-oca ${isMacro(storeCode) ? '' : 'hidden'}"
                             id="ocaButton${data[i].id}" 
                             ${data[i].cancelado ? 'disabled' : ''} 
-                            onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}')">
+                            onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}', '${data[i].fechaDeCreacion}')">
                             <span id="OcaText${data[i].id}">
                             <img class="OcaMeli" src="Img/oca-tini.png" alt="OCA"> Etiqueta <strong>OCA</strong>
                             </span>
@@ -3029,7 +3029,7 @@ function eliminarNodo(id) {
     });
 }
 
-async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, suborden) {
+async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, suborden, fecha) {
     const spinnerOca = document.getElementById(`spinnerOca${id}`);
     const textOca = document.getElementById(`OcaText${id}`);
     const button = document.getElementById(`ocaButton${id}`);
@@ -3042,16 +3042,21 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
 
     console.log(`Enviando datos a OCA:
         ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
-        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}, SubOrden: ${suborden}
+        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}, SubOrden: ${suborden}, Fecha: ${fecha}
     `);
 
     spinnerOca.style.display = 'inline-block';
     textOca.innerText = 'Generando Etiqueta...';
     button.disabled = true;
 
-    const fechaHasta = new Date();
-    const fechaDesde = new Date();
-    fechaDesde.setDate(fechaHasta.getDate() - 30);
+    // Parsear la fecha
+    const [dia, mes, anio] = fecha.split(' ')[0].split('-');
+    const fechaOriginal = new Date(anio, mes - 1, dia); // mes - 1 porque los meses empiezan desde 0
+
+    const fechaHasta = new Date(fechaOriginal);
+    fechaHasta.setDate(fechaHasta.getDate() + 15); // Sumar 10 días
+
+    const fechaDesde = new Date(fechaOriginal); // Igual a la fecha original
 
     const formatFecha = (fecha) => {
         const dia = String(fecha.getDate()).padStart(2, '0');
@@ -3062,6 +3067,12 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
 
     const fechaHastaStr = formatFecha(fechaHasta);
     const fechaDesdeStr = formatFecha(fechaDesde);
+
+    console.log(`Enviando datos a OCA:
+       Desde: ${fechaDesdeStr}
+       Hasta: ${fechaHastaStr} 
+       SubOrden: ${suborden}
+    `);
 
     const url = `https://proxy.cors.sh/http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/List_Envios?CUIT=30-68543701-1&FechaDesde=${fechaDesdeStr}&FechaHasta=${fechaHastaStr}`;
 
