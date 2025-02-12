@@ -175,7 +175,7 @@ h1 {
     margin-top: 22px; /* Espacio adicional para separar del input */
 }
 
-.AndesmarMeli , .AndreaniMeli , .NovogarMeli, .CDSMeli{
+.AndesmarMeli , .OcaMeli, .AndreaniMeli , .NovogarMeli, .CDSMeli{
     align-items: center;
     justify-content: center;
     width: 20px;
@@ -2843,6 +2843,10 @@ div.card-body > p > i{
     margin-bottom: 0px !important;
 }
 
+.btnOcaMeli{
+    margin-bottom: 0px !important;
+}
+
 .btnCDSMeli{
     height: 38px;
 }
@@ -5474,6 +5478,24 @@ input[disabled] {
 
 .btn-dark-blue:hover {
     background-color: #03284d; 
+    color: white;
+}
+
+.btn-oca {
+    background-color: #5B2B82; 
+    color: white;
+    border: none;
+}
+
+.btn-oca:disabled {
+    background-color: #5B2B82;
+    color: white;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-oca:hover {
+    background-color: #45176a; 
     color: white;
 }
 

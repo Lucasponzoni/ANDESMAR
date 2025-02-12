@@ -408,6 +408,7 @@ function loadEnviosFromFirebase() {
                     trackingNumber: data.trackingNumber,
                     precio_venta: data.precio_venta,
                     suborden_total: data.suborden_total,
+                    suborden_: data.suborden_,
                     numeros_tarjeta: data.numeros_tarjeta,
                     orden_publica: data.orden_publica_,
                     sku: data.sku_externo.toUpperCase(),
@@ -1530,10 +1531,21 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
         
                             <div class="medidas ${isMacro(storeCode) ? 'hidden' : ''}"></div> <!-- Div para las medidas -->
 
-                            <div class="bg-Hr-primary mb-1 ${isMacro(storeCode) ? 'hidden' : ''}">
+                            <div class="bg-Hr-primary mb-1">
                                 <p><i class="bi bi-tags-fill"></i> Logistica Privada</p>
                             </div>
-                            
+
+                            <!-- Botón Oca --> 
+                            <button class="mt-1 btn btn-oca ${isMacro(storeCode) ? '' : 'hidden'}"
+                            id="ocaButton${data[i].id}" 
+                            ${data[i].cancelado ? 'disabled' : ''} 
+                            onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}')">
+                            <span id="OcaText${data[i].id}">
+                            <img class="OcaMeli" src="Img/oca-tini.png" alt="OCA"> Etiqueta <strong>OCA</strong>
+                            </span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerOca${data[i].id}" style="display:none;"></span>
+                            </button>
+                          
                             <!-- Botón Cruz del Sur --> 
                             <button class="mt-1 btn btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'} ${isMacro(storeCode) ? 'hidden' : ''}"
                                 id="CDSButton${data[i].id}" 
@@ -2995,6 +3007,88 @@ function eliminarNodo(id) {
                 });
         }
     });
+}
+
+async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, suborden) {
+    const spinnerOca = document.getElementById(`spinnerOca${id}`);
+    const textOca = document.getElementById(`OcaText${id}`);
+    const button = document.getElementById(`ocaButton${id}`);
+
+    // Verificar si los elementos existen
+    if (!spinnerOca || !textOca || !button) {
+        console.error('Elementos no encontrados:', { spinnerOca, textOca, button });
+        return; // Salir de la función si no se encuentran los elementos
+    }
+
+    // Mostrar spinner y cambiar texto
+    spinnerOca.style.display = 'inline-block';
+    textOca.innerText = 'Generando Etiqueta...';
+    button.disabled = true;
+
+    // Obtener la fecha actual y la fecha de hace 30 días
+    const fechaHasta = new Date();
+    const fechaDesde = new Date();
+    fechaDesde.setDate(fechaHasta.getDate() - 30);
+
+    // Formatear fechas a DD-MM-YYYY
+    const formatFecha = (fecha) => {
+        const dia = String(fecha.getDate()).padStart(2, '0');
+        const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexados
+        const anio = fecha.getFullYear();
+        return `${dia}-${mes}-${anio}`;
+    };
+
+    const fechaHastaStr = formatFecha(fechaHasta);
+    const fechaDesdeStr = formatFecha(fechaDesde);
+
+    const url = `https://proxy.cors.sh/http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/List_Envios?CUIT=30-68543701-1&FechaDesde=${fechaDesdeStr}&FechaHasta=${fechaHastaStr}`;
+
+    console.log(`Enviando datos a OCA:
+        FECHA: ${fechaHastaStr}, HECHA HASTA: ${fechaDesdeStr}, CUIT: 30-68543701-1, REMITO: ${suborden}
+    `);
+
+    try {
+        console.log(`Realizando request a la URL: ${url}`);
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                'Content-Type': 'application/xml'
+            }
+        });
+
+        const data = await response.text();
+        console.log(`Response recibido: ${data}`); // Muestra el response
+
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+
+        // Buscar el número de envío
+        const productos = xmlDoc.getElementsByTagName("NroProducto");
+        let numeroEnvio = null;
+
+        for (let i = 0; i < productos.length; i++) {
+            if (productos[i].textContent === suborden) {
+                numeroEnvio = xmlDoc.getElementsByTagName("NumeroEnvio")[i].textContent;
+                break;
+            }
+        }
+
+        // Actualizar el botón con el número de envío
+        if (numeroEnvio) {
+            textOca.innerText = `Etiqueta ${numeroEnvio}`;
+        } else {
+            textOca.innerText = 'No se encontró la etiqueta';
+        }
+
+    } catch (error) {
+        console.error('Error al llamar a la API:', error);
+        textOca.innerText = 'Error al generar etiqueta';
+    } finally {
+        button.disabled = false;
+        spinnerOca.style.display = 'none';
+    }
 }
 
 async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
