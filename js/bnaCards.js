@@ -4185,14 +4185,33 @@ function createBackButton() {
 // FIN VOLVER ATRAS
 
 // BUSCADOR
-searchInput.addEventListener("input", function() { const searchTerm = searchInput.value.toLowerCase();
+const searchButton = document.querySelector('.btn-search-bna');
+let manualSearch = false; // Bandera para indicar si la búsqueda fue iniciada manualmente
+
+searchInput.addEventListener("input", function() {
+    manualSearch = false; // Resetear la bandera en cada input
+    realizarBusqueda();
+});
+
+searchInput.addEventListener("click", function() {
+    searchInput.value = ''; 
+    realizarBusqueda();
+});
+
+searchButton.addEventListener("click", function() {
+    manualSearch = true; // Establecer la bandera cuando se hace clic en el botón
+    realizarBusqueda();
+});
+
+function realizarBusqueda() {
+    const searchTerm = searchInput.value.toLowerCase();
     
     // Verificar si el término de búsqueda es numérico y tiene al menos 7 caracteres
     const isNumeric = /^\d+$/.test(searchTerm);
     const isText = /^[a-zA-Z]+$/.test(searchTerm);
     
-    if ((isNumeric && searchTerm.length < 7) || (isText && searchTerm.length < 5)) {
-        return; // No realizar la búsqueda si no se cumplen las condiciones
+    if (!manualSearch && ((isNumeric && searchTerm.length < 7) || (isText && searchTerm.length < 4))) {
+        return; // No realizar la búsqueda si no se cumplen las condiciones y no es una búsqueda manual
     }
     
     // Restablecer la paginación a la primera página
@@ -4219,7 +4238,7 @@ searchInput.addEventListener("input", function() { const searchTerm = searchInpu
         renderCards(filteredData);
         updatePagination(filteredData.length);
     }
-}); 
+}
 // FIN BUSCADOR
 
 // GENERAR ETIQUETA LOGISTICA PROPIA
