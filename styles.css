@@ -3953,6 +3953,27 @@ div .form-check {
     color: cornflowerblue !important;
     background-color: cornflowerblue;
 }
+
+.carousel-control-next2{
+    border-radius: 0 0px 10px 0;
+}
+
+.carousel-control-prev2{
+    border-radius: 0px 0 0 10px;
+}
+
+.carousel2 {
+    border-radius: 0 0 10px 10px;
+}
+
+.macos-style-producto-meli{
+    font-size: small;
+    text-align: start;
+    background-color: cornflowerblue;
+    color: white;
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+}
 /* Fin Estilos del carrusel */
 
 .macos-style {
@@ -4006,6 +4027,27 @@ div .form-check {
     font-weight: 500; 
     line-height: 1.6;
     transition: background-color 0.3s ease, transform 0.2s ease; 
+}
+
+td.product-cell:hover{
+    background-color: cornflowerblue;
+    color: white !important;
+}
+
+td.product-cell:hover::after {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    position: relative;
+    content: "Ver Fotos 📷";
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+    z-index: 1;
 }
 
 /* MODAL COMENTARIOS EN FACTURACION */

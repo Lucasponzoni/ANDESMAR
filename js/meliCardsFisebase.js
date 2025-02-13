@@ -570,12 +570,6 @@ function crearCard(data) {
      // Verificar si data.Cp está en LogBsAs
      const isLogBs = logBsCps.includes(Number(data.Cp));
 
-    // Verificar si data.pictures existe y es un array
-    const filteredPictures = Array.isArray(data.pictures) ? 
-        data.pictures.filter(picture => 
-            picture.secure_url // Retener imágenes que tengan secure_url
-        ) : [];
-
     // Función para formatear números en pesos
     function formatCurrency(amount) {
     return `$ ${Number(amount).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -634,6 +628,12 @@ const paymentHTML = `
         <span class="payment-details">${paymentDetails}</span>
     </div>
 `;
+
+    // Verificar si data.pictures existe y es un array
+    const filteredPictures = Array.isArray(data.pictures) ? 
+        data.pictures.filter(picture => 
+            picture.secure_url // Retener imágenes que tengan secure_url
+        ) : [];
 
     // Crear el carrusel
     const carouselId = `carousel-${data.idOperacion}`;
