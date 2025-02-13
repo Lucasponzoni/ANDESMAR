@@ -2097,6 +2097,7 @@ div.card-body > p > i{
 }
 
 .card-body-meli{
+    z-index: 10000;
     padding: 1rem 1rem 0 1rem;
 }
 
@@ -2292,15 +2293,18 @@ div.card-body > p > i{
     font-size: 0.75rem;
     text-transform: uppercase;
     padding: 6px 12px;
-    border-radius: 50px;
+    border-radius: 15px 15px 0 0;
     position: absolute;
-    top: -18px;
-    right: 170px;
-    background-color: #ff3b30; 
+    top: -32px;
+    left: 20px;
+    background-color: orangered; 
+    border: solid cornflowerblue 1px;
     color: white;
     display: flex;
+    font-weight: bolder;
     align-items: center;
     justify-content: center;
+    z-index: -1 !important; 
 }
 
 .em-circle-isFraud::before {
@@ -2315,15 +2319,18 @@ div.card-body > p > i{
     font-size: 0.75rem;
     text-transform: uppercase;
     padding: 6px 12px;
-    border-radius: 50px;
+    border-radius: 15px 15px 0 0;
     position: absolute;
-    top: -18px;
-    right: 170px;
+    top: -32px;
+    left: 20px;
     background-color: #34C759; 
+    font-weight: bolder;
+    border: solid cornflowerblue 1px;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: -1 !important; 
 }
 
 .em-circle-ME1{
@@ -2386,17 +2393,20 @@ div.card-body > p > i{
 .em-circle-state {
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     text-transform: uppercase;
-    position: absolute;
-    font-size: 0.75rem;
-    top: -18px;
-    right: 10px;
-    border-radius: 50px;
     padding: 6px 12px;
+    border-radius: 15px 15px 0 0;
+    position: absolute;
+    top: -32px;
+    width: fit-content;
+    right: 20px;
+    font-size: 0.75rem;
     background-color: grey;
+    border: solid cornflowerblue 1px;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: -5 !important;
 }
 
 .em-circle-state::before {
@@ -2504,12 +2514,15 @@ div.card-body > p > i{
     text-transform: uppercase;
     position: absolute;
     font-size: 0.75rem;
-    top: -18px;
-    right: 10px;
-    border-radius: 50px;
     padding: 6px 12px;
+    border-radius: 15px 15px 0 0;
+    position: absolute;
+    top: -32px;
+    right: 20px;
+    font-weight: bolder;
     background-color: grey;
     color: white;
+    border: solid cornflowerblue 1px;
     display: flex;
     align-items: center;
     justify-content: center;
