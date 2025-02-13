@@ -822,7 +822,10 @@ function checkForNewSales() {
       const newSales = Object.values(data).filter(operation => new Date(operation.dateCreated).getTime() > lastCheckTimestamp);
 
       if (newSales.length > 0) {
-        document.getElementById('notificationMessage').textContent = `Ingresaron ${newSales.length} ventas nuevas que no están en planilla`;
+        const message = newSales.length === 1 
+          ? `Ingresó 1 nueva venta que no está en planilla` 
+          : `Ingresaron ${newSales.length} ventas nuevas que no están en planilla`;
+        document.getElementById('notificationMessage').textContent = message;
         document.getElementById('newSalesNotification').style.display = 'block';
         lastCheckTimestamp = Date.now();
       }
