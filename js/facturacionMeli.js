@@ -1175,11 +1175,50 @@ if (operation.client && operation.client.billing_info && Array.isArray(operation
 
         row.appendChild(shippingCell);
 
-        // Producto
-        const productCell = document.createElement('td');
-        productCell.className = 'product-cell'; // Añadir clase para estilo iOS
-        productCell.innerHTML = `Cantidad: <strong>X${operation.Cantidad}</strong> <br> SKU: <strong>${operation.SKU}</strong>`;
-        row.appendChild(productCell);
+                // Producto
+                const productCell = document.createElement('td');
+                productCell.className = 'product-cell';
+                productCell.innerHTML = `Cantidad: <strong>X${operation.Cantidad}</strong> <br> SKU: <strong>${operation.SKU}</strong>`;
+                row.appendChild(productCell);
+                
+                // Agregar evento de clic para abrir el modal con el carrusel de imágenes
+                productCell.addEventListener('click', () => {
+                    // Verificar si operation.pictures existe y es un array
+                    const filteredPictures = Array.isArray(operation.pictures) ? 
+                        operation.pictures.filter(picture => picture.secure_url) : [];
+                
+                    // Crear el carrusel
+                    const carouselInner = document.getElementById('carouselInner');
+                    carouselInner.innerHTML = ''; // Limpiar el contenido anterior del carrusel
+                
+                    filteredPictures.forEach((picture, index) => {
+                        const carouselItem = document.createElement('div');
+                        carouselItem.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+                        carouselItem.innerHTML = `
+                            <img src="${picture.secure_url}" class="d-block mx-auto" alt="Imagen ${index + 1}" style="height: 150px; width: auto; max-width: 100%; object-fit: cover;">
+                        `;
+                        carouselInner.appendChild(carouselItem);
+                    });
+                
+                    // Limpiar el contenido anterior del productInfo
+                    const modalBody = document.querySelector('#productModal .modal-body');
+                    const existingProductInfo = modalBody.querySelector('.macos-style-producto-meli');
+                    if (existingProductInfo) {
+                        existingProductInfo.remove();
+                    }
+                
+                    // Agregar el div con la clase macos-style-producto-meli encima del carrusel
+                    const productInfo = document.createElement('div');
+                    productInfo.className = 'macos-style-producto-meli';
+                    productInfo.innerHTML = `<i class="bi bi-info-circle-fill"></i> Producto: X ${operation.Cantidad} <strong style="color: white;">${operation.SKU}</strong> ${operation.Producto}`;
+                    
+                    // Agregar el productInfo y el carrusel al modal
+                    modalBody.insertBefore(productInfo, modalBody.firstChild);
+                
+                    // Mostrar el modal
+                    const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+                    productModal.show();
+                });
 
         // Medio de pago
         const paymentCell = document.createElement('td');
