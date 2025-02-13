@@ -302,15 +302,29 @@ document.addEventListener('DOMContentLoaded', function() {
             pagination.style.display = 'none'; 
 
             if (!isNaN(queryNumber)) {
-                database.ref('envios')
-                    .orderByChild('idOperacion')
-                    .equalTo(queryNumber)
-                    .limitToLast(50000) 
-                    .once('value')
-                    .then(snapshot => {
-                        const allData = snapshot.val(); 
+                const queryPromises = [
+                    database.ref('envios')
+                        .orderByChild('idOperacion')
+                        .equalTo(queryNumber)
+                        .limitToLast(50000)
+                        .once('value'),
+                    database.ref('envios')
+                        .orderByChild('packId')
+                        .equalTo(queryNumber)
+                        .limitToLast(50000)
+                        .once('value')
+                ];
             
-                        if (allData) {
+                Promise.all(queryPromises)
+                    .then(results => {
+                        const allData = {};
+                        results.forEach(snapshot => {
+                            if (snapshot.exists()) {
+                                Object.assign(allData, snapshot.val());
+                            }
+                        });
+            
+                        if (Object.keys(allData).length > 0) {
                             // Procesar los datos y manejar payments
                             const processedData = Object.values(allData).map(data => {
                                 const paymentData = Array.isArray(data.payments) && data.payments.length > 0 ? data.payments[0] : {};
@@ -318,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 // Verifica si idOperacion está definido
                                 const id = data.idOperacion; 
                                 console.log("Mostrando datos del Nodo: ", allData)
-                                console.log("Operación Mercado Libre: ", id)
+                                console.log("Operación Mercado Libre: ", id)            
                         
                                 return {
                                     id: id,
@@ -337,6 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     Recibe: data.Recibe,
                                     pictures: data.pictures,
                                     SKU: data.SKU,
+                                    paqid: data.packId,
                                     Telefono: data.Telefono,
                                     VolumenCM3: data.VolumenCM3,
                                     VolumenM3: data.VolumenM3,
@@ -442,6 +457,7 @@ function cargarDatos() {
                     idOperacion: data.idOperacion,
                     localidad: data.localidad,
                     medidas: data.medidas,
+                    paqid: data.packId,
                     permalink: data.permalink,
                     shippingMode: data.shippingMode,
                     nombreDeUsuario: data.nombreDeUsuario,
@@ -686,6 +702,12 @@ const paymentHTML = `
                     </p>
 
                     </div>
+
+                <div class="PaqID-Container">
+                <div class="PaqID ${!data.paqid ? 'hidden' : ''}">
+                    <i class="bi bi-info-circle-fill info-paq"></i><strong>PaqId:</strong> ${data.paqid}
+                </div>
+                </div>
 
                 <div class="d-flex align-items-center">
 

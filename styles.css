@@ -683,6 +683,33 @@ button:hover {
     color: white;
 }
 
+.PaqID-Container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.PaqID {
+    border-radius: 10px 10px 0 0;
+    width: fit-content;
+    text-align: center;
+    padding: 4px 8px 10px 8px;
+    margin-bottom: -5px;
+    margin-top: 0px;
+    color: #ffffff;
+    font-weight: 500;
+    border: 1px solid cornflowerblue;
+    background-color: rgb(255, 68, 0); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fuente de macOS */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
+    z-index: -100;
+}
+
+.info-paq{
+    margin-right: 5px;
+}
+
 .removeBultoButton{
     background-color: red;
 }
@@ -1864,6 +1891,7 @@ input[disabled] {
 }
 
 .remitoCardMeli {
+    background-color: white;
     text-align: center;
     padding: 0.5rem;
     width: fit-content;
