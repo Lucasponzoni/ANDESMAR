@@ -128,17 +128,68 @@ db.ref('PasarAWebMonto').once('value')
     
                 const row = document.createElement('tr');
     
+                // Función para mostrar la alerta
+                function showAlert(message) {
+                    const alertContainer = document.createElement('div');
+                    alertContainer.className = 'alert-ios-meli';
+                    alertContainer.innerHTML = `
+                        <i class="bi bi-clipboard-check"></i>
+                        ${message}
+                        <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+                    `;
+                    document.body.appendChild(alertContainer);
+                
+                    setTimeout(() => {
+                        alertContainer.style.display = 'none';
+                    }, 3000);
+                }
+                
                 // Estado
                 const stateCell = document.createElement('td');
                 const container = document.createElement('div');
                 container.className = 'ios-style-id-container';
                 container.style.display = 'flex';
                 container.style.flexDirection = 'column';
-    
+                
                 const idElement = document.createElement('span');
                 idElement.textContent = `${operation.idOperacion}`;
                 idElement.classList.add('ios-style-id');
+                
+                // Verificar si existe operacion.packId y crear el div correspondiente
+                if (operation.packId) {
+                    const packIdElement = document.createElement('div');
+                    packIdElement.textContent = `📦 ${operation.packId}`;
+                    packIdElement.classList.add('ios-style-paqId');
+                    container.appendChild(packIdElement);
+                
+                    // Cambiar la clase de idElement si existe packId
+                    idElement.classList.add('ios-style-id-2');
+                
+                    // Agregar evento de clic para copiar packId al portapapeles
+                    packIdElement.addEventListener('click', () => {
+                        navigator.clipboard.writeText(operation.packId).then(() => {
+                            showAlert(`Se ha copiado al portapapeles: PaqId ${operation.packId}`);
+                        }).catch(err => {
+                            console.error('Error al copiar al portapapeles:', err);
+                        });
+                    });
+                } else {
+                    // Mantener la clase original si no existe packId
+                    idElement.classList.add('ios-style-id');
+                }
+                
+                // Agregar evento de clic para copiar idOperacion al portapapeles
+                idElement.addEventListener('click', () => {
+                    navigator.clipboard.writeText(operation.idOperacion).then(() => {
+                        showAlert(`Se ha copiado al portapapeles: idOperacion ${operation.idOperacion}`);
+                    }).catch(err => {
+                        console.error('Error al copiar al portapapeles:', err);
+                    });
+                });
+                
                 container.appendChild(idElement);
+                stateCell.appendChild(container);
+                row.appendChild(stateCell);
     
                 const selectElement = document.createElement('select');
                 selectElement.style.width = '100%';
@@ -842,20 +893,68 @@ function loadTable2() {
     paginatedData.forEach(operation => {
         const row = document.createElement('tr'); 
         
-        // Estado
-        const stateCell = document.createElement('td');
-    
-        // Contenedor para el idOperacion y el select
-        const container = document.createElement('div');
-        container.className = 'ios-style-id-container';
-        container.style.display = 'flex';
-        container.style.flexDirection = 'column'; // Alinea elementos en columna
-
-        // Elemento para el ID de operación
-        const idElement = document.createElement('span');
-        idElement.textContent = `${operation.idOperacion}`;
-        idElement.classList.add('ios-style-id'); // Añadir clase para estilo iOS
-        container.appendChild(idElement);
+                // Función para mostrar la alerta
+                function showAlert(message) {
+                    const alertContainer = document.createElement('div');
+                    alertContainer.className = 'alert-ios-meli';
+                    alertContainer.innerHTML = `
+                        <i class="bi bi-clipboard-check"></i>
+                        ${message}
+                        <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+                    `;
+                    document.body.appendChild(alertContainer);
+                
+                    setTimeout(() => {
+                        alertContainer.style.display = 'none';
+                    }, 3000);
+                }
+                
+                // Estado
+                const stateCell = document.createElement('td');
+                const container = document.createElement('div');
+                container.className = 'ios-style-id-container';
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+                
+                const idElement = document.createElement('span');
+                idElement.textContent = `${operation.idOperacion}`;
+                idElement.classList.add('ios-style-id');
+                
+                // Verificar si existe operacion.packId y crear el div correspondiente
+                if (operation.packId) {
+                    const packIdElement = document.createElement('div');
+                    packIdElement.textContent = `📦 ${operation.packId}`;
+                    packIdElement.classList.add('ios-style-paqId');
+                    container.appendChild(packIdElement);
+                
+                    // Cambiar la clase de idElement si existe packId
+                    idElement.classList.add('ios-style-id-2');
+                
+                    // Agregar evento de clic para copiar packId al portapapeles
+                    packIdElement.addEventListener('click', () => {
+                        navigator.clipboard.writeText(operation.packId).then(() => {
+                            showAlert(`Se ha copiado al portapapeles: PaqId ${operation.packId}`);
+                        }).catch(err => {
+                            console.error('Error al copiar al portapapeles:', err);
+                        });
+                    });
+                } else {
+                    // Mantener la clase original si no existe packId
+                    idElement.classList.add('ios-style-id');
+                }
+                
+                // Agregar evento de clic para copiar idOperacion al portapapeles
+                idElement.addEventListener('click', () => {
+                    navigator.clipboard.writeText(operation.idOperacion).then(() => {
+                        showAlert(`Se ha copiado al portapapeles: idOperacion ${operation.idOperacion}`);
+                    }).catch(err => {
+                        console.error('Error al copiar al portapapeles:', err);
+                    });
+                });
+                
+                container.appendChild(idElement);
+                stateCell.appendChild(container);
+                row.appendChild(stateCell);
 
         const selectElement = document.createElement('select');
         selectElement.style.width = '100%';
