@@ -2870,6 +2870,13 @@ div.card-body > p > i{
     z-index: 1000; 
 }
 
+#scrollToDown {
+    position: fixed;
+    right: 20px; 
+    bottom: 60px; 
+    z-index: 1000; 
+}
+
 .blueSpinner{
     width: 50px;
     overflow: hidden;

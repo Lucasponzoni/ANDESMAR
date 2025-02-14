@@ -1,5 +1,4 @@
    //! FUNCION IR ARRIBA
-
 const scrollToTopButton = document.getElementById("scrollToTop");
 
     window.addEventListener("scroll", () => {
@@ -17,6 +16,36 @@ const scrollToTopButton = document.getElementById("scrollToTop");
             behavior: "smooth"
         });
     });
+
+    //! FUNCION IR ABAJO
+const scrollToDownButton = document.getElementById("scrollToDown");
+
+    // Mostrar el botón cuando el usuario no está en la parte inferior de la página
+    window.addEventListener("scroll", () => {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+            scrollToDownButton.style.display = "none";
+        } else {
+            scrollToDownButton.style.display = "block";
+        }
+    });
+
+// Evento para desplazar hacia abajo
+scrollToDownButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    window.scrollTo({
+        top: document.body.scrollHeight, // Desplazar hasta el final de la página
+        behavior: "smooth"
+    });
+});
+
+// Evento para desplazar hacia abajo
+scrollToDownButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    window.scrollTo({
+        top: document.body.scrollHeight, // Desplazar hasta el final de la página
+        behavior: "smooth"
+    });
+});
 
     //! BUSCARDOR Y EDITOR DE LOCALIDADES EN CADA CARD
     
