@@ -5962,4 +5962,8 @@ img.gray-filter {
     color: yellow;
     font-weight: bolder;
 }
+
+.no-data-message{
+    color: #0051ba;
+}
 /* FIN PAGINATION TIENDAS VIRTUALES */

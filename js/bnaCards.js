@@ -4324,9 +4324,10 @@ function renderDuplicatedOrders() {
 function showNoDataMessage() {
     const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = `
-        <div class="no-data-message" style="text-align: center; margin: 20px;">
+        <div class="no-data-message" style="text-align: center;">
             <i class="fas fa-coffee" style="font-size: 30px;"></i>
-            <p style="font-size: 20px;">Parece que no hay nada por ahora, ¡tómate un cafecito!</p>
+            <p style="font-size: 20px;">Parece que no hay nada por ahora</p>
+            <p style="font-size: 20px;"><strong>¡tómate un cafecito!</strong></p>
         </div>
     `;
 }
