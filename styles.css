@@ -5917,6 +5917,7 @@ img.gray-filter {
 }
 
 .pagination-button:nth-child(1) {
+    border: 1px solid orangered;
     border-radius: 10px 0 0 10px;
     font-weight: bolder;
     background-color: orangered;
@@ -5924,6 +5925,7 @@ img.gray-filter {
 }
 
 .pagination-button:nth-child(7) {
+    border: 1px solid orangered;
     border-radius: 0px 10px 10px 0px;
     font-weight: bolder;
     background-color: orangered;

@@ -4196,7 +4196,7 @@ function renderFilteredPagination(data) {
     }
 
     // Botón de Adelante
-    const forwardButton = createButton(`Adelante (quedan ${totalPages - currentFilteredPage} páginas)`, currentFilteredPage === totalPages);
+    const forwardButton = createButton(`Adelante ${totalPages - currentFilteredPage} páginas`, currentFilteredPage === totalPages);
     forwardButton.addEventListener('click', () => {
         if (currentFilteredPage < totalPages) {
             currentFilteredPage++;
