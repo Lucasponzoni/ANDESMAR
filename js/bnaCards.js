@@ -175,7 +175,7 @@ verificarRemitosDuplicados();
 
 let allData = [];
 let currentPage = 1;
-let itemsPerPage = 100; // Número de elementos por página
+let itemsPerPage = 60; // Número de elementos por página
 let currentPageGroup = 0;
 const paginationContainer = document.getElementById('pagination');
 const searchInput = document.getElementById("searchBna");
