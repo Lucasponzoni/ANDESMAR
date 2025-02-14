@@ -5935,7 +5935,9 @@ img.gray-filter {
 }
 
 .pagination-button:hover {
-    background-color: #0051ba; 
+    background-color: #0051ba;
+    color: white;
+    font-weight: bolder;
 }
 
 .pagination-button:disabled {
@@ -5946,13 +5948,9 @@ img.gray-filter {
     cursor: not-allowed;
 }
 
-.pagination-button:disabled:nth-child(3) {
-    background-color: #b0d4ff;
-    border: 1px solid #007aff; 
-    border-radius: 0 10px 10px 0;
-    color: #0051ba; 
-    opacity: 0.8;
+.active-page {
+    background-color: #0051ba;
+    color: yellow;
     font-weight: bolder;
-    cursor: not-allowed;
 }
 /* FIN PAGINATION TIENDAS VIRTUALES */

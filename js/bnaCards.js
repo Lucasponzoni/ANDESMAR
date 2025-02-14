@@ -4109,17 +4109,31 @@ function renderFilteredPagination(data) {
     }
 
     // Botones de número de página
-    for (let i = startPage; i <= endPage; i++) {
-        const button = createButton(i, currentFilteredPage === i);
+    for (let i = 1; i <= maxVisiblePages; i++) {
+        const pageNumber = startPage + i - 1;
+        const buttonText = pageNumber <= totalPages ? pageNumber : 'X';
+        const isActive = pageNumber === currentFilteredPage; // Verificar si es la página actual
+        const button = createButton(buttonText, pageNumber > totalPages, isActive);
         button.addEventListener('click', () => {
-            currentFilteredPage = i;
-            updateFilteredCards(data);
+            if (pageNumber <= totalPages) {
+                currentFilteredPage = pageNumber;
+                updateFilteredCards(data);
+            }
         });
         filteredPaginationContainer.appendChild(button);
     }
 
     // Botón de Adelante
-    const forwardButton = createButton(`Adelante ${totalPages - currentFilteredPage} páginas`, currentFilteredPage === totalPages);
+    let forwardText;
+    if (totalPages === 0) {
+        forwardText = 'Sin Páginas';
+    } else if (totalPages - currentFilteredPage === 1) {
+        forwardText = 'Adelante 1 página';
+    } else {
+        forwardText = `Adelante ${totalPages - currentFilteredPage} páginas`;
+    }
+
+    const forwardButton = createButton(forwardText, currentFilteredPage === totalPages || totalPages === 0);
     forwardButton.addEventListener('click', () => {
         if (currentFilteredPage < totalPages) {
             currentFilteredPage++;
@@ -4132,12 +4146,17 @@ function renderFilteredPagination(data) {
     filteredPaginationContainer.style.textAlign = 'center'; // Centrar
 }
 
-// Función para crear botones
-function createButton(text, isDisabled) {
+function createButton(text, isDisabled, isActive = false) {
     const button = document.createElement('button');
     button.innerText = text;
     button.disabled = isDisabled; // Deshabilitar si es necesario
     button.className = 'pagination-button'; // Clase CSS para estilos
+
+    // Agregar clase si es la página activa
+    if (isActive) {
+        button.classList.add('active-page');
+    }
+
     return button;
 }
 
