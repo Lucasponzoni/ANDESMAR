@@ -5904,6 +5904,7 @@ img.gray-filter {
 
 /* PAGINATION TIENDAS VIRTUALES */
 #filtered-pagination {
+    padding-left: 5px;
     display: flex;
     justify-content: center;
     align-items: center;

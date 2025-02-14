@@ -4165,8 +4165,14 @@ function updateFilteredCards(data) {
     const uniqueData = filterDuplicates(data); // Filtrar duplicados
     const start = (currentFilteredPage - 1) * itemsPerPageFiltered;
     const end = currentFilteredPage * itemsPerPageFiltered;
-    renderCards(uniqueData.slice(start, end));
-    renderFilteredPagination(uniqueData); // Volver a renderizar la paginación
+
+    if (uniqueData.length === 0) {
+        showNoDataMessage(); // Mostrar mensaje si no hay datos
+        filteredPaginationContainer.style.display = 'none';
+    } else {
+        renderCards(uniqueData.slice(start, end));
+        renderFilteredPagination(uniqueData); // Volver a renderizar la paginación
+    }
 }
 
 // Modificación del evento click del botón switch para entregados
@@ -4314,6 +4320,16 @@ function renderDuplicatedOrders() {
     });
 }
 // FIN SWITCHS BOTÓNES
+
+function showNoDataMessage() {
+    const cardsContainer = document.getElementById('meli-cards');
+    cardsContainer.innerHTML = `
+        <div class="no-data-message" style="text-align: center; margin: 20px;">
+            <i class="fas fa-coffee" style="font-size: 30px;"></i>
+            <p style="font-size: 20px;">Parece que no hay nada por ahora, ¡tómate un cafecito!</p>
+        </div>
+    `;
+}
 
 // VOLVER ATRAS
 function createBackButton() {
