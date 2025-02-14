@@ -4141,6 +4141,10 @@ td.product-cell:hover::after {
     z-index: 1000;
 }
 
+.filtered-pagination > button{
+background-color: orangered;
+}
+
 .notification .d-flex {
     display: flex;
     justify-content: space-between;
@@ -5890,3 +5894,51 @@ img.gray-filter {
     cursor: pointer;
 }
 /* ALERTAS FACTURACION MELI */
+
+/* PAGINATION TIENDAS VIRTUALES */
+#filtered-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.pagination-button {
+    border-top: 1px solid orangered;
+    border-bottom: 1px solid orangered;
+    padding: 10px 15px;
+    border-radius: 0px;
+    background-color: white;
+    margin-left: -1px;
+    color: orangered;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination-button:nth-child(1) {
+    border-radius: 10px 0 0 10px;
+    font-weight: bolder;
+    background-color: orangered;
+    color: white;
+}
+
+.pagination-button:nth-child(7) {
+    border-radius: 0px 10px 10px 0px;
+    font-weight: bolder;
+    background-color: orangered;
+    color: white;
+}
+
+.pagination-button:hover {
+    background-color: orange;
+    color: white;
+}
+
+.pagination-button:disabled {
+    background-color: orangered;
+    color: yellow;
+    opacity: 0.8;
+    font-weight: bolder;
+    cursor: not-allowed;
+}

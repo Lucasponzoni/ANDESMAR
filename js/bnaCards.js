@@ -4152,47 +4152,102 @@ function renderDuplicatedOrders() {
 // FIN DUPLICADOS
 
 // SWITCH BOTÓN 2
-document.getElementById('btnSwitch').addEventListener('click', () => {
-    const sinEntregarCards = allData
-        .filter(item => item.marcaEntregado === 'No' || item.marcaEntregado === undefined)
-        .reverse(); // Invertir el orden de los elementos filtrados
+// Variables para la nueva paginación
+let filteredData = [];
+let currentFilteredPage = 1; // Página actual
+const itemsPerPageFiltered = 3; // Número de elementos por página
+const filteredPaginationContainer = document.getElementById('filtered-pagination'); // Contenedor de paginación
 
-    // Limpiar el contenedor de tarjetas
-    const cardsContainer = document.getElementById('meli-cards');
-    cardsContainer.innerHTML = '';
+// Función para renderizar la nueva paginación
+function renderFilteredPagination(data) {
+    const totalPages = Math.ceil(data.length / itemsPerPageFiltered);
+    const maxVisiblePages = 5; // Máximo de páginas visibles
 
-    // Ocultar la paginación
-    paginationContainer.style.display = 'none';
+    // Limpiar el contenedor de paginación
+    filteredPaginationContainer.innerHTML = '';
 
-    // Renderizar solo las tarjetas sin entregar
-    renderCards(sinEntregarCards);
-
-    // Crear botón de volver
-    createBackButton(() => {
-        renderCards(allData); // Regresar a todas las tarjetas
+    // Botón de Atrás
+    const backButton = createButton('Atrás', currentFilteredPage === 1);
+    backButton.addEventListener('click', () => {
+        if (currentFilteredPage > 1) {
+            currentFilteredPage--;
+            updateFilteredCards(data);
+        }
     });
-});
-// FIN SWITCH BOTÓN 2
+    filteredPaginationContainer.appendChild(backButton);
 
-// SWITCH BOTÓN 1
-document.getElementById('btnSwitch1').addEventListener('click', () => {
-    const sinPrepararCards = allData
-        .filter(item => item.marcaPreparado === 'No' || item.marcaPreparado === undefined)
-        .reverse(); // Invertir el orden de los elementos filtrados
+    // Calcular el rango de páginas a mostrar
+    let startPage = Math.max(1, currentFilteredPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    // Ajustar el rango si está cerca del final
+    if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // Botones de número de página
+    for (let i = startPage; i <= endPage; i++) {
+        const button = createButton(i, currentFilteredPage === i);
+        button.addEventListener('click', () => {
+            currentFilteredPage = i;
+            updateFilteredCards(data);
+        });
+        filteredPaginationContainer.appendChild(button);
+    }
+
+    // Botón de Adelante
+    const forwardButton = createButton(`Adelante (quedan ${totalPages - currentFilteredPage} páginas)`, currentFilteredPage === totalPages);
+    forwardButton.addEventListener('click', () => {
+        if (currentFilteredPage < totalPages) {
+            currentFilteredPage++;
+            updateFilteredCards(data);
+        }
+    });
+    filteredPaginationContainer.appendChild(forwardButton);
+
+    // Centrar el contenido
+    filteredPaginationContainer.style.textAlign = 'center'; // Centrar
+}
+
+// Función para crear botones
+function createButton(text, isDisabled) {
+    const button = document.createElement('button');
+    button.innerText = text;
+    button.disabled = isDisabled; // Deshabilitar si es necesario
+    button.className = 'pagination-button'; // Clase CSS para estilos
+    return button;
+}
+
+// Función para actualizar las tarjetas en la nueva paginación
+function updateFilteredCards(data) {
+    const start = (currentFilteredPage - 1) * itemsPerPageFiltered;
+    const end = currentFilteredPage * itemsPerPageFiltered;
+    renderCards(data.slice(start, end));
+    renderFilteredPagination(data); // Volver a renderizar la paginación
+}
+
+// Modificación del evento click del botón switch
+document.getElementById('btnSwitch').addEventListener('click', () => {
+    filteredData = allData
+        .filter(item => item.marcaEntregado === 'No' || item.marcaEntregado === undefined)
+        .reverse(); // Filtrar y revertir el orden
 
     // Limpiar el contenedor de tarjetas
     const cardsContainer = document.getElementById('meli-cards');
     cardsContainer.innerHTML = '';
 
-    // Ocultar la paginación
+    // Ocultar la paginación original
     paginationContainer.style.display = 'none';
+    filteredPaginationContainer.style.display = 'block'; // Mostrar nueva paginación
 
     // Renderizar solo las tarjetas sin entregar
-    renderCards(sinPrepararCards);
+    updateFilteredCards(filteredData);
 
     // Crear botón de volver
     createBackButton(() => {
-        renderCards(allData); // Regresar a todas las tarjetas
+        renderCards(allData.slice(0, itemsPerPage)); // Regresar a todas las tarjetas
+        paginationContainer.style.display = 'block'; // Mostrar la paginación original
+        filteredPaginationContainer.style.display = 'none'; // Ocultar nueva paginación
     });
 });
 // FIN SWITCH BOTÓN
