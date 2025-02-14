@@ -5906,43 +5906,53 @@ img.gray-filter {
 }
 
 .pagination-button {
-    border-top: 1px solid orangered;
-    border-bottom: 1px solid orangered;
+    border-top: 1px solid #007aff; 
+    border-bottom: 1px solid #007aff; 
     padding: 10px 15px;
-    border-radius: 0px;
+    border-radius: 0;
     background-color: white;
     margin-left: -1px;
-    color: orangered;
+    color: #007aff; 
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
 }
 
 .pagination-button:nth-child(1) {
-    border: 1px solid orangered;
+    border: 1px solid #007aff; 
     border-radius: 10px 0 0 10px;
     font-weight: bolder;
-    background-color: orangered;
-    color: white;
+    background-color: #007aff; 
+    color: white; 
 }
 
 .pagination-button:nth-child(7) {
-    border: 1px solid orangered;
-    border-radius: 0px 10px 10px 0px;
+    border: 1px solid #007aff; 
+    border-radius: 0 10px 10px 0;
     font-weight: bolder;
-    background-color: orangered;
-    color: white;
+    background-color: #007aff; 
+    color: white; 
 }
 
 .pagination-button:hover {
-    background-color: orange;
-    color: white;
+    background-color: #0051ba; 
 }
 
 .pagination-button:disabled {
-    background-color: orangered;
-    color: yellow;
+    background-color: #b0d4ff; 
+    color: #0051ba; 
     opacity: 0.8;
     font-weight: bolder;
     cursor: not-allowed;
 }
+
+.pagination-button:disabled:nth-child(3) {
+    background-color: #b0d4ff;
+    border: 1px solid #007aff; 
+    border-radius: 0 10px 10px 0;
+    color: #0051ba; 
+    opacity: 0.8;
+    font-weight: bolder;
+    cursor: not-allowed;
+}
+/* FIN PAGINATION TIENDAS VIRTUALES */

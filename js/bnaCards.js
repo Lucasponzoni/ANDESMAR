@@ -4061,102 +4061,25 @@ function updatePagination(totalItems) {
 
 // FIN PAGINATION
 
-// SIN PREPARAR BOTON
-document.getElementById('btnPreparar').addEventListener('click', () => {
-    const sinPrepararCards = allData.filter(item => 
-        !item.tipoElectrodomesticoBna && item.datoFacturacion
-    ).reverse();
-    
-    // Limpiar el contenedor de tarjetas
-    const cardsContainer = document.getElementById('meli-cards');
-    cardsContainer.innerHTML = '';
-
-    // Renderizar solo las tarjetas sin preparar
-    renderCards(sinPrepararCards);
-
-    // Crear botón de volver
-    createBackButton(() => {
-        renderCards(allData); // Regresar a todas las tarjetas
-    });
-});
-// FIN SIN PREPARAR BOTON
-
-// SIN FACTURAR BOTON
-document.getElementById('btnFacturar').addEventListener('click', () => {
-    const sinFacturarCards = allData.filter(item => !item.datoFacturacion).reverse(); // Invertir el orden de los elementos filtrados
-    
-    // Limpiar el contenedor de tarjetas
-    const cardsContainer = document.getElementById('meli-cards');
-    cardsContainer.innerHTML = '';
-    
-    // Ocultar la paginación
-    paginationContainer.style.display = 'none';
-
-    // Renderizar solo las tarjetas sin facturar
-    renderCards(sinFacturarCards);
-
-    // Crear botón de volver
-    createBackButton(() => {
-        // Mostrar la paginación nuevamente
-        paginationContainer.style.display = 'block';
-        renderCards(allData); // Regresar a todas las tarjetas
-    });
-});
-// FIN SIN FACTURAR BOTON
-
-//DUPLICADOS
-document.getElementById('duplicateButton').addEventListener('click', () => {
-    renderDuplicatedOrders();
-});
-
-// Función para verificar y renderizar duplicados en 'orden_publica'
-function renderDuplicatedOrders() {
-    let orderCount = {};
-    let duplicatedOrders = [];
-
-    // Contar cada 'orden_publica'
-    allData.forEach(item => {
-        const order = item.orden_publica;
-        if (order) {
-            if (orderCount[order]) {
-                orderCount[order]++;
-                if (orderCount[order] === 2) {
-                    duplicatedOrders.push(order); // Guardar el orden duplicado solo una vez
-                }
-            } else {
-                orderCount[order] = 1;
-            }
-        }
-    });
-
-    // Filtrar los datos duplicados
-    const duplicatedData = allData.filter(item => duplicatedOrders.includes(item.orden_publica));
-
-    // Limpiar el contenedor de tarjetas
-    const cardsContainer = document.getElementById('meli-cards');
-    cardsContainer.innerHTML = '';
-
-    // Ocultar la paginación
-    paginationContainer.style.display = 'none';
-
-    // Renderizar solo las tarjetas duplicadas
-    renderCards(duplicatedData);
-
-    // Crear botón de volver
-    createBackButton(() => {
-        // Mostrar la paginación nuevamente
-        paginationContainer.style.display = 'block';
-        renderCards(allData); // Regresar a todas las tarjetas
-    });
-}
-// FIN DUPLICADOS
-
-// SWITCH BOTÓN 2
+// INICIO SWITCHS BOTÓNES
 // Variables para la nueva paginación
 let filteredData = [];
 let currentFilteredPage = 1; // Página actual
-const itemsPerPageFiltered = 3; // Número de elementos por página
+const itemsPerPageFiltered = 30; // Número de elementos por página
 const filteredPaginationContainer = document.getElementById('filtered-pagination'); // Contenedor de paginación
+
+// Función para filtrar duplicados
+function filterDuplicates(data) {
+    const uniqueOrders = new Set();
+    return data.filter(item => {
+        const order = item.orden_publica;
+        if (order && !uniqueOrders.has(order)) {
+            uniqueOrders.add(order);
+            return true;
+        }
+        return false;
+    });
+}
 
 // Función para renderizar la nueva paginación
 function renderFilteredPagination(data) {
@@ -4220,13 +4143,14 @@ function createButton(text, isDisabled) {
 
 // Función para actualizar las tarjetas en la nueva paginación
 function updateFilteredCards(data) {
+    const uniqueData = filterDuplicates(data); // Filtrar duplicados
     const start = (currentFilteredPage - 1) * itemsPerPageFiltered;
     const end = currentFilteredPage * itemsPerPageFiltered;
-    renderCards(data.slice(start, end));
-    renderFilteredPagination(data); // Volver a renderizar la paginación
+    renderCards(uniqueData.slice(start, end));
+    renderFilteredPagination(uniqueData); // Volver a renderizar la paginación
 }
 
-// Modificación del evento click del botón switch
+// Modificación del evento click del botón switch para entregados
 document.getElementById('btnSwitch').addEventListener('click', () => {
     filteredData = allData
         .filter(item => item.marcaEntregado === 'No' || item.marcaEntregado === undefined)
@@ -4250,7 +4174,127 @@ document.getElementById('btnSwitch').addEventListener('click', () => {
         filteredPaginationContainer.style.display = 'none'; // Ocultar nueva paginación
     });
 });
-// FIN SWITCH BOTÓN
+
+// Modificación del evento click del botón switch para preparados
+document.getElementById('btnSwitch1').addEventListener('click', () => {
+    filteredData = allData
+        .filter(item => item.marcaPreparado === 'No' || item.marcaPreparado === undefined)
+        .reverse(); // Filtrar y revertir el orden
+
+    // Limpiar el contenedor de tarjetas
+    const cardsContainer = document.getElementById('meli-cards');
+    cardsContainer.innerHTML = '';
+
+    // Ocultar la paginación original
+    paginationContainer.style.display = 'none';
+    filteredPaginationContainer.style.display = 'block'; // Mostrar nueva paginación
+
+    // Renderizar solo las tarjetas no preparadas
+    updateFilteredCards(filteredData);
+
+    // Crear botón de volver
+    createBackButton(() => {
+        renderCards(allData.slice(0, itemsPerPage)); // Regresar a todas las tarjetas
+        paginationContainer.style.display = 'block'; // Mostrar la paginación original
+        filteredPaginationContainer.style.display = 'none'; // Ocultar nueva paginación
+    });
+});
+
+// Sin Preparar Botón
+document.getElementById('btnPreparar').addEventListener('click', () => {
+    filteredData = allData.filter(item => 
+        !item.tipoElectrodomesticoBna && item.datoFacturacion
+    ).reverse();
+
+    // Limpiar el contenedor de tarjetas
+    const cardsContainer = document.getElementById('meli-cards');
+    cardsContainer.innerHTML = '';
+
+    // Ocultar la paginación original
+    paginationContainer.style.display = 'none';
+    filteredPaginationContainer.style.display = 'block'; // Mostrar nueva paginación
+
+    // Renderizar solo las tarjetas sin preparar
+    updateFilteredCards(filteredData);
+
+    // Crear botón de volver
+    createBackButton(() => {
+        renderCards(allData.slice(0, itemsPerPage)); // Regresar a todas las tarjetas
+        paginationContainer.style.display = 'block'; // Mostrar la paginación original
+        filteredPaginationContainer.style.display = 'none'; // Ocultar nueva paginación
+    });
+});
+
+// Sin Facturar Botón
+document.getElementById('btnFacturar').addEventListener('click', () => {
+    filteredData = allData.filter(item => !item.datoFacturacion).reverse(); // Invertir el orden de los elementos filtrados
+    
+    // Limpiar el contenedor de tarjetas
+    const cardsContainer = document.getElementById('meli-cards');
+    cardsContainer.innerHTML = '';
+    
+    // Ocultar la paginación original
+    paginationContainer.style.display = 'none';
+    filteredPaginationContainer.style.display = 'block'; // Mostrar nueva paginación
+
+    // Renderizar solo las tarjetas sin facturar
+    updateFilteredCards(filteredData);
+
+    // Crear botón de volver
+    createBackButton(() => {
+        renderCards(allData.slice(0, itemsPerPage)); // Regresar a todas las tarjetas
+        paginationContainer.style.display = 'block'; // Mostrar la paginación original
+        filteredPaginationContainer.style.display = 'none'; // Ocultar nueva paginación
+    });
+});
+
+// Duplicados Botón
+document.getElementById('duplicateButton').addEventListener('click', () => {
+    renderDuplicatedOrders();
+});
+
+// Función para verificar y renderizar duplicados en 'orden_publica'
+function renderDuplicatedOrders() {
+    let orderCount = {};
+    let duplicatedOrders = [];
+
+    // Contar cada 'orden_publica'
+    allData.forEach(item => {
+        const order = item.orden_publica;
+        if (order) {
+            if (orderCount[order]) {
+                orderCount[order]++;
+                if (orderCount[order] === 2) {
+                    duplicatedOrders.push(order); // Guardar el orden duplicado solo una vez
+                }
+            } else {
+                orderCount[order] = 1;
+            }
+        }
+    });
+
+    // Filtrar los datos duplicados
+    const duplicatedData = allData.filter(item => duplicatedOrders.includes(item.orden_publica));
+
+    // Limpiar el contenedor de tarjetas
+    const cardsContainer = document.getElementById('meli-cards');
+    cardsContainer.innerHTML = '';
+
+    // Ocultar la paginación original
+    paginationContainer.style.display = 'none';
+    filteredPaginationContainer.style.display = 'none';
+
+    // Renderizar solo las tarjetas duplicadas
+    renderCards(duplicatedData);
+
+    // Crear botón de volver
+    createBackButton(() => {
+        renderCards(allData.slice(0, itemsPerPage)); // Regresar a todas las tarjetas
+        paginationContainer.style.display = 'block'; // Mostrar la paginación original
+        filteredPaginationContainer.style.display = 'none'; // Ocultar nueva paginación
+    });
+}
+// FIN SWITCHS BOTÓNES
 
 // VOLVER ATRAS
 function createBackButton() {
