@@ -5948,6 +5948,7 @@ img.gray-filter {
 }
 
 .pagination-button:disabled {
+    border: 1px solid #007aff; 
     background-color: #b0d4ff; 
     color: #0051ba; 
     opacity: 0.8;
