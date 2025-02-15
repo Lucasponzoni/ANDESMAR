@@ -3882,7 +3882,7 @@ div .form-check {
     text-align: center;
     background: linear-gradient(to bottom, #ffe4e0, #ffe4e9);
     color: #c62828; 
-    padding: 12px 16px;
+    padding: 2px 5px 15px 5px;
     border-top: 2px solid #ef5350; 
     border-radius: 10px 10px 0 0; 
     margin: 8px 0;
@@ -3900,7 +3900,7 @@ div .form-check {
     background: linear-gradient(to bottom, #deffa1, rgba(255, 255, 255, 0));
     background-color: #deffa1;
     color: green; 
-    padding: 12px 16px;
+    padding: 2px 5px 15px 5px;
     border-top: 2px solid green; 
     border-radius: 10px 10px 0 0; 
     margin: 8px 0;
