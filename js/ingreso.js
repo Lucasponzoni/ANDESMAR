@@ -15,7 +15,7 @@ const db = firebase.database();
 
 let allData = [];
 let currentPage = 1;
-let itemsPerPage = 50; // Número de elementos por página
+let itemsPerPage = 50;
 let currentPageGroup = 0;
 const paginationContainer = document.getElementById('pagination');
 
@@ -24,9 +24,13 @@ let isFiltered = false; // Variable para controlar si los datos están filtrados
 // FILTRAR PENDIENTES
 document.getElementById('filterOldestBtn').addEventListener('click', function() {
     const filteredData = allData.filter(item => item.estado === "Pendiente de despacho");
-    
-    // Hacer reverse en los datos filtrados
-    filteredData.reverse(); // Invertir el orden de los elementos
+
+    // Ordenar los datos filtrados por tiempo transcurrido de mayor a menor
+    filteredData.sort((a, b) => {
+        const tiempoA = calcularTiempoTranscurrido(a.fechaHora).totalMs;
+        const tiempoB = calcularTiempoTranscurrido(b.fechaHora).totalMs;
+        return tiempoB - tiempoA; // Ordenar de mayor a menor
+    });
 
     // Renderizar los datos filtrados
     renderCards(filteredData);
@@ -34,8 +38,9 @@ document.getElementById('filterOldestBtn').addEventListener('click', function() 
     
     // Mostrar el botón de volver atrás
     const backButton = document.getElementById('btnVolverAtras');
-    backButton.style.display = 'block'; // Hacer visible el botón
-    isFiltered = true; // Indicar que los datos están filtrados
+    backButton.style.display = 'block';
+    paginationContainer.classList.add('hidden');
+    isFiltered = true;
 });
 
 // Lógica para el botón de volver atrás
@@ -47,6 +52,7 @@ document.getElementById('btnVolverAtras').addEventListener('click', function() {
 
         // Ocultar el botón de volver atrás
         this.style.display = 'none';
+        paginationContainer.classList.remove('hidden');
         isFiltered = false; // Restablecer el estado de filtrado
     }
 });
@@ -188,10 +194,11 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
 
 function cargarDatos() {
     // Inicializa el campo de búsqueda
-const searchInput = document.getElementById('searchDespachosLogistica');
-// Mensaje inicial
-searchInput.value = "Aguardando que cargue la web ⏳";
-searchInput.disabled = true;
+    const searchInput = document.getElementById('searchDespachosLogistica');
+    // Mensaje inicial
+    searchInput.value = "Aguardando que cargue la web ⏳";
+    searchInput.disabled = true;
+
     db.ref('DespachosLogisticos').once('value').then(snapshot => {
         allData = []; // Limpiar allData
         const tableBody = document.querySelector('#data-table tbody');
@@ -199,16 +206,21 @@ searchInput.disabled = true;
 
         snapshot.forEach(childSnapshot => {
             const data = childSnapshot.val();
-            // Ajustar la fecha y hora aquí
             allData.push(data); // Almacenar datos en allData
         });
 
+        // Ordenar allData por fecha del más viejo al más nuevo
+        allData.sort((a, b) => {
+            const dateA = new Date(a.fechaHora.split(',')[0].split('/').reverse().join('-') + 'T' + a.fechaHora.split(',')[1].trim());
+            const dateB = new Date(b.fechaHora.split(',')[0].split('/').reverse().join('-') + 'T' + b.fechaHora.split(',')[1].trim());
+            return dateA - dateB; // Ordenar de más viejo a más nuevo
+        });
+
+        // Invertir el orden para que quede del más nuevo al más viejo
         allData.reverse();
 
         renderCards(allData);
-
         calcularPorcentajes(allData);
-
         updatePagination(allData.length);
         
         // Ocultar el spinner al cargar los datos
@@ -365,12 +377,7 @@ function formatearTiempoPromedio(totalMs, count) {
 }
 
 function renderCards(data) {
-    // Ordenar los datos por fecha de manera descendente
-    data.sort((a, b) => {
-        const dateA = new Date(a.fechaHora.split(',')[0].split('/').reverse().join('-') + 'T' + a.fechaHora.split(',')[1].trim());
-        const dateB = new Date(b.fechaHora.split(',')[0].split('/').reverse().join('-') + 'T' + b.fechaHora.split(',')[1].trim());
-        return dateB - dateA;
-    });
+    // No ordenar los datos aquí; se asume que ya vienen ordenados desde cargarDatos
 
     // Calcular el promedio de todos los elementos antes de la paginación
     let totalTiempo = 0; // Variable para acumular el tiempo total
@@ -430,7 +437,6 @@ function renderCards(data) {
                 imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
             } else if (numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) {
-                // Eliminar el último dígito si el número de envío tiene 10 caracteres y comienza con '1'
                 const numeroDeEnvioCorto = numeroDeEnvio.slice(0, -1);
                 link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvioCorto}`;
                 imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
