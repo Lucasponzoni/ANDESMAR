@@ -507,7 +507,7 @@ if (operation.client && operation.client.billing_info && Array.isArray(operation
 
 // MODAL DATOS DE PAGO
 // Función para formatear la fecha
-function formatDate(dateString) {
+function formatDate2(dateString) {
     const date = new Date(dateString);
     return `Fecha ${date.toLocaleDateString('es-AR')}, Horario: ${date.toLocaleTimeString('es-AR')}`;
 }
@@ -534,7 +534,7 @@ function createBillingModal(operation) {
     const transactionAmount2 = operation.payments[0]?.transaction_amount || 0;
     const shippingCost2 = operation.payments[0]?.shipping_cost || 0; 
     const couponAmount2 = operation.payments[0]?.coupon_amount || 0;
-    const dateApproved2 = formatDate(operation.payments[0]?.date_approved);
+    const dateApproved2 = formatDate2(operation.payments[0]?.date_approved);
     const totalPaidAmount2 = operation.payments[0]?.total_paid_amount;
     const idOperacion2 = operation.idOperacion;
 
