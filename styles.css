@@ -4066,7 +4066,6 @@ td.product-cell:hover::after {
     color: #444; 
     color: green !important;
     text-align: left;
-    font-weight: bolder !important; 
     line-height: 1.6;
     transition: background-color 0.3s ease, transform 0.2s ease; 
 }
