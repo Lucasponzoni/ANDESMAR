@@ -283,6 +283,11 @@ db.ref('PasarAWebMonto').once('value')
                 const transactionAmount = operation.payments[0]?.transaction_amount || 0;
                 valueCell.innerHTML = `<strong style="color: green;">${formatCurrency(transactionAmount)}</strong>`;
                 row.appendChild(valueCell);
+
+                // Agregar evento click para abrir el modal
+                valueCell.addEventListener('click', () => {
+                    createBillingModal(operation); // Llama a la función que crea el modal
+                });
     
                 // Verificar y actualizar el estado
                 if (transactionAmount >= pasarAWebMonto && (currentState === 'pendiente' || currentState === 'analizar_pasado_a_web' || currentState === undefined)) {
@@ -499,6 +504,110 @@ if (operation.client && operation.client.billing_info && Array.isArray(operation
                 deleteCell.appendChild(deleteButton);
                 row.appendChild(deleteCell);
 
+
+// MODAL DATOS DE PAGO
+// Función para formatear la fecha
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return `Fecha ${date.toLocaleDateString('es-AR')}, Horario: ${date.toLocaleTimeString('es-AR')}`;
+}
+
+// Función para formatear la moneda
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);
+}
+
+// Crear el modal
+function createBillingModal(operation) {
+    // Limpiar el contenido anterior del modal si ya existe
+    const existingModal = document.getElementById('billingModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Verificar si hay pagos disponibles
+    if (!operation.payments || operation.payments.length === 0) {
+        return; 
+    }
+
+    // Obtener los valores de los pagos
+    const transactionAmount2 = operation.payments[0]?.transaction_amount || 0;
+    const shippingCost2 = operation.payments[0]?.shipping_cost || 0; 
+    const couponAmount2 = operation.payments[0]?.coupon_amount || 0;
+    const dateApproved2 = formatDate(operation.payments[0]?.date_approved);
+    const totalPaidAmount2 = operation.payments[0]?.total_paid_amount;
+    const idOperacion2 = operation.idOperacion;
+
+    // Calcular el total facturable
+    const totalPaid = transactionAmount2 + shippingCost2 - couponAmount2;
+
+    const modalHtml = `
+    <div class="modal fade" id="billingModal" tabindex="-1" aria-labelledby="billingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius: 10px; box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);">
+                <div class="modal-header" style="background-color: #e9ecef; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                    <h5 class="modal-title" id="billingModalLabel" style="font-weight: bold; color: #333;">Detalle de Pago ${idOperacion2}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 30px; text-align: center;">
+                    <img src="./Img/mp.webp" alt="Logo" style="width: 120px; display: block; margin: 0 auto 15px;">
+                    <h5 style="color: #333; border: 1px solid #ccc; border-radius: 8px; padding: 12px; background-color: #f8f9fa;">
+                        Factura de Operación ID:  
+                        <a href="https://www.mercadopago.com.ar/activities/1?q=${idOperacion2}" target="_blank" style="color: #007bff; text-decoration: none;">
+                            ${idOperacion2} <i class="bi bi-box-arrow-in-up-right" style="font-size: 1.2rem;"></i>
+                        </a>
+                    </h5>
+                    <p style="margin-top: 15px;"><strong>Fecha de Acreditación:</strong> ${dateApproved2}</p>
+                    <hr>
+                    <p><strong>Costo de Producto:</strong> ${formatCurrency(transactionAmount2)}</p>
+                    <p><strong>Costo de Envío:</strong> ${formatCurrency(shippingCost2)}</p>
+                    <p style="color: red;"><strong>Contraparte:</strong> -${formatCurrency(couponAmount2)}</p>
+                    <hr>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: #28a745;">
+                        <strong>Total Facturable:</strong> ${formatCurrency(totalPaid)}
+                    </p>
+                    <div id="amountCheck" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+
+    // Agregar el modal al body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Calcular y mostrar la verificación de montos
+    const amountCheckDiv = document.getElementById('amountCheck');
+    const totalCalculated = transactionAmount2 + shippingCost2 - couponAmount2;
+    const installments = operation.payments[0]?.installments || 0;
+
+    if (totalCalculated === totalPaidAmount2) {
+        amountCheckDiv.innerHTML = `
+            <div style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 5px; padding: 10px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-check-circle-fill" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                <div style="text-align: center;">
+                    Los montos coinciden con Mercado Pago
+                </div>
+            </div>`;
+    } else {
+        const difference = totalPaidAmount2 - totalCalculated;
+        amountCheckDiv.innerHTML = `
+            <div style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px; padding: 10px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-info-circle-fill" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                <div style="text-align: center;">
+                    Los montos no coinciden con Mercado Pago, abono en ${installments} cuotas con recargo de ${formatCurrency(difference)}
+                </div>
+            </div>`;
+    }
+      
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('billingModal'));
+    modal.show();
+}
+
+// Llamar a la función para crear el modal
+createBillingModal(data);
+// FIN MODAL DATOS DE PAGO
 
 // TRACKING CONTROL
 // Botón para verificar si fue enviado
