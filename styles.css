@@ -231,7 +231,8 @@ form {
 .badge-large2 {
     font-size: 1.1rem;
     top: 0px !important;
-    min-width: fit-content !important;
+    padding: 5px;
+    min-width: 28px !important;
     z-index: 1000 !important;
 }
 
@@ -3106,6 +3107,7 @@ div.card-body > p > i{
 }
 
 .ios-badge {
+    min-width: 28px;
     background-color: #dc3545; 
     color: white; 
     font-size: 1rem;
@@ -4335,17 +4337,34 @@ background-color: orangered;
     color: red;
 }
 
-.contenedorSelect{
-    padding: 5px;
-    border-radius: 6px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #767676;
-}
-
 #contadorNotificaciones{
     right: -10px !important;
+}
+
+.ios-select-meli {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f8f8f8;
+    border: 1px solid cornflowerblue;
+    border-radius: 5px !important;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    max-width: 100%;
+}
+
+.ios-select-meli:focus {
+    border-color: #007aff;
+    box-shadow: 0 0 5px rgba(0, 122, 255, 0.5);
+}
+
+.ios-select-meli option {
+    padding: 10px;
 }
 
 #statusCard {

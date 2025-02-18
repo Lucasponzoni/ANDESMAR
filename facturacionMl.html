@@ -96,8 +96,8 @@
                 </button>
             
                 <div class="contenedorSelect">
-                    <select id="estadoFilter">
-                        <option value="">Todos</option>
+                    <select id="estadoFilter" class="ios-select-meli">
+                        <option value="">Todos ⤵</option>
                         <option value="pendiente">Pendiente</option>
                         <option value="facturado">Facturado</option>
                         <option value="cancelado">Cancelado</option>
@@ -105,19 +105,26 @@
                         <option value="analizar_pasado_a_web">Analizar Pasado a Web</option>
                         <option value="pasado_a_web">Pasado a Web</option>
                     </select>
-                </div>   
+                </div> 
                 
-                <button class="btn btn-primary" data-toggle="modal" data-target="#inputModal">
+                <button class="btn btn-primary position-relative" data-toggle="modal" data-target="#inputModal">
                     <i class="bi bi-shop"></i>
+                    <span id="badgeAnalizar" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span class="visually-hidden">Notificaciones</span>
+                    </span>
                 </button>
+                
             
-                <div id="btnNotificaciones" class="position-relative d-flex justify-content-center align-items-center bg-info text-white p-2 rounded" style="white-space: nowrap;">
-                    Pendientes <i class="bi bi-bell"></i>
-                    <span id="contadorNotificaciones" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-large2">
-                        <i class="bi bi-exclamation-circle"></i>
+                <!-- Botón para aplicar el filtro "Pendientes" -->
+                <button id="btnNotificaciones" class="position-relative d-flex justify-content-center align-items-center bg-info text-white p-2 rounded" style="white-space: nowrap; border: none; cursor: pointer;">
+                    Pendientes <i class="bi bi-bell" style="margin-left: 5px;"></i>
+                    <span id="contadorNotificaciones" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
+                        <i class="fas fa-spinner fa-spin"></i>
                         <span class="visually-hidden"></span>
                     </span>
-                </div>              
+                </button>
+              
             
             </div>
             

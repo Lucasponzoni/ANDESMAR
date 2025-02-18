@@ -243,6 +243,7 @@ function loadTable(data, estadoFilter = null) {
                         .then(() => {
                             console.log(`Estado de facturación actualizado a ${selectElement.value} para la operación ${operationId}`);
                             updateNotificationCount();
+                            updateNotificationCount2();
                         })
                         .catch(error => {
                             console.error("Error al actualizar el estado de facturación:", error);
@@ -308,6 +309,7 @@ function loadTable(data, estadoFilter = null) {
                             console.log(`Estado revertido a pendiente para la operación ${operation.idOperacion}`);
                             updateRowColor();
                             updateNotificationCount();
+                            updateNotificationCount2();
                         })
                         .catch(error => {
                             console.error("Error al revertir el estado de facturación:", error);
@@ -341,6 +343,7 @@ function loadTable(data, estadoFilter = null) {
                 };
                 updateRowColor();
                 updateNotificationCount();
+                updateNotificationCount2();
     
                 // Envío
                 const shippingCell = document.createElement('td');
@@ -755,6 +758,7 @@ commentButton.onclick = () => {
             // Paginación y actualización de notificaciones
             updatePagination();
             updateNotificationCount();
+            updateNotificationCount2();
         } catch (error) {
             console.error('Error al cargar la tabla:', error);
         }
@@ -1025,6 +1029,15 @@ $(document).ready(function() {
     document.getElementById('contadorNotificaciones').textContent = count;
 }
 
+function updateNotificationCount2() {
+    const count = allData.filter(operation => 
+        operation.estadoFacturacion === 'analizar_pasado_a_web'
+    ).length;
+
+    document.getElementById('badgeAnalizar').textContent = count; 
+}
+
+
 // FUNCIONES PARA EL FILTRADO DE ESTADOS
 document.getElementById('estadoFilter').addEventListener('change', function() {
     const estadoFilter = this.value; // Obtener el valor seleccionado
@@ -1044,6 +1057,16 @@ document.getElementById('estadoFilter').addEventListener('change', function() {
     }
 });
 
+document.getElementById('btnNotificaciones').addEventListener('click', function() {
+    const estadoFilter = 'pendiente'; // Valor del filtro
+    document.getElementById('estadoFilter').value = estadoFilter; // Establecer el valor del filtro
+    currentPage = 1; // Reiniciar a la primera página
+    currentPageGroup = 0; // Reiniciar el grupo de páginas
+
+    // Aplicar el filtro
+    loadTable(allData, estadoFilter); // Pasar allData y el filtro
+    document.getElementById('pagination').classList.add('hidden'); // Ocultar paginación
+});
 
 /*
 // NOTIFICADOR DE COMENTARIO EN FACTURACION
