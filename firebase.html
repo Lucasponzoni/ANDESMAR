@@ -65,7 +65,7 @@
             let totalBorrados = 0;
 
             if (envios) {
-                const keys = Object.keys(envios); // Obtener todas las claves
+                const keys = Object.keys(envios).reverse(); // Obtener todas las claves e invertir el orden
                 for (const key of keys) {
                     const envio = envios[key];
                     document.getElementById('status').innerHTML += `Analizando: ${key}<br>`;
