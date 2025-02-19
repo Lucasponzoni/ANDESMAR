@@ -689,6 +689,12 @@ button:hover {
     align-items: center;
 }
 
+.cliente-Container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .PaqID {
     border-radius: 10px 10px 0 0;
     width: fit-content;
@@ -704,6 +710,24 @@ button:hover {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fuente de macOS */
     transition: background-color 0.3s ease, box-shadow 0.3s ease; 
     z-index: -100;
+}
+
+.cliente {
+    width: 100%;
+    text-align: center;
+    padding: 8px;
+    margin-bottom: -5px;
+    color: #ffffff;
+    font-weight: 500;
+    border: 1px solid cornflowerblue;
+    background-color: indigo; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fuente de macOS */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
+    z-index: -100;
+}
+
+.cliente > img{
+    margin-right: 5px;
 }
 
 .info-paq{
@@ -5947,7 +5971,7 @@ img.gray-filter {
 /* ALERTAS FACTURACION MELI */
 .alert-ios-meli {
     position: fixed;
-    bottom: 20px;
+    bottom: 100px;
     right: 20px;
     background-color: #f8f9fa;
     color: #212529;

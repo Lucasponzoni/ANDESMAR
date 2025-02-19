@@ -352,6 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     pictures: data.pictures,
                                     SKU: data.SKU,
                                     paqid: data.packId,
+                                    cliente: data.cliente,
                                     Telefono: data.Telefono,
                                     VolumenCM3: data.VolumenCM3,
                                     VolumenM3: data.VolumenM3,
@@ -458,6 +459,7 @@ function cargarDatos() {
                     localidad: data.localidad,
                     medidas: data.medidas,
                     paqid: data.packId,
+                    cliente: data.cliente,
                     permalink: data.permalink,
                     shippingMode: data.shippingMode,
                     nombreDeUsuario: data.nombreDeUsuario,
@@ -703,9 +705,10 @@ const paymentHTML = `
 
                     </div>
 
-                <div class="PaqID-Container">
+                <div class="PaqID-Container" onclick="copiarPaqId('${data.paqid}')">
                 <div class="PaqID ${!data.paqid ? 'hidden' : ''}">
-                    <i class="bi bi-info-circle-fill info-paq"></i><strong>PaqId:</strong> ${data.paqid}
+                <i class="bi bi-info-circle-fill info-paq"></i>
+                <strong>PaqId:</strong> ${data.paqid}
                 </div>
                 </div>
 
@@ -726,6 +729,13 @@ const paymentHTML = `
 
                 </p>
             
+                </div>
+
+                <div class="cliente-Container" onclick="copiarCliente('${data.cliente}')">
+                <div class="cliente ${!data.cliente ? 'hidden' : ''}">
+                <img src="Img/logo-presea.png" alt="PRESEA" width="20">
+                Cliente Presea: <strong id="nombre-cliente">${data.cliente}</strong> 
+                </div>
                 </div>
 
                 ${carouselHTML}
@@ -1002,6 +1012,38 @@ document.querySelectorAll('.editarDatos').forEach(button => {
         editarDatos(id);
     });
 });
+
+function copiarCliente(cliente) {
+    navigator.clipboard.writeText(cliente).then(() => {
+        showAlert(`Se ha copiado al portapapeles: Cliente ${cliente}`);
+    }).catch(err => {
+        console.error('Error al copiar: ', err);
+    });
+}
+
+function copiarPaqId(paqid) {
+    navigator.clipboard.writeText(paqid).then(() => {
+        showAlert(`Se ha copiado al portapapeles: PaqId ${paqid}`);
+    }).catch(err => {
+        console.error('Error al copiar: ', err);
+    });
+}
+
+// Función para mostrar la alerta
+function showAlert(message) {
+    const alertContainer = document.createElement('div');
+    alertContainer.className = 'alert-ios-meli';
+    alertContainer.innerHTML = `
+        <i class="bi bi-clipboard-check"></i>
+        ${message}
+        <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+    `;
+    document.body.appendChild(alertContainer);
+
+    setTimeout(() => {
+        alertContainer.style.display = 'none';
+    }, 3000);
+}
 
 async function handleButtonClick(numeroDeEnvio, id) {
     // Mostrar spinner
