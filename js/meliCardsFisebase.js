@@ -2696,7 +2696,59 @@ await sendEmail(Name, Subject, template, nombre, email, remito);
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
 
+function monitorConnection() {
+    const notification = document.createElement('div');
+    notification.id = 'notification';
+    notification.style.position = 'fixed';
+    notification.style.bottom = '20px';
+    notification.style.right = '20px';
+    notification.style.display = 'none';
+    notification.style.backgroundColor = '#f8d7da';
+    notification.style.color = '#721c24';
+    notification.style.border = '1px solid #f5c6cb';
+    notification.style.padding = '15px';
+    notification.style.borderRadius = '5px';
+    notification.style.zIndex = '1000';
+
+    notification.innerHTML = `
+        <strong>Has perdido conexión con WiFi - red.</strong> 
+        Recarga la página. 
+        <span class="close-btn" style="cursor:pointer; margin-left:10px; color:#721c24;" onclick="closeNotification()">✖</span>
+        <button onclick="reloadPage()">Recargar</button>
+    `;
+
+    document.body.appendChild(notification);
+
+    let isOnline = navigator.onLine;
+
+    function showNotification() {
+        notification.style.display = 'block';
+    }
+
+    function closeNotification() {
+        notification.style.display = 'none';
+    }
+
+    function reloadPage() {
+        location.reload();
+    }
+
+    function checkConnection() {
+        if (!navigator.onLine && isOnline) {
+            isOnline = false;
+            showNotification();
+        } else if (navigator.onLine && !isOnline) {
+            isOnline = true;
+            closeNotification();
+        }
+    }
+
+    // Verificar la conexión cada 5 segundos
+    setInterval(checkConnection, 5000);
+}
+
 // Llama a cargarDatos para iniciar el proceso
 cargarDatos();
+monitorConnection();
 
 
