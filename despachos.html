@@ -439,6 +439,52 @@
         <i class="fas fa-arrow-down"></i> <!-- Cambiar a flecha hacia abajo -->
     </a>
 
+    <!-- Info WiFi -->
+    <div id="notification-ios-wifi" class="notification-ios-wifi">
+        <img src="./Img/wifiLogi.gif" alt="WiFi Icon" class="wifi-icon-ios-wifi">
+        <span id="notification-text-ios-wifi"><strong></strong>¡Conexión perdida!</strong><br>No se preocupe, cuando la conexión vuelva, la página se recargará automáticamente.</span>
+        <span class="close-btn-ios-wifi" onclick="closeNotification()">✖</span>
+        <button id="retry-button-ios-wifi" class="retry-button-ios-wifi" onclick="reloadPage()">Reintentar</button>
+    </div>
+    
+    <script>
+        let isOnline = navigator.onLine;
+    
+        function showNotification() {
+            const notification = document.getElementById('notification-ios-wifi');
+            notification.style.display = 'flex';
+            notification.classList.add('blink');
+            document.getElementById('notification-text-ios-wifi').innerHTML = '<strong class="LogiPaq-wifi">LogiPaq</strong><br><strong>¡Conexión perdida!</strong><br>No se preocupe, cuando la conexión vuelva, la página se recargará automáticamente.';
+            document.getElementById('retry-button-ios-wifi').textContent = 'Reintentar';
+        }
+    
+        function closeNotification() {
+            const notification = document.getElementById('notification-ios-wifi');
+            notification.style.display = 'none';
+            notification.classList.remove('blink');
+        }
+    
+        function reloadPage() {
+            location.reload();
+        }
+    
+        function checkConnection() {
+            if (!navigator.onLine && isOnline) {
+                isOnline = false;
+                showNotification();
+            } else if (navigator.onLine && !isOnline) {
+                isOnline = true;
+                document.getElementById('notification-text-ios-wifi').textContent = '¡Has recuperado la conexión WiFi!';
+                document.getElementById('retry-button-ios-wifi').textContent = 'Cancelar';
+            }
+        }
+    
+        setInterval(checkConnection, 5000);
+        window.addEventListener('offline', showNotification);
+        window.addEventListener('online', reloadPage);
+    </script>
+    <!-- Fin info WiFi -->
+
     <footer class="text-center">
         <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
         <a class="www" href="https://novogar.com.ar/" target="_blank">NOVOGAR</a>

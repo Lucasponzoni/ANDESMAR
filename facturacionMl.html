@@ -340,9 +340,10 @@
         <i class="fas fa-arrow-down"></i> <!-- Cambiar a flecha hacia abajo -->
     </a>
 
+    <!-- Info WiFi -->
     <div id="notification-ios-wifi" class="notification-ios-wifi">
-        <img src="https://img.icons8.com/ios-filled/50/000000/wifi.png" alt="WiFi Icon" class="wifi-icon-ios-wifi">
-        <span id="notification-text-ios-wifi">¡Conexión perdida!</span>
+        <img src="./Img/wifiLogi.gif" alt="WiFi Icon" class="wifi-icon-ios-wifi">
+        <span id="notification-text-ios-wifi"><strong></strong>¡Conexión perdida!</strong><br>No se preocupe, cuando la conexión vuelva, la página se recargará automáticamente.</span>
         <span class="close-btn-ios-wifi" onclick="closeNotification()">✖</span>
         <button id="retry-button-ios-wifi" class="retry-button-ios-wifi" onclick="reloadPage()">Reintentar</button>
     </div>
@@ -351,13 +352,17 @@
         let isOnline = navigator.onLine;
     
         function showNotification() {
-            document.getElementById('notification-ios-wifi').style.display = 'flex';
-            document.getElementById('notification-text-ios-wifi').textContent = '¡Conexión perdida!';
+            const notification = document.getElementById('notification-ios-wifi');
+            notification.style.display = 'flex';
+            notification.classList.add('blink');
+            document.getElementById('notification-text-ios-wifi').innerHTML = '<strong class="LogiPaq-wifi">LogiPaq</strong><br><strong>¡Conexión perdida!</strong><br>No se preocupe, cuando la conexión vuelva, la página se recargará automáticamente.';
             document.getElementById('retry-button-ios-wifi').textContent = 'Reintentar';
         }
     
         function closeNotification() {
-            document.getElementById('notification-ios-wifi').style.display = 'none';
+            const notification = document.getElementById('notification-ios-wifi');
+            notification.style.display = 'none';
+            notification.classList.remove('blink');
         }
     
         function reloadPage() {
@@ -379,6 +384,7 @@
         window.addEventListener('offline', showNotification);
         window.addEventListener('online', reloadPage);
     </script>
+    <!-- Fin info WiFi -->
 
         <footer class="text-center">
             <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
