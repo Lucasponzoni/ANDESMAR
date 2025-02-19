@@ -2354,6 +2354,41 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         console.log(`CP ${cp} no pertenece a ninguna logística específica. Fecha inicio: ${fechaInicioFormateada}, Fecha entrega: ${fechaEntregaFormateada}`);
     }
 
+    // SweetAlert para el número de cliente
+    const { value: numeroCliente } = await Swal.fire({
+        title: '¿Cuál es el número de cliente?',
+        html: `
+            <div class="input-container">
+                <input id="numeroCliente" class="swal2-input" placeholder="Número de Cliente 🧑🏻‍💻" maxlength="8" required>
+                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false, // Eliminando el botón de cancelar
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroCliente').value;
+            // Validaciones
+            if (!/^\d{2,8}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
+                return false; // Evita que se acepte el valor
+            }
+            return input; // Retorna el valor si es válido
+        },
+        allowEnterKey: true // Permitir que Enter funcione como aceptar
+    });
+    
+    // Si el usuario cancela, salir de la función
+    if (!numeroCliente) {
+        return;
+    }
+    
     spinner2.style.display = "flex";
 
     // Crear un nuevo documento PDF en tamaño 10x15 cm
@@ -2625,7 +2660,8 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             trackingNumber: "Logistica Novogar",
             trackingLink: "Logistica Novogar",
             trackingMessage: trackingMessage,
-            transportCompany: "Novogar"
+            transportCompany: "Novogar",
+            cliente: numeroCliente
         }).then(() => {
             console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
         }).catch(error => {

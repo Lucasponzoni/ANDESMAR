@@ -1900,7 +1900,7 @@ input[disabled] {
     color: black; 
     font-size: 1.4rem;
     font-family: "Roboto", sans-serif !important;
-    font-weight: 600;
+    font-weight: 400;
     margin-bottom: 14px !important;
     transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
     transition: .5s;
@@ -6041,3 +6041,72 @@ img.gray-filter {
     color: #0051ba;
 }
 /* FIN PAGINATION TIENDAS VIRTUALES */
+
+.macos-popup {
+    border-radius: 12px;
+    background-color: #f0f4f8; 
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.macos-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50; 
+    margin-bottom: 10px;
+    text-align: center; 
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    margin-top: -35px;
+}
+
+.macos-input {
+    border: 2px solid #007aff;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    margin-bottom: 5px;
+    width: 100%; 
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+.macos-input:focus {
+    border-color: #005bb5; 
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 122, 255, 0.5);
+}
+
+.input-description {
+    font-size: 14px;
+    color: #7f8c8d; 
+    text-align: center; 
+}
+
+.macos-button {
+    background-color: #007aff; 
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 100%;
+    margin-top: -10px;
+}
+
+.macos-button:hover {
+    background-color: #005bb5; /* Color más oscuro al pasar el mouse */
+    transform: translateY(-1px); /* Efecto de elevación */
+}
+
+.swal2-validation-message{
+    text-align: center;
+    font-size: small;
+    font-weight: 600;
+}
