@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        allData = Object.values(data).slice(-800); // Toma los últimos 800 registros
+        allData = Object.values(data).slice(-400); // Toma los últimos 400 registros
         allData.reverse(); // Invertir el orden de los datos
 
         console.log(`Cantidad de datos recibidos: ${allData.length}`);
