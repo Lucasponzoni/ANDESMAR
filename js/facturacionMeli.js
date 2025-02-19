@@ -218,9 +218,6 @@ function loadTable(data, estadoFilter = null) {
                     const logoImg = document.createElement('img');
                     logoImg.src = './Img/logo-presea.png';
                     logoImg.alt = 'Logo Presea';
-                    logoImg.style.width = '20px';
-                    logoImg.style.height = '20px';
-                    logoImg.style.marginRight = '5px';
                 
                     const clienteText = document.createElement('span');
                     clienteText.textContent = operation.cliente;
