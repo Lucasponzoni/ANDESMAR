@@ -207,6 +207,38 @@ function loadTable(data, estadoFilter = null) {
                 container.style.display = 'flex';
                 container.style.flexDirection = 'column';
                 
+                // Verificar si existe operation.cliente y crear el contenedor correspondiente
+                if (operation.cliente) {
+                    const clienteContainer = document.createElement('div');
+                    clienteContainer.className = 'ios-style-cliente';
+                    clienteContainer.style.display = 'flex';
+                    clienteContainer.style.alignItems = 'center';
+                    clienteContainer.style.cursor = 'pointer'; // Cambiar el cursor para indicar que es clicable
+                
+                    const logoImg = document.createElement('img');
+                    logoImg.src = './Img/logo-presea.png';
+                    logoImg.alt = 'Logo Presea';
+                    logoImg.style.width = '20px';
+                    logoImg.style.height = '20px';
+                    logoImg.style.marginRight = '5px';
+                
+                    const clienteText = document.createElement('span');
+                    clienteText.textContent = operation.cliente;
+                
+                    clienteContainer.appendChild(logoImg);
+                    clienteContainer.appendChild(clienteText);
+                    container.appendChild(clienteContainer);
+                
+                    // Agregar evento de clic para copiar cliente al portapapeles
+                    clienteContainer.addEventListener('click', () => {
+                        navigator.clipboard.writeText(operation.cliente).then(() => {
+                            showAlert(`Se ha copiado al portapapeles: Cliente ${operation.cliente}`);
+                        }).catch(err => {
+                            console.error('Error al copiar al portapapeles:', err);
+                        });
+                    });
+                }
+                
                 const idElement = document.createElement('span');
                 idElement.textContent = `${operation.idOperacion}`;
                 idElement.classList.add('ios-style-id');
