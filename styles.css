@@ -4168,7 +4168,7 @@ td.value-cell:hover::after {
   
   .notification {
     border: 1px solid cornflowerblue;
-    bottom: 60px;
+    bottom: 90px;
     position: fixed;
     background-color: #ffffff;
     border-radius: 12px;
