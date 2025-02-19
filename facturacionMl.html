@@ -99,10 +99,11 @@
                     <select id="estadoFilter" class="ios-select-meli">
                         <option value="">Todos ⤵</option>
                         <option value="pendiente">Pendiente</option>
+                        <option value="pendiente_no_pasa_web">Pendiente NO Pasan</option>
+                        <option value="analizar_pasado_a_web">Analizar Pasarlo a Web</option>
                         <option value="facturado">Facturado</option>
                         <option value="cancelado">Cancelado</option>
                         <option value="bloqueado">Bloqueado</option>
-                        <option value="analizar_pasado_a_web">Analizar Pasado a Web</option>
                         <option value="pasado_a_web">Pasado a Web</option>
                     </select>
                 </div> 
@@ -120,6 +121,15 @@
                 <button id="btnNotificaciones" class="position-relative d-flex justify-content-center align-items-center bg-info text-white p-2 rounded" style="white-space: nowrap; border: none; cursor: pointer;">
                     Pendientes <i class="bi bi-bell" style="margin-left: 5px;"></i>
                     <span id="contadorNotificaciones" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span class="visually-hidden"></span>
+                    </span>
+                </button>
+
+                <!-- Botón para aplicar el filtro "No Pasa" -->
+                <button id="btnNotificaciones3" class="position-relative d-flex justify-content-center align-items-center bg-secondary text-white p-2 rounded" style="white-space: nowrap; border: none; cursor: pointer;">
+                    No Pasan <i class="bi bi-bell" style="margin-left: 5px;"></i>
+                    <span id="contadorNotificaciones3" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
                         <i class="fas fa-spinner fa-spin"></i>
                         <span class="visually-hidden"></span>
                     </span>

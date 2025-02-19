@@ -329,6 +329,7 @@ function loadTable(data, estadoFilter = null) {
                             console.log(`Estado de facturación actualizado a ${selectElement.value} para la operación ${operationId}`);
                             updateNotificationCount();
                             updateNotificationCount2();
+                            updateNotificationCount3();
                         })
                         .catch(error => {
                             console.error("Error al actualizar el estado de facturación:", error);
@@ -395,6 +396,7 @@ function loadTable(data, estadoFilter = null) {
                             updateRowColor();
                             updateNotificationCount();
                             updateNotificationCount2();
+                            updateNotificationCount3();
                         })
                         .catch(error => {
                             console.error("Error al revertir el estado de facturación:", error);
@@ -429,6 +431,7 @@ function loadTable(data, estadoFilter = null) {
                 updateRowColor();
                 updateNotificationCount();
                 updateNotificationCount2();
+                updateNotificationCount3();
     
                 // Envío
                 const shippingCell = document.createElement('td');
@@ -844,6 +847,7 @@ commentButton.onclick = () => {
             updatePagination();
             updateNotificationCount();
             updateNotificationCount2();
+            updateNotificationCount3();
         } catch (error) {
             console.error('Error al cargar la tabla:', error);
         }
@@ -1107,7 +1111,6 @@ $(document).ready(function() {
   function updateNotificationCount() {
     const count = allData.filter(operation => 
         operation.estadoFacturacion === 'pendiente'|| 
-        operation.estadoFacturacion === 'pendiente_no_pasa_web'||
         operation.estadoFacturacion === undefined
     ).length;
 
@@ -1122,6 +1125,14 @@ function updateNotificationCount2() {
     document.getElementById('badgeAnalizar').textContent = count; 
 }
 
+function updateNotificationCount3() {
+    const count = allData.filter(operation => 
+        operation.estadoFacturacion === 'pendiente_no_pasa_web'|| 
+        operation.estadoFacturacion === undefined
+    ).length;
+
+    document.getElementById('contadorNotificaciones3').textContent = count;
+}
 
 // FUNCIONES PARA EL FILTRADO DE ESTADOS
 document.getElementById('estadoFilter').addEventListener('change', function() {
@@ -1144,6 +1155,17 @@ document.getElementById('estadoFilter').addEventListener('change', function() {
 
 document.getElementById('btnNotificaciones').addEventListener('click', function() {
     const estadoFilter = 'pendiente'; // Valor del filtro
+    document.getElementById('estadoFilter').value = estadoFilter; // Establecer el valor del filtro
+    currentPage = 1; // Reiniciar a la primera página
+    currentPageGroup = 0; // Reiniciar el grupo de páginas
+
+    // Aplicar el filtro
+    loadTable(allData, estadoFilter); // Pasar allData y el filtro
+    document.getElementById('pagination').classList.add('hidden'); // Ocultar paginación
+});
+
+document.getElementById('btnNotificaciones3').addEventListener('click', function() {
+    const estadoFilter = 'pendiente_no_pasa_web'; // Valor del filtro
     document.getElementById('estadoFilter').value = estadoFilter; // Establecer el valor del filtro
     currentPage = 1; // Reiniciar a la primera página
     currentPageGroup = 0; // Reiniciar el grupo de páginas
