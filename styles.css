@@ -717,10 +717,10 @@ button:hover {
     text-align: center;
     padding: 8px;
     margin-bottom: -5px;
-    color: #ffffff;
+    color: indigo;
     font-weight: 500;
     border: 1px solid cornflowerblue;
-    background-color: indigo; 
+    background-color: rgb(231, 220, 255); 
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fuente de macOS */
     transition: background-color 0.3s ease, box-shadow 0.3s ease; 
     z-index: -100;
@@ -728,6 +728,10 @@ button:hover {
 
 .cliente > img{
     margin-right: 5px;
+}
+
+.cliente > img{
+    width: 30px;
 }
 
 .info-paq{

@@ -78,11 +78,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Verificar cada venta
         const promises = allData.map(sale => {
             if (sale.trackingNumber && !sale.cliente) {
-                return checkDespachosLogisticos(sale.trackingNumber, sale.idOperacion)
-                    .then(updated => {
-                        if (updated) totalUpdated++;
-                    })
-                    .catch(() => totalNotFound++);
+                const currentHour = new Date().getHours();
+                if (currentHour >= 16) {
+                    return checkDespachosLogisticos(sale.trackingNumber, sale.idOperacion)
+                        .then(updated => {
+                            if (updated) totalUpdated++;
+                        })
+                        .catch(() => totalNotFound++);
+                } else {
+                    console.log('La búsqueda de clientes se ejecutará luego de las 16hs');
+                    totalNotFound++;
+                    return Promise.resolve();
+                }
             } else {
                 totalNotFound++;
                 return Promise.resolve();
