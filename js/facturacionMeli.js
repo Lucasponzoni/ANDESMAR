@@ -998,6 +998,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         for (let page = 1; page <= totalPages; page++) {
             currentPage = page;
+            searchStatus.classList.remove('alert-ios2-ml');
+            searchStatus.classList.add('alert-ios-ml');
             searchMessage.textContent = `Estoy buscando en el contenido de la página ${page}...`;
             searchStatus.querySelector('.spinner-ios-ml').style.display = 'block';
             loadTable(allData);
@@ -1067,6 +1069,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             console.log(`Datos encontrados para el ID: ${searchTerm}`, data);
             loadTable([data]);
+            currentPage = 1;
+            pagination.classList.add('hidden'); 
             searchStatus.classList.remove('alert-ios-ml');
             searchStatus.classList.add('alert-ios2-ml');
             searchMessage.innerHTML = `Datos encontrados en Firebase <i class="bi bi-fire"></i> para el ID: ${searchTerm} <i class="bi bi-check-circle-fill"></i>`;
@@ -1074,7 +1078,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (errorMessage) {
                 errorMessage.style.display = 'none'; 
-                pagination.classList.remove('hidden'); 
                 tableHeader.classList.remove('hidden'); 
             }
 
