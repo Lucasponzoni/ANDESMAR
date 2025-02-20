@@ -4383,10 +4383,6 @@ background-color: orangered;
     color: red;
 }
 
-#contadorNotificaciones{
-    right: -10px !important;
-}
-
 .ios-select-meli {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -6202,3 +6198,43 @@ img.gray-filter {
     color: yellow;
 }
 /* FIN WIFI */
+
+/* ALERTA MERCADO LIBRE - Estilo Danger */
+.alert-danger-ml {
+    text-align: center;
+    background-color: #f8d7da; 
+    border: 1px solid #f5c6cb; 
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #721c24; 
+    margin-top: -8px;
+}
+
+.spinner-danger-ml {
+    margin-left: 10px;
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-top: 6px solid #721c24;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 0.8s linear infinite;
+}
+
+.alert-ios2-ml {
+    background-color: #d4edda; 
+    border: 1px solid #c3e6cb;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #155724; 
+    margin-top: -8px;
+}

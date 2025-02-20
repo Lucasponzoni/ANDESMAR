@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        allData = Object.values(data).slice(-400); // Toma los últimos 400 registros
+        allData = Object.values(data).slice(-200); // Toma los últimos 200 registros
         allData.reverse(); // Invertir el orden de los datos
 
         console.log(`Cantidad de datos recibidos: ${allData.length}`);
@@ -278,23 +278,34 @@ function loadTable(data, estadoFilter = null) {
     
                 const selectElement = document.createElement('select');
                 selectElement.style.width = '100%';
-                selectElement.innerHTML = `
-                    <option value="pendiente">Pendiente ⏳</option>
-                    <option value="facturado">Facturado ✅</option>
-                    <option value="cancelado">Cancelado ❌</option>
-                    <option value="bloqueado">Bloqueado 🔒</option>
-                    <option value="analizar_pasado_a_web">Web ⚠️</option>
-                    <option value="pendiente_no_pasa_web">No Pasa ⏳</option>
-                    <option value="pasado_a_web">Pasado a Web</option>
-                `;
+                
+                // Verificar el valor de operation.shippingMode
+                if (operation.shippingMode === "me2") {
+                    selectElement.disabled = true; // Deshabilitar el select
+                    selectElement.innerHTML = `<option value="">Mercado Envíos</option>`; // Mostrar "Mercado Envíos"
+                } else {
+                    selectElement.innerHTML = `
+                        <option value="pendiente">Pendiente ⏳</option>
+                        <option value="facturado">Facturado ✅</option>
+                        <option value="cancelado">Cancelado ❌</option>
+                        <option value="bloqueado">Bloqueado 🔒</option>
+                        <option value="analizar_pasado_a_web">Web ⚠️</option>
+                        <option value="pendiente_no_pasa_web">No Pasa ⏳</option>
+                        <option value="pasado_a_web">Pasado a Web</option>
+                    `;
+                }
+                
+                // Agregar el select al contenedor
                 container.appendChild(selectElement);
-    
+                
                 stateCell.appendChild(container);
                 row.appendChild(stateCell);
-    
+                
                 // Establecer el estado inicial
                 const currentState = operation.estadoFacturacion || 'pendiente';
-                selectElement.value = currentState;
+                if (operation.shippingMode !== "me2") {
+                    selectElement.value = currentState; // Solo establecer valor si no está deshabilitado
+                }                
     
                 // Cambiar el color de fondo de la fila según el estado
                 switch (currentState) {
@@ -931,19 +942,25 @@ function updatePagination() {
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchFacturacion');
     const searchStatus = document.getElementById('search-status');
+    const searchStatus2 = document.getElementById('search-status2');
     const searchMessage = document.getElementById('search-message');
     const errorMessage = document.querySelector('.error-message');
     const searchTermSpan = document.getElementById('search-term');
+    const pagination = document.getElementById('pagination');
+    const tableHeader = document.querySelector('#data-table thead');
 
     // Evento para borrar el contenido del buscador al hacer clic y llevar a la página 1
     searchInput.addEventListener('focus', function() {
         searchInput.value = '';
         searchTermSpan.textContent = '';
         searchStatus.style.display = 'none';
+        searchStatus2.style.display = 'none'; // Ocultar searchStatus2
         searchMessage.textContent = '';
         errorMessage.style.display = 'none';
         currentPage = 1; // Llevar a la página 1
         loadTable(allData); // Volver a cargar todos los datos
+        pagination.classList.remove('hidden'); // Mostrar paginación
+        tableHeader.classList.remove('hidden'); // Mostrar cabecera de la tabla
     });
 
     searchInput.addEventListener('input', async function() {
@@ -952,10 +969,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (searchTerm === '') {
             searchStatus.style.display = 'none';
+            searchStatus2.style.display = 'none'; // Ocultar searchStatus2
             searchMessage.textContent = '';
             errorMessage.style.display = 'none';
             currentPage = 1; // Llevar a la página 1
             loadTable(allData); // Volver a cargar todos los datos
+            pagination.classList.remove('hidden'); // Mostrar paginación
+            tableHeader.classList.remove('hidden'); // Mostrar cabecera de la tabla
+            return;
+        }
+
+        // Verificar si el input es un número de 16 dígitos
+        if (/^\d{16}$/.test(searchTerm)) {
+            searchStatus.style.display = 'flex';
+            searchStatus2.style.display = 'none'; // Ocultar searchStatus2
+            searchMessage.innerHTML = `Buscando en Firebase... <i class="bi bi-fire"></i>`;
+            searchStatus.querySelector('.spinner-ios-ml').style.display = 'block';
+            await loadDataFromFirebase(searchTerm);
             return;
         }
 
@@ -964,6 +994,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let foundMatch = false;
 
         searchStatus.style.display = 'flex';
+        searchStatus2.style.display = 'none'; // Ocultar searchStatus2
 
         for (let page = 1; page <= totalPages; page++) {
             currentPage = page;
@@ -1008,10 +1039,55 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!foundMatch) {
             searchStatus.style.display = 'none';
             errorMessage.style.display = 'flex';
+            pagination.classList.add('hidden'); 
+            tableHeader.classList.add('hidden');
+            searchStatus2.style.display = 'flex';
         } else {
             errorMessage.style.display = 'none';
         }
     });
+
+    async function loadDataFromFirebase(searchTerm) {
+        console.log(`Iniciando búsqueda para el ID: ${searchTerm}`); 
+
+        try {
+            const snapshot = await db.ref(`envios/${searchTerm}`).once('value');
+            const data = snapshot.val();
+
+            if (!data) {
+                console.log(`No se encontraron datos en Firebase para el ID: ${searchTerm}`);
+                pagination.classList.add('hidden'); 
+                tableHeader.classList.add('hidden'); 
+                searchStatus.querySelector('.spinner-ios-ml').style.display = 'none';
+                searchStatus.style.display = 'none';
+                searchStatus2.style.display = 'flex'; 
+                searchStatus2.innerHTML = `No se encontraron datos en Firebase para ${searchTerm} <i class="bi bi-exclamation-square-fill"></i>`;
+                return;
+            }
+
+            console.log(`Datos encontrados para el ID: ${searchTerm}`, data);
+            loadTable([data]);
+            searchStatus.classList.remove('alert-ios-ml');
+            searchStatus.classList.add('alert-ios2-ml');
+            searchMessage.innerHTML = `Datos encontrados en Firebase <i class="bi bi-fire"></i> para el ID: ${searchTerm} <i class="bi bi-check-circle-fill"></i>`;
+            searchStatus.querySelector('.spinner-ios-ml').style.display = 'none';
+
+            if (errorMessage) {
+                errorMessage.style.display = 'none'; 
+                pagination.classList.remove('hidden'); 
+                tableHeader.classList.remove('hidden'); 
+            }
+
+        } catch (error) {
+            console.error('Error al cargar datos de Firebase:', error);
+            if (errorMessage) {
+                errorMessage.textContent = 'Error al cargar datos de Firebase';
+                errorMessage.style.display = 'flex';
+            }
+        }
+
+        console.log(`Búsqueda finalizada para el ID: ${searchTerm}`);
+    }
 });
 // FIN BUSCADOR
 
