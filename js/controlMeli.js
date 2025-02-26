@@ -1467,7 +1467,7 @@ if (items.length > maxItemsToShow) {
     showMoreButton.innerHTML = 'Ver más <i class="bi bi-chevron-down" style="margin-right: 8px;"></i>';
     
     const showLessButton = document.createElement('button');
-    showLessButton.className = 'btn btn-danger mt-2';
+    showLessButton.className = 'btn btn-danger mt-2 mb-2';
     showLessButton.innerHTML = 'Ver menos <i class="bi bi-chevron-up" style="margin-right: 8px;"></i>';
     showLessButton.style.display = 'none'; // Ocultar inicialmente
 
@@ -1788,12 +1788,21 @@ function uploadFile() {
     const dayOfWeek = today.getDay();
     const hourOfDay = today.getHours();
 
+    //FECHA Y HORA A TENER EN CUENTA EN LA CARGA DE ARCHIVO
     if (hourOfDay >= 12 || (dayOfWeek === 6 && hourOfDay >= 11) || dayOfWeek === 0) {
-        uploadDate.setDate(today.getDate() + 1);
+        uploadDate.setDate(today.getDate() + 1); // Aumenta el día para subir al siguiente día
     }
     
-    if (uploadDate.getDay() === 0) {
-        uploadDate.setDate(uploadDate.getDate() + 1);
+    // Verificar si el día a subir es lunes
+    if (uploadDate.getDay() === 1) { // 1 = Lunes
+        const year = uploadDate.getFullYear();
+        const month = uploadDate.getMonth(); // 0 = Enero, 1 = Febrero, ..., 11 = Diciembre
+        const date = uploadDate.getDate();
+    
+        // Comprobar si es el 3 o 4 de marzo de 2025
+        if ((year === 2025 && month === 2 && (date === 3 || date === 4))) { // 2 = Marzo
+            uploadDate.setDate(date + 2); // Cambiar al miércoles
+        }
     }
 
     const dateString = formatDate(uploadDate);
