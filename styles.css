@@ -5270,6 +5270,11 @@ input[disabled] {
     margin-top: -10px;
 }
 
+#consoleOutput{
+    border-radius: 10px;
+    border: 1px solid cornflowerblue !important;
+}
+
 .alert-modal-logRosario {
     background-color: orangered;
     font-size: small;
