@@ -3502,19 +3502,26 @@ div .form-check {
 }
 
 .card-text-isSkuIncluded{
-    display: flex;
-    align-items: center;
-    background-color: orangered;
-    color: whitesmoke;
-    padding: 12px 16px;
-    border: 1px solid orange;
-    border-radius: 10px;
-    margin: 8px 0;
+    text-align: center;
     font-size: small;
+    background-color: crimson;
+    color: white; 
+    padding: 8px 5px 15px 5px;
+    border-top: 3px solid rgb(138, 0, 28); 
+    border-radius: 10px 10px 0 0; 
+    margin: 8px 0;
+    margin-bottom: -10px;
+    font-size: small;
+    text-transform: uppercase;
     font-family: 'San Francisco', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     font-weight: 600;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-top: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.150); 
+}
+
+.card-text-isSkuIncluded > i{
+    font-size: 1.2rem;
+    color: yellow;
 }
 
 /* Estilo específico para alertError */
@@ -3936,7 +3943,7 @@ div .form-check {
     background: linear-gradient(to bottom, #ffe4e0, #ffe4e9);
     color: #c62828; 
     padding: 2px 5px 15px 5px;
-    border-top: 2px solid #ef5350; 
+    border-top: 3px solid #ef5350; 
     border-radius: 10px 10px 0 0; 
     margin: 8px 0;
     margin-bottom: -10px;
@@ -3954,7 +3961,7 @@ div .form-check {
     background-color: #deffa1;
     color: green; 
     padding: 2px 5px 15px 5px;
-    border-top: 2px solid green; 
+    border-top: 3px solid green; 
     border-radius: 10px 10px 0 0; 
     margin: 8px 0;
     margin-bottom: -10px;
