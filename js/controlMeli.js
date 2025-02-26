@@ -1460,18 +1460,34 @@ function loadFolder(folderPath) {
         // Mostrar los primeros 5 elementos
         items.slice(0, itemsToShow).forEach(item => folderList.appendChild(item));
         
-        // Agregar botón "Ver más" si hay más de 5 elementos
-        if (items.length > maxItemsToShow) {
-            const showMoreButton = document.createElement('button');
-            showMoreButton.className = 'btn btn-primary mt-2';
-            showMoreButton.innerHTML = 'Ver más <i class="bi bi-chevron-down" style="margin-right: 8px;"></i>';
-            showMoreButton.addEventListener('click', () => {
-                // Mostrar todos los elementos
-                items.slice(itemsToShow).forEach(item => folderList.appendChild(item));
-                showMoreButton.style.display = 'none'; // Ocultar el botón "Ver más"
-            });
-            folderList.appendChild(showMoreButton);
-        }
+// Agregar botón "Ver más" si hay más de 5 elementos
+if (items.length > maxItemsToShow) {
+    const showMoreButton = document.createElement('button');
+    showMoreButton.className = 'btn btn-primary mt-2';
+    showMoreButton.innerHTML = 'Ver más <i class="bi bi-chevron-down" style="margin-right: 8px;"></i>';
+    
+    const showLessButton = document.createElement('button');
+    showLessButton.className = 'btn btn-danger mt-2';
+    showLessButton.innerHTML = 'Ver menos <i class="bi bi-chevron-up" style="margin-right: 8px;"></i>';
+    showLessButton.style.display = 'none'; // Ocultar inicialmente
+
+    showMoreButton.addEventListener('click', () => {
+        // Mostrar todos los elementos
+        items.slice(itemsToShow).forEach(item => folderList.appendChild(item));
+        showMoreButton.style.display = 'none'; // Ocultar el botón "Ver más"
+        showLessButton.style.display = 'inline-block'; // Mostrar el botón "Ver menos"
+    });
+
+    showLessButton.addEventListener('click', () => {
+        // Ocultar los elementos adicionales y mostrar solo los primeros 5
+        items.slice(maxItemsToShow).forEach(item => item.remove());
+        showLessButton.style.display = 'none'; // Ocultar el botón "Ver menos"
+        showMoreButton.style.display = 'inline-block'; // Mostrar el botón "Ver más"
+    });
+
+    folderList.appendChild(showMoreButton);
+    folderList.appendChild(showLessButton);
+}
 
         result.items.forEach(fileRef => {
             showSpinner(true);
