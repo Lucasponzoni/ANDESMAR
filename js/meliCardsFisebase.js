@@ -845,7 +845,6 @@ const paymentHTML = `
 
 
     <div class="conjuntoDeBotonesMeli" style="display: flex; flex-direction: row; align-items: center;">
-
     <!-- Botón Andesmar --> 
     <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} btnAndesmarMeli" 
         id="andesmarButton${data.idOperacion}" 
@@ -860,12 +859,11 @@ const paymentHTML = `
     <!-- Botón Andesmar --> 
 
     <!-- Nuevo botón para descargar la etiqueta Mini-->
-    <button class="btn btn-success mb-1" id="downloadButton${data.idOperacion}" style="margin-left: 5px;" onclick="descargarEtiquetaMini('${data.NombreyApellido || data.Recibe}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${limpiarProducto(data.Producto)}', '${data.idOperacion}', '${data.SKU}')">
+    <button class="btn btn-success mb-1 ${isAndesmar ? '' : 'hidden'}" id="downloadButton${data.idOperacion}" style="margin-left: 5px;" onclick="descargarEtiquetaMini('${data.NombreyApellido || data.Recibe}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${limpiarProducto(data.Producto)}', '${data.idOperacion}', '${data.SKU}')">
         <i class="bi bi-download"></i> Mini
     </button>
     </div>
 
-    
     <!-- Botón Andreani -->
     <button class="btn ${isAndreani ? 'btn-success' : 'btn-danger'} btnAndreaniMeli" 
         id="andreaniButton${data.idOperacion}" 
@@ -1597,11 +1595,18 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
             await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte);
 
             // Mostrar el botón de descarga
-            const link = `https://andesmarcargas.com//ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
+            const link = `https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.NroPedido}`;
             button.classList.remove('btn-primary');
             button.classList.add('btn-success');
             button.onclick = () => window.open(link, '_blank'); 
+
+            window.open(link, '_blank'); 
+
+            // Mostrar el botón Mini
+            const miniButton = document.getElementById(`downloadButton${id}`);
+            miniButton.classList.remove('hidden');
+
             NroEnvio.innerHTML = `<a href="https://andesmarcargas.com/seguimiento.html?numero=${idOperacionFinal}&tipo=remito&cod=" target="_blank">Andesmar: ${idOperacionFinal} <i class="bi bi-box-arrow-up-right"></i></a>`;
             spinner.style.display = 'none';
             if (envioState) {
@@ -1610,6 +1615,10 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
             } else {
                 console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
             }
+
+            setTimeout(() => {
+                miniButton.click(); 
+            }, 2000);
         } else {
             text.innerHTML = `Envio No Disponible <i class="bi bi-exclamation-circle-fill"></i>`;
             button.classList.remove('btn-primary');
