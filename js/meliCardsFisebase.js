@@ -2414,6 +2414,16 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             title: 'macos-title',
             confirmButton: 'macos-button',
         },
+        didOpen: () => {
+            const input = document.getElementById('numeroCliente');
+            input.focus(); // Hacer foco en el input al abrir el modal
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm(); // Simular clic en el botón de aceptar
+                }
+            });
+        },
         preConfirm: () => {
             const input = document.getElementById('numeroCliente').value;
             // Validaciones

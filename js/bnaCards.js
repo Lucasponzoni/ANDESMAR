@@ -1630,19 +1630,22 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                 function cleanString(value) {
                     return value.replace(/["']/g, "");
                 }               
-                  
+
 // Evento para manejar el cambio del switch "Entregado"
 document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function() {
     const nuevoEstado = this.checked ? 'Si' : 'No';
 
-    // Actualizar en Firebase
-    firebase.database().ref('enviosBNA/' + data[i].id).update({
-        marcaEntregado: nuevoEstado
-    }).then(() => {
-        console.log(`Estado de entrega actualizado a: ${nuevoEstado}`);
-    }).catch(error => {
-        console.error("Error al actualizar el estado de entrega: ", error);
-    });
+    // Si el checkbox está marcado y el estado es "entregado"
+    if (this.checked && data[i].estadoEnvio === 'entregado') {
+        // Actualizar en Firebase
+        firebase.database().ref('enviosBNA/' + data[i].id).update({
+            marcaEntregado: nuevoEstado
+        }).then(() => {
+            console.log(`Estado de entrega actualizado a: ${nuevoEstado}`);
+        }).catch(error => {
+            console.error("Error al actualizar el estado de entrega: ", error);
+        });
+    }
 });
 
 // Evento para manejar el cambio del switch "Preparación"

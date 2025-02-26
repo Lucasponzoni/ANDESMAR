@@ -134,18 +134,23 @@ function logToConsole(message, type = 'info') {
     const messageElement = document.createElement('div');
     messageElement.textContent = message;
 
-    // Establecer el color de fondo según el tipo de mensaje
-    if (type === 'success') {
-        messageElement.style.backgroundColor = '#d4edda'; // Color de éxito
-        messageElement.style.color = '#155724'; // Texto de éxito
-        messageElement.style.border = '1px solid #c3e6cb'; // Borde de éxito
-        messageElement.innerHTML = `<i class="bi bi-check-circle"></i> ${message}`;
-    } else if (type === 'error') {
-        messageElement.style.backgroundColor = '#f8d7da'; // Color de error
-        messageElement.style.color = '#721c24'; // Texto de error
-        messageElement.style.border = '1px solid #f5c6cb'; // Borde de error
-        messageElement.innerHTML = `<i class="bi bi-x-circle"></i> ${message}`;
-    }
+// Establecer el color de fondo según el tipo de mensaje
+if (type === 'success') {
+    messageElement.style.backgroundColor = '#d4edda'; 
+    messageElement.style.color = '#155724'; 
+    messageElement.style.border = '1px solid #c3e6cb'; 
+    messageElement.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${message}`;
+} else if (type === 'success2') {
+    messageElement.style.backgroundColor = '#cce5ff'; 
+    messageElement.style.color = '#004085'; 
+    messageElement.style.border = '1px solid #b8daff'; 
+    messageElement.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${message}`;
+} else if (type === 'error') {
+    messageElement.style.backgroundColor = '#f8d7da'; 
+    messageElement.style.color = '#721c24'; 
+    messageElement.style.border = '1px solid #f5c6cb';
+    messageElement.innerHTML = `<i class="bi bi-exclamation-circle-fill"></i> ${message}`;
+}
 
     consoleOutput.appendChild(messageElement);
     consoleOutput.scrollTop = consoleOutput.scrollHeight; // Desplazarse hacia abajo
@@ -188,7 +193,7 @@ document.getElementById('importButton').addEventListener('click', async () => {
 
             // Sanitizar el SKU
             const sanitizedSKU = sanitizeSKU(codigo);
-            logToConsole(`Buscando SKU: ${sanitizedSKU}`, 'info');
+            logToConsole(`Buscando SKU: <strong>${sanitizedSKU}</strong>`, 'info');
 
             // Buscar en el catálogo
             const catalogoRef = database.ref(`catalogo/${sanitizedSKU}`);
@@ -214,7 +219,14 @@ document.getElementById('importButton').addEventListener('click', async () => {
         }
 
         // Mostrar resultados de la importación
-        logToConsole(`Se actualizaron ${updateCount} SKUs.`, 'success');
+        logToConsole(`Se actualizaron ${updateCount} SKUs. (Proceso Finalizado)`, 'success2');
+
+        Swal.fire({
+            title: 'Actualización completada',
+            html: `<p><span class="counter imported">${updateCount}</span> SKUs actualizados en la base de datos.</p>`,
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
 
         // Cerrar el modal al finalizar la importación
         const modal = new bootstrap.Modal(document.getElementById('importCategoriesModal'));
