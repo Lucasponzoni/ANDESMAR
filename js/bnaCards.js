@@ -295,10 +295,10 @@ document.getElementById('importButton').addEventListener('click', function() {
                         title: 'Importación completada',
                         html: `
                             <div style="text-align: left; font-size: 1.1em;">
-                                <p><span class="counter imported">${importedCount}</span> Ventas importadas a la base de datos.</p>
-                                <p><span class="counter existing">${existingCount}</span> Ya se encontraban en planilla.</p>
-                                <p><span class="counter skipped">${skippedCount}</span> Registros omitidos por estar vacíos.</p>
-                                <p><span class="counter changed">${changedInfo}</span> Registros de envíos actualizados.</p>
+                                <p><span class="counter2 imported">${importedCount}</span> Ventas importadas a la base de datos.</p>
+                                <p><span class="counter2 existing">${existingCount}</span> Ya se encontraban en planilla.</p>
+                                <p><span class="counter2 skipped">${skippedCount}</span> Registros omitidos por estar vacíos.</p>
+                                <p><span class="counter2 changed">${changedInfo}</span> Registros de envíos actualizados.</p>
                             </div>
                         `,
                         icon: 'success',

@@ -5949,26 +5949,33 @@ img.gray-filter {
     background-color: #005bb5;
 }
 
-.counter {
+.counter2 {
     display: inline-block;
+    padding: 5px 10px;
     border-radius: 10px;
     color: white;
     font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s ease; 
 }
 
-.counter.imported {
+.counter2:hover {
+    transform: scale(1.1); 
+}
+
+.counter2.imported {
     background-color: #4caf50; /* Verde */
 }
 
-.counter.existing {
+.counter2.existing {
     background-color: #ff9800; /* Naranja */
 }
 
-.counter.skipped {
+.counter2.skipped {
     background-color: #f44336; /* Rojo */
 }
 
-.counter.changed {
+.counter2.changed {
     background-color: #2196f3; /* Azul */
 }
 
