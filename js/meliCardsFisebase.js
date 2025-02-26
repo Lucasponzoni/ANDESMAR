@@ -844,6 +844,8 @@ const paymentHTML = `
     <!-- Botón Cruz del Sur -->
 
 
+    <div class="conjuntoDeBotonesMeli" style="display: flex; flex-direction: row; align-items: center;">
+
     <!-- Botón Andesmar --> 
     <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} btnAndesmarMeli" 
         id="andesmarButton${data.idOperacion}" 
@@ -856,6 +858,13 @@ const paymentHTML = `
         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.idOperacion}"></span>
     </button>
     <!-- Botón Andesmar --> 
+
+    <!-- Nuevo botón para descargar la etiqueta Mini-->
+    <button class="btn btn-success mb-1" id="downloadButton${data.idOperacion}" style="margin-left: 5px;" onclick="descargarEtiquetaMini('${data.NombreyApellido || data.Recibe}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${limpiarProducto(data.Producto)}', '${data.idOperacion}', '${data.SKU}')">
+        <i class="bi bi-download"></i> Mini
+    </button>
+    </div>
+
     
     <!-- Botón Andreani -->
     <button class="btn ${isAndreani ? 'btn-success' : 'btn-danger'} btnAndreaniMeli" 
@@ -1252,59 +1261,173 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
     }
 }
 
-async function descargarEtiqueta(numeroCotizacionCds, nicCds, buttonId) {
-    console.log("Parámetros enviados a descargarEtiqueta:");
-    console.log("Cotización CDS:", numeroCotizacionCds);
-    console.log("Número de seguimiento:", nicCds);
-    console.log("ID de operación:", buttonId);
+// GENERAR ETIQUETA LOGISTICA PROPIA
+async function descargarEtiquetaMini(NombreyApellido, Cp, localidad, provincia, calleDestinatario, alturaDestinatario, telefonoDestinatario, producto, idOperacion, SKU) {
 
-    const buttonElement = document.getElementById(buttonId);
+    const { jsPDF } = window.jspdf;
 
-    const urlEtiquetaCds2 = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&id=${numeroCotizacionCds}&tamanioHoja=2&posicionArrancar=1&textoEspecialPorEtiqueta=`;
+    spinner2.style.display = "flex";
 
-    const optionsEtiquetaCds = {
+    // Crear un nuevo documento PDF en tamaño 10x15 cm
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'cm',
+        format: [15, 10],
+        putOnlyUsedFonts: true,
+        floatPrecision: 16
+    });
+
+    // Eliminar el prefijo "200000" del idOperacion
+    const idOperacionFinal = idOperacion.replace(/^20000[0-9]/, '');
+    const idOperacionFinal2 = idOperacionFinal + "ME1";
+    // Limitar el producto a 60 caracteres
+    const productoLimitado = producto.length > 60 ? producto.substring(0, 60) + "..." : producto;
+
+    // URL de la API para generar el código de barras
+    const barcodeApiUrl = `https://proxy.cors.sh/https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(idOperacionFinal2)}&code=Code128&dpi=96`;
+
+    // Obtener el código de barras en formato Base64 usando el proxy CORS
+    const response = await fetch(barcodeApiUrl, {
         method: 'GET',
         headers: {
-            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+            "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd"
         }
+    });
+
+    if (!response.ok) {
+        console.error('Error al generar el código de barras:', response.statusText);
+        spinner2.style.display = "none";
+        return;
+    }
+
+    const blob = await response.blob();
+    const reader = new FileReader();
+
+    reader.onloadend = function() {
+        const barcodeBase64 = reader.result;
+
+        // Contenido HTML
+        const contenido = `
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Etiqueta</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+            <style>
+            body {
+                margin: 0;
+                padding: 0;
+                display: grid;
+                place-items: center;
+                height: 100vh;
+                background-color: #e0e0e0;
+                font-family: 'Arial', sans-serif;
+            }
+            .etiqueta {
+                width: 10cm;
+                margin: 10px;
+                padding: 20px;
+                border-radius: 15px;
+                background-color: #ffffff;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                display: flex;
+                border: 2px dashed #294888;
+                flex-direction: column;
+                align-items: center;
+            }
+            .logo img {
+                max-width: 250px;
+                height: auto;
+                margin-bottom: 5px;
+            }
+            .campo {
+                width: 100%;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+                padding: 5px;
+                border: 1px solid #294888;
+                background-color: #f1f8ff;
+                transition: background-color 0.3s;
+            }
+            .campo span {
+                font-size: 1em;
+                font-weight: bold;
+                color: black;
+            }
+            .campo.uppercase {
+                text-transform: uppercase;
+            }
+            .campo-extra {
+                width: 100%;
+                border-radius: 10px;
+                margin-top: 10px;
+                border: 2px dashed #294888;
+                padding: 10px;
+                text-align: center;
+                font-size: 1em;
+                color: #555;
+                background-color: #f9f9f9;
+            }
+            .contacto {
+                margin-top: 15px;
+                text-align: center;
+                font-size: 0.9em;
+                color: #333;
+            }
+            .contacto p {
+                margin: 5px 0;
+            }
+            </style>
+        </head>
+        <body>
+        <div class="etiqueta">
+            <div class="logo">
+                <img src="./Img/Novogar-andesmar.png" alt="Logo">
+            </div>
+            <div class="campo uppercase"><span>${NombreyApellido || recibe}</span></div>
+            <div class="campo"><span>${Cp}, ${localidad}, ${provincia}</span></div>
+            <div class="campo uppercase"><span>${calleDestinatario} ${alturaDestinatario}</span></div>
+            <div class="campo"><span>Teléfono: ${telefonoDestinatario}</span></div>
+            <div class="campo"><span>${SKU} ${productoLimitado}</span></div>
+            <div class="campo-extra">
+                <img src="${barcodeBase64}" alt="Código de Barras" />
+            </div>
+            <div class="contacto">
+            <hr>
+            <p><strong>📞 Posventa Novogar:</strong> (0341) 6680658 (Solo WhatsApp)</p>
+            <p><strong>📧 Email:</strong> posventa@novogar.com.ar</p>
+            </div>
+        </div>
+        </body>
+        </html>`;
+
+        // Crear un elemento temporal para renderizar el HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = contenido;
+        document.body.appendChild(tempDiv);
+
+        // Usar html2canvas para capturar el contenido
+        html2canvas(tempDiv, { scale: 2 }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            doc.addImage(imgData, 'PNG', 0, 0, 10, 15);
+            const pdfBlob = doc.output('blob');
+
+            // Crear un enlace para abrir el PDF en una nueva ventana
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            spinner2.style.display = "none";
+
+            window.open(pdfUrl, '_blank');
+        });
+
+        document.body.removeChild(tempDiv);
     };
 
-    try {
-        const responseEtiquetaCds2 = await fetch(urlEtiquetaCds2, optionsEtiquetaCds);
-        if (!responseEtiquetaCds2.ok) throw new Error('Error en la respuesta de la API');
-
-        const blobCds2 = await responseEtiquetaCds2.blob();
-        const urlCds2 = window.URL.createObjectURL(blobCds2);
-
-        // Crear un enlace temporal para descargar el archivo con el nombre correcto
-        const a = document.createElement('a');
-        a.href = urlCds2;
-        a.download = `Etiqueta NIC-${nicCds}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(urlCds2);
-
-        // Actualizar el botón para indicar que la etiqueta está lista para descargar
-        if (buttonElement) {
-            buttonElement.innerHTML = `
-                <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar PDF NIC-${nicCds}
-            `;
-            buttonElement.disabled = false; // Habilitar el botón
-            buttonElement.onclick = () => descargarEtiqueta(numeroCotizacionCds, nicCds, buttonId); // Reasignar el onclick
-        }
-
-    } catch (error) {
-        console.error("Error al descargar la etiqueta:", error);
-        if (document.getElementById("errorResponseCruzDelSur")) {
-            document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al descargar la etiqueta. Por favor, intenta nuevamente.";
-        }
-        // Volver a habilitar el botón en caso de error
-        if (buttonElement) {
-            buttonElement.disabled = false;
-        }
-    }
+    reader.readAsDataURL(blob);
 }
+// FIN GENERAR ETIQUETA LOGISTICA PROPIA
 
 const usuario = "BOM6765";
 const clave = "BOM6765";
