@@ -3539,8 +3539,8 @@ div .form-check {
 
 /* Alertas BNA y MELI */
 .custom-alert, .custom-alert-error {
-    position: fixed; /* Cambiar a fixed para que se mantenga en la pantalla */
-    bottom: 70px; /* Colocarlo en la parte superior */
+    position: fixed;
+    bottom: 110px; /* Colocarlo en la parte superior */
     right: 20px;
     background-color: #28a745; 
     color: white;
