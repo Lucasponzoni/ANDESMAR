@@ -1259,6 +1259,60 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
     }
 }
 
+async function descargarEtiqueta(numeroCotizacionCds, nicCds, buttonId) {
+    console.log("Parámetros enviados a descargarEtiqueta:");
+    console.log("Cotización CDS:", numeroCotizacionCds);
+    console.log("Número de seguimiento:", nicCds);
+    console.log("ID de operación:", buttonId);
+
+    const buttonElement = document.getElementById(buttonId);
+
+    const urlEtiquetaCds2 = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&id=${numeroCotizacionCds}&tamanioHoja=2&posicionArrancar=1&textoEspecialPorEtiqueta=`;
+
+    const optionsEtiquetaCds = {
+        method: 'GET',
+        headers: {
+            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+        }
+    };
+
+    try {
+        const responseEtiquetaCds2 = await fetch(urlEtiquetaCds2, optionsEtiquetaCds);
+        if (!responseEtiquetaCds2.ok) throw new Error('Error en la respuesta de la API');
+
+        const blobCds2 = await responseEtiquetaCds2.blob();
+        const urlCds2 = window.URL.createObjectURL(blobCds2);
+
+        // Crear un enlace temporal para descargar el archivo con el nombre correcto
+        const a = document.createElement('a');
+        a.href = urlCds2;
+        a.download = `Etiqueta NIC-${nicCds}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(urlCds2);
+
+        // Actualizar el botón para indicar que la etiqueta está lista para descargar
+        if (buttonElement) {
+            buttonElement.innerHTML = `
+                <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar PDF NIC-${nicCds}
+            `;
+            buttonElement.disabled = false; // Habilitar el botón
+            buttonElement.onclick = () => descargarEtiqueta(numeroCotizacionCds, nicCds, buttonId); // Reasignar el onclick
+        }
+
+    } catch (error) {
+        console.error("Error al descargar la etiqueta:", error);
+        if (document.getElementById("errorResponseCruzDelSur")) {
+            document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al descargar la etiqueta. Por favor, intenta nuevamente.";
+        }
+        // Volver a habilitar el botón en caso de error
+        if (buttonElement) {
+            buttonElement.disabled = false;
+        }
+    }
+}
+
 // GENERAR ETIQUETA LOGISTICA PROPIA
 async function descargarEtiquetaMini(NombreyApellido, Cp, localidad, provincia, calleDestinatario, alturaDestinatario, telefonoDestinatario, producto, idOperacion, SKU) {
 
