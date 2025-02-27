@@ -1395,7 +1395,7 @@ async function descargarEtiquetaMini(NombreyApellido, Cp, localidad, provincia, 
             </div>
             <div class="contacto">
             <hr>
-            <p><strong>📞 Posventa Novogar:</strong> (0341) 6680658 (Solo WhatsApp)</p>
+            <p><strong>💬 Posventa:</strong> (0341) 6680658 (WhatsApp)</p>
             <p><strong>📧 Email:</strong> posventa@novogar.com.ar</p>
             </div>
         </div>
