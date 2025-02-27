@@ -190,3 +190,11 @@ scrollToDownButton.addEventListener("click", (e) => {
                 });
             });
     }
+
+function logout() {
+    localStorage.removeItem('userType');
+    localStorage.removeItem('loginTimestamp');
+    window.location.href = 'logipaq.html';
+}
+
+document.getElementById('logoutButton').addEventListener('click', logout);

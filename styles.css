@@ -88,6 +88,11 @@ h1 {
     width: 50px;
 }
 
+.blackCat2{
+    margin-left: -125px;
+    width: 50px;
+}
+
 .bg-Hr-primary{
     margin-top: -5px;
     border-bottom: 1px dashed grey;
@@ -1720,6 +1725,13 @@ p.card-text{
     background-color: #ff3b30;
     color: white;
     border: solid 1px #ff3b30;
+}
+
+.correo-mercado-libre {
+    min-width: 30px;
+    background-color: #ffe600;
+    color: black;
+    border: solid 1px cornflowerblue;
 }
 
 .correo-novogar, .correo-santafe, .correo-rafaela, .correo-sannicolas {

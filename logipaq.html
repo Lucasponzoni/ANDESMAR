@@ -136,7 +136,7 @@
 
         function isLoginExpired() {
             const savedTimestamp = localStorage.getItem('loginTimestamp');
-            return !savedTimestamp || (Date.now() - savedTimestamp) > 10800000; // 3 horas
+            return !savedTimestamp || (Date.now() - savedTimestamp) > 28800000;
         }
 
         // Verificar si ya está logueado
@@ -157,6 +157,8 @@
                 dbRef.once('value').then(snapshot => {
                     const data = snapshot.val();
                     if (data[1] === username && data[2] === password) {
+                        localStorage.setItem('userType', 'admin');
+                        localStorage.setItem('username', username);
                         buttonText.textContent = 'Ingresando';
                         loginButton.classList.replace('btn-primary', 'btn-success');
                         let countdown = 3;
@@ -167,6 +169,21 @@
                                 clearInterval(interval);
                                 saveLoginTimestamp();
                                 window.location.href = 'index.html';
+                            }
+                        }, 1000);
+                    } else if (data[12] === username && data[13] === password) {
+                        localStorage.setItem('userType', 'placeit');
+                        localStorage.setItem('username', username);
+                        buttonText.textContent = 'Ingresando';
+                        loginButton.classList.replace('btn-primary', 'btn-success');
+                        let countdown = 3;
+                        const interval = setInterval(() => {
+                            buttonText.textContent = `Ingresando (${countdown})`;
+                            countdown--;
+                            if (countdown < 0) {
+                                clearInterval(interval);
+                                saveLoginTimestamp();
+                                window.location.href = 'MeliArPlaceit.html';
                             }
                         }, 1000);
                     } else {

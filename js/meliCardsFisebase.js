@@ -249,59 +249,41 @@ function mostrarResultados(resultados) {
 document.getElementById('prepararME1').addEventListener('click', () => obtenerDatos('me1'));
 document.getElementById('prepararME2').addEventListener('click', () => obtenerDatos('me2'));
 
+function clickPageOne() {
+    const pagination = document.getElementById('pagination');
+    
+    const pageOneLink = pagination.querySelector('li.page-item:nth-child(1) a'); 
+
+    if (pageOneLink) {
+        pageOneLink.click(); 
+        console.log("Clic en la página 1 realizado.");
+    } else {
+        console.error("No se encontró el enlace de la página 1.");
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchMercadoLibre');
     const spinner = document.getElementById('spinner');
     const cardsContainer = document.getElementById('meli-cards');
     const pagination = document.getElementById('pagination');
 
-    // Guarda el contenido inicial de cardsContainer en localStorage
-    if (!localStorage.getItem('initialContent')) {
-        localStorage.setItem('initialContent', cardsContainer.innerHTML);
-    }
-
     searchInput.addEventListener('click', function() {
         searchInput.value = '';
-        const initialContent = localStorage.getItem('initialContent');
-        if (initialContent) {
-            cardsContainer.innerHTML = initialContent;
-            pagination.style.display = 'none'; 
-    
-            // Simular un clic en la página 1
-            const firstPageLink = document.querySelector('.pagination .page-item:first-child .page-link');
-            if (firstPageLink) {
-                firstPageLink.click();
-            }
-        }
+        clickPageOne();
     });
-    
+
     searchInput.addEventListener('input', function() {
         const query = searchInput.value.trim();
-    
-        if (query.length === 0) {
-            // Restaura el contenido inicial y muestra la paginación si el input está vacío
-            const initialContent = localStorage.getItem('initialContent');
-            if (initialContent) {
-                cardsContainer.innerHTML = initialContent;
-                pagination.style.display = 'none'; 
-    
-                // Simular un clic en la página 1
-                const firstPageLink = document.querySelector('.pagination .page-item:first-child .page-link');
-                if (firstPageLink) {
-                    firstPageLink.click();
-                }
-            }
-            return;
-        }
 
         if (query.length >= 9) {
             const queryNumber = Number(query);
-
             spinner.style.display = 'block';
             cardsContainer.innerHTML = '';
             pagination.style.display = 'none'; 
 
             if (!isNaN(queryNumber)) {
+                console.log(`Buscando datos para el número: ${queryNumber}`);
                 const queryPromises = [
                     database.ref('envios')
                         .orderByChild('idOperacion')
@@ -325,15 +307,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
             
                         if (Object.keys(allData).length > 0) {
-                            // Procesar los datos y manejar payments
+                            console.log("Datos encontrados: ", allData);
                             const processedData = Object.values(allData).map(data => {
                                 const paymentData = Array.isArray(data.payments) && data.payments.length > 0 ? data.payments[0] : {};
-                                
-                                // Verifica si idOperacion está definido
                                 const id = data.idOperacion; 
-                                console.log("Mostrando datos del Nodo: ", allData)
-                                console.log("Operación Mercado Libre: ", id)            
-                        
                                 return {
                                     id: id,
                                     idOperacion: id,
@@ -375,8 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     paymentType: paymentData.payment_type || ''
                                 };
                             });
-                        
-                            // Renderizar tarjetas con los datos procesados
+
                             renderCards(processedData);
                         } else {
                             console.log("No se encontraron datos para la consulta.");
@@ -386,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
                                 </div>
                             `;
-                        }                        
+                        }
 
                         spinner.style.display = 'none';
                     })
@@ -398,6 +374,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error("La entrada no es un número válido.");
                 spinner.style.display = 'none';
             }
+        } else if (query.length === 0) {
+            console.log("Entrada vacía, cargando la página 1.");
+            clickPageOne();
         }
     });
 });

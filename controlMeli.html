@@ -27,23 +27,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
     <!-- Incluir jsPDF desde un CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Verificación de acceso antes de cargar el contenido de la página
+        const userType = localStorage.getItem('userType');
+        if (userType === 'placeit') {
+            localStorage.setItem('accessDenied', 'true');
+            window.location.href = 'MeliArPlaceit.html';
+        }
+    </script>
 </head>
 
 <script>
-    // Verificación de sesión
+    document.addEventListener('DOMContentLoaded', () => {
+        checkLogin();
+    });
+
     function checkLogin() {
         const savedTimestamp = localStorage.getItem('loginTimestamp');
-        const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 10800000; // 3 horas
+        const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 28800000;
 
         if (isExpired) {
-            window.location.href = 'logipaq.html'; // Redirige al login si la sesión ha expirado
+            window.location.href = 'logipaq.html'; 
         }
     }
-
-    // Ejecutar la verificación al cargar la página
-    checkLogin();
 </script>
 
 <body class="envios-body">
@@ -372,13 +379,14 @@
     </script>
     <!-- Fin info WiFi -->
         
-            <footer class="center">
-                <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
-                <a class="www" href="https://novogar.com.ar/" target="_blank">NOVOGAR</a>
-                <a href="https://novogar.com.ar/info/empresa" target="_blank">Quienes somos</a>
-                <a href="https://novogar.com.ar/info/Sucursales" target="_blank">Sucursales</a>
-                <a href="https://novogar.com.ar/info/ventaTelefonica" target="_blank">Atención al cliente</a>
-            </footer>
+    <footer class="center">
+        <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
+        <a class="www" href="https://novogar.com.ar/" target="_blank">NOVOGAR</a>
+        <a href="https://novogar.com.ar/info/empresa" target="_blank">Quienes somos</a>
+        <a href="https://novogar.com.ar/info/Sucursales" target="_blank">Sucursales</a>
+        <a href="https://novogar.com.ar/info/ventaTelefonica" target="_blank">Atención al cliente</a>
+        <button id="logoutButton" class="btn btn-danger mt-3"><i class="bi bi-person-gear mr-1"></i>Cerrar Sesión</button>
+    </footer>  
     
         <!-- Scripts Firebase-->
         <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
