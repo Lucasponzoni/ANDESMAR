@@ -562,7 +562,7 @@ const paymentHTML = `
     <button class="mt-1 mb-3 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-danger'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}')">
         <span>
             ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
         </span>
@@ -719,8 +719,111 @@ function showAlert(message) {
     }, 3000);
 }
 
+// Función para solicitar el número de remito usando SweetAlert
+async function solicitarNumeroRemito() {
+    const { value: numeroRemito } = await Swal.fire({
+        title: '¿Cuál es el número de remito?',
+        html: `
+            <div class="input-container">
+                <input id="numeroRemito" class="swal2-input" placeholder="Número de Remito" maxlength="20" required>
+                <small class="input-description">Ingresar número de remito (mínimo 10 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroRemito');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroRemito').value;
+            // Validaciones
+            if (!/^\d{10,}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un número de remito válido');
+                return false;
+            }
+            return input;
+        },
+        allowEnterKey: true
+    });
+
+    // Si el usuario cancela, salir de la función
+    if (!numeroRemito) {
+        return null; // Retorna null si se cancela
+    }
+    return numeroRemito;
+}
+
+// Función para solicitar el número de cliente usando SweetAlert
+async function solicitarCliente() {
+    const { value: numeroCliente } = await Swal.fire({
+        title: '¿Cuál es el número de cliente?',
+        html: `
+            <div class="input-container">
+                <input id="numeroCliente" class="swal2-input" placeholder="Número de Cliente 🧑🏻‍💻" maxlength="8" required>
+                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroCliente');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroCliente').value;
+            // Validaciones
+            if (!/^\d{2,8}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
+                return false;
+            }
+            return input;
+        },
+        allowEnterKey: true
+    });
+
+    // Si el usuario cancela, salir de la función
+    if (!numeroCliente) {
+        return null; // Retorna null si se cancela
+    }
+    return numeroCliente;
+}
+
 // ETIQUETA LOGISTICA PROPIA
-async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, SKU) {
+async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, SKU, comentarios) {
+    // Solicitar el número de remito
+    const numeroRemito = await solicitarNumeroRemito();
+    if (!numeroRemito) return; // Si se cancela, salir de la función
+
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
 
     const { jsPDF } = window.jspdf;
 
@@ -742,7 +845,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     const productoLimitado = producto.length > 60 ? producto.substring(0, 60) + "..." : producto;
 
     // URL de la API para generar el código de barras
-    const barcodeApiUrl = `https://proxy.cors.sh/https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(idOperacionFinal2)}&code=Code128&dpi=96`;
+    const barcodeApiUrl = `https://proxy.cors.sh/https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(numeroRemito)}&code=Code128&dpi=96`;
 
     // Obtener el código de barras en formato Base64 usando el proxy CORS
     const response = await fetch(barcodeApiUrl, {
@@ -790,7 +893,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 background-color: #ffffff;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
                 display: flex;
-                border: 2px dashed #294888;
+                border: 2px dashed #9c0000;
                 flex-direction: column;
                 align-items: center;
             }
@@ -804,9 +907,9 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 border-radius: 10px;
                 display: flex;
                 align-items: center;
-                margin-bottom: 10px;
+                margin-bottom: 5px;
                 padding: 5px;
-                border: 1px solid #294888;
+                border: 1px solid #9c0000;
                 background-color: #f1f8ff;
                 transition: background-color 0.3s;
             }
@@ -822,7 +925,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 width: 100%;
                 border-radius: 10px;
                 margin-top: 10px;
-                border: 2px dashed #294888;
+                border: 2px dashed #9c0000;
                 padding: 10px;
                 text-align: center;
                 font-size: 1em;
@@ -843,13 +946,14 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         <body>
         <div class="etiqueta">
             <div class="logo">
-                <img src="./Img/Novogar-andesmar.png" alt="Logo">
+                <img src="./Img/Placeit-etiqueta.png" alt="Logo">
             </div>
-            <div class="campo uppercase"><span>${NombreyApellido || recibe}</span></div>
+            <div class="campo uppercase"><span>${cliente} ${NombreyApellido || recibe}</span></div>
             <div class="campo"><span>${Cp}, ${localidad}, ${provincia}</span></div>
             <div class="campo uppercase"><span>${calleDestinatario} ${alturaDestinatario}</span></div>
             <div class="campo"><span>Teléfono: ${telefonoDestinatario}</span></div>
             <div class="campo"><span>${SKU} ${productoLimitado}</span></div>
+            <div class="campo"><span>${comentarios}</span></div>
             <div class="campo-extra">
                 <img src="${barcodeBase64}" alt="Código de Barras" />
             </div>
