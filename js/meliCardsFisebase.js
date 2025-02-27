@@ -1517,10 +1517,11 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         recibe
     });
 
+    const resultadoDiv = document.getElementById(`resultado${id}`);
+    const botonCDS = document.getElementById(`CDSButton${id}`);
     const button = document.getElementById(`andesmarButton${id}`);
     const spinner = document.getElementById(`spinnerAndesmar${id}`);
     const text = document.getElementById(`andesmarText${id}`);
-    const resultadoDiv = document.getElementById(`resultado${id}`);
     const envioState = document.getElementById(`estadoEnvio${id}`);
     const buttonAndr = document.getElementById(`andreaniButton${id}`);
     const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
@@ -1533,6 +1534,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     text.innerText = 'Generando Etiqueta...';
 
     buttonAndr.disabled = true;
+    botonCDS.disabled = true;
 
     // Dividir medidas para obtener alto, ancho y largo
     const productoLowerCase = Producto.toLowerCase();
@@ -1687,6 +1689,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
             button.classList.remove('btn-primary');
             button.classList.add('btn-warning', 'btnAndesmarMeli');
             buttonAndr.disabled = false;
+            botonCDS.disabled = false;
             spinner.style.display = 'none';
         }
     })
@@ -1696,6 +1699,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         button.classList.remove('btn-primary');
         button.classList.add('btn-danger');
         buttonAndr.disabled = false;
+        botonCDS.disabled = false;
     });
 }
 
@@ -1756,6 +1760,7 @@ async function getAuthToken() {
 
 async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe, valor) 
 {    
+    const botonCDS = document.getElementById(`CDSButton${id}`);
     const buttonAndr = document.getElementById(`andreaniButton${id}`);
     const spinnerAndr = document.getElementById(`spinnerAndreani${id}`);
     const textAndr = document.getElementById(`andreaniText${id}`);
@@ -1794,6 +1799,8 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
     textAndr.innerText = 'Generando Etiqueta...';
 
     button.disabled = true;
+    botonCDS.disabled = true;
+    buttonAndr.disabled = true;
 
     // Dividir medidas para obtener alto, ancho y largo
     const [largo, ancho, alto] = medidas.split('x').map(Number);
@@ -1953,6 +1960,7 @@ for (let i = 0; i < cantidadFinal; i++) {
         const transporte = "Correo Andreani";
 
         await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
+        buttonAndr.disabled = false;
 
             // Llamar a la API para obtener la etiqueta
             await obtenerEtiqueta(numeroDeEnvio, token, buttonAndr);
@@ -1961,11 +1969,15 @@ for (let i = 0; i < cantidadFinal; i++) {
             buttonAndr.innerText = "Error ⚠️"; 
             resultadoDivAndr.innerText = `Error: ${error.message}`; 
             button.disabled = false;
+            buttonAndr.disabled = true;
+            botonCDS.disabled = false;
         }
     } catch (error) {
         console.error('Error al generar la etiqueta:', error);
         buttonAndr.innerText = "Error Andreani ⚠️"; 
         button.disabled = false;
+        botonCDS.disabled = false;
+        buttonAndr.disabled = true;
         resultadoDivAndr.innerText = `Error Andreani: (Puede No existir el CP o Localidad en Andreani) ${error.message}`; 
     }
 }
