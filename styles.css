@@ -5707,6 +5707,10 @@ input[disabled] {
     cursor: not-allowed;
 }
 
+.btn[disabled] {
+    cursor: not-allowed;
+}
+
 .btn-dark-blue:hover {
     background-color: #03284d; 
     color: white;
