@@ -1145,10 +1145,15 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
     const resultadoDiv = document.getElementById(`resultado${id}`);
     const envioStateCDS = document.getElementById(`estadoEnvio${id}`);
     const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
+    const botonAndesmar = document.getElementById(`andesmarButton${id}`);
+    const botonAndreani = document.getElementById(`andreaniButton${id}`);
 
     // Mostrar spinner y cambiar texto
     spinner.style.display = 'inline-block';
     text.innerText = 'Generando Etiqueta...';
+
+    botonAndesmar.classList.add('disabled');
+    botonAndreani.classList.add('disabled');
 
     buttonCDS.disabled = true;
 
@@ -1241,6 +1246,8 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
         });    
         } else {
             // Manejo de otros estados de error
+            botonAndesmar.classList.remove('disabled');
+            botonAndreani.classList.remove('disabled');
             console.error("Error en la respuesta:", dataCds);
             buttonCDS.classList.remove('btn-dark-blue');
             buttonCDS.classList.add('btn-danger', 'disabled');
@@ -1249,6 +1256,8 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
             resultadoDiv.innerText = `Error: ${dataCds.Respuesta[0].Descripcion}`; 
         }
     } catch (error) {
+        botonAndesmar.classList.remove('disabled');
+        botonAndreani.classList.remove('disabled');
         console.error("Error al crear la cotización:", error);
         document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al crear la cotización. Por favor, intenta nuevamente.";
         buttonCDS.classList.remove('btn-dark-blue');
