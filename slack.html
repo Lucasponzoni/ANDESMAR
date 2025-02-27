@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obtener Mensajes de Slack</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #messages {
+            margin-top: 20px;
+        }
+        .message {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mensajes del Canal de Slack</h1>
+    <button id="fetchMessages">Obtener Mensajes</button>
+    <div id="messages"></div>
+
+    <script>
+        document.getElementById('fetchMessages').addEventListener('click', async () => {
+            const channelId = 'C03DRANH8SY';
+            const token = 'xoxb-3465013196051-8544514858816-mssCqptgEYYe0dewtMHY2sGZ';
+            const corsProxy = 'https://proxy.cors.sh/';
+            const corsApiKey = 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd';
+
+            try {
+                const response = await fetch(`${corsProxy}https://slack.com/api/conversations.history?channel=${channelId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'x-cors-api-key': corsApiKey
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.ok) {
+                    displayMessages(data.messages);
+                } else {
+                    console.error('Error al obtener mensajes:', data.error);
+                }
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+            }
+        });
+
+        function displayMessages(messages) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = ''; // Limpiar mensajes anteriores
+
+            messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                messageDiv.innerHTML = `<strong>${message.user || 'Desconocido'}:</strong> ${message.text}`;
+                messagesDiv.appendChild(messageDiv);
+            });
+        }
+    </script>
+</body>
+</html>

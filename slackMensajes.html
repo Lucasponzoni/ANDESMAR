@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Mensaje a Slack</title>
+    <script>
+        async function enviarMensaje() {
+
+            const corsApiKey = 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd';
+            const url = 'https://proxy.cors.sh/https://hooks.slack.com/services/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';
+            const mensaje = {
+                text: "Mensaje de Prueba. LogiPaq se ha conectado a Slack"
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'x-cors-api-key': corsApiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(mensaje)
+                });
+
+                if (response.ok) {
+                    alert('Mensaje enviado a Slack!');
+                } else {
+                    alert('Error al enviar el mensaje.');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Enviar Mensaje a Slack</h1>
+    <button onclick="enviarMensaje()">Enviar Mensaje</button>
+</body>
+</html>
