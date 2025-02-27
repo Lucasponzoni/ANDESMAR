@@ -3009,14 +3009,19 @@ div.card-body > p > i{
     color: white;
 }
 
+.mini-etiqueta-andi{
+    margin-bottom: 5px !important;
+}
+
 .numeroDeEnvioGenerado {
+    font-size: .9rem;
     margin-bottom: 5px !important;
     text-align: center;
     color: #ffffff; 
     border: solid 1px #007aff; 
     font-weight: 700 !important;
     padding: 0.6rem 1rem;
-    border-radius: 20px;
+    border-radius: 12px;
     background: linear-gradient(145deg, #007aff, #0051cb); /* Gradiente azul */
     box-shadow: 0 0px 8px rgba(0, 0, 0, 0.15);
     transition: background 0.3s ease;

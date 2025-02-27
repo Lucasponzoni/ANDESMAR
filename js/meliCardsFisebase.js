@@ -859,8 +859,8 @@ const paymentHTML = `
     <!-- Botón Andesmar --> 
 
     <!-- Nuevo botón para descargar la etiqueta Mini-->
-    <button class="btn btn-success mb-1 ${isAndesmar ? '' : 'hidden'}" id="downloadButton${data.idOperacion}" style="margin-left: 5px;" onclick="descargarEtiquetaMini('${data.NombreyApellido || data.Recibe}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${limpiarProducto(data.Producto)}', '${data.idOperacion}', '${data.SKU}')">
-        <i class="bi bi-download"></i> Mini
+    <button class="btn btn-success mini-etiqueta-andi mb-1 ${isAndesmar ? '' : 'hidden'}" id="downloadButton${data.idOperacion}" style="margin-left: 2px;" onclick="descargarEtiquetaMini('${data.NombreyApellido || data.Recibe}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${limpiarProducto(data.Producto)}', '${data.idOperacion}', '${data.SKU}')">
+        <i class="bi bi-lightning-charge-fill"></i> Mini
     </button>
     </div>
 
