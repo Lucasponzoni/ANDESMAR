@@ -1259,17 +1259,20 @@ $('#scanRemitoModal').on('shown.bs.modal', function () {
 });
 
 document.getElementById('scanButton').addEventListener('click', function() {
+    // Muestra el contenedor de la cámara
+    document.getElementById('camera-preview').style.display = 'block';
+
     Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
             target: document.querySelector('#camera-preview'), // Elemento donde se mostrará la cámara
             constraints: {
-                facingMode: "environment" // Usa la cámara trasera
+                facingMode: "environment" 
             }
         },
         decoder: {
-            readers: ["code_39_reader"] // Solo leer códigos Code39
+            readers: ["code_39_reader"] 
         }
     }, function(err) {
         if (err) {
@@ -1284,7 +1287,7 @@ document.getElementById('scanButton').addEventListener('click', function() {
         if (code.length === 11 && /^\d+$/.test(code)) { // Verifica que sea numérico y tenga 11 caracteres
             document.getElementById('remitoInput').value = code;
             Quagga.stop();
-            document.getElementById('fotoRemitoInput').click(); // Abre el input para adjuntar foto
+            document.getElementById('fotoRemitoInput').click(); 
         } else {
             Swal.fire('Error', 'Código escaneado no válido', 'error');
         }
