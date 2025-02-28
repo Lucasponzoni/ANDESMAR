@@ -22,6 +22,9 @@ const obtenerCredencialesCDS = async () => {
         idCDS = data[3];
         usuarioCDS = data[4];
         passCDS = data[5];
+        HookTv = data[14];
+        live = data[7];
+        corsh = data[6];
         console.log(`CDS Credentials OK`);
     } catch (error) {
         console.error('Error al obtener credenciales de Firebase:', error);
@@ -2306,6 +2309,38 @@ const transporte = "Pendiente";
 const numeroDeEnvio = `Pendiente`;
 const linkSeguimiento2 = `Pendiente`;
 
+// Determinar el tipo basado en el DNI
+let tipo;
+let mensajeTipo;
+
+if (dni <= 8) {
+    tipo = "TIPO B";
+    mensajeTipo = `🟢 **TIPO B:** El total es *$${monto_total}* 💰`;
+} else {
+    tipo = "TIPO A";
+    mensajeTipo = `🔵 **TIPO A:** A la RAZÓN SOCIAL *${razon_social}*, el total es *$${monto_total}* 💳`;
+}
+
+// Enviar notificación a Slack
+const mensajeSlack = {
+    text: `📄 Estoy procesando la factura de la Orden *${codigo_pago}* 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n${mensajeTipo} 🎉`
+};
+
+fetch(`${corsh}${hook}`, {
+    method: 'POST',
+    headers: {
+        'x-cors-api-key': `${live}`,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(mensajeSlack)
+}).then(response => {
+    if (!response.ok) {
+        throw new Error('Error al enviar el mensaje a Slack');
+    }
+}).catch(error => {
+    console.error('Error:', error);
+});
+
 // Enviar el email después de procesar el envío
 await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);       
             
@@ -2781,12 +2816,12 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
         Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
     `);
 
-    const urlCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenCm3}&peso=${peso}&codigopostal=${cp}&localidad=${localidad}&valor=${precio_venta}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${remito}&nombre=${nombre}&telefono=${telefono}&email=${email}&domicilio=${calle}&bultos=${bultos}&referencia=${remito}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
+    const urlCds = `${corsh}https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenCm3}&peso=${peso}&codigopostal=${cp}&localidad=${localidad}&valor=${precio_venta}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${remito}&nombre=${nombre}&telefono=${telefono}&email=${email}&domicilio=${calle}&bultos=${bultos}&referencia=${remito}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
 
     const optionsCds = {
         method: 'GET',
         headers: {
-            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+            'x-cors-api-key': `${live}`
         }
     };
 
