@@ -1289,11 +1289,6 @@ document.getElementById('scanButton').addEventListener('click', function() {
     // Asegúrate de que el área de enfoque esté visible
     document.querySelector('.focus-area-camera').style.display = 'block';
 
-    // Función para abrir el selector de archivos
-    function abrirSelectorDeArchivos() {
-    document.getElementById('fotoRemitoInput').click();
-    }
-
     Quagga.onDetected(function(data) {
         const code = data.codeResult.code;
         // Verifica que el código escaneado coincida con el formato esperado
@@ -1313,7 +1308,6 @@ document.getElementById('scanButton').addEventListener('click', function() {
         });
         document.getElementById('remitoInput').dispatchEvent(enterEvent);
 
-        abrirSelectorDeArchivos(); 
         } else {
             Swal.fire('Error', 'Código escaneado no válido', 'error');
         }
@@ -1324,12 +1318,7 @@ document.getElementById('scanButton').addEventListener('click', function() {
 document.getElementById('remitoInput').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault(); 
-        const inputValue = this.value;
-        const digitCount = (inputValue.match(/\d/g) || []).length; 
-
-        if (digitCount === 11) { 
-            document.getElementById('fotoRemitoInput').click(); 
-        }
+        document.getElementById('fotoRemitoInput').click(); 
     }
 });
 
