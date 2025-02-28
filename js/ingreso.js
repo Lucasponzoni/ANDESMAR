@@ -1256,6 +1256,9 @@ document.head.appendChild(style);
 // SUBIR REMITO
 $('#scanRemitoModal').on('shown.bs.modal', function () {
     $('#remitoInput').focus();
+    document.getElementById('remitoInput').value = '';
+    const fotoRemitoInput = document.getElementById('fotoRemitoInput');
+    fotoRemitoInput.value = '';
 });
 
 document.getElementById('scanButton').addEventListener('click', function() {
@@ -1286,6 +1289,11 @@ document.getElementById('scanButton').addEventListener('click', function() {
     // Asegúrate de que el área de enfoque esté visible
     document.querySelector('.focus-area-camera').style.display = 'block';
 
+    // Función para abrir el selector de archivos
+    function abrirSelectorDeArchivos() {
+    document.getElementById('fotoRemitoInput').click();
+    }
+
     Quagga.onDetected(function(data) {
         const code = data.codeResult.code;
         // Verifica que el código escaneado coincida con el formato esperado
@@ -1305,6 +1313,7 @@ document.getElementById('scanButton').addEventListener('click', function() {
         });
         document.getElementById('remitoInput').dispatchEvent(enterEvent);
 
+        abrirSelectorDeArchivos(); 
         } else {
             Swal.fire('Error', 'Código escaneado no válido', 'error');
         }
