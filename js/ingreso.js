@@ -1265,7 +1265,7 @@ document.getElementById('scanButton').addEventListener('click', function() {
     // Muestra el contenedor de la cámara
     document.getElementById('camera-preview').style.display = 'block';
 
-    // Configuración de Quagga para leer códigos Code128
+    // Quagga para leer códigos Code128
     Quagga.init({
         inputStream: {
             name: "Live",
