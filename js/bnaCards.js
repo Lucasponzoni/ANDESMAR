@@ -2309,24 +2309,37 @@ const transporte = "Pendiente";
 const numeroDeEnvio = `Pendiente`;
 const linkSeguimiento2 = `Pendiente`;
 
-// Determinar el tipo basado en el DNI
+// Determinar el tipo basado en los datos de DNI y CUIT
 let tipo;
 let mensajeTipo;
 
-if (dni <= 8) {
+const dni = document.getElementById(`dni_${id}`)?.value || '';
+const cuit = document.getElementById(`cuit_${id}`)?.value || '';
+const monto_total = document.getElementById(`monto_total_${id}`)?.value || '';
+const razon_social = document.getElementById(`razon_social_${id}`)?.value || '';
+
+if (dni && dni !== "") { // Verifica si DNI tiene datos 
     tipo = "TIPO B";
     mensajeTipo = `🟢 **TIPO B:** El total es *$${monto_total}* 💰`;
-} else {
+} else if (cuit && cuit !== "") { // Verifica si CUIT tiene datos
     tipo = "TIPO A";
     mensajeTipo = `🔵 **TIPO A:** A la RAZÓN SOCIAL *${razon_social}*, el total es *$${monto_total}* 💳`;
+} else {
+    mensajeTipo = `❌ No se proporcionaron datos válidos para determinar el tipo.`;
 }
+
+const codigo_pago = document.getElementById(`codigo_pago_${id}`)?.value || 'Código no disponible';
+const cantidad_item = document.getElementById(`cantidad_item_${id}`)?.value || '0';
+const codigo_item = document.getElementById(`codigo_item_${id}`)?.value || 'Código no disponible';
+const precio_item = document.getElementById(`precio_item_${id}`)?.value || '0';
+const monto_envio = document.getElementById(`monto_envio_${id}`)?.value || '0';
 
 // Enviar notificación a Slack
 const mensajeSlack = {
     text: `📄 Estoy procesando la factura de la Orden *${codigo_pago}* 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n${mensajeTipo} 🎉`
 };
 
-fetch(`${corsh}${hook}`, {
+fetch(`${corsh}${HookTv}`, {
     method: 'POST',
     headers: {
         'x-cors-api-key': `${live}`,
