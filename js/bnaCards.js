@@ -2323,7 +2323,7 @@ if (dni && dni !== "") { // Verifica si DNI tiene datos
     mensajeTipo = `🟢 **TIPO B:** El total es *$${monto_total}* 💰`;
 } else if (cuit && cuit !== "") { // Verifica si CUIT tiene datos
     tipo = "TIPO A";
-    mensajeTipo = `🔵 **TIPO A:** A la RAZÓN SOCIAL *${razon_social}*, el total es *$${monto_total}* 💳`;
+    mensajeTipo = `🔴 **TIPO A:** A la RAZÓN SOCIAL *${razon_social}*, el total es *$${monto_total}* 💳`;
 } else {
     mensajeTipo = `❌ No se proporcionaron datos válidos para determinar el tipo.`;
 }
@@ -2336,7 +2336,7 @@ const monto_envio = document.getElementById(`monto_envio_${id}`)?.value || '0';
 
 // Enviar notificación a Slack
 const mensajeSlack = {
-    text: `📄 Estoy procesando la factura de la Orden *${codigo_pago}* 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n${mensajeTipo} 🎉`
+    text: `➡️📄 Estoy procesando la factura de la Orden *${codigo_pago}* 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n${mensajeTipo} 🎉`
 };
 
 fetch(`${corsh}${HookTv}`, {
