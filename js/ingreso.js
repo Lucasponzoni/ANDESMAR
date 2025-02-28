@@ -1292,13 +1292,17 @@ document.getElementById('scanButton').addEventListener('click', function() {
         if (code.length === 11 && /^\d+$/.test(code)) {
             document.getElementById('remitoInput').value = code;
             Quagga.stop();
-            // Abre automáticamente el selector de archivos
-            document.getElementById('fotoRemitoInput').click(); 
+            document.querySelector('.focus-area-camera').style.display = 'none';
+            abrirSelectorDeArchivos()
         } else {
             Swal.fire('Error', 'Código escaneado no válido', 'error');
         }
     });
 });
+
+function abrirSelectorDeArchivos() {
+    document.getElementById('fotoRemitoInput').click();
+}
 
 // Evento para el campo de entrada para abrir el selector de archivos al presionar Enter
 document.getElementById('remitoInput').addEventListener('keydown', function(event) {
