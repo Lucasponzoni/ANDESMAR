@@ -472,23 +472,25 @@
     
         .focus-area {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 80%; 
-            height: 20%; 
-            border: 2px dashed #00ff00; 
-            transform: translate(-50%, -50%); 
-            pointer-events: none;
+        top: 50%;
+        left: 50%;
+        width: 80%; 
+        height: 20%; 
+        border: 2px dashed #00ff00; 
+        transform: translate(-50%, -50%); 
+        pointer-events: none; 
+        display: block;
         }
-    
+
         .modal-content {
             background-color: rgba(255, 255, 255, 0.9);
         }
     </style>
     
     <div id="camera-preview" style="display: none;">
-        <div class="focus-area"></div> <!-- Área de enfoque -->
-    </div>
+        <video></video>
+        <div class="focus-area"></div>
+    </div>    
 
     <!-- Info WiFi -->
     <div id="notification-ios-wifi" class="notification-ios-wifi">

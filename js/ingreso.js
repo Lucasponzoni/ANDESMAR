@@ -1262,35 +1262,40 @@ document.getElementById('scanButton').addEventListener('click', function() {
     // Muestra el contenedor de la cámara
     document.getElementById('camera-preview').style.display = 'block';
 
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#camera-preview'), // Elemento donde se mostrará la cámara
-            constraints: {
-                facingMode: "environment" 
-            }
-        },
-        decoder: {
-            readers: ["code_39_reader"] 
+// Configuración de Quagga para leer códigos Code128
+Quagga.init({
+    inputStream: {
+        name: "Live",
+        type: "LiveStream",
+        target: document.querySelector('#camera-preview'),
+        constraints: {
+            facingMode: "environment"
         }
-    }, function(err) {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        Quagga.start();
-    });
+    },
+    decoder: {
+        readers: ["code_128_reader"]
+    }
+}, function(err) {
+    if (err) {
+        console.error(err);
+        return;
+    }
+    Quagga.start();
+});
 
-    Quagga.onDetected(function(data) {
-        const code = data.codeResult.code;
-        if (code.length === 11 && /^\d+$/.test(code)) { // Verifica que sea numérico y tenga 11 caracteres
-            document.getElementById('remitoInput').value = code;
-            Quagga.stop();
-            document.getElementById('fotoRemitoInput').click(); 
-        } else {
-            Swal.fire('Error', 'Código escaneado no válido', 'error');
-        }
+// Asegúrate de que el área de enfoque esté visible
+document.querySelector('.focus-area').style.display = 'block'; // Muestra el área de enfoque
+
+Quagga.onDetected(function(data) {
+    const code = data.codeResult.code;
+    // Verifica que el código escaneado coincida con el formato esperado
+    if (code.length === 11 && /^\d+$/.test(code)) {
+        document.getElementById('remitoInput').value = code;
+        Quagga.stop();
+        document.getElementById('fotoRemitoInput').click(); 
+    } else {
+        Swal.fire('Error', 'Código escaneado no válido', 'error');
+    }
     });
 });
 
