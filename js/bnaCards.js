@@ -27,7 +27,7 @@ const obtenerCredencialesCDS = async () => {
         corsh = data[6];
         console.log(`CDS Credentials OK`);
     } catch (error) {
-        console.error('Error al obtener credenciales de Firebase:', error);
+        console.error('Error al obtener cred de Fire:', error);
     }
 };
 
@@ -1549,7 +1549,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             </div>
 
                             <!-- Botón Oca --> 
-                            <button class="mt-1 btn btn-oca ${isMacro(storeCode) ? '' : 'hidden'}"
+                            <button class="btn mt-1 btn-oca ${isMacro(storeCode) ? '' : 'hidden'}"
                             id="ocaButton${data[i].id}" 
                             ${data[i].cancelado ? 'disabled' : ''} 
                             onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}', '${data[i].fechaDeCreacion}')">
@@ -1560,7 +1560,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             </button>
                           
                             <!-- Botón Cruz del Sur --> 
-                            <button class="mt-1 btn btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'} ${isMacro(storeCode) ? 'hidden' : ''}"
+                            <button class="btn mt-1 btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'} ${isMacro(storeCode) ? 'hidden' : ''}"
                                 id="CDSButton${data[i].id}" 
                                 ${isAndreani || isAndesmar || data[i].cancelado ? 'disabled' : ''}
                                 onclick="${isCDS ? `descargarEtiquetaCDS('${data[i].cotizacion}', '${data[i].trackingNumber}', '${data[i].id}')` : `enviarDatosCDS('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
@@ -1571,9 +1571,9 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             </button>
                             
                             <!-- Botón Andesmar -->          
-                            <button class="mt-1 btn ${isAndesmar ? 'btn-success' : 'btn-primary'} ${isMacro(storeCode) ? 'hidden' : ''}" 
+                            <button class="btn mt-1 ${isAndesmar ? 'btn-success' : 'btn-primary'} ${isMacro(storeCode) ? 'hidden' : ''}" 
                                 id="andesmarButton${data[i].id}" 
-                                ${isAndreani || data[i].cancelado ? 'disabled' : ''} 
+                                ${isAndreani || isCDS || data[i].cancelado ? 'disabled' : ''} 
                                 ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
                                 <span id="andesmarText${data[i].id}">
                                 ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
@@ -1582,9 +1582,9 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             </button>
                             
                             <!-- Botón Andreani --> 
-                            <button class="mt-1 btn btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'} ${isMacro(storeCode) ? 'hidden' : ''}"
+                            <button class="btn mt-1 btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'} ${isMacro(storeCode) ? 'hidden' : ''}"
                                 id="andreaniButton${data[i].id}" 
-                                ${isAndesmar || data[i].cancelado ? 'disabled' : ''} 
+                                ${isAndesmar || isCDS || data[i].cancelado ? 'disabled' : ''} 
                                 onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
                                 <span id="andreaniText${data[i].id}">
                                 ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
@@ -1596,7 +1596,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             </div>
 
                             <!-- Botón Logística Propia --> 
-                            <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'} ${isMacro(storeCode) ? 'hidden' : ''}"
+                            <button class="btn mt-1 btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'} ${isMacro(storeCode) ? 'hidden' : ''}"
                             id="LogPropiaMeliButton${data[i].id}" 
                             ${data[i].cancelado ? 'disabled' : ''} 
                             onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
@@ -2746,6 +2746,8 @@ async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, call
     const envioState = document.getElementById(`estadoEnvio${id}`);
     const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
     const queEntregaCds = "E";
+    const buttonAndi = document.getElementById(`andesmarButton${id}`);
+    const buttonAndr = document.getElementById(`andreaniButton${id}`);
 
     // Verificar si los volúmenes son nulos o no válidos
     if (isNaN(volumenCm3) || isNaN(volumenM3)) {
@@ -2773,6 +2775,8 @@ async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, call
     spinnerCDS.style.display = 'inline-block';
     textCDS.innerText = 'Generando Etiqueta...';
     button.disabled = true
+    buttonAndi.disabled = true;
+    buttonAndr.disabled = true;
 
 
 // Verificar si el tipo de electrodoméstico es uno de los splits
@@ -2913,6 +2917,8 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
             buttonCDS.classList.remove('btn-dark-blue');
             buttonCDS.classList.add('btn-danger', 'disabled');
             spinnerCDS.style.display = 'none';
+            buttonAndi.disabled = false;
+            buttonAndr.disabled = false;
             textCDS.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Error al generar Etiqueta';
             resultadoDiv.innerText = `Error: ${dataCds.Respuesta[0].Descripcion}`; 
         }
@@ -2922,6 +2928,8 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
         buttonCDS.classList.remove('btn-dark-blue');
         buttonCDS.classList.add('btn-danger', 'disabled');
         spinnerCDS.style.display = 'none';
+        buttonAndi.disabled = false;
+        buttonAndr.disabled = false;
         textCDS.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Error al generar Etiqueta';
         resultadoDiv.innerText = `Error: ${error.message}`;
     }

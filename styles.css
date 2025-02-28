@@ -5719,8 +5719,12 @@ input[disabled] {
     cursor: not-allowed;
 }
 
+button.btn.disabled, .btn:disabled {
+    cursor: not-allowed !important;
+}
+
 .btn[disabled] {
-    cursor: not-allowed;
+    cursor: not-allowed !important;
 }
 
 .btn-dark-blue:hover {
