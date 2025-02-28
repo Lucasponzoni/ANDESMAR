@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     pictures: data.pictures,
                                     SKU: data.SKU,
                                     paqid: data.packId,
+                                    diasPlaceIt: data.diasPlaceIt,
                                     cliente: data.cliente,
                                     Telefono: data.Telefono,
                                     VolumenCM3: data.VolumenCM3,
@@ -213,6 +214,7 @@ function cargarDatos() {
                     localidad: data.localidad,
                     medidas: data.medidas,
                     paqid: data.packId,
+                    diasPlaceIt: data.diasPlaceIt,
                     cliente: data.cliente,
                     permalink: data.permalink,
                     shippingMode: data.shippingMode,
@@ -306,6 +308,7 @@ function crearCard(data) {
     const isAndesmar = data.transportCompany === "Andesmar";
     const isAndreani = data.transportCompany === "Andreani"
     const isLogPropia = data.transportCompany === "Novogar"
+    const isLogPlaceIt = data.transportCompany === "PlaceIt"
     const isBlocked = data.estadoFacturacion === "bloqueado"
     // Definir Email con valor por defecto
     const email = data.Email || data.email || 'webnovogar@gmail.com';
@@ -559,17 +562,22 @@ const paymentHTML = `
     </div>
 
     <!-- Botón Logística PlaceIt --> 
-    <button class="mt-1 mb-3 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-danger'}"
+    <button class="mt-1 mb-0 btn btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
         onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}')">
         <span>
-            ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
+            ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
         </span>
         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data.idOperacion}" style="display:none;"></span>
     </button>
     <!-- Botón Logística Propia --> 
 </div>
+
+<div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked || isLogPlaceIt ? 'background-color: #d0ffd1;' : ''}">
+                    ${isBlocked ? '<i class="bi bi-info-square-fill"></i> Despacho Bloqueado por Facturación, separar remito para realizar circuito' : ''}
+                    ${isLogPlaceIt ? `<i class="bi bi-info-square-fill"></i> Plazo de entrega entre ${data.diasPlaceIt}` : ''}
+                </div>
                            
             </div>
 
@@ -828,6 +836,8 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     const { jsPDF } = window.jspdf;
 
     spinner2.style.display = "flex";
+    let button = document.getElementById(`LogPropiaMeliButton${id}`);
+    let resultado = document.getElementById(`resultado${id}`);
 
     // Crear un nuevo documento PDF en tamaño 10x15 cm
     const doc = new jsPDF({
@@ -980,9 +990,44 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             // Crear un enlace para abrir el PDF en una nueva ventana
             const pdfUrl = URL.createObjectURL(pdfBlob);
             spinner2.style.display = "none";
+            button.innerHTML = '<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt';
+            resultado.style.backgroundColor = "#d0ffd1";
+            resultado.innerHTML = `<i class="bi bi-info-square-fill"></i> Plazo de entrega entre ${diaFormateadoPlaceIt}`;
+            button.classList.remove('btn-danger');
+            button.classList.add('btn-success');
 
             window.open(pdfUrl, '_blank');
         });
+
+
+        const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
+        const numeroCliente = cliente;
+        const diaFormateadoPlaceIt = obtenerFechas();
+
+        trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
+        
+            Queremos informarte que vamos a visitarte entre el ${diaFormateadoPlaceIt}.
+        
+            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+        
+            Cualquier consulta, estamos a tu servicio. ¡Gracias!
+            
+            Equipo Posventa Novogar
+            
+            ENVIO CON LOGISTICA PLACEIT`;
+    
+        firebase.database().ref('envios/' + idOperacionSinME1).update({
+            trackingNumber: "Logistica PlaceIt",
+            trackingLink: "Logistica PlaceIt",
+            trackingMessage: trackingMessage,
+            transportCompany: "PlaceIt",
+            cliente: numeroCliente,
+            diasPlaceIt: diaFormateadoPlaceIt
+        }).then(() => {
+            console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
+        }).catch(error => {
+            console.error('Error al actualizar en Firebase:', error);
+        });    
 
         document.body.removeChild(tempDiv);
     };
@@ -990,6 +1035,33 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     reader.readAsDataURL(blob);
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
+
+// OBTENER FECHAS PLACE IT
+function obtenerFechas() {
+    const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const hoy = new Date();
+    
+    // Sumar 48 horas
+    let fechaEntrega = new Date(hoy);
+    fechaEntrega.setHours(fechaEntrega.getHours() + 48);
+    
+    // Contar los días para omitir sábados y domingos
+    let diasContados = 0;
+    while (diasContados < 2) {
+        fechaEntrega.setDate(fechaEntrega.getDate() + 1);
+        if (fechaEntrega.getDay() !== 0 && fechaEntrega.getDay() !== 6) { // 0 = domingo, 6 = sábado
+            diasContados++;
+        }
+    }
+
+    // Formatear las fechas
+    const diaActual = `${diasDeLaSemana[hoy.getDay()]} ${hoy.getDate()} de ${hoy.toLocaleString('default', { month: 'long' })}`;
+    const diaEntrega = `${diasDeLaSemana[fechaEntrega.getDay()]} ${fechaEntrega.getDate()} de ${fechaEntrega.toLocaleString('default', { month: 'long' })}`;
+
+    return `${diaActual} y ${diaEntrega}`;
+}
+
+// FIN OBTENER FECHAS PLACE IT
 
 // Función para actualizar la paginación
 function updatePagination(totalItems) {

@@ -329,6 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     pictures: data.pictures,
                                     SKU: data.SKU,
                                     paqid: data.packId,
+                                    diasPlaceIt: data.diasPlaceIt,
                                     cliente: data.cliente,
                                     Telefono: data.Telefono,
                                     VolumenCM3: data.VolumenCM3,
@@ -438,6 +439,7 @@ function cargarDatos() {
                     localidad: data.localidad,
                     medidas: data.medidas,
                     paqid: data.packId,
+                    diasPlaceIt: data.diasPlaceIt,
                     cliente: data.cliente,
                     permalink: data.permalink,
                     shippingMode: data.shippingMode,
@@ -531,6 +533,7 @@ function crearCard(data) {
     const isAndesmar = data.transportCompany === "Andesmar";
     const isAndreani = data.transportCompany === "Andreani"
     const isLogPropia = data.transportCompany === "Novogar"
+    const isLogPlaceIt = data.transportCompany === "PlaceIt"
     const isBlocked = data.estadoFacturacion === "bloqueado"
     // Definir Email con valor por defecto
     const email = data.Email || data.email || 'webnovogar@gmail.com';
@@ -651,9 +654,8 @@ const paymentHTML = `
             ${isBlocked ? 'Bloqueado' : (data.estadoFacturacion === 'facturado' ? 'Facturado' : 'Factura X')}
             </div>
 
-            
         <div id="estadoEnvio${data.idOperacion}" class="${isAndesmar || isAndreani || isCDS || isLogPropia ? 'em-circle-state2' : 'em-circle-state'}">
-        ${isAndesmar || isAndreani || isCDS || isLogPropia ? 'Envio Preparado' : 'Envio pendiente'}
+        ${isAndesmar || isLogPlaceIt ||isAndreani || isCDS || isLogPropia ? 'Envio Preparado' : 'Envio pendiente'}
         </div>
 
             <div class="card-body-meli">
@@ -731,19 +733,24 @@ const paymentHTML = `
 
                 
                 <p class="numeroDeEnvioGenerado" id="numeroDeEnvioGenerado${data.idOperacion}">
-                Envío: 
-                ${isLogPropia ? 
-                'Logística Propia' : 
-                isAndesmar ? 
-                `<a href="${data.trackingLink}" target="_blank">Andesmar: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                isCDS ? 
-                `<a href="${data.trackingLink}" target="_blank">CDS: NIC-${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                isAndreani ? 
-                `<a href="${data.trackingLink}" target="_blank">Andreani: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                'Número Pendiente'}
+                    Envío: 
+                        ${isLogPropia ? 
+                                               'Logística Propia' : 
+                            (isLogPlaceIt ? 
+                                'Logística PlaceIt' : 
+                                (isAndesmar ? 
+                                    `<a href="${data.trackingLink}" target="_blank">Andesmar: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                    (isCDS ? 
+                                        `<a href="${data.trackingLink}" target="_blank">CDS: NIC-${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                        (isAndreani ? 
+                                            `<a href="${data.trackingLink}" target="_blank">Andreani: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                            'Número Pendiente'
+                                        )
+                                    )
+                                )
+                            )
+                        }
                 </p>
-
-
 
                     <div class="little-card-meli">
 
@@ -813,7 +820,8 @@ const paymentHTML = `
         <button class="btn mb-1 ${isCDS ? 'btn-success' : 'btn-dark-blue'} btnCDSMeli" 
         id="CDSButton${data.idOperacion}" 
         ${isAndesmar || isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
-        ${isBlocked ? 'disabled' : ''} 
+        ${isBlocked ? 'disabled' : ''}
+        ${isLogPlaceIt ? 'disabled' : ''} 
         onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.Recibe}')`}">
         <span id="CDSText${data.idOperacion}">
         ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
@@ -829,6 +837,7 @@ const paymentHTML = `
         id="andesmarButton${data.idOperacion}" 
         ${isAndreani || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
+        ${isLogPlaceIt ? 'disabled' : ''} 
         ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}','${email}', '${data.Recibe}')`}">
         <span id="andesmarText${data.idOperacion}">
             ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>'}
@@ -848,6 +857,7 @@ const paymentHTML = `
         id="andreaniButton${data.idOperacion}" 
         ${isAndesmar || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
+        ${isLogPlaceIt ? 'disabled' : ''} 
         onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.Recibe}', '${data.transactionAmount}')`}">
         <span id="andreaniText${data.idOperacion}">
             ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
@@ -864,6 +874,7 @@ const paymentHTML = `
     <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
+        ${isLogPlaceIt ? 'disabled' : ''} 
         onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}')">
         <span>
             ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
@@ -873,8 +884,9 @@ const paymentHTML = `
     <!-- Botón Logística Propia --> 
 </div>
                 
-                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'background-color: #d0ffd1;' : ''}">
+                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked || isLogPlaceIt || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'background-color: #d0ffd1;' : ''}">
                     ${isBlocked ? '<i class="bi bi-info-square-fill"></i> Despacho Bloqueado por Facturación, separar remito para realizar circuito' : ''}
+                    ${isLogPlaceIt ? `<i class="bi bi-info-square-fill"></i> <strong>Logistica Placeit</strong> Plazo de entrega entre ${data.diasPlaceIt}` : ''}
                     ${logBsCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Buenos Aires, se ha bloqueado el despacho por logistica privada.' : ''}
                     ${logStaFeCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Santa Fe, se ha bloqueado el despacho por logistica privada.' : ''}
                     ${logRafaelaCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Rafaela, se ha bloqueado el despacho por logistica privada.' : ''}
