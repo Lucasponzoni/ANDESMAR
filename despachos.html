@@ -217,41 +217,49 @@
         <img src="./Img/etiqueta-animada.gif" alt="Cargando...">
     </div>
 
-    <!-- Modal para escanear remito y adjuntar foto -->
-    <div class="modal fade" id="scanRemitoModal" tabindex="-1" aria-labelledby="scanRemitoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title" id="scanRemitoModalLabel">Escanear Remito y Adjuntar Foto</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="scanRemitoForm">
-                        <div class="form-group">
-                            <label for="remitoInput">Número de Remito</label>
+<!-- Modal para escanear remito y adjuntar foto -->
+<div class="modal fade" id="scanRemitoModal" tabindex="-1" aria-labelledby="scanRemitoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="scanRemitoModalLabel">Escanear Remito y Adjuntar Foto</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="scanRemitoForm">
+                    <div class="form-group">
+                        <label for="remitoInput">Número de Remito</label>
+                        <div class="input-group">
                             <input type="text" class="form-control" id="remitoInput" maxlength="11" placeholder="Ingrese el número de remito" autofocus>
+                            <div class="input-group-append">
+                                <button class="btn btn-info" id="scanButton" type="button">
+                                    <i class="bi bi-camera"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="fotoRemitoInput">Adjuntar Foto del Remito</label>
-                            <input type="file" class="form-control" id="fotoRemitoInput" accept="image/*" capture="camera">
-                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fotoRemitoInput">Adjuntar Foto del Remito</label>
+                        <input type="file" class="form-control" id="fotoRemitoInput" accept="image/*" capture="camera">
+                    </div>
 
-                            <div id="logisticsAlert" class="Alert35 text-center mt-2" style="display: none;"></div>
-                                <div id="loadingSpinner" class="spinner-border text-info custom-spinner33" role="status" style="display: none; width: 3rem; height: 3rem;">
-                                    <span class="sr-only">Cargando...</span>
-                                </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-info" onclick="subirFoto()">Subir Foto</button>
-                </div>
+                    <div id="logisticsAlert" class="Alert35 text-center mt-2" style="display: none;"></div>
+                    <div id="loadingSpinner" class="spinner-border text-info custom-spinner33" role="status" style="display: none; width: 3rem; height: 3rem;">
+                        <span class="sr-only">Cargando...</span>
+                    </div>
+                </form>
+                <div id="camera-preview" style="display: none;"></div> <!-- Contenedor para la vista previa de la cámara -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-info" onclick="subirFoto()">Subir Foto</button>
             </div>
         </div>
     </div>
-    <!-- FIN Modal para escanear remito y adjuntar foto -->
+</div>
+<!-- FIN Modal para escanear remito y adjuntar foto -->
 
     <!-- Modal para Logística BsAr-StaFe -->
     <div class="modal fade" id="bsarStaFeModal" tabindex="-1" aria-labelledby="bsarStaFeModalLabel" aria-hidden="true">
@@ -527,6 +535,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
+    <!-- Code39 Escaneo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>  
+
     <!-- Cargar jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="./js/features.js"></script>
