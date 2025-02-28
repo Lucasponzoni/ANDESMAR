@@ -1284,7 +1284,7 @@ document.getElementById('scanButton').addEventListener('click', function() {
     });
 
     // Asegúrate de que el área de enfoque esté visible
-    document.querySelector('.focus-area').style.display = 'block';
+    document.querySelector('.focus-area-camera').style.display = 'block';
 
     Quagga.onDetected(function(data) {
         const code = data.codeResult.code;
