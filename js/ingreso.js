@@ -1303,7 +1303,7 @@ document.getElementById('scanButton').addEventListener('click', function() {
             
             document.getElementById('camera-preview').style.display = 'none';
             
-            // Simula el evento "Enter"
+        // Simula el evento "Enter"
         const enterEvent = new KeyboardEvent('keydown', {
             key: 'Enter',
             code: 'Enter',
@@ -1324,7 +1324,12 @@ document.getElementById('scanButton').addEventListener('click', function() {
 document.getElementById('remitoInput').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault(); 
-        document.getElementById('fotoRemitoInput').click(); 
+        const inputValue = this.value;
+        const digitCount = (inputValue.match(/\d/g) || []).length; 
+
+        if (digitCount === 11) { 
+            document.getElementById('fotoRemitoInput').click(); 
+        }
     }
 });
 
