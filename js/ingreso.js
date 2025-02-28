@@ -1262,43 +1262,58 @@ document.getElementById('scanButton').addEventListener('click', function() {
     // Muestra el contenedor de la cámara
     document.getElementById('camera-preview').style.display = 'block';
 
-// Configuración de Quagga para leer códigos Code128
-Quagga.init({
-    inputStream: {
-        name: "Live",
-        type: "LiveStream",
-        target: document.querySelector('#camera-preview'),
-        constraints: {
-            facingMode: "environment"
+    // Configuración de Quagga para leer códigos Code128
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#camera-preview'),
+            constraints: {
+                facingMode: "environment"
+            }
+        },
+        decoder: {
+            readers: ["code_128_reader"]
         }
-    },
-    decoder: {
-        readers: ["code_128_reader"]
-    }
-}, function(err) {
-    if (err) {
-        console.error(err);
-        return;
-    }
-    Quagga.start();
-});
+    }, function(err) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        Quagga.start();
+    });
 
-// Asegúrate de que el área de enfoque esté visible
-document.querySelector('.focus-area').style.display = 'block'; // Muestra el área de enfoque
+    // Asegúrate de que el área de enfoque esté visible
+    document.querySelector('.focus-area').style.display = 'block';
 
-Quagga.onDetected(function(data) {
-    const code = data.codeResult.code;
-    // Verifica que el código escaneado coincida con el formato esperado
-    if (code.length === 11 && /^\d+$/.test(code)) {
-        document.getElementById('remitoInput').value = code;
-        Quagga.stop();
-        document.getElementById('fotoRemitoInput').click(); 
-    } else {
-        Swal.fire('Error', 'Código escaneado no válido', 'error');
-    }
+    Quagga.onDetected(function(data) {
+        const code = data.codeResult.code;
+        // Verifica que el código escaneado coincida con el formato esperado
+        if (code.length === 11 && /^\d+$/.test(code)) {
+            document.getElementById('remitoInput').value = code;
+            Quagga.stop();
+            // Abre automáticamente el selector de archivos
+            document.getElementById('fotoRemitoInput').click(); 
+        } else {
+            Swal.fire('Error', 'Código escaneado no válido', 'error');
+        }
     });
 });
 
+// Evento para el campo de entrada para abrir el selector de archivos al presionar Enter
+document.getElementById('remitoInput').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); 
+        document.getElementById('fotoRemitoInput').click(); 
+    }
+});
+
+// Evento para el cambio del input de foto
+document.getElementById('fotoRemitoInput').addEventListener('change', function() {
+    document.querySelector('.btn-info[onclick="subirFoto()"]').click();
+});
+
+// Función para subir la foto
 function subirFoto() {
     const remito = document.getElementById('remitoInput').value.trim();
     const fotoInput = document.getElementById('fotoRemitoInput').files[0];
@@ -1350,17 +1365,7 @@ function subirFoto() {
     });
 }
 
-document.getElementById('remitoInput').addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        event.preventDefault(); 
-        document.getElementById('fotoRemitoInput').click(); 
-    }
-});
-
-document.getElementById('fotoRemitoInput').addEventListener('change', function() {
-    document.querySelector('.btn-info[onclick="subirFoto()"]').click();
-});
-
+// Función para subir el archivo
 function uploadFile(remitoFotoRef, fotoInput, remito) {
     const uploadTask = remitoFotoRef.put(fotoInput);
     const loadingSpinner = document.getElementById('loadingSpinner');
