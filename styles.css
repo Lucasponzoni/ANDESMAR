@@ -754,6 +754,10 @@ button:hover {
     width: 30px;
 }
 
+.cliente2 > img{
+    width: 30px;
+}
+
 .info-paq{
     margin-right: 5px;
 }
