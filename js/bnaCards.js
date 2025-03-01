@@ -396,6 +396,7 @@ function loadEnviosFromFirebase() {
                 let sinMarcar1Count = 0; 
                 let sinMarcar2Count = 0; 
                 let duplicados = 0; 
+                let slackError = 0; 
 
                 snapshot.forEach(function(childSnapshot) {
                     const data = childSnapshot.val();
@@ -470,6 +471,10 @@ function loadEnviosFromFirebase() {
                         duplicados++;
                     }
 
+                    if (data.errorSlack === true) { 
+                        slackError++;
+                    }
+
                     // Incrementar el contador si tipoElectrodomesticoBna está vacío
                     if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
                         sinPrepararCount++;
@@ -491,6 +496,7 @@ function loadEnviosFromFirebase() {
                 document.getElementById('contadorCards1').innerText = sinMarcar1Count; 
                 document.getElementById('contadorCards2').innerText = sinMarcar2Count; 
                 document.getElementById('contadorCards3').innerText = duplicados; 
+                document.getElementById('contadorCards4').innerText = slackError; 
                 document.getElementById('contadorCardsFacturar').innerText = sinFacturarCount;
 
                 // Habilitar el buscador después de cargar los datos
@@ -4450,6 +4456,36 @@ document.getElementById('btnSwitch1').addEventListener('click', () => {
         paginationContainer.style.display = 'block'; // Mostrar la paginación original
         filteredPaginationContainer.style.display = 'none'; // Ocultar nueva paginación
     });
+});
+
+// Modificación del evento click del botón Slack
+document.getElementById('btnSlack').addEventListener('click', () => {
+    filteredData = allData
+        .filter(item => item.errorSlack === true) // Filtrar solo los que tienen errorSlack como true
+        .reverse(); // Revertir el orden
+
+    // Limpiar el contenedor de tarjetas
+    const cardsContainer = document.getElementById('meli-cards');
+    cardsContainer.innerHTML = '';
+
+    // Ocultar la paginación original
+    paginationContainer.style.display = 'none';
+    filteredPaginationContainer.style.display = 'block'; // Mostrar nueva paginación
+
+    // Renderizar solo las tarjetas con errorSlack
+    updateFilteredCards(filteredData);
+
+    // Crear botón de volver
+    createBackButton(() => {
+        renderCards(allData.slice(0, itemsPerPage)); // Regresar a todas las tarjetas
+        paginationContainer.style.display = 'block'; // Mostrar la paginación original
+        filteredPaginationContainer.style.display = 'none'; // Ocultar nueva paginación
+    });
+
+    // Actualizar contador de errorSlack
+    document.getElementById('contadorCards4').innerText = filteredData.length > 0 
+        ? filteredData.length 
+        : '0'; // Mostrar el número de elementos con errorSlack
 });
 
 // Sin Preparar Botón

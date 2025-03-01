@@ -6380,6 +6380,10 @@ img.gray-filter {
     background-color: rgba(255, 255, 255, 0.9);
 }
 
+#btnSlack > img{
+    width: 25px;
+}
+
 .slack-error-container {
     display: flex;
     justify-content: center;
