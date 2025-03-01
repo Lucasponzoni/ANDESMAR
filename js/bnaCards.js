@@ -1599,7 +1599,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             <button class="btn mt-1 btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'} ${isMacro(storeCode) ? 'hidden' : ''}"
                             id="LogPropiaMeliButton${data[i].id}" 
                             ${data[i].cancelado ? 'disabled' : ''} 
-                            onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')">
+                            onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}',)">
                             <span>
                             ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
                             </span>
@@ -4470,25 +4470,119 @@ function realizarBusqueda() {
 }
 // FIN BUSCADOR
 
-// GENERAR ETIQUETA LOGISTICA PROPIA
-async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
-    let button = document.getElementById(`LogPropiaMeliButton${id}`);
-    let spinner = document.getElementById(`spinnerLogPropia${id}`);
+// Función para solicitar el número de remito usando SweetAlert
+async function solicitarNumeroRemito() {
+    const { value: numeroRemito } = await Swal.fire({
+        title: '¿Cuál es el número de remito?',
+        html: `
+            <div class="input-container">
+                <input id="numeroRemito" class="swal2-input" placeholder="Número de Remito" maxlength="20" required>
+                <small class="input-description">Ingresar número de remito (mínimo 10 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroRemito');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroRemito').value;
+            // Validaciones
+            if (!/^\d{10,}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un número de remito válido');
+                return false;
+            }
+            return input;
+        },
+        allowEnterKey: true
+    });
 
+    // Si el usuario cancela, salir de la función
+    if (!numeroRemito) {
+        return null; // Retorna null si se cancela
+    }
+    return numeroRemito;
+}
+
+// Función para solicitar el número de cliente usando SweetAlert
+async function solicitarCliente() {
+    const { value: numeroCliente } = await Swal.fire({
+        title: '¿Cuál es el número de cliente?',
+        html: `
+            <div class="input-container">
+                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
+                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroCliente');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroCliente').value;
+            // Validaciones
+            if (!/^\d{2,8}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
+                return false;
+            }
+            return input;
+        },
+        allowEnterKey: true
+    });
+
+    // Si el usuario cancela, salir de la función
+    if (!numeroCliente) {
+        return null; // Retorna null si se cancela
+    }
+    return numeroCliente;
+}
+
+// GENERAR ETIQUETA LOGISTICA PROPIA
+async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, SKU) {
     let spinner2 = document.getElementById("spinner2");
 
-    const Name = `Confirmación de Envio Novogar`;
-    const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
-    const template = "emailTemplateLogPropia";
-    
-    // Mostrar spinner y cambiar texto del botón
-    spinner.style.display = "inline-block"; // Usar inline-block en lugar de flex para el spinner
-    button.innerHTML = '<i class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></i> Generando...';
-    button.disabled = true; // Desactivar el botón
+    // Solicitar el número de remito
+    const numeroRemito = await solicitarNumeroRemito();
+    if (!numeroRemito) return; // Si se cancela, salir de la función
+
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
 
     const { jsPDF } = window.jspdf;
 
     spinner2.style.display = "flex";
+    let button = document.getElementById(`LogPropiaMeliButton${id}`);
+    let resultado = document.getElementById(`resultado${id}`);
 
     // Crear un nuevo documento PDF en tamaño 10x15 cm
     const doc = new jsPDF({
@@ -4499,161 +4593,169 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
         floatPrecision: 16
     });
 
-    // Contenido HTML
-    const contenido = `
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Etiqueta</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-        <style>
+    // Eliminar el prefijo "200000" del idOperacion
+    const idOperacionFinal = id.replace(/^20000[0-9]/, '') + "ME1"; // Asegúrate de que id es el correcto
+    // Limitar el producto a 60 caracteres
+    const productoLimitado = producto_nombre.length > 60 ? producto_nombre.substring(0, 60) + "..." : producto_nombre;
+
+    // URL de la API para generar el código de barras
+    const barcodeApiUrl = `https://proxy.cors.sh/https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(numeroRemito)}&code=Code128&dpi=96`;
+
+    // Obtener el código de barras en formato Base64 usando el proxy CORS
+    const response = await fetch(barcodeApiUrl, {
+        method: 'GET',
+        headers: {
+            "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd"
+        }
+    });
+
+    if (!response.ok) {
+        console.error('Error al generar el código de barras:', response.statusText);
+        spinner2.style.display = "none";
+        return;
+    }
+
+    const blob = await response.blob();
+    const reader = new FileReader();
+
+    reader.onloadend = async function() {
+        const barcodeBase64 = reader.result;
+
+        // Contenido HTML
+        const contenido = `
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Etiqueta</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+            <style>
             body {
-                margin: 10px;
+                margin: 0;
                 padding: 0;
                 display: grid;
                 place-items: center;
                 height: 100vh;
-                background-color: #f0f0f0;
+                background-color: #e0e0e0;
+                font-family: 'Arial', sans-serif;
             }
             .etiqueta {
                 width: 10cm;
-                margin: 5px;
-                height: auto;
-                max-height: 15cm;
-                border: 2px dashed #000;
-                border-radius: 10px;
-                padding: 1cm;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                margin: 10px;
+                padding: 20px;
+                border-radius: 15px;
+                background-color: #ffffff;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
                 display: flex;
+                border: 2px dashed #9c0000;
                 flex-direction: column;
-                justify-content: space-between;
-                font-family: Arial, sans-serif;
-                background-color: #fff;
-            }
-            .logo {
-                text-align: center;
-                margin-bottom: 15px;
+                align-items: center;
             }
             .logo img {
                 max-width: 250px;
                 height: auto;
-                display: block;
-                margin: 0 auto;
+                margin-bottom: 5px;
             }
             .campo {
+                width: 100%;
                 border-radius: 10px;
                 display: flex;
                 align-items: center;
-                margin-bottom: 6px;
-                padding: 8px;
-                border: 2px solid #ccc;
-                background-color: #f9f9f9;
-            }
-            .campo i {
-                margin-right: 8px;
-                font-size: 1.2em;
-                color: #000;
+                margin-bottom: 5px;
+                padding: 5px;
+                border: 1px solid #9c0000;
+                background-color: #f1f8ff;
+                transition: background-color 0.3s;
             }
             .campo span {
                 font-size: 1em;
                 font-weight: bold;
-                color: #333;
+                color: black;
             }
-            .footer {
-                text-align: center;
-                font-size: 0.9em;
-                color: #000;
-                margin-top: auto;
-                padding-top: 10px;
-                border-top: 2px solid #ccc;
-            }
-            .contacto {
-                font-size: 0.8em;
-                color: #333;
-                margin-top: 10px;
-                text-align: center;
-            }
-            .contacto p {
-                margin: 3px 0;
+            .campo.uppercase {
+                text-transform: uppercase;
             }
             .campo-extra {
-                border-radius: 8px;
+                width: 100%;
+                border-radius: 10px;
                 margin-top: 10px;
-                border: 2px dashed #ccc;
-                padding: 5px;
+                border: 2px dashed #9c0000;
+                padding: 10px;
+                text-align: center;
+                font-size: 1em;
+                color: #555;
+                background-color: #f9f9f9;
+            }
+            .contacto {
+                margin-top: 15px;
                 text-align: center;
                 font-size: 0.9em;
-                color: #555;
+                color: #333;
             }
-        </style>
-    </head>
-    <body>
+            .contacto p {
+                margin: 5px 0;
+            }
+
+            hr {
+                    border: none; 
+                    height: 1px; 
+                    background-color: #2B2B2BFF; 
+                    margin: 5px 0; 
+                    border-radius: 5px;
+                }
+            </style>
+        </head>
+        <body>
         <div class="etiqueta">
             <div class="logo">
-                <img src="./Img/BNA-Novogar.png" alt="Logo">
+                <img src="./Img/Tiendas-Virtuales.png" alt="Logo">
             </div>
-            <div class="campo">
-                <i class="bi bi-person-square"></i>
-                <span>Orden: ${remito}, Cliente: ${nombre}</span>
-            </div>
-            <div class="campo">
-                <i class="bi bi-geo-alt-fill"></i>
-                <span>${cp}, ${localidad}, ${provincia}</span>
-            </div>
-            <div class="campo">
-                <i class="bi bi-compass"></i>
-                <span>Dirección: ${calle}</span>
-            </div>
-            <div class="campo">
-                <i class="bi bi-telephone-outbound-fill"></i>
-                <span>Teléfono: ${telefono}</span>
-            </div>
+            <div class="campo uppercase"><span>${cliente} ${nombre}</span></div>
+            <div class="campo"><span>${cp}, ${localidad}, ${provincia}</span></div>
+            <div class="campo uppercase"><span>${calle}</span></div>
+            <div class="campo"><span>Teléfono: ${telefono}</span></div>
+            <div class="campo"><span>${SKU}, ${productoLimitado}</span></div>
+            <div class="campo"><span>ORDEN DE TIENDA: ${remito}</span></div>
             <div class="campo-extra">
-                <p><strong>Firma:</strong>  ________________________</p>
-            </div>
-            <div class="campo-extra">
-                <p><strong>Aclaración:</strong>  ________________________</p>
-            </div>
-            <div class="campo-extra">
-                <p><strong>DNI:</strong>  ________________________</p>
+                <img src="${barcodeBase64}" alt="Código de Barras" />
             </div>
             <div class="contacto">
-                <p>Ante cualquier inconveniente, contáctese con posventa:</p>
-                <p><strong><i class="bi bi-chat-dots-fill"></i></strong> (0341) 6680658 (Solo WhatsApp)</p>
-                <p><i class="bi bi-envelope-check-fill"></i> posventa@novogar.com.ar</p>
+            <hr>
+            <p><strong>💬 Posventa:</strong> (0341) 6680658 (WhatsApp)</p>
+            <p><strong>📧 Email:</strong> posventa@novogar.com.ar</p>
             </div>
         </div>
-    </body>
-    </html>`;
+        </body>
+        </html>`;
 
-    // Crear un elemento temporal para renderizar el HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = contenido;
-    document.body.appendChild(tempDiv);
+        // Crear un elemento temporal para renderizar el HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = contenido;
+        document.body.appendChild(tempDiv);
 
-    // Usar html2canvas para capturar el contenido
-    html2canvas(tempDiv, { scale: 2 }).then(canvas => {
+        // Usar html2canvas para capturar el contenido
+        const canvas = await html2canvas(tempDiv, { scale: 2 });
         const imgData = canvas.toDataURL('image/png');
         doc.addImage(imgData, 'PNG', 0, 0, 10, 15);
         const pdfBlob = doc.output('blob');
 
-    // Pushear datos a Firebase
-    const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
-    const transportData = {
-        transportCompany: "Logistica Propia",
-    };
+        // Pushear datos a Firebase
+        const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
+        const transportData = {
+            transportCompany: "Logistica Propia",
+            cliente: cliente,
+            remito: numeroRemito
+        };
 
-    const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
-    NroEnvio.innerHTML = `Logistica Propia`;
-    
-      db.ref(`enviosBNA/${id}`).update(transportData)
-        .then(() => {
+        const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
+        NroEnvio.innerHTML = `Logistica Propia`;
+        
+        try {
+            await db.ref(`enviosBNA/${id}`).update(transportData);
             console.log("Datos actualizados en Firebase como Logistica Propia:", transportData);
-        })
-        .catch((error) => {
-                        console.error("Error al actualizar datos en Firebase:", error);
-        });
+        } catch (error) {
+            console.error("Error al actualizar datos en Firebase:", error);
+        }
 
         const envioState = document.getElementById(`estadoEnvio${id}`);
         envioState.className = 'em-circle-state4';
@@ -4665,16 +4767,17 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
         setTimeout(() => {
             spinner2.style.display = "none";
             // Ocultar el spinner y restaurar el botón
-            spinner.style.display = "none";
-            window.open(pdfUrl, '_blank');
             button.innerHTML = '<i class="bi bi-file-text"></i> Etiqueta Novogar';
             button.disabled = false;
+            window.open(pdfUrl, '_blank');
         }, 2000);
 
         document.body.removeChild(tempDiv);
-    });
+    };
 
-    await sendEmail(Name, Subject, template, nombre, email, remito,);
+    reader.readAsDataURL(blob); // Asegúrate de iniciar la lectura del blob
+
+    await sendEmail(Name, Subject, template, nombre, email, remito);
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
 

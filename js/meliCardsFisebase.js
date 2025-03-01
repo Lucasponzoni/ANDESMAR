@@ -2817,7 +2817,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                     background-color: #2B2B2BFF; 
                     margin: 5px 0; 
                     border-radius: 5px;
-}
+                }
 
             </style>
         </head>
