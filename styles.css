@@ -1032,7 +1032,7 @@ button:hover {
     padding: 0;
     display: flex;
     justify-content: center;
-    text-align: center;
+    text-align: center !important;
 }
 
 .nav-item {
@@ -1048,6 +1048,7 @@ a.nav-link.active{
 }
 
 .nav-item a {
+    text-align: center;
     color: #004080;
     text-decoration: none;
     font-size: 16px;
