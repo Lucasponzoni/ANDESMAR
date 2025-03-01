@@ -23,6 +23,7 @@ const obtenerCredencialesCDS = async () => {
         usuarioCDS = data[4];
         passCDS = data[5];
         HookTv = data[14];
+        HookMd = data[10];
         live = data[7];
         corsh = data[6];
         token = data[11];
@@ -4985,6 +4986,7 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
 
+// SLACK
 const firebaseRefErrores = firebase.database().ref('erroresSlack');
 const firebaseRefEnvios = firebase.database().ref('enviosBNA');
 
@@ -5005,6 +5007,7 @@ async function verificarMensajes() {
 
         if (data.ok) {
             let nuevosErrores = 0;
+            const ordenesConErrores = []; // Array para almacenar números de órdenes con errores
 
             for (const mensaje of data.messages) {
                 // Verificar si el mensaje es del usuario específico y comienza con números entre paréntesis
@@ -5018,6 +5021,7 @@ async function verificarMensajes() {
                         // Si no existe, agregarlo a Firebase
                         await firebaseRefErrores.child(numero).set({ errorMensaje });
                         nuevosErrores++;
+                        ordenesConErrores.push(numero); // Agregar número de orden al array
 
                         // Mostrar el toast después de un retraso de 1 segundo
                         setTimeout(() => {
@@ -5046,6 +5050,8 @@ async function verificarMensajes() {
 
             if (nuevosErrores > 0) {
                 console.log(`Se han localizado ${nuevosErrores} nuevos errores de Slack que no existían en la base de datos.`);
+                // Enviar notificación a Slack
+                await enviarNotificacionSlack(ordenesConErrores, nuevosErrores);
             } else {
                 console.log('No se encontraron nuevos errores.');
             }
@@ -5054,6 +5060,34 @@ async function verificarMensajes() {
         }
     } catch (error) {
         console.error('Error en la solicitud:', error);
+    }
+}
+
+async function enviarNotificacionSlack(ordenes, totalErrores) {
+    const mensaje = `
+    :warning: *Errores en Facturación* :warning: 
+    ${ordenes.join(', ')} 
+    Total de errores: *${totalErrores}* 
+    🟡 Notificado en *LogiPaq* 🟡.
+    `;
+
+    const payload = {
+        text: mensaje,
+        mrkdwn: true // Permitir formato de Markdown
+    };
+
+    try {
+        await fetch(`${corsh}${HookMd}`, {
+            method: 'POST',
+            headers: {
+                "x-cors-api-key": `${live}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        console.log('Notificación enviada a Slack.');
+    } catch (error) {
+        console.error('Error al enviar la notificación a Slack:', error);
     }
 }
 
@@ -5101,6 +5135,7 @@ function iniciarVerificacion() {
         }
     }, 60000); // 60000 ms = 1 minuto
 }
+// FIN SLACK
 
 // Llamar a la función cuando se carga la página
 window.onload = loadEnviosFromFirebase;
