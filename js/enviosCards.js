@@ -108,9 +108,7 @@ async function renderCards(data) {
                 const despachosData = snapshot.val();
                 const despachosKey = Object.keys(despachosData)[0]; // Obtiene la primera coincidencia
                 const cliente = despachosData[despachosKey].cliente;
-                clienteLabel = `<div class="em-circle-state-cliente"><img id="presea" src="./Img/logo-presea.png">${capitalizeText(cliente)} <button class="btn btn-link" onclick="navigator.clipboard.writeText('${capitalizeText(cliente)}')">
-                            <i class="bi bi-clipboard icon-indigo"></i>
-                        </button></div>`;
+                clienteLabel = `<div class="cliente3" onclick="copiarCliente('${cliente}')"><img id="presea" src="./Img/logo-presea.png">Cliente Presea: ${capitalizeText(cliente)}</div>`;
             }
         }).catch(error => {
             console.error("Error fetching data from Firebase Config 2: ", error);
@@ -127,7 +125,6 @@ async function renderCards(data) {
         card.innerHTML = `
             <div class="card mb-3">
                 <div class="card-body">
-                    ${clienteLabel} <!-- Aquí se inserta el valor de cliente obtenido -->
                     ${etiqueta}
                     <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${item.nombreApellido}</h5>
                     <p class="card-text cpLocalidad">${item.codigoPostal}, ${item.localidad}</p>
@@ -142,6 +139,7 @@ async function renderCards(data) {
                         </button>
                     </div>
 
+                    ${clienteLabel} <!-- Aquí se inserta el valor de cliente obtenido -->
                     <div class="apiSeguimiento" style="display: flex; justify-content: center; align-items: center; height: 100px">
                         <img class="blueSpinner" src="./Img/loading-buffering.gif" alt="Cargando...">
                     </div>
@@ -289,7 +287,7 @@ async function renderCards(data) {
             
             const guiaParagraph = document.createElement('p');
             guiaParagraph.className = 'card-text mb-0';
-            guiaParagraph.innerHTML = `<i class="bi bi-truck"></i> ${guia}`;
+            guiaParagraph.innerHTML = `${guia}`;
             
             const copyGuideButton = document.createElement('button');
             copyGuideButton.className = 'btn btn-link copy-guide-btn ms-2';
@@ -329,6 +327,11 @@ async function renderCards(data) {
 
             // Agregar evento para abrir el modal
             reclamarButton.addEventListener('click', () => {
+                const botonEnviarEmail = document.getElementById('botonEnviarEmail');
+                botonEnviarEmail.innerHTML = `Enviar Email <i class="bi bi-send-fill"></i>`;
+                botonEnviarEmail.classList.remove('btn-secondary');
+                botonEnviarEmail.classList.add('btn-primary');
+                botonEnviarEmail.disabled = false;
                 document.getElementById('idModal').value = `${item.id}`;
                 document.getElementById('asunto').value = `Reclamo Novogar / Remito: ${item.remito} Guia: ${data.NroGuia}`;
                 document.getElementById('cuerpo').value = `Estimados, nos contactamos para realizar un reclamo por el envío ${data.NroGuia}.`;
@@ -475,7 +478,7 @@ estadoDiv.appendChild(descargarComprobanteButton);
             });
             paginationContainer.appendChild(backItem);
         }
-    }    
+    } 
 
 // BUSCADOR
 searchInput.addEventListener("input", function() {
@@ -653,6 +656,30 @@ function generatePDF() {
     html2pdf().from(trackingContent).set(opt).save();
 }
 
+function copiarCliente(cliente) {
+    navigator.clipboard.writeText(cliente).then(() => {
+        showAlertAndi(`Se ha copiado al portapapeles: Cliente ${cliente}`);
+    }).catch(err => {
+        console.error('Error al copiar: ', err);
+    });
+}
+
+// Función para mostrar la alerta
+function showAlertAndi(message) {
+    const alertContainer = document.createElement('div');
+    alertContainer.className = 'alert-ios-meli';
+    alertContainer.innerHTML = `
+        <i class="bi bi-clipboard-check"></i>
+        ${message}
+        <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+    `;
+    document.body.appendChild(alertContainer);
+
+    setTimeout(() => {
+        alertContainer.style.display = 'none';
+    }, 3000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const reclamarButton = document.getElementById('reclamarButton');
     const botonEnviarEmail = document.getElementById('botonEnviarEmail');
@@ -790,10 +817,10 @@ document.addEventListener('DOMContentLoaded', () => {
             botonEnviarEmail.innerHTML = `Email enviado con éxito (${counter})`;
             if (counter <= 0) {
                 clearInterval(interval); // Detener el contador
-                botonEnviarEmail.innerHTML = 'Enviar Email';
+                botonEnviarEmail.innerHTML = `Email Enviado <i class="bi bi-check2-all"></i>`;
                 botonEnviarEmail.classList.remove('btn-success');
-                botonEnviarEmail.classList.add('btn-primary');
-                botonEnviarEmail.disabled = false; // Habilitar el botón
+                botonEnviarEmail.classList.add('btn-secondary');
+                botonEnviarEmail.disabled = true; // Habilitar el botón
             }
         }, 1000); // Decrementa el contador cada segundo
     });    
