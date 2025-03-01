@@ -1708,23 +1708,6 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                     return value.replace(/["']/g, "");
                 } 
 
-// Evento para manejar el cambio del switch "Entregado"
-document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function() {
-    const nuevoEstado = this.checked ? 'Si' : 'No';
-
-    // Si el checkbox está marcado y el estado es "entregado"
-    if (this.checked && data[i].estadoEnvio === 'entregado') {
-        // Actualizar en Firebase
-        firebase.database().ref('enviosBNA/' + data[i].id).update({
-            marcaEntregado: nuevoEstado
-        }).then(() => {
-            console.log(`Estado de entrega actualizado a: ${nuevoEstado}`);
-        }).catch(error => {
-            console.error("Error al actualizar el estado de entrega: ", error);
-        });
-    }
-});
-
 // Evento para manejar el cambio del switch "Preparación"
 document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', function() {
     const nuevoEstado = this.checked ? 'Si' : 'No';
@@ -1758,6 +1741,29 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
             // Revertir el estado del switch si se cancela o la contraseña es incorrecta
             this.checked = !this.checked;
         }
+    });
+});
+
+// Evento para manejar el cambio del switch "Entregado"
+document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function() {
+    const nuevoEstado = this.checked ? 'Si' : 'No';
+
+    // Desactivar la escucha de cambios
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off();
+
+    // Actualizar en Firebase
+    firebase.database().ref('enviosBNA/' + data[i].id).update({
+        marcaEntregado: nuevoEstado
+    }).then(() => {
+        console.log(`Estado de entrega actualizado a: ${nuevoEstado}`);
+    }).catch(error => {
+        console.error("Error al actualizar el estado de entrega: ", error);
+    }).finally(() => {
+        // Volver a habilitar la escucha de cambios
+        databaseRef.on('value', snapshot => {
+            
+        });
     });
 });
                 document.getElementById(`edit-localidad-${data[i].id}`).addEventListener('click', function() {
@@ -2572,6 +2578,10 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
     const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
 
+    // Desactivar la escucha de cambios
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off();
+
     // Comprobar si los elementos existen
     if (!volumenCm3Elemento || !volumenM3Elemento) {
         Swal.fire({
@@ -2778,7 +2788,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${data.NroPedido}`;
             button.classList.remove('btn-primary');
             button.classList.add('btn-success');
-            button.onclick = () => window.open(linkEtiqueta, '_blank');
+            window.open(linkEtiqueta, '_blank');
             NroEnvio.innerHTML = `<a href="${linkSeguimiento}" target="_blank">Andesmar: ${data.NroPedido} <i class="bi bi-box-arrow-up-right"></i></a>`;
             
             // Pushear datos a Firebase
@@ -2870,6 +2880,10 @@ function addUpdateObservacionesEvent() {
 // BOTON CRUZ DEL SUR
 async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
     
+    // Desactivar la escucha de cambios
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off();
+
     // Redondear el precio_venta y convertirlo a un entero
     const precioVentaRedondeado = Math.round(precio_venta);
 
@@ -3275,6 +3289,10 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
     const button = document.getElementById(`ocaButton${id}`);
     const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
 
+    // Desactivar la escucha de cambios
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off();
+
     if (!spinnerOca || !textOca || !button) {
         console.error('Elementos no encontrados:', { spinnerOca, textOca, button });
         return;
@@ -3437,6 +3455,10 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
     
     // Redondear el precio_venta y convertirlo a un entero
     const precioVentaRedondeado = Math.round(precio_venta);
+
+    // Desactivar la escucha de cambios
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off();
 
     // Calcular el precio sin IVA (suponiendo un IVA del 21%)
     const tasaIVA = 0.21;
@@ -3787,7 +3809,7 @@ async function obtenerEtiqueta(numeroDeEnvio, token, buttonAndr) {
         buttonAndr.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${numeroDeEnvio}`;
         buttonAndr.classList.remove('btn-secondary');
         buttonAndr.classList.add('btn-success');
-        buttonAndr.onclick = () => window.open(pdfUrl, '_blank');
+        window.open(pdfUrl, '_blank');
     } catch (error) {
         console.error('Error al obtener la etiqueta:', error);
     }
@@ -4791,6 +4813,10 @@ async function solicitarCliente() {
 async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, SKU) {
     let spinner2 = document.getElementById("spinner2");
 
+    // Desactivar la escucha de cambios
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off();
+
     // Solicitar el número de remito
     const numeroRemito = await solicitarNumeroRemito();
     if (!numeroRemito) return; // Si se cancela, salir de la función
@@ -4988,7 +5014,7 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
         setTimeout(() => {
             spinner2.style.display = "none";
             // Ocultar el spinner y restaurar el botón
-            button.innerHTML = '<i class="bi bi-file-text"></i> Etiqueta Novogar';
+            button.innerHTML = '<i class="bi bi-filetype-pdf"></i> Descaargar Etiqueta Novogar';
             button.disabled = false;
             window.open(pdfUrl, '_blank');
         }, 2000);
