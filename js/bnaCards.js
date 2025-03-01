@@ -2543,14 +2543,14 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         }
     }
 
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
+
     spinner.style.display = 'inline-block';
     text.innerText = 'Generando Etiqueta...';
     buttonAndr.disabled = true;
     buttonCDS.disabled = true;
-
-    // Solicitar el cliente
-    const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
         
     const unidadVenta = [3500, 3100, 3400].includes(parseInt(cp))
         ? "CARGAS LOG RTO C Y SEGUIMIENTO"
@@ -2814,16 +2814,16 @@ async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, call
     
     console.log(`Volumen Total en m³: ${volumenTotalcds}`);
 
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
+
     // Mostrar spinner y cambiar texto
     spinnerCDS.style.display = 'inline-block';
     textCDS.innerText = 'Generando Etiqueta...';
     button.disabled = true
     buttonAndi.disabled = true;
     buttonAndr.disabled = true;
-
-    // Solicitar el cliente
-    const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
 
 // Verificar si el tipo de electrodoméstico es uno de los splits
 const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; 
@@ -3151,13 +3151,13 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
         Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}, SubOrden: ${suborden}, Fecha: ${fecha}
     `);
 
-    spinnerOca.style.display = 'inline-block';
-    textOca.innerText = 'Generando Etiqueta...';
-    button.disabled = true;
-
     // Solicitar el cliente
     const cliente = await solicitarCliente();
     if (!cliente) return; // Si se cancela, salir de la función
+
+    spinnerOca.style.display = 'inline-block';
+    textOca.innerText = 'Generando Etiqueta...';
+    button.disabled = true;
 
     // Parsear la fecha
     const [dia, mes, anio] = fecha.split(' ')[0].split('-');

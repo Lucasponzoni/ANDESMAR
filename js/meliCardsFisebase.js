@@ -1187,13 +1187,13 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
     const botonAndesmar = document.getElementById(`andesmarButton${id}`);
     const botonAndreani = document.getElementById(`andreaniButton${id}`);
 
-    // Mostrar spinner y cambiar texto
-    spinner.style.display = 'inline-block';
-    text.innerText = 'Generando Etiqueta...';
-
     // Solicitar el cliente
     const cliente = await solicitarCliente();
     if (!cliente) return; // Si se cancela, salir de la función
+
+    // Mostrar spinner y cambiar texto
+    spinner.style.display = 'inline-block';
+    text.innerText = 'Generando Etiqueta...';
 
     botonAndesmar.classList.add('disabled');
     botonAndreani.classList.add('disabled');
@@ -1573,13 +1573,13 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     // Eliminar el prefijo "200000" del idOperacion
     const idOperacionFinal = idOperacion.replace(/^20000[0-9]/, '');
 
-    // Mostrar spinner y cambiar texto
-    spinner.style.display = 'inline-block';
-    text.innerText = 'Generando Etiqueta...';
-
     // Solicitar el cliente
     const cliente = await solicitarCliente();
     if (!cliente) return; // Si se cancela, salir de la función
+
+    // Mostrar spinner y cambiar texto
+    spinner.style.display = 'inline-block';
+    text.innerText = 'Generando Etiqueta...';
 
     buttonAndr.disabled = true;
     botonCDS.disabled = true;
@@ -1843,13 +1843,13 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
     // Eliminar el prefijo "200000" del idOperacion
     const idOperacionFinalAndreani = idOperacion.replace(/^20000[0-9]/, '');
 
-    // Mostrar spinner y cambiar texto
-    spinnerAndr.style.display = 'inline-block';
-    textAndr.innerText = 'Generando Etiqueta...';
-
     // Solicitar el cliente
     const cliente = await solicitarCliente();
     if (!cliente) return; // Si se cancela, salir de la función
+
+    // Mostrar spinner y cambiar texto
+    spinnerAndr.style.display = 'inline-block';
+    textAndr.innerText = 'Generando Etiqueta...';
 
     button.disabled = true;
     botonCDS.disabled = true;
