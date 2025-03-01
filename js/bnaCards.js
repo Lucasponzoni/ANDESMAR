@@ -420,6 +420,7 @@ function loadEnviosFromFirebase() {
                     cotizacion: data.cotizacion,
                     trackingNumber: data.trackingNumber,
                     precio_venta: data.precio_venta,
+                    cliente: data.cliente,
                     suborden_total: data.suborden_total,
                     suborden_: data.suborden_,
                     numeros_tarjeta: data.numeros_tarjeta,
@@ -1218,6 +1219,13 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
 
                             ${isSkuIncluded ? `<p class="card-text-isSkuIncluded"><i class="bi bi-lightning-charge-fill"></i> SKU ${data[i].sku} con imei</p>` : ''}
                             
+                <div class="cliente-Container" onclick="copiarCliente('${data[i].cliente}')">
+                <div class="cliente2 ${!data[i].cliente ? 'hidden' : ''}">
+                <img src="Img/logo-presea.png" alt="PRESEA" width="20">
+                Cliente Presea: <strong id="nombre-cliente">${data[i].cliente}</strong> 
+                </div>
+                </div>
+
 <div class="d-flex align-items-center justify-content-center contenedorRemito">
     <button class="btn btn-link btn-sm text-decoration-none copy-btn me-2 ios-icon3">
         <i class="bi bi-clipboard"></i>
@@ -1632,7 +1640,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                 // Elimina Comillas en el nombre de los productos
                 function cleanString(value) {
                     return value.replace(/["']/g, "");
-                }               
+                } 
 
 // Evento para manejar el cambio del switch "Entregado"
 document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function() {
@@ -1796,6 +1804,30 @@ if (hasCancelado) {
     // Agregar el evento para actualizar observaciones
     addUpdateObservacionesEvent();
 
+}
+
+function copiarCliente(cliente) {
+    navigator.clipboard.writeText(cliente).then(() => {
+        showAlert(`Se ha copiado al portapapeles: Cliente ${cliente}`);
+    }).catch(err => {
+        console.error('Error al copiar: ', err);
+    });
+}
+
+// Función para mostrar la alerta
+function showAlert(message) {
+    const alertContainer = document.createElement('div');
+    alertContainer.className = 'alert-ios-meli';
+    alertContainer.innerHTML = `
+        <i class="bi bi-clipboard-check"></i>
+        ${message}
+        <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+    `;
+    document.body.appendChild(alertContainer);
+
+    setTimeout(() => {
+        alertContainer.style.display = 'none';
+    }, 3000);
 }
 
 function toggleEdit(id) {
@@ -2424,6 +2456,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     const cantidad = parseInt(document.getElementById(`cantidad-${id}`).value);
     const peso = parseFloat(document.getElementById(`peso-${id}`).value);
 
+    const buttonCDS = document.getElementById(`CDSButton${id}`);
     const button = document.getElementById(`andesmarButton${id}`);
     const spinner = document.getElementById(`spinnerAndesmar${id}`);
     const text = document.getElementById(`andesmarText${id}`);
@@ -2510,8 +2543,12 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     spinner.style.display = 'inline-block';
     text.innerText = 'Generando Etiqueta...';
     buttonAndr.disabled = true;
+    buttonCDS.disabled = true;
+
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
         
-    
     const unidadVenta = [3500, 3100, 3400].includes(parseInt(cp))
         ? "CARGAS LOG RTO C Y SEGUIMIENTO"
         : "cargas remito conformado";
@@ -2612,7 +2649,8 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             const transportData = {
                 transportCompany: "Andesmar",
                 trackingLink: linkSeguimiento,
-                transportCompanyNumber: data.NroPedido
+                transportCompanyNumber: data.NroPedido,
+                cliente: cliente
             };
             
             await db.ref(`enviosBNA/${id}`).update(transportData);
@@ -2645,12 +2683,14 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             await sendEmail(Name, Subject, template, nombre, email, `BNA${remito}`, linkSeguimiento2, transporte);
         } else {
             buttonAndr.disabled = false;
+            buttonCDS.disabled = true;
             text.innerHTML = `Envio No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
             button.classList.remove('btn-primary');
             button.classList.add('btn-warning', 'btnAndesmarMeli');
         }
     } catch (error) {
         buttonAndr.disabled = false;
+        buttonCDS.disabled = true;
         console.error("Error:", error);
         text.innerText = "Envio No Disponible ⚠️"; // Cambiar texto en caso de error
         resultadoDiv.innerText = `Error: ${error.message}`; // Mostrar error debajo
@@ -2778,6 +2818,9 @@ async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, call
     buttonAndi.disabled = true;
     buttonAndr.disabled = true;
 
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
 
 // Verificar si el tipo de electrodoméstico es uno de los splits
 const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; 
@@ -2884,6 +2927,7 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
                             trackingLink: trackingLink,
                             cotizacion: numeroCotizacionCds,
                             transportCompanyNumber: numeroDeEnvioCDS,
+                            cliente: cliente,
                         };
                         
                           db.ref(`enviosBNA/${id}`).update(transportData)
@@ -3108,6 +3152,10 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
     textOca.innerText = 'Generando Etiqueta...';
     button.disabled = true;
 
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
+
     // Parsear la fecha
     const [dia, mes, anio] = fecha.split(' ')[0].split('-');
     const fechaOriginal = new Date(anio, mes - 1, dia); // mes - 1 porque los meses empiezan desde 0
@@ -3213,6 +3261,7 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
                 numero_de_seguimiento: numeroDeEnvioOca,
                 tipoElectrodomesticoBna: "bultoOca",
                 marcaPreparado: "Si",
+                cliente: cliente,
             };
             
               db.ref(`enviosBNA/${id}`).update(transportData)
@@ -3318,6 +3367,10 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
         ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
         Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
     `);
+
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
 
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
@@ -3510,7 +3563,7 @@ if (isSplit) {
             body: JSON.stringify(requestData)
         });
 
-        if (response.ok) {
+        if (response.ok) { 
             const data = await response.json();
             const numeroDeEnvio = data.bultos[0].numeroDeEnvio;
 
@@ -3536,6 +3589,7 @@ if (isSplit) {
                 transportCompany: "Andreani",
                 trackingLink: linkSeguimiento,
                 transportCompanyNumber: numeroDeEnvio,
+                cliente: cliente,
             };
             
               db.ref(`enviosBNA/${id}`).update(transportData)
