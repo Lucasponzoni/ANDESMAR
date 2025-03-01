@@ -1258,18 +1258,17 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                            </button>
                     </p>
 
-                            
-                            ${carritoContenido}
-                            ${descuentoContenido}
-
-                            ${isSkuIncluded ? `<p class="card-text-isSkuIncluded"><i class="bi bi-lightning-charge-fill"></i> SKU ${data[i].sku} con imei</p>` : ''}
-                            
                 <div class="cliente-Container" onclick="copiarCliente('${data[i].cliente}')">
                 <div class="cliente2 ${!data[i].cliente ? 'hidden' : ''}">
                 <img src="Img/logo-presea.png" alt="PRESEA" width="20">
                 Cliente Presea: <strong id="nombre-cliente">${data[i].cliente}</strong> 
                 </div>
                 </div>
+        
+                            ${carritoContenido}
+                            ${descuentoContenido}
+
+                            ${isSkuIncluded ? `<p class="card-text-isSkuIncluded"><i class="bi bi-lightning-charge-fill"></i> SKU ${data[i].sku} con imei</p>` : ''}
 
 <div class="d-flex align-items-center justify-content-center contenedorRemito">
     <button class="btn btn-link btn-sm text-decoration-none copy-btn me-2 ios-icon3">
