@@ -26,7 +26,21 @@
             window.location.href = 'MeliArPlaceit.html';
         }
     </script>
-</head>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        checkLogin();
+    });
+
+    function checkLogin() {
+        const savedTimestamp = localStorage.getItem('loginTimestamp');
+        const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 28800000;
+
+        if (isExpired) {
+            window.location.href = 'logipaq.html'; 
+        }
+    }
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -42,6 +56,7 @@
         }
     }
 </script>
+</head>
 
 <body class="envios-body">
     

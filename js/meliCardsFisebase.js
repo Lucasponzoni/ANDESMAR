@@ -1058,6 +1058,54 @@ async function handleButtonClick(numeroDeEnvio, id) {
     document.getElementById(`spinnerAndreani${id}`).style.display = 'none';
 }
 
+// Función para solicitar el número de cliente usando SweetAlert
+async function solicitarCliente() {
+    const { value: numeroCliente } = await Swal.fire({
+        title: '¿Cuál es el número de cliente?',
+        html: `
+            <div class="input-container">
+                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
+                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroCliente');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroCliente').value;
+            // Validaciones
+            if (!/^\d{2,8}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
+                return false;
+            }
+            return input;
+        },
+        allowEnterKey: true
+    });
+
+    // Si el usuario cancela, salir de la función
+    if (!numeroCliente) {
+        return null; // Retorna null si se cancela
+    }
+    return numeroCliente;
+}
+
 async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
     const url = `https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
     
@@ -1142,6 +1190,10 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
     // Mostrar spinner y cambiar texto
     spinner.style.display = 'inline-block';
     text.innerText = 'Generando Etiqueta...';
+
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
 
     botonAndesmar.classList.add('disabled');
     botonAndreani.classList.add('disabled');
@@ -1229,6 +1281,7 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
             trackingLink: trackingLink,
             trackingMessage: trackingMessage,
             transportCompany: "Cruz del Sur",
+            cliente: cliente,
             cotizacionCDS: numeroCotizacionCds
         }).then(() => {
             console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
@@ -1524,6 +1577,10 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     spinner.style.display = 'inline-block';
     text.innerText = 'Generando Etiqueta...';
 
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
+
     buttonAndr.disabled = true;
     botonCDS.disabled = true;
 
@@ -1612,6 +1669,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
                 trackingLink: trackingLinkAndesmar,
                 trackingMessage: trackingMessage,
                 transportCompany: "Andesmar",
+                cliente: cliente,
                 andesmarId: data.NroPedido
             }).then(() => {
                 console.log(`Datos actualizados en Firebase para la operación: ${idOperacion}`);
@@ -1789,6 +1847,10 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
     spinnerAndr.style.display = 'inline-block';
     textAndr.innerText = 'Generando Etiqueta...';
 
+    // Solicitar el cliente
+    const cliente = await solicitarCliente();
+    if (!cliente) return; // Si se cancela, salir de la función
+
     button.disabled = true;
     botonCDS.disabled = true;
     buttonAndr.disabled = true;
@@ -1935,6 +1997,7 @@ for (let i = 0; i < cantidadFinal; i++) {
             trackingNumber: numeroDeEnvio,
             trackingLink: trackingLink,
             trackingMessage: trackingMessage,
+            cliente: cliente,
             transportCompany: "Andreani"
         }).then(() => {
             console.log(`Datos actualizados en Firebase para la operación: ${idOperacionFinalAndreani}`);

@@ -27,47 +27,46 @@
     <!-- Incluir jsPDF desde un CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            checkAccess();
+            showAccessDeniedAlert();
+        });
+    
+        function checkLogin() {
+            const savedTimestamp = localStorage.getItem('loginTimestamp');
+            const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 28800000;
+    
+            if (isExpired) {
+                window.location.href = 'logipaq.html'; 
+            }
+        }
+    
+        function checkAccess() {
+            const userType = localStorage.getItem('userType');
+    
+            if (userType === 'placeit') {
+                // Permitir
+            }
+        }
+    
+        function showAccessDeniedAlert() {
+            const accessDenied = localStorage.getItem('accessDenied');
+            if (accessDenied === 'true') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Acceso Restringido',
+                    text: 'No tiene permiso para acceder a esa sección.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    localStorage.removeItem('accessDenied');
+                });
+            }
+        }
+    </script>
 </head>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        checkLogin();
-        checkAccess();
-        showAccessDeniedAlert();
-    });
-
-    function checkLogin() {
-        const savedTimestamp = localStorage.getItem('loginTimestamp');
-        const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 28800000;
-
-        if (isExpired) {
-            window.location.href = 'logipaq.html'; 
-        }
-    }
-
-    function checkAccess() {
-        const userType = localStorage.getItem('userType');
-
-        if (userType === 'placeit') {
-            // Permitir
-        }
-    }
-
-    function showAccessDeniedAlert() {
-        const accessDenied = localStorage.getItem('accessDenied');
-        if (accessDenied === 'true') {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Acceso Restringido',
-                text: 'No tiene permiso para acceder a esa sección.',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                localStorage.removeItem('accessDenied');
-            });
-        }
-    }
-</script>
 
 <body class="envios-body">
     
