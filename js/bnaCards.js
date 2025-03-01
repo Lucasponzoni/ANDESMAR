@@ -4501,6 +4501,13 @@ function updateFilteredCards(data) {
 
 // Modificación del evento click del botón switch para entregados
 document.getElementById('btnSwitch').addEventListener('click', () => {
+
+    const databaseRef = firebase.database().ref('enviosBNA');
+
+    databaseRef.on('value', snapshot => {
+        loadEnviosFromFirebase(); 
+    });
+
     filteredData = allData
         .filter(item => item.marcaEntregado === 'No' || item.marcaEntregado === undefined)
         .reverse(); // Filtrar y revertir el orden
@@ -4526,6 +4533,13 @@ document.getElementById('btnSwitch').addEventListener('click', () => {
 
 // Modificación del evento click del botón switch para preparados
 document.getElementById('btnSwitch1').addEventListener('click', () => {
+
+    const databaseRef = firebase.database().ref('enviosBNA');
+
+    databaseRef.on('value', snapshot => {
+        loadEnviosFromFirebase(); 
+    });
+    
     filteredData = allData
         .filter(item => item.marcaPreparado === 'No' || item.marcaPreparado === undefined)
         .reverse(); // Filtrar y revertir el orden
