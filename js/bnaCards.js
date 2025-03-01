@@ -880,63 +880,80 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                     </div>
                 </div>
 
-                <!-- Datos de Compra -->
-                <div class="card-facturacion-meli mb-3">
-                    <div class="card-header-facturacion-meli"><i class="bi bi-bag-fill"></i> Datos de Compra:</div>
-                    <div class="card-body-facturacion-meli">
-                        <div class="row mb-2">
-                            <div class="col">
-                                <label for="codigo_promocion_${data[i].id}">Código Promoción:</label>
-                                <input type="text" id="codigo_promocion_${data[i].id}" value="5000" disabled>
-                            </div>
-                            <div class="col">
-                                <label for="codigo_item_${data[i].id}">Código Item:</label>
-                                <input type="text" id="codigo_item_${data[i].id}" value="${data[i].sku}" disabled>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col">
-                                <label for="nombre_item_${data[i].id}">Nombre Item:</label>
-                                <input type="text" id="nombre_item_${data[i].id}" value="${cleanString(data[i].producto_nombre)}" disabled>
-                            </div>
-                            <div class="col">
-                                <label for="recargo_item_${data[i].id}">Recargo Item:</label>
-                                <input type="text" id="recargo_item_${data[i].id}" value="0" disabled>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col">
-                                <label for="cantidad_item_${data[i].id}">Cantidad Item:</label>
-                                <input type="text" id="cantidad_item_${data[i].id}" value="${data[i].cantidad}" disabled>
-                            </div>
-                            <div class="col">
-                                <label for="precio_item_${data[i].id}">Precio Item:</label>
-                                <input type="text" id="precio_item_${data[i].id}" value="${data[i].precio_venta}" disabled>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col">
-                                <label for="descuentos_${data[i].id}">Descuentos (Puntos BNA):</label>
-                                <input type="text" id="descuentos_${data[i].id}" value="${puntosBna}" disabled>
-                            </div>
-                            <div class="col">
-                                <label for="iva_${data[i].id}">IVA:</label>
-                                <input type="text" id="iva_${data[i].id}" value="" disabled>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col">
-                                <label for="monto_envio_${data[i].id}">Monto de Envío:</label>
-                                <input type="text" id="monto_envio_${data[i].id}" value="${data[i].monto_cobrado}" disabled>
-                            </div>
-                            <div class="col">
-                                <label for="monto_total_${data[i].id}">Monto Total:</label>
-                                <input type="text" id="monto_total_${data[i].id}" value="${total}" disabled>
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
+<!-- Datos de Compra -->
+<div class="card-facturacion-meli mb-3">
+    <div class="card-header-facturacion-meli"><i class="bi bi-bag-fill"></i> Datos de Compra:</div>
+    <div class="card-body-facturacion-meli">
+        <div class="row mb-2">
+            <div class="col">
+                <label for="codigo_promocion_${data[i].id}">Código Promoción:</label>
+                <input type="text" id="codigo_promocion_${data[i].id}" value="5000" disabled>
+            </div>
+            <div class="col">
+                <label for="codigo_item_${data[i].id}">Código Item:</label>
+                <input type="text" id="codigo_item_${data[i].id}" value="${data[i].sku}" disabled>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col">
+                <label for="nombre_item_${data[i].id}">Nombre Item:</label>
+                <input type="text" id="nombre_item_${data[i].id}" value="${cleanString(data[i].producto_nombre)}" disabled>
+            </div>
+            <div class="col">
+                <label for="recargo_item_${data[i].id}">Recargo Item:</label>
+                <input type="text" id="recargo_item_${data[i].id}" value="0" disabled>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col">
+                <label for="cantidad_item_${data[i].id}">Cantidad Item:</label>
+                <input type="text" id="cantidad_item_${data[i].id}" value="${data[i].cantidad}" disabled>
+            </div>
+            <div class="col">
+                <label for="precio_item_${data[i].id}">Precio Item:</label>
+                <input type="text" id="precio_item_${data[i].id}" value="${data[i].precio_venta}" disabled>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col">
+                <label for="descuentos_${data[i].id}">Descuentos (Puntos BNA):</label>
+                <input type="text" id="descuentos_${data[i].id}" value="${puntosBna}" disabled>
+            </div>
+            <div class="col">
+                <label for="iva_${data[i].id}">IVA:</label>
+                <input type="text" id="iva_${data[i].id}" value="" disabled>
+            </div>
+        </div>
+        <div class="row align-items-center mb-2">
+            <div class="col">
+                <label for="monto_envio_${data[i].id}">Monto de Envío:</label>
+                <input type="text" id="monto_envio_${data[i].id}" value="${data[i].monto_cobrado}" disabled>
+            </div>
+            <div class="col">
+                <label for="monto_total_${data[i].id}">Monto Total:</label>
+                <input type="text" id="monto_total_${data[i].id}" value="${total}" disabled>
+            </div>
+        </div>
+
+        <!-- Mensaje de descuento -->
+        <div id="mensaje_${data[i].id}" class="mensaje-desconto" style="display: none; margin-top: 10px; color: green;"></div>
+        
+    </div>
+</div>
+
+        <!-- Pretty Checkbox para descontar envío -->
+        <div class="prettyContainer">
+        <div class="pretty p-default p-curve p-toggle">
+            <input type="checkbox" id="descontar_envio_${data[i].id}" 
+                   onclick="toggleShippingDiscount(this, '${data[i].id}')">
+            <div class="state p-success p-on">
+                <label>Descontar Envío</label>
+            </div>
+            <div class="state p-danger p-off">
+                <label>No Descontar Envío</label>
+            </div>
+        </div>
+        </div>
 
                 <!-- Datos de Cliente -->
                 <div class="card-facturacion-meli mb-3">
@@ -5135,6 +5152,39 @@ function iniciarVerificacion() {
     }, 60000); // 60000 ms = 1 minuto
 }
 // FIN SLACK
+
+// Guardar valores originales
+const originalShippingCosts = {};
+const originalTotals = {};
+
+function toggleShippingDiscount(checkbox, id) {
+    const shippingCostElement = document.getElementById(`monto_envio_${id}`);
+    const totalCostElement = document.getElementById(`monto_total_${id}`);
+    const mensajeElement = document.getElementById(`mensaje_${id}`);
+
+    // Almacenar valores originales si no se han guardado
+    if (!originalShippingCosts[id]) {
+        originalShippingCosts[id] = parseFloat(shippingCostElement.value);
+        originalTotals[id] = parseFloat(totalCostElement.value);
+    }
+
+    let currentTotal = parseFloat(totalCostElement.value); // Usar el valor actual del total
+
+    if (checkbox.checked) {
+        // Descontar costo de envío
+        shippingCostElement.value = '0';
+        currentTotal -= originalShippingCosts[id]; // Descontar solo una vez
+        mensajeElement.innerText = `Se ha descontado $${originalShippingCosts[id].toFixed(2)} de envío.`;
+        mensajeElement.style.display = 'block';
+    } else {
+        // Volver a agregar el costo de envío
+        shippingCostElement.value = originalShippingCosts[id].toFixed(2);
+        currentTotal += originalShippingCosts[id]; // Agregar de vuelta
+        mensajeElement.innerText = '';
+    }
+
+    totalCostElement.value = currentTotal.toFixed(2);
+}
 
 // Llamar a la función cuando se carga la página
 window.onload = loadEnviosFromFirebase;

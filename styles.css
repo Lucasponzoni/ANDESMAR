@@ -6441,3 +6441,21 @@ img.gray-filter {
     text-align: center;
     font-size: 14px;
 }
+
+.card-facturacion-meli {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    margin: 10px;
+}
+
+.mensaje-desconto {
+    font-weight: bold;
+}
+
+.prettyContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
