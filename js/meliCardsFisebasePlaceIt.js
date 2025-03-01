@@ -483,19 +483,24 @@ const paymentHTML = `
 
                 
                 <p class="numeroDeEnvioGenerado" id="numeroDeEnvioGenerado${data.idOperacion}">
-                Envío: 
-                ${isLogPropia ? 
-                'Logística Propia' : 
-                isAndesmar ? 
-                `<a href="${data.trackingLink}" target="_blank">Andesmar: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                isCDS ? 
-                `<a href="${data.trackingLink}" target="_blank">CDS: NIC-${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                isAndreani ? 
-                `<a href="${data.trackingLink}" target="_blank">Andreani: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
-                'Número Pendiente'}
+                    Envío: 
+                        ${isLogPropia ? 
+                                               'Logística Propia' : 
+                            (isLogPlaceIt ? 
+                                'Logística PlaceIt' : 
+                                (isAndesmar ? 
+                                    `<a href="${data.trackingLink}" target="_blank">Andesmar: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                    (isCDS ? 
+                                        `<a href="${data.trackingLink}" target="_blank">CDS: NIC-${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                        (isAndreani ? 
+                                            `<a href="${data.trackingLink}" target="_blank">Andreani: ${data.trackingNumber} <i class="bi bi-box-arrow-up-right"></i></a>` : 
+                                            'Número Pendiente'
+                                        )
+                                    )
+                                )
+                            )
+                        }
                 </p>
-
-
 
                     <div class="little-card-meli">
 
@@ -838,6 +843,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     spinner2.style.display = "flex";
     let button = document.getElementById(`LogPropiaMeliButton${id}`);
     let resultado = document.getElementById(`resultado${id}`);
+    const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
 
     // Crear un nuevo documento PDF en tamaño 10x15 cm
     const doc = new jsPDF({
@@ -1007,6 +1013,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             window.open(pdfUrl, '_blank');
         });
 
+        NroEnvio.innerHTML = `Logística PlaceIt`;
 
         const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
         const numeroCliente = cliente;
