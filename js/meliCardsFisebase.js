@@ -209,7 +209,6 @@ Promise.all([
     cargarDatos(); 
 });
 
-
 // QUERY DE DATOS
 
 function mostrarResultados(resultados) {
@@ -3029,5 +3028,6 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 
 // Llama a cargarDatos para iniciar el proceso
 cargarDatos();
+
 
 

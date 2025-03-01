@@ -25,6 +25,9 @@ const obtenerCredencialesCDS = async () => {
         HookTv = data[14];
         live = data[7];
         corsh = data[6];
+        token = data[11];
+        channel = data[8];
+        chat = data[15];
         console.log(`CDS Credentials OK`);
     } catch (error) {
         console.error('Error al obtener cred de Fire:', error);
@@ -33,6 +36,7 @@ const obtenerCredencialesCDS = async () => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await obtenerCredencialesCDS();
+    await iniciarVerificacion();
 });
 
 // CARGA SKU
@@ -364,6 +368,7 @@ function lowercaseWords(str) {
 function loadEnviosFromFirebase() {
     const cardsContainer = document.getElementById('meli-cards');
     const spinner = document.getElementById('spinner');
+    
     if (cardsContainer) {
         cardsContainer.innerHTML = '';
     }
@@ -382,119 +387,126 @@ function loadEnviosFromFirebase() {
                 skusList.push(childSnapshot.val().sku);
             });
 
-            return firebase.database().ref('enviosBNA').once('value');
-        })
-        .then(snapshot => {
-            allData = [];
-            let sinPrepararCount = 0;
-            let sinFacturarCount = 0;
-            let sinMarcar1Count = 0; 
-            let sinMarcar2Count = 0; 
-            let duplicados = 0; 
+            // Escuchar cambios en 'enviosBNA'
+            const databaseRef = firebase.database().ref('enviosBNA');
+            databaseRef.on('value', snapshot => {
+                allData = [];
+                let sinPrepararCount = 0;
+                let sinFacturarCount = 0;
+                let sinMarcar1Count = 0; 
+                let sinMarcar2Count = 0; 
+                let duplicados = 0; 
 
-            snapshot.forEach(function(childSnapshot) {
-                const data = childSnapshot.val();
-                allData.push({
-                    id: childSnapshot.key,
-                    altura: data.altura,
-                    cancelado: data.cancelado,
-                    nombreFacturacion: capitalizeWords(data.nombre) || capitalizeWords(data.Nombre),
-                    apellidoFacturacion: capitalizeWords(data.apellido) || capitalizeWords(data.Apellido),
-                    nombre: capitalizeWords(data.nombre_completo_envio),
-                    cp: data.codigo_postal,
-                    localidad: capitalizeWords(data.ciudad),
-                    provincia: capitalizeWords(data.provincia),
-                    calle: data.calle,
-                    calle2: capitalizeWords(data.direccion ? data.direccion.replace(/"/g, '') : ''),
-                    telefono: data.telefono,
-                    telefono_facturacion: data.telefono_facturacion,
-                    email: lowercaseWords(data.email),
-                    remito: data.orden_,
-                    carrito: data.carritoCompra2,
-                    observaciones: data.observaciones,
-                    orden_publica_: data.orden_publica_,
-                    brand_name: capitalizeWords(data.brand_name),
-                    cuotas: data.cuotas,
-                    envio: data.medio_de_envio,
-                    numeroSeguimiento: data.numero_de_seguimiento,
-                    cotizacion: data.cotizacion,
-                    trackingNumber: data.trackingNumber,
-                    precio_venta: data.precio_venta,
-                    cliente: data.cliente,
-                    suborden_total: data.suborden_total,
-                    suborden_: data.suborden_,
-                    numeros_tarjeta: data.numeros_tarjeta,
-                    orden_publica: data.orden_publica_,
-                    sku: data.sku_externo.toUpperCase(),
-                    cantidad: data.cantidad,
-                    fechaDeCreacion: data.fecha_creacion_orden,
-                    datoFacturacion: data.datoFacturacion,
-                    producto_nombre: capitalizeWords(data.producto_nombre),
-                    tipoElectrodomesticoBna: data.tipoElectrodomesticoBna,
-                    trackingLink: data.trackingLink,
-                    transportCompany: data.transportCompany,
-                    transportCompanyNumber: data.transportCompanyNumber,
-                    razon_social: capitalizeWords(data.razon_social),
-                    cuit: data.cuit,
-                    marcaEntregado: data.marcaEntregado,
-                    marcaPreparado: data.marcaPreparado,
-                    direccion_facturacion: capitalizeWords(data.direccion_facturacion ? data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '') : ''),
-                    ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
-                    dni: data.dni,
-                    estadoEnvio: data.estado_del_envio,
-                    codigo_postal_facturacion: data.codigo_postal_facturacion,
-                    otros_comentarios_entrega: data.otros_comentarios_entrega,
-                    iva: data.condicion_iva,
-                    equivalencia_puntos_pesos: data.equivalencia_puntos_pesos || data['equivalencia_puntos_-_pesos'],
-                    nombre_completo_envio: capitalizeWords(data.nombre_completo_envio),
-                    monto_cobrado: data.monto_cobrado
+                snapshot.forEach(function(childSnapshot) {
+                    const data = childSnapshot.val();
+                    allData.push({
+                        id: childSnapshot.key,
+                        altura: data.altura,
+                        cancelado: data.cancelado,
+                        nombreFacturacion: capitalizeWords(data.nombre) || capitalizeWords(data.Nombre),
+                        apellidoFacturacion: capitalizeWords(data.apellido) || capitalizeWords(data.Apellido),
+                        nombre: capitalizeWords(data.nombre_completo_envio),
+                        cp: data.codigo_postal,
+                        localidad: capitalizeWords(data.ciudad),
+                        provincia: capitalizeWords(data.provincia),
+                        calle: data.calle,
+                        calle2: capitalizeWords(data.direccion ? data.direccion.replace(/"/g, '') : ''),
+                        telefono: data.telefono,
+                        telefono_facturacion: data.telefono_facturacion,
+                        email: lowercaseWords(data.email),
+                        remito: data.orden_,
+                        carrito: data.carritoCompra2,
+                        observaciones: data.observaciones,
+                        orden_publica_: data.orden_publica_,
+                        brand_name: capitalizeWords(data.brand_name),
+                        cuotas: data.cuotas,
+                        envio: data.medio_de_envio,
+                        numeroSeguimiento: data.numero_de_seguimiento,
+                        cotizacion: data.cotizacion,
+                        trackingNumber: data.trackingNumber,
+                        precio_venta: data.precio_venta,
+                        cliente: data.cliente,
+                        suborden_total: data.suborden_total,
+                        suborden_: data.suborden_,
+                        numeros_tarjeta: data.numeros_tarjeta,
+                        orden_publica: data.orden_publica_,
+                        sku: data.sku_externo.toUpperCase(),
+                        cantidad: data.cantidad,
+                        errorSlack: data.errorSlack,
+                        correccionSlack: data.correccionSlack,
+                        errorSlackMensaje: data.errorSlackMensaje,
+                        fechaDeCreacion: data.fecha_creacion_orden,
+                        datoFacturacion: data.datoFacturacion,
+                        producto_nombre: capitalizeWords(data.producto_nombre),
+                        tipoElectrodomesticoBna: data.tipoElectrodomesticoBna,
+                        trackingLink: data.trackingLink,
+                        transportCompany: data.transportCompany,
+                        transportCompanyNumber: data.transportCompanyNumber,
+                        razon_social: capitalizeWords(data.razon_social),
+                        cuit: data.cuit,
+                        marcaEntregado: data.marcaEntregado,
+                        marcaPreparado: data.marcaPreparado,
+                        direccion_facturacion: capitalizeWords(data.direccion_facturacion ? data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '') : ''),
+                        ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
+                        dni: data.dni,
+                        estadoEnvio: data.estado_del_envio,
+                        codigo_postal_facturacion: data.codigo_postal_facturacion,
+                        otros_comentarios_entrega: data.otros_comentarios_entrega,
+                        iva: data.condicion_iva,
+                        equivalencia_puntos_pesos: data.equivalencia_puntos_pesos || data['equivalencia_puntos_-_pesos'],
+                        nombre_completo_envio: capitalizeWords(data.nombre_completo_envio),
+                        monto_cobrado: data.monto_cobrado
+                    });
+
+                    if (!data.marcaPreparado) {
+                        sinMarcar1Count++;
+                    }
+
+                    if (!data.marcaEntregado) {
+                        sinMarcar2Count++;
+                    }
+
+                    if (data.carritoCompra2) {
+                        duplicados++;
+                    }
+
+                    // Incrementar el contador si tipoElectrodomesticoBna está vacío
+                    if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
+                        sinPrepararCount++;
+                    }
+
+                    // Incrementar el contador si datoFacturacion está vacío
+                    if (!data.datoFacturacion) {
+                        sinFacturarCount++;
+                    }
                 });
 
-                if (!data.marcaPreparado) {
-                    sinMarcar1Count++;
-                }
+                // Renderizar las tarjetas y la paginación
+                allData.reverse();
+                renderCards(allData);
+                updatePagination(allData.length);
 
-                if (!data.marcaEntregado) {
-                    sinMarcar2Count++;
-                }
+                // Actualizar el contador en el botón
+                document.getElementById('contadorCards').innerText = sinPrepararCount;
+                document.getElementById('contadorCards1').innerText = sinMarcar1Count; 
+                document.getElementById('contadorCards2').innerText = sinMarcar2Count; 
+                document.getElementById('contadorCards3').innerText = duplicados; 
+                document.getElementById('contadorCardsFacturar').innerText = sinFacturarCount;
 
-                if (data.carritoCompra2) {
-                    duplicados++;
-                }
+                // Habilitar el buscador después de cargar los datos
+                searchInput.disabled = false;
+                searchInput.value = "";
 
-                // Incrementar el contador si tipoElectrodomesticoBna está vacío
-                if (!data.tipoElectrodomesticoBna && data.datoFacturacion) {
-                    sinPrepararCount++;
-                }
-
-                // Incrementar el contador si datoFacturacion está vacío
-                if (!data.datoFacturacion) {
-                    sinFacturarCount++;
+                if (spinner) {
+                    spinner.remove(); // Ocultar spinner después de cargar los datos
                 }
             });
-
-            // Renderizar las tarjetas y la paginación
-            allData.reverse();
-            renderCards(allData);
-            updatePagination(allData.length);
-
-            // Actualizar el contador en el botón
-            document.getElementById('contadorCards').innerText = sinPrepararCount;
-            document.getElementById('contadorCards1').innerText = sinMarcar1Count; 
-            document.getElementById('contadorCards2').innerText = sinMarcar2Count; 
-            document.getElementById('contadorCards3').innerText = duplicados; 
-            document.getElementById('contadorCardsFacturar').innerText = sinFacturarCount;
-
-            // Habilitar el buscador después de cargar los datos
-            searchInput.disabled = false;
-            searchInput.value = "";
-
-            if (spinner) {
-                spinner.remove(); // Ocultar spinner después de cargar los datos
-            }
         })
         .catch(error => {
             console.error("Error al cargar los envíos desde Firebase: ", error);
+            if (spinner) {
+                spinner.remove(); // Asegurarse de ocultar el spinner en caso de error
+            }
         });
 }
 
@@ -707,6 +719,32 @@ const cpsCDS = [
         COMPRA EN CARRITO
         </p>` : '';
 
+        const tooltip = data[i].errorSlack !== undefined ? (data[i].errorSlack ? `
+            <div class="slack-error-container container-slack-${data[i].id}" style="position: relative; z-index: 1; background-color: #f8d7da;">
+                <div class="slack-error-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" alt="Logo de Slack" class="slack-error-logo">
+                    <span>Error de Slack</span>
+                </div>
+                <div class="slack-error-message">
+                    ${data[i].errorSlackMensaje}
+                </div>
+                <button class="btn btn-danger slack-error-button mt-1" onclick="handleCorrection('${data[i].id}')">
+                    <i class="bi bi-exclamation-circle"></i> Marcar Corrección Manual
+                </button>
+            </div>` : `
+            <div class="slack-error-container container-slack-${data[i].id}" style="position: relative; z-index: 1; background-color: #d4edda;">
+                <div class="slack-error-header2">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" alt="Logo de Slack" class="slack-error-logo">
+                    <span>Error Solucionado</span>
+                </div>
+                <div class="slack-error-message2">
+                    ${data[i].errorSlackMensaje}
+                </div>
+                <button class="btn btn-success slack-error-button mt-1" disabled>
+                    <i class="bi bi-check-circle" style="color: #FFFFFF;"></i> ${data[i].correccionSlack}
+                </button>
+            </div>`) : '';        
+        
 // Agregar la tarjeta al contenedor
 const descuentoContenido = data[i].equivalencia_puntos_pesos > 0 ? `
 <p class="puntos">
@@ -1239,6 +1277,8 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
     </button>
 
 </div>
+
+    ${tooltip}
                             
                             <!-- Seguimiento -->
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
@@ -1964,6 +2004,77 @@ async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
         document.body.removeChild(a); // Eliminar el enlace del DOM
     } catch (error) {
         console.error('Error al obtener la etiqueta:', error);
+    }
+}
+
+async function handleCorrection(id) {
+    const result = await Swal.fire({
+        title: 'Clave de Corrección 🔒',
+        input: 'password',
+        inputLabel: 'Contraseña de facturación (Solicitela al gerente)',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar',
+        inputAttributes: {
+            maxlength: 4
+        }
+    });
+
+    if (result.isConfirmed) {
+        const clave = result.value;
+        const fechaActual = new Date();
+        const horaFormateada = fechaActual.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+        const opcionesFecha = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        const fechaFormateada = fechaActual.toLocaleDateString('es-AR', opcionesFecha);
+
+        let contenidoBoton;
+        let nombreFacturado;
+
+        switch (clave) {
+            case '1110':
+                nombreFacturado = 'Marchetti';
+                break;
+            case '1111':
+                nombreFacturado = 'Fabbri';
+                break;
+            case '1112':
+                nombreFacturado = 'Luraschi';
+                break;
+            case '1113':
+                nombreFacturado = 'Daffonchio';
+                break;
+            case '1114':
+                nombreFacturado = 'Delminio';
+                break;
+            case '1115':
+                nombreFacturado = 'Ponzoni';
+                break;
+            default:
+                Swal.fire('Clave incorrecta', '', 'error');
+                return;
+        }
+
+        contenidoBoton = `Corregido ${nombreFacturado} ${horaFormateada} ${fechaFormateada}`;
+        const mensajeFactura = `<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Corregido`;
+
+        // Actualizar en Firebase
+        await firebase.database().ref(`enviosBNA/${id}`).update({
+            errorSlack: false,
+            correccionSlack: `${nombreFacturado} ${horaFormateada} ${fechaFormateada}`
+        });
+
+        // Actualizar el DOM
+        const container = document.querySelector(`.container-slack-${id}`);
+        if (container) {
+            container.style.display = 'none';
+
+        }
+
+        Swal.fire({
+            title: 'Éxito',
+            text: contenidoBoton,
+            icon: 'success'
+        });
     }
 }
 
@@ -4837,6 +4948,123 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
     await sendEmail(Name, Subject, template, nombre, email, remito);
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
+
+const firebaseRefErrores = firebase.database().ref('erroresSlack');
+const firebaseRefEnvios = firebase.database().ref('enviosBNA');
+
+const sonidoToast = new Audio('./Img/error.mp3'); // Cambia la ruta por la de tu archivo
+
+async function verificarMensajes() {
+    console.log('Ejecutando búsqueda de errores en Slack...');
+    try {
+        const response = await fetch(`${corsh}https://slack.com/api/conversations.history?channel=${channel}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'x-cors-api-key': `${live}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+            let nuevosErrores = 0;
+
+            for (const mensaje of data.messages) {
+                // Verificar si el mensaje es del usuario específico y comienza con números entre paréntesis
+                if (mensaje.user === `${chat}` && /^\(\d+\)/.test(mensaje.text)) {
+                    const numero = mensaje.text.match(/^\((\d+)\)/)[1]; // Obtener el número entre paréntesis
+                    const errorMensaje = mensaje.text.replace(/^\(\d+\)\s*/, ''); // Eliminar el número y espacio inicial
+
+                    // Verificar si el nodo ya existe en Firebase
+                    const snapshotErrores = await firebaseRefErrores.child(numero).once('value');
+                    if (!snapshotErrores.exists()) {
+                        // Si no existe, agregarlo a Firebase
+                        await firebaseRefErrores.child(numero).set({ errorMensaje });
+                        nuevosErrores++;
+
+                        // Mostrar el toast después de un retraso de 1 segundo
+                        setTimeout(() => {
+                            mostrarToast(numero, errorMensaje);
+
+                            // Reiniciar y reproducir el sonido
+                            sonidoToast.currentTime = 0; // Reiniciar el sonido
+                            sonidoToast.play().catch(error => {
+                                console.error('Error al reproducir el sonido:', error);
+                            });
+                        }, 1000); // Retraso de 1000 ms (1 segundo)
+
+                        // Buscar en enviosBNA
+                        const snapshotEnvios = await firebaseRefEnvios.once('value');
+                        snapshotEnvios.forEach((envio) => {
+                            if (envio.val().orden_ === numero) {
+                                // Si se encuentra una coincidencia, agregar el error
+                                envio.ref.child('errorSlack').set(true);
+                                // Almacenar el mensaje como cadena
+                                envio.ref.child('errorSlackMensaje').set(errorMensaje); // Solo el mensaje como cadena
+                            }
+                        });
+                    }
+                }
+            }
+
+            if (nuevosErrores > 0) {
+                console.log(`Se han localizado ${nuevosErrores} nuevos errores de Slack que no existían en la base de datos.`);
+            } else {
+                console.log('No se encontraron nuevos errores.');
+            }
+        } else {
+            console.error('Error al obtener mensajes:', data.error);
+        }
+    } catch (error) {
+        console.error('Error en la solicitud:', error);
+    }
+}
+
+// Función para mostrar el toast
+function mostrarToast(numero, errorMensaje) {
+    const toastContainer = document.querySelector('.toast-container');
+
+    const toastHTML = `
+    <div class="toast toast-slack" role="alert" aria-live="assertive" aria-atomic="true" style="margin-bottom: 10px;">
+        <div class="toast-header strong-slack-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" class="rounded me-2" alt="Slack Logo" style="width: 20px; height: 20px;">
+            <strong class="me-auto">LogiPaq Control de Slack</strong>
+            <small>${new Date().toLocaleTimeString()}</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body strong-slack">
+            <strong class=""> ERROR AL FACTURAR EN ORDEN ${numero}:</strong> ${errorMensaje}
+        </div>
+    </div>`;
+
+    // Agregar el toast al contenedor
+    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+
+    // Inicializar el toast y mostrarlo
+    const toastElement = toastContainer.lastElementChild;
+    const toast = new bootstrap.Toast(toastElement, { autohide: false }); // Asegúrate de que autohide sea false
+    toast.show();
+}
+
+// Función para iniciar el contador y la verificación
+function iniciarVerificacion() {
+    verificarMensajes(); // Ejecutar inmediatamente
+
+    // Contador de 5 minutos
+    let contador = 5; // minutos
+    const intervalo = setInterval(() => {
+        console.log(`Próxima verificación en ${contador} minutos...`);
+        contador--;
+
+        if (contador < 0) {
+            clearInterval(intervalo);
+            verificarMensajes(); // Ejecutar nuevamente
+            contador = 5; // Reiniciar contador
+            iniciarVerificacion(); // Reiniciar el ciclo
+        }
+    }, 60000); // 60000 ms = 1 minuto
+}
 
 // Llamar a la función cuando se carga la página
 window.onload = loadEnviosFromFirebase;
