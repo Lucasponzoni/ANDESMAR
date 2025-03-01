@@ -2683,6 +2683,8 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         return;
     }
 
+    spinner2.style.display = "flex";
+
     // URL de la API para generar el código de barras
     const barcodeApiUrl = `https://proxy.cors.sh/https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(numeroRemito)}&code=Code128&dpi=96`;
 
@@ -2705,8 +2707,6 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 
     reader.onloadend = function() {
         const barcodeBase64 = reader.result;
-
-        spinner2.style.display = "flex";
 
         // Crear un nuevo documento PDF en tamaño 10x15 cm
         const doc = new jsPDF({
