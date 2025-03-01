@@ -1047,6 +1047,10 @@ a.nav-link.active{
     color: white !important;
 }
 
+.btnFacturar{
+    text-align: center;
+}
+
 .nav-item a {
     text-align: center;
     color: #004080;
