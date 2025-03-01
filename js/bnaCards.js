@@ -166,7 +166,7 @@ function verificarRemitosDuplicados() {
                         databaseRef.child(childSnapshot.key).update({ carritoCompra2: true });
                     }
                 });
-                console.log(`La Orden ${remito} está duplicada ${remitoCount[remito]} veces.`);
+                // console.log(`La Orden ${remito} está duplicada ${remitoCount[remito]} veces.`);
             }
         });
     });
@@ -1552,6 +1552,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
         
                             <div class="medidas ${isMacro(storeCode) ? 'hidden' : ''}"></div> <!-- Div para las medidas -->
 
+                        <div class="conjuntoDeBotonesMeli" style="display: flex; flex-direction: column;">
                             <div class="bg-Hr-primary mb-1">
                                 <p><i class="bi bi-tags-fill"></i> Logistica Privada</p>
                             </div>
@@ -1623,6 +1624,8 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             onclick="window.open('https://int.oca.com.ar/soporteclientes/', '_blank')">
                             <img class="OcaMeli" src="Img/oca-tini.png" alt="OCA"> Formulario de Reclamo <strong>OCA</strong>
                             </button>
+
+                        </div>
 
                            <div id="resultado${data[i].id}" class="mt-2 errorMeliBna">
                             ${data[i].cancelado ? 
