@@ -460,13 +460,13 @@ function loadEnviosFromFirebase() {
                         monto_cobrado: data.monto_cobrado
                     });
 
-                    if (!data.marcaPreparado) {
+                    if (!data.marcaPreparado || data.marcaPreparado === 'No') {
                         sinMarcar1Count++;
                     }
-
-                    if (!data.marcaEntregado) {
+                    
+                    if (!data.marcaEntregado || data.marcaEntregado === 'No') {
                         sinMarcar2Count++;
-                    }
+                    }                    
 
                     if (data.carritoCompra2) {
                         duplicados++;
@@ -1746,6 +1746,13 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
                 marcaPreparado: nuevoEstado
             }).then(() => {
                 console.log(`Estado de preparación actualizado a: ${nuevoEstado}`);
+                
+                // Actualizar el badge
+                const contadorCards1 = document.getElementById('contadorCards1');
+                if (contadorCards1) {
+                    const currentCount = parseInt(contadorCards1.innerText) || 0;
+                    contadorCards1.innerText = this.checked ? Math.max(currentCount - 1, 0) : currentCount + 1; // Resta si está marcado, suma si está desmarcado
+                }
             }).catch(error => {
                 console.error("Error al actualizar el estado de preparación: ", error);
             });
@@ -1769,12 +1776,19 @@ document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', 
         marcaEntregado: nuevoEstado
     }).then(() => {
         console.log(`Estado de entrega actualizado a: ${nuevoEstado}`);
+        
+        // Actualizar el badge
+        const contadorCards2 = document.getElementById('contadorCards2');
+        if (contadorCards2) {
+            const currentCount = parseInt(contadorCards2.innerText) || 0;
+            contadorCards2.innerText = this.checked ? Math.max(currentCount - 1, 0) : currentCount + 1; // Resta si está marcado, suma si está desmarcado
+        }
     }).catch(error => {
         console.error("Error al actualizar el estado de entrega: ", error);
     }).finally(() => {
         // Volver a habilitar la escucha de cambios
         databaseRef.on('value', snapshot => {
-            
+            // Aquí puedes manejar la actualización de datos si es necesario
         });
     });
 });
@@ -4509,7 +4523,7 @@ document.getElementById('btnSwitch').addEventListener('click', () => {
     });
 
     filteredData = allData
-        .filter(item => item.marcaEntregado === 'No' || item.marcaEntregado === undefined)
+        .filter(item => item.marcaEntregado === 'No' || item.marcaEntregado === '' || item.marcaEntregado === undefined)
         .reverse(); // Filtrar y revertir el orden
 
     // Limpiar el contenedor de tarjetas
@@ -4539,9 +4553,9 @@ document.getElementById('btnSwitch1').addEventListener('click', () => {
     databaseRef.on('value', snapshot => {
         loadEnviosFromFirebase(); 
     });
-    
+
     filteredData = allData
-        .filter(item => item.marcaPreparado === 'No' || item.marcaPreparado === undefined)
+        .filter(item => item.marcaPreparado === 'No' || item.marcaPreparado === '' || item.marcaPreparado === undefined)
         .reverse(); // Filtrar y revertir el orden
 
     // Limpiar el contenedor de tarjetas
