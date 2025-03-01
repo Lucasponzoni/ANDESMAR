@@ -1525,6 +1525,10 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
     <option value="">Seleccione un producto ⤵</option>
     ${isMacro(storeCode) ? `
         <option value="heladera">Heladera</option>
+        <option value="heladera_bajo_mesada">Heladera Bajo Mesada</option>
+        <option value="freezer_pequeño">Freezer Pequeño</option>
+        <option value="freezer_medio">Freezer Mediano</option>
+        <option value="freezer_grande">Freezer Grande</option>
         <option value="cocina">Cocina</option>
         <option value="hornoEmpotrable">Horno Empotrable</option>
         <option value="lavavajillas">Lavavajillas</option>
@@ -1568,6 +1572,10 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
         <option value="bulto50">Bulto Pequeño 50x50</option>
     ` : `
         <option value="heladera">Heladera</option>
+        <option value="heladera_bajo_mesada">Heladera Bajo Mesada</option>
+        <option value="freezer_pequeño">Freezer Pequeño</option>
+        <option value="freezer_medio">Freezer Mediano</option>
+        <option value="freezer_grande">Freezer Grande</option>
         <option value="cocina">Cocina</option>
         <option value="hornoEmpotrable">Horno Empotrable</option>
         <option value="lavavajillas">Lavavajillas</option>
@@ -1711,6 +1719,10 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
 // Evento para manejar el cambio del switch "Preparación"
 document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', function() {
     const nuevoEstado = this.checked ? 'Si' : 'No';
+
+    // Desactivar la escucha de cambios
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off();
 
     // Mostrar el cuadro de diálogo para la contraseña
     Swal.fire({
@@ -2345,6 +2357,10 @@ async function marcarFacturado2(id, email, nombre, remito) {
     const claveInput = document.getElementById(`clave-facturacion-${id}`);
     const clave = claveInput.value;
 
+    // Desactivar la escucha de cambios
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off(); // Desactiva la escucha
+
     // Comprobación de la clave y formateo de la fecha y hora
     let contenidoBoton;
     const fechaActual = new Date();
@@ -2530,7 +2546,11 @@ fetch(`${corsh}${HookTv}`, {
 });
 
 // Enviar el email después de procesar el envío
-await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);       
+await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio); 
+
+databaseRef.on('value', snapshot => {
+    loadEnviosFromFirebase(); 
+});
             
 // Actualizar los contadores de los badges
 actualizarContadores(-1, 1); // Restar 1 a Facturar y sumar 1 a Preparar
@@ -3824,6 +3844,10 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
     // Limpiar el div de medidas antes de agregar nuevos campos
     medidasDiv.innerHTML = '';
 
+    // Desactivar la escucha de cambios
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off();
+
     // Si no es una carga inicial, mostrar el alert y actualizar Firebase
     if (!isInitialLoad) {
         const alertDiv = card.querySelector(`#alert-${id}`);
@@ -3901,11 +3925,39 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
             peso = 60; 
             valor = 700000;
             break;
+        case "heladera_bajo_mesada":
+            alto = 85; 
+            ancho = 60; 
+            largo = 60; 
+            peso = 50; 
+            valor = 600000;
+            break;
         case "cocina":
             alto = 85; 
             ancho = 60; 
             largo = 60; 
             peso = 50; 
+            valor = 600000;
+            break;
+        case "freezer_pequeño":
+            alto = 90; 
+            ancho = 89; 
+            largo = 65; 
+            peso = 40;
+            valor = 300000;
+            break;
+        case "freezer_medio":
+            alto = 84; 
+            ancho = 113; 
+            largo = 62; 
+            peso = 54; 
+            valor = 450000;
+            break;
+        case "freezer_grande":
+            alto = 86; 
+            ancho = 164; 
+            largo = 70; 
+            peso = 60; 
             valor = 600000;
             break;
         case "hornoEmpotrable":
