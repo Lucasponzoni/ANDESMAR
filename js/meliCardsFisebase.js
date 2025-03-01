@@ -2486,7 +2486,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     const diaPredeterminadoStaFe = await database.ref('DiaPredeterminadoStaFe').once('value').then(snapshot => snapshot.val());
     const diaPredeterminadoRafaela = await database.ref('DiaPredeterminadoRafaela').once('value').then(snapshot => snapshot.val());
     const diaPredeterminadoSanNicolas = await database.ref('DiaPredeterminadoSanNicolas').once('value').then(snapshot => snapshot.val());
-    
+
     function obtenerProximoDia(fecha, dia) {
         const diasDeLaSemana = {
             'lunes': 1,
@@ -2497,7 +2497,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             'sabado': 6,
             'domingo': 0
         };
-        
+
         const diaActual = fecha.getDay();
         let diasParaSumar = (diasDeLaSemana[dia.toLowerCase()] - diaActual + 7) % 7;
         if (diasParaSumar === 0) diasParaSumar = 7; // Si es hoy, sumar 7 días
@@ -2505,11 +2505,11 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         const esManana = diasParaSumar === 1;
         return { fechaProximoDia, esManana, diasParaSumar };
     }
-    
+
     function sumarDiasHabiles(fecha, dias) {
         let diasAgregados = 0;
         let nuevaFecha = new Date(fecha);
-    
+
         while (diasAgregados < dias) {
             nuevaFecha.setDate(nuevaFecha.getDate() + 1);
             // Si no es domingo, sumar un día hábil
@@ -2517,24 +2517,24 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 diasAgregados++;
             }
         }
-    
+
         return nuevaFecha;
     }
-    
+
     function obtenerProximoSabado(fecha) {
         const diaActual = fecha.getDay();
         const diasParaSumar = (6 - diaActual + 7) % 7;
         const fechaProximoSabado = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar);
         return fechaProximoSabado;
     }
-    
+
     // Determinar la logística según el CP
     const logistica = logBsCps.includes(Number(Cp)) ? 'Buenos Aires' :
                       logStaFeCps.includes(Number(Cp)) ? 'Santa Fe' :
                       logRafaelaCps.includes(Number(Cp)) ? 'Rafaela' :
                       logSanNicolasCps.includes(Number(Cp)) ? 'San Nicolás' :
                       'logística Propia';
-    
+
     let diaPredeterminado;
     if (logistica === 'Buenos Aires') {
         diaPredeterminado = diaPredeterminadoBsAs;
@@ -2545,7 +2545,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     } else if (logistica === 'San Nicolás') {
         diaPredeterminado = diaPredeterminadoSanNicolas;
     }
-    
+
     let diaFormateado;
     const cp = Number(Cp);
     if (cp === 2132 || cp === 2131 || cp === 2134) {
@@ -2556,7 +2556,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     } else if (logistica !== 'logística Propia') {
         const { fechaProximoDia, esManana, diasParaSumar } = obtenerProximoDia(new Date(), diaPredeterminado);
         console.log(`CP ${cp} pertenece a la logística ${logistica}. Día predeterminado: ${diaPredeterminado}. Próximo día: ${fechaProximoDia}`);
-    
+
         let diasParaSumarFinal = diasParaSumar; // Inicializar la variable
         if (esManana) {
             // Preguntar al usuario si es mañana
@@ -2576,11 +2576,11 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 confirmButtonText: 'Sí',
                 cancelButtonText: 'No'
             });
-    
+
             // Determinar la cantidad de días a sumar
             diasParaSumarFinal = incluirMañana ? 1 : diasParaSumar; // Usar la respuesta directamente
         }
-    
+
         const fechaProgramada = new Date(new Date().setDate(new Date().getDate() + diasParaSumarFinal)); // Sumar días directamente
         diaFormateado = fechaProgramada.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
         console.log(`Fecha programada: ${diaFormateado}`);
@@ -2594,12 +2594,56 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         console.log(`CP ${cp} no pertenece a ninguna logística específica. Fecha inicio: ${fechaInicioFormateada}, Fecha entrega: ${fechaEntregaFormateada}`);
     }
 
+    const { value: numeroRemito } = await Swal.fire({
+        title: '¿Cuál es el número de remito?',
+        html: `
+            <div class="input-container">
+                <input id="numeroRemito" class="swal2-input" placeholder="Número de Remito" maxlength="20" required>
+                <small class="input-description">Ingresar número de remito (mínimo 10 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroRemito');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroRemito').value;
+            // Validaciones
+            if (!/^\d{10,}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un número de remito válido');
+                return false;
+            }
+            return input;
+        },
+        allowEnterKey: true // Permitir que Enter funcione como aceptar
+    });
+
+    // Si el usuario cancela, salir de la función
+    if (!numeroRemito) {
+        return;
+    }
+
     // SweetAlert para el número de cliente
     const { value: numeroCliente } = await Swal.fire({
         title: '¿Cuál es el número de cliente?',
         html: `
             <div class="input-container">
-                <input id="numeroCliente" class="swal2-input" placeholder="Número de Cliente 🧑🏻‍💻" maxlength="8" required>
+                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
                 <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
             </div>
         `,
@@ -2633,316 +2677,290 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         },
         allowEnterKey: true // Permitir que Enter funcione como aceptar
     });
-    
+
     // Si el usuario cancela, salir de la función
     if (!numeroCliente) {
         return;
     }
-    
-    spinner2.style.display = "flex";
 
-    // Crear un nuevo documento PDF en tamaño 10x15 cm
-    const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'cm',
-        format: [15, 10],
-        putOnlyUsedFonts: true,
-        floatPrecision: 16
+    // URL de la API para generar el código de barras
+    const barcodeApiUrl = `https://proxy.cors.sh/https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(numeroRemito)}&code=Code128&dpi=96`;
+
+    // Obtener el código de barras en formato Base64 usando el proxy CORS
+    const response = await fetch(barcodeApiUrl, {
+        method: 'GET',
+        headers: {
+            "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd"
+        }
     });
 
-    function sumarDiasHabiles(fecha, dias) {
-        let diasAgregados = 0;
-        let nuevaFecha = new Date(fecha);
-    
-        while (diasAgregados < dias) {
-            nuevaFecha.setDate(nuevaFecha.getDate() + 1);
-            // Si no es domingo, sumar un día hábil
-            if (nuevaFecha.getDay() !== 0) {
-                diasAgregados++;
-            }
-        }
-    
-        return nuevaFecha;
+    if (!response.ok) {
+        console.error('Error al generar el código de barras:', response.statusText);
+        spinner2.style.display = "none";
+        return;
     }
 
-    // Obtener la fecha actual
-    const fechaFormateada = `${fechaActual.getDate().toString().padStart(2, '0')}-${(fechaActual.getMonth() + 1).toString().padStart(2, '0')}-${fechaActual.getFullYear().toString().slice(-2)}`;
-    const fechaVencimiento = sumarDiasHabiles(fechaActual, 3);
-    const fechaVencimientoFormateada = `${fechaVencimiento.getDate().toString().padStart(2, '0')}-${(fechaVencimiento.getMonth() + 1).toString().padStart(2, '0')}-${fechaVencimiento.getFullYear().toString().slice(-2)}`;    
+    const blob = await response.blob();
+    const reader = new FileReader();
 
-    // Determinar la imagen según el CP
-    let logoSrc = './Img/Meli-Novogar.png';
-    if (logBsCps.includes(Number(Cp))) {
-        logoSrc = './Img/Camion-BsAs-Novogar.png';
-    } else if (logStaFeCps.includes(Number(Cp))) {
-        logoSrc = './Img/Camion-Santa-fe-Novogar.png';
-    } else if (logRafaelaCps.includes(Number(Cp))) {
-        logoSrc = './Img/Camion-Rafaela-Novogar.png';
-    } else if (logSanNicolasCps.includes(Number(Cp))) {
-        logoSrc = './Img/Camion-SNicolas-Novogar.png';
-    }
-    
-    // Contenido HTML
-    let contenido = `
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Etiqueta</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-        <style>
-            body {
-                margin: 10px;
-                padding: 0;
-                display: grid;
-                place-items: center;
-                height: 100vh;
-                background-color: #f0f0f0;
-            }
-            .etiqueta {
-                width: 10cm;
-                margin: 5px;
-                height: auto;
-                max-height: 15cm;
-                border: 2px dashed #000;
-                border-radius: 10px;
-                padding: 1cm;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                font-family: Arial, sans-serif;
-                background-color: #fff;
-            }
-            .logo {
-                text-align: center;
-                margin-bottom: 15px;
-            }
-            .logo img {
-                max-width: 250px;
-                height: auto;
-                display: block;
-                margin: 0 auto;
-            }
-            .campo {
-                border-radius: 10px;
-                display: flex;
-                align-items: center;
-                margin-bottom: 6px;
-                padding: 8px;
-                border: 2px solid #ccc;
-                background-color: #f9f9f9;
-            }
-            .campo i {
-                margin-right: 8px;
-                font-size: 1.2em;
-                color: #000;
-            }
-            .campo span {
-                font-size: 1em;
-                font-weight: bold;
-                color: #333;
-            }
-            .footer {
-                text-align: center;
-                font-size: 0.9em;
-                color: #000;
-                margin-top: auto;
-                padding-top: 10px;
-                border-top: 2px solid #ccc;
-            }
-            .contacto {
-                font-size: 0.8em;
-                color: #333;
-                margin-top: 10px;
-                text-align: center;
-            }
-            .contacto p {
-                margin: 3px 0;
-            }
-            .campo-extra {
-                border-radius: 8px;
-                margin-top: 10px;
-                border: 2px dashed #ccc;
-                padding: 5px;
-                text-align: center;
-                font-size: 0.9em;
-                color: #555;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="etiqueta">
-            <div class="logo">
-                <img src="${logoSrc}" alt="Logo">
-            </div>
-            <div class="campo">
-                <i class="bi bi-person-square"></i>
-                <span>${NombreyApellido || recibe}</span>
-            </div>
-            <div class="campo">
-                <i class="bi bi-geo-alt-fill"></i>
-                <span>${Cp}, ${localidad}, ${provincia}</span>
-            </div>
-            <div class="campo">
-                <i class="bi bi-compass"></i>
-                <span>${calleDestinatario} ${alturaDestinatario}</span>
-            </div>
-            <div class="campo">
-                <i class="bi bi-telephone-outbound-fill"></i>
-                <span>Teléfono: ${telefonoDestinatario}</span>
-            </div>`;
+    reader.onloadend = function() {
+        const barcodeBase64 = reader.result;
 
-    // Agregar información sobre el camión
-    contenido += `<div class="campo"><i class="bi bi-info-circle-fill"></i><span>Vence: ${diaFormateado}</span></div>`;
+        spinner2.style.display = "flex";
 
-    const idOperacionsSinMe1 = idOperacion.replace(/ME1$/, '');
+        // Crear un nuevo documento PDF en tamaño 10x15 cm
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'cm',
+            format: [15, 10],
+            putOnlyUsedFonts: true,
+            floatPrecision: 16
+        });
 
-    contenido += `
-            <div class="campo-extra">
-                <p><strong>Firma:</strong>  ________________________</p>
-            </div>
-            <div class="campo-extra">
-                <p><strong>Operación:</strong>  ${idOperacionsSinMe1}</p>
-            </div>
-            <div class="campo-extra">
-                <p><strong>DNI:</strong>  ________________________</p>
-            </div>
-            <div class="contacto">
-                <p><strong><i class="bi bi-chat-dots-fill"></i></strong> Posventa Novogar: (0341) 6680658 (Solo WhatsApp)</p>
-            </div>
-        </div>
-    </body>
-    </html>`;
+        // Obtener la fecha actual
+        const fechaFormateada = `${fechaActual.getDate().toString().padStart(2, '0')}-${(fechaActual.getMonth() + 1).toString().padStart(2, '0')}-${fechaActual.getFullYear().toString().slice(-2)}`;
+        const fechaVencimiento = sumarDiasHabiles(fechaActual, 3);
+        const fechaVencimientoFormateada = `${fechaVencimiento.getDate().toString().padStart(2, '0')}-${(fechaVencimiento.getMonth() + 1).toString().padStart(2, '0')}-${fechaVencimiento.getFullYear().toString().slice(-2)}`;    
 
-    // Crear un elemento temporal para renderizar el HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = contenido;
-    document.body.appendChild(tempDiv);
-
-    // Usar html2canvas para capturar el contenido
-    html2canvas(tempDiv, { scale: 2 }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        doc.addImage(imgData, 'PNG', 0, 0, 10, 15);
-        const pdfBlob = doc.output('blob');
-
-        const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
-        NroEnvio.innerHTML = `Logistica Propia`;
-
-        let trackingMessage = ''; // Inicializar la variable
-
-        // Generar el mensaje de seguimiento basado en la logística
+        // Determinar la imagen según el CP
+        let logoSrc = './Img/Meli-Novogar.png';
         if (logBsCps.includes(Number(Cp))) {
-            const diaFormateadoBsAs = diaFormateado; // Usar la variable ya calculada
-            trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
-        
-            Queremos informarte que vamos a visitarte el ${diaFormateadoBsAs}.
-                
-            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
-        
-            Cualquier consulta, estamos a tu servicio. ¡Gracias!
-            
-            Equipo Posventa Novogar
-            
-            ENVIO CON LOGISTICA BUENOS AIRES`;
-
+            logoSrc = './Img/Camion-BsAs-Novogar.png';
         } else if (logStaFeCps.includes(Number(Cp))) {
-            const diaFormateadoStaFe = diaFormateado; // Usar la variable ya calculada
-            trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
-        
-            Queremos informarte que vamos a visitarte el ${diaFormateadoStaFe}.
-        
-            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
-        
-            Cualquier consulta, estamos a tu servicio. ¡Gracias!
-            
-            Equipo Posventa Novogar
-            
-            ENVIO CON LOGISTICA SANTA FE`;
-        } else if (logSanNicolasCps.includes(Number(Cp))) {
-            const diaFormateadoSanNicolas = diaFormateado; // Usar la variable ya calculada
-            trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
-        
-            Queremos informarte que vamos a visitarte el ${diaFormateadoSanNicolas}.
-        
-            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
-        
-            Cualquier consulta, estamos a tu servicio. ¡Gracias!
-            
-            Equipo Posventa Novogar
-            
-            ENVIO CON LOGISTICA SAN NICOLAS`;
+            logoSrc = './Img/Camion-Santa-fe-Novogar.png';
         } else if (logRafaelaCps.includes(Number(Cp))) {
-            const diaFormateadoRafaela = diaFormateado; // Usar la variable ya calculada
-            trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
-        
-            Queremos informarte que vamos a visitarte el ${diaFormateadoRafaela}.
-        
-            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
-        
-            Cualquier consulta, estamos a tu servicio. ¡Gracias!
-            
-            Equipo Posventa Novogar
-            
-            ENVIO CON LOGISTICA RAFAELA`;
-        } else {
-            // Mensaje para otras zonas
-            const diaFormateadoLocal = diaFormateado;
-            trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
-        
-            ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística: ${diaFormateadoLocal}. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
-            
-            DETALLES DE ENTREGA:
-            .Rosario: Entregas en 48 horas.
-            .Villa Gobernador Gálvez, Arroyo Seco, San Lorenzo, Baigorria, Capitán Bermúdez: Lunes, miércoles y viernes.
-            .Funes, Roldán y Pérez: Sábados. (Sin excepción)
-        
-            Estamos a tu servicio.
-        
-            ¡Saludos!
-        
-            Equipo Posventa Novogar`;
+            logoSrc = './Img/Camion-Rafaela-Novogar.png';
+        } else if (logSanNicolasCps.includes(Number(Cp))) {
+            logoSrc = './Img/Camion-SNicolas-Novogar.png';
         }
 
-        const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
-    
-        firebase.database().ref('envios/' + idOperacionSinME1).update({
-            trackingNumber: "Logistica Novogar",
-            trackingLink: "Logistica Novogar",
-            trackingMessage: trackingMessage,
-            transportCompany: "Novogar",
-            cliente: numeroCliente
-        }).then(() => {
-            console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
-        }).catch(error => {
-            console.error('Error al actualizar en Firebase:', error);
-        });    
+        // Contenido HTML
+        let contenido = `
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Etiqueta</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+            <style>
+                body {
+                    margin: 0;
+                    padding: 0;
+                    display: grid;
+                    place-items: center;
+                    height: 100vh;
+                    background-color: #e0e0e0;
+                    font-family: 'Arial', sans-serif;
+                }
+                .etiqueta {
+                    width: 10cm;
+                    margin: 10px;
+                    padding: 12px;
+                    border-radius: 15px;
+                    background-color: #ffffff;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                    display: flex;
+                    border: 2px dashed #9c0000;
+                    flex-direction: column;
+                    align-items: center;
+                }
+                .logo img {
+                    max-width: 250px;
+                    height: auto;
+                    margin-bottom: 5px;
+                }
+                .campo {
+                    font-family: "Roboto", sans-serif;
+                    width: 100%;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 5px;
+                    padding: 5px;
+                    border: 1px solid #9c0000;
+                    background-color: #f1f8ff;
+                    transition: background-color 0.3s;
+                }
+                .campo span {
+                    font-size: 1em;
+                    font-weight: bold;
+                    color: black;
+                }
+                .campo.uppercase {
+                    text-transform: uppercase;
+                }
+                .campo-extra {
+                    font-family: "Roboto", sans-serif;
+                    width: 100%;
+                    border-radius: 10px;
+                    margin-top: 10px;
+                    border: 2px dashed #9c0000;
+                    padding: 10px;
+                    text-align: center;
+                    font-size: 1em;
+                    color: #555;
+                    background-color: #f9f9f9;
+                }
+                .contacto {
+                    margin-top: 15px;
+                    text-align: center;
+                    font-size: 0.9em;
+                    color: #2B2B2BFF;
+                }
+                .contacto p {
+                    margin: 5px 0;
+                }
 
-        // Crear un enlace para abrir el PDF en una nueva ventana
-        const pdfUrl = URL.createObjectURL(pdfBlob);
+                hr {
+                    border: none; 
+                    height: 1px; 
+                    background-color: #2B2B2BFF; 
+                    margin: 5px 0; 
+                    border-radius: 5px;
+}
 
-                setTimeout(() => {
-            spinner2.style.display = "none";
-            // Ocultar el spinner y restaurar el botón
-            spinner.style.display = "none";
-            window.open(pdfUrl, '_blank');
-            button.innerHTML = '<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar';
-            button.classList.remove('btn-secondary');
-            button.classList.add('btn-success');
-            button.disabled = false;
-        }, 2000);
+            </style>
+        </head>
+        <body>
+            <div class="etiqueta">
+                <div class="logo">
+                    <img src="${logoSrc}" alt="Logo">
+                </div>
+                <div class="campo">
+                    <span style="text-transform: uppercase;">${numeroCliente} ${NombreyApellido || recibe}</span>
+                </div>
+                <div class="campo">
+                    <span>${Cp}, ${localidad}, ${provincia}</span>
+                </div>
+                <div class="campo">
+                    <span style="text-transform: uppercase;">${calleDestinatario} ${alturaDestinatario}</span>
+                </div>
+                <div class="campo">
+                    <span>Teléfono: ${telefonoDestinatario}</span>
+                </div>`;
 
-        document.body.removeChild(tempDiv);
-    });
+                
 
-const nombre = NombreyApellido
-const remito = idOperacion.replace(/ME1$/, '');
-const Name = `Confirmación de envio Mercado Libre`;
-const Subject = `Tu compra en Novogar ${remito} ya fue preparada para despacho`;
-const template = "emailTemplateLogPropia";
+        // Agregar información sobre el camión
+        contenido += `<div class="campo"><strong>DIA DE VENCIMIENTO: ${diaFormateado}</strong></div>`;
 
-await sendEmail(Name, Subject, template, nombre, email, remito);
+        const idOperacionsSinMe1 = idOperacion.replace(/ME1$/, '');
 
+        contenido += `
+                <div class="campo-extra">
+                    <p><strong>Operación: ${idOperacionsSinMe1}</strong></p>
+                </div>
+                <div class="campo-extra">
+                    <img src="${barcodeBase64}" alt="Código de Barras" />
+                </div>
+                <div class="contacto">
+                    <hr>
+                    <p><strong>💬 Posventa:</strong> (0341) 6680658 (WhatsApp)</p>
+                    <p><strong>📧 Email:</strong> posventa@novogar.com.ar</p>
+                </div>
+            </div>
+        </body>
+        </html>`;
+
+        // Crear un elemento temporal para renderizar el HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = contenido;
+        document.body.appendChild(tempDiv);
+
+        // Usar html2canvas para capturar el contenido
+        html2canvas(tempDiv, { scale: 2 }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            doc.addImage(imgData, 'PNG', 0, 0, 10, 15);
+            const pdfBlob = doc.output('blob');
+
+            const NroEnvio = document.getElementById(`numeroDeEnvioGenerado${id}`);
+            NroEnvio.innerHTML = `Logistica Propia`;
+
+            let trackingMessage = ''; // Inicializar la variable
+
+            // Generar el mensaje de seguimiento basado en la logística
+            if (logBsCps.includes(Number(Cp))) {
+                trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
+                Queremos informarte que vamos a visitarte el ${diaFormateado}.
+                Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+                Cualquier consulta, estamos a tu servicio. ¡Gracias!
+                Equipo Posventa Novogar
+                ENVIO CON LOGISTICA BUENOS AIRES`;
+            } else if (logStaFeCps.includes(Number(Cp))) {
+                trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
+                Queremos informarte que vamos a visitarte el ${diaFormateado}.
+                Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+                Cualquier consulta, estamos a tu servicio. ¡Gracias!
+                Equipo Posventa Novogar
+                ENVIO CON LOGISTICA SANTA FE`;
+            } else if (logSanNicolasCps.includes(Number(Cp))) {
+                trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
+                Queremos informarte que vamos a visitarte el ${diaFormateado}.
+                Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+                Cualquier consulta, estamos a tu servicio. ¡Gracias!
+                Equipo Posventa Novogar
+                ENVIO CON LOGISTICA SAN NICOLAS`;
+            } else if (logRafaelaCps.includes(Number(Cp))) {
+                trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
+                Queremos informarte que vamos a visitarte el ${diaFormateado}.
+                Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+                Cualquier consulta, estamos a tu servicio. ¡Gracias!
+                Equipo Posventa Novogar
+                ENVIO CON LOGISTICA RAFAELA`;
+            } else {
+                // Mensaje para otras zonas
+                trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
+                ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística: ${diaFormateado}. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
+                Estamos a tu servicio.
+                ¡Saludos!
+                Equipo Posventa Novogar`;
+            }
+
+            const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
+
+            // Actualizar en Firebase
+            firebase.database().ref('envios/' + idOperacionSinME1).update({
+                trackingNumber: "Logistica Novogar",
+                trackingLink: "Logistica Novogar",
+                trackingMessage: trackingMessage,
+                transportCompany: "Novogar",
+                cliente: numeroCliente,
+                remito: numeroRemito
+            }).then(() => {
+                console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
+            }).catch(error => {
+                console.error('Error al actualizar en Firebase:', error);
+            });
+
+            // Crear un enlace para abrir el PDF en una nueva ventana
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+
+            setTimeout(() => {
+                spinner2.style.display = "none";
+                // Ocultar el spinner y restaurar el botón
+                spinner.style.display = "none";
+                window.open(pdfUrl, '_blank');
+                button.innerHTML = '<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar';
+                button.classList.remove('btn-secondary');
+                button.classList.add('btn-success');
+                button.disabled = false;
+            }, 2000);
+
+            document.body.removeChild(tempDiv);
+        });
+
+    }; // Fin de reader.onloadend
+
+    // Leer el blob como Data URL
+    reader.readAsDataURL(blob);
+
+    const nombre = NombreyApellido;
+    const remito = idOperacion.replace(/ME1$/, '');
+    const Name = `Confirmación de envio Mercado Libre`;
+    const Subject = `Tu compra en Novogar ${remito} ya fue preparada para despacho`;
+    const template = "emailTemplateLogPropia";
+
+    await sendEmail(Name, Subject, template, nombre, email, remito);
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
 

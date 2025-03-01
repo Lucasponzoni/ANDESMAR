@@ -781,7 +781,7 @@ async function solicitarCliente() {
         title: '¿Cuál es el número de cliente?',
         html: `
             <div class="input-container">
-                <input id="numeroCliente" class="swal2-input" placeholder="Número de Cliente 🧑🏻‍💻" maxlength="8" required>
+                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
                 <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
             </div>
         `,
