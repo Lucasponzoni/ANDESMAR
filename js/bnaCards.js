@@ -1624,8 +1624,6 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
         <option value="bulto50">Bulto Pequeño 50x50</option>
     `}
 </select>
-
-                    
         
                             <div class="medidas ${isMacro(storeCode) ? 'hidden' : ''}"></div> <!-- Div para las medidas -->
 
