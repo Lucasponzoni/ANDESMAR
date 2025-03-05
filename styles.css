@@ -4252,6 +4252,7 @@ td.value-cell:hover::after {
 }
 
 .ios-fact{
+    color: white;
     font-size: 25px !important;
 }
 
