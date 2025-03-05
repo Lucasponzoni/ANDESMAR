@@ -428,6 +428,8 @@ function loadEnviosFromFirebase() {
                         trackingNumber: data.trackingNumber,
                         precio_venta: data.precio_venta,
                         cliente: data.cliente,
+                        total_con_tasas_2: data.total_con_tasas_2,
+                        precio_producto: data.precio_producto,
                         suborden_total: data.suborden_total,
                         suborden_: data.suborden_,
                         numeros_tarjeta: data.numeros_tarjeta,
@@ -708,7 +710,7 @@ const cpsCDS = [
         const cupon = ordenPublica.substring(0, 13); 
         const autorizacion = ordenPublica.substring(ordenPublica.length - 4); 
 
-        const precioVenta = parseFloat(data[i].precio_venta);
+        const precioVenta = parseFloat(data[i].precio_producto);
         const cantidad = parseFloat(data[i].cantidad);
         const montoCobrado = parseFloat(data[i].monto_cobrado);
         const equivalencia_puntos_pesos = parseFloat(data[i].equivalencia_puntos_pesos);
@@ -913,7 +915,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
             </div>
             <div class="col">
                 <label for="precio_item_${data[i].id}">Precio Item:</label>
-                <input type="text" id="precio_item_${data[i].id}" value="${data[i].precio_venta}" disabled>
+                <input type="text" id="precio_item_${data[i].id}" value="${data[i].precio_producto}" disabled>
             </div>
         </div>
         <div class="row mb-2">
@@ -1430,23 +1432,25 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                     <p class="card-text-pago"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
                                     
 
-<p class="card-text-pago">
-    <strong>Precio de Venta:</strong> $ ${(data[i].precio_venta * data[i].cantidad).toFixed(2)}
-    <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].precio_venta * data[i].cantidad).toFixed(2)}')">
-        <i class="bi bi-clipboard"></i>
-    </button>
-</p>
+                      <p class="card-text-pago">
+                          <strong>Precio de Venta:</strong> $ ${(data[i].precio_venta * data[i].cantidad).toFixed(2)}
+                          <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].precio_venta * data[i].cantidad).toFixed(2)}')">
+                              <i class="bi bi-clipboard"></i>
+                          </button>
+                      </p>
 
                        <p class="card-text-pago">
                            <strong>Cantidad:</strong> <strong class="strong-costo2">${data[i].cantidad} U.</strong>
                        </p>
                        
                        <p class="card-text-pago">
-                           <strong>Valor por producto:</strong> <strong class="strong-costo">$ ${data[i].precio_venta}</strong>
-                           <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta}')">
-                               <i class="bi bi-clipboard"></i>
-                           </button>
-                       </p>
+                            <strong>Valor por producto:</strong> 
+                            <strong class="strong-costo">$ ${data[i].precio_venta === "0.0" ? (data[i].precio_producto) : data[i].precio_venta}</strong>
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta === "0.0" ? (data[i].precio_producto * data[i].cantidad) : data[i].precio_venta}')">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </p>
+
 
                        <p class="card-text-pago">
                         <strong>Costo de Envío:</strong> <strong class="strong-costo">$${data[i].monto_cobrado}</strong>
@@ -1456,9 +1460,9 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         </p>
 
 
-<p class="card-text-pago">
-    <strong>Total:</strong> ${new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(total)}
-</p>
+                        <p class="card-text-pago">
+                            <strong>Total:</strong> ${new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(total)}
+                        </p>
 
                             <!-- Contenedor gris con CUPON y AUTORIZACION -->
                             <div class="contenedor-pago bg-light p-3 mb-2 rounded" style="border-bottom: solid 2px #dc3545;">
