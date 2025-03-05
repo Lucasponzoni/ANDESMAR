@@ -920,7 +920,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
         </div>
         <div class="row mb-2">
             <div class="col">
-                <label for="descuentos_${data[i].id}">Descuentos (Puntos BNA):</label>
+                <label for="descuentos_${data[i].id}">Descuentos (Puntos):</label>
                 <input type="text" id="descuentos_${data[i].id}" value="${puntosBna}" disabled>
             </div>
             <div class="col">
