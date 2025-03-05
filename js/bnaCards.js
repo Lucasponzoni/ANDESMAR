@@ -5187,10 +5187,10 @@ async function verificarMensajes() {
 
 async function enviarNotificacionSlack(ordenes, totalErrores) {
     const mensaje = `
-    :warning: *Errores en Facturación* :warning: 
+    🟡 *Errores en Facturación* 🟡 
     ${ordenes.join(', ')} 
     Total de errores: *${totalErrores}* 
-    🟡 Notificado en *LogiPaq* 🟡.
+    Notificado en *LogiPaq*.
     `;
 
     const payload = {
