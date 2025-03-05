@@ -1445,8 +1445,8 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                        
                        <p class="card-text-pago">
                             <strong>Valor por producto:</strong> 
-                            <strong class="strong-costo">$ ${data[i].precio_venta === "0.0" ? (data[i].precio_producto) : data[i].precio_venta}</strong>
-                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta === "0.0" ? (data[i].precio_producto * data[i].cantidad) : data[i].precio_venta}')">
+                            <strong class="strong-costo">$ ${data[i].precio_producto}</strong>
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_producto}')">
                                 <i class="bi bi-clipboard"></i>
                             </button>
                         </p>
