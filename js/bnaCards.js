@@ -810,7 +810,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="metodo_pago_${data[i].id}">Método de Pago:</label>
-                                <input type="text" id="metodo_pago_${data[i].id}" value="BNA TIENDA BANCO NACION" disabled>
+                                <input type="text" id="metodo_pago_${data[i].id}" value="${isMacro(storeCode) ? 'TIENDA BANCO MACRO' : 'BNA TIENDA BANCO NACION'}" disabled>
                             </div>
                             <div class="col">
                                 <label for="numero_lote_${data[i].id}">Número de Lote:</label>
@@ -843,15 +843,17 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 <input type="text" id="cuotas_${data[i].id}" value="${data[i].cuotas}" disabled>
                             </div>
                             <div class="col">
-                                <label for="banco_${data[i].id}">Banco:</label>
-                                <input type="text" id="banco_${data[i].id}" value="BANCO NACION" disabled>
-                            </div>
+                        <label for="banco_${data[i].id}">Banco:</label>
+                                <input type="text" id="banco_${data[i].id}" value="${isMacro(storeCode) ? 'BANCO MACRO' : 'BANCO NACION'}" disabled>
+                        </div>
+
                         </div>
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="tipo_entrega_${data[i].id}">Tipo de Entrega:</label>
-                                <input type="text" id="tipo_entrega_${data[i].id}" value="33" disabled>
+                                <input type="text" id="tipo_entrega_${data[i].id}" value="${isMacro(storeCode) ? '41' : '33'}" disabled>
                             </div>
+
                             <div class="col">
                                 <label for="deposito_${data[i].id}">Depósito:</label>
                                 <input type="text" id="deposito_${data[i].id}" value="9" disabled>
@@ -887,7 +889,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
         <div class="row mb-2">
             <div class="col">
                 <label for="codigo_promocion_${data[i].id}">Código Promoción:</label>
-                <input type="text" id="codigo_promocion_${data[i].id}" value="5000" disabled>
+                <input type="text" id="codigo_promocion_${data[i].id}" value="${isMacro(storeCode) ? '5001' : '5000'}" disabled>
             </div>
             <div class="col">
                 <label for="codigo_item_${data[i].id}">Código Item:</label>
@@ -2541,7 +2543,7 @@ const monto_envio = document.getElementById(`monto_envio_${id}`)?.value || '0';
 
 // Enviar notificación a Slack
 const mensajeSlack = {
-    text: `➡️📄 Estoy procesando la factura de la Orden *${codigo_pago}* 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n${mensajeTipo} 🎉`
+    text: `➡️📄 Estoy procesando la factura de la Orden *${codigo_pago}* 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n ${mensajeTipo} 🎉 \n\n`
 };
 
 fetch(`${corsh}${HookTv}`, {
