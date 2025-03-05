@@ -282,41 +282,41 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body modal-meli">
                 <textarea id="comentarioInput" class="form-control" placeholder="Escribe tu comentario aquí..." rows="3" style="resize: none;"></textarea>
                 
                         <!-- Input de Email -->
                         <div class="input-group mt-3">
-                            <span class="input-group-text"><i class="ios-fact bi bi-envelope-fill"></i></span>
+                            <span class="input-group-text"><i class="ios-fact bi bi-envelope-fill mr-1"></i> Email</span>
                             <input type="email" class="form-control" placeholder="Actualizar email" aria-label="Email">
                             <button id="guardarEmailBtn" class="btn btn-primary-2" type="button">Guardar</button>
                         </div>
 
                         <!-- Input de Teléfono -->
                         <div class="input-group mt-3">
-                            <span class="input-group-text"><i class="ios-fact bi bi-telephone-fill"></i></span>
+                            <span class="input-group-text"><i class="ios-fact bi bi-telephone-fill mr-1"></i> Telefono</span>
                             <input type="tel" class="form-control" placeholder="Actualizar teléfono" aria-label="Teléfono">
                             <button id="guardarTelefonoBtn" class="btn btn-primary-2" type="button">Guardar</button>
                         </div>
 
-                        <!-- Input de Calle -->
+                       <!-- Input de Calle -->
                         <div class="input-group mt-3">
-                            <span class="input-group-text"><i class="ios-fact bi bi-house-fill"></i></span>
-                            <input type="text" class="form-control" placeholder="Calle" aria-label="Calle">
+                            <span class="input-group-text"><i class="ios-fact bi bi-house-fill mr-1"></i> Calle</span>
+                            <input type="text" id="calleInput" class="form-control" placeholder="Calle" aria-label="Calle">
                             <button id="guardarCalleBtn" class="btn btn-primary-2" type="button">Guardar</button>
                         </div>
 
                         <!-- Input de Altura -->
                         <div class="input-group mt-3">
-                            <span class="input-group-text"><i class="ios-fact bi bi-geo-alt-fill"></i></span>
-                                                   <input type="text" class="form-control" placeholder="Altura" aria-label="Altura">
+                            <span class="input-group-text"><i class="ios-fact bi bi-geo-alt-fill mr-1"></i> Altura</span>
+                            <input type="text" id="alturaInput" class="form-control" placeholder="Altura" aria-label="Altura">
                             <button id="guardarAlturaBtn" class="btn btn-primary-2" type="button">Guardar</button>
                         </div>
 
                         <!-- Input de Observaciones -->
                         <div class="input-group mt-3">
-                            <span class="input-group-text"><i class="ios-fact bi bi-pencil-fill"></i></span>
-                            <textarea class="form-control" placeholder="Observaciones" aria-label="Observaciones"></textarea>
+                            <span class="input-group-text"><i class="bi bi-journal-text mr-1"></i> Observaciones</span>
+                            <textarea id="observacionesInput" class="form-control" placeholder="Observaciones" aria-label="Observaciones"></textarea>
                             <button id="guardarObservacionesBtn" class="btn btn-primary-2" type="button">Guardar</button>
                         </div>
 
@@ -328,8 +328,12 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="guardarComentarioBtn">Guardar Comentario</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle mr-1"></i>Cerrar
+                </button>
+                <button type="button" class="btn btn-primary" id="guardarComentarioBtn">
+                    <i class="bi bi-save mr-1"></i>Guardar Comentario
+                </button>
             </div>
         </div>
     </div>

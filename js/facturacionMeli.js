@@ -789,6 +789,9 @@ commentButton.onclick = () => {
             document.getElementById('comentarioInput').value = data.comentario || '';
             document.querySelector('input[type="email"]').value = data.email || '';
             document.querySelector('input[type="tel"]').value = data.Telefono || '';
+            document.getElementById('calleInput').value = data.Calle || '';
+            document.getElementById('alturaInput').value = data.Altura || '';
+            document.getElementById('observacionesInput').value = data.Observaciones || '';
 
             // Cambiar el estado del botón según los datos
             if (data.email) {
@@ -808,9 +811,13 @@ commentButton.onclick = () => {
                 actualizarEstadoDespacho(false);
             }
         } else {
+            // Limpiar campos si no existe
             document.getElementById('comentarioInput').value = '';
             document.querySelector('input[type="email"]').value = '';
             document.querySelector('input[type="tel"]').value = '';
+            document.getElementById('calleInput').value = '';
+            document.getElementById('alturaInput').value = '';
+            document.getElementById('observacionesInput').value = '';
             actualizarEstadoDespacho(false);
             commentButton.classList.remove('btn-warning', 'btn-success');
             commentButton.classList.add('btn-secondary');
@@ -819,13 +826,14 @@ commentButton.onclick = () => {
 
     $('#comentarioModal').modal('show');
 
+    // Guardar Comentario
     document.getElementById('guardarComentarioBtn').onclick = function() {
         const comentario = document.getElementById('comentarioInput').value;
         db.ref('envios').child(operation.idOperacion).update({ comentario: comentario })
             .then(() => {
                 Swal.fire('¡Éxito!', 'Comentario actualizado correctamente.', 'success');
                 $('#comentarioModal').modal('hide');
-                loadTable(data); // Asegúrate de pasar los datos correctos aquí.
+                loadTable(data);
                 commentButton.classList.remove('btn-secondary', 'btn-warning');
                 commentButton.classList.add('btn-success');
             })
@@ -834,12 +842,12 @@ commentButton.onclick = () => {
             });
     };
 
+    // Guardar Email
     document.getElementById('guardarEmailBtn').onclick = function() {
         const email = document.querySelector('input[type="email"]').value;
         db.ref('envios').child(operation.idOperacion).update({ email: email })
             .then(() => {
                 mostrarAlertaExito('Email actualizado correctamente.');
-                // Cambiar el estado del botón después de actualizar el email
                 commentButton.classList.remove('btn-secondary', 'btn-success');
                 commentButton.classList.add('btn-warning');
             })
@@ -848,6 +856,7 @@ commentButton.onclick = () => {
             });
     };
 
+    // Guardar Teléfono
     document.getElementById('guardarTelefonoBtn').onclick = function() {
         const telefono = document.querySelector('input[type="tel"]').value;
         db.ref('envios').child(operation.idOperacion).update({ Telefono: telefono })
@@ -858,8 +867,45 @@ commentButton.onclick = () => {
                 Swal.fire('Error', 'No se pudo actualizar el teléfono: ' + error.message, 'error');
             });
     };
+
+    // Guardar Calle
+    document.getElementById('guardarCalleBtn').onclick = function() {
+        const calle = document.getElementById('calleInput').value;
+        db.ref('envios').child(operation.idOperacion).update({ Calle: calle })
+            .then(() => {
+                mostrarAlertaExito('Calle actualizada correctamente.');
+            })
+            .catch(error => {
+                Swal.fire('Error', 'No se pudo actualizar la calle: ' + error.message, 'error');
+            });
+    };
+
+    // Guardar Altura
+    document.getElementById('guardarAlturaBtn').onclick = function() {
+        const altura = document.getElementById('alturaInput').value;
+        db.ref('envios').child(operation.idOperacion).update({ Altura: altura })
+            .then(() => {
+                mostrarAlertaExito('Altura actualizada correctamente.');
+            })
+            .catch(error => {
+                Swal.fire('Error', 'No se pudo actualizar la altura: ' + error.message, 'error');
+            });
+    };
+
+    // Guardar Observaciones
+    document.getElementById('guardarObservacionesBtn').onclick = function() {
+        const observaciones = document.getElementById('observacionesInput').value;
+        db.ref('envios').child(operation.idOperacion).update({ Observaciones: observaciones })
+            .then(() => {
+                mostrarAlertaExito('Observaciones actualizadas correctamente.');
+            })
+            .catch(error => {
+                Swal.fire('Error', 'No se pudo actualizar las observaciones: ' + error.message, 'error');
+            });
+    };
 };
-          });
+
+});
     
             // Paginación y actualización de notificaciones
             updatePagination();

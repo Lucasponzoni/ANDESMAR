@@ -6463,3 +6463,20 @@ img.gray-filter {
     justify-content: center;
     align-items: center;
 }
+
+.modal-meli .input-group-text{
+    padding: 2px;
+    background-color: #1e90ff;
+}
+
+.modal-meli .input-group .input-group-text i{
+    font-size: 1rem !important;
+}
+
+.modal-meli .input-group{
+    border-radius: 8px;
+}
+
+#comentarioInput{
+    border-radius: 10px !important;
+}
