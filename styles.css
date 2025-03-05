@@ -4815,6 +4815,9 @@ input[disabled] {
 }
 
 .counter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: fit-content;
     font-weight: 600;
     background-color: #007aff; 
