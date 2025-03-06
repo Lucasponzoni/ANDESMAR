@@ -421,7 +421,9 @@ function loadEnviosFromFirebase() {
                         observaciones: data.observaciones,
                         orden_publica_: data.orden_publica_,
                         brand_name: capitalizeWords(data.brand_name),
+                        marca_de_tarjeta: capitalizeWords(data.marca_de_tarjeta),
                         cuotas: data.cuotas,
+                        nro_de_cuotas: data.nro_de_cuotas,
                         envio: data.medio_de_envio,
                         numeroSeguimiento: data.numero_de_seguimiento,
                         cotizacion: data.cotizacion,
@@ -450,13 +452,18 @@ function loadEnviosFromFirebase() {
                         cuit: data.cuit,
                         marcaEntregado: data.marcaEntregado,
                         marcaPreparado: data.marcaPreparado,
+                        direccion: capitalizeWords(data.direccion.replace(/"/g, '').replace(/:\s*-?\s*/i, '')),
                         direccion_facturacion: capitalizeWords(data.direccion_facturacion ? data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '') : ''),
                         ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
+                        ciudad_factura: capitalizeWords(data.ciudad_factura),
                         dni: data.dni,
+                        nombre_factura: capitalizeWords(data.nombre_factura),
                         estadoEnvio: data.estado_del_envio,
                         codigo_postal_facturacion: data.codigo_postal_facturacion,
+                        codigo_postal_factura: data.codigo_postal_factura,
                         otros_comentarios_entrega: data.otros_comentarios_entrega,
                         iva: data.condicion_iva,
+                        iva2: data.iva,
                         equivalencia_puntos_pesos: data.equivalencia_puntos_pesos || data['equivalencia_puntos_-_pesos'],
                         nombre_completo_envio: capitalizeWords(data.nombre_completo_envio),
                         monto_cobrado: data.monto_cobrado
@@ -842,7 +849,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="cuotas_${data[i].id}">Cuotas:</label>
-                                <input type="text" id="cuotas_${data[i].id}" value="${data[i].cuotas}" disabled>
+                                <input type="text" id="cuotas_${data[i].id}" value="${(data[i].cuotas && data[i].cuotas !== '0') ? data[i].cuotas : data[i].nro_de_cuotas}" disabled>
                             </div>
                             <div class="col">
                         <label for="banco_${data[i].id}">Banco:</label>
@@ -925,7 +932,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
             </div>
             <div class="col">
                 <label for="iva_${data[i].id}">IVA:</label>
-                <input type="text" id="iva_${data[i].id}" value="" disabled>
+                <input type="text" id="iva_${data[i].id}" value="${data[i].iva2}" disabled>
             </div>
         </div>
         <div class="row align-items-center mb-2">
@@ -1022,12 +1029,12 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="dni_${data[i].id}">DNI:</label>
-                                <input type="text" id="dni_${data[i].id}" value="${data[i].cuit}" disabled>
+                                <input type="text" id="dni_${data[i].id}" value="${(data[i].cuit && data[i].cuit !== '0') ? data[i].cuit : data[i].dni}" disabled>
                             </div>
                             <div class="col">
                                 <label for="telefono_${data[i].id}">Teléfono:</label>
-                                <input type="text" id="telefono_${data[i].id}" value="${data[i].telefono_facturacion}" disabled>
-                            </div>
+                                <input type="text" id="telefono_${data[i].id}" value="${(data[i].telefono_facturacion && data[i].telefono_facturacion !== '0') ? data[i].telefono_facturacion : data[i].telefono}" disabled>
+                            </div> 
                         </div>
                         <div class="row mb-2">
                             <div class="col">
@@ -1056,11 +1063,11 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="localidad_${data[i].id}">Localidad:</label>
-                                <input type="text" id="localidad_${data[i].id}" value="${data[i].ciudad_facturacion}" disabled>
-                            </div>
+                                <input type="text" id="localidad_${data[i].id}" value="${(data[i].ciudad_facturacion && data[i].ciudad_facturacion !== '0') ? data[i].ciudad_facturacion : data[i].ciudad_factura}" disabled>
+                            </div> 
                             <div class="col">
                                 <label for="codigo_postal_${data[i].id}">Código Postal:</label>
-                                <input type="text" id="codigo_postal_${data[i].id}" value="${data[i].codigo_postal_facturacion}" disabled>
+                                <input type="text" id="codigo_postal_${data[i].id}" value="${(data[i].codigo_postal_facturacion && data[i].codigo_postal_facturacion !== '0') ? data[i].codigo_postal_facturacion : data[i].codigo_postal_factura}" disabled>
                             </div>
                         </div>
                         <div class="row mb-2">
@@ -1386,32 +1393,32 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             </p>
 
                             <p class="card-text-facturacion">
-                                <strong>Nombre / Razon social:</strong> ${data[i].razon_social}
+                                <strong>Nombre / Razon social:</strong> ${(data[i].razon_social && data[i].razon_social !== '0') ? data[i].razon_social : data[i].nombre_factura}
                                 <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].razon_social}')">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                             </p>
                             <p class="card-text-facturacion">
-                                <strong>D.N.I. / CUIT:</strong> ${data[i].cuit}
-                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].cuit}')">
+                                <strong>D.N.I. / CUIT:</strong> ${(data[i].cuit && data[i].cuit !== '0') ? data[i].cuit : data[i].dni}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].cuit && data[i].cuit !== '0') ? data[i].cuit : data[i].dni}')">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                             </p>
                             <p class="card-text-facturacion">
-                                <strong>Direccion:</strong> ${data[i].direccion_facturacion}
-                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].direccion_facturacion}')">
+                                <strong>Direccion:</strong> ${(data[i].direccion_facturacion && data[i].direccion_facturacion !== '0') ? data[i].direccion_facturacion : data[i].direccion}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].direccion_facturacion && data[i].direccion_facturacion !== '0') ? data[i].direccion_facturacion : data[i].direccion}')">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                             </p>
                             <p class="card-text-facturacion">
-                                <strong>Localidad:</strong> ${data[i].ciudad_facturacion}
-                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].ciudad_facturacion}')">
+                                <strong>Localidad:</strong> ${(data[i].ciudad_facturacion && data[i].ciudad_facturacion !== '0') ? data[i].ciudad_facturacion : data[i].ciudad_factura}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].ciudad_facturacion && data[i].ciudad_facturacion !== '0') ? data[i].ciudad_facturacion : data[i].ciudad_factura}')">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                             </p>
                             <p class="card-text-facturacion">
-                                <strong>CP:</strong> ${data[i].codigo_postal_facturacion}
-                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].codigo_postal_facturacion}')">
+                                <strong>CP:</strong> ${(data[i].codigo_postal_facturacion && data[i].codigo_postal_facturacion !== '0') ? data[i].codigo_postal_facturacion : data[i].codigo_postal_factura}
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].codigo_postal_facturacion && data[i].codigo_postal_facturacion !== '0') ? data[i].codigo_postal_facturacion : data[i].codigo_postal_factura}')">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                             </p>
@@ -1427,8 +1434,8 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             <!-- Contenido del colapso -->
                             <div class="collapse" id="collapseDetallePago-${data[i].id}">
                                 <div class="pago p-2 mt-2 mb-2"">
-                                    <p class="card-text-pago"><strong>Entidad:</strong> ${data[i].brand_name || 'N/A'}</p>
-                                    <p class="card-text-pago"><strong>Cuotas:</strong> ${data[i].cuotas || 'N/A'}</p>
+                                    <p class="card-text-pago"><strong>Entidad:</strong> ${(data[i].brand_name && data[i].brand_name !== '0') ? data[i].brand_name : data[i].marca_de_tarjeta || 'N/A'}</p>
+                                    <p class="card-text-pago"><strong>Cuotas:</strong> ${(data[i].cuotas && data[i].cuotas !== '0') ? data[i].cuotas : data[i].nro_de_cuotas || 'N/A'}</p>
                                     <p class="card-text-pago"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
                                     
 
