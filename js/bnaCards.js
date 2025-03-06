@@ -2544,13 +2544,14 @@ if (dni && dni !== "") { // Verifica si DNI tiene datos
 
 const codigo_pago = document.getElementById(`codigo_pago_${id}`)?.value || 'Código no disponible';
 const cantidad_item = document.getElementById(`cantidad_item_${id}`)?.value || '0';
+const metodo_pago_TV = document.getElementById(`metodo_pago_${id}`)?.value || 'SIN DATO DE LA TIENDA';
 const codigo_item = document.getElementById(`codigo_item_${id}`)?.value || 'Código no disponible';
 const precio_item = document.getElementById(`precio_item_${id}`)?.value || '0';
 const monto_envio = document.getElementById(`monto_envio_${id}`)?.value || '0';
 
 // Enviar notificación a Slack
 const mensajeSlack = {
-    text: `➡️📄 Estoy procesando la factura de la Orden *${codigo_pago}* 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n ${mensajeTipo} 🎉 \n\n`
+    text: `\n\n➡️📄 Estoy procesando la factura de la Orden *${codigo_pago}* de *${metodo_pago_TV}*\n\n 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n ${mensajeTipo} 🎉 \n\n`
 };
 
 fetch(`${corsh}${HookTv}`, {
