@@ -6480,3 +6480,26 @@ img.gray-filter {
 #comentarioInput{
     border-radius: 10px !important;
 }
+
+.import-spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo difuminado */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Asegúrate de que esté por encima de otros elementos */
+}
+
+.import-spinner-container {
+    text-align: center;
+}
+
+.import-spinner-progress {
+    margin-top: 10px;
+    color: white;
+    font-size: 24px;
+}

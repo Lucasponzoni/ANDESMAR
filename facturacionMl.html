@@ -116,9 +116,14 @@
                         <option value="pasado_a_web">Pasado a Web</option>
                     </select>
                 </div> 
+
+                <!-- Botón para abrir el modal de importación -->
+                <button id="btnImportar" class="btn btn-success" data-toggle="modal" data-target="#importModal">
+                    <i class="bi bi-file-earmark-plus-fill" style="font-size: 20px;"></i>
+                </button>
                 
                 <button class="btn btn-primary position-relative" data-toggle="modal" data-target="#inputModal">
-                    <i class="bi bi-shop"></i>
+                    <i class="bi bi-bag-check-fill" style="font-size: 20px;"></i>
                     <span id="badgeAnalizar" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
                         <i class="fas fa-spinner fa-spin"></i>
                         <span class="visually-hidden">Notificaciones</span>
@@ -128,7 +133,7 @@
             
                 <!-- Botón para aplicar el filtro "Pendientes" -->
                 <button id="btnNotificaciones" class="position-relative d-flex justify-content-center align-items-center bg-info text-white p-2 rounded" style="white-space: nowrap; border: none; cursor: pointer;">
-                    Pendientes <i class="bi bi-bell" style="margin-left: 5px;"></i>
+                    <i class="bi bi-bell-fill" style="font-size: 20px;"></i>
                     <span id="contadorNotificaciones" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
                         <i class="fas fa-spinner fa-spin"></i>
                         <span class="visually-hidden"></span>
@@ -137,7 +142,7 @@
 
                 <!-- Botón para aplicar el filtro "No Pasa" -->
                 <button id="btnNotificaciones3" class="position-relative d-flex justify-content-center align-items-center bg-secondary text-white p-2 rounded" style="white-space: nowrap; border: none; cursor: pointer;">
-                    No Pasan <i class="bi bi-bell" style="margin-left: 5px;"></i>
+                    <i class="bi bi-bell-slash-fill" style="font-size: 20px;"></i>
                     <span id="contadorNotificaciones3" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
                         <i class="fas fa-spinner fa-spin"></i>
                         <span class="visually-hidden"></span>
@@ -233,6 +238,34 @@
         </table>
     </div>
 
+<!-- Modal de Importación -->
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document"> <!-- Modal más ancho -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Importar Archivo XLS</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 col-md-10 col-sm-12"> <!-- Aumentar el ancho -->
+                        <div class="input-group">
+                            <input type="file" id="fileInput" accept=".xls,.xlsx" class="form-control">
+                            <div class="input-group-append">
+                                <button id="importButton" class="btn btn-primary">
+                                    <i class="bi bi-filetype-xls"></i> Importar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Fotografias SKU -->
 <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -272,7 +305,15 @@
         <div id="spinner2" class="spinner-container" style="display:none;">
             <div class="spinner"></div>
         </div>
-        
+
+        <!-- Spinner centrado con fondo difuminado -->
+        <div id="spinnerOverlay" class="import-spinner-overlay" style="display:none;">
+            <div class="import-spinner-container">
+                <img id="spinnerImage" src="./Img/etiqueta-animada.gif" alt="Cargando...">
+                <div id="spinnerProgress" class="import-spinner-progress">0%</div>
+            </div>
+        </div>
+     
 <!-- Modal Comentario -->
 <div class="modal fade" id="comentarioModal" tabindex="-1" aria-labelledby="comentarioModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -461,6 +502,7 @@
         <!-- SweetAlert JS -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     
         <!-- Cargar dompurify -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.4/purify.min.js"></script>

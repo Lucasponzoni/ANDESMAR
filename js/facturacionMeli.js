@@ -1307,6 +1307,113 @@ document.getElementById('btnNotificaciones3').addEventListener('click', function
     document.getElementById('pagination').classList.add('hidden'); // Ocultar paginación
 });
 
+document.getElementById('importButton').addEventListener('click', function() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert('Por favor, selecciona un archivo.');
+        return;
+    }
+
+    // Mostrar el spinner
+    document.getElementById('spinnerOverlay').style.display = 'flex';
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+        const headers = rows[0];
+
+        let totalRows = rows.length - 1; // Sin contar la cabecera
+        let processedRows = 0;
+        let newDataCount = 0;
+
+        const importPromises = rows.slice(1).map(row => {
+            const cuit = row[headers.indexOf('cuit')];
+            const numero = row[headers.indexOf('numero')];
+            const dataObject = {};
+
+            headers.forEach((header, index) => {
+                if (header !== 'cuit' && header !== 'numero') {
+                    dataObject[header] = row[index];
+                }
+            });
+
+            const cuitRef = db.ref(`IVA/${cuit}`);
+            return cuitRef.child(numero).once('value').then(snapshot => {
+                if (!snapshot.exists()) {
+                    // Si no existe, se puede importar
+                    return cuitRef.child(numero).set(dataObject)
+                        .then(() => {
+                            processedRows++;
+                            newDataCount++;
+                            const progress = Math.round((processedRows / totalRows) * 100);
+                            document.getElementById('spinnerProgress').innerText = `${progress}%`;
+                        });
+                } else {
+                    // Si el número ya existe, se omite
+                    processedRows++;
+                    return Promise.resolve();
+                }
+            });
+        });
+
+        // Esperar a que todas las promesas se resuelvan
+        Promise.all(importPromises).then(() => {
+            // Ocultar el spinner
+            document.getElementById('spinnerOverlay').style.display = 'none';
+
+            // Mostrar mensaje de éxito
+            if (newDataCount > 0) {
+                Swal.fire({
+                    title: 'Confirmación de Importación',
+                    html: `<style>
+                              .swal-message {
+                                  text-align: center;
+                                  font-size: 18px;
+                              }
+            
+                              .counter.imported {
+                                  font-weight: bold; 
+                                  font-size: 24px;
+                                  color: white; 
+                                  background-color: #007bff; 
+                                  padding: 10px 20px; 
+                                  border-radius: 5px; 
+                                  margin-bottom: 5px;
+                                  display: inline-block; 
+                              }
+                           </style>
+                           <div class="swal-message">
+                              <span class="counter imported">${newDataCount}</span>
+                              <br>Se han importado nuevos datos de IVA.
+                           </div>`,
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonText: 'Aceptar',
+                    cancelButtonText: 'Cancelar'
+                });
+            } else {
+                Swal.fire({
+                    title: 'No hay nuevos datos',
+                    text: 'No se encontraron nuevos datos para importar.',
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+            }                    
+        }).catch(error => {
+            console.error('Error al subir datos:', error);
+            document.getElementById('spinnerOverlay').style.display = 'none'; // Asegurarse de ocultar el spinner en caso de error
+        });
+    };
+
+    reader.readAsArrayBuffer(file); // Leer como ArrayBuffer para XLS
+});
+
 /*
 // NOTIFICADOR DE COMENTARIO EN FACTURACION
 document.addEventListener("DOMContentLoaded", function() {
