@@ -2455,7 +2455,7 @@ const isSkuIncluded = skusList.includes(skuValue) || skusList.includes(codigoIte
 const datos = {
     order_id: document.getElementById(`order_id_${id}`)?.value || '',
     estado: 'Aprobado',
-    metodo_pago: document.getElementById(`metodo_pago_${data[i].id}`)?.value || '',
+    metodo_pago: document.getElementById(`metodo_pago_${id}`)?.value || '',
     numero_lote: '11',
     cupon_pago: document.getElementById(`cupon_pago_${id}`)?.value || '',
     cod_autorizacion: document.getElementById(`cod_autorizacion_${id}`)?.value || '',
