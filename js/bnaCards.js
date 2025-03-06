@@ -2375,8 +2375,6 @@ function cerrarCollapseCard(id) {
     });
 }
 
-
-
 async function marcarFacturado2(id, email, nombre, remito) {
     const facturaStatusDiv = document.getElementById(`factura-status-${id}`);
     const claveInput = document.getElementById(`clave-facturacion-${id}`);
