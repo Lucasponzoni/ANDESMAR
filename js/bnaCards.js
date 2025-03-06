@@ -2551,7 +2551,7 @@ const monto_envio = document.getElementById(`monto_envio_${id}`)?.value || '0';
 
 // Enviar notificación a Slack
 const mensajeSlack = {
-    text: `\n\n➡️📄 Estoy procesando la factura de la Orden *${codigo_pago}* de *${metodo_pago_TV}*\n\n 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n ${mensajeTipo} 🎉 \n\n`
+    text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n➡️📄 Estoy procesando la factura de la Orden *${codigo_pago}* de *${metodo_pago_TV}*\n\n 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n ${mensajeTipo} 🎉 \n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
 };
 
 fetch(`${corsh}${HookTv}`, {
