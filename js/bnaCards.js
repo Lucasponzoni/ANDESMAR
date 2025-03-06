@@ -1394,7 +1394,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
 
                             <p class="card-text-facturacion">
                                 <strong>Nombre / Razon social:</strong> ${(data[i].razon_social && data[i].razon_social !== '0') ? data[i].razon_social : data[i].nombre_factura}
-                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].razon_social}')">
+                                <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${(data[i].razon_social && data[i].razon_social !== '0') ? data[i].razon_social : data[i].nombre_factura}')">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                             </p>
