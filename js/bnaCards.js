@@ -744,10 +744,17 @@ const cpsCDS = [
                 <div class="slack-error-message">
                     ${data[i].errorSlackMensaje}
                 </div>
+
+                <button class="btn btn-primary mt-1" onclick="marcarFacturado3('${data[i].id}', '${data[i].email}', '${data[i].nombre}', '${data[i].remito}')">
+                    <i class="bi bi-arrow-repeat"></i> Reprocesar
+                </button>
+
                 <button class="btn btn-danger slack-error-button mt-1" onclick="handleCorrection('${data[i].id}')">
                     <i class="bi bi-exclamation-circle"></i> Marcar Corrección Manual
                 </button>
-            </div>` : `
+                
+            </div>
+            ` : `
             <div class="slack-error-container container-slack-${data[i].id}" style="position: relative; z-index: 1; background-color: #d4edda;">
                 <div class="slack-error-header2">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" alt="Logo de Slack" class="slack-error-logo">
@@ -757,7 +764,7 @@ const cpsCDS = [
                     ${data[i].errorSlackMensaje}
                 </div>
                 <button class="btn btn-success slack-error-button mt-1" disabled>
-                    <i class="bi bi-check-circle" style="color: #FFFFFF;"></i> ${data[i].correccionSlack}
+                    <i class="bi bi-check-circle" style="color: #FFFFFF;"></i> ${data[i].correccionSlack ? data[i].correccionSlack : "Reprocesado por Automata"}
                 </button>
             </div>`) : '';        
         
@@ -2590,6 +2597,149 @@ searchInput.value = '';
 searchInput.dispatchEvent(new Event('input'));
 }, 2000);
 
+}
+
+async function marcarFacturado3(id, email, nombre, remito) {
+
+    // Obtener el order_id para usarlo como ID del nodo
+    const orderId = document.getElementById(`order_id_${id}`)?.value;
+    const randomNum = Math.floor(100 + Math.random() * 900); // Random 3 Numeros
+    const refFacturacion = firebase.database().ref(`facturacionBna/${randomNum}-reproceso-${orderId}`);
+
+    // Pushear en Firebase
+    const refEnvios = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
+
+    // Obtener el SKU desde ambos campos
+    const skuInput = document.getElementById(`sku_${id}`);
+    const codigoItemInput = document.getElementById(`codigo_item_${id}`);
+
+    const skuValue = skuInput ? skuInput.value : '';
+    const codigoItemValue = codigoItemInput ? codigoItemInput.value : '';
+
+    // Verificar si el SKU está incluido en la lista
+    const isSkuIncluded = skusList.includes(skuValue) || skusList.includes(codigoItemValue);
+
+    // Crear objeto con los datos
+    const datos = {
+        order_id: `${randomNum}-reproceso-${orderId}` || '',
+        estado: 'Aprobado',
+        metodo_pago: document.getElementById(`metodo_pago_${id}`)?.value || '',
+        numero_lote: '11',
+        cupon_pago: document.getElementById(`cupon_pago_${id}`)?.value || '',
+        cod_autorizacion: document.getElementById(`cod_autorizacion_${id}`)?.value || '',
+        numero_tarjeta_visible: document.getElementById(`numero_tarjeta_visible_${id}`)?.value || '',
+        codigo_pago: document.getElementById(`codigo_pago_${id}`)?.value || '',
+        cuotas: document.getElementById(`cuotas_${id}`)?.value || '',
+        banco: '',
+        tipo_entrega: '33',
+        deposito: '9',
+        exportado: '0',
+        descuentos: document.getElementById(`descuentos_${id}`)?.value || '',
+        fecha_acreditacion: document.getElementById(`fecha_acreditacion_${id}`)?.value || '',
+        fecha: document.getElementById(`fecha_${id}`)?.value || '',
+        monto_depositado: document.getElementById(`monto_depositado_${id}`)?.value || '',
+        observacion_deposito_transferencia: document.getElementById(`observacion_deposito_transferencia_${id}`)?.value || '',
+        codigo_promocion: document.getElementById(`codigo_promocion_${id}`)?.value || '',
+        codigo_item: codigoItemValue, // Usar el valor del campo codigo_item
+        nombre_item: document.getElementById(`nombre_item_${id}`).value || '',
+        recargo_item: '0',
+        email: document.getElementById(`email_${id}`)?.value || '',
+        cantidad_item: document.getElementById(`cantidad_item_${id}`)?.value || '',
+        precio_item: document.getElementById(`precio_item_${id}`)?.value || '',
+        monto_envio: document.getElementById(`monto_envio_${id}`)?.value || '',
+        monto_total: document.getElementById(`monto_total_${id}`)?.value || '',
+        razon_social: document.getElementById(`razon_social_${id}`)?.value || '',
+        cuit: document.getElementById(`cuit_${id}`)?.value || '',
+        condicion_iva: document.getElementById(`condicion_iva_${id}`)?.value || '',
+        nombre: document.getElementById(`nombre_${id}`)?.value || '',
+        apellido: document.getElementById(`apellido_${id}`)?.value || '',
+        dni: document.getElementById(`dni_${id}`)?.value || '',
+        telefono: document.getElementById(`telefono_${id}`)?.value || '',
+        domicilio_fiscal: document.getElementById(`domicilio_fiscal_${id}`)?.value || '',
+        calle: document.getElementById(`calle_${id}`)?.value || '',
+        altura: document.getElementById(`altura_${id}`)?.value || '',
+        localidad: document.getElementById(`localidad_${id}`)?.value || '',
+        codigo_postal: document.getElementById(`codigo_postal_${id}`)?.value || '',
+        domicilio_envio: document.getElementById(`domicilio_envio_${id}`)?.value || '',
+        localidad_envio: document.getElementById(`localidad_envio_${id}`)?.value || '',
+        telefono_envio: document.getElementById(`telefono_envio_${id}`)?.value || '',
+        persona_autorizada: document.getElementById(`persona_autorizada_${id}`)?.value || '',
+        otros_comentarios_entrega: document.getElementById(`otros_comentarios_entrega_${id}`)?.value || '',
+        provincia: document.getElementById(`provincia_${id}`)?.value || ''
+    };
+
+    // Solo agregar imei: "si" si el SKU está incluido
+    if (isSkuIncluded) {
+        datos.imei = "si";
+    }
+
+    try {
+
+        await refEnvios.set(datos); 
+    
+        await refFacturacion.set(datos); 
+        
+        Swal.fire('Datos enviados para su facturación', '', 'success');
+        console.log('Datos enviados a Firebase para ser Reprocesado');
+    } catch (error) {
+        console.error('Error al guardar en Firebase:', error);
+        Swal.fire('Error al guardar datos', '', 'error');
+    }
+
+    // Actualizar en Firebase
+    await firebase.database().ref(`enviosBNA/${id}`).update({
+        errorSlack: false,
+    });
+    
+    // Determinar el tipo basado en los datos de DNI y CUIT
+    let tipo;
+    let mensajeTipo;
+
+    const dni = document.getElementById(`dni_${id}`)?.value || '';
+    const cuit = document.getElementById(`cuit_${id}`)?.value || '';
+    const monto_total = document.getElementById(`monto_total_${id}`)?.value || '';
+    const razon_social = document.getElementById(`razon_social_${id}`)?.value || '';
+
+    if (dni && dni !== "") { // Verifica si DNI tiene datos 
+        tipo = "TIPO B";
+        mensajeTipo = `🟢 **TIPO B:** El total es *$${monto_total}* 💰`;
+    } else if (cuit && cuit !== "") { // Verifica si CUIT tiene datos
+        tipo = "TIPO A";
+        mensajeTipo = `🔴 **TIPO A:** A la RAZÓN SOCIAL *${razon_social}*, el total es *$${monto_total}* 💳`;
+    } else {
+        mensajeTipo = `❌ No se proporcionaron datos válidos para determinar el tipo.`;
+    }
+
+    const codigo_pago = document.getElementById(`codigo_pago_${id}`)?.value || 'Código no disponible';
+    const cantidad_item = document.getElementById(`cantidad_item_${id}`)?.value || '0';
+    const metodo_pago_TV = document.getElementById(`metodo_pago_${id}`)?.value || 'SIN DATO DE LA TIENDA';
+    const codigo_item = document.getElementById(`codigo_item_${id}`)?.value || 'Código no disponible';
+    const precio_item = document.getElementById(`precio_item_${id}`)?.value || '0';
+    const monto_envio = document.getElementById(`monto_envio_${id}`)?.value || '0';
+
+    // Enviar notificación a Slack
+    const mensajeSlack = {
+        text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🔁📄 Estoy *Re-Procesando por ERROR DE SLACK* la factura de la Orden *${codigo_pago}* de *${metodo_pago_TV}*\n\n 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n 🟡 **REPROCESO:** Error de Slack \n\n ${mensajeTipo} 🎉 \n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
+    };
+
+    fetch(`${corsh}${HookTv}`, {
+        method: 'POST',
+        headers: {
+            'x-cors-api-key': `${live}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(mensajeSlack)
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Error al enviar el mensaje a Slack');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+
+    databaseRef.on('value', snapshot => {
+        loadEnviosFromFirebase(); 
+    });      
 }
 
 function cerrarModal(id) {
