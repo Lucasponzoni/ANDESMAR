@@ -123,7 +123,7 @@ function verificarActualizacionBaseDeDatos() {
         
         // Mostrar el spinner por al menos 3 segundos
         setTimeout(() => {
-            descargarDatosDesdeFirebase(1000).then(() => {
+            descargarDatosDesdeFirebase(1500).then(() => {
                 const fechaActual = new Date().toLocaleString('es-AR', {
                     day: '2-digit',
                     month: '2-digit',
@@ -194,8 +194,38 @@ function descargarDatosDesdeFirebase(limite) {
         const datosAlmacenados = {};
         snapshot.forEach(childSnapshot => {
             const data = childSnapshot.val();
-            const { attributes, ...filteredData } = data; // Excluir el objeto attributes
-            datosAlmacenados[filteredData.shippingId] = filteredData; 
+            // Verificar si shippingMode es "me2"
+            if (data.shippingMode === "me2") {
+                // Excluir los campos no deseados
+                const {
+                    userProductId,
+                    sellerId,
+                    permalink,
+                    nombreDeUsuario,
+                    medidas,
+                    localidad,
+                    itemId,
+                    estadoFacturacion,
+                    dateCreated,
+                    categoryId,
+                    buyerId,
+                    VolumenM3,
+                    VolumenCM3,
+                    Telefono,
+                    Recibe,
+                    Provincia,
+                    Peso,
+                    Observaciones,
+                    NombreyApellido,
+                    Calle,
+                    Altura,
+                    payments, 
+                    attributes, 
+                    ...filteredData
+                } = data;
+
+                datosAlmacenados[filteredData.shippingId] = filteredData; 
+            }
         });
         localStorage.setItem('envios', JSON.stringify(datosAlmacenados)); 
     });
