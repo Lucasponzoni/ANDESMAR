@@ -5270,6 +5270,10 @@ const firebaseRefEnvios = firebase.database().ref('enviosBNA');
 const sonidoToast = new Audio('./Img/error.mp3'); // Cambia la ruta por la de tu archivo
 
 async function verificarMensajes() {
+
+    // Esperar 20 segundos antes de continuar
+    await new Promise(resolve => setTimeout(resolve, 20000));
+
     console.log('Ejecutando búsqueda de errores en Slack...');
     try {
         const response = await fetch(`${corsh}https://slack.com/api/conversations.history?channel=${channel}`, {
@@ -5287,11 +5291,21 @@ async function verificarMensajes() {
             const ordenesConErrores = []; // Array para almacenar números de órdenes con errores
 
             for (const mensaje of data.messages) {
-                // Verificar si el mensaje es del usuario específico y comienza con números entre paréntesis
-                if (mensaje.user === `${chat}` && /^\(\d+\)/.test(mensaje.text)) {
-                    const numero = mensaje.text.match(/^\((\d+)\)/)[1]; // Obtener el número entre paréntesis
-                    const errorMensaje = mensaje.text.replace(/^\(\d+\)\s*/, ''); // Eliminar el número y espacio inicial
-
+                // Verificar si el mensaje es del usuario específico y comienza con el formato requerido
+                if (mensaje.user === `${chat}` && /^\(\d+(-reproceso-\d{7})?\)/.test(mensaje.text)) {
+                    let numero;
+                    const reprocesoMatch = mensaje.text.match(/^\((\d+)(?:-reproceso-(\d{7}))?\)/);
+            
+                    if (reprocesoMatch) {
+                        // Si hay un número después de "reproceso" o solo el número simple
+                        numero = reprocesoMatch[2] ? reprocesoMatch[2] : reprocesoMatch[1];
+                    } else {
+                        console.error('No se encontró un formato válido en el mensaje:', mensaje.text);
+                        continue; // Saltar al siguiente mensaje si no hay coincidencia
+                    }
+            
+                    const errorMensaje = mensaje.text.replace(/^\(\d+(-reproceso-\d{7})?\)\s*/, ''); // Eliminar el número y espacio inicial
+            
                     // Verificar si el nodo ya existe en Firebase
                     const snapshotErrores = await firebaseRefErrores.child(numero).once('value');
                     if (!snapshotErrores.exists()) {
@@ -5299,18 +5313,18 @@ async function verificarMensajes() {
                         await firebaseRefErrores.child(numero).set({ errorMensaje });
                         nuevosErrores++;
                         ordenesConErrores.push(numero); // Agregar número de orden al array
-
+            
                         // Mostrar el toast después de un retraso de 1 segundo
                         setTimeout(() => {
                             mostrarToast(numero, errorMensaje);
-
+            
                             // Reiniciar y reproducir el sonido
                             sonidoToast.currentTime = 0; // Reiniciar el sonido
                             sonidoToast.play().catch(error => {
                                 console.error('Error al reproducir el sonido:', error);
                             });
                         }, 1000); // Retraso de 1000 ms (1 segundo)
-
+            
                         // Buscar en enviosBNA
                         const snapshotEnvios = await firebaseRefEnvios.once('value');
                         snapshotEnvios.forEach((envio) => {
@@ -5323,7 +5337,7 @@ async function verificarMensajes() {
                         });
                     }
                 }
-            }
+            }                  
 
             if (nuevosErrores > 0) {
                 console.log(`Se han localizado ${nuevosErrores} nuevos errores de Slack que no existían en la base de datos.`);
