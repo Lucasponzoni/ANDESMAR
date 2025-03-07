@@ -4871,7 +4871,6 @@ function showNoDataMessage() {
 
 // VOLVER ATRAS
 function createBackButton() {
-
     const databaseRef = firebase.database().ref('enviosBNA');
     databaseRef.off(); // Desactiva la escucha
 
@@ -4887,7 +4886,9 @@ function createBackButton() {
     // Agregar evento al botón de volver
     backButton.addEventListener('click', () => {
         databaseRef.once('value').then(snapshot => {
-        loadEnviosFromFirebase(snapshot); 
+            loadEnviosFromFirebase(snapshot);
+            // Eliminar el botón después de cargar los datos
+            backButton.remove(); 
         });
     });
 
