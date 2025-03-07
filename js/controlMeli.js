@@ -196,7 +196,7 @@ function descargarDatosDesdeFirebase(limite) {
             const data = childSnapshot.val();
             // Verificar si shippingMode es "me2"
             if (data.shippingMode === "me2") {
-                // Excluir los campos no deseados y el objeto attributes
+                // Excluir los campos no deseados
                 const {
                     userProductId,
                     sellerId,
