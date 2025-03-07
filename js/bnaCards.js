@@ -4871,6 +4871,10 @@ function showNoDataMessage() {
 
 // VOLVER ATRAS
 function createBackButton() {
+
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off(); // Desactiva la escucha
+
     // Verificar si ya existe el botón de volver
     if (document.getElementById('btnVolver')) return;
 
@@ -4882,7 +4886,9 @@ function createBackButton() {
 
     // Agregar evento al botón de volver
     backButton.addEventListener('click', () => {
-        location.reload(); // Recargar la página al hacer clic
+        databaseRef.once('value').then(snapshot => {
+        loadEnviosFromFirebase(snapshot); 
+        });
     });
 
     // Agregar el botón al principio del contenedor de botones
