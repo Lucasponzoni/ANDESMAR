@@ -123,7 +123,7 @@ function verificarActualizacionBaseDeDatos() {
         
         // Mostrar el spinner por al menos 3 segundos
         setTimeout(() => {
-            descargarDatosDesdeFirebase(1000).then(() => {
+            descargarDatosDesdeFirebase(1100).then(() => {
                 const fechaActual = new Date().toLocaleString('es-AR', {
                     day: '2-digit',
                     month: '2-digit',
@@ -194,8 +194,11 @@ function descargarDatosDesdeFirebase(limite) {
         const datosAlmacenados = {};
         snapshot.forEach(childSnapshot => {
             const data = childSnapshot.val();
-            const { attributes, ...filteredData } = data; // Excluir el objeto attributes
-            datosAlmacenados[filteredData.shippingId] = filteredData; 
+            // Verificar si shippingMode es "me2"
+            if (data.shippingMode === "me2") {
+                const { attributes, ...filteredData } = data; // Excluir el objeto attributes
+                datosAlmacenados[filteredData.shippingId] = filteredData; 
+            }
         });
         localStorage.setItem('envios', JSON.stringify(datosAlmacenados)); 
     });
