@@ -2606,9 +2606,6 @@ async function marcarFacturado3(id, email, nombre, remito) {
     const randomNum = Math.floor(100 + Math.random() * 900); // Random 3 Numeros
     const refFacturacion = firebase.database().ref(`facturacionBna/${randomNum}-reproceso-${orderId}`);
 
-    // Pushear en Firebase
-    const refEnvios = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
-
     // Obtener el SKU desde ambos campos
     const skuInput = document.getElementById(`sku_${id}`);
     const codigoItemInput = document.getElementById(`codigo_item_${id}`);
@@ -2674,8 +2671,6 @@ async function marcarFacturado3(id, email, nombre, remito) {
     }
 
     try {
-
-        await refEnvios.set(datos); 
     
         await refFacturacion.set(datos); 
         
