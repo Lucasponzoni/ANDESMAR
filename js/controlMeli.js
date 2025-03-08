@@ -400,7 +400,7 @@ function procesarDatos(data) {
         if (paymentType !== "account_money") {
             const icon = 'warning';
             const title = 'Validación manual requerida';
-            const message = 'No se pudo validar la provincia de compra por un error en Mercado Libre, pero el envío fue agregado igualmente. Validar Manualmente';
+            const message = 'No se pudo validar la provincia de compra por un error en Mercado Libre, pero el envío fue agregado igualmente. Validar manualmente';
             const idOperacion = data.shippingId;
 
             const toastHTML = `
@@ -437,6 +437,10 @@ function procesarDatos(data) {
             const toastElement = toastContainer.lastElementChild; // Obtener el último toast agregado
             const toast = new bootstrap.Toast(toastElement, { autohide: false }); // Establecer autohide en false
             toast.show();
+
+            // Reproducir sonido del toast
+            const sonidoToast = new Audio('./Img/error.mp3');
+            sonidoToast.play();
 
             // Actualizar posiciones después de agregar el nuevo toast
             actualizarPosicionesToasts();
@@ -492,12 +496,12 @@ function actualizarPosicionesToasts() {
 
     toasts.forEach((toast) => {
         if (toast.style.display !== 'none') {
-            lastVisibleToast = toast;
+            lastVisibleToast = toast; // Guardar el último toast visible
         }
     });
 
     toasts.forEach((toast) => {
-
+        // Si es el último toast visible, aplicar 90px de margen inferior
         if (toast === lastVisibleToast) {
             toast.style.marginBottom = '90px';
         } else {
