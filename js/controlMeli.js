@@ -404,30 +404,30 @@ function procesarDatos(data) {
             const idOperacion = data.shippingId;
 
             const toastHTML = `
-<div class="toast toast-${icon}" role="alert" aria-live="assertive" aria-atomic="true" style="margin-bottom: 5px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-    <div class="toast-header strong-slack-header" style="display: flex; justify-content: space-between; align-items: center;">
-        <img src="./Img/meli.png" class="rounded me-2" alt="Logo de Mercado Libre" style="width: 25px; margin-right: 10px;">
-        <strong class="me-auto" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">${title}</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar" style="border: none; background: transparent; color: #aaa; font-size: 1.5rem; padding: 0 !important;" onclick="actualizarPosicionesToasts()">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="toast-body strong-slack" style="text-align: center; color: ${icon === 'error' ? '#dc3545' : '#007bff'};">
-        ${message} <br> 
-        <hr style="margin: 10px 0;">
-        <strong style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px;">
-            Código de operación: 
-            <span style="background-color: #f0f0f0; padding: 6px 12px; border-radius: 5px; font-weight: bold; color: #333; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);">
-                ${idOperacion}
-            </span>
-        </strong>
-    </div>
-    <div class="toast-footer" style="text-align: center; margin-top: 10px;">
-        <a href="https://www.mercadolibre.com.ar/ventas/${idOperacion}/detalle" target="_blank" class="btn btn-primary mb-2" style="background-color: #007bff; border-color: #007bff;">
-            <i class="bi bi-arrow-right-circle"></i> Ir a Mercado Libre
-        </a>
-    </div>
-</div>`;
+            <div class="toast toast-${icon}" role="alert" aria-live="assertive" aria-atomic="true" style="margin-bottom: 5px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <div class="toast-header strong-slack-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <img src="./Img/meli.png" class="rounded me-2" alt="Logo de Mercado Libre" style="width: 25px; margin-right: 10px;">
+                    <strong class="me-auto" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">${title}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar" style="border: none; background: transparent; color: #aaa; font-size: 1.5rem; padding: 0 !important;" onclick="actualizarPosicionesToasts()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body strong-slack" style="text-align: center; color: ${icon === 'error' ? '#dc3545' : '#007bff'};">
+                    ${message} <br> 
+                    <hr style="margin: 10px 0;">
+                    <strong style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px;">
+                        Código de operación: 
+                        <span style="background-color: #f0f0f0; padding: 6px 12px; border-radius: 5px; font-weight: bold; color: #333; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);">
+                            ${idOperacion}
+                        </span>
+                    </strong>
+                </div>
+                <div class="toast-footer" style="text-align: center; margin-top: 10px;">
+                    <a href="https://www.mercadolibre.com.ar/ventas/${idOperacion}/detalle" target="_blank" class="btn btn-primary mb-2" style="background-color: #007bff; border-color: #007bff;">
+                        <i class="bi bi-arrow-right-circle"></i> Ir a Mercado Libre
+                    </a>
+                </div>
+            </div>`;
 
             // Agregar el toastHTML al contenedor
             const toastContainer = document.getElementById('toast-container');
