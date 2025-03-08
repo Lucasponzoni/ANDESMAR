@@ -401,7 +401,8 @@ function procesarDatos(data) {
             const icon = 'warning';
             const title = 'Validación manual requerida';
             const message = 'No se pudo validar la provincia de compra por un error en Mercado Libre, pero el envío fue agregado igualmente. Validar manualmente';
-            const idOperacion = data.shippingId;
+            const shippingId = data.shippingId;
+            const idOperacion = data.idOperacion;
 
             const toastHTML = `
             <div class="toast toast-${icon}" role="alert" aria-live="assertive" aria-atomic="true" style="margin-bottom: 5px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
@@ -418,7 +419,7 @@ function procesarDatos(data) {
                     <strong style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px;">
                         Código de operación: 
                         <span style="background-color: #f0f0f0; padding: 6px 12px; border-radius: 5px; font-weight: bold; color: #333; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);">
-                            ${idOperacion}
+                            ${shippingId}
                         </span>
                     </strong>
                 </div>

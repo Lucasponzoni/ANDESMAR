@@ -1646,17 +1646,19 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 <p><i class="bi bi-tags-fill"></i> Logistica Privada</p>
                             </div>
 
-                            <!-- Botón Oca --> 
-                            <button class="btn mt-1 btn-oca ${isMacro(storeCode) ? '' : 'hidden'}"
-                            id="ocaButton${data[i].id}" 
-                            ${data[i].cancelado ? 'disabled' : ''} 
-                            onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}', '${data[i].fechaDeCreacion}')">
-                            <span id="OcaText${data[i].id}">
-                            <img class="OcaMeli" src="Img/oca-tini.png" alt="OCA"> Etiqueta <strong>OCA</strong>
-                            </span>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerOca${data[i].id}" style="display:none;"></span>
-                            </button>
-                          
+                            <!-- Botón Oca -->
+                            <button class="btn mt-1 ${data[i].marcaPreparado === 'Si' ? 'btn-success' : 'btn-oca'} ${isMacro(storeCode) ? '' : 'hidden'}" 
+                                    id="ocaButton${data[i].id}" 
+                                    ${data[i].cancelado ? 'disabled' : ''} 
+                                    onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}', '${data[i].fechaDeCreacion}')">
+                                <span id="OcaText${data[i].id}">
+                                    ${data[i].marcaPreparado === 'Si' 
+                                        ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].numeroSeguimiento}` 
+                                        : `<img class="OcaMeli" src="Img/oca-tini.png" alt="OCA"> Etiqueta <strong>OCA</strong>`}
+                                </span>
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerOca${data[i].id}" style="display:none;"></span>
+                            </button>                           
+
                             <!-- Botón Cruz del Sur --> 
                             <button class="btn mt-1 btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'} ${isMacro(storeCode) ? 'hidden' : ''}"
                                 id="CDSButton${data[i].id}" 
@@ -2197,7 +2199,7 @@ async function marcarFacturado(id, email, nombre, remito) {
                 contenidoBoton = `Facturado Automata Nicolas D. ${horaFormateada} ${fechaFormateada}`;
                 mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else if (clave === '1115') {
-                contenidoBoton = `Facturado Automata Julian L. ${horaFormateada} ${fechaFormateada}`;
+                contenidoBoton = `Facturado Automata Lucas P. ${horaFormateada} ${fechaFormateada}`;
                 mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else {
                 Swal.fire('Clave incorrecta', '', 'error');
@@ -2319,8 +2321,8 @@ function marcarCancelado2(id) {
             contenidoBoton = `Cancelado Nicolas ${horaFormateada} ${fechaFormateada}`;
             break;
         case '1115':
-            nombreFacturador = 'Julian L.';
-            contenidoBoton = `Cancelado Julian L. ${horaFormateada} ${fechaFormateada}`;
+            nombreFacturador = 'Lucas P.';
+            contenidoBoton = `Cancelado Lucas P. ${horaFormateada} ${fechaFormateada}`;
             break;
         default:
             Swal.fire('Clave incorrecta', '', 'error');
@@ -2412,7 +2414,7 @@ async function marcarFacturado2(id, email, nombre, remito) {
         contenidoBoton = `Facturado Automata Leo ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1112') {
-        contenidoBoton = `Facturado Automata Marina ${horaFormateada} ${fechaFormateada}`;
+        contenidoBoton = `Facturado Automata Luraschi ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1113') {
         contenidoBoton = `Facturado Automata Mauricio ${horaFormateada} ${fechaFormateada}`;
@@ -2421,7 +2423,7 @@ async function marcarFacturado2(id, email, nombre, remito) {
         contenidoBoton = `Facturado Automata Nicolas D. ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1115') {
-        contenidoBoton = `Facturado Automata Julian L. ${horaFormateada} ${fechaFormateada}`;
+        contenidoBoton = `Facturado Automata Lucas P. ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else {
         Swal.fire('Clave incorrecta', '', 'error');
@@ -3582,12 +3584,10 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
             button.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${numeroEnvio}`;
             button.classList.remove('btn-secondary');
             button.classList.add('btn-success');
-            button.onclick = () => {
-                const link = document.createElement('a');
-                link.href = pdfUrlBlob;
-                link.download = `OCA-${nombre}-${numeroEnvio}.pdf`;
-                link.click();
-            };
+            const link = document.createElement('a');
+            link.href = pdfUrlBlob;
+            link.download = `OCA-${nombre}-${numeroEnvio}.pdf`;
+            link.click();
 
             const linkSeguimiento = `https://www.aftership.com/es/track/oca-ar/${numeroEnvio}`;
             const numeroDeEnvioOca = `${numeroEnvio}`;
