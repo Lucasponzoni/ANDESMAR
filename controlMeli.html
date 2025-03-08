@@ -340,6 +340,9 @@
         <span class="close-btn-ios-wifi" onclick="closeNotification()">✖</span>
         <button id="retry-button-ios-wifi" class="retry-button-ios-wifi" onclick="reloadPage()">Reintentar</button>
     </div>
+
+    <!-- Contenedor de Toasts -->
+    <div id="toast-container" aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050;"></div>
     
     <script>
         let isOnline = navigator.onLine;
