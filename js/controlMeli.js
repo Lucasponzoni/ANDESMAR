@@ -389,20 +389,26 @@ function buscarEnFirebase(codigoNumerico, limite) {
 function procesarDatos(data) {
     // Verificar si el estado es Jujuy o Tierra del Fuego en billing_info
     let additionalInfo;
+    const paymentType = data.payments && data.payments[0] && data.payments[0].payment_type;
+
     if (data.client && data.client.billing_info && data.client.billing_info.additional_info) {
         additionalInfo = data.client.billing_info.additional_info;
     } else {
         additionalInfo = []; // Si no existe, definir como un array vacío
-        Swal.fire({
-            icon: 'warning',
-            title: 'Validación manual requerida',
-            text: 'No se pudo validar la provincia de compra por un error en Mercado Libre, pero el envío fue agregado igualmente. Verifica la etiqueta de forma manual.'
-        });
+        
+        // Solo mostrar advertencia si el tipo de pago no es "account_money"
+        if (paymentType !== "account_money") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Validación manual requerida',
+                text: 'No se pudo validar la provincia de compra por un error en Mercado Libre, pero el envío fue agregado igualmente. Verifica la etiqueta de forma manual.'
+            });
+        }
     }
 
     const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "jujuy");
     const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "tierra del fuego");
-    
+
     if (estadoJujuy) {
         Swal.fire({
             icon: 'error',
