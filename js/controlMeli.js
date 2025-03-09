@@ -1818,21 +1818,12 @@ function uploadFile() {
     const dayOfWeek = today.getDay();
     const hourOfDay = today.getHours();
 
-    //FECHA Y HORA A TENER EN CUENTA EN LA CARGA DE ARCHIVO
     if (hourOfDay >= 12 || (dayOfWeek === 6 && hourOfDay >= 11) || dayOfWeek === 0) {
-        uploadDate.setDate(today.getDate() + 1); // Aumenta el día para subir al siguiente día
+        uploadDate.setDate(today.getDate() + 1);
     }
     
-    // Verificar si el día a subir es lunes
-    if (uploadDate.getDay() === 1) { // 1 = Lunes
-        const year = uploadDate.getFullYear();
-        const month = uploadDate.getMonth(); // 0 = Enero, 1 = Febrero, ..., 11 = Diciembre
-        const date = uploadDate.getDate();
-    
-        // Comprobar si es el 3 o 4 de marzo de 2025
-        if ((year === 2025 && month === 2 && (date === 3 || date === 4))) { // 2 = Marzo
-            uploadDate.setDate(date + 2); // Cambiar al miércoles
-        }
+    if (uploadDate.getDay() === 0) {
+        uploadDate.setDate(uploadDate.getDate() + 1);
     }
 
     const dateString = formatDate(uploadDate);
