@@ -469,7 +469,7 @@ function procesarDatos(data) {
             title: 'Envío no permitido',
             text: 'Los envíos que facturan a Jujuy no están permitidos, separar etiqueta.'
         });
-        $('.lookBase').html(`Se encontró etiqueta en <span style="color:rgb(134, 77, 255); font-weight: bold;">LocalStorage <i class="bi bi-floppy2-fill"></i></span> y NO fue agregada a la planilla. <span class="redStrong2"><i class="bi bi-check-circle-fill"></i> ¡ERROR! Envio NO Permitido</span>`).show();
+        $('.lookBase').html(`Se encontró etiqueta en <span style="color:rgb(134, 77, 255); font-weight: bold;">LocalStorage <i class="bi bi-info-circle-fill"></i></span> y NO fue agregada a la planilla. <span class="redStrong2"><i class="bi bi-check-circle-fill"></i> ¡ERROR! Envio NO Permitido</span>`).show();
         return; // Salir de la función
     }
 
@@ -479,7 +479,7 @@ function procesarDatos(data) {
             title: 'Envío no permitido',
             text: 'Los envíos que facturan a Tierra del Fuego no están permitidos, separar etiqueta.'
         });
-        $('.lookBase').html(`Se encontró etiqueta en <span style="color:rgb(134, 77, 255); font-weight: bold;">LocalStorage <i class="bi bi-floppy2-fill"></i></span> y NO fue agregada a la planilla. <span class="redStrong2"><i class="bi bi-check-circle-fill"></i> ¡ERROR! Envio NO Permitido</span>`).show();
+        $('.lookBase').html(`Se encontró etiqueta en <span style="color:rgb(134, 77, 255); font-weight: bold;">LocalStorage <i class="bi bi-info-circle-fill"></i></span> y NO fue agregada a la planilla. <span class="redStrong2"><i class="bi bi-check-circle-fill"></i> ¡ERROR! Envio NO Permitido</span>`).show();
         return; // Salir de la función
     }
 
@@ -490,7 +490,7 @@ function procesarDatos(data) {
             title: 'Envío no permitido',
             text: `Se detectó un envío a ${data.Provincia}, verificar en Mercado Pago si posee retención de impuesto a esta provincia.`
         });
-        $('.lookBase').html(`Se encontró etiqueta en <span style="color:rgb(134, 77, 255); font-weight: bold;">LocalStorage <i class="bi bi-floppy2-fill"></i></span> y NO fue agregada a la planilla. <span class="redStrong2"><i class="bi bi-check-circle-fill"></i> ¡ERROR! Envio NO Permitido</span>`).show();
+        $('.lookBase').html(`Se encontró etiqueta en <span style="color:rgb(134, 77, 255); font-weight: bold;">LocalStorage <i class="bi bi-info-circle-fill"></i></span> y NO fue agregada a la planilla. <span class="redStrong2"><i class="bi bi-check-circle-fill"></i> ¡ERROR! Envio NO Permitido</span>`).show();
         return; // Salir de la función
     }
 
