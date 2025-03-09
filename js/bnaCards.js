@@ -1646,17 +1646,19 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 <p><i class="bi bi-tags-fill"></i> Logistica Privada</p>
                             </div>
 
-                            <!-- Botón Oca --> 
-                            <button class="btn mt-1 btn-oca ${isMacro(storeCode) ? '' : 'hidden'}"
-                            id="ocaButton${data[i].id}" 
-                            ${data[i].cancelado ? 'disabled' : ''} 
-                            onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}', '${data[i].fechaDeCreacion}')">
-                            <span id="OcaText${data[i].id}">
-                            <img class="OcaMeli" src="Img/oca-tini.png" alt="OCA"> Etiqueta <strong>OCA</strong>
-                            </span>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerOca${data[i].id}" style="display:none;"></span>
-                            </button>
-                          
+                            <!-- Botón Oca -->
+                            <button class="btn mt-1 ${data[i].marcaPreparado === 'Si' ? 'btn-success' : 'btn-oca'} ${isMacro(storeCode) ? '' : 'hidden'}" 
+                                    id="ocaButton${data[i].id}" 
+                                    ${data[i].cancelado ? 'disabled' : ''} 
+                                    onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}', '${data[i].fechaDeCreacion}')">
+                                <span id="OcaText${data[i].id}">
+                                    ${data[i].marcaPreparado === 'Si' 
+                                        ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].numeroSeguimiento}` 
+                                        : `<img class="OcaMeli" src="Img/oca-tini.png" alt="OCA"> Etiqueta <strong>OCA</strong>`}
+                                </span>
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerOca${data[i].id}" style="display:none;"></span>
+                            </button>                           
+
                             <!-- Botón Cruz del Sur --> 
                             <button class="btn mt-1 btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'} ${isMacro(storeCode) ? 'hidden' : ''}"
                                 id="CDSButton${data[i].id}" 
@@ -2197,7 +2199,7 @@ async function marcarFacturado(id, email, nombre, remito) {
                 contenidoBoton = `Facturado Automata Nicolas D. ${horaFormateada} ${fechaFormateada}`;
                 mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else if (clave === '1115') {
-                contenidoBoton = `Facturado Automata Julian L. ${horaFormateada} ${fechaFormateada}`;
+                contenidoBoton = `Facturado Automata Lucas P. ${horaFormateada} ${fechaFormateada}`;
                 mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else {
                 Swal.fire('Clave incorrecta', '', 'error');
@@ -2319,8 +2321,8 @@ function marcarCancelado2(id) {
             contenidoBoton = `Cancelado Nicolas ${horaFormateada} ${fechaFormateada}`;
             break;
         case '1115':
-            nombreFacturador = 'Julian L.';
-            contenidoBoton = `Cancelado Julian L. ${horaFormateada} ${fechaFormateada}`;
+            nombreFacturador = 'Lucas P.';
+            contenidoBoton = `Cancelado Lucas P. ${horaFormateada} ${fechaFormateada}`;
             break;
         default:
             Swal.fire('Clave incorrecta', '', 'error');
@@ -2412,7 +2414,7 @@ async function marcarFacturado2(id, email, nombre, remito) {
         contenidoBoton = `Facturado Automata Leo ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1112') {
-        contenidoBoton = `Facturado Automata Marina ${horaFormateada} ${fechaFormateada}`;
+        contenidoBoton = `Facturado Automata Luraschi ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1113') {
         contenidoBoton = `Facturado Automata Mauricio ${horaFormateada} ${fechaFormateada}`;
@@ -2421,7 +2423,7 @@ async function marcarFacturado2(id, email, nombre, remito) {
         contenidoBoton = `Facturado Automata Nicolas D. ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1115') {
-        contenidoBoton = `Facturado Automata Julian L. ${horaFormateada} ${fechaFormateada}`;
+        contenidoBoton = `Facturado Automata Lucas P. ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else {
         Swal.fire('Clave incorrecta', '', 'error');
@@ -2606,9 +2608,6 @@ async function marcarFacturado3(id, email, nombre, remito) {
     const randomNum = Math.floor(100 + Math.random() * 900); // Random 3 Numeros
     const refFacturacion = firebase.database().ref(`facturacionBna/${randomNum}-reproceso-${orderId}`);
 
-    // Pushear en Firebase
-    const refEnvios = firebase.database().ref(`enviosBNA/${id}/datoFacturacion`);
-
     // Obtener el SKU desde ambos campos
     const skuInput = document.getElementById(`sku_${id}`);
     const codigoItemInput = document.getElementById(`codigo_item_${id}`);
@@ -2674,8 +2673,6 @@ async function marcarFacturado3(id, email, nombre, remito) {
     }
 
     try {
-
-        await refEnvios.set(datos); 
     
         await refFacturacion.set(datos); 
         
@@ -3587,12 +3584,10 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
             button.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${numeroEnvio}`;
             button.classList.remove('btn-secondary');
             button.classList.add('btn-success');
-            button.onclick = () => {
-                const link = document.createElement('a');
-                link.href = pdfUrlBlob;
-                link.download = `OCA-${nombre}-${numeroEnvio}.pdf`;
-                link.click();
-            };
+            const link = document.createElement('a');
+            link.href = pdfUrlBlob;
+            link.download = `OCA-${nombre}-${numeroEnvio}.pdf`;
+            link.click();
 
             const linkSeguimiento = `https://www.aftership.com/es/track/oca-ar/${numeroEnvio}`;
             const numeroDeEnvioOca = `${numeroEnvio}`;
@@ -4876,6 +4871,9 @@ function showNoDataMessage() {
 
 // VOLVER ATRAS
 function createBackButton() {
+    const databaseRef = firebase.database().ref('enviosBNA');
+    databaseRef.off(); // Desactiva la escucha
+
     // Verificar si ya existe el botón de volver
     if (document.getElementById('btnVolver')) return;
 
@@ -4887,7 +4885,11 @@ function createBackButton() {
 
     // Agregar evento al botón de volver
     backButton.addEventListener('click', () => {
-        location.reload(); // Recargar la página al hacer clic
+        databaseRef.once('value').then(snapshot => {
+            loadEnviosFromFirebase(snapshot);
+            // Eliminar el botón después de cargar los datos
+            backButton.remove(); 
+        });
     });
 
     // Agregar el botón al principio del contenedor de botones
@@ -5275,6 +5277,10 @@ const firebaseRefEnvios = firebase.database().ref('enviosBNA');
 const sonidoToast = new Audio('./Img/error.mp3'); // Cambia la ruta por la de tu archivo
 
 async function verificarMensajes() {
+
+    // Esperar 20 segundos antes de continuar
+    await new Promise(resolve => setTimeout(resolve, 20000));
+
     console.log('Ejecutando búsqueda de errores en Slack...');
     try {
         const response = await fetch(`${corsh}https://slack.com/api/conversations.history?channel=${channel}`, {
@@ -5292,11 +5298,21 @@ async function verificarMensajes() {
             const ordenesConErrores = []; // Array para almacenar números de órdenes con errores
 
             for (const mensaje of data.messages) {
-                // Verificar si el mensaje es del usuario específico y comienza con números entre paréntesis
-                if (mensaje.user === `${chat}` && /^\(\d+\)/.test(mensaje.text)) {
-                    const numero = mensaje.text.match(/^\((\d+)\)/)[1]; // Obtener el número entre paréntesis
-                    const errorMensaje = mensaje.text.replace(/^\(\d+\)\s*/, ''); // Eliminar el número y espacio inicial
-
+                // Verificar si el mensaje es del usuario específico y comienza con el formato requerido
+                if (mensaje.user === `${chat}` && /^\(\d+(-reproceso-\d{7})?\)/.test(mensaje.text)) {
+                    let numero;
+                    const reprocesoMatch = mensaje.text.match(/^\((\d+)(?:-reproceso-(\d{7}))?\)/);
+            
+                    if (reprocesoMatch) {
+                        // Si hay un número después de "reproceso" o solo el número simple
+                        numero = reprocesoMatch[2] ? reprocesoMatch[2] : reprocesoMatch[1];
+                    } else {
+                        console.error('No se encontró un formato válido en el mensaje:', mensaje.text);
+                        continue; // Saltar al siguiente mensaje si no hay coincidencia
+                    }
+            
+                    const errorMensaje = mensaje.text.replace(/^\(\d+(-reproceso-\d{7})?\)\s*/, ''); // Eliminar el número y espacio inicial
+            
                     // Verificar si el nodo ya existe en Firebase
                     const snapshotErrores = await firebaseRefErrores.child(numero).once('value');
                     if (!snapshotErrores.exists()) {
@@ -5304,18 +5320,18 @@ async function verificarMensajes() {
                         await firebaseRefErrores.child(numero).set({ errorMensaje });
                         nuevosErrores++;
                         ordenesConErrores.push(numero); // Agregar número de orden al array
-
+            
                         // Mostrar el toast después de un retraso de 1 segundo
                         setTimeout(() => {
                             mostrarToast(numero, errorMensaje);
-
+            
                             // Reiniciar y reproducir el sonido
                             sonidoToast.currentTime = 0; // Reiniciar el sonido
                             sonidoToast.play().catch(error => {
                                 console.error('Error al reproducir el sonido:', error);
                             });
                         }, 1000); // Retraso de 1000 ms (1 segundo)
-
+            
                         // Buscar en enviosBNA
                         const snapshotEnvios = await firebaseRefEnvios.once('value');
                         snapshotEnvios.forEach((envio) => {
@@ -5328,7 +5344,7 @@ async function verificarMensajes() {
                         });
                     }
                 }
-            }
+            }                  
 
             if (nuevosErrores > 0) {
                 console.log(`Se han localizado ${nuevosErrores} nuevos errores de Slack que no existían en la base de datos.`);
