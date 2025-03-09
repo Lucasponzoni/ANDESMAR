@@ -219,10 +219,22 @@ function descargarDatosDesdeFirebase(limite) {
                     Calle,
                     Altura,
                     payments, 
-                    attributes, 
+                    attributes,
+                    billing_info, // Descarga State_Name
                     ...filteredData
                 } = data;
 
+                // Filtrar solo el STATE_NAME de billing_info
+                if (billing_info && billing_info.additional_info) {
+                    const stateInfo = billing_info.additional_info.find(info => info.type === "STATE_NAME");
+                    if (stateInfo) {
+                        billing_info.additional_info = [{ type: "STATE_NAME", value: stateInfo.value }];
+                    } else {
+                        billing_info.additional_info = [];
+                    }
+                }
+
+                filteredData.billing_info = billing_info; 
                 datosAlmacenados[filteredData.shippingId] = filteredData; 
             }
         });
@@ -457,6 +469,7 @@ function procesarDatos(data) {
             title: 'Envío no permitido',
             text: 'Los envíos que facturan a Jujuy no están permitidos, separar etiqueta.'
         });
+        $('.lookBase').html(`Se encontró etiqueta en <span style="color:rgb(134, 77, 255); font-weight: bold;">LocalStorage <i class="bi bi-floppy2-fill"></i></span> y NO fue agregada a la planilla. <span class="redStrong2"><i class="bi bi-check-circle-fill"></i> ¡ERROR! Envio NO Permitido</span>`).show();
         return; // Salir de la función
     }
 
@@ -466,6 +479,7 @@ function procesarDatos(data) {
             title: 'Envío no permitido',
             text: 'Los envíos que facturan a Tierra del Fuego no están permitidos, separar etiqueta.'
         });
+        $('.lookBase').html(`Se encontró etiqueta en <span style="color:rgb(134, 77, 255); font-weight: bold;">LocalStorage <i class="bi bi-floppy2-fill"></i></span> y NO fue agregada a la planilla. <span class="redStrong2"><i class="bi bi-check-circle-fill"></i> ¡ERROR! Envio NO Permitido</span>`).show();
         return; // Salir de la función
     }
 
@@ -476,6 +490,7 @@ function procesarDatos(data) {
             title: 'Envío no permitido',
             text: `Se detectó un envío a ${data.Provincia}, verificar en Mercado Pago si posee retención de impuesto a esta provincia.`
         });
+        $('.lookBase').html(`Se encontró etiqueta en <span style="color:rgb(134, 77, 255); font-weight: bold;">LocalStorage <i class="bi bi-floppy2-fill"></i></span> y NO fue agregada a la planilla. <span class="redStrong2"><i class="bi bi-check-circle-fill"></i> ¡ERROR! Envio NO Permitido</span>`).show();
         return; // Salir de la función
     }
 
