@@ -426,7 +426,7 @@ function procesarDatos(data) {
                     </button>
                 </div>
                 <div class="toast-body strong-slack" style="text-align: center; color: ${icon === 'error' ? '#dc3545' : '#007bff'};">
-                    ${message} <br> 
+                    ${message} <br>
                     <hr style="margin: 10px 0;">
                     <strong style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px;">
                         Código de operación: 
@@ -440,6 +440,10 @@ function procesarDatos(data) {
                         <i class="bi bi-arrow-right-circle"></i> Ir a Mercado Libre
                     </a>
                 </div>
+                <div id="contadorDiv" style="text-align: center; margin-top: 10px; font-weight: bold; font-size: 16px; color: #fff; background-color: #dc3545; padding: 5px 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);">
+                    <i class="bi bi-clock" style="margin-right: 5px;"></i>
+                    <span id="contador">10</span> segundos restantes
+                </div>
             </div>`;
 
             // Agregar el toastHTML al contenedor
@@ -450,6 +454,21 @@ function procesarDatos(data) {
             const toastElement = toastContainer.lastElementChild; // Obtener el último toast agregado
             const toast = new bootstrap.Toast(toastElement, { autohide: false }); // Establecer autohide en false
             toast.show();
+
+            // Contador de 10 segundos
+            let contador = 10;
+            const contadorElement = toastElement.querySelector('#contador'); // Obtener el elemento del contador
+            contadorElement.innerText = contador; // Reiniciar el contador en el elemento
+
+            const interval = setInterval(() => {
+                contador--;
+                contadorElement.innerText = contador; // Actualizar el contador
+
+                if (contador <= 0) {
+                    clearInterval(interval);
+                    toast.hide(); // Cerrar el toast
+                }
+            }, 1000);
 
             // Reproducir sonido del toast
             const sonidoToast = new Audio('./Img/error.mp3');
