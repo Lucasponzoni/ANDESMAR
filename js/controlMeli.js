@@ -1990,3 +1990,56 @@ function uploadFile() {
     reader.readAsText(file);
 }
 // FIN UPLOAD ETIQUETAS MELI
+
+// BORRAR DATOS DE PLANILLA
+function borrarElemento() {
+    // Preguntar por la contraseña
+    Swal.fire({
+        title: 'Ingrese la contraseña',
+        inputLabel: 'Contraseña para borrar todos los datos de planilla',
+        input: 'password',
+        inputAttributes: {
+            autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        icon: 'question',
+        preConfirm: (password) => {
+            // Validar la contraseña
+            if (password !== '37892345' && password !== '46295786') {
+                Swal.showValidationMessage('Contraseña incorrecta');
+            } else {
+                return password;
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Confirmar la eliminación
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: 'Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, borrar datos',
+                cancelButtonText: 'No, cancelar'
+            }).then((confirmResult) => {
+                if (confirmResult.isConfirmed) {
+                    // Eliminar datos de Firebase
+                    const dbRef = firebase.database().ref('/despachoDelDiaMeli');
+                    dbRef.remove()
+                        .then(() => {
+                            Swal.fire('¡Eliminado!', 'Los datos han sido borrados.', 'success').then(() => {
+                                // Recargar la página después de la eliminación
+                                location.reload();
+                            });
+                        })
+                        .catch((error) => {
+                            Swal.fire('Error', 'No se pudo borrar los datos: ' + error.message, 'error');
+                        });
+                }
+            });
+        }
+    });
+}
+// FIN BORRAR DATOS DE PLANILLA
