@@ -1023,10 +1023,12 @@ document.getElementById('cerrarButton').onclick = async function() {
                 cancelButtonText: '<i class="bi bi-x-circle"></i> Cierre Total'
             });
 
+            if (result.isDismissed) return;
+
             if (result.isConfirmed) {
                 // Mostrar spinner
                 const spinner = document.createElement('img');
-                spinner.src = 'Img/spinner.gif';
+                spinner.src = 'Img/cargando.gif';
                 spinner.className = 'spinner-gif-colecta';
                 spinner.style.position = 'fixed';
                 spinner.style.top = '50%';
