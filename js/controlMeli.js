@@ -1062,8 +1062,6 @@ document.getElementById('cerrarButton').onclick = async function() {
 
             await proximaColectaRef.remove(); // Eliminar contenido de DespachosProximaColecta
 
-            // Eliminar el spinner
-            document.body.removeChild(spinner);
             setTimeout(() => {
                 location.reload(); // Recargar la página
             }, 6000); // 6 segundos de espera
