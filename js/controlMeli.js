@@ -833,6 +833,65 @@ function obtenerDatosTabla() {
     return html;
 }
 
+async function enviarCorreoDespacho(destinatarioEmail, datosEgresados) {
+    const emailBody = obtenerDatosTabla(datosEgresados); // Asegúrate de que esta función reciba los datos correctos
+    const fecha = new Date().toLocaleDateString(); // Formato de fecha
+    const Subject = `Despacho MERCADO LIBRE del dia: ${fecha}`;
+    const smtpU = 's154745_3';
+    const smtpP = 'QbikuGyHqJ';
+
+    const emailData = {
+        "Html": {
+            "DocType": null,
+            "Head": null,
+            "Body": emailBody,
+            "BodyTag": "<body>"
+        },
+        "Text": "",
+        "Subject": Subject,
+        "From": {
+            "Name": "Posventa Novogar",
+            "Email": "posventa@novogar.com.ar"
+        },
+        "To": [
+            {
+                "Name": "Despacho Mercado Libre",
+                "Email": destinatarioEmail
+            }
+        ],
+        "Cc": [],
+        "Bcc": ["webnovagar@gmail.com", "posventa@novogar.com.ar"],
+        "CharSet": "utf-8",
+        "User": {
+            "Username": smtpU,
+            "Secret": smtpP,
+        }
+    };
+
+    try {
+        const response = await fetch('https://proxy.cors.sh/https://send.mailup.com/API/v2.0/messages/sendmessage', {
+            method: 'POST',
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(emailData)
+        });
+
+        const result = await response.json();
+        if (result.Status === 'done') {
+            console.log('Email enviado exitosamente');
+            showAlert(`<i class="bi bi-envelope-check"></i> Email de Despacho enviado a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
+        } else {
+            console.log(`Error al enviar el email: ${result.Message}`);
+            showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
+        }
+    } catch (error) {
+        console.error('Error al enviar el email:', error);
+        showAlertError(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${new Date().toLocaleTimeString()}`);
+    }
+}
+
 async function enviarCorreoDespacho(destinatarioEmail) {
     const emailBody = obtenerDatosTabla();
     const fecha = new Date().toLocaleDateString(); // Formato de fecha
