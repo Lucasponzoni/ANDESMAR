@@ -204,11 +204,10 @@ Promise.all([
     cargarCpsLogStaFe(),
     cargarCpsLogRafaela(),
     cargarCpsLogSanNicolas(),
-    cargarCpsLogCDS() // Agregada la carga de CPs de LogCDS
+    cargarCpsLogCDS()
 ]).then(() => {
     cargarDatos(); 
 });
-
 // QUERY DE DATOS
 
 function mostrarResultados(resultados) {
@@ -2013,10 +2012,12 @@ for (let i = 0; i < cantidadFinal; i++) {
         const transporte = "Correo Andreani";
 
         await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
+
+        // Llamar a la API para obtener la etiqueta
+        await obtenerEtiqueta(numeroDeEnvio, token, buttonAndr);
+
         buttonAndr.disabled = false;
 
-            // Llamar a la API para obtener la etiqueta
-            await obtenerEtiqueta(numeroDeEnvio, token, buttonAndr);
         } else {
             console.error('Error al generar la etiqueta:', response.statusText);
             buttonAndr.innerText = "Error ⚠️"; 
@@ -2055,15 +2056,15 @@ async function obtenerEtiqueta(numeroDeEnvio, token, buttonAndr) {
         const blob = await response.blob();
         const pdfUrl = URL.createObjectURL(blob);
 
-        buttonAndr.href = pdfUrl; // Establecer el href del botón
+        buttonAndr.href = pdfUrl;
         buttonAndr.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${numeroDeEnvio}`;
         buttonAndr.classList.remove('btn-warning');
         buttonAndr.classList.add('btn-success');
-        buttonAndr.onclick = () => window.open(pdfUrl, '_blank');
+        window.open(pdfUrl, '_blank');
     } catch (error) {
         console.error('Error al obtener la etiqueta:', error);
-        buttonAndr.innerText = "Error en Etiquetado ⚠️"; // Cambiar texto en caso de error
-        resultadoDivAndr.innerText = `Error: ${error.message}`; // Mostrar error debajo
+        buttonAndr.innerText = "Error en Etiquetado ⚠️";
+        resultadoDivAndr.innerText = `Error: ${error.message}`;
         buttonAndr.disabled = true;
     }
 }

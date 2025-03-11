@@ -240,6 +240,7 @@ function calcularPorcentajes(data) {
     let countAndreani = 0;
     let countAndesmar = 0;
     let countCruzDelSur = 0;
+    let countOca = 0; // Nueva variable para OCA
     let countPendientes = 0;
 
     const now = new Date();
@@ -253,12 +254,15 @@ function calcularPorcentajes(data) {
             if (item.numeroDeEnvio) {
                 const numeroDeEnvio = item.numeroDeEnvio;
                 // Contar envíos de Andreani
-                if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
-                    (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) {
+                if ((((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
+                    (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) || 
+                    (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('4')))) {
                     countAndreani++;
                 } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) || 
                            (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1'))) {
                     countCruzDelSur++;
+                } else if (numeroDeEnvio.length === 19 && numeroDeEnvio.startsWith('4')) { 
+                    countOca++;
                 } else {
                     countAndesmar++;
                 }
@@ -271,12 +275,13 @@ function calcularPorcentajes(data) {
         }
     });
 
-    const totalEnvios = countAndreani + countAndesmar + countCruzDelSur;
+    const totalEnvios = countAndreani + countAndesmar + countCruzDelSur + countOca; // Incluir OCA en total
 
     // Calcular porcentajes
     const andreaniPorcentaje = totalEnvios > 0 ? ((countAndreani / totalEnvios) * 100).toFixed(2) : 0;
     const andesmarPorcentaje = totalEnvios > 0 ? ((countAndesmar / totalEnvios) * 100).toFixed(2) : 0;
     const cruzDelSurPorcentaje = totalEnvios > 0 ? ((countCruzDelSur / totalEnvios) * 100).toFixed(2) : 0;
+    const ocaPorcentaje = totalEnvios > 0 ? ((countOca / totalEnvios) * 100).toFixed(2) : 0; // Porcentaje de OCA
 
     // Actualizar el HTML
     document.getElementById('andreaniPorcentaje').innerHTML = `
@@ -287,7 +292,7 @@ function calcularPorcentajes(data) {
     <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countAndreani} despachos)</span>
     <div class="pie-chart" style="--percentage: ${andreaniPorcentaje}; --color: #dc3545;"></div>
     `;
-    
+
     document.getElementById('andesmarPorcentaje').innerHTML = `
     <img src="./Img/andesmar-mini.png" alt="Andesmar" class="gray-filter">  
     <div class="d-flex align-items-center flex-wrap">
@@ -295,7 +300,6 @@ function calcularPorcentajes(data) {
     </div>
         <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countAndesmar} despachos)</span>
         <div class="pie-chart" style="--percentage: ${andesmarPorcentaje}; --color: #007bff;"></div>
-
     `;
 
     document.getElementById('cruzDelSurPorcentaje').innerHTML = `
@@ -305,9 +309,17 @@ function calcularPorcentajes(data) {
     </div>
         <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countCruzDelSur} despachos)</span>
         <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #003366;"></div>
-
     `;
-    
+
+    document.getElementById('ocaPorcentaje').innerHTML = `
+    <img src="./Img/oca-mini.png" alt="OCA" class="gray-filter">   
+    <div class="d-flex align-items-center flex-wrap">
+        <span class="ml-1" style="font-weight: bold;">OCA: ${ocaPorcentaje}%</span>
+    </div>
+        <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countOca} despachos)</span>
+        <div class="pie-chart" style="--percentage: ${ocaPorcentaje}; --color: #5B2B82;"></div>
+    `;
+
     document.getElementById('SinDespacharPorcentaje').innerHTML = `
     <div class="macos-button-porcentaje">
         <span class="ml-1"><i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i> Pendientes:</span>
@@ -441,7 +453,11 @@ function renderCards(data) {
                 link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvioCorto}`;
                 imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
-            } else if (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1')) {
+            } else if (numeroDeEnvio.length === 19) {
+                link = `https://www.aftership.com/es/track/oca-ar/${numeroDeEnvio}`; // Reemplaza con la URL correspondiente
+                imgSrc = './Img/oca-logo.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-oca"><img src="${imgSrc}" alt="Ejemplo" class="img-transporte"></a>`;
+            }    else if (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1')) {
                 link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvio}`;
                 imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;

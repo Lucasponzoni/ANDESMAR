@@ -2061,6 +2061,12 @@ div.card-body > p > i{
     border-width: 0.5em;
 }
 
+.spinner-border-porcentaje {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-width: 0.3em;
+}
+
 .spinner-border2 {
     width: 1.5rem;
     height: 1.5rem;
@@ -5913,15 +5919,23 @@ button.btn.disabled, .btn:disabled {
 }
 
 .percentage-card:nth-child(1):hover {
-    background: linear-gradient(to bottom, #ffffff, rgba(220, 53, 69, 0.7)); /* Blanco a rojo clarito */
+    background: linear-gradient(to bottom, #ffffff, rgba(220, 53, 69, 0.7));
 }
 
 .percentage-card:nth-child(2):hover {
-    background: linear-gradient(to bottom, #ffffff, rgba(0, 123, 255, 0.7)); /* Blanco a azul clarito */
+    background: linear-gradient(to bottom, #ffffff, rgba(0, 123, 255, 0.7));
 }
 
 .percentage-card:nth-child(3):hover {
-    background: linear-gradient(to bottom, #ffffff, rgba(0, 51, 102, 0.7)); /* Blanco a azul más oscuro */
+    background: linear-gradient(to bottom, #ffffff, rgba(0, 51, 102, 0.7));
+}
+
+.percentage-card:nth-child(4):hover {
+    background: linear-gradient(to bottom, #ffffff, rgba(91, 43, 130, 0.7));
+}
+
+.text-purple {
+    color: #800080;
 }
 
 .pie-chart {
