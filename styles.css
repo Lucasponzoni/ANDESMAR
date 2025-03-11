@@ -6503,3 +6503,7 @@ img.gray-filter {
     color: white;
     font-size: 24px;
 }
+
+.spinner-gif-colecta {
+    width: 80px !important;
+}	

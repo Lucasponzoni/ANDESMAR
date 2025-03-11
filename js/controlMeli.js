@@ -991,23 +991,104 @@ document.getElementById('cerrarButton').onclick = async function() {
     });
 
     if (password === '6572') {
-        for (const email of destinatarios) {
-            await enviarCorreoDespacho(email);
-        }
-
-        // Eliminar el nodo en Firebase
-        const firebaseUrl = 'https://despachos-meli-novogar-default-rtdb.firebaseio.com/despachoDelDiaMeli.json';
-        await fetch(firebaseUrl, {
-            method: 'DELETE'
+        // Contar paquetes no egresados
+        const snapshot = await database.ref('/despachoDelDiaMeli').once('value');
+        let noEgresados = [];
+        snapshot.forEach(childSnapshot => {
+            const data = childSnapshot.val();
+            if (!data.estado || data.estado !== 'preparado') {
+                noEgresados.push(childSnapshot.key); // Guardar el ID de los no egresados
+            }
         });
-        console.log('Nodo eliminado de Firebase');
 
-        // Resetear la tabla
-        tableBody.innerHTML = '<tr><td colspan="7" class="no-data">No has comenzado una colecta aún, manos a la obra 😎</td></tr>';
-        document.getElementById('totalCantidad').innerHTML = '<i class="bi bi-box-seam-fill"></i> Total Unidades: 0';
-        document.getElementById('totalFila').innerHTML = '<i class="bi bi-bookmark-check-fill"></i> Total Etiquetas: 0';
+        const totalPaquetes = snapshot.numChildren(); // Total de paquetes
+        const mensaje = `Vas a cerrar la colecta pero quedan ${noEgresados.length} paquetes sin egresar de ${totalPaquetes} en total. ¿Deseas realizar un cierre parcial y pasar los artículos para la próxima colecta?`;
 
-        showAlert('<i class="bi bi-check-circle"></i> Colecta cerrada y datos enviados exitosamente.');
+        const result = await Swal.fire({
+            title: 'Cierre de Colecta',
+            text: mensaje,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Cierre Parcial',
+            cancelButtonText: 'Cierre Total'
+        });
+
+        if (result.isConfirmed) {
+            // Mostrar spinner
+            const spinner = document.createElement('img');
+            spinner.src = 'Img/spinner.gif';
+            spinner.className = 'spinner-gif-colecta';
+            spinner.style.position = 'fixed';
+            spinner.style.top = '50%';
+            spinner.style.left = '50%';
+            spinner.style.transform = 'translate(-50%, -50%)';
+            spinner.style.width = '50%'; 
+            spinner.style.zIndex = '9999';
+            document.body.appendChild(spinner);
+
+            // Cierre Parcial
+            const proximaColectaRef = database.ref('/DespachosProximaColecta');
+
+            for (const id of noEgresados) {
+                const data = await database.ref('/despachoDelDiaMeli/' + id).once('value');
+                await proximaColectaRef.child(id).set(data.val()); // Mover a nueva carpeta
+                await database.ref('/despachoDelDiaMeli/' + id).remove(); // Eliminar de la actual
+                $(`#data-table-body tr[data-id="${id}"]`).remove(); // Eliminar del DOM
+            }
+
+            // Recalcular contadores
+            actualizarContador();
+
+            // Enviar emails
+            for (const email of destinatarios) {
+                await enviarCorreoDespacho(email);
+            }
+
+            // Limpiar contenido de "despachoDelDiaMeli" antes de recuperar datos
+            await database.ref('/despachoDelDiaMeli').remove(); // Eliminar contenido de despachoDelDiaMeli
+
+            // Recuperar datos de "DespachosProximaColecta"
+            const despachosSnapshot = await proximaColectaRef.once('value');
+            const despachos = despachosSnapshot.val(); // Obtener el objeto completo
+
+            if (despachos) {
+                for (const key in despachos) {
+                    const data = despachos[key];
+                    if (!data.estado || data.estado !== 'preparado') {
+                        await database.ref('/despachoDelDiaMeli').child(key).set(data); // Copiar a despachoDelDiaMeli
+                    }
+                }
+            }
+
+            await proximaColectaRef.remove(); // Eliminar contenido de DespachosProximaColecta
+
+            // Eliminar el spinner
+            document.body.removeChild(spinner);
+            setTimeout(() => {
+                location.reload(); // Recargar la página
+            }, 6000); // 6 segundos de espera
+        } else {
+            // Cierre Total
+            for (const email of destinatarios) {
+                await enviarCorreoDespacho(email);
+            }
+
+            // Eliminar el nodo en Firebase
+            const firebaseUrl = 'https://despachos-meli-novogar-default-rtdb.firebaseio.com/despachoDelDiaMeli.json';
+            await fetch(firebaseUrl, {
+                method: 'DELETE'
+            });
+            console.log('Nodo eliminado de Firebase');
+
+            // Resetear la tabla
+            tableBody.innerHTML = '<tr><td colspan="7" class="no-data">No has comenzado una colecta aún, manos a la obra 😎</td></tr>';
+            document.getElementById('totalCantidad').innerHTML = '<i class="bi bi-box-seam-fill"></i> Total Unidades: 0';
+            document.getElementById('totalFila').innerHTML = '<i class="bi bi-bookmark-check-fill"></i> Total Etiquetas: 0';
+
+            // Eliminar el spinner
+            document.body.removeChild(spinner);
+            showAlert('<i class="bi bi-check-circle"></i> Colecta cerrada y datos enviados exitosamente.');
+        }
     }
 };
 
