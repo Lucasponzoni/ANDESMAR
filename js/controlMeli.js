@@ -1027,16 +1027,22 @@ document.getElementById('cerrarButton').onclick = async function() {
 
             if (result.isConfirmed) {
                 // Mostrar spinner
+                const spinnerContainer = document.createElement('div');
+                spinnerContainer.style.position = 'fixed';
+                spinnerContainer.style.top = '50%';
+                spinnerContainer.style.left = '50%';
+                spinnerContainer.style.transform = 'translate(-50%, -50%)';
+                spinnerContainer.style.textAlign = 'center';
+                spinnerContainer.style.zIndex = '9999';
+                spinnerContainer.className = 'spinner-container-colecta';
+
                 const spinner = document.createElement('img');
-                spinner.src = 'Img/cargando.gif';
+                spinner.src = 'Img/cargando.png';
                 spinner.className = 'spinner-gif-colecta';
-                spinner.style.position = 'fixed';
-                spinner.style.top = '50%';
-                spinner.style.left = '50%';
-                spinner.style.transform = 'translate(-50%, -50%)';
-                spinner.style.width = '50%'; 
-                spinner.style.zIndex = '9999';
-                document.body.appendChild(spinner);
+                spinner.style.width = '50%';
+
+                spinnerContainer.appendChild(spinner);
+                document.body.appendChild(spinnerContainer);
 
                 // Cierre Parcial
                 const proximaColectaRef = database.ref('/DespachosProximaColecta');
