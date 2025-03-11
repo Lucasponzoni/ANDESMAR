@@ -455,7 +455,7 @@ function renderCards(data) {
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
             } else if (numeroDeEnvio.length === 19) {
                 link = `https://www.aftership.com/es/track/oca-ar/${numeroDeEnvio}`; // Reemplaza con la URL correspondiente
-                imgSrc = './Img/oca-logo.png'; // Ruta de la imagen
+                imgSrc = './Img/oca-mini.png'; // Ruta de la imagen
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-oca"><img src="${imgSrc}" alt="Ejemplo" class="img-transporte"></a>`;
             }    else if (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1')) {
                 link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvio}`;
