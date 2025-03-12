@@ -5280,8 +5280,9 @@ const firebaseRefEnvios = firebase.database().ref('enviosBNA');
 
 const sonidoToast = new Audio('./Img/error.mp3'); // Cambia la ruta por la de tu archivo
 
-async function verificarMensajes() {
+const firebaseRefMensajesProcesados = firebase.database().ref('mensajesProcesados'); // Referencia para mensajes procesados
 
+async function verificarMensajes() {
     // Esperar 20 segundos antes de continuar
     await new Promise(resolve => setTimeout(resolve, 20000));
 
@@ -5299,60 +5300,71 @@ async function verificarMensajes() {
 
         if (data.ok) {
             let nuevosErrores = 0;
-            const ordenesConErrores = []; // Array para almacenar números de órdenes con errores
+            const ordenesConErrores = [];
 
             for (const mensaje of data.messages) {
-                // Verificar si el mensaje es del usuario específico y comienza con el formato requerido
-                if (mensaje.user === `${chat}` && /^\(\d+(-reproceso-\d{7})?\)/.test(mensaje.text)) {
+                const mensajeId = mensaje.ts.replace(/\./g, '_'); // Reemplazar puntos por guiones bajos
+
+                // Verificar si el mensaje ya fue procesado
+                const snapshotMensajeProcesado = await firebaseRefMensajesProcesados.child(mensajeId).once('value');
+                if (snapshotMensajeProcesado.exists()) {
+                    continue; // Si ya fue procesado, saltar al siguiente mensaje
+                }
+
+                if (mensaje.user === `${chat}` && /^\(\d+(-reproceso-\d+)?\)/.test(mensaje.text)) {
                     let numero;
-                    const reprocesoMatch = mensaje.text.match(/^\((\d+)(?:-reproceso-(\d{7}))?\)/);
-            
+                    const reprocesoMatch = mensaje.text.match(/^\((\d+)(?:-reproceso-(\d+))?\)/);
+
                     if (reprocesoMatch) {
-                        // Si hay un número después de "reproceso" o solo el número simple
                         numero = reprocesoMatch[2] ? reprocesoMatch[2] : reprocesoMatch[1];
                     } else {
                         console.error('No se encontró un formato válido en el mensaje:', mensaje.text);
-                        continue; // Saltar al siguiente mensaje si no hay coincidencia
+                        continue;
                     }
-            
-                    const errorMensaje = mensaje.text.replace(/^\(\d+(-reproceso-\d{7})?\)\s*/, ''); // Eliminar el número y espacio inicial
-            
-                    // Verificar si el nodo ya existe en Firebase
-                    const snapshotErrores = await firebaseRefErrores.child(numero).once('value');
-                    if (!snapshotErrores.exists()) {
-                        // Si no existe, agregarlo a Firebase
-                        await firebaseRefErrores.child(numero).set({ errorMensaje });
-                        nuevosErrores++;
-                        ordenesConErrores.push(numero); // Agregar número de orden al array
-            
-                        // Mostrar el toast después de un retraso de 1 segundo
-                        setTimeout(() => {
-                            mostrarToast(numero, errorMensaje);
-            
-                            // Reiniciar y reproducir el sonido
-                            sonidoToast.currentTime = 0; // Reiniciar el sonido
-                            sonidoToast.play().catch(error => {
-                                console.error('Error al reproducir el sonido:', error);
-                            });
-                        }, 1000); // Retraso de 1000 ms (1 segundo)
-            
-                        // Buscar en enviosBNA
-                        const snapshotEnvios = await firebaseRefEnvios.once('value');
-                        snapshotEnvios.forEach((envio) => {
-                            if (envio.val().orden_ === numero) {
-                                // Si se encuentra una coincidencia, agregar el error
-                                envio.ref.child('errorSlack').set(true);
-                                // Almacenar el mensaje como cadena
-                                envio.ref.child('errorSlackMensaje').set(errorMensaje); // Solo el mensaje como cadena
-                            }
-                        });
+
+                    const errorMensaje = mensaje.text.replace(/^\(\d+(-reproceso-\d+)?\)\s*/, '');
+                    let nuevoNumero = numero;
+                    let reprocesoCount = 1;
+
+                    while (true) {
+                        const snapshotErrores = await firebaseRefErrores.child(nuevoNumero).once('value');
+                        if (!snapshotErrores.exists()) {
+                            await firebaseRefErrores.child(nuevoNumero).set({ errorMensaje });
+                            nuevosErrores++;
+                            ordenesConErrores.push(nuevoNumero);
+
+                            // Mostrar el toast y reproducir sonido
+                            setTimeout(() => {
+                                mostrarToast(nuevoNumero, errorMensaje);
+                                sonidoToast.currentTime = 0;
+                                sonidoToast.play().catch(error => {
+                                    console.error('Error al reproducir el sonido:', error);
+                                });
+                            }, 1000);
+
+                            break;
+                        } else {
+                            reprocesoCount++;
+                            nuevoNumero = `${numero}-reproceso${reprocesoCount}`;
+                        }
                     }
+
+                    // Agregar el ID del mensaje a Firebase como procesado
+                    await firebaseRefMensajesProcesados.child(mensajeId).set(true);
+
+                    // Buscar en enviosBNA
+                    const snapshotEnvios = await firebaseRefEnvios.once('value');
+                    snapshotEnvios.forEach((envio) => {
+                        if (envio.val().orden_ === numero) {
+                            envio.ref.child('errorSlack').set(true);
+                            envio.ref.child('errorSlackMensaje').set(errorMensaje);
+                        }
+                    });
                 }
-            }                  
+            }
 
             if (nuevosErrores > 0) {
                 console.log(`Se han localizado ${nuevosErrores} nuevos errores de Slack que no existían en la base de datos.`);
-                // Enviar notificación a Slack
                 await enviarNotificacionSlack(ordenesConErrores, nuevosErrores);
             } else {
                 console.log('No se encontraron nuevos errores.');
