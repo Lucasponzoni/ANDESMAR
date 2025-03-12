@@ -1898,7 +1898,7 @@ for (let i = 0; i < cantidadFinal; i++) {
 }
 
     const requestData = {
-        "contrato": volumenCM3 > 100000 ? "351002753" : "400017259",
+        "contrato": volumenCM3 > 100000 ? "351003637" : "400017259",
         "idPedido": (idOperacionFinalAndreani + "-MELI").toUpperCase(),
         "origen": {
             "postal": {
