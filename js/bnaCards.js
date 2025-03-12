@@ -1454,7 +1454,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                       </p>
 
                        <p class="card-text-pago">
-                           <strong>Cantidad:</strong> <strong class="strong-costo2">${data[i].cantidad} U.</strong>
+                            <strong>Cantidad:</strong> <strong id="strong-costo2-${data[i].id}" class="strong-costo2">${data[i].cantidad} U.</strong>
                        </p>
                        
                        <p class="card-text-pago">
@@ -1685,7 +1685,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             <button class="btn mt-1 btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'} ${isMacro(storeCode) ? 'hidden' : ''}"
                                 id="andreaniButton${data[i].id}" 
                                 ${isAndesmar || isCDS || data[i].cancelado ? 'disabled' : ''} 
-                                onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
+                                onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}',)`}" >
                                 <span id="andreaniText${data[i].id}">
                                 ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
                                 </span>
@@ -4401,6 +4401,10 @@ medidasDiv.appendChild(medidasTextoDiv);
     const bultoDiv = document.createElement('div');
     bultoDiv.className = 'bultoImput mb-3'; // Añadido margen inferior
 
+    const CantidadReal = document.getElementById(`strong-costo2-${id}`).textContent || "1";
+    const valorSinU = parseInt(CantidadReal.replace(" U.", "").trim()) || 1; 
+    console.log("Valor sin U:", valorSinU);
+
     bultoDiv.innerHTML = `
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
@@ -4420,7 +4424,7 @@ medidasDiv.appendChild(medidasTextoDiv);
         </div>
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-            <input type="number" id="cantidad-${id}" name="Cantidad" class="form-control-medidas" step="1" value="1" min="1" required>
+            <input type="number" id="cantidad-${id}" name="Cantidad" class="form-control-medidas" step="1" value="${valorSinU}" min="1" required>
         </div>
     `;
 
@@ -4484,7 +4488,7 @@ medidasDiv.appendChild(medidasTextoDiv);
                 </div>
                 <div class="input-group me-2">
                     <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-                    <input type="number" id="cantidadInterior-${id}" name="CantidadInterior" class="form-control-medidas" step="1" value="1" min="1" required disabled>
+                    <input type="number" id="cantidadInterior-${id}" name="CantidadInterior" class="form-control-medidas" step="1" value="${valorSinU}" min="1" required disabled>
                 </div>
             </div>
         `;
