@@ -820,7 +820,7 @@ const paymentHTML = `
         ${isAndesmar || isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''}
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.Recibe}')`}">
+        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${limpiarNombreApellido(data.Recibe)}')`}">
         <span id="CDSText${data.idOperacion}">
         ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
         </span>
@@ -836,7 +836,7 @@ const paymentHTML = `
         ${isAndreani || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}','${email}', '${data.Recibe}')`}">
+        ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}','${email}', '${limpiarNombreApellido(data.Recibe)}')`}">
         <span id="andesmarText${data.idOperacion}">
             ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>'}
         </span>
@@ -845,7 +845,7 @@ const paymentHTML = `
     <!-- Botón Andesmar --> 
 
     <!-- Nuevo botón para descargar la etiqueta Mini-->
-    <button class="btn btn-success mini-etiqueta-andi mb-1 ${isAndesmar ? '' : 'hidden'}" id="downloadButton${data.idOperacion}" style="margin-left: 2px;" onclick="descargarEtiquetaMini('${data.NombreyApellido || data.Recibe}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${limpiarProducto(data.Producto)}', '${data.idOperacion}', '${data.SKU}')">
+    <button class="btn btn-success mini-etiqueta-andi mb-1 ${isAndesmar ? '' : 'hidden'}" id="downloadButton${data.idOperacion}" style="margin-left: 2px;" onclick="descargarEtiquetaMini('${limpiarNombreApellido(data.NombreyApellido || data.Recibe)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${limpiarProducto(data.Producto)}', '${data.idOperacion}', '${data.SKU}')">
         <i class="bi bi-lightning-charge-fill"></i> Mini
     </button>
     </div>
@@ -856,7 +856,7 @@ const paymentHTML = `
         ${isAndesmar || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.Recibe}', '${data.transactionAmount}')`}">
+        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${limpiarNombreApellido(data.Recibe)}', '${data.transactionAmount}')`}">
         <span id="andreaniText${data.idOperacion}">
             ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
         </span>
@@ -873,7 +873,7 @@ const paymentHTML = `
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${limpiarNombreApellido(data.Recibe)}')">
         <span>
             ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
         </span>
@@ -1176,6 +1176,11 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
 
     let totalBultosCds = cantidad; // Asumiendo que cantidad es total de bultos
 
+    // Dividir medidas para obtener alto, ancho y largo
+    const productoLowerCase = Producto.toLowerCase();
+
+    const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000")|| productoLowerCase.includes("tiro balanceado") ? cantidad * 2 : cantidad;
+    
     const buttonCDS = document.getElementById(`CDSButton${id}`);
     const spinner = document.getElementById(`spinnerCDS${id}`);
     const text = document.getElementById(`CDSText${id}`);
@@ -1201,7 +1206,7 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
     const referenciaCds = documentoCds;
     const buttonId = `CDSButton${id}`;
 
-    const urlCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenTotalcds}&peso=${pesoCds}&codigopostal=${codigoPostalCds}&localidad=${localidadCds}&valor=${valorCds}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${documentoCds}&nombre=${nombreCds}&telefono=${telefonoCds}&email=${emailCds}&domicilio=${domicilioCds}&bultos=${totalBultosCds}&referencia=${referenciaCds}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
+    const urlCds = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenTotalcds}&peso=${pesoCds}&codigopostal=${codigoPostalCds}&localidad=${localidadCds}&valor=${valorCds}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${documentoCds}&nombre=${nombreCds}&telefono=${telefonoCds}&email=${emailCds}&domicilio=${domicilioCds}&bultos=${cantidadFinal}&referencia=${referenciaCds}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
 
     const optionsCds = {
         method: 'GET',
@@ -2698,6 +2703,9 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 
     // Si el usuario cancela, salir de la función
     if (!numeroRemito) {
+        spinner.style.display = "none";
+        button.innerHTML = '<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>';
+        button.disabled = false;  
         return;
     }
 
