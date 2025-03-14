@@ -543,6 +543,11 @@ function crearCard(data) {
         // Eliminar caracteres no alfabéticos y espacios extra
         return nombreApellido.replace(/[^a-zA-Z\s]/g, '').trim().replace(/\s+/g, ' ');
     } 
+
+    function limpiarRecibe(nombreApellido) {
+        // Eliminar caracteres no alfabéticos y espacios extra
+        return nombreApellido.replace(/[^a-zA-Z\s]/g, '').trim().replace(/\s+/g, ' ');
+    } 
     
     function limpiarProducto(Producto) {
         // Eliminar caracteres no alfabéticos y espacios extra
@@ -620,6 +625,8 @@ const paymentHTML = `
     // Crear el carrusel
     const carouselId = `carousel-${data.idOperacion}`;
     let carouselItems = '';
+
+    const recibeSinCaracteresEspeciales = data.Recibe.replace(/[.'":]/g, ''); 
 
     filteredPictures.forEach((picture, index) => {
         carouselItems += `
@@ -820,7 +827,7 @@ const paymentHTML = `
         ${isAndesmar || isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''}
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${limpiarNombreApellido(data.Recibe)}')`}">
+        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}')`}">
         <span id="CDSText${data.idOperacion}">
         ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
         </span>
@@ -836,7 +843,7 @@ const paymentHTML = `
         ${isAndreani || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}','${email}', '${limpiarNombreApellido(data.Recibe)}')`}">
+        ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}','${email}', '${recibeSinCaracteresEspeciales}')`}">
         <span id="andesmarText${data.idOperacion}">
             ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>'}
         </span>
@@ -856,7 +863,7 @@ const paymentHTML = `
         ${isAndesmar || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${limpiarNombreApellido(data.Recibe)}', '${data.transactionAmount}')`}">
+        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}')`}">
         <span id="andreaniText${data.idOperacion}">
             ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
         </span>
@@ -873,7 +880,7 @@ const paymentHTML = `
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${limpiarNombreApellido(data.Recibe)}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${recibeSinCaracteresEspeciales}')">
         <span>
             ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
         </span>
