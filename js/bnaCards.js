@@ -2124,6 +2124,9 @@ async function handleCorrection(id) {
             case '1115':
                 nombreFacturado = 'Ponzoni';
                 break;
+            case '1116':
+                nombreFacturado = 'Villalba';
+                break;
             default:
                 Swal.fire('Clave incorrecta', '', 'error');
                 return;
@@ -2200,6 +2203,9 @@ async function marcarFacturado(id, email, nombre, remito) {
                 mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else if (clave === '1115') {
                 contenidoBoton = `Facturado Automata Lucas P. ${horaFormateada} ${fechaFormateada}`;
+                mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
+            } else if (clave === '1116') {
+                contenidoBoton = `Facturado Automata Rocio V. ${horaFormateada} ${fechaFormateada}`;
                 mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
             } else {
                 Swal.fire('Clave incorrecta', '', 'error');
@@ -2324,6 +2330,10 @@ function marcarCancelado2(id) {
             nombreFacturador = 'Lucas P.';
             contenidoBoton = `Cancelado Lucas P. ${horaFormateada} ${fechaFormateada}`;
             break;
+        case '1116':
+            nombreFacturador = 'Rocio V.';
+            contenidoBoton = `Cancelado Rocio V. ${horaFormateada} ${fechaFormateada}`;
+            break;
         default:
             Swal.fire('Clave incorrecta', '', 'error');
             return; // Salir si la clave es incorrecta
@@ -2424,6 +2434,9 @@ async function marcarFacturado2(id, email, nombre, remito) {
         mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else if (clave === '1115') {
         contenidoBoton = `Facturado Automata Lucas P. ${horaFormateada} ${fechaFormateada}`;
+        mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
+    } else if (clave === '1116') {
+        contenidoBoton = `Facturado Automata Rocio V. ${horaFormateada} ${fechaFormateada}`;
         mensajeFactura = '<i class="bi bi-check-circle" style="margin-right: 5px;"></i> Facturado';
     } else {
         Swal.fire('Clave incorrecta', '', 'error');
