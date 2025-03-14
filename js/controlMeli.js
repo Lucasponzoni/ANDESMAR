@@ -104,6 +104,51 @@ $(document).ready(function() {
     
 });
 
+// Evento al hacer clic en el botón
+document.getElementById('btn-actualizar').addEventListener('click', verificarActualizacionBaseDeDatos2);
+
+// Función para verificar y actualizar la base de datos
+function verificarActualizacionBaseDeDatos2() {
+    $('.lookBase').html(`
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <i class="fas fa-exclamation-triangle" style="color: orange; margin-bottom: 10px; font-size: 24px;"></i>
+            <span style="color: grey; font-weight: bold; text-align: center;">
+                Estoy forzando la descarga de la base de datos, aguarde...
+            </span>
+            <i class="fas fa-spinner fa-spin" style="color: cornflowerblue; margin-top: 10px; font-size: 40px;"></i>
+        </div>
+    `).show();    
+    
+    // Eliminar el localStorage actual antes de descargar nuevos datos
+    localStorage.removeItem('envios');
+    localStorage.clear();
+    $('#codigoInput').prop('disabled', true);
+
+            // Mostrar el spinner por al menos 3 segundos
+setTimeout(() => {
+    descargarDatosDesdeFirebase(3000).then(() => {
+                    const fechaActual = new Date().toLocaleString('es-AR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                    $('.lookBase').html(`Base de datos actualizada al día <span class="redStrong">${fechaActual}</span>`).show();
+                    $('#codigoInput').prop('disabled', false);
+                    $('#codigoInput').focus();
+                }).catch(error => {
+                    console.error("Error al descargar datos: ", error);
+                    Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al descargar la base de datos.'
+            });
+        });
+    }, 3000); // Esperar 3 segundos
+}
+    
 function verificarActualizacionBaseDeDatos() {
     const ultimaActualizacion = localStorage.getItem('ultimaActualizacion');
     const ahora = new Date().getTime();
@@ -120,6 +165,8 @@ function verificarActualizacionBaseDeDatos() {
 
         // Borrar el localStorage antes de mostrar el spinner y descargar los datos
         localStorage.clear();
+
+        $('#codigoInput').prop('disabled', true);
         
         // Mostrar el spinner por al menos 3 segundos
         setTimeout(() => {
@@ -135,6 +182,8 @@ function verificarActualizacionBaseDeDatos() {
                 localStorage.setItem('ultimaActualizacion', ahora); // Tiempo de actualización
                 $('.lookBase').html(`Base de datos actualizada al día <span class="redStrong">${fechaActual}</span>`).show();
                 $('#spinner4').hide();
+                $('#codigoInput').prop('disabled', false);
+                $('#codigoInput').focus();
             }).catch(error => {
                 console.error("Error al descargar datos: ", error);
                 $('#spinner4').hide();
