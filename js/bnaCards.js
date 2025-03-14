@@ -425,6 +425,7 @@ function loadEnviosFromFirebase() {
                         cuotas: data.cuotas,
                         nro_de_cuotas: data.nro_de_cuotas,
                         envio: data.medio_de_envio,
+                        cupon: data.cupon,
                         numeroSeguimiento: data.numero_de_seguimiento,
                         cotizacion: data.cotizacion,
                         trackingNumber: data.trackingNumber,
@@ -836,7 +837,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="cupon_pago_${data[i].id}">Cupón de Pago:</label>
-                                <input type="text" id="cupon_pago_${data[i].id}" value="${cupon}" disabled>
+                                <input type="text" id="cupon_pago_${data[i].id}" value="${data[i].cupon ? data[i].cupon : cupon}" disabled>
                             </div>
                             <div class="col">
                                 <label for="cod_autorizacion_${data[i].id}">Código de Autorización:</label>
@@ -1483,9 +1484,9 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             <div class="mb-3 text-center">
                             <strong class="text-primary">CUPON:</strong>
                             <div class="d-flex justify-content-center align-items-center">
-                            <span class="me-2">${cupon}</span>
+                            <span class="me-2">${data[i].cupon ? data[i].cupon : cupon}</span>
                             
-                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${cupon}')">
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].cupon ? data[i].cupon : cupon}')">
                             <i class="bi bi-clipboard"></i>
                             </button>
 

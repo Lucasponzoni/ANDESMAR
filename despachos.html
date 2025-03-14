@@ -82,37 +82,40 @@
             </div>
         </div>
         
-                <div class="col-md-6 mb-3 d-flex justify-content-end ingreso-egreso trio-de-botones">
+        <div class="col-md-6 mb-3 d-flex justify-content-end ingreso-egreso trio-de-botones">
             <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
-                <i class="bi bi-arrow-return-left"></i>
+                <i class="bi bi-arrow-return-left" style="font-size: 20px;"></i>
+            </button>
+            <button class="btn btn-dark" id="btnImprimirNodos" type="button" title="Imprimir" data-toggle="modal" data-target="#ImprimirNodos">
+                <i class="bi bi-printer" style="font-size: 20px;"></i>
             </button>
             <button class="btn btn-primary" id="ingresoBtn" data-toggle="modal" data-target="#ingresoModal">
-                <i class="bi bi-box-arrow-in-down"></i>
+                <i class="bi bi-box-arrow-in-down" style="font-size: 20px;"></i>
             </button>
             <!-- Botón para filtrar por antigüedad -->
             <button class="btn btn-danger" id="filterOldestBtn" title="Filtrar por antigüedad">
-                <i class="bi bi-clock"></i>
+                <i class="bi bi-clock" style="font-size: 20px;"></i>
             </button>
             <!-- Botón de Logística Propia -->
             <button class="btn btn-secondary" id="logisticaPropiaBtn" data-toggle="modal" data-target="#logisticaModal">
-                <i class="bi bi-truck"></i> Local
+                <i class="bi bi-truck" style="font-size: 20px;"></i> Local
             </button>
             <!-- Nuevo botón BsAr-StaFe -->
             <button class="btn btn-info" id="bsarStaFeBtn" data-toggle="modal" data-target="#bsarStaFeModal">
-                <i class="bi bi-truck"></i> Interior
+                <i class="bi bi-truck" style="font-size: 20px;"></i>
             </button>
             <!-- Nuevo botón para abrir el modal de panel de control -->
             <button class="btn btn-warning" id="controlPanelBtn" data-toggle="modal" data-target="#controlPanelModal">
-                <i class="bi bi-gear"></i> Panel
+                <i class="bi bi-gear" style="font-size: 20px;"></i>
             </button>
             <!-- Botón para abrir el modal de escanear remito y adjuntar foto -->
             <button class="btn btn-success" id="scanRemitoBtn" data-toggle="modal" data-target="#scanRemitoModal">
-                <i class="bi bi-camera2"></i>
+                <i class="bi bi-camera2" style="font-size: 20px;"></i>
             </button>
             <button class="btn btn-secondary ml-2" id="promedioBtn" title="Promedio Despacho: Xd Yh Zm">
-                <i class="bi bi-calculator"></i> Calculando Promedio...
+                <i class="bi bi-calculator" style="font-size: 20px;"></i> Calculando Promedio...
             </button>
-        </div>
+        </div>        
                                
     </div>
 </div>
@@ -393,6 +396,43 @@
     </div>
 </div>
 <!-- Fin Modal Comentario -->
+
+<!-- Modal Nodos -->
+<div class="modal fade" id="ImprimirNodos" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Seleccione el nodo que desea imprimir la etiqueta</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="nodosList">
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'C.I.T.', this)">C.I.T.</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'BENAVIDEZ', this)">BENAVIDEZ</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'FLORENCIO V.', this)">FLORENCIO VARELA</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'AVELLANEDA', this)">AVELLANEDA</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'VENADO T.', this)">VENADO TUERTO</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'BAHIA BLANCA', this)">BAHIA BLANCA</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'GUALEGUAYCHU', this)">GUALEGUAYCHU</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'CONCORDIA', this)">CONCORDIA</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'SANTA FE', this)">SANTA FE</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'RECONQUISTA', this)">RECONQUISTA</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'RESISTENCIA', this)">RESISTENCIA</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'CORDOBA', this)">CORDOBA</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'TUCUMAN', this)">TUCUMAN</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'CASILDA', this)">CASILDA</button>
+                    <button class="btn btn-outline-primary campo" onclick="generarPDFNodo('remito', 'cliente', 'fechaEntrega', 'VILLA MARIA', this)">VILLA MARIA</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin Modal Nodos -->
 
 <!-- Modal de Panel de Control -->
 <div class="modal fade" id="controlPanelModal" tabindex="-1" aria-labelledby="controlPanelModalLabel" aria-hidden="true">

@@ -1686,5 +1686,190 @@ document.getElementById('controlPanelBtn').addEventListener('click', function ()
 });
 // FIN PANEL DE CONTROL
 
+// ETIQUETA NODOS
+async function generarPDFNodo(remito, cliente, fechaEntrega, operadorLogistico, button) {
+    let spinner = document.getElementById("spinner2");
+    spinner.style.display = "flex";
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'cm',
+        format: [15, 10],
+        putOnlyUsedFonts: true,
+        floatPrecision: 16
+    });
+
+    let logoSrc = './Img/Camion-Rosario.png';
+    // Aquí puedes agregar lógica para seleccionar el logo basado en el operador logístico
+
+    const contenido = `
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etiqueta</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            margin: 5px;
+            padding: 0;
+            display: grid;
+            place-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .etiqueta {
+            width: 10cm;
+            margin: 5px;
+            height: auto;
+            max-height: 15cm;
+            border: 2px dashed #000;
+            border-radius: 10px;
+            padding: 1cm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .logo img {
+            max-width: 250px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .campo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 6px;
+            padding: 5px;
+            border: 2px solid #ccc;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .campo2 {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 6px;
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .campo span {
+            font-size: 1em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .cantidad {
+            width: 200px;
+            margin-top: 5px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+            background-color: #ffffff; 
+            border: 2px solid red; 
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #000;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 2px solid #ccc;
+        }
+
+        .contacto {
+            font-size: 0.8em;
+            color: #333;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .contacto p {
+            margin: 3px 0;
+            /* Ajustado */
+        }
+
+        .campo-extra {
+            border-radius: 8px;
+            margin-top: 2px;
+            /* Ajustado */
+            border: 2px dashed #ccc;
+            padding: 5px;
+            /* Ajustado */
+            text-align: center;
+            font-size: 0.9em;
+            /* Ajustado */
+            color: #555;
+        }
+    </style>
+</head>
+
+<body data-listener-added_8bc0a513="true">
+    <div class="etiqueta">
+        <div class="logo"><img src="Img/Novogar-Logo.png" alt="Logo" style="margin: 0 auto; display: block; "></div>
+        <div class="campo"><strong><span style="font-size: 20px; font-family: Tahoma, Geneva, sans-serif; color: rgb(0, 0, 0);">NODO ANDREANI</span></strong></div>
+        <div class="campo" style="text-align: center;"><span style="font-size: 35px; font-family: Tahoma, Geneva, sans-serif; color: rgb(0, 0, 0);">${operadorLogistico.toUpperCase()}</span></div>
+        <div class="campo-extra"><span style="font-size: 13px; color: rgb(0, 0, 0);">ESTE PALLET ES PROPIEDAD DE&nbsp;</span><strong><span style="font-size: 13px; color: rgb(0, 0, 0);">NOVOGAR.COM.AR</span></strong></div>
+        <div class="campo2" style="text-align: center;"><span style="font-size: 20px; font-family: Tahoma, Geneva, sans-serif; color: rgb(0, 0, 0);"></span><div class="cantidad">BULTOS ____</div></div>
+        <div class="contacto">
+            <p><strong>Cont&aacute;ctese con posventa:</strong></p>
+            <p><strong>(0341) 6680658 (Solo WhatsApp)</strong></p>
+            <p><strong>posventa@novogar.com.ar</strong></p>
+        </div>
+        <div class="logo"><img src="Img/Andreani-black.jpg" alt="Logo" style="margin: 0 auto; display: block; width: 210px;"></div>
+    </div>
+</body>
+
+</html>`;
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = contenido;
+    document.body.appendChild(tempDiv);
+
+    html2canvas(tempDiv, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', 0, 0, 10, 15);
+        const pdfBlob = doc.output('blob');
+
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        setTimeout(() => {
+            spinner.style.display = "none";
+            window.open(pdfUrl, '_blank');
+        }, 2000);
+
+        document.body.removeChild(tempDiv);
+    }).catch(error => {
+        spinner.style.display = "none";
+        console.error("Error al generar el PDF:", error);
+    });
+}
+// FIN ETIQUETA NODOS
+
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;
