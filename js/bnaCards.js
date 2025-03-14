@@ -4417,7 +4417,6 @@ medidasDiv.appendChild(medidasTextoDiv);
 
     const CantidadReal = document.getElementById(`strong-costo2-${id}`).textContent || "1";
     const valorSinU = parseInt(CantidadReal.replace(" U.", "").trim()) || 1; 
-    console.log("Valor sin U:", valorSinU);
 
     bultoDiv.innerHTML = `
         <div class="input-group mb-2">
@@ -5251,7 +5250,8 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
         const transportData = {
             transportCompany: "Logistica Propia",
             cliente: cliente,
-            remito: numeroRemito
+            remito: numeroRemito,
+            tipoElectrodomesticoBna: "bulto50",
         };
 
         const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
