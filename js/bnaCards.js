@@ -1133,7 +1133,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <div class="row mb-2">
                             <div class="col">
                             <label for="otros_comentarios_entrega_${data[i].id}">Otros Comentarios de Entrega:</label>
-                            <input type="text" id="otros_comentarios_entrega_${data[i].id}" value="${data[i].otros_comentarios_entrega !== undefined ? data[i].otros_comentarios_entrega : `Coordinar a Línea ${data[i].telefono}`}" disabled>
+                            <input type="text" id="otros_comentarios_entrega_${data[i].id}" value="${isMacro(storeCode) ? 'GUIA OCA: ' + data[i].numeroSeguimiento : (data[i].otros_comentarios_entrega !== undefined ? data[i].otros_comentarios_entrega : `Coordinar a Línea ${data[i].telefono}`)}" disabled>
                             </div>
 
                         </div>
