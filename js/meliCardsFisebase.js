@@ -1186,7 +1186,7 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
     // Dividir medidas para obtener alto, ancho y largo
     const productoLowerCase = Producto.toLowerCase();
 
-    const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000")|| productoLowerCase.includes("tiro balanceado") ? cantidad * 2 : cantidad;
+    const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000")|| productoLowerCase.includes("balanceado") ? cantidad * 2 : cantidad;
     
     const buttonCDS = document.getElementById(`CDSButton${id}`);
     const spinner = document.getElementById(`spinnerCDS${id}`);
@@ -1598,7 +1598,7 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     const productoLowerCase = Producto.toLowerCase();
 
     const [largo, ancho, alto] = Medidas.split('x').map(Number);
-    const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000")|| productoLowerCase.includes("tiro balanceado") ? cantidad * 2 : cantidad;
+    const cantidadFinal = productoLowerCase.includes("split") || productoLowerCase.includes("18000")|| productoLowerCase.includes("balanceado") ? cantidad * 2 : cantidad;
 
     // Verificar el código postal y definir la unidad de venta
     const unidadVenta = [3500, 3100, 3400].includes(parseInt(Cp))
@@ -1885,7 +1885,7 @@ const productoLowerCase = Producto.toLowerCase();
 // Determinar la cantidad a usar
 const cantidadFinal = productoLowerCase.includes("split") || 
                       productoLowerCase.includes("18000") || 
-                      productoLowerCase.includes("tiro balanceado") ? 
+                      productoLowerCase.includes("balanceado") ? 
                       cantidad * 2 : cantidad;
 
 // Desestructurar las medidas y convertir a número
