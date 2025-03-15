@@ -5955,6 +5955,13 @@ button.btn.disabled, .btn:disabled {
     }
 }
 
+@media (max-width: 762px) {
+    #porcentajes, .estadisticas-header {
+        display: none !important; 
+    }
+}
+
+
 .percentage-card h2 {
     font-size: 1.5em;
     margin: 0;
