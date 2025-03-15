@@ -1766,20 +1766,30 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
         }
     }).then((result) => {
         if (result.isConfirmed) {
-            // Si la contraseña es correcta, actualizar en Firebase
-            firebase.database().ref('enviosBNA/' + data[i].id).update({
-                marcaPreparado: nuevoEstado
-            }).then(() => {
-                console.log(`Estado de preparación actualizado a: ${nuevoEstado}`);
-                
-                // Actualizar el badge
-                const contadorCards1 = document.getElementById('contadorCards1');
-                if (contadorCards1) {
-                    const currentCount = parseInt(contadorCards1.innerText) || 0;
-                    contadorCards1.innerText = this.checked ? Math.max(currentCount - 1, 0) : currentCount + 1; // Resta si está marcado, suma si está desmarcado
+            // Verificar si el tipo de electrodoméstico ya existe
+            firebase.database().ref('enviosBNA/' + data[i].id).once('value').then((snapshot) => {
+                const tipoElectrodomesticoActual = snapshot.val().tipoElectrodomesticoBna;
+
+                // Solo actualizar si el tipo de electrodoméstico no existe
+                if (!tipoElectrodomesticoActual) {
+                    firebase.database().ref('enviosBNA/' + data[i].id).update({
+                        marcaPreparado: nuevoEstado,
+                        tipoElectrodomesticoBna: "bulto50"
+                    }).then(() => {
+                        console.log(`Estado de preparación actualizado a: ${nuevoEstado}`);
+                        
+                        // Actualizar el badge
+                        const contadorCards1 = document.getElementById('contadorCards1');
+                        if (contadorCards1) {
+                            const currentCount = parseInt(contadorCards1.innerText) || 0;
+                            contadorCards1.innerText = this.checked ? Math.max(currentCount - 1, 0) : currentCount + 1; // Resta si está marcado, suma si está desmarcado
+                        }
+                    }).catch(error => {
+                        console.error("Error al actualizar el estado de preparación: ", error);
+                    });
+                } else {
+                    console.log('El tipo de electrodoméstico ya existe, ignorando la actualización.');
                 }
-            }).catch(error => {
-                console.error("Error al actualizar el estado de preparación: ", error);
             });
         } else {
             // Revertir el estado del switch si se cancela o la contraseña es incorrecta
