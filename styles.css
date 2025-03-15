@@ -3863,6 +3863,15 @@ div .form-check {
     font-weight: 600;
 }
 
+.subdato-texto2{
+    background-color: red;
+    color: white;
+    padding: 3px;
+    border-radius: 5px;
+    font-size: .8rem;
+    font-weight: 600;
+}
+
 .subdato-texto3{
     background-color: green;
     color: white;
@@ -3972,6 +3981,21 @@ div .form-check {
     color: white; 
 }
 
+.btn-oca2 {
+    background: linear-gradient(135deg, #5B2B82, #7A3E99);
+    color: white; 
+}
+
+.btn-placeit {
+    background: linear-gradient(135deg, #0055a9, #7A3E99);
+    color: white; 
+    cursor: not-allowed;
+}
+
+.btn-placeit:hover {
+    cursor: not-allowed;
+}
+
 .btn-novogar {
     background: linear-gradient(135deg, #717171, #323232); 
     color: white; 
@@ -3996,7 +4020,8 @@ div .form-check {
 /* FIN TRANSPORTE EN TABLAS */
 
 #porcentajes {
-
+    max-width: 100%;
+    overflow-x: auto;
     padding: 12px 20px; 
     border-radius: 10px; 
     color: #333; 
@@ -5898,24 +5923,51 @@ button.btn.disabled, .btn:disabled {
 }
 
 .percentage-card {
-    background: linear-gradient(to bottom, #fff, #c2d3e9); 
+    flex: 1 0 auto; /* Permite que las tarjetas se ajusten */
+    max-width: 200px; /* Limita el ancho máximo de cada tarjeta */
+    background: linear-gradient(to bottom, #f9f9f9, #e1e8f0);
     border: 1px solid #d0d0d0;
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    color: #333;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #2c3e50;
     font-weight: bold;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.3s ease;
-    margin-bottom: 10px;
+    transition: background 0.3s ease, transform 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.percentage-card:hover {
+    background: linear-gradient(to bottom, #e1e8f0, #f9f9f9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.percentage-card h2 {
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.percentage-card p {
+    font-size: 1em;
+    color: #7f8c8d;
+}
+
+.percentage-card img {
+    width: 50px;
 }
 
 .conteo{
-    margin-top: -20px;
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    width: fit-content !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .percentage-card:nth-child(1):hover {
@@ -5934,6 +5986,45 @@ button.btn.disabled, .btn:disabled {
     background: linear-gradient(to bottom, #ffffff, rgba(91, 43, 130, 0.7));
 }
 
+.percentage-card:nth-child(5):hover {
+    background: linear-gradient(to bottom, #ffffff, rgba(255, 0, 120, 0.7));
+}
+
+.conteo-Andreani{
+    background-color: rgba(220, 53, 69, 0.7);
+    padding: 5px;
+    border-radius: 5px;
+    color: white;
+}
+
+.conteo-andesmar{
+    background-color: rgba(0, 123, 255, 0.7);
+    padding: 5px;
+    border-radius: 5px;
+    color: white;
+}
+
+.conteo-cds{
+    background-color: rgba(0, 51, 102, 0.7);
+    padding: 5px;
+    border-radius: 5px;
+    color: white;
+}
+
+.conteo-oca{
+    background-color: rgba(91, 43, 130, 0.7);
+    padding: 5px;
+    border-radius: 5px;
+    color: white;
+}
+
+.conteo-placeit{
+    background-color: rgba(255, 0, 120, 0.7);
+    padding: 5px;
+    border-radius: 5px;
+    color: white;
+}
+
 .text-purple {
     color: #800080;
 }
@@ -5947,14 +6038,14 @@ button.btn.disabled, .btn:disabled {
         var(--color) calc(var(--percentage) * 1%),
         #e0e0e0 0
     );
-    box-shadow: 0 0px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     margin: 15px auto;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .pie-chart:hover {
     transform: scale(1.1);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
 .pie-chart::before {
@@ -5962,13 +6053,25 @@ button.btn.disabled, .btn:disabled {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 60%;
-    height: 60%;
-    background: cornsilk;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
+    background: transparent; /* Mantener transparente */
+    box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 6px solid rgba(255, 255, 255, 0.5); /* Borde interno */
     transform: translate(-50%, -50%);
-    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 2px solid #f0f0f0;
+}
+
+.pie-chart::after {
+    content: attr(data-percentage);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.7);
 }
 
 .text-dark-blue{
@@ -5976,7 +6079,7 @@ button.btn.disabled, .btn:disabled {
 }
 
 img.gray-filter {
-    width: auto;
+    width: 160px;
     filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(50%) contrast(20%);
 }
 

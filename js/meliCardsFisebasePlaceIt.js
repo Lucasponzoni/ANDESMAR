@@ -570,7 +570,7 @@ const paymentHTML = `
     <button class="mt-1 mb-0 btn btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}')">
         <span>
             ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
         </span>
@@ -829,7 +829,7 @@ async function solicitarCliente() {
 }
 
 // ETIQUETA LOGISTICA PROPIA
-async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, SKU, comentarios) {
+async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, SKU, total, comentarios) {
     // Solicitar el número de remito
     const numeroRemito = await solicitarNumeroRemito();
     if (!numeroRemito) return; // Si se cancela, salir de la función
@@ -1036,14 +1036,39 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             trackingLink: "Logistica PlaceIt",
             trackingMessage: trackingMessage,
             transportCompany: "PlaceIt",
-            cliente: numeroCliente,
+            cliente: cliente,
             diasPlaceIt: diaFormateadoPlaceIt
         }).then(() => {
-            console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
+            console.log(`Datos actualizados en Firebase (Mercado libre) para la operación: ${idOperacionSinME1}`);
         }).catch(error => {
             console.error('Error al actualizar en Firebase:', error);
-        });    
+        });
 
+        const fechaHora = new Date().toLocaleString('es-ES', {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false // Cambia a true si prefieres el formato de 12 horas
+        });
+        
+        firebase.database().ref(`DespachosLogisticos/${numeroRemito}`).set({
+            cliente: cliente,
+            estado: "Envio Express PlaceIt",
+            fechaHora: fechaHora,
+            operadorLogistico: "PlaceIt",
+            remito: numeroRemito,
+            remitoVBA: numeroRemito,
+            subdato: diaFormateadoPlaceIt,
+            valorDeclarado: total
+        }).then(() => {
+            console.log(`Datos actualizados en Firebase (Logistica) para la operación: ${idOperacionSinME1}`);
+        }).catch(error => {
+            console.error('Error al actualizar en Firebase:', error);
+        });
+        
         document.body.removeChild(tempDiv);
     };
 

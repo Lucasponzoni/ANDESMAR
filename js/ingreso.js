@@ -241,6 +241,7 @@ function calcularPorcentajes(data) {
     let countAndesmar = 0;
     let countCruzDelSur = 0;
     let countOca = 0; // Nueva variable para OCA
+    let countPlaceIt = 0; // Nueva variable para PlaceIt
     let countPendientes = 0;
 
     const now = new Date();
@@ -268,6 +269,11 @@ function calcularPorcentajes(data) {
                 }
             }
 
+            // Contar envíos de PlaceIt
+            if (item.operadorLogistico === "PlaceIt") {
+                countPlaceIt++;
+            }
+
             // Contar los pendientes de despacho
             if (item.estado === "Pendiente de despacho") {
                 countPendientes++;
@@ -275,13 +281,14 @@ function calcularPorcentajes(data) {
         }
     });
 
-    const totalEnvios = countAndreani + countAndesmar + countCruzDelSur + countOca; // Incluir OCA en total
+    const totalEnvios = countAndreani + countAndesmar + countCruzDelSur + countOca + countPlaceIt; // Incluir PlaceIt en total
 
     // Calcular porcentajes
     const andreaniPorcentaje = totalEnvios > 0 ? ((countAndreani / totalEnvios) * 100).toFixed(2) : 0;
     const andesmarPorcentaje = totalEnvios > 0 ? ((countAndesmar / totalEnvios) * 100).toFixed(2) : 0;
     const cruzDelSurPorcentaje = totalEnvios > 0 ? ((countCruzDelSur / totalEnvios) * 100).toFixed(2) : 0;
     const ocaPorcentaje = totalEnvios > 0 ? ((countOca / totalEnvios) * 100).toFixed(2) : 0; // Porcentaje de OCA
+    const placeItPorcentaje = totalEnvios > 0 ? ((countPlaceIt / totalEnvios) * 100).toFixed(2) : 0; // Porcentaje de PlaceIt
 
     // Actualizar el HTML
     document.getElementById('andreaniPorcentaje').innerHTML = `
@@ -289,7 +296,7 @@ function calcularPorcentajes(data) {
     <div class="d-flex align-items-center flex-wrap">
         <span class="ml-1" style="font-weight: bold;">Andreani: ${andreaniPorcentaje}%</span>
     </div>
-    <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countAndreani} despachos)</span>
+    <span class="ml-1 conteo-Andreani" style="font-size: 0.9em;">${countAndreani} despachos</span>
     <div class="pie-chart" style="--percentage: ${andreaniPorcentaje}; --color: #dc3545;"></div>
     `;
 
@@ -298,16 +305,16 @@ function calcularPorcentajes(data) {
     <div class="d-flex align-items-center flex-wrap">
         <span class="ml-1" style="font-weight: bold;">Andesmar: ${andesmarPorcentaje}%</span>
     </div>
-        <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countAndesmar} despachos)</span>
+        <span class="ml-1 conteo-andesmar" style="font-size: 0.9em;">${countAndesmar} despachos</span>
         <div class="pie-chart" style="--percentage: ${andesmarPorcentaje}; --color: #007bff;"></div>
     `;
 
     document.getElementById('cruzDelSurPorcentaje').innerHTML = `
     <img src="./Img/cds-mini.png" alt="Cruz del Sur" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">Cruz del Sur: ${cruzDelSurPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">CDS: ${cruzDelSurPorcentaje}%</span>
     </div>
-        <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countCruzDelSur} despachos)</span>
+        <span class="ml-1 conteo-cds" style="font-size: 0.9em;">${countCruzDelSur} despachos</span>
         <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #003366;"></div>
     `;
 
@@ -316,8 +323,18 @@ function calcularPorcentajes(data) {
     <div class="d-flex align-items-center flex-wrap">
         <span class="ml-1" style="font-weight: bold;">OCA: ${ocaPorcentaje}%</span>
     </div>
-        <span class="ml-1 conteo" style="font-size: 0.9em;"><br>(${countOca} despachos)</span>
+        <span class="ml-1 conteo-oca" style="font-size: 0.9em;">${countOca} despachos</span>
         <div class="pie-chart" style="--percentage: ${ocaPorcentaje}; --color: #5B2B82;"></div>
+    `;
+
+    // Actualizar el HTML para PlaceIt
+    document.getElementById('placeItPorcentaje').innerHTML = `
+    <img src="./Img/placeit-mini.png" alt="PlaceIt" class="gray-filter">   
+    <div class="d-flex align-items-center flex-wrap">
+        <span class="ml-1" style="font-weight: bold;">PlaceIt: ${placeItPorcentaje}%</span>
+    </div>
+        <span class="ml-1 conteo-placeit" style="font-size: 0.9em;">${countPlaceIt} despachos</span>
+        <div class="pie-chart" style="--percentage: ${placeItPorcentaje}; --color: #ff0078;"></div>
     `;
 
     document.getElementById('SinDespacharPorcentaje').innerHTML = `
@@ -389,7 +406,6 @@ function formatearTiempoPromedio(totalMs, count) {
 }
 
 function renderCards(data) {
-    // No ordenar los datos aquí; se asume que ya vienen ordenados desde cargarDatos
 
     // Calcular el promedio de todos los elementos antes de la paginación
     let totalTiempo = 0; // Variable para acumular el tiempo total
@@ -421,12 +437,18 @@ function renderCards(data) {
 
     for (let i = startIndex; i < endIndex; i++) {
         const item = data[i];
-        const estadoClass = item.estado === "Pendiente de despacho" ? "pendiente-despacho" : 
-                            item.estado === "Despachado" ? "estado-despachado" : 
-                            item.estado.startsWith("Se entrega el día") ? "estado-entrega2" : "";
-        const alertIcon = item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning icon-state-ios"></i>' : 
-                          item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success icon-state-ios"></i>' : 
-                          item.estado.startsWith("Se entrega el día") ? '<i class="bi bi-box-seam-fill"></i>' : '';
+        
+        const estadoClass = 
+            item.estado === "Pendiente de despacho" ? "pendiente-despacho" : 
+            item.estado === "Despachado" ? "estado-despachado" : 
+            item.estado.startsWith("Se entrega el día") ? "estado-entrega2" : 
+            item.estado === "Envio Express PlaceIt" ? "estado-despachado" : "";
+    
+        const alertIcon = 
+            item.estado === "Pendiente de despacho" ? '<i class="bi bi-exclamation-triangle-fill text-warning icon-state-ios"></i>' : 
+            item.estado === "Despachado" ? '<i class="bi bi-check-circle-fill text-success icon-state-ios"></i>' : 
+            item.estado === "Envio Express PlaceIt" ? '<i class="bi bi-lightning-charge-fill text-success icon-state-ios"></i>' :
+            item.estado.startsWith("Se entrega el día") ? '<i class="bi bi-box-seam-fill"></i>' : '';
 
         const remito = item.remito ? item.remito : item.remitoVBA;
         const formattedDateTime = formatDateTime(item.fechaHora);
@@ -436,61 +458,65 @@ function renderCards(data) {
         const tiempoTexto = tiempoTranscurrido ? 
             `<span class="tiempo-transcurrido"><i class="bi bi-clock icono-tiempo"></i>${tiempoTranscurrido.dias}d ${tiempoTranscurrido.horas}h ${tiempoTranscurrido.minutos}m</span>` : '';
 
-        let operadorLogistico = '';
+            let operadorLogistico = '';
 
-        if (item.numeroDeEnvio) {
-            const numeroDeEnvio = item.numeroDeEnvio;
-            let link, imgSrc;
-
-            // Verificar el formato del número de envío
-            if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
-                (numeroDeEnvio.length === 15 && (numeroDeEnvio.startsWith('36') || numeroDeEnvio.startsWith('40')))) {
-                link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
-                imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
-                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
-            } else if (numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) {
-                const numeroDeEnvioCorto = numeroDeEnvio.slice(0, -1);
-                link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvioCorto}`;
-                imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
-                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
-            } else if (numeroDeEnvio.length === 19) {
-                link = `https://www.aftership.com/es/track/oca-ar/${numeroDeEnvio}`; // Reemplaza con la URL correspondiente
-                imgSrc = './Img/oca-mini.png'; // Ruta de la imagen
-                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-oca"><img src="${imgSrc}" alt="Ejemplo" class="img-transporte"></a>`;
-            }    else if (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1')) {
-                link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvio}`;
-                imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
-                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
+            if (item.numeroDeEnvio) {
+                const numeroDeEnvio = item.numeroDeEnvio;
+                let link, imgSrc;
+            
+            // Verificar si el operador logístico es "PlaceIt"
+                if (item.operadorLogistico === "PlaceIt" && item.estado === "Envio Express PlaceIt") {
+                    imgSrc = './Img/placeit-mini.png';
+                    operadorLogistico = `<a class="btn-ios btn-placeit" disabled><img src="${imgSrc}" alt="PlaceIt" class="img-transporte"></a>`;
+                } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
+                           (numeroDeEnvio.length === 15 && (numeroDeEnvio.startsWith('36') || numeroDeEnvio.startsWith('40')))) {
+                    link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
+                    imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
+                    operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
+                } else if (numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) {
+                    const numeroDeEnvioCorto = numeroDeEnvio.slice(0, -1);
+                    link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvioCorto}`;
+                    imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
+                    operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
+                } else if (numeroDeEnvio.length === 19) {
+                    link = `https://www.aftership.com/es/track/oca-ar/${numeroDeEnvio}`; // Reemplaza con la URL correspondiente
+                    imgSrc = './Img/oca-mini.png'; // Ruta de la imagen
+                    operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-oca2"><img src="${imgSrc}" alt="Oca" class="img-transporte"></a>`;
+                } else if (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1')) {
+                    link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvio}`;
+                    imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
+                    operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
+                } else {
+                    link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=remito`;
+                    imgSrc = './Img/andesmar-mini.png'; // Ruta de la imagen
+                    operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
+                }
             } else {
-                link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=remito`;
-                imgSrc = './Img/andesmar-mini.png'; // Ruta de la imagen
-                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
-            }
-        } else {
-            // Si el operador logístico es "Logística Novogar"
-            if (item.operadorLogistico === "Logística Novogar") {
-                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
-            } else if (item.operadorLogistico === "Logística Novogar StaFe") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
-            } else if (item.operadorLogistico === "Logística Novogar Rafaela") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
-            } else if (item.operadorLogistico === "Logística Novogar BsAs") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
-            } else if (item.operadorLogistico === "Logística Novogar SanNicolas") {
-                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> San Nicolás</button>`;
-            } else {
-                operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
-            }
-        }
+                // Si el operador logístico es "Logística Novogar"
+                if (item.operadorLogistico === "Logística Novogar") {
+                    operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
+                } else if (item.operadorLogistico === "Logística Novogar StaFe") {
+                    operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
+                } else if (item.operadorLogistico === "Logística Novogar Rafaela") {
+                    operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
+                } else if (item.operadorLogistico === "Logística Novogar BsAs") {
+                    operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
+                } else if (item.operadorLogistico === "Logística Novogar SanNicolas") {
+                    operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> San Nicolás</button>`;
+                } else {
+                    operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
+                }
+            }                                 
 
         // Agregar estilo e ícono si el estado inicia con "(se entrega entre"
         const entregaEntreClass = item.estado.startsWith("(se entrega entre") ? "estado-entrega" : "";
         const entregaEntreIcon = item.estado.startsWith("(se entrega entre") ? '<i class="bi bi-check-circle-fill icon-state-ios"></i>' : '';
 
         const comentarioClase = item.comentario ? 'btn-success' : 'btn-secondary';
-        let subdatoTexto = item.subdato ? 
-            `<br><span class="${item.subdato.startsWith('Pendiente de confirmar') ? 'subdato-texto1' : 'subdato-texto2'}">${item.subdato}</span>` : '';
 
+        let subdatoTexto = item.subdato ? 
+            `<br><span class="${item.subdato.startsWith('Pendiente de confirmar') ? 'subdato-texto1' : 'subdato-texto2'}">Plazo ${item.subdato}</span>` : '';
+        
         // Verificar si existe item.fotoURL y crear el botón de descarga
         let remitoColumna = remito;
         if (item.fotoURL) {
