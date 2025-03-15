@@ -1040,11 +1040,7 @@ button:hover {
 }
 
 a.nav-link{
-    color: #004080 !important;
-}
-
-a.nav-link.active{
-    color: white !important;
+    color: #0050c7 !important;
 }
 
 .btnFacturar{
@@ -1053,7 +1049,7 @@ a.nav-link.active{
 
 .nav-item a {
     text-align: center;
-    color: #004080;
+    color: #0373e3;
     text-decoration: none;
     font-size: 16px;
     padding: 10px 10px;
@@ -1069,22 +1065,25 @@ a.nav-link.active{
 
 .nav-item .active {
     font-weight: 500;
-    background-color: #44b4fc;
-    color: #ffffff;
+    border-radius: 0;
+    background-color: #e1effd;
+    border-bottom: #0373e3 solid 5px;
 }
 
+a.nav-link.active, .dropdown-item.active{
+    border-radius: 0;
+    color: #0373e3 !important;
+}
 a.nav-link.active, a.nav-link {
     border-radius: 5px !important;
-    transition: .5s;
+    transition: .2s;
 }
 
-a.nav-link:hover{
-    background-color: cornflowerblue !important;
-    transform: scale(1.05);
-    color: white !important;
-
+a.nav-link:hover, .dropdown-item:hover{
+    color: #e3034a !important;
+    background-color: #fde1f5 !important;
+    border-bottom: #e3034a solid 5px;
 }
-
 /* Menu Hamburguesa */
 
 @media (max-width: 940px) {
@@ -1135,7 +1134,12 @@ a.nav-link:hover{
 }
 
 #meli-logo{
-    width: 30px;
+    width: 35px;
+    margin-left: 5px;
+}
+
+#meli-logo2{
+    width: 35px;
     margin-right: 5px;
 }
 
@@ -6672,3 +6676,6 @@ img.gray-filter {
     background-color: #000000a8; 
 }
 
+.dropdown-menu {
+    z-index: 100000 !important;
+}
