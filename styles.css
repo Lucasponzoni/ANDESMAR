@@ -5923,8 +5923,8 @@ button.btn.disabled, .btn:disabled {
 }
 
 .percentage-card {
-    flex: 1 0 auto; /* Permite que las tarjetas se ajusten */
-    max-width: 200px; /* Limita el ancho máximo de cada tarjeta */
+    flex: 1 0 auto;
+    max-width: 200px;
     background: linear-gradient(to bottom, #f9f9f9, #e1e8f0);
     border: 1px solid #d0d0d0;
     border-radius: 16px;
@@ -5945,6 +5945,14 @@ button.btn.disabled, .btn:disabled {
     background: linear-gradient(to bottom, #e1e8f0, #f9f9f9);
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 762px) {
+    .percentage-card {
+        max-width: none;
+        width: 100%;
+        margin: 10px 0;
+    }
 }
 
 .percentage-card h2 {

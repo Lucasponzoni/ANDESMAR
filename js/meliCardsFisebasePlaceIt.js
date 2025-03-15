@@ -1060,6 +1060,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             fechaHora: fechaHora,
             operadorLogistico: "PlaceIt",
             remito: numeroRemito,
+            numeroDeEnvio: 123456,
             remitoVBA: numeroRemito,
             subdato: diaFormateadoPlaceIt,
             valorDeclarado: total
