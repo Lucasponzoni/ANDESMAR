@@ -1744,6 +1744,10 @@ async function generarPDFNodo(remito, cliente, fechaEntrega, operadorLogistico, 
             margin-bottom: 15px;
         }
 
+        .logo3 {
+            margin-top: 20px
+        }
+
         .logo img {
             max-width: 250px;
             height: auto;
@@ -1842,7 +1846,7 @@ async function generarPDFNodo(remito, cliente, fechaEntrega, operadorLogistico, 
             <p><strong>(0341) 6680658 (Solo WhatsApp)</strong></p>
             <p><strong>posventa@novogar.com.ar</strong></p>
         </div>
-        <div class="logo"><img src="Img/Andreani-black.jpg" alt="Logo" style="margin: 0 auto; display: block; width: 210px;"></div>
+        <div class="logo logo3"><img src="Img/Andreani-black.jpg" alt="Logo" style="margin: 0 auto; display: block; width: 210px;"></div>
     </div>
 </body>
 
