@@ -271,6 +271,12 @@
                 </form>
                 <div id="camera-preview" style="display: none;"></div> <!-- Contenedor para la vista previa de la cámara -->
             </div>
+
+            <div id="camera-preview" style="display: none;">
+                <video></video>
+                <div class="focus-area-camera"></div>
+            </div>   
+            
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-info" onclick="subirFoto()">Subir Foto</button>
@@ -514,11 +520,7 @@
     <style>
 
     </style>
-    
-    <div id="camera-preview" style="display: none;">
-        <video></video>
-        <div class="focus-area-camera"></div>
-    </div>    
+     
 
     <!-- Info WiFi -->
     <div id="notification-ios-wifi" class="notification-ios-wifi">

@@ -6492,6 +6492,24 @@ img.gray-filter {
     object-fit: cover; 
 }
 
+#camera-preview::after {
+    content: "Escanea Codigo de Barras";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%; 
+    height: 80%; 
+    border: 2px dashed rgba(255, 255, 0, 0.8);
+    border-radius: 10px; 
+    transform: translate(-50%, -50%); 
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2); 
+    color: #fff; 
+    font-size: 1.5em; 
+    pointer-events: none; 
+}
+
 .focus-area-camera {
     position: absolute;
     top: 50%;
