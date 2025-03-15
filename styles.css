@@ -3932,7 +3932,7 @@ div .form-check {
     background-color: #f9f9f9;
     color: #2c3e50; 
     border: 1px solid #bdc3c7; 
-    border-radius: 12px; 
+    border-radius: 8px; 
     padding: 0.4rem 0.8rem; 
     transition: background-color 0.3s ease, box-shadow 0.3s ease; 
     white-space: nowrap; 
@@ -5891,35 +5891,22 @@ button.btn.disabled, .btn:disabled {
 }
 
 .macos-button-porcentaje {
-    position: fixed;
-    bottom: 70px;
     right: 65px;
-    border: 1px solid #a0a0a0;
-    background-color: whitesmoke;
-    border-radius: 12px;
-    padding: 10px 20px;
-    color: #333;
-    font-weight: bold;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    bottom: 70px;
+    position: fixed;
+    background-color: #f9f9f9;
+    color: #2c3e50; 
+    border: 1px solid #bdc3c7; 
+    border-radius: 8px; 
+    padding: 0.4rem 0.8rem; 
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
+    white-space: nowrap; 
     z-index: 1000;
 }
 
-#badge-danger-porcentaje {
-    padding: 10px;
-    border-radius: 10px;
-    background: linear-gradient(to bottom, #ff5f5f, #d9534f);
-    color: whitesmoke;
-    font-size: 14px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    border: 1px solid #d43f3a; 
-    font-weight: bold;
-    text-align: center;
-    display: inline-block;
-    transition: background 0.3s ease; 
+.pill-preparacion{
+    color: red;
+    font-weight: 600 !important;
 }
 
 .percentage-card {

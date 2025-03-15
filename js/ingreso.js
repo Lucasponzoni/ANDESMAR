@@ -339,10 +339,7 @@ function calcularPorcentajes(data) {
 
     document.getElementById('SinDespacharPorcentaje').innerHTML = `
     <div class="macos-button-porcentaje">
-        <span class="ml-1"><i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i> Pendientes:</span>
-        <span class="badge badge-danger badge-danger-porcentaje;" id="badge-danger-porcentaje">
-            ${countPendientes} en preparación
-        </span>
+        <span class="ml-1"><i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i> Pendientes:</span> <span class="pill-preparacion">${countPendientes}</span> en preparación
     </div>
     `;
 }
