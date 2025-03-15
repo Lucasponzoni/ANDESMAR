@@ -6533,3 +6533,18 @@ img.gray-filter {
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
+#fecha-tiendas-virtuales{
+    position: relative;
+    padding: 20px 5px 2px 5px;
+    font-size: small;
+    font-weight: 600 !important;
+    margin-bottom: -25px;
+    top: -25px;
+    width: fit-content;
+    z-index: -1;
+    border-radius: 0 0 10px 10px;
+    color: white;
+    border: solid 1px #007aff;
+    background-color: #000000a8; 
+}
+

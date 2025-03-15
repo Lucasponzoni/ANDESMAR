@@ -1268,7 +1268,11 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <ul id="suggestions-${data[i].id}" class="suggestions-container list-group"></ul>
                     </div>
 
-                <div id="direccion-bna" class="ios-card">
+                    <p id= "fecha-tiendas-virtuales" class="fecha-tiendas-virtuales">
+                    ${data[i].fechaDeCreacion}
+                    </p>
+
+                <div id="direccion-bna" class="ios-card"> 
                     
                     <p class="ios-card-text">
                         <i class="bi bi-house ios-icon"></i>
