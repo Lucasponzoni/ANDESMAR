@@ -3991,7 +3991,7 @@ function createBackButton() {
     backButton.id = 'btnVolver';
     backButton.type = 'button';
     backButton.className = 'btn btn-dark';
-    backButton.innerHTML = '<i class="bi bi-arrow-return-left"></i> Atrás';
+    backButton.innerHTML = '<i class="bi bi-arrow-return-left"></i>';
 
     // Agregar evento al botón de volver
     backButton.addEventListener('click', () => {

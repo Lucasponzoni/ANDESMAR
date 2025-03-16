@@ -125,12 +125,12 @@
                         </button>
                         
                         <button id="btnSwitch1" type="button" class="btn btn-light position-relative" style="white-space: nowrap;">
-                            <i class="bi bi-1-circle-fill" style="font-size: 22px; color: #3498db;"></i> Sin Preparado
+                            <i class="bi bi-1-circle-fill" style="font-size: 22px; color: #3498db;"></i> Preparado
                             <span id="contadorCards1" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
                         </button>                      
                                             
                         <button id="btnSwitch" type="button" class="btn btn-light position-relative" style="white-space: nowrap;">
-                            <i class="bi bi-2-circle-fill" style="font-size: 22px; color: #2d853c;"></i> Sin Entregado
+                            <i class="bi bi-2-circle-fill" style="font-size: 22px; color: #2d853c;"></i> Entregado
                             <span id="contadorCards2" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
                         </button>
 
@@ -141,6 +141,10 @@
                                     
                         <button class="btn btn-light position-relative" data-toggle="modal" data-target="#skuModal" id="openSkuModal" type="button" style="white-space: nowrap;">
                             <i class="fas fa-laptop" style="font-size: 22px; color: #c0392b;"></i> Cargar Imei
+                        </button>
+
+                        <button class="btn btn-light position-relative" data-toggle="modal" data-target="#skuPlaceItModal" id="openSkuPlaceItModal" type="button" style="white-space: nowrap;">
+                            <i class="fas fa-plus-circle" style="font-size: 22px; color: #692cf7;"></i> Express
                         </button>
                     </div>
                 </div>
@@ -192,7 +196,6 @@
         <img id="spinnerImage" src="./Img/etiqueta-animada.gif" alt="Cargando..."></img>
     </div>    
 
-    
 <!-- Modal para Agregar SKU -->
 <div class="modal fade" id="skuModal" tabindex="-1" role="dialog" aria-labelledby="skuModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -230,6 +233,44 @@
     </div>
 </div> 
 <!-- Fin Modal para Agregar SKU -->
+
+<!-- Modal para Agregar SKU PlaceIt -->
+<div class="modal fade" id="skuPlaceItModal" tabindex="-1" role="dialog" aria-labelledby="skuPlaceItModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header sku-modal-header">
+                <h5 class="modal-title sku-modal-title" id="skuPlaceItModalLabel">Agregar SKU PlaceIt</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="sku-input-group">
+                    <input type="text" class="form-control sku-input" id="newSkuInputPlaceIt" placeholder="Ingrese el SKU">
+                    <button id="addSkuButtonPlaceIt" class="btn btn-primary">Agregar SKU</button>
+                </div>
+                <div class="spinner-border sku-spinner" id="loadingSpinnerPlaceIt" role="status" style="display: none;">
+                    <span class="sr-only">Cargando...</span>
+                </div>
+
+                <div id="alertContainerPlaceIt" style="display: none;"></div>
+
+                <table class="table table-bordered sku-table">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="skuPlaceItListBody">
+                        <!-- Los SKU se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> 
+<!-- Fin Modal para Agregar SKU PlaceIt -->
 
      <!-- Botón de flecha hacia arriba -->
      <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
