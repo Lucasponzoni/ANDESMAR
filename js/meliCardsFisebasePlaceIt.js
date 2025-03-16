@@ -1073,7 +1073,18 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         document.body.removeChild(tempDiv);
     };
 
+    const Name = `Confirmación de Compra Novogar`;
+    const Subject = `Tu compra con envio Express ${numeroRemito} ya fue preparada para despacho`;
+    const template = "emailTemplatePlaceIt";
+    const transporte = "Logistica PlaceIt";
+    const numeroDeEnvio = diaFormateadoPlaceIt;
+    const linkSeguimiento2 = cliente;
+    const remito = numeroRemito;
+
     reader.readAsDataURL(blob);
+
+    // Enviar el email después de procesar el envío
+    await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
 

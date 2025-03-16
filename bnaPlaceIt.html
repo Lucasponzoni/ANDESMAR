@@ -118,7 +118,7 @@
                     <input type="text" class="form-control" id="searchBna" placeholder="Buscar por nombre, dirección, remito...">
                     <div class="input-group-append">
                         <button class="btn-search-bna btn btn-outline-secondary" type="button">
-                            <i class="fas fa-search"></i>
+                            <i class="fas fa-search" style="font-size: 22px;"></i>
                         </button>
                     </div>
                 </div>
@@ -127,54 +127,52 @@
                 <!-- Botones -->
                 <div class="trio-de-botones-container">
                     <div class="trio-de-botones">
-                        <button id="btnFacturar" type="button" class="btn btn-primary position-relative" style="white-space: nowrap;">
-                            Facturar <i class="bi bi-cart-check-fill" style="font-size: 24px;"></i>
+                        <button id="btnFacturar" type="button" class="hidden btn btn-light position-relative" style="white-space: nowrap;">
+                            <i class="bi bi-cart-check-fill" style="font-size: 22px; color: #007aff;"></i> Facturar
                             <span id="contadorCardsFacturar" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-large">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 <span class="visually-hidden"></span>
                             </span>
                         </button>
                         
-                        <button id="btnPreparar" type="button" class="btn btn-secondary position-relative" style="white-space: nowrap;">
-                            <i class="bi bi-box2" style="font-size: 24px;"></i>
+                        <button id="btnPreparar" type="button" class="hidden btn btn-light position-relative" style="white-space: nowrap;">
+                            <i class="bi bi-box2" style="font-size: 22px; color: #f39c12;"></i> Preparar
                             <span id="contadorCards" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-large">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 <span class="visually-hidden"></span>
                             </span>
                         </button>
-
-                        <button id="btnSlack" type="button" class="btn btn-dark position-relative" style="white-space: nowrap">
-                            <img src="./Img/slack.png" alt="Slack">
+                    
+                        <button id="btnSlack" type="button" class="hidden btn btn-light position-relative" style="white-space: nowrap;">
+                            <img src="./Img/slack.png" alt="Slack" style="width: 22px; height: 22px;"> Errores
                             <span id="contadorCards4" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
                         </button>
-                
-                        <button id="btnSwitch1" type="button" class="btn btn-info position-relative" style="white-space: nowrap">
-                            <i class="bi bi-1-circle-fill" style="font-size: 24px;"></i>
+                        
+                        <button id="btnSwitch1" type="button" class="hidden btn btn-light position-relative" style="white-space: nowrap;">
+                            <i class="bi bi-1-circle-fill" style="font-size: 22px; color: #3498db;"></i> Sin Preparado
                             <span id="contadorCards1" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
                         </button>                      
-                        
-                        <button id="btnSwitch" type="button" class="btn btn-success position-relative" style="white-space: nowrap">
-                            <i class="bi bi-2-circle-fill" style="font-size: 24px;"></i>
+                                            
+                        <button id="btnSwitch" type="button" class="hidden btn btn-light position-relative" style="white-space: nowrap;">
+                            <i class="bi bi-2-circle-fill" style="font-size: 22px; color: #2d853c;"></i> Sin Entregado
                             <span id="contadorCards2" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
                         </button>
 
-                        <button class="btn btn-warning position-relative" id="duplicateButton" type="button" style="white-space: nowrap; margin-top: 10px;">
-                            <i class="fas fa-clone" style="font-size: 24px;"></i>
+                        <button id="duplicateButton" type="button" class="hidden btn btn-light position-relative" style="white-space: nowrap;">
+                            <i class="fas fa-clone" style="font-size: 22px; color: #ec812e;"></i> Duplicados
                             <span id="contadorCards3" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
-                        </button>  
-                
-                        <button class="btn btn-danger" data-toggle="modal" data-target="#skuModal" id="openSkuModal" type="button" style="white-space: nowrap">
-                            <i class="fas fa-laptop" style="font-size: 24px;"></i> 
                         </button>
-                                     
+                                    
+                        <button class="hidden btn btn-light position-relative" data-toggle="modal" data-target="#skuModal" id="openSkuModal" type="button" style="white-space: nowrap;">
+                            <i class="fas fa-laptop" style="font-size: 22px; color: #c0392b;"></i> Cargar Imei
+                        </button>
                     </div>
                 </div>
 
-                
             </div>
         </div>
     </div>    
-    
+
     <div class="container mt-5" id="cards-container">
 
         <div class="position-relative import-container mt-5 hidden">
