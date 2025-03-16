@@ -5307,6 +5307,10 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
 
     reader.readAsDataURL(blob); // Asegúrate de iniciar la lectura del blob
 
+    const Name = `Confirmación de Compra Novogar`;
+    const Subject = `Tu compra ${numeroRemito} ya fue preparada para despacho`;
+    const template = "emailTemplateLogPropia";
+
     await sendEmail(Name, Subject, template, nombre, email, remito);
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA

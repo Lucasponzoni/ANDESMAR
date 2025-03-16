@@ -3644,7 +3644,7 @@ div .form-check {
     padding: 15px 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+    z-index: 10000000 !important;
     transition: transform 0.3s ease, opacity 0.3s ease; 
     transform: translateY(-20px); /* Cambiar para que baje desde arriba */
     opacity: 0; 
