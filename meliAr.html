@@ -84,6 +84,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="./MeliArPlaceit.html">Envios Meli PlaceIt</a>
+                            <a class="dropdown-item" href="./bnaPlaceIt.html">Envios Tiendas V. PlaceIt</a>
                         </div>
                     </li>
                 </ul>
@@ -96,26 +97,30 @@
             <div class="col-md-6 mb-3">
                 <!-- Buscador -->
                 <div class="input-group">
-                    <input type="text" class="form-control" id="searchMercadoLibre" placeholder="📦 Buscar por Operacion">
+                    <input type="text" class="form-control" id="searchMercadoLibre" placeholder="📦 Buscar por Operación">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button">
-                            <i class="fas fa-search"></i>
+                            <i class="fas fa-search" style="font-size: 22px"></i>
                         </button>
                     </div> 
                 </div>
             </div>
-
-<div class="cajonBtnMeli col-md-3 mb-3 d-flex align-items-center" style="gap: 5px;">
-    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#queryModal">
-        <i class="bi bi-clipboard-data-fill"></i>
-    </button>
-    <button type="button" class="btn btn-warning" id="calendario-log-propia" data-toggle="modal" data-target="#logisticaModal">
-        <i class="bi bi-calendar-fill"></i>
-    </button>
-    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#localidadesModal">
-        <i class="bi bi-geo-alt-fill"></i>
-    </button>
-</div>
+    
+            <div class="cajonBtnMeli col-md-3 mb-3 d-flex align-items-center" style="gap: 5px;">
+                <button type="button" class="btn btn-light d-flex align-items-center" data-toggle="modal" data-target="#queryModal">
+                    <i class="bi bi-clipboard-data-fill" style="font-size: 22px; color: #007aff; margin-right: 5px;"></i> Query
+                </button>
+                
+                <button type="button" class="btn btn-light d-flex align-items-center" id="calendario-log-propia" data-toggle="modal" data-target="#logisticaModal">
+                    <i class="bi bi-calendar-fill" style="font-size: 22px; color: #f39c12; margin-right: 5px;"></i> Calendario
+                </button>
+                
+                <button type="button" class="btn btn-light d-flex align-items-center" data-toggle="modal" data-target="#localidadesModal">
+                    <i class="bi bi-geo-alt-fill" style="font-size: 22px; color: #2d853c; margin-right: 5px;"></i> Localidades
+                </button>
+            </div>            
+        </div>
+    </div>    
 
 <!-- MODAL LOCALIDADES -->
 <div class="modal fade" id="localidadesModal" tabindex="-1" role="dialog" aria-labelledby="localidadesModalLabel" aria-hidden="true">

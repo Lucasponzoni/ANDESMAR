@@ -75,6 +75,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="./MeliArPlaceit.html">Envios Meli PlaceIt</a>
+                            <a class="dropdown-item" href="./bnaPlaceIt.html">Envios Tiendas V. PlaceIt</a>
                         </div>
                     </li>
                 </ul>
@@ -82,58 +83,53 @@
         </div>
     </nav>
 
-<div class="container mt-4">
-    <div class="row justify-content-between align-items-center search-filter-container">
-        <div class="col-md-6 mb-3">
-            <div class="input-group">
-                <input type="text" class="form-control" id="searchDespachosLogistica" placeholder="Buscar por cliente o Remito...">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button">
-                        <i class="fas fa-search"></i>
-                    </button>
+    <div class="container mt-4">
+        <div class="row justify-content-between align-items-center search-filter-container">
+            <div class="col-md-6 mb-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchDespachosLogistica" placeholder="Buscar por cliente o Remito...">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search" style="font-size: 22px"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
+    
+            <div class="col-12 mb-3 d-flex justify-content-end ingreso-egreso" style="overflow-x: auto; white-space: nowrap;">
+                <div style="min-width: 100%;">
+                    <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
+                        <i class="bi bi-arrow-return-left" style="font-size: 22px;"></i> Atrás
+                    </button>
+                    <button class="btn btn-light" id="btnImprimirNodos" type="button" title="Imprimir" data-toggle="modal" data-target="#ImprimirNodos">
+                        <i class="bi bi-printer-fill" style="font-size: 22px; color: #007aff;"></i> Nodos
+                    </button>
+                    <button class="btn btn-light" id="ingresoBtn" data-toggle="modal" data-target="#ingresoModal">
+                        <i class="bi bi-cloud-plus-fill" style="font-size: 22px; color: #2d853c;"></i> Ingresar
+                    </button>
+                    <button class="btn btn-light" id="filterOldestBtn" title="Filtrar por antigüedad">
+                        <i class="bi bi-alarm-fill" style="font-size: 22px; color: #ff3b30;"></i> Demoradas
+                    </button>
+                    <button class="btn btn-light" id="logisticaPropiaBtn" data-toggle="modal" data-target="#logisticaModal">
+                        <i class="bi bi-geo-alt-fill" style="font-size: 22px; color: #f39c12;"></i> Logística Local
+                    </button>
+                    <button class="btn btn-light" id="bsarStaFeBtn" data-toggle="modal" data-target="#bsarStaFeModal">
+                        <i class="bi bi-globe-americas" style="font-size: 22px; color: #007aff;"></i> Logística Camiones
+                    </button>
+                    <button class="btn btn-light" id="controlPanelBtn" data-toggle="modal" data-target="#controlPanelModal">
+                        <i class="bi bi-clock-history" style="font-size: 22px; color: #8e44ad;"></i> Historial
+                    </button>
+                    <button class="btn btn-light" id="scanRemitoBtn" data-toggle="modal" data-target="#scanRemitoModal">
+                        <i class="bi bi-camera-fill" style="font-size: 22px; color: #3498db;"></i> Remitos
+                    </button>
+                    <button class="btn btn-light ml-2" id="promedioBtn" title="Promedio Despacho: Xd Yh Zm">
+                        <i class="bi bi-calculator" style="font-size: 22px; color: #e67e22;"></i> Calculando Promedio...
+                    </button>
+                </div>                                                           
+            </div>  
         </div>
-        
-        <div class="col-md-6 mb-3 d-flex justify-content-end ingreso-egreso trio-de-botones">
-            <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
-                <i class="bi bi-arrow-return-left" style="font-size: 20px;"></i>
-            </button>
-            <button class="btn btn-dark" id="btnImprimirNodos" type="button" title="Imprimir" data-toggle="modal" data-target="#ImprimirNodos">
-                <i class="bi bi-printer" style="font-size: 20px;"></i>
-            </button>
-            <button class="btn btn-primary" id="ingresoBtn" data-toggle="modal" data-target="#ingresoModal">
-                <i class="bi bi-box-arrow-in-down" style="font-size: 20px;"></i>
-            </button>
-            <!-- Botón para filtrar por antigüedad -->
-            <button class="btn btn-danger" id="filterOldestBtn" title="Filtrar por antigüedad">
-                <i class="bi bi-clock" style="font-size: 20px;"></i>
-            </button>
-            <!-- Botón de Logística Propia -->
-            <button class="btn btn-secondary" id="logisticaPropiaBtn" data-toggle="modal" data-target="#logisticaModal">
-                <i class="bi bi-truck" style="font-size: 20px;"></i>
-            </button>
-            <!-- Nuevo botón BsAr-StaFe -->
-            <button class="btn btn-info" id="bsarStaFeBtn" data-toggle="modal" data-target="#bsarStaFeModal">
-                <i class="bi bi-truck" style="font-size: 20px;"></i>
-            </button>
-            <!-- Nuevo botón para abrir el modal de panel de control -->
-            <button class="btn btn-warning" id="controlPanelBtn" data-toggle="modal" data-target="#controlPanelModal">
-                <i class="bi bi-gear" style="font-size: 20px;"></i>
-            </button>
-            <!-- Botón para abrir el modal de escanear remito y adjuntar foto -->
-            <button class="btn btn-success" id="scanRemitoBtn" data-toggle="modal" data-target="#scanRemitoModal">
-                <i class="bi bi-camera2" style="font-size: 20px;"></i>
-            </button>
-            <button class="btn btn-secondary ml-2" id="promedioBtn" title="Promedio Despacho: Xd Yh Zm">
-                <i class="bi bi-calculator" style="font-size: 20px;"></i> Calculando Promedio...
-            </button>
-        </div>        
-                               
-    </div>
-</div>
+    </div>                
 
-        
     <div class="container mt-5" id="cards-container">                   
     
         <div class="spinner-border spinner-border37892" role="status" id="spinner">

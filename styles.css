@@ -1154,7 +1154,7 @@ a.nav-link:hover, .dropdown-item:hover{
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* VOLUMENES ESTILO iOS */
@@ -2289,16 +2289,14 @@ div.card-body > p > i{
 }
 
 .custom-select {
-    min-width: 130px;
-    margin-bottom: 0;
-    border-radius: 8px;
-    padding: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.custom-select:focus {
-    border-color: cornflowerblue;
-    box-shadow: none;
+    min-width: 130px; 
+    margin-bottom: 0; 
+    border-radius: 5px !important; 
+    padding: 8px; 
+    background-color: #f8f9fa; 
+    border: 1px solid #ced4da; 
+    color: #495057;
+    height: 47px; 
 }
 
 .apiSeguimiento {
@@ -2338,7 +2336,7 @@ div.card-body > p > i{
     min-width: 170px;
 }
 
-#simbel{
+#simbel {
     width: 70px;
 }
 
@@ -2357,10 +2355,6 @@ div.card-body > p > i{
     width: 70px;
     padding-left: 5px;
     filter: brightness(0) invert(1);
-}
-
-.simbel{
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .mercado-btn{
@@ -3056,7 +3050,7 @@ div.card-body > p > i{
 }
 
 .errorMeliBna{
-    width: 70%;
+    width: 90%;
     font-weight: 800;
     text-align: left;
     font-family: "Chakra Petch", sans-serif;
@@ -4517,11 +4511,11 @@ background-color: orangered;
 }
 
 .ios-select-meli {
+    height: 47px;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     background-color: #f8f8f8;
-    border: 1px solid cornflowerblue;
     border-radius: 5px !important;
     padding: 10px 20px;
     font-size: 16px;
@@ -4531,6 +4525,8 @@ background-color: orangered;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
     width: 100%;
     max-width: 100%;
+    cursor: pointer;
+    border: dashed 1px grey;
 }
 
 .ios-select-meli:focus {
@@ -4655,7 +4651,7 @@ background-color: orangered;
 }
 
 .contenedor-botones-meli{
-margin-bottom: 20px;
+margin-bottom: 40px;
 }
 
 #spinner3 {
@@ -6678,4 +6674,9 @@ img.gray-filter {
 
 .dropdown-menu {
     z-index: 100000 !important;
+}
+
+.disabled {
+    cursor: not-allowed !important;
+    pointer-events: none !important; 
 }

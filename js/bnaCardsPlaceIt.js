@@ -37,7 +37,6 @@ const obtenerCredencialesCDS = async () => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await obtenerCredencialesCDS();
-    await iniciarVerificacion();
 });
 
 // CARGA SKU
@@ -736,40 +735,7 @@ const cpsCDS = [
         <p class="carrito">
         <i class="bi bi-cart-fill carrito-icon"></i>
         COMPRA EN CARRITO
-        </p>` : '';
-
-        const tooltip = data[i].errorSlack !== undefined ? (data[i].errorSlack ? `
-            <div class="slack-error-container container-slack-${data[i].id}" style="position: relative; z-index: 1; background-color: #f8d7da;">
-                <div class="slack-error-header">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" alt="Logo de Slack" class="slack-error-logo">
-                    <span>Error de Slack</span>
-                </div>
-                <div class="slack-error-message">
-                    ${data[i].errorSlackMensaje}
-                </div>
-
-                <button class="btn btn-primary mt-1" onclick="marcarFacturado3('${data[i].id}', '${data[i].email}', '${data[i].nombre}', '${data[i].remito}')">
-                    <i class="bi bi-arrow-repeat"></i> Reprocesar
-                </button>
-
-                <button class="btn btn-danger slack-error-button mt-1" onclick="handleCorrection('${data[i].id}')">
-                    <i class="bi bi-exclamation-circle"></i> Marcar Corrección Manual
-                </button>
-                
-            </div>
-            ` : `
-            <div class="slack-error-container container-slack-${data[i].id}" style="position: relative; z-index: 1; background-color: #d4edda;">
-                <div class="slack-error-header2">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" alt="Logo de Slack" class="slack-error-logo">
-                    <span>Error Solucionado</span>
-                </div>
-                <div class="slack-error-message2">
-                    ${data[i].errorSlackMensaje}
-                </div>
-                <button class="btn btn-success slack-error-button mt-1" disabled>
-                    <i class="bi bi-check-circle" style="color: #FFFFFF;"></i> ${data[i].correccionSlack ? data[i].correccionSlack : "Reprocesado por Automata"}
-                </button>
-            </div>`) : '';        
+        </p>` : '';       
         
 // Agregar la tarjeta al contenedor
 const descuentoContenido = data[i].equivalencia_puntos_pesos > 0 ? `
@@ -1225,12 +1191,12 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
 </div>
 
                             <div id="estadoEnvio${data[i].id}" class="${(isAndreani || isCDS || isAndesmar || isLogPropia || data[i].envio === 'oca') ? 'em-circle-state4' : 'em-circle-state3'}">
-                                ${(isAndreani || isAndesmar || isLogPlaceIt || isCDS || isLogPropia || data[i].envio === 'oca') ? 
+                                ${(isAndreani || isAndesmar || isCDS || isLogPropia || data[i].envio === 'oca') ? 
                                     '<i class="bi bi-check-circle-fill margen-icon"></i> Preparado' : 
                                     '<i class="bi bi-stopwatch-fill margen-icon"></i> Pendiente'}
                             </div>
 
-                            <button class="btn-delete-bna btn btn-outline-danger" onclick="eliminarNodo('${data[i].id}')"><i class="bi bi-trash3-fill"></i></button>
+                            <button class="btn-delete-bna btn btn-outline-danger hidden" onclick="eliminarNodo('${data[i].id}')"><i class="bi bi-trash3-fill"></i></button>
 
                             <div class="em-state-bna">${shopImage}</div>
                             <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
@@ -1259,7 +1225,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             }
                             </p>
 
-                            <button class="btn btn-sm btn-" style="color: #007bff;" id="edit-localidad-${data[i].id}">
+                            <button class="hidden btn btn-sm btn-" style="color: #007bff;" id="edit-localidad-${data[i].id}">
                             <i class="bi bi-pencil-square ios-icon2"></i>
                             </button>
 
@@ -1319,15 +1285,13 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
 
     <p class="orden mx-2">${data[i].remito}</p>
 
-    <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3" 
+    <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3 disabled" 
         onclick="window.open(getOrderUrl('${data[i].orden_publica_}'), '_blank');">
         <i class="bi bi-bag-check"></i>
     </button>
 
 </div>
-
-    ${tooltip}
-                            
+    
                             <!-- Seguimiento -->
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
                                 ${isLogPlaceIt ? 
@@ -1347,13 +1311,14 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             <!-- Fin Seguimiento -->
 
                             <!-- Nuevo contenedor para los switches -->
-                            <div class="d-flex contenedor-switches mt-1 justify-content-between">
-                                <div class="form-check form-switch switch-ios"> 
+                            <div class="d-flex contenedor-switches mt-1 justify-content-between disabled hidden">
+                                
+                                <div class="form-check form-switch switch-ios disabled"> 
                                     <input class="form-check-input input-interruptor" type="checkbox" id="preparacion-${data[i].id}" ${data[i].marcaPreparado === 'Si' || data[i].envio === 'oca' ? 'checked' : ''}>
                                     <label class="form-check-label etiqueta-interruptor" for="preparacion-${data[i].id}"><strong>1</strong> Preparación</label>
                                 </div>
 
-                                <div class="form-check form-switch switch-ios"> 
+                                <div class="form-check form-switch switch-ios disabled"> 
                                     <input class="form-check-input input-interruptor" type="checkbox" id="entregado-${data[i].id}-1" ${data[i].marcaEntregado === 'Si' || data[i].estadoEnvio === 'entregado' ? 'checked' : ''}>
                                     <label class="form-check-label etiqueta-interruptor" for="entregado-${data[i].id}-1"><strong>2</strong> Entregado</label>
                                 </div>
@@ -1367,7 +1332,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
 
                             <!-- Botón para mostrar/ocultar el detalle del producto -->
                             <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleProducto-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleProducto-${data[i].id}">
-                                                           <i class="bi bi-chevron-down"></i> Detalle de Producto <i class="bi bi-cart-check"></i>
+                                <i class="bi bi-chevron-down"></i> Detalle de Producto <i class="bi bi-cart-check"></i>
                             </button>
 
                             <!-- Contenido del colapso -->
@@ -1396,7 +1361,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             </div>
 
                             <!-- Botón para mostrar/ocultar el detalle de Facturacion -->
-                            <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleFacturacion-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleFacturacion-${data[i].id}">
+                            <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1 disabled" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleFacturacion-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleFacturacion-${data[i].id}">
                                                            <i class="bi bi-chevron-down"></i> Detalle de Facturacion <i class="bi bi-receipt"></i>
                             </button>
 
@@ -1443,7 +1408,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             </div>
 
                             <!-- Botón para mostrar/ocultar el detalle del Pago -->
-                            <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetallePago-${data[i].id}" aria-expanded="false" aria-controls="collapseDetallePago-${data[i].id}">
+                            <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1 disabled" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetallePago-${data[i].id}" aria-expanded="false" aria-controls="collapseDetallePago-${data[i].id}">
                                 <i class="bi bi-chevron-down"></i> Detalle de Pago <i class="bi bi-credit-card"></i>
                             </button>
 
@@ -1547,7 +1512,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 Datos Actualizados en DataBase <i class="bi bi-check2-all"></i>
                             </div>
                     
-<select class="tipoElectrodomesticoBna ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}" 
+<select class="tipoElectrodomesticoBna hidden" 
         id="tipoElectrodomesticoBna-${data[i].id}" 
         name="TipoElectrodomestico" 
         onchange="rellenarMedidas(this, '${data[i].id}')">
@@ -1648,82 +1613,22 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
     `}
 </select>
         
-                        <div class="medidas ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"></div> <!-- Div para las medidas -->
+                            <div class="medidas hidden"></div> <!-- Div para las medidas -->
 
                         <div class="conjuntoDeBotonesMeli" style="display: flex; flex-direction: column;">
                             
-                        <div class="bg-Hr-primary mb-1">
-                            <p><i class="bi bi-tags-fill"></i> ${isLogPlaceIt ? 'Logística PlaceIt' : 'Logística Privada'}</p>
-                        </div>
-
-                            <!-- Botón Oca -->
-                            <button class="btn mt-1 ${data[i].marcaPreparado === 'Si' ? 'btn-success' : 'btn-oca'} ${isMacro(storeCode) ? '' : 'hidden'}" 
-                                    id="ocaButton${data[i].id}" 
-                                    ${data[i].cancelado ? 'disabled' : ''} 
-                                    onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}', '${data[i].fechaDeCreacion}')">
-                                <span id="OcaText${data[i].id}">
-                                    ${data[i].marcaPreparado === 'Si' 
-                                        ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].numeroSeguimiento}` 
-                                        : `<img class="OcaMeli" src="Img/oca-tini.png" alt="OCA"> Etiqueta <strong>OCA</strong>`}
-                                </span>
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerOca${data[i].id}" style="display:none;"></span>
-                            </button>                           
-
-                            <!-- Botón Cruz del Sur --> 
-                            <button class="btn mt-1 btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
-                                id="CDSButton${data[i].id}" 
-                                ${isAndreani || isAndesmar || data[i].cancelado ? 'disabled' : ''}
-                                onclick="${isCDS ? `descargarEtiquetaCDS('${data[i].cotizacion}', '${data[i].trackingNumber}', '${data[i].id}')` : `enviarDatosCDS('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
-                                <span id="CDSText${data[i].id}">
-                                ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
-                                </span>
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerCDS${data[i].id}" style="display:none;"></span>
-                            </button>
-                            
-                            <!-- Botón Andesmar -->          
-                            <button class="btn mt-1 ${isAndesmar ? 'btn-success' : 'btn-primary'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}" 
-                                id="andesmarButton${data[i].id}" 
-                                ${isAndreani || isCDS || data[i].cancelado ? 'disabled' : ''} 
-                                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
-                                <span id="andesmarText${data[i].id}">
-                                ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
-                                </span>
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data[i].id}"></span>
-                            </button>
-                            
-                            <!-- Botón Andreani --> 
-                            <button class="btn mt-1 btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
-                                id="andreaniButton${data[i].id}" 
-                                ${isAndesmar || isCDS || data[i].cancelado ? 'disabled' : ''} 
-                                onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}',)`}" >
-                                <span id="andreaniText${data[i].id}">
-                                ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
-                                </span>
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data[i].id}" style="display:none;"></span>
-                            </button>
-                            <div class="bg-Hr-primary ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}">
-                            <p><i class="bi bi-tags-fill"></i> Logistica Propia</p>
+                            <div class="bg-Hr-primary">
+                            <p><i class="bi bi-tags-fill"></i> Logistica PlaceIt</p>
                             </div>
 
-                            <!-- Botón Logística Propia --> 
-                            <button class="btn mt-1 btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
-                            id="LogPropiaMeliButton${data[i].id}" 
+                            <!-- Botón Logística PlaceIt --> 
+                            <button class="btn mt-1 btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
+                            id="LogPropiButtonPlaceIt${data[i].id}" 
                             ${data[i].cancelado ? 'disabled' : ''} 
-                            onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}',)">
+                            onclick="generarPDFPlaceIt('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${data[i].cantidad}',)">
                             <span>
-                            ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
-                            </span>
+                            ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}</span>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
-                            </button>
-
-                            <div class="bg-Hr-primary ${data[i].envio !== 'oca' || isLogPlaceIt ? 'hidden' : ''}">
-                            <p><i class="bi bi-info-circle-fill"></i> Generar reclamo</p>
-                            </div>
-
-                            <!-- Botón Formulario de Reclamo OCA -->
-                            <button class="mt-1 btn btn-danger ${data[i].envio !== 'oca' || isLogPlaceIt ? 'hidden' : ''}"
-                            onclick="window.open('https://int.oca.com.ar/soporteclientes/', '_blank')">
-                            <img class="OcaMeli" src="Img/oca-tini.png" alt="OCA"> Formulario de Reclamo <strong>OCA</strong>
                             </button>
 
                         </div>
@@ -1734,14 +1639,15 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 ''
                             }
                             ${data[i].diaPlaceIt ? 
-                                `<div>Se entrega con PlaceIt entre ${data[i].diaPlaceIt}</div>` : 
+                                `<div>Se entrega entre ${data[i].diaPlaceIt}</div>` : 
                                 ''
                             }
                         </div>
 
-                    </div>
+                        </div>
                         
-                </div>
+                    </div>
+
                 `
                 ;
 
@@ -2797,282 +2703,365 @@ function cerrarModal(id) {
     }
 }
 
-const usuario = "BOM6765";
-const clave = "BOM6765";
-const codigoCliente = "6765";
-
-async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, suborden_total, precio_venta, producto_nombre) {
-    // Obtener los elementos de volumen
-    const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
-    const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
-
-    // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
-    databaseRef.off();
-
-    // Comprobar si los elementos existen
-    if (!volumenCm3Elemento || !volumenM3Elemento) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Advertencia',
-            text: 'Debe seleccionar un producto del listado.',
-            confirmButtonText: 'OK'
-        });
-        return; // Salir de la función si no se seleccionó un producto
-    }
-
-    // Obtener los valores de texto
-    const volumenCm3Texto = volumenCm3Elemento.textContent;
-    const volumenM3Texto = volumenM3Elemento.textContent;
-
-    const alto = parseFloat(document.getElementById(`alto-${id}`).value);
-    const ancho = parseFloat(document.getElementById(`ancho-${id}`).value);
-    const largo = parseFloat(document.getElementById(`largo-${id}`).value);
-    const cantidad = parseInt(document.getElementById(`cantidad-${id}`).value);
-    const peso = parseFloat(document.getElementById(`peso-${id}`).value);
-
-    const buttonCDS = document.getElementById(`CDSButton${id}`);
-    const button = document.getElementById(`andesmarButton${id}`);
-    const spinner = document.getElementById(`spinnerAndesmar${id}`);
-    const text = document.getElementById(`andesmarText${id}`);
-    const resultadoDiv = document.getElementById(`resultado${id}`);
-    const envioState = document.getElementById(`estadoEnvio${id}`);
-    const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
-    const buttonAndr = document.getElementById(`andreaniButton${id}`);
-
-    // Comprobar si los elementos existen y asignar null si no existen
-    const altoInterior = parseFloat(document.getElementById(`altoInterior-${id}`)?.value) || null;
-    const anchoInterior = parseFloat(document.getElementById(`anchoInterior-${id}`)?.value) || null;
-    const largoInterior = parseFloat(document.getElementById(`largoInterior-${id}`)?.value) || null;
-    const observaciones = document.getElementById(`observaciones-${id}`).value; // Obtiene el valor del campo de observaciones
-    const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value;
-
-    // Extraer los números de los textos (eliminar 'cm³' y 'm³')
-    const volumenCm3 = parseInt(volumenCm3Texto.replace(' cm³', ''));
-    const volumenM3 = parseFloat(volumenM3Texto.replace(' m³', ''));
-
-    // Verificar si los volúmenes son nulos o no válidos
-    if (isNaN(volumenCm3) || isNaN(volumenM3)) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Advertencia',
-            text: 'Debe seleccionar un producto del listado.',
-            confirmButtonText: 'OK'
-        });
-        return; // Salir de la función si no se seleccionó un producto
-    }
-
-    console.log(`Enviando datos a Andesmar:
-        Volumen en m³: ${volumenM3}, Alto: ${alto}, Ancho: ${ancho}, Largo: ${largo}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
-        ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
-        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
-    `);
-
-    // Verificar si el tipo de electrodoméstico es uno de los splits
-    const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
-    const isSplit = splitTypes.includes(tipoElectrodomestico);
-
-    // Inicializar cantidadKits
-    let cantidadKitsParsed = 0;
-
-    // Calcular la cantidad de bultos
-    let bultos = cantidad;
-
-    if (isSplit) {
-        // Preguntar si incluye kit de instalación solo si es un split
-        const { value: incluyeKit } = await Swal.fire({
-            title: '¿Incluye kit de instalación?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Sí',
-            cancelButtonText: 'No'
-        });
-
-        if (incluyeKit) {
-            // Preguntar la cantidad de kits de instalación
-            const { value: cantidadKits } = await Swal.fire({
-                title: 'Cantidad de kits de instalación',
-                input: 'number',
-                inputLabel: 'Ingrese la cantidad de kits',
-                inputAttributes: {
-                    min: 1,
-                    max: 100
-                },
-                showCancelButton: true,
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar'
+// Función para solicitar el número de remito usando SweetAlert
+async function solicitarNumeroRemito() {
+    const { value: numeroRemito } = await Swal.fire({
+        title: '¿Cuál es el número de remito?',
+        html: `
+            <div class="input-container">
+                <input id="numeroRemito" class="swal2-input" placeholder="Número de Remito" maxlength="20" required>
+                <small class="input-description">Ingresar número de remito (mínimo 10 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroRemito');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
             });
-
-            if (cantidadKits === null) {
-                // Si el usuario cancela, salir de la función
-                return;
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroRemito').value;
+            // Validaciones
+            if (!/^\d{10,}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un número de remito válido');
+                return false;
             }
+            return input;
+        },
+        allowEnterKey: true
+    });
 
-            cantidadKitsParsed = parseInt(cantidadKits) || 1; // Usar 1 si no es un número válido
-            bultos = (cantidad * 2) + cantidadKitsParsed; // Duplicar bultos si es un split y sumar los kits
-        } else {
-            bultos *= 2; // Duplicar bultos si es un split y no incluye kit
-        }
+    // Si el usuario cancela, salir de la función
+    if (!numeroRemito) {
+        return null; // Retorna null si se cancela
     }
+    return numeroRemito;
+}
+
+// Función para solicitar el número de cliente usando SweetAlert
+async function solicitarCliente() {
+    const { value: numeroCliente } = await Swal.fire({
+        title: '¿Cuál es el número de cliente?',
+        html: `
+            <div class="input-container">
+                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
+                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroCliente');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroCliente').value;
+            // Validaciones
+            if (!/^\d{2,8}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
+                return false;
+            }
+            return input;
+        },
+        allowEnterKey: true
+    });
+
+    // Si el usuario cancela, salir de la función
+    if (!numeroCliente) {
+        return null; // Retorna null si se cancela
+    }
+    return numeroCliente;
+}
+
+// ETIQUETA LOGISTICA PLACE IT
+async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrden, calle, numero, telefono, email, precio_venta, producto_nombre, SKU, cantidad) {
+    // Solicitar el número de remito
+    const numeroRemito = await solicitarNumeroRemito();
+    if (!numeroRemito) return; // Si se cancela, salir de la función
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();
     if (!cliente) return; // Si se cancela, salir de la función
 
-    spinner.style.display = 'inline-block';
-    text.innerText = 'Generando Etiqueta...';
-    buttonAndr.disabled = true;
-    buttonCDS.disabled = true;
-        
-    const unidadVenta = [3500, 3100, 3400].includes(parseInt(cp))
-        ? "CARGAS LOG RTO C Y SEGUIMIENTO"
-        : "cargas remito conformado";
+    const { jsPDF } = window.jspdf;
 
-    const requestObj = {
-        CalleRemitente: "Mendoza",
-        CalleNroRemitente: "2799",
-        CodigoPostalRemitente: "2000",
-        NombreApellidoDestinatario: nombre,
-        CodigoPostalDestinatario: cp,
-        CalleDestinatario: calle,
-        CalleNroDestinatario: "S/N",
-        TelefonoDestinatario: telefono,
-        MailDestinatario: email,
-        NroRemito: "BNA" + remito,
-        Bultos: bultos,
-        Peso: peso * cantidad,
-        ValorDeclarado: precio_venta * cantidad,
-        M3: volumenM3,
-        Alto: [],
-        Ancho: [],
-        Largo: [],
-        Observaciones: `${calle}, Telefono: ${telefono}, Electrodomestico: ${producto_nombre}`,
-        ModalidadEntrega: "Puerta-Puerta",
-        UnidadVenta: unidadVenta,        
-        servicio: {
-            EsFletePagoDestino: false,
-            EsRemitoconformado: true
-        },
-        logueo: {
-            Usuario: usuario,
-            Clave: clave,
-            CodigoCliente: codigoCliente
+    spinner2.style.display = "flex";
+    let button = document.getElementById(`LogPropiButtonPlaceIt${id}`);
+    let resultado = document.getElementById(`resultado${id}`);
+    const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
+
+    // Crear un nuevo documento PDF en tamaño 10x15 cm
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'cm',
+        format: [15, 10],
+        putOnlyUsedFonts: true,
+        floatPrecision: 16
+    });
+
+    const diaFormateadoPlaceIt = await obtenerFechas();
+
+    // Limitar el producto a 60 caracteres
+    const productoLimitado = producto_nombre.length > 60 ? producto_nombre.substring(0, 60) + "..." : producto_nombre;
+
+    // URL de la API para generar el código de barras
+    const barcodeApiUrl = `https://proxy.cors.sh/https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(numeroRemito)}&code=Code128&dpi=96`;
+
+    // Obtener el código de barras en formato Base64 usando el proxy CORS
+    const response = await fetch(barcodeApiUrl, {
+        method: 'GET',
+        headers: {
+            "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd"
         }
-    };
+    });
 
-    // Llenar las medidas de acuerdo a la cantidad de bultos
-    for (let i = 0; i < cantidad; i++) {
-        requestObj.Alto.push(alto);
-        requestObj.Ancho.push(ancho);
-        requestObj.Largo.push(largo);
+    if (!response.ok) {
+        console.error('Error al generar el código de barras:', response.statusText);
+        spinner2.style.display = "none";
+        return;
     }
 
-    // Si es un split, agregar las medidas de la unidad interior
-    if (isSplit) {
-        for (let i = 0; i < cantidad; i++) {
-            requestObj.Alto.push(altoInterior);
-            requestObj.Ancho.push(anchoInterior);
-            requestObj.Largo.push(largoInterior);
+    const blob = await response.blob();
+    const reader = new FileReader();
+
+    reader.onloadend = async function() {
+        const barcodeBase64 = reader.result;
+
+        // Contenido HTML
+        const contenido = `
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Etiqueta</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+            <style>
+            body {
+                margin: 0;
+                padding: 0;
+                display: grid;
+                place-items: center;
+                height: 100vh;
+                background-color: #e0e0e0;
+                font-family: 'Arial', sans-serif;
+            }
+            .etiqueta {
+                width: 10cm;
+                margin: 10px;
+                padding: 20px;
+                border-radius: 15px;
+                background-color: #ffffff;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                display: flex;
+                border: 2px dashed #9c0000;
+                flex-direction: column;
+                align-items: center;
+            }
+            .logo img {
+                max-width: 250px;
+                height: auto;
+                margin-bottom: 5px;
+            }
+            .campo {
+                width: 100%;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                margin-bottom: 5px;
+                padding: 5px;
+                border: 1px solid #9c0000;
+                background-color: #f1f8ff;
+                transition: background-color 0.3s;
+            }
+            .campo span {
+                font-size: 1em;
+                font-weight: bold;
+                color: black;
+            }
+            .campo.uppercase {
+                text-transform: uppercase;
+            }
+            .campo-extra {
+                width: 100%;
+                border-radius: 10px;
+                margin-top: 10px;
+                border: 2px dashed #9c0000;
+                padding: 10px;
+                text-align: center;
+                font-size: 1em;
+                color: #555;
+                background-color: #f9f9f9;
+            }
+            .contacto {
+                margin-top: 15px;
+                text-align: center;
+                font-size: 0.9em;
+                color: #333;
+            }
+            .contacto p {
+                margin: 5px 0;
+            }
+            hr {
+                border: none; 
+                height: 1px; 
+                background-color: #2B2B2BFF; 
+                margin: 5px 0; 
+                border-radius: 5px;
+            }
+            </style>
+        </head>
+        <body>
+        <div class="etiqueta">
+            <div class="logo">
+                <img src="./Img/Placeit-etiqueta.png" alt="Logo">
+            </div>
+                <div class="campo uppercase"><span>${cliente} ${nombre}</span></div>
+                <div class="campo"><span>${cp}, ${localidad}, ${provincia}</span></div>
+                <div class="campo uppercase"><span>${calle}</span></div>
+                <div class="campo"><span>Teléfono: ${telefono}</span></div>
+                <div class="campo"><span>X ${cantidad} Unidad. ${SKU}, ${productoLimitado}</span></div>
+                <div class="campo"><span>Coordinar en Línea: ${telefono}<br>Email: ${email}</span></div>
+            <div class="campo-extra">
+                <img src="${barcodeBase64}" alt="Código de Barras" />
+            </div>
+            <div class="contacto">
+            <hr>
+            <p><strong>💬 Posventa:</strong> (0341) 6680658 (WhatsApp)</p>
+            <p><strong>📧 Email:</strong> posventa@novogar.com.ar</p>
+            </div>
+        </div>
+        </body>
+        </html>`;
+
+        // Crear un elemento temporal para renderizar el HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = contenido;
+        document.body.appendChild(tempDiv);
+
+        // Usar html2canvas para capturar el contenido
+        const canvas = await html2canvas(tempDiv, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', 0, 0, 10, 15);
+        const pdfBlob = doc.output('blob');
+
+        // Crear un enlace para abrir el PDF en una nueva ventana
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        spinner2.style.display = "none";
+        button.innerHTML = '<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt';
+        resultado.style.backgroundColor = "#d0ffd1";
+        resultado.innerHTML = `<i class="bi bi-info-square-fill"></i> Plazo de entrega entre ${diaFormateadoPlaceIt}`;
+        resultado.style.marginBottom = '15px';
+        button.classList.remove('btn-danger');
+        button.classList.add('btn-success');
+
+        window.open(pdfUrl, '_blank');
+
+        // Pushear datos a Firebase
+        const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
+        const transportData = {
+            transportCompany: "Logistica PlaceIt",
+            diaPlaceIt: diaFormateadoPlaceIt,
+            cliente: cliente,
+            remito: numeroRemito,
+            tipoElectrodomesticoBna: "bulto50",
+            marcaPreparado: "Si",
+            marcaEntregado: "Si",
+        };
+
+        try {
+            await db.ref(`enviosBNA/${id}`).update(transportData);
+            console.log("Datos actualizados en Firebase como Logistica PlaceIt:", transportData);
+        } catch (error) {
+            console.error("Error al actualizar datos en Firebase:", error);
         }
-    }
 
-    // Si incluye kit de instalación, agregar sus medidas (40x35x30 cm)
-    if (cantidadKitsParsed > 0) {
-        for (let i = 0; i < cantidadKitsParsed; i++) {
-            requestObj.Alto.push(40); // Alto del kit en cm
-            requestObj.Ancho.push(35); // Ancho del kit en cm
-            requestObj.Largo.push(30); // Largo del kit en cm
-        }
-    }
-
-    const proxyUrl = "https://proxy.cors.sh/";
-    const apiUrl = "https://api.andesmarcargas.com/api/InsertEtiqueta";
-
-    console.log(`Datos enviados a API Andesmar (${remito}):`, requestObj); // Mostrar request en consola
-
-    try {
-        const response = await fetch(proxyUrl + apiUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd",
-            },
-            body: JSON.stringify(requestObj)
+        // Almacenar datos en la base de datos Meli
+        const fechaHora = new Date().toLocaleString('es-ES', {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
         });
 
-        const data = await response.json();
-        console.log(`Datos Respuesta API Andesmar (${remito}):`, data); // Mostrar response en consola
-
-        if (data.NroPedido) {
-            const Name = `Confirmación de Envio Novogar`;
-            const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
-            const template = "emailTemplateAndesmar";
-            const transporte = "Andesmar Cargas";
-            const linkEtiqueta = `https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
-            const linkSeguimiento = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}&tipo=remito&cod=`;
-            const linkSeguimiento2 = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}&tipo=remito&cod=`;
-
-            // Actualizar el texto del botón
-            text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${data.NroPedido}`;
-            button.classList.remove('btn-primary');
-            button.classList.add('btn-success');
-            window.open(linkEtiqueta, '_blank');
-            NroEnvio.innerHTML = `<a href="${linkSeguimiento}" target="_blank">Andesmar: ${data.NroPedido} <i class="bi bi-box-arrow-up-right"></i></a>`;
-            
-            // Pushear datos a Firebase
-            const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
-            const transportData = {
-                transportCompany: "Andesmar",
-                trackingLink: linkSeguimiento,
-                transportCompanyNumber: data.NroPedido,
-                cliente: cliente
-            };
-            
-            await db.ref(`enviosBNA/${id}`).update(transportData);
-            console.log("Datos actualizados en Firebase:", transportData);
-    
-            // Nueva entrada en Firebase
-            const nuevaEntradaRef = db.ref('enviosAndesmar').push(); // RUTA FIREBASE
-            await nuevaEntradaRef.set({
-                nombreApellido: nombre,
-                nroPedido: data.NroPedido, 
-                codigoPostal: cp,
-                localidad: `${localidad}, ${provincia}`, 
-                calleDelDestinatario: calle,
-                numeroDeCalle: "S/N",
-                telefono: telefono,
-                remito: `BNA${remito}`, 
-                cotizacion: `$${precio_venta - suborden_total}` 
+        try {
+            await dbMeli.ref(`DespachosLogisticos/${numeroRemito}`).set({
+                cliente: cliente,
+                estado: "Envio Express PlaceIt",
+                fechaHora: fechaHora,
+                operadorLogistico: "PlaceIt",
+                remito: numeroRemito,
+                numeroDeEnvio: 123456,
+                remitoVBA: numeroRemito,
+                subdato: diaFormateadoPlaceIt,
+                valorDeclarado: precio_venta
             });
-            console.log("Nueva entrada agregada a Firebase:", { nombre, nroPedido: data.NroPedido, cp, localidad, calle, telefono });
-                
-            // Actualizar estado de envío
-            if (envioState) {
-                envioState.className = 'em-circle-state4';
-                envioState.innerHTML = `Preparado`;
-            } else {
-                console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
-            }
-
-            // Enviar el email después de procesar el envío
-            await sendEmail(Name, Subject, template, nombre, email, `BNA${remito}`, linkSeguimiento2, transporte);
-        } else {
-            buttonAndr.disabled = false;
-            buttonCDS.disabled = true;
-            text.innerHTML = `Envio No Disponible <i class="bi bi-exclamation-circle-fill"></i>`; 
-            button.classList.remove('btn-primary');
-            button.classList.add('btn-warning', 'btnAndesmarMeli');
+            console.log(`Datos actualizados en Firebase (Logistica) para la operación: ${remitoOrden}`);
+        } catch (error) {
+            console.error('Error al actualizar en Firebase:', error);
         }
-    } catch (error) {
-        buttonAndr.disabled = false;
-        buttonCDS.disabled = true;
-        console.error("Error:", error);
-        text.innerText = "Envio No Disponible ⚠️"; // Cambiar texto en caso de error
-        resultadoDiv.innerText = `Error: ${error.message}`; // Mostrar error debajo
-    } finally {
-        spinner.style.display = 'none'; // Asegúrate de ocultar el spinner en caso de error
-    }
+
+        NroEnvio.innerHTML = `Logística PlaceIt`;
+        document.body.removeChild(tempDiv);
+    };
+
+    reader.readAsDataURL(blob);
 }
+// FIN GENERAR ETIQUETA LOGISTICA PLACE IT
+
+// OBTENER FECHAS PLACE IT
+function obtenerFechas() {
+    const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const hoy = new Date();
+    
+    // Sumar 48 horas
+    let fechaEntrega = new Date(hoy);
+    fechaEntrega.setHours(fechaEntrega.getHours() + 48);
+    
+    // Contar los días para omitir sábados y domingos
+    let diasContados = 0;
+    while (diasContados < 2) {
+        fechaEntrega.setDate(fechaEntrega.getDate() + 1);
+        if (fechaEntrega.getDay() !== 0 && fechaEntrega.getDay() !== 6) { // 0 = domingo, 6 = sábado
+            diasContados++;
+        }
+    }
+
+    // Formatear las fechas
+    const diaActual = `${diasDeLaSemana[hoy.getDay()]} ${hoy.getDate()} de ${hoy.toLocaleString('default', { month: 'long' })}`;
+    const diaEntrega = `${diasDeLaSemana[fechaEntrega.getDay()]} ${fechaEntrega.getDate()} de ${fechaEntrega.toLocaleString('default', { month: 'long' })}`;
+
+    return `${diaActual} y ${diaEntrega}`;
+}
+// FIN OBTENER FECHAS PLACE IT
 
 function addUpdateObservacionesEvent() {
     const updateButtons = document.querySelectorAll('.update-observaciones');
@@ -3104,943 +3093,6 @@ function addUpdateObservacionesEvent() {
         });
     });
 }
-
-// BOTON CRUZ DEL SUR
-async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
-    
-    // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
-    databaseRef.off();
-
-    // Redondear el precio_venta y convertirlo a un entero
-    const precioVentaRedondeado = Math.round(precio_venta);
-
-    // Calcular el precio sin IVA (suponiendo un IVA del 21%)
-    const tasaIVA = 0.21;
-    const precioSinIVA = parseFloat((precioVentaRedondeado / (1 + tasaIVA)).toFixed(2)); 
-
-    console.log(`Precio con IVA: ${precioVentaRedondeado}, Precio sin IVA: ${precioSinIVA}`);
-
-    // Obtener los elementos de volumen
-    const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
-    const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
-
-    // Comprobar si los elementos existen
-    if (!volumenCm3Elemento || !volumenM3Elemento) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Advertencia',
-            text: 'Debe seleccionar un producto del listado.',
-            confirmButtonText: 'OK'
-        });
-        return; // Salir de la función si no se seleccionó un producto
-    }
-
-    // Obtener los valores de texto
-    const volumenCm3Texto = volumenCm3Elemento.textContent;
-    const volumenM3Texto = volumenM3Elemento.textContent;
-
-    const altoA = document.getElementById(`alto-${id}`).value;
-    const anchoA = document.getElementById(`ancho-${id}`).value;
-    const largoA = document.getElementById(`largo-${id}`).value;
-    const cantidad = document.getElementById(`cantidad-${id}`).value;
-    const peso = document.getElementById(`peso-${id}`).value;
-
-    // Comprobar si los elementos existen y asignar null si no existen
-    const altoInterior = document.getElementById(`altoInterior-${id}`) ? document.getElementById(`altoInterior-${id}`).value : null;
-    const anchoInterior = document.getElementById(`anchoInterior-${id}`) ? document.getElementById(`anchoInterior-${id}`).value : null;
-    const largoInterior = document.getElementById(`largoInterior-${id}`) ? document.getElementById(`largoInterior-${id}`).value : null;
-
-    const observaciones = document.getElementById(`observaciones-${id}`).value;
-
-    // Extraer los números de los textos (eliminar 'cm³' y 'm³')
-    const volumenCm3 = parseInt(volumenCm3Texto.replace(' cm³', ''));
-    const volumenM3 = parseFloat(volumenM3Texto.replace(' m³', ''));
-
-    const button = document.getElementById(`CDSButton${id}`);
-    const buttonCDS = document.getElementById(`CDSButton${id}`);
-    const spinnerCDS = document.getElementById(`spinnerCDS${id}`);
-    const textCDS = document.getElementById(`CDSText${id}`);
-    const resultadoDiv = document.getElementById(`resultado${id}`);
-    const envioState = document.getElementById(`estadoEnvio${id}`);
-    const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
-    const queEntregaCds = "E";
-    const buttonAndi = document.getElementById(`andesmarButton${id}`);
-    const buttonAndr = document.getElementById(`andreaniButton${id}`);
-
-    // Verificar si los volúmenes son nulos o no válidos
-    if (isNaN(volumenCm3) || isNaN(volumenM3)) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Advertencia',
-            text: 'Debe seleccionar un producto del listado.',
-            confirmButtonText: 'OK'
-        });
-        return; // Salir de la función si no se seleccionó un producto
-    }
-
-    console.log(`Enviando datos a Cruz del Sur:
-            Volumen en m³: ${volumenM3}, Alto: ${altoA}, Ancho: ${anchoA}, Largo: ${largoA}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
-            ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
-            Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
-        `);
-    
-    // Calcular el volumen total en m³ multiplicando los lados
-    const volumenTotalcds = (altoA * anchoA * largoA) / 1000000; 
-    
-    console.log(`Volumen Total en m³: ${volumenTotalcds}`);
-
-    // Solicitar el cliente
-    const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
-
-    // Mostrar spinner y cambiar texto
-    spinnerCDS.style.display = 'inline-block';
-    textCDS.innerText = 'Generando Etiqueta...';
-    button.disabled = true
-    buttonAndi.disabled = true;
-    buttonAndr.disabled = true;
-
-// Verificar si el tipo de electrodoméstico es uno de los splits
-const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; 
-const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
-const isSplit = splitTypes.includes(tipoElectrodomestico);
-
-    // Inicializar cantidadKits
-    let cantidadKitsParsed = 0;
-
-    // Calcular la cantidad de bultos
-    let bultos = cantidad;
-
-    if (isSplit) {
-        // Preguntar si incluye kit de instalación solo si es un split
-        const { value: incluyeKit } = await Swal.fire({
-            title: '¿Incluye kit de instalación?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Sí',
-            cancelButtonText: 'No'
-        });
-
-        if (incluyeKit) {
-            // Preguntar la cantidad de kits de instalación
-            const { value: cantidadKits } = await Swal.fire({
-                title: 'Cantidad de kits de instalación',
-                input: 'number',
-                inputLabel: 'Ingrese la cantidad de kits',
-                inputAttributes: {
-                    min: 1,
-                    max: 100
-                },
-                showCancelButton: true,
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar'
-            });
-
-            if (cantidadKits === null) {
-                // Si el usuario cancela, salir de la función
-                return;
-            }
-
-            cantidadKitsParsed = parseInt(cantidadKits) || 1; // Usar 1 si no es un número válido
-            bultos = (cantidad * 2) + cantidadKitsParsed; // Duplicar bultos si es un split y sumar los kits
-        } else {
-            bultos *= 2; // Duplicar bultos si es un split y no incluye kit
-        }
-    }
-
-    console.log(`Enviando datos a Cruz del Sur:
-        Volumen en m³: ${volumenM3}, Alto: ${altoA}, Ancho: ${anchoA}, Largo: ${largoA}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
-        ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
-        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
-    `);
-
-    const urlCds = `${corsh}https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenCm3}&peso=${peso}&codigopostal=${cp}&localidad=${localidad}&valor=${precio_venta}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${remito}&nombre=${nombre}&telefono=${telefono}&email=${email}&domicilio=${calle}&bultos=${bultos}&referencia=${remito}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
-
-    const optionsCds = {
-        method: 'GET',
-        headers: {
-            'x-cors-api-key': `${live}`
-        }
-    };
-
-    try {
-        const responseCds = await fetch(urlCds, optionsCds);
-        const dataCds = await responseCds.json();
-        console.log(dataCds); // Para depuración
-
-        // Manejo de la respuesta
-        if (dataCds.Respuesta[0].Estado === 0) {
-            const numeroCotizacionCds = dataCds.Respuesta[0].NumeroCotizacion;
-            const nicCds = dataCds.Respuesta[0].NIC;
-
-            const buttonId = `CDSButton${id}`;
-
-            // Actualizar el botón con el NIC
-            const buttonElement = document.getElementById(buttonId);
-            if (buttonElement) {
-                buttonElement.innerHTML = `
-                    Orden NIC-${nicCds} <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                `;
-                buttonElement.disabled = true; // Mantener el botón deshabilitado
-                buttonCDS.classList.remove('btn-dark-blue');
-                buttonCDS.classList.add('btn-secondary');
-            }
-            
-            
-            // Llamar a la API para descargar la etiqueta
-            await descargarEtiquetaCDS(numeroCotizacionCds, nicCds, buttonId);
-            buttonCDS.classList.remove('btn-secondary');
-            buttonCDS.classList.add('btn-success');
-
-            const trackingLink = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${nicCds}`;
-            NroEnvio.innerHTML = `<a href="${trackingLink}" target="_blank">CDS: NIC-${nicCds} <i class="bi bi-box-arrow-up-right"></i></a>`;
-            const numeroDeEnvioCDS = `NIC-${nicCds}`;
-            trackingNumber = `${nicCds}`;
-
-                        // Pushear datos a Firebase
-                        const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
-                        const transportData = {
-                            transportCompany: "Cruz del Sur",
-                            trackingNumber: trackingNumber,
-                            trackingLink: trackingLink,
-                            cotizacion: numeroCotizacionCds,
-                            transportCompanyNumber: numeroDeEnvioCDS,
-                            cliente: cliente,
-                        };
-                        
-                          db.ref(`enviosBNA/${id}`).update(transportData)
-                            .then(() => {
-                                console.log("Datos actualizados en Firebase como Andreani:", transportData);
-                            })
-                            .catch((error) => {
-                                            console.error("Error al actualizar datos en Firebase:", error);
-                            });
-            
-            
-                        // Cambiar el estado del envío
-                        if (envioState) {
-                            envioState.className = 'em-circle-state4';
-                            envioState.innerHTML = `Preparado`;
-                        }
-
-                        const Name = `Confirmación de Envio Novogar`;
-                        const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
-                        const template = "emailTemplateAndreani";
-                        const transporte = "Correo Cruz del Sur";
-                        const numeroDeEnvio = `NIC-${nicCds}`;
-                        const linkSeguimiento2 = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${nicCds}`;
-            
-                        // Enviar el email después de procesar el envío
-                        await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);            
- 
-        } else {
-            // Manejo de otros estados de error
-            console.error("Error en la respuesta:", dataCds);
-            buttonCDS.classList.remove('btn-dark-blue');
-            buttonCDS.classList.add('btn-danger', 'disabled');
-            spinnerCDS.style.display = 'none';
-            buttonAndi.disabled = false;
-            buttonAndr.disabled = false;
-            textCDS.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Error al generar Etiqueta';
-            resultadoDiv.innerText = `Error: ${dataCds.Respuesta[0].Descripcion}`; 
-        }
-    } catch (error) {
-        console.error("Error al crear la cotización:", error);
-        document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al crear la cotización. Por favor, intenta nuevamente.";
-        buttonCDS.classList.remove('btn-dark-blue');
-        buttonCDS.classList.add('btn-danger', 'disabled');
-        spinnerCDS.style.display = 'none';
-        buttonAndi.disabled = false;
-        buttonAndr.disabled = false;
-        textCDS.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Error al generar Etiqueta';
-        resultadoDiv.innerText = `Error: ${error.message}`;
-    }
-}
-
-async function descargarEtiquetaCDS(numeroCotizacionCds, nicCds, buttonId) {
-    console.log("Parámetros enviados a descargarEtiqueta:");
-    console.log("Cotización CDS:", numeroCotizacionCds);
-    console.log("Número de seguimiento:", nicCds);
-    console.log("ID de operación:", buttonId);
-
-    const buttonElement = document.getElementById(buttonId);
-
-    const urlEtiquetaCds2 = `https://proxy.cors.sh/https://api-ventaenlinea.cruzdelsur.com/api/EtiquetasPDF?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&id=${numeroCotizacionCds}&tamanioHoja=2&posicionArrancar=1&textoEspecialPorEtiqueta=`;
-
-    const optionsEtiquetaCds = {
-        method: 'GET',
-        headers: {
-            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
-        }
-    };
-
-    try {
-        const responseEtiquetaCds2 = await fetch(urlEtiquetaCds2, optionsEtiquetaCds);
-        if (!responseEtiquetaCds2.ok) throw new Error('Error en la respuesta de la API');
-
-        const blobCds2 = await responseEtiquetaCds2.blob();
-        const urlCds2 = window.URL.createObjectURL(blobCds2);
-
-        // Crear un enlace temporal para descargar el archivo con el nombre correcto
-        const a = document.createElement('a');
-        a.href = urlCds2;
-        a.download = `Etiqueta NIC-${nicCds}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(urlCds2);
-
-        // Actualizar el botón para indicar que la etiqueta está lista para descargar
-        if (buttonElement) {
-            buttonElement.innerHTML = `
-                <i class="bi bi-filetype-pdf" style="margin-right: 8px;"></i> Descargar NIC-${nicCds}
-            `;
-            buttonElement.disabled = false; // Habilitar el botón
-            buttonElement.onclick = () => descargarEtiqueta(numeroCotizacionCds, nicCds, buttonId); // Reasignar el onclick
-        }
-
-    } catch (error) {
-        console.error("Error al descargar la etiqueta:", error);
-        if (document.getElementById("errorResponseCruzDelSur")) {
-            document.getElementById("errorResponseCruzDelSur").innerText = "Ocurrió un error al descargar la etiqueta. Por favor, intenta nuevamente.";
-        }
-        // Volver a habilitar el botón en caso de error
-        if (buttonElement) {
-            buttonElement.disabled = false;
-        }
-    }
-}
-// FIN BOTON CRUZ DEL SUR
-
-// Función para enviar datos a la API de Andreani
-const apiUrlLogin = 'https://apis.andreani.com/login';
-const apiUrlLabel = 'https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio';
-const username = 'novogar_gla';
-const password = 'JoBOraCDJZC';
-
-// Mapeo de provincias a códigos de región
-const regionMap = {
-    "Salta": "AR-A",
-    "buenos aires": "AR-B",
-    "capital federal": "AR-C",
-    "san luis": "AR-D",
-    "entre rios": "AR-E",
-    "la rioja": "AR-F",
-    "santiago del estero": "AR-G",
-    "chaco": "AR-H",
-    "san juan": "AR-J",
-    "catamarca": "AR-K",
-    "la pampa": "AR-L",
-    "mendoza": "AR-M",
-    "misiones": "AR-N",
-    "formosa": "AR-P",
-    "neuquen": "AR-Q",
-    "rio negro": "AR-R",
-    "santa fe": "AR-S",
-    "tucuman": "AR-T",
-    "chubut": "AR-U",
-    "tierra del fuego": "AR-V",
-    "corrientes": "AR-W",
-    "cordoba": "AR-X",
-    "jujuy": "AR-Y",
-    "santa cruz": "AR-Z"
-};
-
-async function getAuthToken() {
-    try {
-        const response = await fetch(apiUrlLogin, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Basic ${btoa(`${username}:${password}`)}`
-            }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Token de autenticación:', data.token);
-            return data.token; 
-        } else {
-            throw new Error('No se pudo obtener el token');
-        }
-    } catch (error) {
-        console.error('Error al obtener el token de autenticación:', error);
-    }
-}
-
-// Función para eliminar el nodo de Firebase
-function eliminarNodo(id) {
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: "¡No podrás deshacer esto!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, eliminarlo!',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            firebase.database().ref('enviosBNA/' + id).remove()
-                .then(() => {
-                    console.log(`Nodo con ID ${id} eliminado exitosamente.`);
-                    // Eliminar la tarjeta del DOM
-                    const cardElement = document.querySelector(`[data-id="${id}"]`);
-                    if (cardElement) {
-                        cardElement.remove();
-                    }
-                    Swal.fire(
-                        'Eliminado!',
-                        'El elemento ha sido eliminado.',
-                        'success'
-                    );
-
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
-                })
-                .catch(error => {
-                    console.error("Error al eliminar el nodo: ", error);
-                    Swal.fire(
-                        'Error',
-                        'Ocurrió un error al eliminar el elemento.',
-                        'error'
-                    );
-                });
-        }
-    });
-}
-
-async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, suborden, fecha) {
-    const spinnerOca = document.getElementById(`spinnerOca${id}`);
-    const textOca = document.getElementById(`OcaText${id}`);
-    const button = document.getElementById(`ocaButton${id}`);
-    const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
-
-    // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
-    databaseRef.off();
-
-    if (!spinnerOca || !textOca || !button) {
-        console.error('Elementos no encontrados:', { spinnerOca, textOca, button });
-        return;
-    }
-
-    console.log(`Enviando datos a OCA:
-        ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
-        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}, SubOrden: ${suborden}, Fecha: ${fecha}
-    `);
-
-    // Solicitar el cliente
-    const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
-
-    spinnerOca.style.display = 'inline-block';
-    textOca.innerText = 'Generando Etiqueta...';
-    button.disabled = true;
-
-    // Parsear la fecha
-    const [dia, mes, anio] = fecha.split(' ')[0].split('-');
-    const fechaOriginal = new Date(anio, mes - 1, dia); // mes - 1 porque los meses empiezan desde 0
-
-    const fechaHasta = new Date(fechaOriginal);
-    fechaHasta.setDate(fechaHasta.getDate() + 15); // Sumar 10 días
-
-    const fechaDesde = new Date(fechaOriginal); // Igual a la fecha original
-
-    const formatFecha = (fecha) => {
-        const dia = String(fecha.getDate()).padStart(2, '0');
-        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-        const anio = fecha.getFullYear();
-        return `${dia}-${mes}-${anio}`;
-    };
-
-    const fechaHastaStr = formatFecha(fechaHasta);
-    const fechaDesdeStr = formatFecha(fechaDesde);
-
-    console.log(`Enviando datos a OCA:
-       Desde: ${fechaDesdeStr}
-       Hasta: ${fechaHastaStr} 
-       SubOrden: ${suborden}
-    `);
-
-    const url = `https://proxy.cors.sh/http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/List_Envios?CUIT=30-68543701-1&FechaDesde=${fechaDesdeStr}&FechaHasta=${fechaHastaStr}`;
-
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
-                'Content-Type': 'application/xml'
-            }
-        });
-
-        const data = await response.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data, "text/xml");
-
-        const productos = xmlDoc.getElementsByTagName("NroProducto");
-        let numeroEnvio = null;
-
-        for (let i = 0; i < productos.length; i++) {
-            if (productos[i].textContent === suborden) {
-                numeroEnvio = xmlDoc.getElementsByTagName("NumeroEnvio")[i].textContent;
-                break;
-            }
-        }
-
-        if (numeroEnvio) {
-            textOca.innerText = `Etiqueta ${numeroEnvio}`;
-            button.classList.remove('btn-oca');
-            button.classList.add('btn-secondary');
-
-            // Llamada a la segunda API
-            const pdfUrl = `https://proxy.cors.sh/http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/GetPdfDeEtiquetasPorOrdenOrNumeroEnvioParaEtiquetadora?ordenRetiro=&numeroEnvio=${numeroEnvio}&logisticaInversa=`;
-            const pdfResponse = await fetch(pdfUrl, {
-                method: 'GET',
-                headers: {
-                    'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
-                    'Content-Type': 'application/xml'
-                }
-            });
-
-            const pdfData = await pdfResponse.text();
-            console.log('PDF Data:', pdfData);
-
-            const base64Data = pdfData.replace(/<\?xml.*?\?>/, '').replace(/<string.*?>/, '').replace(/<\/string>/, '');
-            const binaryString = atob(base64Data);
-            const binaryLen = binaryString.length;
-            const bytes = new Uint8Array(binaryLen);
-            for (let i = 0; i < binaryLen; i++) {
-                const ascii = binaryString.charCodeAt(i);
-                bytes[i] = ascii;
-            }
-            const pdfBlob = new Blob([bytes], { type: 'application/pdf' });
-            const pdfUrlBlob = URL.createObjectURL(pdfBlob);
-
-            button.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${numeroEnvio}`;
-            button.classList.remove('btn-secondary');
-            button.classList.add('btn-success');
-            const link = document.createElement('a');
-            link.href = pdfUrlBlob;
-            link.download = `OCA-${nombre}-${numeroEnvio}.pdf`;
-            link.click();
-
-            const linkSeguimiento = `https://www.aftership.com/es/track/oca-ar/${numeroEnvio}`;
-            const numeroDeEnvioOca = `${numeroEnvio}`;
-
-            const envioState = document.getElementById(`estadoEnvio${id}`);
-            envioState.className = 'em-circle-state4';
-            envioState.innerHTML = `Preparado`;
-            NroEnvio.innerHTML = `<a href="${linkSeguimiento}" target="_blank">OCA: ${numeroEnvio} <i class="bi bi-box-arrow-up-right"></i></a>`;
-
-            // Pushear datos a Firebase
-            const db = firebase.database();
-            const transportData = {
-                medio_de_envio: "oca",
-                trackingLink: linkSeguimiento,
-                numero_de_seguimiento: numeroDeEnvioOca,
-                tipoElectrodomesticoBna: "bultoOca",
-                marcaPreparado: "Si",
-                cliente: cliente,
-            };
-            
-              db.ref(`enviosBNA/${id}`).update(transportData)
-                .then(() => {
-                    console.log("Datos actualizados en Firebase como Oca:", transportData);
-                })
-                .catch((error) => {
-                                console.error("Error al actualizar datos en Firebase:", error);
-                });
-
-            const Name = `Confirmación de Envio Novogar`;
-            const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
-            const template = "emailTemplateOCA";
-            const transporte = "OCA";
-            const numeroDeEnvio = `${numeroEnvio}`;
-            const linkSeguimiento2 = `https://www.aftership.com/es/track/oca-ar/${numeroEnvio}`;
-
-            await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
-            
-        } else {
-            textOca.innerText = '⚠️ No se encontró la etiqueta ';
-            button.classList.add('disabled', 'btn-secondary');
-        }
-
-    } catch (error) {
-        console.error('Error al llamar a la API:', error);
-        textOca.innerText = '⚠️ Error al generar etiqueta';
-        button.classList.add('disabled');
-    } finally {
-        button.disabled = false;
-        spinnerOca.style.display = 'none';
-    }
-}
-
-async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
-    
-    // Redondear el precio_venta y convertirlo a un entero
-    const precioVentaRedondeado = Math.round(precio_venta);
-
-    // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
-    databaseRef.off();
-
-    // Calcular el precio sin IVA (suponiendo un IVA del 21%)
-    const tasaIVA = 0.21;
-    const precioSinIVA = parseFloat((precioVentaRedondeado / (1 + tasaIVA)).toFixed(2)); 
-
-    console.log(`Precio con IVA: ${precioVentaRedondeado}, Precio sin IVA: ${precioSinIVA}`);
-
-    // Obtener los elementos de volumen
-    const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
-    const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
-
-    // Comprobar si los elementos existen
-    if (!volumenCm3Elemento || !volumenM3Elemento) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Advertencia',
-            text: 'Debe seleccionar un producto del listado.',
-            confirmButtonText: 'OK'
-        });
-        return; // Salir de la función si no se seleccionó un producto
-    }
-
-    // Obtener los valores de texto
-    const volumenCm3Texto = volumenCm3Elemento.textContent;
-    const volumenM3Texto = volumenM3Elemento.textContent;
-
-    const altoA = document.getElementById(`alto-${id}`).value;
-    const anchoA = document.getElementById(`ancho-${id}`).value;
-    const largoA = document.getElementById(`largo-${id}`).value;
-    const cantidad = document.getElementById(`cantidad-${id}`).value;
-    const peso = document.getElementById(`peso-${id}`).value;
-
-    // Comprobar si los elementos existen y asignar null si no existen
-    const altoInterior = document.getElementById(`altoInterior-${id}`) ? document.getElementById(`altoInterior-${id}`).value : null;
-    const anchoInterior = document.getElementById(`anchoInterior-${id}`) ? document.getElementById(`anchoInterior-${id}`).value : null;
-    const largoInterior = document.getElementById(`largoInterior-${id}`) ? document.getElementById(`largoInterior-${id}`).value : null;
-
-    const observaciones = document.getElementById(`observaciones-${id}`).value;
-
-    // Extraer los números de los textos (eliminar 'cm³' y 'm³')
-    const volumenCm3 = parseInt(volumenCm3Texto.replace(' cm³', ''));
-    const volumenM3 = parseFloat(volumenM3Texto.replace(' m³', ''));
-
-    const button = document.getElementById(`andesmarButton${id}`);
-    const buttonAndr = document.getElementById(`andreaniButton${id}`);
-    const spinnerAndr = document.getElementById(`spinnerAndreani${id}`);
-    const textAndr = document.getElementById(`andreaniText${id}`);
-    const resultadoDiv = document.getElementById(`resultado${id}`);
-    const envioState = document.getElementById(`estadoEnvio${id}`);
-    const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
-
-    // Verificar si los volúmenes son nulos o no válidos
-    if (isNaN(volumenCm3) || isNaN(volumenM3)) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Advertencia',
-            text: 'Debe seleccionar un producto del listado.',
-            confirmButtonText: 'OK'
-        });
-        return; // Salir de la función si no se seleccionó un producto
-    }
-
-    console.log(`Enviando datos a Andesmar:
-        Volumen en m³: ${volumenM3}, Alto: ${altoA}, Ancho: ${anchoA}, Largo: ${largoA}, Cantidad: ${cantidad}, Peso: ${peso}, Alto UI: ${altoInterior}, Ancho UI: ${anchoInterior}, Largo UI: ${largoInterior}, Volumen en cm³: ${volumenCm3}, Observaciones: ${observaciones}, 
-        ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
-        Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
-    `);
-
-    // Solicitar el cliente
-    const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
-
-    // Mostrar spinner y cambiar texto
-    spinnerAndr.style.display = 'inline-block';
-    textAndr.innerText = 'Generando Etiqueta...';
-    button.disabled = true
-
-    const token = await getAuthToken();
-
-    // Obtener el nombre de la provincia y convertirlo a minúsculas
-    const provinciaNombre = provincia.toLowerCase();
-    const regionCodigo = regionMap[provinciaNombre] || ""; // Obtener el código de región
-
-// Inicializar el array de bultos
-const bultos = [];
-
-// Verificar si el tipo de electrodoméstico es uno de los splits
-const tipoElectrodomestico = document.getElementById(`tipoElectrodomesticoBna-${id}`).value; 
-const splitTypes = ["split2700", "split3300", "split4500", "split5500", "split6000", "splitPisoTecho18000"];
-const isSplit = splitTypes.includes(tipoElectrodomestico);
-
-// Inicializar cantidadKits
-let cantidadKitsParsed = 0;
-
-// Preguntar si incluye kit de instalación solo si es un split
-if (isSplit) {
-    const { value: incluyeKit } = await Swal.fire({
-        title: '¿Incluye kit de instalación?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sí',
-        cancelButtonText: 'No'
-    });
-
-    if (incluyeKit) {
-        const { value: cantidadKits } = await Swal.fire({
-            title: 'Cantidad de kits de instalación',
-            input: 'number',
-            inputLabel: 'Ingrese la cantidad de kits',
-            inputAttributes: {
-                min: 1,
-                max: 100
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar'
-        });
-
-        if (cantidadKits === null) {
-            return; // Si el usuario cancela, salir de la función
-        }
-
-        cantidadKitsParsed = parseInt(cantidadKits) || 1; // Usar 1 si no es un número válido
-    }
-}
-
-// Ajustar la cantidad de bultos
-const cantidadBultos = isSplit ? cantidad : cantidad;
-const VolumenTotalFinal = isSplit ? volumenCm3 / 2 : volumenCm3 / cantidad;
-
-// Inicializar arreglos para las medidas
-const Alto = [];
-const Ancho = [];
-const Largo = [];
-
-// Llenar las medidas de acuerdo a la cantidad de bultos
-for (let i = 0; i < cantidadBultos; i++) {
-    Alto.push(altoA);
-    Ancho.push(anchoA);
-    Largo.push(largoA);
-}
-
-// Si es un split, agregar las medidas de la unidad interior tantas veces como la cantidad de bultos
-if (isSplit) {
-    for (let i = 0; i < cantidadBultos; i++) {
-        Alto.push(altoInterior);
-        Ancho.push(anchoInterior);
-        Largo.push(largoInterior);
-    }
-}
-
-// Crear bultos con las medidas reales
-for (let i = 0; i < cantidadBultos; i++) {
-    bultos.push({
-        "kilos": peso / cantidadBultos,
-        "largoCm": Ancho[i] || null, // Usar Ancho[i] si existe, de lo contrario null
-        "altoCm": Alto[i] || null, // Usar Alto[i] si existe, de lo contrario null
-        "anchoCm": Largo[i] || null, // Usar Largo[i] si existe, de lo contrario null
-        "volumenCm": VolumenTotalFinal,
-        "valorDeclaradoSinImpuestos": precioSinIVA,
-        "valorDeclaradoConImpuestos": precioVentaRedondeado,
-        "referencias": [
-            { "meta": "detalle", "contenido": producto_nombre },
-            { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
-            { "meta": "observaciones", "contenido": `${calle}, Telefono: ${telefono} Electrodomestico: ${producto_nombre}` }
-        ]
-    });
-}
-
-// Si es un split, agregar los bultos de la unidad interior
-if (isSplit) {
-    for (let i = 0; i < cantidadBultos; i++) {
-        bultos.push({
-            "kilos": peso / cantidadBultos, // Ajusta según sea necesario
-            "largoCm": anchoInterior,
-            "altoCm": altoInterior,
-            "anchoCm": largoInterior,
-            "volumenCm": VolumenTotalFinal, // Ajustar según sea necesario
-            "valorDeclaradoSinImpuestos": precioSinIVA,
-            "valorDeclaradoConImpuestos": precioVentaRedondeado,
-            "referencias": [
-                { "meta": "detalle", "contenido": "Unidad Interior" }, // Detalle de la unidad interior
-                { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
-                { "meta": "observaciones", "contenido": `${calle}, Telefono: ${telefono} Unidad Interior: ${producto_nombre}` }
-            ]
-        });
-    }
-
-    // Agregar bultos de kits de instalación
-    for (let i = 0; i < cantidadKitsParsed; i++) {
-        bultos.push({
-            "kilos": 5, // Peso estimado del kit de instalación
-            "largoCm": 40,
-            "altoCm": 40,
-            "anchoCm": 40,
-            "volumenCm": 40 * 40 * 40, // Volumen del kit de instalación
-            "valorDeclaradoSinImpuestos": precioSinIVA,
-            "valorDeclaradoConImpuestos": precioVentaRedondeado,
-            "referencias": [
-                { "meta": "detalle", "contenido": "Kit de Instalación" }, // Detalle del kit de instalación
-                { "meta": "idCliente", "contenido": `${remito}-BNA`.toUpperCase() },
-                { "meta": "observaciones", "contenido": `${calle}, Telefono: ${telefono} Kit de Instalación: ${producto_nombre}` }
-            ]
-        });
-    }
-}
-
-    const requestData = {
-        "contrato": volumenCm3 > 100000 ? "351002753" : "400017259",
-        "idPedido": `${remito}-BNA`.toUpperCase(),
-        "origen": {
-            "postal": {
-                "codigoPostal": "2126",
-                "calle": "R. Prov. 21 Km",
-                "numero": "4,9",
-                "localidad": "ALVEAR",
-                "region": "AR-S",
-                "pais": "Argentina"
-            }
-        },
-        "destino": {
-            "postal": {
-                "codigoPostal": cp,
-                "calle": calle,
-                "numero": "S/N",
-                "localidad": localidad,
-                "region": regionCodigo,
-                "pais": "Argentina"
-            }
-        },
-        "remitente": {
-            "nombreCompleto": "NOVOGAR.COM.AR",
-            "email": "posventa@novogar.com.ar",
-            "documentoTipo": "CUIT",
-            "documentoNumero": "30685437011",
-            "telefonos": [{ "tipo": 1, "numero": "3416680658" }]
-        },
-        "destinatario": [{
-            "nombreCompleto": nombre,
-            "email": email,
-            "documentoTipo": "CUIT",
-            "documentoNumero": "30685437011",
-            "telefonos": [{ "tipo": 1, "numero": telefono}]
-        }],
-        "remito": {
-            "numeroRemito": `${remito}-BNA`.toUpperCase(),
-        },
-        "bultos": bultos
-    };
-
-    console.log(`Datos enviados a API ANDREANI (${remito}):`, requestData);
-
-    try {
-        const response = await fetch(apiUrlLabel, {
-            method: 'POST',
-            headers: {
-                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
-                'x-authorization-token': token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        if (response.ok) { 
-            const data = await response.json();
-            const numeroDeEnvio = data.bultos[0].numeroDeEnvio;
-
-            console.log(`Datos Respuesta API ANDREANI (${remito}):`, response);
-
-            const Name = `Confirmación de Envio Novogar`;
-            const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
-            const template = "emailTemplateAndreani";
-            const transporte = "Correo Andreani";
-            const linkSeguimiento2 = `https://andreani.com/#!/informacionEnvio/${numeroDeEnvio}`;
-            const linkSeguimiento = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
-            
-            // Configurar el botón de descarga inicial  
-            buttonAndr.disabled = true;
-            textAndr.innerHTML = `Orden ${numeroDeEnvio}`;
-            buttonAndr.classList.remove('btn-danger');
-            buttonAndr.classList.add('btn-secondary');
-            NroEnvio.innerHTML = `<a href="${linkSeguimiento}" target="_blank">Andreani: ${numeroDeEnvio} <i class="bi bi-box-arrow-up-right"></i></a>`;
-        
-            // Pushear datos a Firebase
-            const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
-            const transportData = {
-                transportCompany: "Andreani",
-                trackingLink: linkSeguimiento,
-                transportCompanyNumber: numeroDeEnvio,
-                cliente: cliente,
-            };
-            
-              db.ref(`enviosBNA/${id}`).update(transportData)
-                .then(() => {
-                    console.log("Datos actualizados en Firebase como Andreani:", transportData);
-                })
-                .catch((error) => {
-                                console.error("Error al actualizar datos en Firebase:", error);
-                });
-
-            // Cambiar el estado del envío
-            if (envioState) {
-                envioState.className = 'em-circle-state4';
-                envioState.innerHTML = `Preparado`;
-            }
-            // Enviar el email después de procesar el envío
-            await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
-            // Llamar a la API para obtener la etiqueta
-            await obtenerEtiqueta(numeroDeEnvio, token, buttonAndr);
-        } else {
-            console.error('Error al generar la etiqueta:', response.statusText);
-            buttonAndr.innerText = "Error Andreani ⚠️"; 
-            resultadoDiv.innerText = `Error Andreani: (Puede no existir el CP o Localidad en Andreani) ${response.statusText}`; 
-            buttonAndr.disabled = true;
-            button.disabled = false
-        }
-    } catch (error) {
-        console.error('Error al generar la etiqueta:', error);
-
-        button.innerText = "Error Andreani ⚠️"; 
-        resultadoDiv.innerText = `Error Andreani: (Puede no existir el CP o Localidad en Andreani) ${error.message}`; 
-        buttonAndr.disabled = true;
-        button.disabled = false
-    }
-}
-
-async function obtenerEtiqueta(numeroDeEnvio, token, buttonAndr) {
-    const url = `https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
-    try {
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
-                "x-authorization-token": token,
-                "Accept": "application/pdf"
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error HTTP! Status: ${response.status}`);
-        }
-
-        const blob = await response.blob();
-        const pdfUrl = URL.createObjectURL(blob);
-
-        buttonAndr.disabled = false;
-        buttonAndr.href = pdfUrl; 
-        buttonAndr.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${numeroDeEnvio}`;
-        buttonAndr.classList.remove('btn-secondary');
-        buttonAndr.classList.add('btn-success');
-        window.open(pdfUrl, '_blank');
-    } catch (error) {
-        console.error('Error al obtener la etiqueta:', error);
-    }
-}
-
 
 function rellenarMedidas(selectElement, id, isInitialLoad = false) {
     const selectedValue = selectElement.value;
@@ -4545,7 +3597,6 @@ medidasDiv.appendChild(medidasTextoDiv);
 }
 
 // INICIO PAGINATION
-
 function updatePagination(totalItems) {
     paginationContainer.innerHTML = "";
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -4591,7 +3642,6 @@ function updatePagination(totalItems) {
         paginationContainer.appendChild(backItem);
     }
 }
-
 // FIN PAGINATION
 
 // INICIO SWITCHS BOTÓNES
@@ -4994,499 +4044,6 @@ function realizarBusqueda() {
     }
 }
 // FIN BUSCADOR
-
-// Función para solicitar el número de remito usando SweetAlert
-async function solicitarNumeroRemito() {
-    const { value: numeroRemito } = await Swal.fire({
-        title: '¿Cuál es el número de remito?',
-        html: `
-            <div class="input-container">
-                <input id="numeroRemito" class="swal2-input" placeholder="Número de Remito" maxlength="20" required>
-                <small class="input-description">Ingresar número de remito (mínimo 10 dígitos, solo números)</small>
-            </div>
-        `,
-        icon: 'question',
-        showCancelButton: false,
-        confirmButtonText: 'Aceptar',
-        customClass: {
-            popup: 'macos-popup',
-            input: 'macos-input',
-            title: 'macos-title',
-            confirmButton: 'macos-button',
-        },
-        didOpen: () => {
-            const input = document.getElementById('numeroRemito');
-            input.focus();
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    Swal.clickConfirm();
-                }
-            });
-        },
-        preConfirm: () => {
-            const input = document.getElementById('numeroRemito').value;
-            // Validaciones
-            if (!/^\d{10,}$/.test(input)) {
-                Swal.showValidationMessage('Por favor, ingrese un número de remito válido');
-                return false;
-            }
-            return input;
-        },
-        allowEnterKey: true
-    });
-
-    // Si el usuario cancela, salir de la función
-    if (!numeroRemito) {
-        return null; // Retorna null si se cancela
-    }
-    return numeroRemito;
-}
-
-// Función para solicitar el número de cliente usando SweetAlert
-async function solicitarCliente() {
-    const { value: numeroCliente } = await Swal.fire({
-        title: '¿Cuál es el número de cliente?',
-        html: `
-            <div class="input-container">
-                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
-                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
-            </div>
-        `,
-        icon: 'question',
-        showCancelButton: false,
-        confirmButtonText: 'Aceptar',
-        customClass: {
-            popup: 'macos-popup',
-            input: 'macos-input',
-            title: 'macos-title',
-            confirmButton: 'macos-button',
-        },
-        didOpen: () => {
-            const input = document.getElementById('numeroCliente');
-            input.focus();
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    Swal.clickConfirm();
-                }
-            });
-        },
-        preConfirm: () => {
-            const input = document.getElementById('numeroCliente').value;
-            // Validaciones
-            if (!/^\d{2,8}$/.test(input)) {
-                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
-                return false;
-            }
-            return input;
-        },
-        allowEnterKey: true
-    });
-
-    // Si el usuario cancela, salir de la función
-    if (!numeroCliente) {
-        return null; // Retorna null si se cancela
-    }
-    return numeroCliente;
-}
-
-// GENERAR ETIQUETA LOGISTICA PROPIA
-async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, SKU) {
-    let spinner2 = document.getElementById("spinner2");
-
-    // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
-    databaseRef.off();
-
-    // Solicitar el número de remito
-    const numeroRemito = await solicitarNumeroRemito();
-    if (!numeroRemito) return; // Si se cancela, salir de la función
-
-    // Solicitar el cliente
-    const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
-
-    const { jsPDF } = window.jspdf;
-
-    spinner2.style.display = "flex";
-    let button = document.getElementById(`LogPropiaMeliButton${id}`);
-    let resultado = document.getElementById(`resultado${id}`);
-
-    // Crear un nuevo documento PDF en tamaño 10x15 cm
-    const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'cm',
-        format: [15, 10],
-        putOnlyUsedFonts: true,
-        floatPrecision: 16
-    });
-
-    // Eliminar el prefijo "200000" del idOperacion
-    const idOperacionFinal = id.replace(/^20000[0-9]/, '') + "ME1"; // Asegúrate de que id es el correcto
-    // Limitar el producto a 60 caracteres
-    const productoLimitado = producto_nombre.length > 60 ? producto_nombre.substring(0, 60) + "..." : producto_nombre;
-
-    // URL de la API para generar el código de barras
-    const barcodeApiUrl = `https://proxy.cors.sh/https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(numeroRemito)}&code=Code128&dpi=96`;
-
-    // Obtener el código de barras en formato Base64 usando el proxy CORS
-    const response = await fetch(barcodeApiUrl, {
-        method: 'GET',
-        headers: {
-            "x-cors-api-key": "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd"
-        }
-    });
-
-    if (!response.ok) {
-        console.error('Error al generar el código de barras:', response.statusText);
-        spinner2.style.display = "none";
-        return;
-    }
-
-    const blob = await response.blob();
-    const reader = new FileReader();
-
-    reader.onloadend = async function() {
-        const barcodeBase64 = reader.result;
-
-        // Contenido HTML
-        const contenido = `
-        <html lang="es">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Etiqueta</title>
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-            <style>
-            body {
-                margin: 0;
-                padding: 0;
-                display: grid;
-                place-items: center;
-                height: 100vh;
-                background-color: #e0e0e0;
-                font-family: 'Arial', sans-serif;
-            }
-            .etiqueta {
-                width: 10cm;
-                margin: 10px;
-                padding: 20px;
-                border-radius: 15px;
-                background-color: #ffffff;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-                display: flex;
-                border: 2px dashed #9c0000;
-                flex-direction: column;
-                align-items: center;
-            }
-            .logo img {
-                max-width: 250px;
-                height: auto;
-                margin-bottom: 5px;
-            }
-            .campo {
-                width: 100%;
-                border-radius: 10px;
-                display: flex;
-                align-items: center;
-                margin-bottom: 5px;
-                padding: 5px;
-                border: 1px solid #9c0000;
-                background-color: #f1f8ff;
-                transition: background-color 0.3s;
-            }
-            .campo span {
-                font-size: 1em;
-                font-weight: bold;
-                color: black;
-            }
-            .campo.uppercase {
-                text-transform: uppercase;
-            }
-            .campo-extra {
-                width: 100%;
-                border-radius: 10px;
-                margin-top: 10px;
-                border: 2px dashed #9c0000;
-                padding: 10px;
-                text-align: center;
-                font-size: 1em;
-                color: #555;
-                background-color: #f9f9f9;
-            }
-            .contacto {
-                margin-top: 15px;
-                text-align: center;
-                font-size: 0.9em;
-                color: #333;
-            }
-            .contacto p {
-                margin: 5px 0;
-            }
-
-            hr {
-                    border: none; 
-                    height: 1px; 
-                    background-color: #2B2B2BFF; 
-                    margin: 5px 0; 
-                    border-radius: 5px;
-                }
-            </style>
-        </head>
-        <body>
-        <div class="etiqueta">
-            <div class="logo">
-                <img src="./Img/Tiendas-Virtuales.png" alt="Logo">
-            </div>
-            <div class="campo uppercase"><span>${cliente} ${nombre}</span></div>
-            <div class="campo"><span>${cp}, ${localidad}, ${provincia}</span></div>
-            <div class="campo uppercase"><span>${calle}</span></div>
-            <div class="campo"><span>Teléfono: ${telefono}</span></div>
-            <div class="campo"><span>${SKU}, ${productoLimitado}</span></div>
-            <div class="campo"><span>ORDEN DE TIENDA: ${remito}</span></div>
-            <div class="campo-extra">
-                <img src="${barcodeBase64}" alt="Código de Barras" />
-            </div>
-            <div class="contacto">
-            <hr>
-            <p><strong>💬 Posventa:</strong> (0341) 6680658 (WhatsApp)</p>
-            <p><strong>📧 Email:</strong> posventa@novogar.com.ar</p>
-            </div>
-        </div>
-        </body>
-        </html>`;
-
-        // Crear un elemento temporal para renderizar el HTML
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = contenido;
-        document.body.appendChild(tempDiv);
-
-        // Usar html2canvas para capturar el contenido
-        const canvas = await html2canvas(tempDiv, { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
-        doc.addImage(imgData, 'PNG', 0, 0, 10, 15);
-        const pdfBlob = doc.output('blob');
-
-        // Pushear datos a Firebase
-        const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
-        const transportData = {
-            transportCompany: "Logistica Propia",
-            cliente: cliente,
-            remito: numeroRemito,
-            tipoElectrodomesticoBna: "bulto50",
-        };
-
-        const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
-        NroEnvio.innerHTML = `Logistica Propia`;
-        
-        try {
-            await db.ref(`enviosBNA/${id}`).update(transportData);
-            console.log("Datos actualizados en Firebase como Logistica Propia:", transportData);
-        } catch (error) {
-            console.error("Error al actualizar datos en Firebase:", error);
-        }
-
-        const envioState = document.getElementById(`estadoEnvio${id}`);
-        envioState.className = 'em-circle-state4';
-        envioState.innerHTML = `Preparado`;
-
-        // Crear un enlace para abrir el PDF en una nueva ventana
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-
-        setTimeout(() => {
-            spinner2.style.display = "none";
-            // Ocultar el spinner y restaurar el botón
-            button.innerHTML = '<i class="bi bi-filetype-pdf"></i> Descaargar Etiqueta Novogar';
-            button.disabled = false;
-            window.open(pdfUrl, '_blank');
-        }, 2000);
-
-        document.body.removeChild(tempDiv);
-    };
-
-    reader.readAsDataURL(blob); // Asegúrate de iniciar la lectura del blob
-
-    await sendEmail(Name, Subject, template, nombre, email, remito);
-}
-// FIN GENERAR ETIQUETA LOGISTICA PROPIA
-
-// SLACK
-const firebaseRefErrores = firebase.database().ref('erroresSlack');
-const firebaseRefEnvios = firebase.database().ref('enviosBNA');
-
-const sonidoToast = new Audio('./Img/error.mp3'); // Cambia la ruta por la de tu archivo
-
-const firebaseRefMensajesProcesados = firebase.database().ref('mensajesProcesados'); // Referencia para mensajes procesados
-
-async function verificarMensajes() {
-    // Esperar 20 segundos antes de continuar
-    await new Promise(resolve => setTimeout(resolve, 20000));
-
-    console.log('Ejecutando búsqueda de errores en Slack...');
-    try {
-        const response = await fetch(`${corsh}https://slack.com/api/conversations.history?channel=${channel}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'x-cors-api-key': `${live}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (data.ok) {
-            let nuevosErrores = 0;
-            const ordenesConErrores = [];
-
-            for (const mensaje of data.messages) {
-                const mensajeId = mensaje.ts.replace(/\./g, '_'); // Reemplazar puntos por guiones bajos
-
-                // Verificar si el mensaje ya fue procesado
-                const snapshotMensajeProcesado = await firebaseRefMensajesProcesados.child(mensajeId).once('value');
-                if (snapshotMensajeProcesado.exists()) {
-                    continue; // Si ya fue procesado, saltar al siguiente mensaje
-                }
-
-                if (mensaje.user === `${chat}` && /^\(\d+(-reproceso-\d+)?\)/.test(mensaje.text)) {
-                    let numero;
-                    const reprocesoMatch = mensaje.text.match(/^\((\d+)(?:-reproceso-(\d+))?\)/);
-
-                    if (reprocesoMatch) {
-                        numero = reprocesoMatch[2] ? reprocesoMatch[2] : reprocesoMatch[1];
-                    } else {
-                        console.error('No se encontró un formato válido en el mensaje:', mensaje.text);
-                        continue;
-                    }
-
-                    const errorMensaje = mensaje.text.replace(/^\(\d+(-reproceso-\d+)?\)\s*/, '');
-                    let nuevoNumero = numero;
-                    let reprocesoCount = 1;
-
-                    while (true) {
-                        const snapshotErrores = await firebaseRefErrores.child(nuevoNumero).once('value');
-                        if (!snapshotErrores.exists()) {
-                            await firebaseRefErrores.child(nuevoNumero).set({ errorMensaje });
-                            nuevosErrores++;
-                            ordenesConErrores.push(nuevoNumero);
-
-                            // Mostrar el toast y reproducir sonido
-                            setTimeout(() => {
-                                mostrarToast(nuevoNumero, errorMensaje);
-                                sonidoToast.currentTime = 0;
-                                sonidoToast.play().catch(error => {
-                                    console.error('Error al reproducir el sonido:', error);
-                                });
-                            }, 1000);
-
-                            break;
-                        } else {
-                            reprocesoCount++;
-                            nuevoNumero = `${numero}-reproceso${reprocesoCount}`;
-                        }
-                    }
-
-                    // Agregar el ID del mensaje a Firebase como procesado
-                    await firebaseRefMensajesProcesados.child(mensajeId).set(true);
-
-                    // Buscar en enviosBNA
-                    const snapshotEnvios = await firebaseRefEnvios.once('value');
-                    snapshotEnvios.forEach((envio) => {
-                        if (envio.val().orden_ === numero) {
-                            envio.ref.child('errorSlack').set(true);
-                            envio.ref.child('errorSlackMensaje').set(errorMensaje);
-                        }
-                    });
-                }
-            }
-
-            if (nuevosErrores > 0) {
-                console.log(`Se han localizado ${nuevosErrores} nuevos errores de Slack que no existían en la base de datos.`);
-                await enviarNotificacionSlack(ordenesConErrores, nuevosErrores);
-            } else {
-                console.log('No se encontraron nuevos errores.');
-            }
-        } else {
-            console.error('Error al obtener mensajes:', data.error);
-        }
-    } catch (error) {
-        console.error('Error en la solicitud:', error);
-    }
-}
-
-async function enviarNotificacionSlack(ordenes, totalErrores) {
-    const mensaje = `
-    🟡 *Errores en Facturación* 🟡 
-    ${ordenes.join(', ')} 
-    Total de errores: *${totalErrores}* 
-    Notificado en *LogiPaq*.
-    `;
-
-    const payload = {
-        text: mensaje,
-        mrkdwn: true // Permitir formato de Markdown
-    };
-
-    try {
-        await fetch(`${corsh}${HookMd}`, {
-            method: 'POST',
-            headers: {
-                "x-cors-api-key": `${live}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-        console.log('Notificación enviada a Slack.');
-    } catch (error) {
-        console.error('Error al enviar la notificación a Slack:', error);
-    }
-}
-
-// Función para mostrar el toast
-function mostrarToast(numero, errorMensaje) {
-    const toastContainer = document.querySelector('.toast-container');
-
-    const toastHTML = `
-    <div class="toast toast-slack" role="alert" aria-live="assertive" aria-atomic="true" style="margin-bottom: 10px;">
-        <div class="toast-header strong-slack-header">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" class="rounded me-2" alt="Slack Logo" style="width: 20px; height: 20px;">
-            <strong class="me-auto">LogiPaq Control de Slack</strong>
-            <small>${new Date().toLocaleTimeString()}</small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body strong-slack">
-            <strong class=""> ERROR AL FACTURAR EN ORDEN ${numero}:</strong> ${errorMensaje}
-        </div>
-    </div>`;
-
-    // Agregar el toast al contenedor
-    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-
-    // Inicializar el toast y mostrarlo
-    const toastElement = toastContainer.lastElementChild;
-    const toast = new bootstrap.Toast(toastElement, { autohide: false }); // Asegúrate de que autohide sea false
-    toast.show();
-}
-
-// Función para iniciar el contador y la verificación
-function iniciarVerificacion() {
-    verificarMensajes(); // Ejecutar inmediatamente
-
-    // Contador de 5 minutos
-    let contador = 5; // minutos
-    const intervalo = setInterval(() => {
-        console.log(`Próxima verificación en ${contador} minutos...`);
-        contador--;
-
-        if (contador < 0) {
-            clearInterval(intervalo);
-            verificarMensajes(); // Ejecutar nuevamente
-            contador = 5; // Reiniciar contador
-            iniciarVerificacion(); // Reiniciar el ciclo
-        }
-    }, 60000); // 60000 ms = 1 minuto
-}
-// FIN SLACK
 
 // Guardar valores originales
 const originalShippingCosts = {};

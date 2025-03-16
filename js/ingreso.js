@@ -38,7 +38,7 @@ document.getElementById('filterOldestBtn').addEventListener('click', function() 
     
     // Mostrar el botón de volver atrás
     const backButton = document.getElementById('btnVolverAtras');
-    backButton.style.display = 'block';
+    backButton.style.display = 'inline-block';
     paginationContainer.classList.add('hidden');
     isFiltered = true;
 });

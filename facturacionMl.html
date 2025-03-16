@@ -92,6 +92,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="./MeliArPlaceit.html">Envios Meli PlaceIt</a>
+                            <a class="dropdown-item" href="./bnaPlaceIt.html">Envios Tiendas V. PlaceIt</a>
                         </div>
                     </li>
                 </ul>
@@ -106,20 +107,20 @@
                     <input type="text" class="form-control" id="searchFacturacion" placeholder="Buscar por operacion, cliente, nombre...">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button">
-                            <i class="fas fa-search"></i>
+                            <i class="fas fa-search" style="font-size: 22px"></i>
                         </button>
                     </div>
                 </div>
             </div>
             
-            <div class="col-md-3 mb-3 d-flex justify-content-end ingreso-egreso trio-de-botones">
-                <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
-                    <i class="bi bi-arrow-return-left"></i>
+            <div class="col-md-12 mb-3 d-flex justify-content-start ingreso-egreso trio-de-botones" style="overflow-x: auto; white-space: nowrap; padding-top: 20px;">
+                <button class="btn btn-light" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
+                    <i class="bi bi-arrow-return-left" style="font-size: 22px; color: #007aff;"></i> Atrás
                 </button>
             
                 <div class="contenedorSelect">
                     <select id="estadoFilter" class="ios-select-meli">
-                        <option value="">Todos ⤵</option>
+                        <option value="">Todos ⬇️</option>
                         <option value="pendiente">Pendiente</option>
                         <option value="pendiente_no_pasa_web">Pendiente NO Pasan</option>
                         <option value="analizar_pasado_a_web">Analizar Pasarlo a Web</option>
@@ -128,42 +129,39 @@
                         <option value="bloqueado">Bloqueado</option>
                         <option value="pasado_a_web">Pasado a Web</option>
                     </select>
-                </div> 
-
+                </div>
+            
                 <!-- Botón para abrir el modal de importación -->
-                <button id="btnImportar" class="btn btn-success" data-toggle="modal" data-target="#importModal">
-                    <i class="bi bi-file-earmark-plus-fill" style="font-size: 20px;"></i>
+                <button id="btnImportar" class="btn btn-light" data-toggle="modal" data-target="#importModal">
+                    <i class="bi bi-file-earmark-plus-fill" style="font-size: 22px; color: #2d853c;"></i> Importar IVA
                 </button>
-                
-                <button class="btn btn-primary position-relative" data-toggle="modal" data-target="#inputModal">
-                    <i class="bi bi-bag-check-fill" style="font-size: 20px;"></i>
+            
+                <button class="btn btn-light position-relative" data-toggle="modal" data-target="#inputModal">
+                    <i class="bi bi-bag-check-fill" style="font-size: 22px; color: #007bff;"></i> $ Precio pasar a Web
                     <span id="badgeAnalizar" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
                         <i class="fas fa-spinner fa-spin"></i>
                         <span class="visually-hidden">Notificaciones</span>
                     </span>
                 </button>
-                
             
                 <!-- Botón para aplicar el filtro "Pendientes" -->
-                <button id="btnNotificaciones" class="position-relative d-flex justify-content-center align-items-center bg-info text-white p-2 rounded" style="white-space: nowrap; border: none; cursor: pointer;">
-                    <i class="bi bi-bell-fill" style="font-size: 20px;"></i>
+                <button id="btnNotificaciones" class="btn btn-light position-relative" style="white-space: nowrap; border: none; cursor: pointer;">
+                    <i class="bi bi-bell-fill" style="font-size: 22px; color: #e67e22;"></i> Pendientes
                     <span id="contadorNotificaciones" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
-                        <i class="fas fa-spinner fa-spin"></i>
+                        <i class="fas fa-spinner fa-spin"></i> 
                         <span class="visually-hidden"></span>
                     </span>
                 </button>
-
-                <!-- Botón para aplicar el filtro "No Pasa" -->
-                <button id="btnNotificaciones3" class="position-relative d-flex justify-content-center align-items-center bg-secondary text-white p-2 rounded" style="white-space: nowrap; border: none; cursor: pointer;">
-                    <i class="bi bi-bell-slash-fill" style="font-size: 20px;"></i>
-                    <span id="contadorNotificaciones3" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <span class="visually-hidden"></span>
-                    </span>
-                </button>
-              
             
-            </div>
+                <!-- Botón para aplicar el filtro "No Pasa" -->
+                <button id="btnNotificaciones3" class="btn btn-light position-relative" style="white-space: nowrap; border: none; cursor: pointer;">
+                    <i class="bi bi-bell-slash-fill" style="font-size: 22px; color: #ff3b30;"></i> Pendientes NO Pasan
+                    <span id="contadorNotificaciones3" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
+                        <i class="fas fa-spinner fa-spin"></i> 
+                        <span class="visually-hidden"></span>
+                    </span>
+                </button>
+            </div>                                 
             
             </div> 
                                    

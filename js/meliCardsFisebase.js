@@ -626,7 +626,7 @@ const paymentHTML = `
     const carouselId = `carousel-${data.idOperacion}`;
     let carouselItems = '';
 
-    const recibeSinCaracteresEspeciales = data.Recibe.replace(/[.'":]/g, ''); 
+    const recibeSinCaracteresEspeciales = data && data.Recibe ? data.Recibe.replace(/"/g, '') : '';
 
     filteredPictures.forEach((picture, index) => {
         carouselItems += `

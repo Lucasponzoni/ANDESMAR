@@ -86,6 +86,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="./MeliArPlaceit.html">Envios Meli PlaceIt</a>
+                            <a class="dropdown-item" href="./bnaPlaceIt.html">Envios Tiendas V. PlaceIt</a>
                         </div>
                     </li>
                 </ul>
@@ -101,30 +102,34 @@
                     <input type="text" class="form-control" id="searchMercadoLibre" placeholder="📦 Etiqueta y Operacion">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button">
-                            <i class="fas fa-search"></i>
+                            <i class="fas fa-search" style="font-size: 22px"></i>
                         </button>
                     </div>
                 </div>
             </div> 
 
-            <div class="col-md-6 mb-3 d-flex justify-content-end botonesMeli">
+            <div class="col-md-12 mb-3 d-flex justify-content-start botonesMeli" style="overflow-x: auto; white-space: nowrap;">
                 <!-- Aca van los botones -->
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#etiquetasModal">
-                    <i class="bi bi-tag-fill"></i> Etiquetas
+                <button type="button" class="btn btn-light me-2" data-toggle="modal" data-target="#etiquetasModal">
+                    <i class="bi bi-tag-fill" style="font-size: 22px; color: #007aff;"></i> Etiquetas MeLi
                 </button>
-                <button type="button" class="btn btn-danger me-2" data-toggle="modal" data-target="#escaneoColecta">
-                    <i class="bi bi-1-circle-fill"></i> Ingreso
+                
+                <button type="button" class="btn btn-light me-2" data-toggle="modal" data-target="#escaneoColecta">
+                    <i class="bi bi-1-circle-fill" style="font-size: 22px; color: #ff3b30;"></i> Ingreso
                 </button>
-                <button type="button" class="btn btn-secondary me-2" data-toggle="modal" data-target="#escaneoColecta2">
-                    <i class="bi bi-2-circle-fill"></i> Egreso
+                
+                <button type="button" class="btn btn-light me-2" data-toggle="modal" data-target="#escaneoColecta2">
+                    <i class="bi bi-2-circle-fill" style="font-size: 22px; color: #2d853c;"></i> Egreso
                 </button>
-                <button type="button" id="cerrarButton" class="btn btn-success me-2" data-toggle="modal" data-target="#queryModal">
-                    <i class="bi bi-x-lg"></i> Cerrar
+                
+                <button type="button" id="cerrarButton" class="btn btn-light me-2" data-toggle="modal" data-target="#queryModal">
+                    <i class="bi bi-x-lg" style="font-size: 22px; color: #652d85;"></i> Cerrar Colecta (Total / Parcial)
                 </button>
-                <button type="button" id="borrarButton" class="btn btn-danger me-2" onclick="borrarElemento()">
-                    <i class="bi bi-trash"></i>
+                
+                <button type="button" id="borrarButton" class="btn btn-light me-2" onclick="borrarElemento()">
+                    <i class="bi bi-trash3-fill" style="font-size: 22px; color: #e67e22;"></i> Borrar Todo
                 </button>
-            </div>
+            </div>            
             
         </div>
     </div>    

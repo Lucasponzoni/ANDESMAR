@@ -976,7 +976,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             <div class="campo"><span>${Cp}, ${localidad}, ${provincia}</span></div>
             <div class="campo uppercase"><span>${calleDestinatario} ${alturaDestinatario}</span></div>
             <div class="campo"><span>Teléfono: ${telefonoDestinatario}</span></div>
-            <div class="campo"><span>${SKU}, ${productoLimitado}</span></div>
+            <div class="campo"><span>X ${cantidad} Unidad. ${SKU}, ${productoLimitado}</span></div>
             <div class="campo"><span>${comentarios}</span></div>
             <div class="campo-extra">
                 <img src="${barcodeBase64}" alt="Código de Barras" />
