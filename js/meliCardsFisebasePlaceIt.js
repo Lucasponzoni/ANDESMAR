@@ -1066,6 +1066,26 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             valorDeclarado: total
         }).then(() => {
             console.log(`Datos actualizados en Firebase (Logistica) para la operación: ${idOperacionSinME1}`);
+            const Name = `Confirmación de Compra Novogar`;
+            const Subject = `Tu compra con envío Express ${numeroRemito} ya fue preparada para despacho`;
+            const template = "emailTemplatePlaceIt";
+            const transporte = "Logística PlaceIt";
+            const numeroDeEnvio = numeroRemito; // Usar número de remito real
+            const linkSeguimiento2 = `https://tracking.placeit.com/?remito=${numeroRemito}`;
+            const remito = numeroRemito;
+            const nombre = NombreyApellido || recibe;
+        
+            return sendEmail(
+                Name, 
+                Subject, 
+                template, 
+                nombre, 
+                email, 
+                remito, 
+                linkSeguimiento2, 
+                transporte, 
+                numeroDeEnvio
+            );
         }).catch(error => {
             console.error('Error al actualizar en Firebase:', error);
         });
@@ -1073,18 +1093,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         document.body.removeChild(tempDiv);
     };
 
-    const Name = `Confirmación de Compra Novogar`;
-    const Subject = `Tu compra con envio Express ${numeroRemito} ya fue preparada para despacho`;
-    const template = "emailTemplatePlaceIt";
-    const transporte = "Logistica PlaceIt";
-    const numeroDeEnvio = diaFormateadoPlaceIt;
-    const linkSeguimiento2 = cliente;
-    const remito = numeroRemito;
-
     reader.readAsDataURL(blob);
-
-    // Enviar el email después de procesar el envío
-    await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
 
@@ -1093,10 +1102,18 @@ function obtenerFechas() {
     const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
     const hoy = new Date();
     
-    // Sumar 48 horas
+    // Determinar el próximo día hábil
     let fechaEntrega = new Date(hoy);
-    fechaEntrega.setHours(fechaEntrega.getHours() + 48);
     
+    // Si hoy es sábado, avanzar al lunes
+    if (hoy.getDay() === 6) { // 6 = sábado
+        fechaEntrega.setDate(hoy.getDate() + 2); // Avanzar 2 días
+    } else if (hoy.getDay() === 0) { // 0 = domingo
+        fechaEntrega.setDate(hoy.getDate() + 1); // Avanzar 1 día
+    } else {
+        fechaEntrega.setHours(fechaEntrega.getHours() + 48); // Sumar 48 horas
+    }
+
     // Contar los días para omitir sábados y domingos
     let diasContados = 0;
     while (diasContados < 2) {
@@ -1110,7 +1127,7 @@ function obtenerFechas() {
     const diaActual = `${diasDeLaSemana[hoy.getDay()]} ${hoy.getDate()} de ${hoy.toLocaleString('default', { month: 'long' })}`;
     const diaEntrega = `${diasDeLaSemana[fechaEntrega.getDay()]} ${fechaEntrega.getDate()} de ${fechaEntrega.toLocaleString('default', { month: 'long' })}`;
 
-    return `${diaActual} y ${diaEntrega}`;
+    return `Plazo de entrega entre ${diaActual} y ${diaEntrega}`;
 }
 
 // FIN OBTENER FECHAS PLACE IT

@@ -3053,10 +3053,18 @@ function obtenerFechas() {
     const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
     const hoy = new Date();
     
-    // Sumar 48 horas
+    // Determinar el próximo día hábil
     let fechaEntrega = new Date(hoy);
-    fechaEntrega.setHours(fechaEntrega.getHours() + 48);
     
+    // Si hoy es sábado, avanzar al lunes
+    if (hoy.getDay() === 6) { // 6 = sábado
+        fechaEntrega.setDate(hoy.getDate() + 2); // Avanzar 2 días
+    } else if (hoy.getDay() === 0) { // 0 = domingo
+        fechaEntrega.setDate(hoy.getDate() + 1); // Avanzar 1 día
+    } else {
+        fechaEntrega.setHours(fechaEntrega.getHours() + 48); // Sumar 48 horas
+    }
+
     // Contar los días para omitir sábados y domingos
     let diasContados = 0;
     while (diasContados < 2) {
@@ -3070,8 +3078,9 @@ function obtenerFechas() {
     const diaActual = `${diasDeLaSemana[hoy.getDay()]} ${hoy.getDate()} de ${hoy.toLocaleString('default', { month: 'long' })}`;
     const diaEntrega = `${diasDeLaSemana[fechaEntrega.getDay()]} ${fechaEntrega.getDate()} de ${fechaEntrega.toLocaleString('default', { month: 'long' })}`;
 
-    return `${diaActual} y ${diaEntrega}`;
+    return `Plazo de entrega entre ${diaActual} y ${diaEntrega}`;
 }
+
 // FIN OBTENER FECHAS PLACE IT
 
 function addUpdateObservacionesEvent() {
