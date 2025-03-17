@@ -121,7 +121,7 @@ async function importNewSKUs(newSKUs, skuDataMap) {
 
         Swal.fire({
             title: 'Importación completada',
-            html: `<p><span class="counter imported">${importedCount}</span> SKUs importados a la base de datos.</p>`,
+            html: `<p><span style="color: red;"><strong>${importedCount}</strong></span> SKUs importados a la base de datos.</p>`,
             icon: 'success',
             confirmButtonText: 'OK'
         });
@@ -223,7 +223,7 @@ document.getElementById('importButton').addEventListener('click', async () => {
 
         Swal.fire({
             title: 'Actualización completada',
-            html: `<p><span class="counter imported">${updateCount}</span> SKUs actualizados en la base de datos.</p>`,
+            html: `<p><span style="color: red;"><strong>${updateCount}</strong></span> SKUs actualizados en la base de datos.</p>`,
             icon: 'success',
             confirmButtonText: 'OK'
         });
