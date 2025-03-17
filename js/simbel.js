@@ -185,6 +185,19 @@ const searchInput = document.getElementById('searchMercadoLibre');
 searchInput.disabled = true;
 searchInput.value = "Aguardando que cargue la web ⏳";
 
+function capitalizarTexto(texto) {
+    if (!texto) return '';
+    return texto
+        .toLowerCase()
+        .split(' ')
+        .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+        .join(' ');
+}
+
+function eliminarComen(texto) {
+    return texto.replace(/- comen:.*$/i, '').trim();
+}
+
 function cargarDatos() {
     const spinner = document.getElementById('spinner');
     const cardsContainer = document.getElementById('meli-cards');
@@ -225,17 +238,17 @@ function cargarDatos() {
                             Cp: data.objeto.cliente.c_postal || 0, // codigo3
                             Email: data.objeto.cliente.e_mail || 0, // codigo4
                             NombreyApellido: (data.objeto.cliente.nombres + ' ' + data.objeto.cliente.apellido || "").toLowerCase() || "sin nombre",
-                            Observaciones: data.objeto.comprobante.cabecera.obs || 0, // codigo6
+                            Observaciones: eliminarComen(capitalizarTexto(data.objeto.comprobante.cabecera.obs)) || 0,
                             Peso: 0,
                             Producto: 0,
-                            Provincia: data.objeto.cliente.provincia || 0, // codigo8
+                            Provincia: capitalizarTexto(data.objeto.cliente.provincia) || 0,
                             Recibe: data.objeto.cliente.referencia || 0, // codigo9
                             pictures: 0,
                             SKU: 0,
                             Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0, // codigo11
                             VolumenCM3: 0,
                             VolumenM3: 0,
-                            localidad: data.objeto.cliente.localidad || 0, // codigo13
+                            localidad: capitalizarTexto(data.objeto.cliente.localidad) || 0,
                             medidas: 0,
                             paqid: 0,
                             diasPlaceIt: 0,
