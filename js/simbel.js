@@ -232,7 +232,7 @@ function cargarDatos() {
                             id: key || 0, // codigo12
                             idOperacion: key,
                             Altura: data.Altura || 0,
-                            Calle: data.objeto.cliente.domicilio || 0, // codigo1
+                            Calle: capitalizarTexto(data.objeto.cliente.domicilio) || 0, // codigo1
                             Cantidad: 0, // codigo2
                             Correosugerido: 0,
                             Cp: data.objeto.cliente.c_postal || 0, // codigo3
