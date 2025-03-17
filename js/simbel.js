@@ -25,6 +25,18 @@ const firebaseConfig2 = {
     measurementId: "G-64DDP7D6Q2"
 };
 
+firebase.database().ref('ventasWeb').once('value')
+    .then(snapshot => {
+        if (snapshot.exists()) {
+            console.log("Conexión exitosa a Firebase, datos disponibles.");
+        } else {
+            console.log("No hay datos en 'ventasWeb'.");
+        }
+    })
+    .catch(error => {
+        console.error("Error al conectar a Firebase: ", error);
+    });
+
 function clickPageOne() {
     const pagination = document.getElementById('pagination');
     
@@ -52,81 +64,76 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.addEventListener('input', function() {
         const query = searchInput.value.trim();
 
-        if (query.length >= 9) {
-            const queryNumber = Number(query);
+        // Cambiar la condición para buscar solo cuando la longitud sea exactamente 6
+        if (query.length === 6) {
+            const queryNumber = query; // Mantenerlo como string para compararlo con el nodo
             spinner.style.display = 'block';
             cardsContainer.innerHTML = '';
             pagination.style.display = 'none'; 
 
-            if (!isNaN(queryNumber)) {
-                console.log(`Buscando datos para el número: ${queryNumber}`);
-                const queryPromises = [
-                    database.ref('envios')
-                        .orderByChild('idOperacion')
-                        .equalTo(queryNumber)
-                        .limitToLast(50000)
-                        .once('value'),
-                    database.ref('envios')
-                        .orderByChild('packId')
-                        .equalTo(queryNumber)
-                        .limitToLast(50000)
-                        .once('value')
-                ];
+            console.log(`Buscando datos para el número: ${queryNumber}`);
             
-                Promise.all(queryPromises)
-                    .then(results => {
-                        const allData = {};
-                        results.forEach(snapshot => {
-                            if (snapshot.exists()) {
-                                Object.assign(allData, snapshot.val());
+            database.ref('ventasWeb')
+                .orderByChild('metodo')
+                .equalTo('despachanvtav')
+                .limitToLast(50000)
+                .once('value')
+                .then(snapshot => {
+                    const allData = [];
+                    if (snapshot.exists()) {
+                        snapshot.forEach(childSnapshot => {
+                            const key = childSnapshot.key; // Obtener el nombre del nodo
+                            const data = childSnapshot.val();
+
+                            // Comprobar si el nombre del nodo coincide con el query
+                            if (key === queryNumber) {
+                                allData.push(data); // Agregar el objeto completo
                             }
                         });
-            
-                        if (Object.keys(allData).length > 0) {
+
+                        if (allData.length > 0) {
                             console.log("Datos encontrados: ", allData);
-                            const processedData = Object.values(allData).map(data => {
-                                const paymentData = Array.isArray(data.payments) && data.payments.length > 0 ? data.payments[0] : {};
-                                const id = data.idOperacion; 
+                            const processedData = allData.map(data => {
                                 return {
-                                    id: id,
-                                    idOperacion: id,
-                                    Altura: data.Altura,
-                                    Calle: data.Calle,
-                                    Cantidad: data.Cantidad,
-                                    Correosugerido: data.Correosugerido,
-                                    Cp: data.Cp,
-                                    Email: data.email,
-                                    NombreyApellido: data.NombreyApellido ? data.NombreyApellido.toLowerCase() : "sin nombre",
-                                    Observaciones: data.Observaciones,
-                                    Peso: data.Peso,
-                                    Producto: data.Producto,
-                                    Provincia: data.Provincia ? data.Provincia.toLowerCase() : "sin provincia",
-                                    Recibe: data.Recibe,
-                                    pictures: data.pictures,
-                                    SKU: data.SKU,
-                                    paqid: data.packId,
-                                    diasPlaceIt: data.diasPlaceIt,
-                                    cliente: data.cliente,
-                                    Telefono: data.Telefono,
-                                    VolumenCM3: data.VolumenCM3,
-                                    VolumenM3: data.VolumenM3,
-                                    localidad: data.localidad ? data.localidad.toLowerCase() : "sin localidad",
-                                    medidas: data.medidas,
-                                    permalink: data.permalink,
-                                    shippingMode: data.shippingMode,
-                                    nombreDeUsuario: data.nombreDeUsuario,
-                                    transportCompany: data.transportCompany,
-                                    trackingNumber: data.trackingNumber,
-                                    trackingLink: data.trackingLink,
-                                    estadoFacturacion: data.estadoFacturacion,
-                                    andesmarId: data.andesmarId,
-                                    shippingId: data.shippingId,
-                                    cotizacion: data.cotizacionCDS,
-                                    installment_amount: paymentData.installment_amount || 0,
-                                    payment_method_id: paymentData.payment_method_id || 0,
-                                    transactionAmount: paymentData.transaction_amount || 0,
-                                    installments: paymentData.installments || 0,
-                                    paymentType: paymentData.payment_type || ''
+                                    id: data.objeto.comprobante.cabecera.num_compro || 0, // codigo12
+                                    idOperacion: data.objeto.comprobante.cabecera.num_compro || 0,
+                                    Altura: data.Altura || 0,
+                                    Calle: data.objeto.cliente.domicilio || 0, // codigo1
+                                    Cantidad: 0, // codigo2
+                                    Correosugerido: 0,
+                                    Cp: data.objeto.cliente.c_postal || 0, // codigo3
+                                    Email: data.objeto.cliente.e_mail || 0, // codigo4
+                                    NombreyApellido: (data.objeto.cliente.nombres + ' ' + data.objeto.cliente.apellido || "").toLowerCase() || "sin nombre",
+                                    Observaciones: data.objeto.comprobante.cabecera.obs || 0, // codigo6
+                                    Peso: 0,
+                                    Producto: 0,
+                                    Provincia: data.objeto.cliente.provincia || 0, // codigo8
+                                    Recibe: data.objeto.cliente.referencia || 0, // codigo9
+                                    pictures: 0,
+                                    SKU: 0,
+                                    Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0, // codigo11
+                                    VolumenCM3: 0,
+                                    VolumenM3: 0,
+                                    localidad: data.objeto.cliente.localidad || 0, // codigo13
+                                    medidas: 0,
+                                    paqid: 0,
+                                    diasPlaceIt: 0,
+                                    cliente: data.objeto.cliente || 0,
+                                    permalink: 0,
+                                    shippingMode: 0,
+                                    nombreDeUsuario: 0,
+                                    transportCompany: 0,
+                                    trackingNumber: 0,
+                                    trackingLink: 0,
+                                    estadoFacturacion: 0,
+                                    andesmarId: 0,
+                                    shippingId: 0,
+                                    cotizacion: 0,
+                                    installment_amount: 0,
+                                    payment_method_id: 0,
+                                    transactionAmount: 0,
+                                    installments: 0,
+                                    paymentType: ''
                                 };
                             });
 
@@ -140,24 +147,28 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>
                             `;
                         }
+                    } else {
+                        console.log("No se encontraron datos para la consulta.");
+                        cardsContainer.innerHTML = `
+                            <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
+                                <p class="errorp">No se encontraron resultados para "${query}" en el servidor</p>
+                                <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
+                            </div>
+                        `;
+                    }
 
-                        spinner.style.display = 'none';
-                    })
-                    .catch(error => {
-                        console.error("Error al buscar los datos: ", error);
-                        spinner.style.display = 'none';
-                    });
-            } else {
-                console.error("La entrada no es un número válido.");
-                spinner.style.display = 'none';
-            }
+                    spinner.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error("Error al buscar los datos: ", error);
+                    spinner.style.display = 'none';
+                });
         } else if (query.length === 0) {
             console.log("Entrada vacía, cargando la página 1.");
             clickPageOne();
         }
     });
 });
-// FIN QUERYDE DATOS
 
 // Inicializa el segundo proyecto
 const app2 = firebase.initializeApp(firebaseConfig2, "app2");
@@ -174,7 +185,6 @@ const searchInput = document.getElementById('searchMercadoLibre');
 searchInput.disabled = true;
 searchInput.value = "Aguardando que cargue la web ⏳";
 
-// Función para cargar datos de Firebase
 function cargarDatos() {
     const spinner = document.getElementById('spinner');
     const cardsContainer = document.getElementById('meli-cards');
@@ -183,63 +193,94 @@ function cargarDatos() {
     spinner.style.display = 'block'; 
     cardsContainer.innerHTML = ''; // Limpia el contenedor de cards
 
-    database.ref('envios')
-        .orderByKey()
-        .limitToLast(itemsPerPage)
+    allData = []; // Reiniciar el arreglo de datos
+
+    database.ref('ventasWeb')
+        .orderByChild('metodo')
+        .equalTo('despachanvtav')
         .once('value')
         .then(snapshot => {
-            allData = []; // Reiniciar el arreglo de datos
-            snapshot.forEach(childSnapshot => {
-                const data = childSnapshot.val();
-                allData.push({ 
-                    id: data.idOperacion, 
-                    Altura: data.Altura,
-                    Calle: data.Calle,
-                    Cantidad: data.Cantidad,
-                    Correosugerido: data.Correosugerido,
-                    Cp: data.Cp,
-                    Email: data.email,
-                    NombreyApellido: data.NombreyApellido.toLowerCase(),
-                    Observaciones: data.Observaciones,
-                    Peso: data.Peso,
-                    Producto: data.Producto,
-                    Provincia: data.Provincia,
-                    Recibe: data.Recibe,
-                    pictures: data.pictures,
-                    SKU: data.SKU,
-                    Telefono: data.Telefono,
-                    VolumenCM3: data.VolumenCM3,
-                    VolumenM3: data.VolumenM3,
-                    idOperacion: data.idOperacion,
-                    localidad: data.localidad,
-                    medidas: data.medidas,
-                    paqid: data.packId,
-                    diasPlaceIt: data.diasPlaceIt,
-                    cliente: data.cliente,
-                    permalink: data.permalink,
-                    shippingMode: data.shippingMode,
-                    nombreDeUsuario: data.nombreDeUsuario,
-                    transportCompany: data.transportCompany,
-                    trackingNumber: data.trackingNumber,
-                    trackingLink: data.trackingLink,
-                    estadoFacturacion: data.estadoFacturacion,
-                    andesmarId: data.andesmarId,
-                    shippingId: data.shippingId,
-                    cotizacion: data.cotizacionCDS,
-                    installment_amount: data.payments?.[0]?.installment_amount || 0,
-                    payment_method_id: data.payments?.[0]?.payment_method_id || 0,
-                    transactionAmount: data.payments?.[0]?.transaction_amount || 0,
-                    installments: data.payments?.[0]?.installments || 0,
-                    paymentType: data.payments?.[0]?.payment_type || ''
-                });
-            });
+            console.log("Snapshot recibido: ", snapshot.val()); // Ver el contenido del snapshot
 
-            // Invertir datos si es necesario
-            allData.reverse();
+            if (snapshot.exists()) {
+                let dataCount = 0; // Contador de datos válidos
 
-            // Renderizar tarjetas
-            renderCards(allData);
+                // Convertir el snapshot a un array
+                const dataArray = Object.entries(snapshot.val());
 
+                // Usar un bucle for...of para poder usar break
+                for (const [key, childSnapshot] of dataArray) {
+                    const data = childSnapshot; // Obtener el valor del nodo
+                    console.log("Procesando nodo: ", key); // Mostrar el nombre del nodo
+
+                    // Verificar si el nombre del nodo tiene exactamente 6 dígitos
+                    if (key.length === 6 && /^\d{6}$/.test(key)) {
+                        allData.push({ 
+                            id: key || 0, // codigo12
+                            idOperacion: key,
+                            Altura: data.Altura || 0,
+                            Calle: data.objeto.cliente.domicilio || 0, // codigo1
+                            Cantidad: 0, // codigo2
+                            Correosugerido: 0,
+                            Cp: data.objeto.cliente.c_postal || 0, // codigo3
+                            Email: data.objeto.cliente.e_mail || 0, // codigo4
+                            NombreyApellido: (data.objeto.cliente.nombres + ' ' + data.objeto.cliente.apellido || "").toLowerCase() || "sin nombre",
+                            Observaciones: data.objeto.comprobante.cabecera.obs || 0, // codigo6
+                            Peso: 0,
+                            Producto: 0,
+                            Provincia: data.objeto.cliente.provincia || 0, // codigo8
+                            Recibe: data.objeto.cliente.referencia || 0, // codigo9
+                            pictures: 0,
+                            SKU: 0,
+                            Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0, // codigo11
+                            VolumenCM3: 0,
+                            VolumenM3: 0,
+                            localidad: data.objeto.cliente.localidad || 0, // codigo13
+                            medidas: 0,
+                            paqid: 0,
+                            diasPlaceIt: 0,
+                            cliente: data.objeto.cliente || 0,
+                            permalink: 0,
+                            shippingMode: 0,
+                            nombreDeUsuario: data.objeto.cliente.cuit || 0,
+                            transportCompany: 0,
+                            trackingNumber: 0,
+                            trackingLink: 0,
+                            estadoFacturacion: 0,
+                            andesmarId: 0,
+                            shippingId: 0,
+                            cotizacion: 0,
+                            installment_amount: 0,
+                            payment_method_id: 0,
+                            transactionAmount: 0,
+                            installments: 0,
+                            paymentType: ''
+                        });
+                        dataCount++; // Incrementar contador de datos válidos
+                    } else {
+                        console.log("Nodo ignorado: ", key); // Mostrar nodos ignorados
+                    }
+
+                    // Si se ha alcanzado el límite, detener la búsqueda
+                    if (dataCount >= itemsPerPage) {
+                        break; // Salir del bucle for...of
+                    }
+                }
+
+                console.log("Datos encontrados: ", allData);
+                
+                // Limitar los resultados a itemsPerPage después de filtrar
+                const paginatedData = allData.slice(0, itemsPerPage);
+                renderCards(paginatedData); // Llama a la función para renderizar las tarjetas
+            } else {
+                console.log("No se encontraron datos que cumplan con el filtro.");
+                cardsContainer.innerHTML = `
+                    <div class="d-flex flex-column align-items-center justify-content-center text-center w-100">
+                        <p class="errorp">No se encontraron resultados para la consulta.</p>
+                        <img src="./Img/error.gif" alt="No se encontraron resultados" class="error img-fluid mb-3">
+                    </div>
+                `;
+            }
             // Ocultar el spinner
             pagination.style.display = 'none'; 
             spinner.style.display = 'none';
@@ -249,6 +290,7 @@ function cargarDatos() {
         })
         .catch(error => {
             console.error("Error al cargar los datos: ", error);
+            spinner.style.display = 'none'; // Asegúrate de ocultar el spinner en caso de error
         });
 }
 
@@ -320,13 +362,7 @@ function crearCard(data) {
         // Eliminar caracteres no alfabéticos y espacios extra
         return nombreApellido.replace(/[^a-zA-Z\s]/g, '').trim().replace(/\s+/g, ' ');
     } 
-    
-    function limpiarProducto(Producto) {
-        // Eliminar caracteres no alfabéticos y espacios extra
-        return Producto.replace(/[^a-zA-Z\s]/g, '').trim().replace(/\s+/g, ' ');
-    }   
-
-
+  
     // Función para formatear números en pesos
     function formatCurrency(amount) {
     return `$ ${Number(amount).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -426,7 +462,20 @@ const paymentHTML = `
             <div class="card-body-meli">
 
                 <h5 class="card-title-meli"><i class="bi bi-person-bounding-box"></i> ${data.NombreyApellido && data.NombreyApellido.trim() !== '' ? data.NombreyApellido : data.Recibe}</h5>
-                <h6 class="user-title-meli">${data.nombreDeUsuario && data.nombreDeUsuario.trim() !== '' ? data.nombreDeUsuario : data.Recibe}</h6>
+                <h6 class="user-title-meli">
+                    ${data.nombreDeUsuario !== undefined && data.nombreDeUsuario !== null && data.nombreDeUsuario.toString().trim() !== '' 
+                        ? (function() {
+                            const numeroUsuario = Number(data.nombreDeUsuario.toString().trim());
+
+                            if (numeroUsuario.toString().length <= 8) {
+                                return `D.N.I. ${numeroUsuario}`;
+                            } else {
+                                return `C.U.I.T. ${numeroUsuario}`;
+                            }
+                        })() 
+                        : data.Recibe}
+                </h6>
+
                 <div class="meli-box1"> 
                     <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> ${data.Cp}, ${data.localidad}, ${data.Provincia}</p>
 
@@ -446,17 +495,13 @@ const paymentHTML = `
                 <div class="d-flex align-items-center">
 
                 <p class="remitoCardMeli w-100 card-text mb-0">
-                <a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank" style="text-decoration: none; color: inherit;">
-                    ${data.idOperacion}
+                <a href="https://admin.novogar.com.ar/admin/pedidos/edit/${data.idOperacion}" target="_blank" style="text-decoration: none; color: inherit;">
+                    NOV${data.idOperacion}
                 </a>
 
                 <button class="btn btn-link copy-btn p-1 m-0" style="display: inline-flex; align-items: center;">
                     <i class="bi bi-clipboard ios-icon" style="margin: 0;"></i>
                 </button>
-
-                    <button class="btn btn-link p-1 m-0" style="display: inline-flex; align-items: center;" onclick="window.open('${data.permalink}', '_blank');">
-                    <i class="bi bi-shop ios-icon" style="margin: 0;"></i>
-                    </button>
 
                 </p>
             
@@ -473,8 +518,8 @@ const paymentHTML = `
                 <div class="macos-style">
                 Producto: X ${data.Cantidad} ${data.SKU}
                 </div>
-                
-                <div class="em-circle-${data.shippingMode.toLowerCase() === 'me1' ? 'ME1' : 'ME2'}">${data.shippingMode.toUpperCase()}</div>
+
+                <div class="em-circle-ME1">Venta WEB</div>
 
                 <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails${data.idOperacion}" aria-expanded="false" aria-controls="collapseDetails${data.idOperacion}">
                     <i class="bi bi-chevron-down"></i> Ver más detalles
@@ -570,7 +615,7 @@ const paymentHTML = `
     <button class="mt-1 mb-0 btn btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}')">
         <span>
             ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
         </span>
