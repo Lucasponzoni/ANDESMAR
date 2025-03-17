@@ -4119,11 +4119,22 @@ div .form-check {
     color: #c62828; 
 }
 
-.grauito{
+.gratuito{
     background-color: orange;
     color: white !important;
     padding: 5px;
     border-radius: 5px;
+}
+
+.express-meli{
+    background-color: green;
+    color: white !important;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.express-meli-sub{
+    font-weight: 800 !important;
 }
 
 .notification {
