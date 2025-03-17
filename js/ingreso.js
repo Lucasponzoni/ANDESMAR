@@ -512,7 +512,7 @@ function renderCards(data) {
         const comentarioClase = item.comentario ? 'btn-success' : 'btn-secondary';
 
         let subdatoTexto = item.subdato ? 
-            `<br><span class="${item.subdato.startsWith('Pendiente de confirmar') ? 'subdato-texto1' : 'subdato-texto2'}">Plazo ${item.subdato}</span>` : '';
+            `<br><span class="${item.subdato.startsWith('Pendiente de confirmar') ? 'subdato-texto1' : 'subdato-texto2'}">${item.subdato}</span>` : '';
         
         // Verificar si existe item.fotoURL y crear el botón de descarga
         let remitoColumna = remito;

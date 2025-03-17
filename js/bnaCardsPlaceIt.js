@@ -3046,41 +3046,56 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
     // Enviar el email después de procesar el envío
     await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
 }
-// FIN GENERAR ETIQUETA LOGISTICA PLACE IT
 
 // OBTENER FECHAS PLACE IT
 function obtenerFechas() {
     const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
     const hoy = new Date();
     
+    // Ajustar la hora a la zona horaria de Argentina (UTC-3)
+    const offset = -3 * 60; // UTC-3 en minutos
+    const utcDate = hoy.getTime() + (hoy.getTimezoneOffset() * 60 * 1000);
+    const fechaActual = new Date(utcDate + (offset * 60 * 1000));
+
+    console.log("Fecha actual (Argentina):", fechaActual);
+
     // Determinar el próximo día hábil
-    let fechaEntrega = new Date(hoy);
-    
+    let fechaEntrega = new Date(fechaActual);
+
     // Si hoy es sábado, avanzar al lunes
-    if (hoy.getDay() === 6) { // 6 = sábado
-        fechaEntrega.setDate(hoy.getDate() + 2); // Avanzar 2 días
-    } else if (hoy.getDay() === 0) { // 0 = domingo
-        fechaEntrega.setDate(hoy.getDate() + 1); // Avanzar 1 día
+    if (fechaActual.getDay() === 6) { // 6 = sábado
+        fechaEntrega.setDate(fechaActual.getDate() + 2); // Avanzar 2 días
+    } else if (fechaActual.getDay() === 0) { // 0 = domingo
+        fechaEntrega.setDate(fechaActual.getDate() + 1); // Avanzar 1 día
     } else {
-        fechaEntrega.setHours(fechaEntrega.getHours() + 48); // Sumar 48 horas
+        fechaEntrega.setDate(fechaActual.getDate() + 1); // Avanzar al siguiente día
     }
 
-    // Contar los días para omitir sábados y domingos
-    let diasContados = 0;
-    while (diasContados < 2) {
+    console.log("Próximo día hábil:", fechaEntrega);
+
+    // Sumar 48 horas a la fecha de entrega
+    fechaEntrega.setHours(fechaEntrega.getHours() + 24);
+    console.log("Fecha de entrega después de sumar 48 horas:", fechaEntrega);
+
+    // Asegurarse de que la fecha de entrega sea un día hábil
+    while (fechaEntrega.getDay() === 0 || fechaEntrega.getDay() === 6) { // 0 = domingo, 6 = sábado
         fechaEntrega.setDate(fechaEntrega.getDate() + 1);
-        if (fechaEntrega.getDay() !== 0 && fechaEntrega.getDay() !== 6) { // 0 = domingo, 6 = sábado
-            diasContados++;
-        }
     }
+
+    console.log("Fecha final de entrega:", fechaEntrega);
 
     // Formatear las fechas
-    const diaActual = `${diasDeLaSemana[hoy.getDay()]} ${hoy.getDate()} de ${hoy.toLocaleString('default', { month: 'long' })}`;
+    const diaActual = `${diasDeLaSemana[fechaActual.getDay()]} ${fechaActual.getDate()} de ${fechaActual.toLocaleString('default', { month: 'long' })}`;
     const diaEntrega = `${diasDeLaSemana[fechaEntrega.getDay()]} ${fechaEntrega.getDate()} de ${fechaEntrega.toLocaleString('default', { month: 'long' })}`;
 
-    return `Plazo de entrega entre ${diaActual} y ${diaEntrega}`;
+    const mensajeFinal = `Plazo de entrega entre ${diaActual} y ${diaEntrega}`;
+    console.log("Mensaje final:", mensajeFinal); // Imprimir el mensaje final
+
+    return mensajeFinal;
 }
 
+// Ejecutar la función para probar
+console.log(obtenerFechas());
 // FIN OBTENER FECHAS PLACE IT
 
 function addUpdateObservacionesEvent() {
