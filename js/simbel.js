@@ -94,32 +94,31 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (allData.length > 0) {
                             console.log("Datos encontrados: ", allData);
                             const processedData = allData.map(item => {
-                                const { key, data } = item; // Desestructurar key y data
+                                const { key, data } = item;
                                 return {
-                                    id: key,
+                                    id: key || 0,
                                     idOperacion: key,
                                     Altura: data.Altura || 0,
-                                    Calle: capitalizarTexto(data.objeto.cliente.domicilio) || 0, // codigo1
-                                    Cantidad: 0, // codigo2
+                                    Calle: capitalizarTexto(data.objeto.cliente.domicilio) || 0, 
+                                    Cantidad: 0, 
                                     Correosugerido: 0,
-                                    Cp: data.objeto.cliente.c_postal || 0, // codigo3
-                                    Email: data.objeto.cliente.e_mail || 0, // codigo4
+                                    Cp: data.objeto.cliente.c_postal || 0, 
+                                    Email: data.objeto.cliente.e_mail || 0, 
                                     NombreyApellido: (data.objeto.cliente.nombres + ' ' + data.objeto.cliente.apellido || "").toLowerCase() || "sin nombre",
                                     Observaciones: eliminarComen(capitalizarTexto(data.objeto.comprobante.cabecera.obs)) || 0,
                                     Peso: 0,
                                     Producto: 0,
                                     Provincia: capitalizarTexto(data.objeto.cliente.provincia) || 0,
-                                    Recibe: data.objeto.cliente.referencia || 0, // codigo9
+                                    Recibe: data.objeto.cliente.referencia || 0, 
                                     pictures: 0,
                                     SKU: 0,
-                                    Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0, // codigo11
+                                    Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0,
                                     VolumenCM3: 0,
                                     VolumenM3: 0,
                                     localidad: capitalizarTexto(data.objeto.cliente.localidad) || 0,
                                     medidas: 0,
                                     paqid: 0,
                                     diasPlaceIt: 0,
-                                    cliente: data.objeto.cliente || 0,
                                     permalink: 0,
                                     shippingMode: 0,
                                     nombreDeUsuario: data.objeto.cliente.cuit || 0,
@@ -133,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     installment_amount: 0, 
                                     payment_method_id: 0,
                                     transactionAmount: data.objeto.valores[0]?.importe || 0,  
-                                    items: data.objeto.comprobante.items || [],                      
+                                    items: data.objeto.comprobante.items || [],                     
                                     paymentType: ''
                                 };
                             });
@@ -231,23 +230,23 @@ function cargarDatos() {
                     if (key.length === 6 && /^\d{6}$/.test(key)) {
                         if (data.objeto && data.objeto.cliente && data.objeto.valores) {
                             allData.push({ 
-                                id: key || 0, // codigo12
+                                id: key || 0,
                                 idOperacion: key,
                                 Altura: data.Altura || 0,
-                                Calle: capitalizarTexto(data.objeto.cliente.domicilio) || 0, // codigo1
-                                Cantidad: 0, // codigo2
+                                Calle: capitalizarTexto(data.objeto.cliente.domicilio) || 0, 
+                                Cantidad: 0, 
                                 Correosugerido: 0,
-                                Cp: data.objeto.cliente.c_postal || 0, // codigo3
-                                Email: data.objeto.cliente.e_mail || 0, // codigo4
+                                Cp: data.objeto.cliente.c_postal || 0, 
+                                Email: data.objeto.cliente.e_mail || 0, 
                                 NombreyApellido: (data.objeto.cliente.nombres + ' ' + data.objeto.cliente.apellido || "").toLowerCase() || "sin nombre",
                                 Observaciones: eliminarComen(capitalizarTexto(data.objeto.comprobante.cabecera.obs)) || 0,
                                 Peso: 0,
                                 Producto: 0,
                                 Provincia: capitalizarTexto(data.objeto.cliente.provincia) || 0,
-                                Recibe: data.objeto.cliente.referencia || 0, // codigo9
+                                Recibe: data.objeto.cliente.referencia || 0, 
                                 pictures: 0,
                                 SKU: 0,
-                                Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0, // codigo11
+                                Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0,
                                 VolumenCM3: 0,
                                 VolumenM3: 0,
                                 localidad: capitalizarTexto(data.objeto.cliente.localidad) || 0,
@@ -385,93 +384,146 @@ function crearCard(data) {
     return `$ ${Number(amount).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
-// Crear el carrusel con spinner mientras se cargan las imágenes
-const carouselId = `carousel-${data.idOperacion}`;
-let carouselItems = `
-    <div class="carousel-item active">
-        <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="sr-only">Cargando...</span>
+    // CARROUSEL Y MEDIDAS
+    // Crear el carrusel con spinner mientras se cargan las imágenes
+    const carouselId = `carousel-${data.idOperacion}`;
+    let carouselItems = `
+        <div class="carousel-item active">
+            <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
+                <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="sr-only">Cargando...</span>
+                </div>
             </div>
         </div>
-    </div>
-`;
+    `;
 
-const carouselHTML = `
-    <div id="${carouselId}" class="carousel slide" data-ride="carousel">
-        <div class="carousel-inner" style="max-height: 150px; overflow: hidden;">
-            ${carouselItems}
+    let medidasHTML = ''; // Inicializar medidasHTML vacío
+
+    const carouselHTML = `
+        <div id="${carouselId}" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner" style="max-height: 150px; overflow: hidden;">
+                ${carouselItems}
+            </div>
+            <a class="carousel-control-prev" href="#${carouselId}" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Anterior</span>
+            </a>
+            <a class="carousel-control-next" href="#${carouselId}" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Siguiente</span>
+            </a>
         </div>
-        <a class="carousel-control-prev" href="#${carouselId}" role="button" data-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Anterior</span>
-        </a>
-        <a class="carousel-control-next" href="#${carouselId}" role="button" data-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Siguiente</span>
-        </a>
-    </div>
-`;
+    `;
 
-// Función para cargar imágenes desde Firebase
-async function cargarImagenesDesdeFirebase(sku, carouselId) {
-    // Ignorar el SKU "110"
-    if (sku === "110") return;
+    // Función para cargar imágenes y medidas desde Firebase
+    async function cargarDatosDesdeFirebase(sku, carouselId, idOperacion) {
+        // Ignorar el SKU "110"
+        if (sku === "110") return;
 
-    // Normalizar el SKU eliminando caracteres especiales excepto el guion medio
-    const skuNormalizado = sku.replace(/[^a-zA-Z0-9-]/g, '');
+        // Normalizar el SKU eliminando caracteres especiales excepto el guion medio
+        const skuNormalizado = sku.replace(/[^a-zA-Z0-9-]/g, '');
 
-    try {
-        const snapshot = await firebase.database().ref(`/catalogo/${skuNormalizado}`).once('value');
-        if (snapshot.exists() && snapshot.val().pictures) {
-            const pictures = snapshot.val().pictures;
+        try {
+            const snapshot = await firebase.database().ref(`/catalogo/${skuNormalizado}`).once('value');
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const pictures = data.pictures || [];
+                const peso = data.Peso || 0;
+                const volumenCM3 = data.VolumenCM3 || 0;
+                const volumenM3 = data.VolumenM3 || 0;
+                const medidas = data.medidas || 'No especificado';
+                const marca = data.marca || 'No especificado';
+                const skuValue = data.SKU || 'No especificado';
 
-            // Generar los elementos del carrusel con las imágenes
-            let carouselItems = '';
-            pictures.forEach((picture, index) => {
-                carouselItems += `
-                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                        <img src="${picture.secure_url}" class="d-block mx-auto" alt="Imagen ${index + 1}" style="height: 150px; width: auto; max-width: 100%; object-fit: cover;">
+                // Generar los elementos del carrusel con las imágenes
+                let carouselItems = '';
+                pictures.forEach((picture, index) => {
+                    carouselItems += `
+                        <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                            <img src="${picture.secure_url}" class="d-block mx-auto" alt="Imagen ${index + 1}" style="height: 150px; width: auto; max-width: 100%; object-fit: cover;">
+                        </div>
+                    `;
+                });
+
+                // Actualizar el carrusel con las imágenes
+                const carouselInner = document.querySelector(`#${carouselId} .carousel-inner`);
+                if (carouselInner) {
+                    carouselInner.innerHTML = carouselItems;
+                }
+
+                // Generar el HTML para las medidas
+                const medidasHTMLFragment = `
+                    <div class="medidas-simbel">
+                        <div>
+                            <i class="bi bi-code-square"></i> 
+                            <strong>SKU: </strong>
+                            <span id="sku-${idOperacion}" style="color: #007bff;">${skuValue}</span>
+                        </div>
+                        <div>
+                            <i class="bi bi-arrows-angle-expand"></i> 
+                            Medidas: <span id="medidas-${idOperacion}">${medidas}</span>
+                        </div>
+                        <div>
+                            <i class="bi bi-box-arrow-in-down"></i> 
+                            Peso: <span id="peso-${idOperacion}">${Math.round(peso / 1000)}</span> kg
+                        </div>
+                        <div>
+                            <i class="bi bi-box"></i> 
+                            Volumen M³: <span id="volumenM3-${idOperacion}">${volumenM3}</span> m³
+                        </div>
+                        <div>
+                            <i class="bi bi-box"></i> 
+                            Volumen CM³: <span id="volumenCM3-${idOperacion}">${volumenCM3}</span> cm³
+                        </div>
+                        <div>
+                            <i class="bi bi-boxes"></i> 
+                            Marca: <span id="marca-${idOperacion}">${marca}</span>
+                        </div>
                     </div>
                 `;
-            });
 
-            // Actualizar el carrusel con las imágenes
-            const carouselInner = document.querySelector(`#${carouselId} .carousel-inner`);
-            if (carouselInner) {
-                carouselInner.innerHTML = carouselItems;
+                // Agregar las medidas al contenedor correspondiente
+                const medidasContainer = document.getElementById(`medidas-container-${idOperacion}`);
+                if (medidasContainer) {
+                    medidasContainer.innerHTML += medidasHTMLFragment;
+                }
+            } else {
+                console.warn(`No se encontraron datos para el SKU: ${sku}`);
+                mostrarImagenPorDefecto(carouselId);
             }
-        } else {
-            console.warn(`No se encontraron imágenes para el SKU: ${sku}`);
-            // Usar imagen de reemplazo
-            const carouselInner = document.querySelector(`#${carouselId} .carousel-inner`);
-            if (carouselInner) {
-                carouselInner.innerHTML += `
-                    <div class="carousel-item active">
-                        <img src="Img/Novogar-Sin-Foto copia.jpg" class="d-block mx-auto" alt="Sin imagen" style="height: 150px; width: auto; max-width: 100%; object-fit: cover;">
-                    </div>
-                `;
-            }
+        } catch (error) {
+            console.error(`Error al cargar datos para el SKU: ${sku}`, error);
+            mostrarImagenPorDefecto(carouselId);
         }
-    } catch (error) {
-        console.error(`Error al cargar imágenes para el SKU: ${sku}`, error);
     }
-}
 
-// Llamar a la función para cargar imágenes de los SKUs de los productos
-if (data && Array.isArray(data.items)) {
-    const uniqueSKUs = new Set(); // Usar un Set para evitar duplicados
-    data.items.forEach(item => {
-        if (item.cod_alfa && item.cod_alfa !== "110") {
-            uniqueSKUs.add(item.cod_alfa);
+    // Función para mostrar una imagen por defecto si no se encuentran imágenes
+    function mostrarImagenPorDefecto(carouselId) {
+        const carouselInner = document.querySelector(`#${carouselId} .carousel-inner`);
+        if (carouselInner) {
+            carouselInner.innerHTML = `
+                <div class="carousel-item active">
+                    <img src="Img/Novogar-Sin-Foto copia.jpg" class="d-block mx-auto" alt="Sin imagen disponible" style="height: 150px; width: auto; max-width: 100%; object-fit: cover;">
+                </div>
+            `;
         }
-    });
+    }
 
-    // Cargar imágenes para cada SKU único
-    uniqueSKUs.forEach(sku => {
-        cargarImagenesDesdeFirebase(sku, carouselId);
-    });
-}
+    // Llamar a la función para cargar imágenes y medidas de los SKUs de los productos
+    if (data && Array.isArray(data.items)) {
+        const uniqueSKUs = new Set(); // Usar un Set para evitar duplicados
+        data.items.forEach(item => {
+            if (item.cod_alfa && item.cod_alfa !== "110") {
+                uniqueSKUs.add(item.cod_alfa);
+            }
+        });
+
+        // Cargar datos para cada SKU único
+        uniqueSKUs.forEach(sku => {
+            cargarDatosDesdeFirebase(sku, carouselId, data.idOperacion);
+        });
+    }
+    // FIN CARROUSEL Y MEDIDAS
 
     // Crear el contenedor de productos
     let productosHTML = '';
@@ -661,12 +713,8 @@ if (data && Array.isArray(data.items)) {
                         <div>Total: <strong id="valor-${data.idOperacion}" style="font-size: 1.1rem; color: #28a745; font-weight: bolder;">${formatCurrency(data.transactionAmount)}</strong></div>
                     </div>
 
-                        <div><i class="bi bi-code-square"></i> <strong>SKU: </strong><span id="sku-${data.idOperacion}" style="color: #007bff;">${data.SKU}</span></div>
-                        <div><i class="bi bi-arrows-angle-expand"></i> Medidas: <span id="medidas-${data.idOperacion}">${data.medidas}</span></div>
-                        <div><i class="bi bi-box-arrow-in-down"></i> Peso: <span id="peso-${data.idOperacion}">${Math.round(data.Peso / 1000)}</span> kg</div>
-                        <div><i class="bi bi-box"></i> Volumen M³: <span id="volumenM3-${data.idOperacion}">${data.VolumenM3}</span> m³</div>
-                        <div><i class="bi bi-box"></i> Volumen CM³: <span id="volumenCM3-${data.idOperacion}">${data.VolumenCM3}</span> cm³</div>
-                        <div><i class="bi bi-boxes"></i> Cantidad: <span id="cantidad-${data.idOperacion}">${data.Cantidad}</span></div>
+                    <div id="medidas-container-${data.idOperacion}"></div>
+                    
                     </div>
 
                     <button class="btn btn-secondary w-100 mt-2 editarDatos" id="editButton-${data.idOperacion}" disabled onclick="editarDatos('${data.idOperacion}')">Editar datos</button>

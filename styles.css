@@ -4224,6 +4224,13 @@ div .form-check {
     padding: 5px;
 }
 
+.medidas-simbel{
+    padding: 5px;
+    border: 1px dashed cornflowerblue;
+    margin-top: -1px;
+    border-top: 8px solid cornflowerblue;
+}
+
 .payment-cell {
     display: flex;
     align-items: center;
