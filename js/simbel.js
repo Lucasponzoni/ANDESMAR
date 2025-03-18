@@ -609,8 +609,8 @@ function crearCard(data) {
                 <div class="meli-box1"> 
                     <p class="card-text cpLocalidad-meli"><i class="fas fa-map-marker-alt"></i> ${data.Cp}, ${data.localidad}, ${data.Provincia}</p>
 
-                    <p class="card-text correo-meli correo-mercado-libre"> 
-                            <img src="Img/meli.png" alt="Logística Novogar" width="30">
+                    <p class="card-text correo-meli correo-novogar-simbel"> 
+                            <img src="Img/Novogar N.png" alt="Logística Novogar" width="30">
                     </p>
 
                     </div>

@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Signika:wght@300..700&display=swap');
-
-*{
-    font-family: "Roboto", sans-serif;
-    font-style: normal;
-}
-
+@import url('https://fonts.googleapis.com/css2?family=Iansui&family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Iansui&family=Outfit:wght@100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 @font-face {
     font-family: 'Modica Oft';
     src: url('./fonts/modica.otf'),
+}
+
+*{
+    font-style: normal;
 }
 
 *::selection {
@@ -1792,6 +1792,13 @@ p.card-text{
     border: solid 1px cornflowerblue;
 }
 
+.correo-novogar-simbel {
+    min-width: 30px;
+    background: linear-gradient(360deg, #fed1d1, #ffffff);
+    color: rgb(255, 255, 255);
+    border: solid 1px cornflowerblue;
+}
+
 .correo-novogar, .correo-santafe, .correo-rafaela, .correo-sannicolas {
     background-color: green;
     color: white;
@@ -1954,9 +1961,9 @@ input[disabled] {
 }
 
 .orden{
-    font-family: "Roboto", sans-serif;
+    font-family: "Rubik", sans-serif;
     font-size: x-large;
-    font-weight: 800;
+    font-weight: 400;
     margin: 0;
 }
 
@@ -1988,32 +1995,10 @@ input[disabled] {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-.remitoCardMeli {
-    background-color: white;
-    text-align: center;
-    padding: 0.5rem;
-    width: fit-content;
-    border-radius: 10px 10px 0 0;
-    border: solid 1px rgb(145, 182, 250);
-    color: black; 
-    font-size: 1.4rem;
-    font-family: "Roboto", sans-serif !important;
-    font-weight: 400;
-    margin-bottom: 14px !important;
-    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-    transition: .5s;
-    margin-bottom: -5px !important;
-}
-
 .lock-btn{
     position: absolute;
     right: 10px;
     bottom: 10px;
-}
-
-.remitoCardMeli:hover{
-    color: cornflowerblue;
-    font-family: "Roboto", sans-serif !important;
 }
 
 .little-card-meli > p{
@@ -4134,7 +4119,7 @@ div .form-check {
 }
 
 .express-meli-sub{
-    font-weight: 800 !important;
+    font-weight: 400 !important;
 }
 
 .notification {
@@ -4228,7 +4213,7 @@ div .form-check {
     padding: 5px;
     border: 1px dashed cornflowerblue;
     margin-top: -1px;
-    border-top: 8px solid cornflowerblue;
+    border-radius: 0 !important;
 }
 
 .payment-cell {
@@ -6737,4 +6722,25 @@ img.gray-filter {
 .disabled {
     cursor: not-allowed !important;
     pointer-events: none !important; 
+}
+
+.remitoCardMeli {
+    background-color: white;
+    text-align: center;
+    padding: 0.5rem;
+    width: fit-content;
+    border-radius: 10px 10px 0 0;
+    border: solid 1px rgb(145, 182, 250);
+    color: black; 
+    font-size: 1.4rem;
+    font-family: "Rubik", sans-serif !important;
+    font-weight: 400;
+    margin-bottom: 14px !important;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    transition: .5s;
+    margin-bottom: -5px !important;
+}
+
+.remitoCardMeli:hover{
+    color: cornflowerblue;
 }

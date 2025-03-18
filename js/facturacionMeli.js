@@ -1191,7 +1191,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 searchStatus.querySelector('.spinner-ios-ml').style.display = 'none';
                 searchStatus.style.display = 'none';
                 searchStatus2.style.display = 'flex'; 
-                searchStatus2.innerHTML = `No se encontraron datos en Firebase para ${searchTerm} <i class="bi bi-exclamation-square-fill"></i>`;
+                searchStatus2.innerHTML = `No se encontraron datos en Firebase para ${searchTerm} <i class="bi bi-exclamation-square-fill ml-1"></i>`;
                 return;
             }
 
