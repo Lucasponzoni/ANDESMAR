@@ -329,7 +329,7 @@ function calcularPorcentajes(data) {
 
     // Actualizar el HTML para PlaceIt
     document.getElementById('placeItPorcentaje').innerHTML = `
-    <img src="./Img/placeit-mini.png" alt="PlaceIt" class="gray-filter">   
+    <img src="./Img/placeit-mini2.png" alt="PlaceIt" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
         <span class="ml-1" style="font-weight: bold;">PlaceIt: ${placeItPorcentaje}%</span>
     </div>

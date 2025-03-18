@@ -1041,7 +1041,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 background-color: #ffffff;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
                 display: flex;
-                border: 2px dashed #9c0000;
+                border: 2px dashed #282555;
                 flex-direction: column;
                 align-items: center;
             }
@@ -1057,7 +1057,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 align-items: center;
                 margin-bottom: 5px;
                 padding: 5px;
-                border: 1px solid #9c0000;
+                border: 1px solid #282555;
                 background-color: #f1f8ff;
                 transition: background-color 0.3s;
             }
@@ -1073,7 +1073,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 width: 100%;
                 border-radius: 10px;
                 margin-top: 10px;
-                border: 2px dashed #9c0000;
+                border: 2px dashed #282555;
                 padding: 10px;
                 text-align: center;
                 font-size: 1em;
