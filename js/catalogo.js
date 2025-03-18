@@ -245,6 +245,41 @@ async function cargarCatalogo() {
     const spinner = document.getElementById('spinner');
     spinner.style.display = 'flex'; // Mostrar el spinner
 
+    // Agregar CSS dinámicamente
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Estilos para la tabla */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        /* Colores de fondo para las filas */
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2; /* Color claro */
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #e0e0e0; /* Color un poco más oscuro */
+        }
+
+        /* Colores de fondo para los encabezados */
+        th:nth-child(odd) {
+            background-color: #d9edf7; /* Color claro para encabezados impares */
+        }
+
+        th:nth-child(even) {
+            background-color: #bce8f1; /* Color más oscuro para encabezados pares */
+        }
+    `;
+    document.head.appendChild(style); // Agregar el estilo al documento
+
     const catalogoRef = database.ref('catalogo');
     const snapshot = await catalogoRef.once('value');
 
