@@ -111,38 +111,17 @@ const emailTemplatePlaceIt = (Name, Subject, templateName, nombre, email, remito
             <h1 style="color: #333; font-size: 24px;">&iexcl;Tu compra ha sido preparada para despacho!</h1>
         </div>
         <div style="margin: 20px 0; text-align: center;">
-            <p style="font-size: 16px; color: #333;">
-                Dentro de las próximas <strong style="color: #28a745;">48 horas hábiles</strong>, recibirás tu compra con envío exprés directamente desde nuestro almacén en Capital hasta tu domicilio.
-            </p>
-            
-            <!-- Sección de Fecha de Entrega -->
+            <p style="font-size: 16px; color: #333;">Dentro de las pr&oacute;ximas <strong style="color: #28a745;">48 horas h&aacute;biles</strong>, recibir&aacute;s tu compra con env&iacute;o expr&eacute;s directamente desde nuestro almac&eacute;n en Capital hasta tu domicilio.</p><!-- Sección de Fecha de Entrega -->
             <div style="background-color: #ffffff; border: 1px solid #d1d1d1; border-radius: 12px; padding: 15px; margin: 20px 0; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
-                <p style="font-weight: bold; margin: 5px 0;">
-                    <span style="color: rgb(61, 142, 185); font-size: 16px; background-color: #e7f3ff; border-radius: 4px; padding: 4px 8px; display: inline-block;">
-                        Recibilo entre ${numeroDeEnvio}
-                    </span>
-                </p>
-            </div>
-
-            <!-- Sección de Transporte, Cliente y Remito -->
+                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(61, 142, 185); font-size: 16px; background-color: #e7f3ff; border-radius: 4px; padding: 4px 8px; display: inline-block;">&nbsp;Recibilo entre ${numeroDeEnvio}&nbsp;</span></p>
+            </div><!-- Sección de Transporte, Cliente y Remito -->
             <div style="background-color: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin: 10px 0;">
-                <p style="font-weight: bold; margin: 5px 0;">
-                    <span style="color: rgb(0, 0, 0);">Transporte:</span> 
-                    <span style="color: rgb(61, 142, 185); font-size: 16px;">${transporte}</span>
-                </p>                
-                <p style="font-weight: bold; margin: 5px 0;">
-                    <span style="color: rgb(0, 0, 0);">Cliente Novogar:</span> 
-                    <span style="color: rgb(61, 142, 185); font-size: 16px;">${linkSeguimiento2}</span>
-                </p>
-                <p style="font-weight: bold; margin: 5px 0;">
-                    <span style="color: rgb(0, 0, 0);">Remito:</span> 
-                    <span style="color: rgb(61, 142, 185); font-size: 16px;">${remito}</span>
-                </p>
+                <img src="./placeit-nano.png" alt="Descripción de la imagen" style="max-width: 100%; height: auto;">
+              <hr style="border: 1px solid #e0e0e0; margin: 20px 0;">
+              <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Transporte:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${transporte}</span></p>
+                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Cliente Novogar:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${linkSeguimiento2}</span></p>
+                <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Remito:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${remito}</span></p>
             </div>
-            
-            <a style="display: inline-block; background-color: #007aff; color: #ffffff; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 10px;">
-                Envío Express ⚡️
-            </a>
         </div>
         <hr style="border: 1px solid #e0e0e0; margin: 20px 0;">
         <div style="text-align: center; font-size: 14px; color: rgb(102, 102, 102);">
