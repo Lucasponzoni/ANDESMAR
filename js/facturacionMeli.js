@@ -981,7 +981,6 @@ commentButton.onclick = () => {
 };
 
 });
-    
             // Paginación y actualización de notificaciones
             updatePagination();
             updateNotificationCount();
