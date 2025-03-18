@@ -520,6 +520,7 @@ function crearCard(data) {
 
     // Crear el contenedor de productos
     let productosHTML2 = '';
+    let productosTexto = '';
 
     // Verifica que data y sus propiedades existan
     if (data && Array.isArray(data.items)) {
@@ -532,11 +533,18 @@ function crearCard(data) {
             `;
         }).join(', '); // Separar los productos con una coma
 
+        // Asignar el HTML al contenedor
         productosHTML2 = `
             <div class="macos-style2">
                 <strong><i class="bi bi-bag-fill"></i></strong> ${productos}
             </div>
         `;
+
+        // Asignar el texto plano
+        productosTexto = data.items.map(item => {
+            const sku = item.cod_alfa === "110" ? "Envio" : item.cod_alfa; // Reemplazar "110" por "Envio"
+            return `X ${item.cantidad}u. ${sku}`;
+        }).join(', '); // Separar los productos con una coma
     } else {
         // Mensaje si no hay productos
         productosHTML2 = `
@@ -544,6 +552,7 @@ function crearCard(data) {
                 <strong>No hay productos disponibles.</strong>
             </div>
         `;
+        productosTexto = 'No hay productos disponibles.';
     }
 
     cardDiv.innerHTML = `
@@ -691,7 +700,7 @@ function crearCard(data) {
     <button class="mt-1 mb-0 btn btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', 'NOV${data.idOperacion}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', 'NOV${data.idOperacion}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}', '${productosTexto}')">
         <span>
             ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
         </span>
@@ -950,7 +959,7 @@ async function solicitarCliente() {
 }
 
 // ETIQUETA LOGISTICA PROPIA
-async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, SKU, total, comentarios) {
+async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, SKU, total, comentarios, productosTexto) {
     // Solicitar el número de remito
     const numeroRemito = await solicitarNumeroRemito();
     if (!numeroRemito) return; // Si se cancela, salir de la función
@@ -1099,7 +1108,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             <div class="campo"><span>${Cp}, ${localidad}, ${provincia}</span></div>
             <div class="campo uppercase"><span>${calleDestinatario}</span></div>
             <div class="campo"><span>Teléfono: ${telefonoDestinatario}</span></div>
-            <div class="campo"><span>X ${cantidad} Unidad. ${SKU}, ${productoLimitado}</span></div>
+            <div class="campo"><span>${productosTexto}</span></div>
             <div class="campo"><span>${comentarios}</span></div>
             <div class="campo-extra">
                 <img src="${barcodeBase64}" alt="Código de Barras" />
