@@ -534,8 +534,7 @@ function renderCards(data) {
             <td class="valor-columna">${item.valorDeclarado}</td>
             <td>${operadorLogistico}</td>
             <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
-            <td><button class="btn ${comentarioClase} btn-sm" onclick="abrirModalComentario('${remito}')"><i class="bi bi-pencil-fill"></i></button></td> <!-- Botón de comentario -->
-        </tr>`;
+            <td><button class="btn ${comentarioClase} btn-sm" onclick="abrirModalComentario('${remito}', this)"><i class="bi bi-pencil-fill"></i></button></td> <!-- Botón de comentario -->        </tr>`;
 
         tableBody.insertAdjacentHTML('beforeend', row);
     }
@@ -970,11 +969,9 @@ function abrirModalComentario(remito, button) {
                     Swal.fire('¡Éxito!', 'Comentario actualizado correctamente.', 'success');
                     $('#comentarioModal').modal('hide'); // Cerrar modal
 
-                    // Cambiar la clase del botón en el DOM
-                    if (button) {
-                        button.classList.remove('btn-secondary');
-                        button.classList.add('btn-success');
-                    }
+                    // Cambiar el color del botón
+                    button.classList.remove('btn-secondary');
+                    button.classList.add('btn-success');
                 }).catch(error => {
                     Swal.fire('Error', 'No se pudo actualizar el comentario: ' + error.message, 'error');
                 });
