@@ -2884,7 +2884,7 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
                 align-items: center;
             }
             .logo img {
-                max-width: 250px;
+                max-width: 315px;
                 height: auto;
                 margin-bottom: 5px;
             }

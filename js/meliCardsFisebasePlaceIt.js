@@ -914,7 +914,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 align-items: center;
             }
             .logo img {
-                max-width: 250px;
+                max-width: 315px;
                 height: auto;
                 margin-bottom: 5px;
             }

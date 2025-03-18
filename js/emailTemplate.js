@@ -116,7 +116,7 @@ const emailTemplatePlaceIt = (Name, Subject, templateName, nombre, email, remito
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(61, 142, 185); font-size: 16px; background-color: #e7f3ff; border-radius: 4px; padding: 4px 8px; display: inline-block;">&nbsp;Recibilo entre ${numeroDeEnvio}&nbsp;</span></p>
             </div><!-- Sección de Transporte, Cliente y Remito -->
             <div style="background-color: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin: 10px 0;">
-                <img src="./placeit-nano.png" alt="Descripción de la imagen" style="max-width: 100%; height: auto;">
+                <img src="https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Novogar%2Fplaceit-nano.png?alt=media&token=c8007cea-681b-4368-a902-f78180c99d51" alt="Descripción de la imagen" style="max-width: 100%; height: auto;">
               <hr style="border: 1px solid #e0e0e0; margin: 20px 0;">
               <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Transporte:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${transporte}</span></p>
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(0, 0, 0);">Cliente Novogar:</span> <span style="color: rgb(61, 142, 185); font-size: 16px;">${linkSeguimiento2}</span></p>
