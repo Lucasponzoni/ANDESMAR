@@ -2423,8 +2423,8 @@ div.card-body > p > i{
     text-transform: uppercase;
     padding: 5px;
     border-radius: 0 0 5px 5px;
-    margin-top: -10px;
-    background-color: crimson; 
+    background-color: orange;
+    border: cornflowerblue solid 1px; 
     color: white;
     display: flex;
     align-items: center;
@@ -2440,8 +2440,8 @@ div.card-body > p > i{
     text-transform: uppercase;
     padding: 5px;
     border-radius: 0 0 5px 5px;
-    margin-top: -10px;
-    background-color: cornflowerblue; 
+    background-color: grey;
+    border: cornflowerblue solid 1px;  
     color: white;
     display: flex;
     align-items: center;
@@ -3024,8 +3024,9 @@ div.card-body > p > i{
 }
 
 .errorMeli{
+    text-align: center;
     width: 90%;
-    font-weight: 800;
+    font-weight: 600;
     text-align: left;
     font-family: "Chakra Petch", sans-serif;
     text-transform: uppercase;
@@ -4177,7 +4178,6 @@ div .form-check {
 .macos-style {
     text-align: center;
     background-color: white; 
-    border-radius: 0 0 5px 5px;
     padding: 10px 5px 5px; 
     height: 38px;
     border: cornflowerblue solid 1px;
@@ -4185,21 +4185,20 @@ div .form-check {
     color: cornflowerblue;
     font-weight: 400;
     margin-top: -15px;
-    margin-bottom: 5px;
+    margin-bottom: -1px;
     font-size: 16px; 
 }
 
 .macos-style2 {
     text-align: center;
     background-color: white; 
-    border-radius: 0 0 5px 5px;
     padding: 10px 5px 5px; 
     border: cornflowerblue solid 1px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: cornflowerblue;
     font-weight: 400;
     margin-top: -15px;
-    margin-bottom: 5px;
+    margin-bottom: -1px;
     font-size: 16px; 
 }
 
@@ -6725,6 +6724,9 @@ img.gray-filter {
 }
 
 .remitoCardMeli {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: white;
     text-align: center;
     padding: 0.5rem;

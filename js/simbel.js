@@ -597,15 +597,16 @@ function crearCard(data) {
             
                 </div>
 
+                ${carouselHTML}
+                
+                ${productosHTML2}
+
                 <div class="cliente-Container" onclick="copiarCliente('${data.cliente}')">
                 <div class="cliente ${!data.cliente ? 'hidden' : ''}">
                 <img src="Img/logo-presea.png" alt="PRESEA" width="20">
                 Cliente Presea: <strong id="nombre-cliente">${data.cliente}</strong> 
                 </div>
                 </div>
-
-                ${carouselHTML}
-                ${productosHTML2}
 
                 <div class="em-circle-ME1">Venta WEB</div>
 

@@ -717,16 +717,16 @@ const paymentHTML = `
             
                 </div>
 
+                ${carouselHTML}
+                <div class="macos-style">
+                <i class="bi bi-bag-fill mr-1"></i>Producto: X <strong>${data.Cantidad}</strong>u. <strong>${data.SKU}</strong>
+                </div>
+
                 <div class="cliente-Container" onclick="copiarCliente('${data.cliente}')">
                 <div class="cliente ${!data.cliente ? 'hidden' : ''}">
                 <img src="Img/logo-presea.png" alt="PRESEA" width="20">
                 Cliente Presea: <strong id="nombre-cliente">${data.cliente}</strong> 
                 </div>
-                </div>
-
-                ${carouselHTML}
-                <div class="macos-style">
-                Producto: X ${data.Cantidad} ${data.SKU}
                 </div>
                 
                 <div class="em-circle-${data.shippingMode.toLowerCase() === 'me1' ? 'ME1' : 'ME2'}">${data.shippingMode.toUpperCase()}</div>
