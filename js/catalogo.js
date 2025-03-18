@@ -56,7 +56,7 @@ document.getElementById('buscarCatalogo').addEventListener('click', async () => 
             if (newSKUCount > 0) {
                 Swal.fire({
                     title: 'Confirmación de Importación',
-                    html: `<p>Hay <span class="counter imported">${newSKUCount}</span> nuevos SKUs para importar.</p>`,
+                    html: `<p>Hay <span style="color: red;"><strong>${newSKUCount}</strong></span> nuevos SKUs para importar.</p>`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Importar',
@@ -240,3 +240,145 @@ document.getElementById('importButton').addEventListener('click', async () => {
 function sanitizeSKU(sku) {
     return sku ? sku.replace(/[.#$[\]]/g, '_') : ''; // Sanitiza solo si SKU no es undefined
 }
+
+async function cargarCatalogo() {
+    const spinner = document.getElementById('spinner');
+    spinner.style.display = 'flex'; // Mostrar el spinner
+
+    const catalogoRef = database.ref('catalogo');
+    const snapshot = await catalogoRef.once('value');
+
+    // Contenedor de la tabla
+    const meliCards = document.getElementById('meli-cards');
+    meliCards.innerHTML = ''; // Limpiar contenido previo
+
+    // Crear encabezados de la tabla
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const headers = [
+        'Codigo', 'Nombre', 'Precio', 'Precio De Lista', 'Cod. Moneda',
+        'Cod. Proveedor', 'Stock', 'Stock Min.', 'Cod. Categoria Padre',
+        'Id Categoria Padre', 'Descripcion', 'Texto', 'Marca/Proveedor',
+        'Impuesto', 'Keywords', 'Video', 'Publicado', 'Disponible',
+        'Fecha (dd-mm-aaaa)', 'Id. Sist. Gestion', 'Medidas expresadas en',
+        'Peso expresado en', 'Peso de la caja', 'Ancho de la caja',
+        'Alto de la caja', 'Profundidad de la caja', 'Bultos'
+    ];
+
+    headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    meliCards.appendChild(thead); // Agregar encabezado a la tabla
+
+    // Crear cuerpo de la tabla
+    const tbody = document.createElement('tbody');
+
+    snapshot.forEach(childSnapshot => {
+        const data = childSnapshot.val();
+        const row = document.createElement('tr');
+
+        // Obtener medidas
+        const medidas = data.medidas ? data.medidas.match(/(\d+(\.\d+)?)x(\d+(\.\d+)?)x(\d+(\.\d+)?)/) : [];
+        const medida1 = medidas[1] || '';
+        const medida2 = medidas[3] || '';
+        const medida3 = medidas[5] || '';
+
+        // Crear las keywords
+        const keywords = [
+            data.Producto || '',
+            data.marca || '',
+            data.subrubro || '',
+            data.userProductId || '',
+            data.itemId || '',
+            data.categoryId || ''
+        ].filter(Boolean).join(', ');
+
+        // Separar palabras del producto para keywords
+        const productKeywords = (data.Producto || '').split(' ').join(', ');
+
+        // Crear celdas con los datos requeridos
+        const rowData = [
+            sanitizeSKU(data.SKU),
+            data.Producto || '',
+            '',
+            '',
+            'ARS',
+            data.itemId || '',
+            '',
+            '5',
+            '',
+            '',
+            data.Producto || '',
+            '',
+            data.marca || '',
+            '',
+            productKeywords + ', ' + keywords,
+            '',
+            'SI',
+            'SI',
+            new Date().toLocaleDateString('es-AR'),
+            '',
+            '0',
+            '0',
+            medida1,
+            medida1,
+            medida2,
+            medida3,
+            '1'
+        ];
+
+        rowData.forEach(cellData => {
+            const td = document.createElement('td');
+            td.textContent = cellData;
+            row.appendChild(td);
+        });
+
+        // Agregar atributos dinámicamente
+        if (data.attributes) {
+            let attributeIndex = 1; // Para contar los atributos
+
+            data.attributes.forEach(attribute => {
+                if (attribute.value_name) {
+                    // Crear encabezados si no existen
+                    const attrHeaderText = `Atributo ${attributeIndex}`;
+                    const valueHeaderText = `Valor ${attributeIndex}`;
+
+                    // Verificar si el encabezado ya existe
+                    if (!Array.from(headerRow.children).some(th => th.textContent === attrHeaderText)) {
+                        const attrHeader = document.createElement('th');
+                        attrHeader.textContent = attrHeaderText;
+                        headerRow.appendChild(attrHeader);
+                    }
+
+                    if (!Array.from(headerRow.children).some(th => th.textContent === valueHeaderText)) {
+                        const valueHeader = document.createElement('th');
+                        valueHeader.textContent = valueHeaderText;
+                        headerRow.appendChild(valueHeader);
+                    }
+
+                    // Crear celdas para el atributo y su valor
+                    const attrCell = document.createElement('td');
+                    attrCell.textContent = attribute.name;
+                    row.appendChild(attrCell);
+
+                    const valueCell = document.createElement('td');
+                    valueCell.textContent = attribute.value_name;
+                    row.appendChild(valueCell);
+
+                    attributeIndex++; // Incrementar el índice de atributos
+                }
+            });
+        }
+
+        tbody.appendChild(row);
+    });
+
+    meliCards.appendChild(tbody); // Agregar cuerpo de la tabla
+    spinner.style.display = 'none'; // Ocultar el spinner
+}
+
+// Llamar a la función para cargar el catálogo al iniciar
+cargarCatalogo();
