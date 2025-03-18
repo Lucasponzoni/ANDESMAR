@@ -1367,7 +1367,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             ${descuentoContenido}
 
                             ${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) ? `<p class="card-text-isSkuIncludedPlaceIt"><i class="bi bi-lightning-charge-fill"></i> CP <strong>${data[i].cp}</strong> + SKU <strong>${data[i].sku}</strong> Con envio Express</p>` : ''}
-                            ${isSkuIncluded ? `<p class="card-text-isSkuIncluded"><i class="bi bi-lightning-charge-fill"></i> SKU ${data[i].sku} con imei</p>` : ''}
+                            ${isSkuIncluded ? `<p class="card-text-isSkuIncluded"><i class="bi bi-lightning-charge-fill"></i> SKU <strong>${data[i].sku}</strong> con imei</p>` : ''}
 
 <div class="d-flex align-items-center justify-content-center contenedorRemito">
     <button class="btn btn-link btn-sm text-decoration-none copy-btn me-2 ios-icon3">

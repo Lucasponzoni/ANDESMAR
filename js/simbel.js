@@ -100,37 +100,18 @@ document.addEventListener('DOMContentLoaded', function() {
                                     idOperacion: key,
                                     Altura: data.Altura || 0,
                                     Calle: capitalizarTexto(data.objeto.cliente.domicilio) || 0, 
-                                    Cantidad: 0, 
-                                    Correosugerido: 0,
                                     Cp: data.objeto.cliente.c_postal || 0, 
                                     Email: data.objeto.cliente.e_mail || 0, 
                                     NombreyApellido: (data.objeto.cliente.nombres + ' ' + data.objeto.cliente.apellido || "").toLowerCase() || "sin nombre",
                                     Observaciones: eliminarComen(capitalizarTexto(data.objeto.comprobante.cabecera.obs)) || 0,
-                                    Peso: 0,
-                                    Producto: 0,
                                     Provincia: capitalizarTexto(data.objeto.cliente.provincia) || 0,
                                     Recibe: data.objeto.cliente.referencia || 0, 
-                                    pictures: 0,
-                                    SKU: 0,
                                     Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0,
-                                    VolumenCM3: 0,
-                                    VolumenM3: 0,
                                     localidad: capitalizarTexto(data.objeto.cliente.localidad) || 0,
-                                    medidas: 0,
-                                    paqid: 0,
-                                    diasPlaceIt: 0,
-                                    permalink: 0,
-                                    shippingMode: 0,
+                                    cliente: data.cliente,
+                                    transportCompany: data.transportCompany,
+                                    diasPlaceIt: data.diaPlaceIt,
                                     nombreDeUsuario: data.objeto.cliente.cuit || 0,
-                                    transportCompany: 0,
-                                    trackingNumber: 0,
-                                    trackingLink: 0,
-                                    estadoFacturacion: 0,
-                                    andesmarId: 0,
-                                    shippingId: 0,
-                                    cotizacion: 0,
-                                    installment_amount: 0, 
-                                    payment_method_id: 0,
                                     transactionAmount: data.objeto.valores[0]?.importe || 0,  
                                     items: data.objeto.comprobante.items || [],                     
                                     paymentType: ''
@@ -213,18 +194,16 @@ function cargarDatos() {
         .equalTo('despachanvtav')
         .once('value')
         .then(snapshot => {
-            console.log("Snapshot recibido: ", snapshot.val()); // Ver el contenido del snapshot
 
             if (snapshot.exists()) {
                 let dataCount = 0; // Contador de datos válidos
 
-                // Convertir el snapshot a un array
-                const dataArray = Object.entries(snapshot.val());
+                // Convertir el snapshot a un array y luego invertirlo para obtener los datos más nuevos primero
+                const dataArray = Object.entries(snapshot.val()).reverse();
 
                 // Usar un bucle for...of para poder usar break
                 for (const [key, childSnapshot] of dataArray) {
-                    const data = childSnapshot; // Obtener el valor del nodo
-                    console.log("Procesando nodo: ", key); // Mostrar el nombre del nodo
+                    const data = childSnapshot;
 
                     // Verificar si el nombre del nodo tiene exactamente 6 dígitos
                     if (key.length === 6 && /^\d{6}$/.test(key)) {
@@ -234,37 +213,18 @@ function cargarDatos() {
                                 idOperacion: key,
                                 Altura: data.Altura || 0,
                                 Calle: capitalizarTexto(data.objeto.cliente.domicilio) || 0, 
-                                Cantidad: 0, 
-                                Correosugerido: 0,
                                 Cp: data.objeto.cliente.c_postal || 0, 
                                 Email: data.objeto.cliente.e_mail || 0, 
                                 NombreyApellido: (data.objeto.cliente.nombres + ' ' + data.objeto.cliente.apellido || "").toLowerCase() || "sin nombre",
                                 Observaciones: eliminarComen(capitalizarTexto(data.objeto.comprobante.cabecera.obs)) || 0,
-                                Peso: 0,
-                                Producto: 0,
                                 Provincia: capitalizarTexto(data.objeto.cliente.provincia) || 0,
                                 Recibe: data.objeto.cliente.referencia || 0, 
-                                pictures: 0,
-                                SKU: 0,
                                 Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0,
-                                VolumenCM3: 0,
-                                VolumenM3: 0,
                                 localidad: capitalizarTexto(data.objeto.cliente.localidad) || 0,
-                                medidas: 0,
-                                paqid: 0,
-                                diasPlaceIt: 0,
-                                permalink: 0,
-                                shippingMode: 0,
+                                cliente: data.cliente,
+                                transportCompany: data.transportCompany,
+                                diasPlaceIt: data.diaPlaceIt,
                                 nombreDeUsuario: data.objeto.cliente.cuit || 0,
-                                transportCompany: 0,
-                                trackingNumber: 0,
-                                trackingLink: 0,
-                                estadoFacturacion: 0,
-                                andesmarId: 0,
-                                shippingId: 0,
-                                cotizacion: 0,
-                                installment_amount: 0, 
-                                payment_method_id: 0,
                                 transactionAmount: data.objeto.valores[0]?.importe || 0,  
                                 items: data.objeto.comprobante.items || [],                     
                                 paymentType: ''
@@ -274,7 +234,7 @@ function cargarDatos() {
                             console.log("Estructura de datos inesperada para el nodo: ", key);
                         }
                     } else {
-                        console.log("Nodo ignorado: ", key); // Mostrar nodos ignorados
+                        //Nodo ignorado
                     }
 
                     // Si se ha alcanzado el límite, detener la búsqueda
@@ -366,7 +326,7 @@ function crearCard(data) {
     const isAndesmar = data.transportCompany === "Andesmar";
     const isAndreani = data.transportCompany === "Andreani"
     const isLogPropia = data.transportCompany === "Novogar"
-    const isLogPlaceIt = data.transportCompany === "PlaceIt"
+    const isLogPlaceIt = data.transportCompany === "Logistica PlaceIt"
     const isBlocked = data.estadoFacturacion === "bloqueado"
     // Definir Email con valor por defecto
     const email = data.Email || data.email || 'webnovogar@gmail.com';
@@ -397,7 +357,7 @@ function crearCard(data) {
         </div>
     `;
 
-    let medidasHTML = ''; // Inicializar medidasHTML vacío
+    let medidasHTML = '';
 
     const carouselHTML = `
         <div id="${carouselId}" class="carousel slide" data-ride="carousel">
@@ -730,7 +690,7 @@ function crearCard(data) {
     <button class="mt-1 mb-0 btn btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', 'NOV${data.idOperacion}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}')">
         <span>
             ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
         </span>
@@ -1040,6 +1000,8 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     const blob = await response.blob();
     const reader = new FileReader();
 
+    const diaFormateadoPlaceIt = obtenerFechas();
+
     reader.onloadend = function() {
         const barcodeBase64 = reader.result;
 
@@ -1134,7 +1096,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             </div>
             <div class="campo uppercase"><span>${cliente} ${NombreyApellido || recibe}</span></div>
             <div class="campo"><span>${Cp}, ${localidad}, ${provincia}</span></div>
-            <div class="campo uppercase"><span>${calleDestinatario} ${alturaDestinatario}</span></div>
+            <div class="campo uppercase"><span>${calleDestinatario}</span></div>
             <div class="campo"><span>Teléfono: ${telefonoDestinatario}</span></div>
             <div class="campo"><span>X ${cantidad} Unidad. ${SKU}, ${productoLimitado}</span></div>
             <div class="campo"><span>${comentarios}</span></div>
@@ -1173,36 +1135,23 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             window.open(pdfUrl, '_blank');
         });
 
+                            // Pushear datos a Firebase
+                            const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
+                            const transportData = {
+                                transportCompany: "Logistica PlaceIt",
+                                diaPlaceIt: diaFormateadoPlaceIt,
+                                cliente: cliente,
+                                remito: numeroRemito,
+                            };
+                    
+                            try {
+                                firebase.database().ref(`ventasWeb/${id}`).update(transportData);
+                                console.log("Datos actualizados en Firebase como Logistica PlaceIt:", transportData);
+                            } catch (error) {
+                                console.error("Error al actualizar datos en Firebase:", error);
+                            }
+
         NroEnvio.innerHTML = `Logística PlaceIt`;
-
-        const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
-        const numeroCliente = cliente;
-        const diaFormateadoPlaceIt = obtenerFechas();
-
-        trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
-        
-            Queremos informarte que vamos a visitarte entre el ${diaFormateadoPlaceIt}.
-        
-            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
-        
-            Cualquier consulta, estamos a tu servicio. ¡Gracias!
-            
-            Equipo Posventa Novogar
-            
-            ENVIO CON LOGISTICA PLACEIT`;
-    
-        firebase.database().ref('envios/' + idOperacionSinME1).update({
-            trackingNumber: "Logistica PlaceIt",
-            trackingLink: "Logistica PlaceIt",
-            trackingMessage: trackingMessage,
-            transportCompany: "PlaceIt",
-            cliente: cliente,
-            diasPlaceIt: diaFormateadoPlaceIt
-        }).then(() => {
-            console.log(`Datos actualizados en Firebase (Mercado libre) para la operación: ${idOperacionSinME1}`);
-        }).catch(error => {
-            console.error('Error al actualizar en Firebase:', error);
-        });
 
         const fechaHora = new Date().toLocaleString('es-ES', {
             day: 'numeric',
@@ -1225,16 +1174,16 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             subdato: diaFormateadoPlaceIt,
             valorDeclarado: total
         }).then(() => {
-            console.log(`Datos actualizados en Firebase (Logistica) para la operación: ${idOperacionSinME1}`);
+            console.log(`Datos actualizados en Firebase (Logistica) para la operación: NOV${id}`);
             const Name = `Confirmación de Compra Novogar`;
-            const Subject = `Tu compra con envío Express ${numeroRemito} ya fue preparada para despacho`;
+            const Subject = `Tu compra con envío Express NOV${id} ya fue preparada para despacho`;
             const template = "emailTemplatePlaceIt";
             const transporte = "Logística PlaceIt";
-            const numeroDeEnvio = numeroRemito; // Usar número de remito real
-            const linkSeguimiento2 = `https://tracking.placeit.com/?remito=${numeroRemito}`;
+            const numeroDeEnvio = diaFormateadoPlaceIt;
+            const linkSeguimiento2 = cliente;
             const remito = numeroRemito;
             const nombre = NombreyApellido || recibe;
-        
+    
             return sendEmail(
                 Name, 
                 Subject, 
@@ -1262,34 +1211,50 @@ function obtenerFechas() {
     const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
     const hoy = new Date();
     
+    // Ajustar la hora a la zona horaria de Argentina (UTC-3)
+    const offset = -3 * 60; // UTC-3 en minutos
+    const utcDate = hoy.getTime() + (hoy.getTimezoneOffset() * 60 * 1000);
+    const fechaActual = new Date(utcDate + (offset * 60 * 1000));
+
+    console.log("Fecha actual (Argentina):", fechaActual);
+
     // Determinar el próximo día hábil
-    let fechaEntrega = new Date(hoy);
-    
+    let fechaEntrega = new Date(fechaActual);
+
     // Si hoy es sábado, avanzar al lunes
-    if (hoy.getDay() === 6) { // 6 = sábado
-        fechaEntrega.setDate(hoy.getDate() + 2); // Avanzar 2 días
-    } else if (hoy.getDay() === 0) { // 0 = domingo
-        fechaEntrega.setDate(hoy.getDate() + 1); // Avanzar 1 día
+    if (fechaActual.getDay() === 6) { // 6 = sábado
+        fechaEntrega.setDate(fechaActual.getDate() + 2); // Avanzar 2 días
+    } else if (fechaActual.getDay() === 0) { // 0 = domingo
+        fechaEntrega.setDate(fechaActual.getDate() + 1); // Avanzar 1 día
     } else {
-        fechaEntrega.setHours(fechaEntrega.getHours() + 48); // Sumar 48 horas
+        fechaEntrega.setDate(fechaActual.getDate() + 1); // Avanzar al siguiente día
     }
 
-    // Contar los días para omitir sábados y domingos
-    let diasContados = 0;
-    while (diasContados < 2) {
+    console.log("Próximo día hábil:", fechaEntrega);
+
+    // Sumar 48 horas a la fecha de entrega
+    fechaEntrega.setHours(fechaEntrega.getHours() + 24);
+    console.log("Fecha de entrega después de sumar 48 horas:", fechaEntrega);
+
+    // Asegurarse de que la fecha de entrega sea un día hábil
+    while (fechaEntrega.getDay() === 0 || fechaEntrega.getDay() === 6) { // 0 = domingo, 6 = sábado
         fechaEntrega.setDate(fechaEntrega.getDate() + 1);
-        if (fechaEntrega.getDay() !== 0 && fechaEntrega.getDay() !== 6) { // 0 = domingo, 6 = sábado
-            diasContados++;
-        }
     }
+
+    console.log("Fecha final de entrega:", fechaEntrega);
 
     // Formatear las fechas
-    const diaActual = `${diasDeLaSemana[hoy.getDay()]} ${hoy.getDate()} de ${hoy.toLocaleString('default', { month: 'long' })}`;
+    const diaActual = `${diasDeLaSemana[fechaActual.getDay()]} ${fechaActual.getDate()} de ${fechaActual.toLocaleString('default', { month: 'long' })}`;
     const diaEntrega = `${diasDeLaSemana[fechaEntrega.getDay()]} ${fechaEntrega.getDate()} de ${fechaEntrega.toLocaleString('default', { month: 'long' })}`;
 
-    return `Plazo de entrega entre ${diaActual} y ${diaEntrega}`;
+    const mensajeFinal = `Plazo de entrega entre ${diaActual} y ${diaEntrega}`;
+    console.log("Mensaje final:", mensajeFinal); // Imprimir el mensaje final
+
+    return mensajeFinal;
 }
 
+// Ejecutar la función para probar
+console.log(obtenerFechas());
 // FIN OBTENER FECHAS PLACE IT
 
 // Función para actualizar la paginación
