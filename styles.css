@@ -3025,7 +3025,7 @@ div.card-body > p > i{
 
 .errorMeli{
     width: 90%;
-    font-weight: 600;
+    font-weight: 800;
     text-align: left;
     font-family: "Chakra Petch", sans-serif;
     text-transform: uppercase;
@@ -6735,9 +6735,10 @@ img.gray-filter {
     font-size: 1.4rem;
     font-family: "Rubik", sans-serif !important;
     font-weight: 400;
+    margin-bottom: 14px !important;
     transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
     transition: .5s;
-    margin-bottom: -6px !important;
+    margin-bottom: -5px !important;
 }
 
 .remitoCardMeli:hover{
