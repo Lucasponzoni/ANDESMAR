@@ -88,8 +88,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 const paymentData = Array.isArray(data.payments) && data.payments.length > 0 ? data.payments[0] : {};
                                 const id = data.idOperacion; 
                                 return {
-                                    id: id,
-                                    idOperacion: id,
+                                    id: childSnapshot.key,
+                                    idOperacion: child(snapshot.key()),
                                     Altura: data.Altura,
                                     Calle: data.Calle,
                                     Cantidad: data.Cantidad,

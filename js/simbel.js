@@ -87,41 +87,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
                             // Comprobar si el nombre del nodo coincide con el query
                             if (key === queryNumber) {
-                                allData.push(data); // Agregar el objeto completo
+                                allData.push({ key, data }); // Agregar el objeto completo con el key
                             }
                         });
 
                         if (allData.length > 0) {
                             console.log("Datos encontrados: ", allData);
-                            const processedData = allData.map(data => {
+                            const processedData = allData.map(item => {
+                                const { key, data } = item; // Desestructurar key y data
                                 return {
-                                    id: data.objeto.comprobante.cabecera.num_compro || 0, // codigo12
-                                    idOperacion: data.objeto.comprobante.cabecera.num_compro || 0,
+                                    id: key,
+                                    idOperacion: key,
                                     Altura: data.Altura || 0,
-                                    Calle: data.objeto.cliente.domicilio || 0, // codigo1
+                                    Calle: capitalizarTexto(data.objeto.cliente.domicilio) || 0, // codigo1
                                     Cantidad: 0, // codigo2
                                     Correosugerido: 0,
                                     Cp: data.objeto.cliente.c_postal || 0, // codigo3
                                     Email: data.objeto.cliente.e_mail || 0, // codigo4
                                     NombreyApellido: (data.objeto.cliente.nombres + ' ' + data.objeto.cliente.apellido || "").toLowerCase() || "sin nombre",
-                                    Observaciones: data.objeto.comprobante.cabecera.obs || 0, // codigo6
+                                    Observaciones: eliminarComen(capitalizarTexto(data.objeto.comprobante.cabecera.obs)) || 0,
                                     Peso: 0,
                                     Producto: 0,
-                                    Provincia: data.objeto.cliente.provincia || 0, // codigo8
+                                    Provincia: capitalizarTexto(data.objeto.cliente.provincia) || 0,
                                     Recibe: data.objeto.cliente.referencia || 0, // codigo9
                                     pictures: 0,
                                     SKU: 0,
                                     Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0, // codigo11
                                     VolumenCM3: 0,
                                     VolumenM3: 0,
-                                    localidad: data.objeto.cliente.localidad || 0, // codigo13
+                                    localidad: capitalizarTexto(data.objeto.cliente.localidad) || 0,
                                     medidas: 0,
                                     paqid: 0,
                                     diasPlaceIt: 0,
                                     cliente: data.objeto.cliente || 0,
                                     permalink: 0,
                                     shippingMode: 0,
-                                    nombreDeUsuario: 0,
+                                    nombreDeUsuario: data.objeto.cliente.cuit || 0,
                                     transportCompany: 0,
                                     trackingNumber: 0,
                                     trackingLink: 0,
@@ -129,10 +130,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                     andesmarId: 0,
                                     shippingId: 0,
                                     cotizacion: 0,
-                                    installment_amount: 0,
+                                    installment_amount: 0, 
                                     payment_method_id: 0,
-                                    transactionAmount: 0,
-                                    installments: 0,
+                                    transactionAmount: data.objeto.valores[0]?.importe || 0,  
+                                    items: data.objeto.comprobante.items || [],                      
                                     paymentType: ''
                                 };
                             });
@@ -228,48 +229,51 @@ function cargarDatos() {
 
                     // Verificar si el nombre del nodo tiene exactamente 6 dígitos
                     if (key.length === 6 && /^\d{6}$/.test(key)) {
-                        allData.push({ 
-                            id: key || 0, // codigo12
-                            idOperacion: key,
-                            Altura: data.Altura || 0,
-                            Calle: capitalizarTexto(data.objeto.cliente.domicilio) || 0, // codigo1
-                            Cantidad: 0, // codigo2
-                            Correosugerido: 0,
-                            Cp: data.objeto.cliente.c_postal || 0, // codigo3
-                            Email: data.objeto.cliente.e_mail || 0, // codigo4
-                            NombreyApellido: (data.objeto.cliente.nombres + ' ' + data.objeto.cliente.apellido || "").toLowerCase() || "sin nombre",
-                            Observaciones: eliminarComen(capitalizarTexto(data.objeto.comprobante.cabecera.obs)) || 0,
-                            Peso: 0,
-                            Producto: 0,
-                            Provincia: capitalizarTexto(data.objeto.cliente.provincia) || 0,
-                            Recibe: data.objeto.cliente.referencia || 0, // codigo9
-                            pictures: 0,
-                            SKU: 0,
-                            Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0, // codigo11
-                            VolumenCM3: 0,
-                            VolumenM3: 0,
-                            localidad: capitalizarTexto(data.objeto.cliente.localidad) || 0,
-                            medidas: 0,
-                            paqid: 0,
-                            diasPlaceIt: 0,
-                            cliente: data.objeto.cliente || 0,
-                            permalink: 0,
-                            shippingMode: 0,
-                            nombreDeUsuario: data.objeto.cliente.cuit || 0,
-                            transportCompany: 0,
-                            trackingNumber: 0,
-                            trackingLink: 0,
-                            estadoFacturacion: 0,
-                            andesmarId: 0,
-                            shippingId: 0,
-                            cotizacion: 0,
-                            installment_amount: 0,
-                            payment_method_id: 0,
-                            transactionAmount: 0,
-                            installments: 0,
-                            paymentType: ''
-                        });
-                        dataCount++; // Incrementar contador de datos válidos
+                        if (data.objeto && data.objeto.cliente && data.objeto.valores) {
+                            allData.push({ 
+                                id: key || 0, // codigo12
+                                idOperacion: key,
+                                Altura: data.Altura || 0,
+                                Calle: capitalizarTexto(data.objeto.cliente.domicilio) || 0, // codigo1
+                                Cantidad: 0, // codigo2
+                                Correosugerido: 0,
+                                Cp: data.objeto.cliente.c_postal || 0, // codigo3
+                                Email: data.objeto.cliente.e_mail || 0, // codigo4
+                                NombreyApellido: (data.objeto.cliente.nombres + ' ' + data.objeto.cliente.apellido || "").toLowerCase() || "sin nombre",
+                                Observaciones: eliminarComen(capitalizarTexto(data.objeto.comprobante.cabecera.obs)) || 0,
+                                Peso: 0,
+                                Producto: 0,
+                                Provincia: capitalizarTexto(data.objeto.cliente.provincia) || 0,
+                                Recibe: data.objeto.cliente.referencia || 0, // codigo9
+                                pictures: 0,
+                                SKU: 0,
+                                Telefono: data.objeto.cliente.dom_entregas[0]?.telefono || 0, // codigo11
+                                VolumenCM3: 0,
+                                VolumenM3: 0,
+                                localidad: capitalizarTexto(data.objeto.cliente.localidad) || 0,
+                                medidas: 0,
+                                paqid: 0,
+                                diasPlaceIt: 0,
+                                permalink: 0,
+                                shippingMode: 0,
+                                nombreDeUsuario: data.objeto.cliente.cuit || 0,
+                                transportCompany: 0,
+                                trackingNumber: 0,
+                                trackingLink: 0,
+                                estadoFacturacion: 0,
+                                andesmarId: 0,
+                                shippingId: 0,
+                                cotizacion: 0,
+                                installment_amount: 0, 
+                                payment_method_id: 0,
+                                transactionAmount: data.objeto.valores[0]?.importe || 0,  
+                                items: data.objeto.comprobante.items || [],                     
+                                paymentType: ''
+                            });
+                            dataCount++; // Incrementar contador de datos válidos
+                        } else {
+                            console.log("Estructura de datos inesperada para el nodo: ", key);
+                        }
                     } else {
                         console.log("Nodo ignorado: ", key); // Mostrar nodos ignorados
                     }
@@ -381,93 +385,154 @@ function crearCard(data) {
     return `$ ${Number(amount).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
-    const payment = data.payments?.[0] || {};
-
-let paymentMethodImage = '';
-let paymentDetails = '';
-
-switch (data.payment_method_id) {
-    case 'consumer_credits':
-        paymentMethodImage = './Img/mercadocredito.png';
-        paymentDetails = '<strong>Crédito sin tarjeta</strong>';
-        break;
-    case 'account_money':
-        paymentMethodImage = './Img/mercadopago.png';
-        paymentDetails = '<strong>Dinero en Cuenta</strong>';
-        break;
-    case 'visa':
-    case 'debvisa':
-        paymentMethodImage = './Img/visa.png';
-        break;
-    case 'master':
-    case 'debmaster':
-        paymentMethodImage = './Img/master.png';
-        break;
-    case 'amex':
-        paymentMethodImage = './Img/amex.png';
-        break;
-    case 'naranja':
-        paymentMethodImage = './Img/naranja.png';
-        break;
-    case 'cabal':
-    case 'debcabal':
-        paymentMethodImage = './Img/cabal.png';
-        break;
-    case 'pagofacil':
-        paymentMethodImage = './Img/pagofacil.png';
-        paymentDetails = '<strong>PagoFacil Ticket</strong>';
-        break;
-    case 'rapipago':
-        paymentMethodImage = './Img/rapipago.png';
-        paymentDetails = '<strong>RapiPago Ticket</strong>';
-        break;
-}
-
-if (data.payment_method_id !== 'consumer_credits' && data.payment_method_id !== 'account_money' && data.payment_method_id !== 'pagofacil' && data.payment_method_id !== 'rapipago') {
-    const paymentType = data.paymentType === 'credit_card' ? '<strong>Crédito</strong>' : data.paymentType === 'debit_card' ? '<strong>Débito</strong>' : payment.paymentType;
-    paymentDetails = `${paymentType} en ${data.installments} cuota/s de ${formatCurrency(data.installment_amount)}`;
-}
-
-const paymentHTML = `
-    <div class="payment-cell">
-        <img src="${paymentMethodImage}" alt="${payment.payment_method_id}">
-        <span class="payment-details">${paymentDetails}</span>
+// Crear el carrusel con spinner mientras se cargan las imágenes
+const carouselId = `carousel-${data.idOperacion}`;
+let carouselItems = `
+    <div class="carousel-item active">
+        <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Cargando...</span>
+            </div>
+        </div>
     </div>
 `;
 
-    // Verificar si data.pictures existe y es un array
-    const filteredPictures = Array.isArray(data.pictures) ? 
-        data.pictures.filter(picture => 
-            picture.secure_url // Retener imágenes que tengan secure_url
-        ) : [];
+const carouselHTML = `
+    <div id="${carouselId}" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner" style="max-height: 150px; overflow: hidden;">
+            ${carouselItems}
+        </div>
+        <a class="carousel-control-prev" href="#${carouselId}" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Anterior</span>
+        </a>
+        <a class="carousel-control-next" href="#${carouselId}" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Siguiente</span>
+        </a>
+    </div>
+`;
 
-    // Crear el carrusel
-    const carouselId = `carousel-${data.idOperacion}`;
-    let carouselItems = '';
+// Función para cargar imágenes desde Firebase
+async function cargarImagenesDesdeFirebase(sku, carouselId) {
+    // Ignorar el SKU "110"
+    if (sku === "110") return;
 
-    filteredPictures.forEach((picture, index) => {
-        carouselItems += `
-            <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                <img src="${picture.secure_url}" class="d-block mx-auto" alt="Imagen ${index + 1}" style="height: 150px; width: auto; max-width: 100%; object-fit: cover;">
-            </div>
-        `;
+    // Normalizar el SKU eliminando caracteres especiales excepto el guion medio
+    const skuNormalizado = sku.replace(/[^a-zA-Z0-9-]/g, '');
+
+    try {
+        const snapshot = await firebase.database().ref(`/catalogo/${skuNormalizado}`).once('value');
+        if (snapshot.exists() && snapshot.val().pictures) {
+            const pictures = snapshot.val().pictures;
+
+            // Generar los elementos del carrusel con las imágenes
+            let carouselItems = '';
+            pictures.forEach((picture, index) => {
+                carouselItems += `
+                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                        <img src="${picture.secure_url}" class="d-block mx-auto" alt="Imagen ${index + 1}" style="height: 150px; width: auto; max-width: 100%; object-fit: cover;">
+                    </div>
+                `;
+            });
+
+            // Actualizar el carrusel con las imágenes
+            const carouselInner = document.querySelector(`#${carouselId} .carousel-inner`);
+            if (carouselInner) {
+                carouselInner.innerHTML = carouselItems;
+            }
+        } else {
+            console.warn(`No se encontraron imágenes para el SKU: ${sku}`);
+            // Usar imagen de reemplazo
+            const carouselInner = document.querySelector(`#${carouselId} .carousel-inner`);
+            if (carouselInner) {
+                carouselInner.innerHTML += `
+                    <div class="carousel-item active">
+                        <img src="Img/Novogar-Sin-Foto copia.jpg" class="d-block mx-auto" alt="Sin imagen" style="height: 150px; width: auto; max-width: 100%; object-fit: cover;">
+                    </div>
+                `;
+            }
+        }
+    } catch (error) {
+        console.error(`Error al cargar imágenes para el SKU: ${sku}`, error);
+    }
+}
+
+// Llamar a la función para cargar imágenes de los SKUs de los productos
+if (data && Array.isArray(data.items)) {
+    const uniqueSKUs = new Set(); // Usar un Set para evitar duplicados
+    data.items.forEach(item => {
+        if (item.cod_alfa && item.cod_alfa !== "110") {
+            uniqueSKUs.add(item.cod_alfa);
+        }
     });
 
-    const carouselHTML = `
-        <div id="${carouselId}" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner" style="max-height: 150px; overflow: hidden;">
-                ${carouselItems}
+    // Cargar imágenes para cada SKU único
+    uniqueSKUs.forEach(sku => {
+        cargarImagenesDesdeFirebase(sku, carouselId);
+    });
+}
+
+    // Crear el contenedor de productos
+    let productosHTML = '';
+    
+    // Verifica que data y sus propiedades existan
+    if (data && Array.isArray(data.items)) {
+        // Itera sobre los items
+        data.items.forEach((item, index) => {
+            const precioFormateado = new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+            }).format(item.precio || 0);
+    
+            const descripcionProducto = item.cod_alfa === "110" ? "Costo de Envío" : `Producto ${data.items.length > 1 ? index + 1 : ''}`;
+    
+            productosHTML += `
+                <div style="border-top: 1px solid #ccc; padding-top: 10px; padding-bottom: 10px; font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;">
+                    <i class="bi bi-bag-fill"></i> 
+                    <strong style="color: #007bff;">${descripcionProducto}:</strong> 
+                    <span id="producto-${data.idOperacion}" style="font-weight: bold; text-transform: uppercase;">X ${item.cantidad} u. ${item.cod_alfa}</span>
+                    <p style="margin: 5px 0; font-size: 0.9rem; color: #555;">${item.detalle || 'Sin descripción disponible'}</p>
+                    <p style="margin: 5px 0; font-size: 1rem; color: #28a745; font-weight: bold;">${precioFormateado}</p>
+                </div>
+            `;
+        });
+    } else {
+        // Mensaje si no hay productos
+        productosHTML = `
+            <div style="padding: 10px; font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;">
+                <strong>No hay productos disponibles.</strong>
             </div>
-            <a class="carousel-control-prev" href="#${carouselId}" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Anterior</span>
-            </a>
-            <a class="carousel-control-next" href="#${carouselId}" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Siguiente</span>
-            </a>
-        </div>
-    `;
+        `;
+    }
+
+    // Crear el contenedor de productos
+    let productosHTML2 = '';
+
+    // Verifica que data y sus propiedades existan
+    if (data && Array.isArray(data.items)) {
+        // Generar la lista de productos en un solo párrafo
+        const productos = data.items.map(item => {
+            const sku = item.cod_alfa === "110" ? "Envio" : item.cod_alfa; // Reemplazar "110" por "Envio"
+            return `
+                X <strong>${item.cantidad}</strong>u. 
+                <strong>${sku}</strong> 
+            `;
+        }).join(', '); // Separar los productos con una coma
+
+        productosHTML2 = `
+            <div class="macos-style2">
+                <strong><i class="bi bi-bag-fill"></i></strong> ${productos}
+            </div>
+        `;
+    } else {
+        // Mensaje si no hay productos
+        productosHTML2 = `
+            <div class="macos-style2">
+                <strong>No hay productos disponibles.</strong>
+            </div>
+        `;
+    }
 
     cardDiv.innerHTML = `
         <div class="card position-relative">
@@ -528,9 +593,7 @@ const paymentHTML = `
                 </div>
 
                 ${carouselHTML}
-                <div class="macos-style">
-                Producto: X ${data.Cantidad} ${data.SKU}
-                </div>
+                ${productosHTML2}
 
                 <div class="em-circle-ME1">Venta WEB</div>
 
@@ -582,29 +645,20 @@ const paymentHTML = `
                             <div id="sugerencias-${data.idOperacion}" class="sugerencias" style="display: none;"></div>
                         </div>
                         <p><i class="fas fa-home ios-icon"></i> Calle: <span id="calle-${data.idOperacion}">${data.Calle}</span></p>
-                        <p><i class="bi bi-123 ios-icon"></i> Altura: <span id="altura-${data.idOperacion}">${data.Altura}</span></p>
+                        <p><i class="bi bi-123 ios-icon"></i> Altura: <span id="altura-${data.idOperacion}">S/N</span></p>
                         <p><i class="fas fa-phone ios-icon"></i> Telefono: <span id="telefono-${data.idOperacion}">${data.Telefono!== undefined ? data.Telefono : 'No Disponible'}</span></p>
                         <p><i class="bi bi-envelope-at-fill ios-icon"></i> Email: <span id="email-${data.idOperacion}" style="text-transform: lowercase;">${email}</span></p>
                         <p><i class="bi bi-info-circle-fill ios-icon"></i> Autorizado: <span id="autorizado-${data.idOperacion}">${data.Recibe !== undefined ? data.Recibe : 'Sin Autorizado, solo titular'}</span></p>
                         <p><i class="bi bi-sticky-fill ios-icon"></i> Observaciones: <span id="observaciones-${data.idOperacion}">${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}</span></p>
                     </div>
                     <div class="dimensions-info">
+                    
                     <h6>Dimensiones</h6>
-                    <div style="border-top: 1px dashed cornflowerblue; padding-top: 10px; border-bottom: 1px dashed cornflowerblue; margin-bottom: 5px; padding-bottom: 10px; margin-left: 0px; border-left: 1px dashed cornflowerblue; padding-left: 5px; margin-right:0px; border-right: 1px dashed cornflowerblue; padding-right: 5px;">
-                        <i class="bi bi-rocket-takeoff-fill"></i> 
-                        <strong style="color: #007bff;">Shipping ID:</strong> 
-                        <span id="shippingID-${data.idOperacion}">${data.shippingId!== undefined ? data.shippingId : 'Sin ID es ME1'}</span>
-                    </div>
 
-                    <div style="border-top: 1px solid #ccc; padding-top: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px;">
-                        <i class="bi bi-bag-fill"></i> 
-                        <strong style="color: #007bff;">Producto:</strong> 
-                        <span id="producto-${data.idOperacion}">${data.Producto}</span>
-                    </div>
+                     ${productosHTML}
 
-                    <div style="border-top: 1px solid #ccc; padding-top: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px;">
-                        <div><i class="bi bi-coin"></i> Total: <strong id="valor-${data.idOperacion}" style="color: green;">${formatCurrency(data.transactionAmount)}</strong></div>
-                        ${paymentHTML}
+                    <div class="total-simbel" style="padding-top: 10px; border-bottom: 2px solid green; padding-bottom: 10px; font-size: 1.1rem; margin-bottom: 5px;">
+                        <div>Total: <strong id="valor-${data.idOperacion}" style="font-size: 1.1rem; color: #28a745; font-weight: bolder;">${formatCurrency(data.transactionAmount)}</strong></div>
                     </div>
 
                         <div><i class="bi bi-code-square"></i> <strong>SKU: </strong><span id="sku-${data.idOperacion}" style="color: #007bff;">${data.SKU}</span></div>
