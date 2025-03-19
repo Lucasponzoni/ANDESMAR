@@ -367,7 +367,16 @@ function calcularPorcentajes(data) {
             }
 
             // Contar envíos que tienen "subdato2" y "fotoURL", pero no "subdato3", "subdato4" o "subdato5"
-            if (item.subdato2 && item.fotoURL && !item.subdato3 && !item.subdato4 && !item.subdato5 && !item.subdato6 && !item.subdato7 && !item.subdato8 && !item.subdato9 && !item.subdato10) {
+            if (
+                (item.subdato && item.fotoURL && 
+                    !item.subdato3 && !item.subdato4 && !item.subdato5 && 
+                    !item.subdato6 && !item.subdato7 && !item.subdato8 && 
+                    !item.subdato9 && !item.subdato10) || 
+                (item.subdato2 && item.fotoURL && 
+                    !item.subdato3 && !item.subdato4 && !item.subdato5 && 
+                    !item.subdato6 && !item.subdato7 && !item.subdato8 && 
+                    !item.subdato9 && !item.subdato10)
+            ) {
                 countOca++;
             }
 
@@ -379,8 +388,8 @@ function calcularPorcentajes(data) {
         }
     });
 
-    const totalEnvios = countAndreani + countAndesmar + countCruzDelSur + countOca + countPlaceIt;
-    const totalPre = countAndreani + countAndesmar + countCruzDelSur;
+    const totalEnvios = countCruzDelSur + countOca + countPlaceIt;
+    const totalPre = countCruzDelSur;
     const totalPost = countOca + countPlaceIt;
 
     // Calcular porcentajes
