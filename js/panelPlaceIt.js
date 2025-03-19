@@ -23,14 +23,14 @@ let isFiltered = false; // Variable para controlar si los datos están filtrados
 
 // FILTRAR PENDIENTES
 document.getElementById('filterOldestBtn').addEventListener('click', function() {
-    const filteredData = allData.filter(item => item.estado === "Pendiente de despacho");
-
-    // Ordenar los datos filtrados por tiempo transcurrido de mayor a menor
-    filteredData.sort((a, b) => {
-        const tiempoA = calcularTiempoTranscurrido(a.fechaHora).totalMs;
-        const tiempoB = calcularTiempoTranscurrido(b.fechaHora).totalMs;
-        return tiempoB - tiempoA; // Ordenar de mayor a menor
-    });
+    const filteredData = allData
+        .filter(item => !item.fotoURL) // Filtrar elementos sin fotoURL
+        .sort((a, b) => {
+            // Convertir las fechas a formato ISO para una comparación correcta
+            const dateA = new Date(a.fechaHora.split(', ')[0].split('/').reverse().join('-') + 'T' + a.fechaHora.split(', ')[1]);
+            const dateB = new Date(b.fechaHora.split(', ')[0].split('/').reverse().join('-') + 'T' + b.fechaHora.split(', ')[1]);
+            return dateA.getTime() - dateB.getTime(); // Ordenar de más antiguo a más reciente
+        });
 
     // Renderizar los datos filtrados
     renderCards(filteredData);
@@ -256,15 +256,110 @@ function calcularPorcentajes(data) {
         if (itemDate >= thirtyDaysAgo && item.numeroDeEnvio) {
             const numeroDeEnvio = item.numeroDeEnvio;
 
-            // Contar envíos si existe "subdato" y no existen subdatos adicionales
-            if (item.subdato && !item.subdato2 && !item.subdato3 && !item.subdato4) {
+            if (
+                !item.fotoURL && 
+                item.subdato && 
+                !item.subdato2 && 
+                !item.subdato3 && 
+                !item.subdato4 &&
+                !item.subdato5 && 
+                !item.subdato6 && 
+                !item.subdato7 && 
+                !item.subdato8 && 
+                !item.subdato9 && 
+                !item.subdato10
+            ) {
                 countAndreani++;
             }
+            
+            // Contar si existen subdatos del 2 al 10 y comienzan con "Te visitamos pero"
+            if (
+                !item.fotoURL &&
+                (
+                    (item.subdato10 && item.subdato10.startsWith("Te visitamos pero") && 
+                        !(
+                            item.subdato9 && !item.subdato9.startsWith("Te visitamos pero") ||
+                            item.subdato8 && !item.subdato8.startsWith("Te visitamos pero") ||
+                            item.subdato7 && !item.subdato7.startsWith("Te visitamos pero") ||
+                            item.subdato6 && !item.subdato6.startsWith("Te visitamos pero") ||
+                            item.subdato5 && !item.subdato5.startsWith("Te visitamos pero") ||
+                            item.subdato4 && !item.subdato4.startsWith("Te visitamos pero") ||
+                            item.subdato3 && !item.subdato3.startsWith("Te visitamos pero") ||
+                            item.subdato2 && !item.subdato2.startsWith("Te visitamos pero")
+                        )
+                    ) ||
+                    (item.subdato9 && item.subdato9.startsWith("Te visitamos pero") && 
+                        !(
+                            item.subdato8 && !item.subdato8.startsWith("Te visitamos pero") ||
+                            item.subdato7 && !item.subdato7.startsWith("Te visitamos pero") ||
+                            item.subdato6 && !item.subdato6.startsWith("Te visitamos pero") ||
+                            item.subdato5 && !item.subdato5.startsWith("Te visitamos pero") ||
+                            item.subdato4 && !item.subdato4.startsWith("Te visitamos pero") ||
+                            item.subdato3 && !item.subdato3.startsWith("Te visitamos pero") ||
+                            item.subdato2 && !item.subdato2.startsWith("Te visitamos pero")
+                        )
+                    ) ||
+                    (item.subdato8 && item.subdato8.startsWith("Te visitamos pero") && 
+                        !(
+                            item.subdato7 && !item.subdato7.startsWith("Te visitamos pero") ||
+                            item.subdato6 && !item.subdato6.startsWith("Te visitamos pero") ||
+                            item.subdato5 && !item.subdato5.startsWith("Te visitamos pero") ||
+                            item.subdato4 && !item.subdato4.startsWith("Te visitamos pero") ||
+                            item.subdato3 && !item.subdato3.startsWith("Te visitamos pero") ||
+                            item.subdato2 && !item.subdato2.startsWith("Te visitamos pero")
+                        )
+                    ) ||
+                    (item.subdato7 && item.subdato7.startsWith("Te visitamos pero") && 
+                        !(
+                            item.subdato6 && !item.subdato6.startsWith("Te visitamos pero") ||
+                            item.subdato5 && !item.subdato5.startsWith("Te visitamos pero") ||
+                            item.subdato4 && !item.subdato4.startsWith("Te visitamos pero") ||
+                            item.subdato3 && !item.subdato3.startsWith("Te visitamos pero") ||
+                            item.subdato2 && !item.subdato2.startsWith("Te visitamos pero")
+                        )
+                    ) ||
+                    (item.subdato6 && item.subdato6.startsWith("Te visitamos pero") && 
+                        !(
+                            item.subdato5 && !item.subdato5.startsWith("Te visitamos pero") ||
+                            item.subdato4 && !item.subdato4.startsWith("Te visitamos pero") ||
+                            item.subdato3 && !item.subdato3.startsWith("Te visitamos pero") ||
+                            item.subdato2 && !item.subdato2.startsWith("Te visitamos pero")
+                        )
+                    ) ||
+                    (item.subdato5 && item.subdato5.startsWith("Te visitamos pero") && 
+                        !(
+                            item.subdato4 && !item.subdato4.startsWith("Te visitamos pero") ||
+                            item.subdato3 && !item.subdato3.startsWith("Te visitamos pero") ||
+                            item.subdato2 && !item.subdato2.startsWith("Te visitamos pero")
+                        )
+                    ) ||
+                    (item.subdato4 && item.subdato4.startsWith("Te visitamos pero") && 
+                        !(
+                            item.subdato3 && !item.subdato3.startsWith("Te visitamos pero") ||
+                            item.subdato2 && !item.subdato2.startsWith("Te visitamos pero")
+                        )
+                    ) ||
+                    (item.subdato3 && item.subdato3.startsWith("Te visitamos pero") && 
+                        !(item.subdato2 && !item.subdato2.startsWith("Te visitamos pero"))
+                    ) ||
+                    (item.subdato2 && item.subdato2.startsWith("Te visitamos pero"))
+                )
+            ) {
+                countAndreani++;
+            }                     
 
             // Contar envíos que si existen subdatos 2, 3, 4 o 5 y no existe "fotoURL"
-            if ((item.subdato2 || item.subdato3 || item.subdato4 || item.subdato5) && !item.fotoURL) {
+            if (
+                (!item.fotoURL) && 
+                (
+                    (item.subdato2 && !item.subdato2.startsWith("Te visitamos pero")) ||
+                    (item.subdato3 && !item.subdato3.startsWith("Te visitamos pero")) ||
+                    (item.subdato4 && !item.subdato4.startsWith("Te visitamos pero")) ||
+                    (item.subdato5 && !item.subdato5.startsWith("Te visitamos pero"))
+                )
+            ) {
                 countAndesmar++;
-            }
+            }                     
 
             // Contar envíos de Cruz del Sur que no tienen "fotoURL"
             if (item.remitoDigital === 0) {
@@ -272,14 +367,14 @@ function calcularPorcentajes(data) {
             }
 
             // Contar envíos que tienen "subdato2" y "fotoURL", pero no "subdato3", "subdato4" o "subdato5"
-            if (item.subdato2 && item.fotoURL && !item.subdato3 && !item.subdato4 && !item.subdato5) {
+            if (item.subdato2 && item.fotoURL && !item.subdato3 && !item.subdato4 && !item.subdato5 && !item.subdato6 && !item.subdato7 && !item.subdato8 && !item.subdato9 && !item.subdato10) {
                 countOca++;
             }
 
             // Contar envíos que tienen "subdato2", "fotoURL" y al menos uno de "subdato3", "subdato4" o "subdato5"
             if (item.operadorLogistico === "PlaceIt" && item.subdato2 && item.fotoURL &&
-                (item.subdato3 || item.subdato4 || item.subdato5)) {
-                countPlaceIt++;
+                (item.subdato3 || item.subdato4 || item.subdato5 || item.subdato6 || item.subdato7 || item.subdato8 || item.subdato8 || item.subdato10)) {
+                countPlaceIt++; 
             }
         }
     });
@@ -515,9 +610,54 @@ function renderCards(data) {
 
         const comentarioClase = item.comentario ? 'btn-success' : 'btn-secondary';
 
-        let subdatoTexto = item.subdato ? 
-            `<br><span class="${item.subdato.startsWith('Pendiente de confirmar') ? 'subdato-texto1' : 'subdato-texto2'}">${item.subdato}</span>` : '';
+        let subdatoTexto = '';
+        let ultimoSubdato = null;
+        let ultimoSubdatoFecha = null;
+        let numeroDeVisita = 0; 
         
+
+        for (let i = 0; i <= 10; i++) { 
+            const subdatoKey = i === 0 ? 'subdato' : `subdato${i}`; 
+            const subdatoFechaKey = i === 0 ? 'subdatoFecha' : `subdato${i}Fecha`;
+        
+            if (item[subdatoKey]) {
+                ultimoSubdato = item[subdatoKey];
+                ultimoSubdatoFecha = item[subdatoFechaKey] || ''; 
+                numeroDeVisita = i; 
+            }
+        }
+        
+        // Verificar si hay un último subdato
+        if (ultimoSubdato) {
+            if (ultimoSubdato.startsWith('Plazo de entrega entre')) {
+                subdatoTexto = `
+                    <br>
+                    <span class="subdato-texto2">
+                        <i class="bi bi-clock-history"></i> ${ultimoSubdato} ${ultimoSubdatoFecha}
+                    </span>
+                `;
+            } else if (ultimoSubdato.startsWith('En reparto')) {
+                const visitaTexto = numeroDeVisita > 1 ? `(VISITA ${numeroDeVisita - 1})` : ''; 
+                subdatoTexto = `
+                    <br>
+                    <span class="subdato-texto4">
+                        <i class="bi bi-send-fill"></i> ${ultimoSubdato} ${visitaTexto} ${ultimoSubdatoFecha}hs.
+                    </span>
+                `;
+            } else if (ultimoSubdato.startsWith('Te visitamos pero')) {
+                subdatoTexto = `
+                    <br>
+                    <span class="subdato-texto5">
+                        <i class="bi bi-exclamation-circle-fill"></i> ${ultimoSubdato} ${ultimoSubdatoFecha}hs.
+                    </span>
+                `;
+            } else {
+                console.warn(`El subdato no coincide con ninguna condición:`, ultimoSubdato);
+            }
+        } else {
+            console.warn(`No se encontró ningún subdato para el item:`, item);
+        }
+
         // Verificar si existe item.fotoURL y crear el botón de descarga
         let remitoColumna = remito;
         if (item.fotoURL) {
@@ -771,6 +911,40 @@ $('#logisticaModal').on('shown.bs.modal', function () {
     $('#remitoLogistica').focus();
 });
 
+// MODAL ACTUALIZACIONES DE ESTADO PLACEIT
+const toggleVisitBtn = document.getElementById('toggleVisitBtn');
+let isVisitMarked = false;
+
+// Obtener referencia al input y al div de alerta
+const remitoInput = document.getElementById('remitoLogistica');
+const alertModal = document.querySelector('.alert-modal-placeit');
+
+// Manejar el clic en el botón
+toggleVisitBtn.addEventListener('click', () => {
+    isVisitMarked = !isVisitMarked; // Cambiar el estado
+
+    if (isVisitMarked) {
+        // Marcar visita sin éxito
+        toggleVisitBtn.classList.remove('btn-primary');
+        toggleVisitBtn.classList.add('btn-danger');
+        toggleVisitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Desmarcar visita sin éxito';
+        
+        // Cambiar el mensaje de alerta
+        alertModal.innerHTML = 'Al escanear remito y marcar "Visita fallida" el cliente recibirá un email <br><strong>"Te visitamos pero no logramos concretar la entrega"</strong>';
+    } else {
+        // Desmarcar visita sin éxito
+        toggleVisitBtn.classList.remove('btn-danger');
+        toggleVisitBtn.classList.add('btn-primary');
+        toggleVisitBtn.innerHTML = '<i class="bi bi-exclamation-circle"></i> Marcar visita sin éxito';
+        
+        // Cambiar el mensaje de alerta
+        alertModal.innerHTML = 'Al escanear remito el cliente recibirá un email <br><strong>"Hoy vamos a visitarte"</strong>';
+    }
+
+    // Hacer foco en el input
+    remitoInput.focus();
+});
+
 // Evento para manejar el escaneo al presionar "Enter"
 document.getElementById('remitoLogistica').addEventListener('keypress', async function (event) {
     if (event.key === 'Enter') {
@@ -800,14 +974,19 @@ document.getElementById('remitoLogistica').addEventListener('keypress', async fu
                     }
 
                     // Actualizar el estado en Firebase
+                    const estado = isVisitMarked ? "Te visitamos pero no logramos concretar la entrega" : `En reparto ${fechaEntregaStr}`;
+                    const template = isVisitMarked ? "emailTemplatePlaceItEntregaError" : "emailTemplatePlaceItEntrega";
+                    const Name = isVisitMarked ? "Visita sin éxito" : "Hoy vamos a visitarte";
+                    const Subject = isVisitMarked ?  "Te visitamos pero no logramos entregar la compra": `Tu compra se encuentra en reparto`;
+
                     childSnapshot.ref.update({
-                        [`subdato${subdatoIndex}`]: `En reparto ${fechaEntregaStr}`,
+                        [`subdato${subdatoIndex}`]: estado,
                         [`subdato${subdatoIndex}Fecha`]: fechaEntregaFinalStr,
                     }).then(() => {
                         // Agregar el nuevo estado a la tabla
                         const newRow = `<tr>
                                             <td>${fechaEntregaStr}</td>
-                                            <td>En reparto ${fechaEntregaStr}</td>
+                                            <td>${estado}</td>
                                             <td>${cliente}</td>
                                             <td>${remitoValue}</td>
                                             <td>${data.valorDeclarado}</td>
@@ -817,18 +996,16 @@ document.getElementById('remitoLogistica').addEventListener('keypress', async fu
                         tableBody.insertAdjacentHTML('afterbegin', newRow); // Agregar nuevo registro en la parte superior
 
                         // Mostrar alerta
-                        mostrarAlerta('Estado actualizado a Logística Propia.', 'success');
+                        mostrarAlerta('Estado actualizado PlaceIt', 'success');
 
                         // Enviar el correo electrónico en segundo plano
-                        const Name = `Hoy vamos a visitarte`;
-                        const Subject = `Tu compra en Novogar ${remitoValue} se encuentra en reparto`;
-                        const template = "emailTemplatePlaceItEntrega";    
                         const linkSeguimiento2 = cliente;     
                         const transporte = "Logistica PlaceIt";
                         const numeroDeEnvio = ``;       
+
                         sendEmail(Name, Subject, template, cliente, email, remitoValue, linkSeguimiento2, transporte, numeroDeEnvio)
                             .then(() => {
-                                console.log(`Email de reparto enviado a ${email}`);
+                                console.log(`Email enviado a ${email}`);
                             })
                             .catch(error => {
                                 console.error(`Error al enviar email: ${error.message}`);
@@ -849,6 +1026,7 @@ document.getElementById('remitoLogistica').addEventListener('keypress', async fu
         }
     }
 });
+// FIN MODAL ACTUALIZACIONES DE ESTADO PLACEIT
 
 function mostrarAlerta(mensaje, tipo) {
     const alerta = document.createElement('div');

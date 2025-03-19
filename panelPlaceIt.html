@@ -100,7 +100,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto" id="navbarNavUl">
-                    <li class="nav-item"><a href="./controlMeli.html" class="nav-link"><img id="meli-logo2" src="./Img/meli.png">Mercado Libre</a></li>
+                    <li class="nav-item"><a href="./MeliArPlaceit.html" class="nav-link"><img id="meli-logo2" src="./Img/meli.png">Mercado Libre</a></li>
                     <li class="nav-item"><a href="./bnaPlaceIt.html" class="nav-link">Tiendas Virtuales</a></li>
                     <li class="nav-item"><a href="./simbel.html" class="nav-link">Ventas Web</a></li>
                     <li class="nav-item"><a href="#" class="nav-link active"><i class="bi bi-gear-fill mr-1"></i>Panel PlaceIt</a></li>
@@ -419,9 +419,16 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="confirmLogisticaBtn">Confirmar</button>
-            </div>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cerrar
+                </button>
+                <button type="button" class="btn btn-success hidden" id="confirmLogisticaBtn">
+                    <i class="bi bi-check-circle"></i> Confirmar
+                </button>
+                <button type="button" class="btn btn-primary" id="toggleVisitBtn">
+                    <i class="bi bi-exclamation-circle"></i> Marcar visita sin éxito
+                </button>
+            </div>                      
         </div>
     </div>
 </div>

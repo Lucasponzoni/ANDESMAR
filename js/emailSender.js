@@ -12,6 +12,7 @@ async function sendEmail(Name, Subject, templateName, nombre, email, remito, lin
         "emailFacturacion": emailFacturacion,
         "emailTemplateOCA": emailTemplateOCA,
         "emailTemplatePlaceIt": emailTemplatePlaceIt,
+        "emailTemplatePlaceItEntregaError": emailTemplatePlaceItEntregaError,
         "emailTemplatePlaceItEntrega": emailTemplatePlaceItEntrega
     };
 

@@ -3867,13 +3867,16 @@ div .form-check {
     font-weight: 600;
 }
 
-.subdato-texto2{
-    background-color: red;
+.subdato-texto2 {
+    background-color: grey;
     color: white;
     padding: 3px;
     border-radius: 5px;
     font-size: .8rem;
     font-weight: 600;
+    white-space: nowrap; 
+    overflow-x: auto; 
+    display: inline-block;
 }
 
 .subdato-texto3{
@@ -3883,6 +3886,33 @@ div .form-check {
     border-radius: 5px;
     font-size: .8rem;
     font-weight: 600;
+    white-space: nowrap; 
+    overflow-x: auto; 
+    display: inline-block;
+}
+
+.subdato-texto4{
+    background-color: #007bff;
+    color: white;
+    padding: 3px;
+    border-radius: 5px;
+    font-size: .8rem;
+    font-weight: 600;
+    white-space: nowrap; 
+    overflow-x: auto; 
+    display: inline-block;
+}
+
+.subdato-texto5{
+    background-color: red;
+    color: white;
+    padding: 3px;
+    border-radius: 5px;
+    font-size: .8rem;
+    font-weight: 600;
+    white-space: nowrap; 
+    overflow-x: auto; 
+    display: inline-block;
 }
 
 .valor-columna {
