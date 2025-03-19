@@ -335,6 +335,7 @@ function calcularPorcentajes(data) {
     <div class="d-flex align-items-center flex-wrap">
         <span class="ml-1" style="font-weight: bold;">PlaceIt: <span class="porcentaje-resaltado">${placeItPorcentaje}%</span></span>
     </div>
+        <span class="ml-1 conteo-oca" style="font-size: 0.9em;">${countPlaceIt} despachos</span>
         <div class="pie-chart" style="--percentage: ${placeItPorcentaje}; --color: #ff0078;"></div>
     `;
 
