@@ -3018,6 +3018,8 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
                 estado: "Envio Express PlaceIt",
                 fechaHora: fechaHora,
                 operadorLogistico: "PlaceIt",
+                remitoDigital: 0,
+                email: email,
                 remito: numeroRemito,
                 numeroDeEnvio: 123456,
                 remitoVBA: numeroRemito,

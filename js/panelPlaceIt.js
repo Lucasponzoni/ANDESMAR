@@ -206,7 +206,10 @@ function cargarDatos() {
 
         snapshot.forEach(childSnapshot => {
             const data = childSnapshot.val();
-            allData.push(data); // Almacenar datos en allData
+            // Verifica si operadorLogistico es "PlaceIt"
+            if (data.operadorLogistico === "PlaceIt") {
+                allData.push(data); // Almacenar datos en allData solo si cumple la condición
+            }
         });
 
         // Ordenar allData por fecha del más viejo al más nuevo
@@ -241,8 +244,7 @@ function calcularPorcentajes(data) {
     let countAndesmar = 0;
     let countCruzDelSur = 0;
     let countOca = 0;
-    let countPlaceIt = 0; 
-    let countPendientes = 0;
+    let countPlaceIt = 0;
 
     const now = new Date();
     const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000)); // Fecha de hace 30 días
@@ -251,99 +253,97 @@ function calcularPorcentajes(data) {
         const [day, month, year] = item.fechaHora.split(',')[0].split('/');
         const itemDate = new Date(`${year}-${month}-${day}`);
 
-        if (itemDate >= thirtyDaysAgo) {
-            if (item.numeroDeEnvio) {
-                const numeroDeEnvio = item.numeroDeEnvio;
-                
-                // Contar envíos de Andreani
-                if ((((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
-                    (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) || 
-                    (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('4')))) {
-                    countAndreani++;
-                } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) || 
-                           (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1'))) {
-                    countCruzDelSur++;
-                } else if (numeroDeEnvio.length === 19 && numeroDeEnvio.startsWith('4')) { 
-                    countOca++;
-                } else if (item.operadorLogistico !== "PlaceIt") { 
-                    countAndesmar++;
-                }
+        if (itemDate >= thirtyDaysAgo && item.numeroDeEnvio) {
+            const numeroDeEnvio = item.numeroDeEnvio;
+
+            // Imprimir el objeto para verificar su estructura
+            console.log(item);
+
+            // Contar envíos si existe "subdato" y no existen subdatos adicionales
+            if (item.subdato && !item.subdato2 && !item.subdato3 && !item.subdato4) {
+                countAndreani++;
             }
-        
-            // Contar envíos de PlaceIt
-            if (item.operadorLogistico === "PlaceIt") {
+
+            // Contar envíos que si existen subdatos 2, 3, 4 o 5 y no existe "fotoURL"
+            if ((item.subdato2 || item.subdato3 || item.subdato4 || item.subdato5) && !item.fotoURL) {
+                countAndesmar++;
+            }
+
+            // Contar envíos de Cruz del Sur que no tienen "fotoURL"
+            if (item.remitoDigital === 0) {
+                countCruzDelSur++;
+            }
+
+            // Contar envíos que tienen "subdato2" y "fotoURL", pero no "subdato3", "subdato4" o "subdato5"
+            if (item.subdato2 && item.fotoURL && !item.subdato3 && !item.subdato4 && !item.subdato5) {
+                countOca++;
+            }
+
+            // Contar envíos que tienen "subdato2", "fotoURL" y al menos uno de "subdato3", "subdato4" o "subdato5"
+            if (item.operadorLogistico === "PlaceIt" && item.subdato2 && item.fotoURL &&
+                (item.subdato3 || item.subdato4 || item.subdato5)) {
                 countPlaceIt++;
             }
-        
-            // Contar los pendientes de despacho
-            if (item.estado === "Pendiente de despacho") {
-                countPendientes++;
-            }
         }
-        
     });
 
-    const totalEnvios = countAndreani + countAndesmar + countCruzDelSur + countOca + countPlaceIt; // Incluir PlaceIt en total
+    const totalEnvios = countAndreani + countAndesmar + countCruzDelSur + countOca + countPlaceIt;
 
     // Calcular porcentajes
     const andreaniPorcentaje = totalEnvios > 0 ? ((countAndreani / totalEnvios) * 100).toFixed(2) : 0;
     const andesmarPorcentaje = totalEnvios > 0 ? ((countAndesmar / totalEnvios) * 100).toFixed(2) : 0;
     const cruzDelSurPorcentaje = totalEnvios > 0 ? ((countCruzDelSur / totalEnvios) * 100).toFixed(2) : 0;
-    const ocaPorcentaje = totalEnvios > 0 ? ((countOca / totalEnvios) * 100).toFixed(2) : 0; // Porcentaje de OCA
-    const placeItPorcentaje = totalEnvios > 0 ? ((countPlaceIt / totalEnvios) * 100).toFixed(2) : 0; // Porcentaje de PlaceIt
+    const ocaPorcentaje = totalEnvios > 0 ? ((countOca / totalEnvios) * 100).toFixed(2) : 0;
+    const placeItPorcentaje = totalEnvios > 0 ? ((countPlaceIt / totalEnvios) * 100).toFixed(2) : 0;
 
     // Actualizar el HTML
     document.getElementById('andreaniPorcentaje').innerHTML = `
-    <img src="./Img/andreani-mini.png" alt="Andreani" class="gray-filter"> 
+    <img src="./Img/placeit-mini-white.png" alt="Andreani" class="gray-filter"> 
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">Andreani: ${andreaniPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">Sin Reparto: <br> ${andreaniPorcentaje}%</span>
     </div>
     <span class="ml-1 conteo-Andreani" style="font-size: 0.9em;">${countAndreani} despachos</span>
     <div class="pie-chart" style="--percentage: ${andreaniPorcentaje}; --color: #dc3545;"></div>
     `;
 
     document.getElementById('andesmarPorcentaje').innerHTML = `
-    <img src="./Img/andesmar-mini.png" alt="Andesmar" class="gray-filter">  
+    <img src="./Img/placeit-mini-white.png" alt="Andesmar" class="gray-filter">  
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">Andesmar: ${andesmarPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">En reparto: <br> ${andesmarPorcentaje}%</span>
     </div>
         <span class="ml-1 conteo-andesmar" style="font-size: 0.9em;">${countAndesmar} despachos</span>
-        <div class="pie-chart" style="--percentage: ${andesmarPorcentaje}; --color: #007bff;"></div>
+        <div class="pie-chart" style="--percentage: ${andesmarPorcentaje}; --color: #00A2FFFF;"></div>
     `;
 
     document.getElementById('cruzDelSurPorcentaje').innerHTML = `
-    <img src="./Img/cds-mini.png" alt="Cruz del Sur" class="gray-filter">   
+    <img src="./Img/placeit-mini-white.png" alt="Cruz del Sur" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">CDS: ${cruzDelSurPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">Sin remito: <br> ${cruzDelSurPorcentaje}%</span>
     </div>
         <span class="ml-1 conteo-cds" style="font-size: 0.9em;">${countCruzDelSur} despachos</span>
-        <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #003366;"></div>
+        <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #FFAE00FF;"></div>
     `;
 
     document.getElementById('ocaPorcentaje').innerHTML = `
-    <img src="./Img/oca-mini.png" alt="OCA" class="gray-filter">   
+    <img src="./Img/placeit-mini-white.png" alt="OCA" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">OCA: ${ocaPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">1º Contacto: <br> ${ocaPorcentaje}%</span>
     </div>
         <span class="ml-1 conteo-oca" style="font-size: 0.9em;">${countOca} despachos</span>
-        <div class="pie-chart" style="--percentage: ${ocaPorcentaje}; --color: #5B2B82;"></div>
+        <div class="pie-chart" style="--percentage: ${ocaPorcentaje}; --color: #71C200FF;"></div>
     `;
 
     // Actualizar el HTML para PlaceIt
     document.getElementById('placeItPorcentaje').innerHTML = `
-    <img src="./Img/placeit-mini2.png" alt="PlaceIt" class="gray-filter">   
+    <img src="./Img/placeit-mini-white.png" alt="PlaceIt" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">PlaceIt: ${placeItPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">2º Contacto: <br> ${placeItPorcentaje}%</span>
     </div>
         <span class="ml-1 conteo-placeit" style="font-size: 0.9em;">${countPlaceIt} despachos</span>
-        <div class="pie-chart" style="--percentage: ${placeItPorcentaje}; --color: #ff0078;"></div>
+        <div class="pie-chart" style="--percentage: ${placeItPorcentaje}; --color: #65AD00FF;"></div>
     `;
 
-    document.getElementById('SinDespacharPorcentaje').innerHTML = `
-    <div class="macos-button-porcentaje">
-        <span class="ml-1"><i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i> Pendientes:</span> <span class="pill-preparacion">${countPendientes}</span> en preparación
-    </div>
-    `;
+    document.getElementById('estadisticas-header').innerHTML = `<i class="bi bi-info-circle-fill"></i> Estadísticas de los últimos 30 días sobre <strong>${totalEnvios} Envios</strong>`
 }
 
 function eliminarFila(button) {
@@ -770,7 +770,7 @@ $('#logisticaModal').on('shown.bs.modal', function () {
 });
 
 // Evento para manejar el escaneo al presionar "Enter"
-document.getElementById('remitoLogistica').addEventListener('keypress', function (event) {
+document.getElementById('remitoLogistica').addEventListener('keypress', async function (event) {
     if (event.key === 'Enter') {
         event.preventDefault(); // Evitar el comportamiento por defecto
         const remitoValue = this.value;
@@ -778,58 +778,70 @@ document.getElementById('remitoLogistica').addEventListener('keypress', function
         // Verificar si el remito es válido
         if (/^23[0-9]\d{8}$/.test(remitoValue)) {
             // Buscar en Firebase
-            db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remitoValue).once('value', snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const data = childSnapshot.val();
-                        const fechaEntrega = new Date();
-                        const fechaEntregaStr = `${fechaEntrega.getDate()}/${fechaEntrega.getMonth() + 1}/${fechaEntrega.getFullYear()}`;
-                        const horaEntregaStr = `${fechaEntrega.getHours()}:${fechaEntrega.getMinutes()}:${fechaEntrega.getSeconds()}`;
-                        const fechaEntregaFinal = `${fechaEntrega.getDate()}/${fechaEntrega.getMonth() + 1}/${fechaEntrega.getFullYear()}, ${horaEntregaStr}`;
+            const snapshot = await db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remitoValue).once('value');
+            if (snapshot.exists()) {
+                snapshot.forEach(childSnapshot => {
+                    const data = childSnapshot.val();
+                    const fechaEntrega = new Date();
+                    const fechaEntregaStr = `${fechaEntrega.getDate()} de ${fechaEntrega.toLocaleString('default', { month: 'long' })} de ${fechaEntrega.getFullYear()}`;
+                    const horaEntregaStr = `${fechaEntrega.getHours().toString().padStart(2, '0')}:${fechaEntrega.getMinutes().toString().padStart(2, '0')}:${fechaEntrega.getSeconds().toString().padStart(2, '0')}`;
+                    const fechaEntregaFinalStr = `${fechaEntrega.getDate()}/${fechaEntrega.getMonth() + 1}/${fechaEntrega.getFullYear()}, ${horaEntregaStr}`;
 
-                        // Sumar 3 días a la fecha de entrega, omitiendo domingos
-                        let diasSumados = 0;
-                        while (diasSumados < 3) {
-                            fechaEntrega.setDate(fechaEntrega.getDate() + 1);
-                            if (fechaEntrega.getDay() !== 0) { // 0 es domingo
-                                diasSumados++;
-                            }
-                        }
+                    // Obtener el email y otros datos si existen
+                    const email = data.email || 'No disponible';
+                    const cliente = data.cliente || 'Cliente no disponible';
 
-                        const fechaEntregaFinalStr = `${fechaEntrega.getDate()}/${fechaEntrega.getMonth() + 1}/${fechaEntrega.getFullYear()}`;
+                    // Determinar el siguiente subdato
+                    let subdatoIndex = 2;
+                    while (data[`subdato${subdatoIndex}`]) {
+                        subdatoIndex++;
+                    }
 
-                        // Actualizar el estado en Firebase
-                        childSnapshot.ref.update({
-                            estado: `(se entrega entre ${fechaEntregaStr} & ${fechaEntregaFinalStr})`,
-                            operadorLogistico: "Logística Novogar" // Agregar operador logístico
-                        }).then(() => {
-                            // Agregar el nuevo estado a la tabla
-                            const newRow = `<tr>
-                                                <td>${fechaEntregaStr}</td>
-                                                <td>(se entrega entre ${fechaEntregaStr} & ${fechaEntregaFinalStr})</td>
-                                                <td>${data.cliente}</td>
-                                                <td>${remitoValue}</td>
-                                                <td>${data.valorDeclarado}</td>
-                                                <td>Logística Novogar</td> <!-- Mostrar operador logístico -->
-                                                <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
-                                            </tr>`;
-                            const tableBody = document.querySelector('#data-table tbody');
-                            tableBody.insertAdjacentHTML('afterbegin', newRow); // Agregar nuevo registro en la parte superior
+                    // Actualizar el estado en Firebase
+                    childSnapshot.ref.update({
+                        [`subdato${subdatoIndex}`]: `En reparto ${fechaEntregaStr}`,
+                        [`subdato${subdatoIndex}Fecha`]: fechaEntregaFinalStr,
+                    }).then(() => {
+                        // Agregar el nuevo estado a la tabla
+                        const newRow = `<tr>
+                                            <td>${fechaEntregaStr}</td>
+                                            <td>En reparto ${fechaEntregaStr}</td>
+                                            <td>${cliente}</td>
+                                            <td>${remitoValue}</td>
+                                            <td>${data.valorDeclarado}</td>
+                                            <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">X</button></td>
+                                        </tr>`;
+                        const tableBody = document.querySelector('#data-table tbody');
+                        tableBody.insertAdjacentHTML('afterbegin', newRow); // Agregar nuevo registro en la parte superior
 
-                            // Mostrar alerta
-                            mostrarAlerta('Estado actualizado a Logística Propia.', 'success');
+                        // Mostrar alerta
+                        mostrarAlerta('Estado actualizado a Logística Propia.', 'success');
 
-                            // Limpiar el input y volver a enfocar
-                            $('#remitoLogistica').val('');
-                            $('#remitoLogistica').focus();
-                        }).catch(error => {
-                            mostrarAlerta('Error al actualizar el estado: ' + error.message, 'error');
-                        });
+                        // Enviar el correo electrónico en segundo plano
+                        const Name = `Hoy vamos a visitarte`;
+                        const Subject = `Tu compra en Novogar ${remitoValue} se encuentra en reparto`;
+                        const template = "emailTemplatePlaceItEntrega";    
+                        const linkSeguimiento2 = cliente;     
+                        const transporte = "Logistica PlaceIt";
+                        const numeroDeEnvio = ``;       
+                        sendEmail(Name, Subject, template, cliente, email, remitoValue, linkSeguimiento2, transporte, numeroDeEnvio)
+                            .then(() => {
+                                console.log(`Email de reparto enviado a ${email}`);
+                            })
+                            .catch(error => {
+                                console.error(`Error al enviar email: ${error.message}`);
+                            });
+
+                        // Limpiar el input y volver a enfocar
+                        $('#remitoLogistica').val('');
+                        $('#remitoLogistica').focus();
+                    }).catch(error => {
+                        mostrarAlerta('Error al actualizar el estado: ' + error.message, 'error');
                     });
-                } else {
-                    mostrarAlerta('Remito no encontrado.', 'error');
-                }
-            });
+                });
+            } else {
+                mostrarAlerta('Remito no encontrado.', 'error');
+            }
         } else {
             mostrarAlerta('Número de remito inválido. Debe comenzar con 230 o 238 y tener 11 dígitos.', 'error');
         }

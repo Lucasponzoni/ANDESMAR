@@ -6034,6 +6034,10 @@ button.btn.disabled, .btn:disabled {
     background: linear-gradient(to bottom, #ffffff, rgba(255, 0, 120, 0.7));
 }
 
+.percentage-card2:hover{
+    background: linear-gradient(to bottom, #ffffff, rgba(0, 51, 102, 0.7))!important;
+}
+
 .conteo-Andreani{
     background-color: rgba(0, 51, 102, 0.7);
     padding: 5px;
@@ -6745,4 +6749,78 @@ img.gray-filter {
 
 .remitoCardMeli:hover{
     color: cornflowerblue;
+}
+
+.estadisticas-placeIt1{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #ededed;
+    padding: 5px 0 20px 0;
+    border-radius: 12px 0 0 12px;
+    border: 1px solid #ccc;
+}
+
+.estadisticas-placeIt2{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #ededed;
+    padding: 5px 0 20px 0;
+    border-radius: 0 12px 12px 0;
+    border: 1px solid #ccc;
+    margin-left: -1px;
+}
+
+.estadisticas-pit{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.porcentaje-bordes:last-child{
+    border-radius: 0 0 10px 10px;
+}
+
+.estadisticas-1 {
+    margin-bottom: 0;
+    background-color: orangered;
+    padding: 10px;
+    color: white;
+    width: fit-content;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.estadisticas-1 i {
+    font-size: 20px;
+    margin-right: 5px;
+}
+
+.estadisticas-2 {
+    margin-bottom: 0;
+    background-color: green;
+    padding: 10px;
+    color: white;
+    width: fit-content;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.estadisticas-2 i {
+    font-size: 20px;
+    margin-right: 5px;
+}
+
+.alert-modal-placeit {
+    font-size: 1rem;
+    text-align: center;
+    background-color: #f0f0f5;
+    padding: 10px;
+    border-radius: 12px;
+    color: #333;
 }

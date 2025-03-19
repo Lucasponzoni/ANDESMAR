@@ -88,8 +88,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 const paymentData = Array.isArray(data.payments) && data.payments.length > 0 ? data.payments[0] : {};
                                 const id = data.idOperacion; 
                                 return {
-                                    id: childSnapshot.key,
-                                    idOperacion: child(snapshot.key()),
+                                    id: id,
+                                    idOperacion: id,
                                     Altura: data.Altura,
                                     Calle: data.Calle,
                                     Cantidad: data.Cantidad,
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-// FIN QUERYDE DATOS
+// FIN QUERY DE DATOS
 
 // Inicializa el segundo proyecto
 const app2 = firebase.initializeApp(firebaseConfig2, "app2");
@@ -462,16 +462,16 @@ const paymentHTML = `
             
                 </div>
 
+                ${carouselHTML}
+                <div class="macos-style">
+                <i class="bi bi-bag-fill mr-1"></i>Producto: X <strong>${data.Cantidad}</strong>u. <strong>${data.SKU}</strong>
+                </div>
+
                 <div class="cliente-Container" onclick="copiarCliente('${data.cliente}')">
                 <div class="cliente ${!data.cliente ? 'hidden' : ''}">
                 <img src="Img/logo-presea.png" alt="PRESEA" width="20">
                 Cliente Presea: <strong id="nombre-cliente">${data.cliente}</strong> 
                 </div>
-                </div>
-
-                ${carouselHTML}
-                <div class="macos-style">
-                Producto: X ${data.Cantidad} ${data.SKU}
                 </div>
                 
                 <div class="em-circle-${data.shippingMode.toLowerCase() === 'me1' ? 'ME1' : 'ME2'}">${data.shippingMode.toUpperCase()}</div>
@@ -1059,6 +1059,8 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             estado: "Envio Express PlaceIt",
             fechaHora: fechaHora,
             operadorLogistico: "PlaceIt",
+            remitoDigital: 0,
+            email: email,
             remito: numeroRemito,
             numeroDeEnvio: 123456,
             remitoVBA: numeroRemito,
