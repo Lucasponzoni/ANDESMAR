@@ -296,7 +296,7 @@ function calcularPorcentajes(data) {
     document.getElementById('andreaniPorcentaje').innerHTML = `
     <img src="./Img/andreani-mini.png" alt="Andreani" class="gray-filter"> 
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">Andreani: ${andreaniPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">Andreani: <span class="porcentaje-resaltado">${andreaniPorcentaje}%</span></span>
     </div>
     <span class="ml-1 conteo-Andreani" style="font-size: 0.9em;">${countAndreani} despachos</span>
     <div class="pie-chart" style="--percentage: ${andreaniPorcentaje}; --color: #dc3545;"></div>
@@ -305,7 +305,7 @@ function calcularPorcentajes(data) {
     document.getElementById('andesmarPorcentaje').innerHTML = `
     <img src="./Img/andesmar-mini.png" alt="Andesmar" class="gray-filter">  
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">Andesmar: ${andesmarPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">Andesmar: <span class="porcentaje-resaltado">${andesmarPorcentaje}%</span></span>
     </div>
         <span class="ml-1 conteo-andesmar" style="font-size: 0.9em;">${countAndesmar} despachos</span>
         <div class="pie-chart" style="--percentage: ${andesmarPorcentaje}; --color: #007bff;"></div>
@@ -314,7 +314,7 @@ function calcularPorcentajes(data) {
     document.getElementById('cruzDelSurPorcentaje').innerHTML = `
     <img src="./Img/cds-mini.png" alt="Cruz del Sur" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">CDS: ${cruzDelSurPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">CDS: <span class="porcentaje-resaltado">${cruzDelSurPorcentaje}%</span></span>
     </div>
         <span class="ml-1 conteo-cds" style="font-size: 0.9em;">${countCruzDelSur} despachos</span>
         <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #003366;"></div>
@@ -323,7 +323,7 @@ function calcularPorcentajes(data) {
     document.getElementById('ocaPorcentaje').innerHTML = `
     <img src="./Img/oca-mini.png" alt="OCA" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">OCA: ${ocaPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">OCA: <span class="porcentaje-resaltado">${ocaPorcentaje}%</span></span>
     </div>
         <span class="ml-1 conteo-oca" style="font-size: 0.9em;">${countOca} despachos</span>
         <div class="pie-chart" style="--percentage: ${ocaPorcentaje}; --color: #5B2B82;"></div>
@@ -333,9 +333,8 @@ function calcularPorcentajes(data) {
     document.getElementById('placeItPorcentaje').innerHTML = `
     <img src="./Img/placeit-mini2.png" alt="PlaceIt" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">PlaceIt: ${placeItPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">PlaceIt: <span class="porcentaje-resaltado">${placeItPorcentaje}%</span></span>
     </div>
-        <span class="ml-1 conteo-placeit" style="font-size: 0.9em;">${countPlaceIt} despachos</span>
         <div class="pie-chart" style="--percentage: ${placeItPorcentaje}; --color: #ff0078;"></div>
     `;
 

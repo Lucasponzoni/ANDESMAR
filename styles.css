@@ -6824,3 +6824,10 @@ img.gray-filter {
     border-radius: 12px;
     color: #333;
 }
+
+.porcentaje-resaltado{
+    font-size: 1.2rem;
+    font-weight: 500;
+    font-family: "Rubik", sans-serif !important;
+    color: grey;
+}

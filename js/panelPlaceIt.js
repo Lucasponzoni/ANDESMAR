@@ -256,9 +256,6 @@ function calcularPorcentajes(data) {
         if (itemDate >= thirtyDaysAgo && item.numeroDeEnvio) {
             const numeroDeEnvio = item.numeroDeEnvio;
 
-            // Imprimir el objeto para verificar su estructura
-            console.log(item);
-
             // Contar envíos si existe "subdato" y no existen subdatos adicionales
             if (item.subdato && !item.subdato2 && !item.subdato3 && !item.subdato4) {
                 countAndreani++;
@@ -302,7 +299,7 @@ function calcularPorcentajes(data) {
     document.getElementById('andreaniPorcentaje').innerHTML = `
     <img src="./Img/placeit-mini-white.png" alt="Andreani" class="gray-filter"> 
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">Sin Reparto: <br> ${andreaniPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">Sin Reparto: <br> <span class="porcentaje-resaltado">${andreaniPorcentaje}%</span></span>
     </div>
     <span class="ml-1 conteo-Andreani" style="font-size: 0.9em;">${countAndreani} despachos</span>
     <div class="pie-chart" style="--percentage: ${andreaniPorcentaje}; --color: #dc3545;"></div>
@@ -311,7 +308,7 @@ function calcularPorcentajes(data) {
     document.getElementById('andesmarPorcentaje').innerHTML = `
     <img src="./Img/placeit-mini-white.png" alt="Andesmar" class="gray-filter">  
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">En reparto: <br> ${andesmarPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">En reparto: <br> <span class="porcentaje-resaltado">${andesmarPorcentaje}%</span></span>
     </div>
         <span class="ml-1 conteo-andesmar" style="font-size: 0.9em;">${countAndesmar} despachos</span>
         <div class="pie-chart" style="--percentage: ${andesmarPorcentaje}; --color: #00A2FFFF;"></div>
@@ -320,7 +317,7 @@ function calcularPorcentajes(data) {
     document.getElementById('cruzDelSurPorcentaje').innerHTML = `
     <img src="./Img/placeit-mini-white.png" alt="Cruz del Sur" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">Sin remito: <br> ${cruzDelSurPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">Sin remito: <br> <span class="porcentaje-resaltado">${cruzDelSurPorcentaje}%</span></span>
     </div>
         <span class="ml-1 conteo-cds" style="font-size: 0.9em;">${countCruzDelSur} despachos</span>
         <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #FF8C00FF;"></div>
@@ -329,7 +326,7 @@ function calcularPorcentajes(data) {
     document.getElementById('ocaPorcentaje').innerHTML = `
     <img src="./Img/placeit-mini-white.png" alt="OCA" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">1º Contacto: <br> ${ocaPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">1º Contacto: <br> <span class="porcentaje-resaltado">${ocaPorcentaje}%</span></span>
     </div>
         <span class="ml-1 conteo-oca" style="font-size: 0.9em;">${countOca} despachos</span>
         <div class="pie-chart" style="--percentage: ${ocaPorcentaje}; --color: #71C200FF;"></div>
@@ -339,7 +336,7 @@ function calcularPorcentajes(data) {
     document.getElementById('placeItPorcentaje').innerHTML = `
     <img src="./Img/placeit-mini-white.png" alt="PlaceIt" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">2º Contacto: <br> ${placeItPorcentaje}%</span>
+        <span class="ml-1" style="font-weight: bold;">2º Contacto: <br> <span class="porcentaje-resaltado">${placeItPorcentaje}%</span></span>
     </div>
         <span class="ml-1 conteo-placeit" style="font-size: 0.9em;">${countPlaceIt} despachos</span>
         <div class="pie-chart" style="--percentage: ${placeItPorcentaje}; --color: #65AD00FF;"></div>
