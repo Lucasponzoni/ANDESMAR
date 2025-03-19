@@ -348,7 +348,7 @@ function calcularPorcentajes(data) {
     document.getElementById('estadisticas-header').innerHTML = `<i class="bi bi-info-circle-fill"></i> Estadísticas de los últimos 30 días sobre <strong>${totalEnvios} Envios</strong>`
 
     document.getElementById('estadisticas-2').innerHTML = `<i class="bi bi-clipboard2-pulse-fill ml-1"></i> Eficacia de entrega en <strong class="ml-1">${totalPost} Envios</strong>`
-    document.getElementById('estadisticas-1').innerHTML = `<i class="bi bi-clipboard2-pulse-fill ml-1"></i> Estadisticas Pre-Entrega <strong class="ml-1">${totalPre} Envios</strong>`
+    document.getElementById('estadisticas-1').innerHTML = `<i class="bi bi-clipboard2-pulse-fill ml-1"></i> Estadisticas Pre-Entrega en <strong class="ml-1">${totalPre} Envios</strong>`
 }
 
 function eliminarFila(button) {
