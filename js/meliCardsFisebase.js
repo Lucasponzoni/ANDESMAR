@@ -2915,9 +2915,13 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                 </div>
                 <div class="campo">
                     <span>Teléfono: ${telefonoDestinatario}</span>
+                </div>
+                <div class="campo">
+                    <span>Autorizado: ${recibe}</span>
+                </div>
+                <div class="campo">
+                    <span>Observaciones: ${observaciones}</span>
                 </div>`;
-
-                
 
         // Agregar información sobre el camión
         contenido += `<div class="campo"><strong>DIA DE VENCIMIENTO: ${diaFormateado}</strong></div>`;
@@ -2926,13 +2930,11 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 
         contenido += `
                 <div class="campo-extra">
-                    <p><strong>Operación: ${idOperacionsSinMe1}</strong></p>
-                </div>
-                <div class="campo-extra">
                     <img src="${barcodeBase64}" alt="Código de Barras" />
                 </div>
                 <div class="contacto">
                     <hr>
+                    <p><strong>Operación: ${idOperacionsSinMe1}</strong></p>
                     <p><strong>💬 Posventa:</strong> (0341) 6680658 (WhatsApp)</p>
                     <p><strong>📧 Email:</strong> posventa@novogar.com.ar</p>
                 </div>
