@@ -344,6 +344,8 @@ function calcularPorcentajes(data) {
         <span class="ml-1"><i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i> Pendientes:</span> <span class="pill-preparacion">${countPendientes}</span> en preparación
     </div>
     `;
+
+    document.getElementById('estadisticas-header').innerHTML = `<i class="bi bi-info-circle-fill"></i> Estadísticas de los últimos 30 días sobre <strong>${totalEnvios} Envios</strong>`
 }
 
 function eliminarFila(button) {

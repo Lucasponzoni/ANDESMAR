@@ -288,6 +288,8 @@ function calcularPorcentajes(data) {
     });
 
     const totalEnvios = countAndreani + countAndesmar + countCruzDelSur + countOca + countPlaceIt;
+    const totalPre = countAndreani + countAndesmar + countCruzDelSur;
+    const totalPost = countOca + countPlaceIt;
 
     // Calcular porcentajes
     const andreaniPorcentaje = totalEnvios > 0 ? ((countAndreani / totalEnvios) * 100).toFixed(2) : 0;
@@ -321,7 +323,7 @@ function calcularPorcentajes(data) {
         <span class="ml-1" style="font-weight: bold;">Sin remito: <br> ${cruzDelSurPorcentaje}%</span>
     </div>
         <span class="ml-1 conteo-cds" style="font-size: 0.9em;">${countCruzDelSur} despachos</span>
-        <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #FFAE00FF;"></div>
+        <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #FF8C00FF;"></div>
     `;
 
     document.getElementById('ocaPorcentaje').innerHTML = `
@@ -344,6 +346,9 @@ function calcularPorcentajes(data) {
     `;
 
     document.getElementById('estadisticas-header').innerHTML = `<i class="bi bi-info-circle-fill"></i> Estadísticas de los últimos 30 días sobre <strong>${totalEnvios} Envios</strong>`
+
+    document.getElementById('estadisticas-2').innerHTML = `<i class="bi bi-clipboard2-pulse-fill ml-1"></i> Eficacia de entrega en <strong class="ml-1">${totalPost} Envios</strong>`
+    document.getElementById('estadisticas-1').innerHTML = `<i class="bi bi-clipboard2-pulse-fill ml-1"></i> Estadisticas Pre-Entrega <strong class="ml-1">${totalPre} Envios</strong>`
 }
 
 function eliminarFila(button) {
@@ -1446,7 +1451,8 @@ function uploadFile(remitoFotoRef, fotoInput, remito) {
         uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
             const remitoRef = firebase.database().ref(`DespachosLogisticos/${remito}`);
             remitoRef.update({
-                fotoURL: downloadURL
+                fotoURL: downloadURL,
+                remitoDigital: 1,
             }).then(() => {
                 document.getElementById('scanRemitoForm').reset();
                 loadingSpinner.style.display = 'none';

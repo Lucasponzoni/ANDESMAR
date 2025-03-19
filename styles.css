@@ -6035,7 +6035,7 @@ button.btn.disabled, .btn:disabled {
 }
 
 .percentage-card2:hover{
-    background: linear-gradient(to bottom, #ffffff, rgba(0, 51, 102, 0.7))!important;
+    background: linear-gradient(to bottom, #ffffff, rgba(0, 51, 102, 0.5))!important;
 }
 
 .conteo-Andreani{
