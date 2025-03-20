@@ -265,9 +265,15 @@ function calcularPorcentajes(data) {
                     countCruzDelSur++;
                 } else if (numeroDeEnvio.length === 19 && numeroDeEnvio.startsWith('4')) { 
                     countOca++;
-                } else if (item.operadorLogistico !== "PlaceIt") { 
-                    countAndesmar++;
-                }
+                } else if (item.operadorLogistico !== "PlaceIt" && 
+                    item.operadorLogistico !== "Logística Novogar StaFe" && 
+                    item.operadorLogistico !== "Logística Novogar Rafaela" && 
+                    item.operadorLogistico !== "Logística Novogar BsAs" && 
+                    item.operadorLogistico !== "Logística Novogar SanNicolas" && 
+                    item.operadorLogistico !== "Logística Novogar") {
+               countAndesmar++;
+           }
+           
             }
         
             // Contar envíos de PlaceIt
