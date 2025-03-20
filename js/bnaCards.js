@@ -695,7 +695,7 @@ const cpsPlaceIt = [
     1843, 1844, 1845, 1846, 1847, 1848, 1849, 1850, 1851, 1852, 1853, 1854, 1855, 1856, 1857, 1858, 1859, 1860, 1861,
     1862, 1863, 1864, 1865, 1866, 1867, 1868, 1869, 1870, 1871, 1872, 1873, 1874, 1875, 1876, 1877, 1878, 1879, 1880,
     1881, 1882, 1883, 1884, 1885, 1886, 1887, 1888, 1889, 1890, 1891, 1892, 1893, 1894, 1895, 1896, 1897, 1898, 1900,
-    1901, 1902, 1903, 1904, 1905, 1906, 1907, 1908, 1910, 1912, 1914, 1916, 2610, 2760
+    1901, 1902, 1903, 1904, 1905, 1906, 1907, 1908, 1910, 1912, 1914, 1916, 2610, 2760, 1420
 ];
 
     function renderCards(data) {
@@ -926,12 +926,12 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="tipo_entrega_${data[i].id}">Tipo de Entrega:</label>
-                                <input type="text" id="tipo_entrega_${data[i].id}" value="${isMacro(storeCode) ? '41' : '33'}" disabled>
+                                <input type="text" id="tipo_entrega_${data[i].id}" value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) ? '40' : (isMacro(storeCode) ? '41' : '33')}" disabled>
                             </div>
 
                             <div class="col">
                                 <label for="deposito_${data[i].id}">Depósito:</label>
-                                <input type="text" id="deposito_${data[i].id}" value="9" disabled>
+                                <input type="text" id="deposito_${data[i].id}"value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) ? '60' : '9'}" disabled>
                             </div>
                         </div>
                         <div class="row mb-2">
