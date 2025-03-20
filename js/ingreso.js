@@ -466,48 +466,48 @@ function renderCards(data) {
                 let link, imgSrc;
             
             // Verificar si el operador logístico es "PlaceIt"
-                if (item.operadorLogistico === "PlaceIt" && item.estado === "Envio Express PlaceIt") {
-                    imgSrc = './Img/placeit-mini.png';
-                    operadorLogistico = `<a class="btn-ios btn-placeit" disabled><img src="${imgSrc}" alt="PlaceIt" class="img-transporte"></a>`;
-                } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
-                           (numeroDeEnvio.length === 15 && (numeroDeEnvio.startsWith('36') || numeroDeEnvio.startsWith('40')))) {
-                    link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
-                    imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
-                    operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
-                } else if (numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) {
-                    const numeroDeEnvioCorto = numeroDeEnvio.slice(0, -1);
-                    link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvioCorto}`;
-                    imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
-                    operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
-                } else if (numeroDeEnvio.length === 19) {
-                    link = `https://www.aftership.com/es/track/oca-ar/${numeroDeEnvio}`; // Reemplaza con la URL correspondiente
-                    imgSrc = './Img/oca-mini.png'; // Ruta de la imagen
-                    operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-oca2"><img src="${imgSrc}" alt="Oca" class="img-transporte"></a>`;
-                } else if (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1')) {
-                    link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvio}`;
-                    imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
-                    operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
-                } else {
-                    link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=remito`;
-                    imgSrc = './Img/andesmar-mini.png'; // Ruta de la imagen
-                    operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
-                }
+            if (item.operadorLogistico === "PlaceIt" && item.estado === "Envio Express PlaceIt") {
+                imgSrc = './Img/placeit-mini.png';
+                operadorLogistico = `<a class="btn-ios btn-placeit" onclick="abrirModalTimeline('${remito}')"><img src="${imgSrc}" alt="PlaceIt" class="img-transporte"></a>`;
+            } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
+                       (numeroDeEnvio.length === 15 && (numeroDeEnvio.startsWith('36') || numeroDeEnvio.startsWith('40')))) {
+                link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
+                imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
+            } else if (numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) {
+                const numeroDeEnvioCorto = numeroDeEnvio.slice(0, -1);
+                link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvioCorto}`;
+                imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
+            } else if (numeroDeEnvio.length === 19) {
+                link = `https://www.aftership.com/es/track/oca-ar/${numeroDeEnvio}`; // Reemplaza con la URL correspondiente
+                imgSrc = './Img/oca-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-oca2"><img src="${imgSrc}" alt="Oca" class="img-transporte"></a>`;
+            } else if (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1')) {
+                link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvio}`;
+                imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-cds"><img src="${imgSrc}" alt="Cruz del Sur" class="img-transporte"></a>`;
             } else {
-                // Si el operador logístico es "Logística Novogar"
-                if (item.operadorLogistico === "Logística Novogar") {
-                    operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
-                } else if (item.operadorLogistico === "Logística Novogar StaFe") {
-                    operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
-                } else if (item.operadorLogistico === "Logística Novogar Rafaela") {
-                    operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
-                } else if (item.operadorLogistico === "Logística Novogar BsAs") {
-                    operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
-                } else if (item.operadorLogistico === "Logística Novogar SanNicolas") {
-                    operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> San Nicolás</button>`;
-                } else {
-                    operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
-                }
-            }                                 
+                link = `https://andesmarcargas.com/seguimiento.html?numero=${numeroDeEnvio}&tipo=remito`;
+                imgSrc = './Img/andesmar-mini.png'; // Ruta de la imagen
+                operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andesmar"><img src="${imgSrc}" alt="Andesmar" class="img-transporte"></a>`;
+            }
+        } else {
+            // Si el operador logístico es "Logística Novogar"
+            if (item.operadorLogistico === "Logística Novogar") {
+                operadorLogistico = `<button class="btn-ios btn-novogar" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Novogar</button>`;
+            } else if (item.operadorLogistico === "Logística Novogar StaFe") {
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Santa Fé</button>`;
+            } else if (item.operadorLogistico === "Logística Novogar Rafaela") {
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Rafaela</button>`;
+            } else if (item.operadorLogistico === "Logística Novogar BsAs") {
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> Buenos Aires</button>`;
+            } else if (item.operadorLogistico === "Logística Novogar SanNicolas") {
+                operadorLogistico = `<button class="btn-ios btn-novogar2" onclick="generarPDF('${remito}', '${item.cliente}', '${item.estado}', '${item.operadorLogistico}',this)"><img class="NovogarMeli2" src="Img/novogar-tini.png" alt="Novogar"> San Nicolás</button>`;
+            } else {
+                operadorLogistico = item.operadorLogistico; // Mostrar el operador logístico original
+            }
+        }                                 
 
         // Agregar estilo e ícono si el estado inicia con "(se entrega entre"
         const entregaEntreClass = item.estado.startsWith("(se entrega entre") ? "estado-entrega" : "";
@@ -515,9 +515,54 @@ function renderCards(data) {
 
         const comentarioClase = item.comentario ? 'btn-success' : 'btn-secondary';
 
-        let subdatoTexto = item.subdato ? 
-            `<br><span class="${item.subdato.startsWith('Pendiente de confirmar') ? 'subdato-texto1' : 'subdato-texto2'}">${item.subdato}</span>` : '';
+        let subdatoTexto = '';
+        let ultimoSubdato = null;
+        let ultimoSubdatoFecha = null;
+        let numeroDeVisita = 0; 
         
+
+        for (let i = 0; i <= 10; i++) { 
+            const subdatoKey = i === 0 ? 'subdato' : `subdato${i}`; 
+            const subdatoFechaKey = i === 0 ? 'subdatoFecha' : `subdato${i}Fecha`;
+        
+            if (item[subdatoKey]) {
+                ultimoSubdato = item[subdatoKey];
+                ultimoSubdatoFecha = item[subdatoFechaKey] || ''; 
+                numeroDeVisita = i; 
+            }
+        }
+        
+        // Verificar si hay un último subdato
+        if (ultimoSubdato) {
+            if (ultimoSubdato.startsWith('Plazo de entrega entre')) {
+                subdatoTexto = `
+                    <br>
+                    <span class="subdato-texto2">
+                        <i class="bi bi-clock-history"></i> ${ultimoSubdato} ${ultimoSubdatoFecha}
+                    </span>
+                `;
+            } else if (ultimoSubdato.startsWith('En reparto')) {
+                const visitaTexto = numeroDeVisita > 1 ? `(VISITA ${numeroDeVisita - 1})` : ''; 
+                subdatoTexto = `
+                    <br>
+                    <span class="subdato-texto4">
+                        <i class="bi bi-send-fill"></i> ${ultimoSubdato} ${visitaTexto} ${ultimoSubdatoFecha}hs.
+                    </span>
+                `;
+            } else if (ultimoSubdato.startsWith('Te visitamos pero')) {
+                subdatoTexto = `
+                    <br>
+                    <span class="subdato-texto5">
+                        <i class="bi bi-exclamation-circle-fill"></i> ${ultimoSubdato} ${ultimoSubdatoFecha}hs.
+                    </span>
+                `;
+            } else {
+                console.warn(`El subdato no coincide con ninguna condición:`, ultimoSubdato);
+            }
+        } else {
+            console.warn(`No se encontró ningún subdato para el item:`, item);
+        }
+
         // Verificar si existe item.fotoURL y crear el botón de descarga
         let remitoColumna = remito;
         if (item.fotoURL) {
@@ -542,6 +587,85 @@ function renderCards(data) {
 
         tableBody.insertAdjacentHTML('beforeend', row);
     }
+    
+}
+
+function abrirModalTimeline(remito) {
+    const timelineContent = document.getElementById('timelineContent');
+    const spinner = document.getElementById('timelineSpinner');
+
+    // Mostrar el spinner y ocultar el contenido
+    timelineContent.innerHTML = ''; // Limpiar contenido previo
+
+    // Buscar el remito en Firebase
+    db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remito).once('value', (snapshot) => {
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const item = childSnapshot.val();
+
+                const timeline = [];
+
+                // Agregar estado inicial
+                timeline.push(`
+                    <li class="timeline-placeit-item">
+                        <div class="timeline-placeit-item-title">${item.estado}</div>
+                        <div class="timeline-placeit-item-date">${formatDateTime(item.fechaHora)}</div>
+                    </li>
+                `);
+
+                // Agregar subdato inicial
+                if (item.subdato) {
+                    timeline.push(`
+                        <li class="timeline-placeit-item">
+                            <div class="timeline-placeit-item-title">${item.subdato}</div>
+                            <div class="timeline-placeit-item-date">${formatDateTime(item.subdatoFecha || item.fechaHora)}</div>
+                        </li>
+                    `);
+                }
+
+                // Agregar subdatos en orden
+                for (let i = 2; i <= 10; i++) {
+                    const subdatoKey = `subdato${i}`;
+                    const subdatoFechaKey = `subdato${i}Fecha`;
+                    if (item[subdatoKey]) {
+                        timeline.push(`
+                            <li class="timeline-placeit-item">
+                                <div class="timeline-placeit-item-title">${item[subdatoKey]}</div>
+                                <div class="timeline-placeit-item-date">${formatDateTime(item[subdatoFechaKey] || item.fechaHora)}</div>
+                            </li>
+                        `);
+                    }
+                }
+
+                // Agregar estado final si hay fotoURL
+                if (item.fotoURL) {
+                    timeline.push(`
+                        <li class="timeline-placeit-item">
+                            <div class="timeline-placeit-item-title">Envío entregado con éxito</div>
+                            <div class="timeline-placeit-item-date">Remito disponible</div>
+                            <div class="timeline-placeit-item-content">
+                                <button class="timeline-placeit-item-button" onclick="abrirFoto('${item.fotoURL}')">Ver Remito</button>
+                            </div>
+                        </li>
+                    `);
+                }
+
+                // Insertar la línea de tiempo en el modal
+                timelineContent.innerHTML = `<ul class="timeline-placeit">${timeline.join('')}</ul>`;
+
+                timelineContent.style.display = 'block';
+
+                // Mostrar el modal
+                const modal = new bootstrap.Modal(document.getElementById('timelineModal'));
+                modal.show();
+            });
+        } else {
+            Swal.fire('Error', 'No se encontraron datos para este remito.', 'error');
+        }
+    }).catch((error) => {
+        console.error('Error al buscar el remito en Firebase:', error);
+        Swal.fire('Error', 'Ocurrió un error al buscar el remito.', 'error');
+    });
 }
 
 // Función para abrir la foto en una nueva pestaña
