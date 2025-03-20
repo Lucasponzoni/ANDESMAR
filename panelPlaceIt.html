@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Signika:wght@300..700&family=Titan+One&display=swap" rel="stylesheet">
     
     <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="./Img/caja.png">
@@ -432,6 +433,30 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Línea de Tiempo -->
+<div class="modal fade" id="timelineModal" tabindex="-1" aria-labelledby="timelineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-light text-dark">
+            <div class="modal-header bg-light text-dark">
+                <h5 class="modal-title text-dark" id="timelineModalLabel">Línea de Tiempo PlaceIt</h5>
+            </div>
+            <div class="modal-body">
+                <ul id="timelineContent" class="timeline" style="display: none; list-style: none; padding: 0; margin: 0;">
+                    <!-- Los estados se agregarán dinámicamente aquí -->
+                </ul>
+            </div>
+
+            <div class="modal-footer d-flex justify-content-center">
+                <div class="alert-modal-Pi text-center">
+                    <span>Para cerrar haga click fuera de la ventana</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Fin Modal Línea de Tiempo -->
 
 <!-- Modal Comentario -->
 <div class="modal fade" id="comentarioModal" tabindex="-1" aria-labelledby="comentarioModalLabel" aria-hidden="true">

@@ -572,7 +572,7 @@ function renderCards(data) {
             // Verificar si el operador logístico es "PlaceIt"
                 if (item.operadorLogistico === "PlaceIt" && item.estado === "Envio Express PlaceIt") {
                     imgSrc = './Img/placeit-mini.png';
-                    operadorLogistico = `<a class="btn-ios btn-placeit" disabled><img src="${imgSrc}" alt="PlaceIt" class="img-transporte"></a>`;
+                    operadorLogistico = `<a class="btn-ios btn-placeit" onclick="abrirModalTimeline('${remito}')"><img src="${imgSrc}" alt="PlaceIt" class="img-transporte"></a>`;
                 } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
                            (numeroDeEnvio.length === 15 && (numeroDeEnvio.startsWith('36') || numeroDeEnvio.startsWith('40')))) {
                     link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
@@ -691,6 +691,85 @@ function renderCards(data) {
 
         tableBody.insertAdjacentHTML('beforeend', row);
     }
+    
+}
+
+function abrirModalTimeline(remito) {
+    const timelineContent = document.getElementById('timelineContent');
+    const spinner = document.getElementById('timelineSpinner');
+
+    // Mostrar el spinner y ocultar el contenido
+    timelineContent.innerHTML = ''; // Limpiar contenido previo
+
+    // Buscar el remito en Firebase
+    db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remito).once('value', (snapshot) => {
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const item = childSnapshot.val();
+
+                const timeline = [];
+
+                // Agregar estado inicial
+                timeline.push(`
+                    <li class="timeline-placeit-item">
+                        <div class="timeline-placeit-item-title">${item.estado}</div>
+                        <div class="timeline-placeit-item-date">${formatDateTime(item.fechaHora)}</div>
+                    </li>
+                `);
+
+                // Agregar subdato inicial
+                if (item.subdato) {
+                    timeline.push(`
+                        <li class="timeline-placeit-item">
+                            <div class="timeline-placeit-item-title">${item.subdato}</div>
+                            <div class="timeline-placeit-item-date">${formatDateTime(item.subdatoFecha || item.fechaHora)}</div>
+                        </li>
+                    `);
+                }
+
+                // Agregar subdatos en orden
+                for (let i = 2; i <= 10; i++) {
+                    const subdatoKey = `subdato${i}`;
+                    const subdatoFechaKey = `subdato${i}Fecha`;
+                    if (item[subdatoKey]) {
+                        timeline.push(`
+                            <li class="timeline-placeit-item">
+                                <div class="timeline-placeit-item-title">${item[subdatoKey]}</div>
+                                <div class="timeline-placeit-item-date">${formatDateTime(item[subdatoFechaKey] || item.fechaHora)}</div>
+                            </li>
+                        `);
+                    }
+                }
+
+                // Agregar estado final si hay fotoURL
+                if (item.fotoURL) {
+                    timeline.push(`
+                        <li class="timeline-placeit-item">
+                            <div class="timeline-placeit-item-title">Envío entregado con éxito</div>
+                            <div class="timeline-placeit-item-date">Remito disponible</div>
+                            <div class="timeline-placeit-item-content">
+                                <button class="timeline-placeit-item-button" onclick="abrirFoto('${item.fotoURL}')">Ver Remito</button>
+                            </div>
+                        </li>
+                    `);
+                }
+
+                // Insertar la línea de tiempo en el modal
+                timelineContent.innerHTML = `<ul class="timeline-placeit">${timeline.join('')}</ul>`;
+
+                timelineContent.style.display = 'block';
+
+                // Mostrar el modal
+                const modal = new bootstrap.Modal(document.getElementById('timelineModal'));
+                modal.show();
+            });
+        } else {
+            Swal.fire('Error', 'No se encontraron datos para este remito.', 'error');
+        }
+    }).catch((error) => {
+        console.error('Error al buscar el remito en Firebase:', error);
+        Swal.fire('Error', 'Ocurrió un error al buscar el remito.', 'error');
+    });
 }
 
 // Función para abrir la foto en una nueva pestaña

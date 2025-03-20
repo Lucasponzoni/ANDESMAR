@@ -4023,12 +4023,11 @@ div .form-check {
 .btn-placeit {
     background: linear-gradient(135deg, #0055a9, #7A3E99);
     color: white; 
-    cursor: not-allowed;
 }
 
-.btn-placeit:hover {
+/*.btn-placeit:hover {
     cursor: not-allowed;
-}
+}*/
 
 .btn-novogar {
     background: linear-gradient(135deg, #717171, #323232); 
@@ -6855,9 +6854,140 @@ img.gray-filter {
     color: #333;
 }
 
+.alert-modal-Pi {
+    background-color: #007aff;
+    padding: 10px;
+    color: white;
+    border-radius: 5px;
+    width: fit-content;
+}
+
 .porcentaje-resaltado{
     font-size: 1.2rem;
     font-weight: 500;
     font-family: "Rubik", sans-serif !important;
     color: grey;
 }
+
+/* Estilo para la línea de tiempo PlaceIt*/
+.timeline {
+  position: relative;
+  padding-left: 30px;
+  margin: 20px 0;
+  list-style: none;
+  border-left: 0px solid #d1d1d6; 
+}
+
+.timeline-placeit {
+    position: relative;
+    padding-left: 30px;
+    margin: 20px 0;
+    list-style: none;
+    border-left: 0px solid #d1d1d6; 
+}
+
+.timeline-placeit-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.timeline-placeit-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -24px;
+    top: -20px;
+    width: 30px;
+    height: 30px;
+    background-color: orangered; 
+    border: 1px solid white; 
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+    z-index: 1;
+}
+
+/* Ícono de reloj para todos los elementos excepto el último */
+.timeline-placeit-item:not(:last-child)::before {
+    content: '\f017'; 
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900; 
+    color: white; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.timeline-placeit-item:last-child::before {
+    font-weight: 900; 
+    content: ''; 
+    color: white;
+    background-color: green;
+}
+
+.timeline-placeit-item-title {
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.timeline-placeit-item-date {
+    font-size: 0.9rem;
+}
+
+.timeline-placeit-item-content {
+    border-radius: 10px;
+    margin-top: 5px;
+    font-size: 0.9rem;
+}
+
+.timeline-placeit-item-button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 15px;
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.timeline-placeit-item-button:hover {
+    background-color: #005bb5;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .timeline-placeit {
+        padding-left: 20px;
+    }
+
+    .timeline-placeit-item::before {
+        width: 15px;
+        height: 15px;
+        left: -8px;
+    }
+
+    .timeline-placeit-item-title {
+        font-size: 0.9rem;
+    }
+
+    .timeline-placeit-item-date {
+        font-size: 0.8rem;
+    }
+
+    .timeline-placeit-item-content {
+        font-size: 0.8rem;
+    }
+
+    .timeline-placeit-item-button {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
+/* Fin Estilo para la línea de tiempo */
