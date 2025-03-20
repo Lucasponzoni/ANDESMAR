@@ -1254,12 +1254,76 @@ function abrirModalComentario(remito, button) {
                     // Cambiar el color del botón
                     button.classList.remove('btn-secondary');
                     button.classList.add('btn-success');
+
+                    // Enviar correo
+                    const destinatarioEmail = "posventanovogar@gmail.com"; 
+                    const emailOrigen = "info@novogar.com.ar"; 
+                    const emailBody = `Se ha agregado un nuevo comentario en el envio (REMITO ${remito}): ${comentario}`;
+                    const emailSubject = `Hay un nuevo comentario en el envío ${remito} de PlaceIt`;
+
+                    enviarCorreo(destinatarioEmail, emailOrigen, emailBody, emailSubject);
                 }).catch(error => {
                     Swal.fire('Error', 'No se pudo actualizar el comentario: ' + error.message, 'error');
                 });
             });
         });
     };
+}
+
+// Función para enviar el correo
+async function enviarCorreo(destinatarioEmail, emailOrigen, emailBody, emailSubject) {
+    const smtpU = 's154745_3';
+    const smtpP = 'QbikuGyHqJ';
+
+    const emailData = {
+        "Html": {
+            "DocType": null,
+            "Head": null,
+            "Body": emailBody,
+            "BodyTag": "<body>"
+        },
+        "Text": "",
+        "Subject": emailSubject,
+        "From": {
+            "Name": "Posventa Novogar",
+            "Email": emailOrigen
+        },
+        "To": [
+            {
+                "Name": "Cliente",
+                "Email": destinatarioEmail
+            }
+        ],
+        "Cc": [],
+        "Bcc": ["webnovagar@gmail.com", "posventa@novogar.com.ar"],
+        "CharSet": "utf-8",
+        "User": {
+            "Username": smtpU,
+            "Secret": smtpP
+        }
+    };
+
+    try {
+        const response = await fetch('https://proxy.cors.sh/https://send.mailup.com/API/v2.0/messages/sendmessage', {
+            method: 'POST',
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(emailData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al enviar el correo');
+        }
+
+        // Mostrar mensaje en consola y alerta
+        console.log('Correo enviado exitosamente.');
+        showCustomAlert(`<i class="bi bi-envelope-check"></i> Email enviado a Posventa a las ${new Date().toLocaleTimeString()}`);
+
+    } catch (error) {
+        console.error('Error al enviar el correo:', error);
+    }
 }
 
 // Ajustar el tamaño del input de comentario
@@ -1269,7 +1333,6 @@ comentarioInput.addEventListener('input', () => {
     comentarioInput.style.height = 'auto'; // Resetea la altura
     comentarioInput.style.height = `${comentarioInput.scrollHeight}px`; // Ajusta a la altura del contenido
 });
-
 // FIN MODAL COMENTARIO
 
 /*
