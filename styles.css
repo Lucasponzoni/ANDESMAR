@@ -3222,7 +3222,7 @@ div.card-body > p > i{
 /* Círculo numerado */
 .timeline-circle {
     position: absolute;
-    left: -15px;
+    left: -25px;
     display: flex;
     justify-content: center;
     align-items: center;

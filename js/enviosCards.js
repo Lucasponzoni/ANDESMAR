@@ -545,7 +545,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 "NroPedido": nroPedido
             };
 
-            fetch('https://proxy.cors.sh/https://apitest.andesmarcargas.com/api/EstadosHistoricos', {
+            fetch('https://proxy.cors.sh/https://api.andesmarcargas.com/api/EstadosHistoricos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
