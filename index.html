@@ -134,9 +134,12 @@
         <div class="localidad">
             <input type="text" id="localidad" name="localidad" value="" autocomplete="off" placeholder="Localidad" required>
             <span class="clear-button" id="clearButton">✖</span>
-            <div class="spinner2" id="loadingSpinner"></div>
+            <div class="spinner-border text-primary mt-2" id="loadingSpinner" style="display: none; width: 2rem; height: 2rem;" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
             <div class="lista-localidades" id="listaLocalidades"></div>
         </div>
+        
     </div>
 
 
@@ -572,6 +575,7 @@
     <script src="./js/cotizadorAndesmar.js"></script>
     <script src="./js/cotizadorAndreani.js" defer></script>
     <script src="./js/bultos.js"></script>
+    <script src="./js/ciudades.js"></script>
     <script src="./js/localidades.js"></script>
     <script src="./js/trucks.js"></script>
     <script src="./js/script.js"></script>
