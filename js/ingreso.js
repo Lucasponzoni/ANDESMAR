@@ -547,6 +547,13 @@ function renderCards(data) {
                         <i class="bi bi-clock-history"></i> ${ultimoSubdato} ${ultimoSubdatoFecha}
                     </span>
                 `;
+            } else if (ultimoSubdato.startsWith('Pendiente de confirmar')) {
+                subdatoTexto = `
+                    <br>
+                    <span class="subdato-texto1">
+                        <i class="bi bi-clock-history"></i> ${ultimoSubdato}
+                    </span>
+                `;
             } else if (ultimoSubdato.startsWith('En reparto')) {
                 const visitaTexto = numeroDeVisita > 1 ? `(VISITA ${numeroDeVisita - 1})` : ''; 
                 subdatoTexto = `
@@ -577,7 +584,7 @@ function renderCards(data) {
             
             // Si existe item.fotoURL y item.subdato, mostrar subdato específico
             if (item.subdato) {
-                subdatoTexto = `<br><span class="subdato-texto3">Producto entregado, remito disponible</span>`;
+                subdatoTexto = `<br><span class="subdato-texto3"><i class="bi bi-check-circle-fill mr-1"></i>Producto entregado, remito disponible</span>`;
             }
         }
 

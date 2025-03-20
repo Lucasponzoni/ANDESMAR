@@ -675,7 +675,7 @@ function renderCards(data) {
             
             // Si existe item.fotoURL y item.subdato, mostrar subdato específico
             if (item.subdato) {
-                subdatoTexto = `<br><span class="subdato-texto3">Producto entregado, remito disponible</span>`;
+                subdatoTexto = `<br><span class="subdato-texto3"><i class="bi bi-check-circle-fill mr-1"></i>Producto entregado, remito disponible</span>`;
             }
         }
 
