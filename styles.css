@@ -6960,34 +6960,4 @@ img.gray-filter {
 .timeline-placeit-item-button:hover {
     background-color: #005bb5;
 }
-
-/* Responsividad */
-@media (max-width: 768px) {
-    .timeline-placeit {
-        padding-left: 20px;
-    }
-
-    .timeline-placeit-item::before {
-        width: 15px;
-        height: 15px;
-        left: -8px;
-    }
-
-    .timeline-placeit-item-title {
-        font-size: 0.9rem;
-    }
-
-    .timeline-placeit-item-date {
-        font-size: 0.8rem;
-    }
-
-    .timeline-placeit-item-content {
-        font-size: 0.8rem;
-    }
-
-    .timeline-placeit-item-button {
-        font-size: 0.8rem;
-        padding: 6px 12px;
-    }
-}
 /* Fin Estilo para la línea de tiempo */
