@@ -2568,7 +2568,7 @@ const datos = {
     cuotas: document.getElementById(`cuotas_${id}`)?.value || '',
     banco: '',
     tipo_entrega: document.getElementById(`tipo_entrega_${id}`)?.value || '',
-    deposito: document.getElementById(`deposito_${data[i].id}`)?.value || '',
+    deposito: document.getElementById(`deposito_${id}`)?.value || '',
     exportado: '0',
     descuentos: document.getElementById(`descuentos_${id}`)?.value || '',
     fecha_acreditacion: document.getElementById(`fecha_acreditacion_${id}`)?.value || '',
