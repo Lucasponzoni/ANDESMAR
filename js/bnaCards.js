@@ -37,6 +37,7 @@ const obtenerCredencialesCDS = async () => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await obtenerCredencialesCDS();
+    await cargarPrecios();
     await iniciarVerificacion();
 });
 
@@ -395,7 +396,7 @@ function cargarPrecios() {
                         stock: childData.stock
                     });
                 });
-                console.log("Stock Sincronizado");
+                console.log(preciosArray);
             } else {
                 console.log("No hay datos en la ruta especificada.");
             }
@@ -816,36 +817,44 @@ const cpsPlaceIt = [
         const shopCode = data[i].orden_publica_.split('-').pop();
         const shopImage = getShopImage(shopCode);
 
-        // VERIFICAR STOCK Y PRECIO
-        // Función para sanitizar el SKU
-        function sanitizeSku(sku) {
-            return sku.replace(/[^a-zA-Z0-9]/g, ''); // Eliminar caracteres especiales
-        }
+// VERIFICAR STOCK Y PRECIO
+// Función para sanitizar el SKU
+function sanitizeSku(sku) {
+    return sku.replace(/[^a-zA-Z0-9]/g, ''); // Eliminar caracteres especiales
+}
 
-        // Obtener el SKU actual
-        const skuActual = data[i].sku;
+// Obtener el SKU actual
+const skuActual = data[i].sku;
 
-        // Buscar el stock correspondiente en preciosArray
-        const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === sanitizeSku(skuActual));
-        const stock = precioItem ? precioItem.stock : 0; // Si no se encuentra, stock es 0
+// Buscar el stock correspondiente en preciosArray
+const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === sanitizeSku(skuActual));
+const stock = precioItem ? precioItem.stock : 0; // Si no se encuentra, stock es 0
 
-        // Determinar clase de estilo según el stock
-        const stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
-        const stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
-        const stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+// Determinar mensaje y clase de estilo según el stock
+let stockMessage, stockClass, stockIcon;
 
-        // Generar el HTML para el stock con clases CSS
-        let htmlstock = `
-        <div class="container-stock-tv">
-            <div class="status-box-stock-tv">
-                <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
-                <p class="status-text-stock-tv ${stockClass}">
-                ${stockMessage} <strong>${skuActual}</strong>: <strong>${stock}</strong> u.
-                </p>
-            </div>
-        </div>
-        `;
-        // FIN VERIFICAR STOCK Y PRECIO
+if (stock === 0) {
+    stockMessage = 'Sin Stock';
+    stockClass = 'sin-stock';
+    stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+} else {
+    stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
+    stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
+    stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+}
+
+// Generar el HTML para el stock con clases CSS
+let htmlstock = `
+<div class="container-stock-tv">
+    <div class="status-box-stock-tv">
+        <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
+        <p class="status-text-stock-tv ${stockClass}">
+        ${stock === 0 ? stockMessage : `${stockMessage} <strong>${skuActual}</strong>: <strong>${stock}</strong> u.`}
+        </p>
+    </div>
+</div>
+`;
+// FIN VERIFICAR STOCK Y PRECIO
 
         // Agregar la tarjeta al contenedor
         const carritoContenido = data[i].carrito ? `
@@ -1435,8 +1444,8 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
 
                             ${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) 
                                 ? (isMacro(storeCode) 
-                                    ? `<p class="card-text-isNotSkuIncludedPlaceIt"><i class="bi bi-shield-lock-fill"></i> CP <strong>${data[i].cp}</strong> + SKU <strong>${data[i].sku}</strong> Sin envío Express</p>` 
-                                    : `<p class="card-text-isSkuIncludedPlaceIt"><i class="bi bi-lightning-charge-fill"></i> CP <strong>${data[i].cp}</strong> + SKU <strong>${data[i].sku}</strong> Con envío Express</p>`) 
+                                    ? `<p class="card-text-isNotSkuIncludedPlaceIt"><i class="bi bi-shield-lock-fill"></i> CP <strong>${data[i].cp}</strong> + <strong>${data[i].sku}</strong> Sin Express</p>` 
+                                    : `<p class="card-text-isSkuIncludedPlaceIt"><i class="bi bi-lightning-charge-fill"></i> CP <strong>${data[i].cp}</strong> + SKU <strong>${data[i].sku}</strong> Con Express</p>`) 
                                 : ''}                            
                                 
                             ${isSkuIncluded ? `<p class="card-text-isSkuIncluded"><i class="bi bi-lightning-charge-fill"></i> SKU <strong>${data[i].sku}</strong> con imei</p>` : ''}
