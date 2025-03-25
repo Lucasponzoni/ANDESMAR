@@ -890,7 +890,25 @@ const paymentHTML = `
         </span>
         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data.idOperacion}" style="display:none;"></span>
     </button>
-    <!-- Botón Logística Propia --> 
+    <!-- Botón Logística Propia -->
+    
+    <div class="bg-Hr-primary">
+        <p><i class="bi bi-tags-fill"></i> Repuesto Posventa</p>
+    </div>
+
+    <!-- Botón Repuesto Andreani -->
+    <button class="btn ${isAndreani ? 'btn-success' : 'btn-info'} btnAndreaniMeli2 mt-1" 
+            id="andreaniButton2${data.idOperacion}" 
+            onclick="enviarDatosAndreani2(
+                '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '35.0x35.0x35.0', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}')">
+        <span id="andreaniText2${data.idOperacion}">
+            <img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> 
+            Etiqueta Respuesto <strong>Andreani</strong>
+        </span>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani2${data.idOperacion}" style="display:none;"></span>
+    </button>
+    <!-- Botón Repuesto Andreani -->
+
 </div>
                 
                 <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked || isLogPlaceIt || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'background-color: #d0ffd1;' : ''}">
@@ -2049,6 +2067,186 @@ for (let i = 0; i < cantidadFinal; i++) {
         botonCDS.disabled = false;
         buttonAndr.disabled = true;
         resultadoDivAndr.innerText = `Error Andreani: (Puede No existir el CP o Localidad en Andreani) ${error.message}`; 
+    }
+}
+
+async function enviarDatosAndreani2(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe, valor) 
+{    
+    const buttonAndr = document.getElementById(`andreaniButton2${id}`);
+    const spinnerAndr = document.getElementById(`spinnerAndreani2${id}`);
+    const textAndr = document.getElementById(`andreaniText2${id}`);
+    const resultadoDivAndr = document.getElementById(`resultado${id}`);
+
+    console.log('Parámetros enviados a enviarDatosAndreani:');
+    console.log({
+        id,
+        NombreyApellido,
+        Cp,
+        localidad,
+        Provincia,
+        idOperacion,
+        calleDestinatario,
+        alturaDestinatario,
+        telefonoDestinatario,
+        observaciones,
+        peso,
+        volumenCM3,
+        cantidad,
+        medidas,
+        Producto,
+        email,
+        recibe,
+        valor,
+    });
+
+    // Eliminar el prefijo "200000" del idOperacion
+    const idOperacionFinalAndreani = idOperacion.replace(/^20000[0-9]/, '');
+
+    // Mostrar spinner y cambiar texto
+    buttonAndr.disabled = true;
+    spinnerAndr.style.display = 'inline-block';
+    textAndr.innerText = 'Generando Etiqueta...';
+
+    // Dividir medidas para obtener alto, ancho y largo
+    const [largo, ancho, alto] = medidas.split('x').map(Number);
+
+    const token = await getAuthToken();
+
+// Obtener el nombre de la provincia y convertirlo a minúsculas
+const provinciaNombre = Provincia.toLowerCase();
+const regionCodigo = regionMap[provinciaNombre] || ""; // Obtener el código de región
+
+// Inicializar el array de bultos
+const bultos = [];
+const pesoTotal = peso || 0; // Obtener peso total
+const volumenTotal = volumenCM3 || 0; // Obtener volumen total
+
+// Convertir Producto a minúsculas para la verificación
+const productoLowerCase = Producto.toLowerCase();
+
+// Determinar la cantidad a usar
+const cantidadFinal = productoLowerCase.includes("split") || 
+                      productoLowerCase.includes("18000") || 
+                      productoLowerCase.includes("balanceado") ? 
+                      cantidad * 2 : cantidad;
+
+// Desestructurar las medidas y convertir a número
+const [largoAnd, anchoAnd, altoAnd] = medidas.split('x').map(Number);
+
+// Crear los bultos
+for (let i = 0; i < cantidadFinal; i++) {
+    bultos.push({
+        "kilos": pesoTotal,
+        "largoCm": largoAnd,
+        "altoCm": altoAnd,
+        "anchoCm": anchoAnd,
+        "volumenCm": volumenTotal,
+        "valorDeclaradoSinImpuestos": valor / 1.21,
+        "valorDeclaradoConImpuestos": valor,
+        "referencias": [
+            { "meta": "detalle", "contenido": Producto },
+            { "meta": "idCliente", "contenido": (idOperacionFinalAndreani + "-MELI").toUpperCase() },
+            { "meta": "observaciones", "contenido": observaciones }
+        ]
+    });
+}
+
+    const requestData = {
+        "contrato": volumenCM3 > 100000 ? "351003637" : "400017259",
+        "idPedido": (idOperacionFinalAndreani + "-MELI").toUpperCase(),
+        "origen": {
+            "postal": {
+                "codigoPostal": "2126",
+                "calle": "R. Prov. 21 Km",
+                "numero": "4,9",
+                "localidad": "ALVEAR",
+                "region": "AR-S",
+                "pais": "Argentina"
+            }
+        },
+        "destino": {
+            "postal": {
+                "codigoPostal": Cp,
+                "calle": calleDestinatario,
+                "numero": alturaDestinatario,
+                "localidad": localidad,
+                "region": regionCodigo,
+                "pais": "Argentina"
+            }
+        },
+        "remitente": {
+            "nombreCompleto": "NOVOGAR.COM.AR",
+            "email": "posventa@novogar.com.ar",
+            "documentoTipo": "CUIT",
+            "documentoNumero": "30685437011",
+            "telefonos": [{ "tipo": 1, "numero": "3416680658" }]
+        },
+        "destinatario": [{
+            "nombreCompleto": NombreyApellido || recibe,
+            "email": email,
+            "documentoTipo": "CUIT",
+            "documentoNumero": "30685437011",
+            "telefonos": [{ "tipo": 1, "numero": telefonoDestinatario }]
+        }],
+        "remito": {
+            "numeroRemito": (idOperacionFinalAndreani + "-MELI").toUpperCase(),
+        },
+        "bultos": bultos
+    };
+
+    console.log(`Datos enviados a API ANDREANI (MELI ${idOperacionFinalAndreani}):`, requestData);
+
+    try {
+        const response = await fetch(apiUrlLabel, {
+            method: 'POST',
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                'x-authorization-token': token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const numeroDeEnvio = data.bultos[0].numeroDeEnvio;
+
+            console.log(`Datos Respuesta API ANDREANI (MELI ${idOperacionFinalAndreani}):`, response);
+
+            const mensajeClipboard = `Hola ${NombreyApellido.toUpperCase()}, hemos preparado el envío de tu repuesto a través de Correo Andreani. El número de envío generado es ${numeroDeEnvio}. Podrás seguirlo dentro de las próximas 24 horas hábiles ingresando al siguiente enlace: andreani.com/#!/informacionEnvio/${numeroDeEnvio} ¡Gracias por confiar en nosotros! Equipo Posventa Novogar`;
+
+            // Configurar el botón de descarga inicial
+            textAndr.innerHTML = `Orden ${numeroDeEnvio}`;
+            buttonAndr.classList.remove('btn-info');
+            buttonAndr.classList.add('btn-secondary');
+
+            navigator.clipboard.writeText(mensajeClipboard).then(() => {
+                console.log('Mensaje copiado al portapapeles:', mensajeClipboard);
+                showAlert(`Mensaje copiado al portapapeles: ${mensajeClipboard}`);
+            }).catch(err => {
+                console.error('Error al copiar el mensaje:', err);
+            });            
+        
+        // Llamar a la API para obtener la etiqueta
+        await obtenerEtiqueta(numeroDeEnvio, token, buttonAndr);
+
+        buttonAndr.disabled = false;
+
+        } else {
+            console.error('Error al generar la etiqueta:', response.statusText);
+            buttonAndr.classList.remove('btn-info');
+            buttonAndr.innerText = "Error ⚠️"; 
+            resultadoDivAndr.innerText = `Error: ${error.message}`; 
+            buttonAndr.classList.add('btn-danger');
+            buttonAndr.disabled = true;
+        }
+    } catch (error) {
+        console.error('Error al generar la etiqueta:', error);
+        buttonAndr.classList.remove('btn-info');
+        buttonAndr.innerText = "Error Andreani ⚠️"; 
+        buttonAndr.classList.add('btn-danger');
+        resultadoDivAndr.innerText = `Error Andreani: (Puede No existir el CP o Localidad en Andreani) ${error.message}`; 
+        buttonAndr.disabled = true;
     }
 }
 
