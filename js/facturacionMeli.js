@@ -56,7 +56,7 @@ function cargarPrecios() {
                         stock: childData.stock
                     });
                 });
-                console.log(preciosArray);
+                console.log("Stock Sincronizado con éxito.");
             } else {
                 console.log("No hay datos en la ruta especificada.");
             }

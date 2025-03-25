@@ -384,7 +384,7 @@ function lowercaseWords(str) {
 let preciosArray = [];
 
 // Función para cargar precios y stock
-function cargarPrecios() {
+async function cargarPrecios() {
     return dbStock.ref('precios/').once('value')
         .then(preciosSnapshot => {
             // Verificamos si hay datos
@@ -396,7 +396,7 @@ function cargarPrecios() {
                         stock: childData.stock
                     });
                 });
-                console.log(preciosArray);
+                console.log("Stock Sincronizado con éxito.");
             } else {
                 console.log("No hay datos en la ruta especificada.");
             }
@@ -436,9 +436,6 @@ function loadEnviosFromFirebase() {
             skuSnapshot.forEach(childSnapshot => {
                 skusPlaceItList.push(childSnapshot.val().sku);
             });
-
-    // Llamar a la función para cargar precios y stock
-    cargarPrecios();
 
             // Escuchar cambios en 'enviosBNA'
             const databaseRef = firebase.database().ref('enviosBNA');
