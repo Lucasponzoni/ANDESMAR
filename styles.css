@@ -4542,6 +4542,7 @@ background-color: orangered;
     box-shadow: 0 1px 8px rgba(0, 0, 0, 0.4); 
     margin-bottom: 0 !important;
     border-radius: 0 0 10px 10px !important;
+    z-index: 1;
 }
 
 .alerta {
@@ -7043,3 +7044,39 @@ img.gray-filter {
     font-family: "Rubik", sans-serif;
 }
 /* FIN STOCK PRECIO */
+
+.status-box-stock-Facturacion {
+    text-align: center;
+    padding: 3px 12px;
+    display: flex;
+    align-items: center;;
+    justify-content: center;
+    border: 1px solid #ccc;
+    background-color: #ecf0f1;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    z-index: 0;
+    padding-top: 20px;
+    margin-top: -15px;
+    border-radius: 10px;
+}
+
+.stock-normal-stock-Facturacion {
+    color: #34C759;
+    font-family: "Rubik", sans-serif;
+    font-size: .8rem;
+    font-weight: 400;
+}
+
+.stock-bajo-stock-Facturacion {
+    color: #FF3B30;
+    font-family: "Rubik", sans-serif;
+    font-size: .8rem;
+    font-weight: 400;
+}
+
+.sin-stock-Facturacion{
+    color: #FF3B30;
+    font-family: "Rubik", sans-serif;
+    font-size: .8rem;
+    font-weight: 400;
+}

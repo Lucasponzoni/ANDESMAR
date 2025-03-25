@@ -38,6 +38,34 @@ function obtenerSkus() {
 
 // Llama a la función para obtener los SKUs
 obtenerSkus();
+cargarPrecios()
+
+// CARGAR PRECIOS Y STOCK
+let preciosArray = [];
+
+// Función para cargar precios y stock
+function cargarPrecios() {
+    return dbStock.ref('precios/').once('value')
+        .then(preciosSnapshot => {
+            // Verificamos si hay datos
+            if (preciosSnapshot.exists()) {
+                preciosSnapshot.forEach(childSnapshot => {
+                    const childData = childSnapshot.val();
+                    preciosArray.push({
+                        sku: childData.sku,
+                        stock: childData.stock
+                    });
+                });
+                console.log(preciosArray);
+            } else {
+                console.log("No hay datos en la ruta especificada.");
+            }
+        })
+        .catch(error => {
+            console.error("Error al acceder a la base de datos:", error);
+        });
+}
+// FIN CARGAR PRECIOS Y STOCK
 
 let allData = [];
 let currentPage = 1;
@@ -269,6 +297,45 @@ function loadTable(data, estadoFilter = null) {
                         alertContainer.style.display = 'none';
                     }, 3000);
                 }
+
+                // VERIFICAR STOCK Y PRECIO
+                // Función para sanitizar el SKU
+                function sanitizeSku(sku) {
+                    return sku ? sku.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : ''; // Eliminar caracteres especiales y pasar a minúsculas
+                }
+
+                // Obtener el SKU actual
+                const skuActual = sanitizeSku(operation.SKU); // Sanitiza el SKU actual
+
+                // Buscar el stock correspondiente en preciosArray
+                const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === skuActual); // Asegúrate de sanitizar item.sku
+                const stock = precioItem ? precioItem.stock : 0; // Si no se encuentra, stock es 0
+
+                // Determinar mensaje y clase de estilo según el stock
+                let stockMessage, stockClass, stockIcon;
+
+                if (stock === 0) {
+                    stockMessage = 'Sin Stock';
+                    stockClass = 'sin-stock-Facturacion';
+                    stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+                } else {
+                    stockClass = stock < 10 ? 'stock-bajo-stock-Facturacion' : 'stock-normal-stock-Facturacion';
+                    stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
+                    stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+                }
+
+                // Generar el HTML para el stock con clases CSS
+                let htmlstock = `
+                <div class="container-stock-Facturacion">
+                    <div class="status-box-stock-Facturacion">
+                        <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
+                        <p class="status-text-stock-tv ${stockClass}">
+                        ${stock === 0 ? stockMessage : `${stockMessage} <strong>${stock}</strong> u.`}
+                        </p>
+                    </div>
+                </div>
+                `;
+                // FIN VERIFICAR STOCK Y PRECIO
                 
                 // Estado
                 const stateCell = document.createElement('td');
@@ -345,7 +412,7 @@ function loadTable(data, estadoFilter = null) {
                 container.appendChild(idElement);
                 stateCell.appendChild(container);
                 row.appendChild(stateCell);
-    
+
                 const selectElement = document.createElement('select');
                 selectElement.style.width = '100%';
                 
@@ -370,6 +437,11 @@ function loadTable(data, estadoFilter = null) {
                 
                 stateCell.appendChild(container);
                 row.appendChild(stateCell);
+
+                // Crear el div con el contenido `${htmlstock}`
+                const htmlStockDiv = document.createElement('div');
+                htmlStockDiv.innerHTML = `${htmlstock}`;
+                container.appendChild(htmlStockDiv);
                 
                 // Establecer el estado inicial
                 const currentState = operation.estadoFacturacion || 'pendiente';
