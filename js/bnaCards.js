@@ -379,6 +379,33 @@ function lowercaseWords(str) {
     return str ? str.toLowerCase() : ''; // Retornar cadena vacía si str es undefined o null
 }
 
+// CARGAR PRECIOS Y STOCK
+function cargarPrecios() {
+    const preciosArray = [];
+
+    dbStock.ref('precios/').once('value')
+        .then(preciosSnapshot => {
+            // Verificamos si hay datos
+            if (preciosSnapshot.exists()) {
+                preciosSnapshot.forEach(childSnapshot => {
+                    const childData = childSnapshot.val();
+                    preciosArray.push({
+                        sku: childData.sku,
+                        stock: childData.stock
+                    });
+                });
+
+                console.log("Stock Sincronizado"); // Muestra el array con los datos deseados
+            } else {
+                console.log("No hay datos en la ruta especificada.");
+            }
+        })
+        .catch(error => {
+            console.error("Error al acceder a la base de datos:", error);
+        });
+}
+// FIN CARGAR PRECIOS Y STOCK
+
 // CARGAR DATOS DE FIREBASE
 function loadEnviosFromFirebase() {
     const cardsContainer = document.getElementById('meli-cards');
@@ -408,6 +435,9 @@ function loadEnviosFromFirebase() {
             skuSnapshot.forEach(childSnapshot => {
                 skusPlaceItList.push(childSnapshot.val().sku);
             });
+
+    // Llamar a la función para cargar precios y stock
+    cargarPrecios();
 
             // Escuchar cambios en 'enviosBNA'
             const databaseRef = firebase.database().ref('enviosBNA');
