@@ -86,8 +86,8 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
 
         if (activeElement.id === 'remito') {
             const remitoValue = activeElement.value;
-            // Remitos del 230 al 239
-            if (/^23[0-9]\d{8}$/.test(remitoValue)) {
+            // Remitos del 230 al 239 y 254 al 259
+            if (/^(23[0-9]|25[0-9])\d{8}$/.test(remitoValue)) {
                 // Verificar si el remito ya existe en Firebase
                 db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remitoValue).once('value', snapshot => {
                     if (snapshot.exists()) {
@@ -104,7 +104,7 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
                 Swal.fire({
                     icon: 'error',
                     title: 'Número de remito inválido',
-                    text: 'Debe comenzar con 230 o 238 y tener 11 dígitos.',
+                    text: 'Debe comenzar con 254, 230 o 238 y tener 11 dígitos.',
                 });
             }
         } else if (activeElement.id === 'cliente') {
@@ -1040,7 +1040,7 @@ document.getElementById('remitoLogistica').addEventListener('keypress', async fu
         const remitoValue = this.value;
 
         // Verificar si el remito es válido
-        if (/^23[0-9]\d{8}$/.test(remitoValue)) {
+        if (/^(23[0-9]|25[0-9])\d{8}$/.test(remitoValue)) {
             // Buscar en Firebase
             const snapshot = await db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remitoValue).once('value');
             if (snapshot.exists()) {

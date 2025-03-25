@@ -379,6 +379,33 @@ function lowercaseWords(str) {
     return str ? str.toLowerCase() : ''; // Retornar cadena vacía si str es undefined o null
 }
 
+// CARGAR PRECIOS Y STOCK
+let preciosArray = [];
+
+// Función para cargar precios y stock
+function cargarPrecios() {
+    return dbStock.ref('precios/').once('value')
+        .then(preciosSnapshot => {
+            // Verificamos si hay datos
+            if (preciosSnapshot.exists()) {
+                preciosSnapshot.forEach(childSnapshot => {
+                    const childData = childSnapshot.val();
+                    preciosArray.push({
+                        sku: childData.sku,
+                        stock: childData.stock
+                    });
+                });
+                console.log("Stock Sincronizado");
+            } else {
+                console.log("No hay datos en la ruta especificada.");
+            }
+        })
+        .catch(error => {
+            console.error("Error al acceder a la base de datos:", error);
+        });
+}
+// FIN CARGAR PRECIOS Y STOCK
+
 // CARGAR DATOS DE FIREBASE
 function loadEnviosFromFirebase() {
     const cardsContainer = document.getElementById('meli-cards');
@@ -408,6 +435,9 @@ function loadEnviosFromFirebase() {
             skuSnapshot.forEach(childSnapshot => {
                 skusPlaceItList.push(childSnapshot.val().sku);
             });
+
+    // Llamar a la función para cargar precios y stock
+    cargarPrecios();
 
             // Escuchar cambios en 'enviosBNA'
             const databaseRef = firebase.database().ref('enviosBNA');
@@ -786,6 +816,37 @@ const cpsPlaceIt = [
         const shopCode = data[i].orden_publica_.split('-').pop();
         const shopImage = getShopImage(shopCode);
 
+        // VERIFICAR STOCK Y PRECIO
+        // Función para sanitizar el SKU
+        function sanitizeSku(sku) {
+            return sku.replace(/[^a-zA-Z0-9]/g, ''); // Eliminar caracteres especiales
+        }
+
+        // Obtener el SKU actual
+        const skuActual = data[i].sku;
+
+        // Buscar el stock correspondiente en preciosArray
+        const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === sanitizeSku(skuActual));
+        const stock = precioItem ? precioItem.stock : 0; // Si no se encuentra, stock es 0
+
+        // Determinar clase de estilo según el stock
+        const stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
+        const stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
+        const stockIcon = stock < 10 ? 'bi-exclamation-circle' : 'bi-check-circle';
+
+        // Generar el HTML para el stock con clases CSS
+        let htmlstock = `
+        <div class="container-stock-tv">
+            <div class="status-box-stock-tv">
+                <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
+                <p class="status-text-stock-tv ${stockClass}">
+                ${stockMessage} <strong>${skuActual}</strong>: <strong>${stock}</strong> u.
+                </p>
+            </div>
+        </div>
+        `;
+        // FIN VERIFICAR STOCK Y PRECIO
+
         // Agregar la tarjeta al contenedor
         const carritoContenido = data[i].carrito ? `
         <p class="carrito">
@@ -924,15 +985,21 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
 
                         </div>
                         <div class="row mb-2">
+
                             <div class="col">
                                 <label for="tipo_entrega_${data[i].id}">Tipo de Entrega:</label>
-                                <input type="text" id="tipo_entrega_${data[i].id}" value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) ? '40' : (isMacro(storeCode) ? '41' : '33')}" disabled>
+                                <input type="text" id="tipo_entrega_${data[i].id}" 
+                                    value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) && !isMacro(storeCode) ? '40' : (isMacro(storeCode) ? '41' : '33')}" 
+                                    disabled>
                             </div>
 
                             <div class="col">
                                 <label for="deposito_${data[i].id}">Depósito:</label>
-                                <input type="text" id="deposito_${data[i].id}"value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) ? '60' : '9'}" disabled>
+                                <input type="text" id="deposito_${data[i].id}" 
+                                    value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) && !isMacro(storeCode) ? '60' : '9'}" 
+                                    disabled>
                             </div>
+
                         </div>
                         <div class="row mb-2">
                             <div class="col">
@@ -1362,11 +1429,16 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                 Cliente Presea: <strong id="nombre-cliente">${data[i].cliente}</strong> 
                 </div>
                 </div>
-        
+
                             ${carritoContenido}
                             ${descuentoContenido}
 
-                            ${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) ? `<p class="card-text-isSkuIncludedPlaceIt"><i class="bi bi-lightning-charge-fill"></i> CP <strong>${data[i].cp}</strong> + SKU <strong>${data[i].sku}</strong> Con envio Express</p>` : ''}
+                            ${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) 
+                                ? (isMacro(storeCode) 
+                                    ? `<p class="card-text-isNotSkuIncludedPlaceIt"><i class="bi bi-shield-lock-fill"></i> CP <strong>${data[i].cp}</strong> + SKU <strong>${data[i].sku}</strong> Sin envío Express</p>` 
+                                    : `<p class="card-text-isSkuIncludedPlaceIt"><i class="bi bi-lightning-charge-fill"></i> CP <strong>${data[i].cp}</strong> + SKU <strong>${data[i].sku}</strong> Con envío Express</p>`) 
+                                : ''}                            
+                                
                             ${isSkuIncluded ? `<p class="card-text-isSkuIncluded"><i class="bi bi-lightning-charge-fill"></i> SKU <strong>${data[i].sku}</strong> con imei</p>` : ''}
 
 <div class="d-flex align-items-center justify-content-center contenedorRemito">
@@ -1421,6 +1493,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 ${mensajeFactura}
                             </div>
 
+                            ${htmlstock}
 
                             <!-- Botón para mostrar/ocultar el detalle del producto -->
                             <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleProducto-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleProducto-${data[i].id}">
@@ -2043,7 +2116,9 @@ function toggleEdit(id) {
         `calle_${id}`,
         `email_${id}`,
         `altura_${id}`,
+        `deposito_${id}`,
         `localidad_${id}`,
+        `tipo_entrega_${id}`,
         `codigo_postal_${id}`,
         `domicilio_envio_${id}`,
         `localidad_envio_${id}`,
@@ -2080,6 +2155,8 @@ function toggleEdit(id) {
             domicilio_fiscal: document.getElementById(`domicilio_fiscal_${id}`).value,
             calle: document.getElementById(`calle_${id}`).value,
             altura: document.getElementById(`altura_${id}`).value,
+            deposito: document.getElementById(`deposito_${id}`).value,
+            tipo_entrega: document.getElementById(`tipo_entrega_${id}`).value,
             localidad: document.getElementById(`localidad_${id}`).value,
             codigo_postal: document.getElementById(`codigo_postal_${id}`).value,
             domicilio_envio: document.getElementById(`domicilio_envio_${id}`).value,
@@ -2568,7 +2645,7 @@ const datos = {
     cuotas: document.getElementById(`cuotas_${id}`)?.value || '',
     banco: '',
     tipo_entrega: document.getElementById(`tipo_entrega_${id}`)?.value || '',
-    deposito: document.getElementById(`deposito_${data[i].id}`)?.value || '',
+    deposito: document.getElementById(`deposito_${id}`)?.value || '',
     exportado: '0',
     descuentos: document.getElementById(`descuentos_${id}`)?.value || '',
     fecha_acreditacion: document.getElementById(`fecha_acreditacion_${id}`)?.value || '',
