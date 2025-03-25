@@ -6999,7 +6999,7 @@ img.gray-filter {
 .status-box-stock-tv {
     text-align: center;
     padding: 3px 12px;
-    border-radius: 12px;
+    border-radius: 15px;
     background-color: #ecf0f1;
     margin-bottom: 5px;
     display: flex;
@@ -7026,6 +7026,6 @@ img.gray-filter {
 }
 
 .stock-normal-stock-tv {
-    color: green;
+    color: #34C759;
 }
 /* FIN STOCK PRECIO */

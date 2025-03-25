@@ -832,7 +832,7 @@ const cpsPlaceIt = [
         // Determinar clase de estilo según el stock
         const stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
         const stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
-        const stockIcon = stock < 10 ? 'bi-exclamation-circle' : 'bi-check-circle';
+        const stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
 
         // Generar el HTML para el stock con clases CSS
         let htmlstock = `
