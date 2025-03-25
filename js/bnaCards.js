@@ -380,10 +380,11 @@ function lowercaseWords(str) {
 }
 
 // CARGAR PRECIOS Y STOCK
-function cargarPrecios() {
-    const preciosArray = [];
+let preciosArray = [];
 
-    dbStock.ref('precios/').once('value')
+// Función para cargar precios y stock
+function cargarPrecios() {
+    return dbStock.ref('precios/').once('value')
         .then(preciosSnapshot => {
             // Verificamos si hay datos
             if (preciosSnapshot.exists()) {
@@ -394,8 +395,7 @@ function cargarPrecios() {
                         stock: childData.stock
                     });
                 });
-
-                console.log("Stock Sincronizado"); // Muestra el array con los datos deseados
+                console.log("Stock Sincronizado");
             } else {
                 console.log("No hay datos en la ruta especificada.");
             }
@@ -815,6 +815,37 @@ const cpsPlaceIt = [
 
         const shopCode = data[i].orden_publica_.split('-').pop();
         const shopImage = getShopImage(shopCode);
+
+        // VERIFICAR STOCK Y PRECIO
+        // Función para sanitizar el SKU
+        function sanitizeSku(sku) {
+            return sku.replace(/[^a-zA-Z0-9]/g, ''); // Eliminar caracteres especiales
+        }
+
+        // Obtener el SKU actual
+        const skuActual = data[i].sku;
+
+        // Buscar el stock correspondiente en preciosArray
+        const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === sanitizeSku(skuActual));
+        const stock = precioItem ? precioItem.stock : 0; // Si no se encuentra, stock es 0
+
+        // Determinar clase de estilo según el stock
+        const stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
+        const stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
+        const stockIcon = stock < 10 ? 'bi-exclamation-circle' : 'bi-check-circle';
+
+        // Generar el HTML para el stock con clases CSS
+        let htmlstock = `
+        <div class="container-stock-tv">
+            <div class="status-box-stock-tv">
+                <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
+                <p class="status-text-stock-tv ${stockClass}">
+                ${stockMessage} <strong>${skuActual}</strong>: <strong>${stock}</strong> u.
+                </p>
+            </div>
+        </div>
+        `;
+        // FIN VERIFICAR STOCK Y PRECIO
 
         // Agregar la tarjeta al contenedor
         const carritoContenido = data[i].carrito ? `
@@ -1398,7 +1429,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                 Cliente Presea: <strong id="nombre-cliente">${data[i].cliente}</strong> 
                 </div>
                 </div>
-        
+
                             ${carritoContenido}
                             ${descuentoContenido}
 
@@ -1462,6 +1493,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 ${mensajeFactura}
                             </div>
 
+                            ${htmlstock}
 
                             <!-- Botón para mostrar/ocultar el detalle del producto -->
                             <button class="btn-bna-collapse btn btn-outline-secondary btn-sm mt-2 w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalleProducto-${data[i].id}" aria-expanded="false" aria-controls="collapseDetalleProducto-${data[i].id}">

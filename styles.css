@@ -6977,3 +6977,55 @@ img.gray-filter {
     background-color: #005bb5;
 }
 /* Fin Estilo para la línea de tiempo */
+
+/* STOCK PRECIO */
+.title-stock-tv {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #1C1C1E;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.icon-title-stock-tv {
+    font-size: 0.8em;
+    margin-right: 6px;
+    color: #8E8E93;
+    padding: 5px;
+    text-align: center;
+}
+
+.status-box-stock-tv {
+    text-align: center;
+    padding: 3px 12px;
+    border-radius: 12px;
+    background-color: #ecf0f1;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    padding-top: 40px;
+    margin-top: -40px;
+}
+
+.icon-stock-tv {
+    font-size: 0.9em;
+    margin-right: 6px;
+}
+
+.status-text-stock-tv {
+    font-size: 0.85em;
+    font-weight: 500;
+    margin: 0;
+}
+
+.stock-bajo-stock-tv {
+    color: #FF3B30;
+}
+
+.stock-normal-stock-tv {
+    color: green;
+}
+/* FIN STOCK PRECIO */
