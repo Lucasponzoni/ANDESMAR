@@ -1372,7 +1372,12 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             ${carritoContenido}
                             ${descuentoContenido}
 
-                            ${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) ? `<p class="card-text-isSkuIncludedPlaceIt"><i class="bi bi-lightning-charge-fill"></i> CP <strong>${data[i].cp}</strong> + SKU <strong>${data[i].sku}</strong> Con envio Express</p>` : ''}
+                            ${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) 
+                                ? (isMacro(storeCode) 
+                                    ? `<p class="card-text-isNotSkuIncludedPlaceIt"><i class="bi bi-shield-lock-fill"></i> CP <strong>${data[i].cp}</strong> + SKU <strong>${data[i].sku}</strong> Sin envío Express</p>` 
+                                    : `<p class="card-text-isSkuIncludedPlaceIt"><i class="bi bi-lightning-charge-fill"></i> CP <strong>${data[i].cp}</strong> + SKU <strong>${data[i].sku}</strong> Con envío Express</p>`) 
+                                : ''}                            
+                                
                             ${isSkuIncluded ? `<p class="card-text-isSkuIncluded"><i class="bi bi-lightning-charge-fill"></i> SKU <strong>${data[i].sku}</strong> con imei</p>` : ''}
 
 <div class="d-flex align-items-center justify-content-center contenedorRemito">
