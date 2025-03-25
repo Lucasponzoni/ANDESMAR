@@ -326,6 +326,13 @@ function crearCard(data) {
         return Producto.replace(/[^a-zA-Z\s]/g, '').trim().replace(/\s+/g, ' ');
     }   
 
+    function limpiarComentarios(observaciones) {
+        return observaciones
+            .replace(/[\n\r]/g, ' ') 
+            .replace(/[.,\/:;!@#$%^&*()_+|~=`{}\[\]<>?]/g, '')
+            .replace(/'/g, "\\'") 
+            .replace(/"/g, '\\"');
+    }       
 
     // Función para formatear números en pesos
     function formatCurrency(amount) {
@@ -570,7 +577,7 @@ const paymentHTML = `
     <button class="mt-1 mb-0 btn btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${limpiarComentarios(data.Observaciones !== undefined ? data.Observaciones : "Sin Observaciones")}')">
         <span>
             ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
         </span>
