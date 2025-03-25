@@ -924,15 +924,21 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
 
                         </div>
                         <div class="row mb-2">
+
                             <div class="col">
                                 <label for="tipo_entrega_${data[i].id}">Tipo de Entrega:</label>
-                                <input type="text" id="tipo_entrega_${data[i].id}" value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) ? '40' : (isMacro(storeCode) ? '41' : '33')}" disabled>
+                                <input type="text" id="tipo_entrega_${data[i].id}" 
+                                    value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) && !isMacro(storeCode) ? '40' : (isMacro(storeCode) ? '41' : '33')}" 
+                                    disabled>
                             </div>
 
                             <div class="col">
                                 <label for="deposito_${data[i].id}">Depósito:</label>
-                                <input type="text" id="deposito_${data[i].id}"value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) ? '60' : '9'}" disabled>
+                                <input type="text" id="deposito_${data[i].id}" 
+                                    value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) && !isMacro(storeCode) ? '60' : '9'}" 
+                                    disabled>
                             </div>
+
                         </div>
                         <div class="row mb-2">
                             <div class="col">
