@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await obtenerCredencialesCDS();
     await cargarPrecios();
     await iniciarVerificacion();
+    await loadEnviosFromFirebase();
 });
 
 // CARGA SKU
@@ -408,7 +409,7 @@ async function cargarPrecios() {
 // FIN CARGAR PRECIOS Y STOCK
 
 // CARGAR DATOS DE FIREBASE
-function loadEnviosFromFirebase() {
+async function loadEnviosFromFirebase() {
     const cardsContainer = document.getElementById('meli-cards');
     const spinner = document.getElementById('spinner');
     
