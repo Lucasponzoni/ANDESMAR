@@ -498,7 +498,8 @@ function loadTable(data, estadoFilter = null) {
     
                 // Fecha y hora
                 const dateCell = document.createElement('td');
-                dateCell.innerHTML = `<strong>${formatDate(operation.dateCreated)}</strong>, ${formatTime(operation.dateCreated)}`;
+                dateCell.innerHTML = `${formatDate(operation.dateCreated)}, ${formatTime(operation.dateCreated)}`;
+                dateCell.className = 'product-date';
                 row.appendChild(dateCell);
     
                 // Operación
@@ -522,7 +523,7 @@ function loadTable(data, estadoFilter = null) {
                 const valueCell = document.createElement('td');
                 valueCell.className = 'value-cell';
                 const transactionAmount = operation.payments[0]?.transaction_amount || 0;
-                valueCell.innerHTML = `<strong>${formatCurrency(transactionAmount)}</strong>`;
+                valueCell.innerHTML = `${formatCurrency(transactionAmount)}`;
                 row.appendChild(valueCell);
 
                 // Agregar evento click para abrir el modal
@@ -604,13 +605,13 @@ function loadTable(data, estadoFilter = null) {
                         shippingCell.innerHTML = `<strong class="alerta">⚠️ ${stateName.toUpperCase()}</strong>`;
                     } else if (isSkuInList && isCpInCpsPlaceIt) {
                         shippingCell.innerHTML = `
-                            <strong class="express-meli" style="color: yellow;">⚡ ENVÍO EXPRESS</strong><br>
-                            <span class="express-meli-sub" style="font-size: smaller;">Cambiar a condición: 40-60</span>
+                            <strong class="express-meli" style="color: yellow;">⚡ EXPRESS</strong><br>
+                            <span class="express-meli-sub" style="font-size: smaller;">Condición: 40-60</span>
                         `;
                     } else if (["Misiones", "Tierra del Fuego"].includes(stateName)) {
                         shippingCell.innerHTML = `<strong class="alerta">⚠️ ${stateName.toUpperCase()}</strong>`;
                     } else if (shippingCost > 0) {
-                        shippingCell.innerHTML = `<strong style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
+                        shippingCell.innerHTML = `<strong class="shipping-value" style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
                     } else {
                         // Solo muestra "GRATUITO" si no hay envío express
                         shippingCell.innerHTML = `<strong class="gratuito" style="color: orangered;">GRATUITO</strong>`;
@@ -625,7 +626,7 @@ function loadTable(data, estadoFilter = null) {
                 // Producto
                 const productCell = document.createElement('td');
                 productCell.className = 'product-cell';
-                productCell.innerHTML = `Cantidad: <strong>X${operation.Cantidad}</strong> <br> SKU: <strong>${operation.SKU}</strong>`;
+                productCell.innerHTML = `Cantidad: <strong>X${operation.Cantidad}</strong> <br> <strong>${operation.SKU}</strong>`;
                 row.appendChild(productCell);
                 
                 // Agregar evento de clic para abrir el modal con el carrusel de imágenes

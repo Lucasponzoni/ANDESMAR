@@ -3751,7 +3751,6 @@ div .form-check {
 /* Estilo de las celdas */
 .table td {
     color: #333; 
-    font-size: 14px; 
 }
 
 .modal-content {
@@ -4323,13 +4322,27 @@ td.product-cell:hover::after {
 
 /* Nuevo estilo iOS para la columna Valor */
 .value-cell {
+    font-family: "Rubik", sans-serif;
     padding: 15px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 500;
     color: #444; 
     color: green !important;
+    font-size: .9rem;
     text-align: left;
     line-height: 1.6;
     transition: background-color 0.3s ease, transform 0.2s ease; 
+}
+
+.shipping-value{
+    font-family: "Rubik", sans-serif;
+    font-weight: 500;
+    font-size: .9rem;
+}
+
+.product-date{
+    font-family: "Rubik", sans-serif;
+    font-weight: 400;
+    font-size: .9rem;
 }
 
 td.value-cell:hover{
