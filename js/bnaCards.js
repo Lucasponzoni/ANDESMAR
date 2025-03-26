@@ -926,7 +926,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
         card.innerHTML = `
 
 <!-- MODAL FACTURACION -->
-        <!-- Modal -->
+<!-- Modal -->
 <div class="modal fade" id="infoFacturacionModal${data[i].id}" tabindex="-1" aria-labelledby="infoFacturacionLabel${data[i].id}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -943,7 +943,8 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="order_id_${data[i].id}">Order ID:</label>
-                                <input type="text" id="order_id_${data[i].id}" value="${data[i].carrito ? Math.floor(Math.random() * 900 + 100) + '-carrito-' : ''}${data[i].remito}" disabled>                            </div>
+                                <input type="text" id="order_id_${data[i].id}" value="${data[i].carrito ? Math.floor(Math.random() * 900 + 100) + '-carrito-' : ''}${data[i].remito}" disabled>
+                            </div>
                             <div class="col">
                                 <label for="estado_${data[i].id}">Estado:</label>
                                 <input type="text" id="estado_${data[i].id}" value="Aprobado" disabled>
@@ -985,27 +986,23 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 <input type="text" id="cuotas_${data[i].id}" value="${(data[i].cuotas && data[i].cuotas !== '0') ? data[i].cuotas : data[i].nro_de_cuotas}" disabled>
                             </div>
                             <div class="col">
-                        <label for="banco_${data[i].id}">Banco:</label>
+                                <label for="banco_${data[i].id}">Banco:</label>
                                 <input type="text" id="banco_${data[i].id}" value="${isMacro(storeCode) ? 'BANCO MACRO' : 'BANCO NACION'}" disabled>
-                        </div>
-
+                            </div>
                         </div>
                         <div class="row mb-2">
-
                             <div class="col">
                                 <label for="tipo_entrega_${data[i].id}">Tipo de Entrega:</label>
                                 <input type="text" id="tipo_entrega_${data[i].id}" 
                                     value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) && !isMacro(storeCode) ? '40' : (isMacro(storeCode) ? '41' : '33')}" 
                                     disabled>
                             </div>
-
                             <div class="col">
                                 <label for="deposito_${data[i].id}">Depósito:</label>
                                 <input type="text" id="deposito_${data[i].id}" 
                                     value="${isSkuIncludedPlaceIt && cpsPlaceIt.includes(Number(data[i].cp)) && !isMacro(storeCode) ? '60' : '9'}" 
                                     disabled>
                             </div>
-
                         </div>
                         <div class="row mb-2">
                             <div class="col">
@@ -1030,80 +1027,80 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                     </div>
                 </div>
 
-<!-- Datos de Compra -->
-<div class="card-facturacion-meli mb-3">
-    <div class="card-header-facturacion-meli"><i class="bi bi-bag-fill"></i> Datos de Compra:</div>
-    <div class="card-body-facturacion-meli">
-        <div class="row mb-2">
-            <div class="col">
-                <label for="codigo_promocion_${data[i].id}">Código Promoción:</label>
-                <input type="text" id="codigo_promocion_${data[i].id}" value="${isMacro(storeCode) ? '5001' : '5000'}" disabled>
-            </div>
-            <div class="col">
-                <label for="codigo_item_${data[i].id}">Código Item:</label>
-                <input type="text" id="codigo_item_${data[i].id}" value="${data[i].sku}" disabled>
-            </div>
-        </div>
-        <div class="row mb-2">
-            <div class="col">
-                <label for="nombre_item_${data[i].id}">Nombre Item:</label>
-                <input type="text" id="nombre_item_${data[i].id}" value="${cleanString(data[i].producto_nombre)}" disabled>
-            </div>
-            <div class="col">
-                <label for="recargo_item_${data[i].id}">Recargo Item:</label>
-                <input type="text" id="recargo_item_${data[i].id}" value="0" disabled>
-            </div>
-        </div>
-        <div class="row mb-2">
-            <div class="col">
-                <label for="cantidad_item_${data[i].id}">Cantidad Item:</label>
-                <input type="text" id="cantidad_item_${data[i].id}" value="${data[i].cantidad}" disabled>
-            </div>
-            <div class="col">
-                <label for="precio_item_${data[i].id}">Precio Item:</label>
-                <input type="text" id="precio_item_${data[i].id}" value="${data[i].precio_venta === "0.0" ? (data[i].precio_producto * data[i].cantidad) : data[i].precio_venta}" disabled>
-            </div>
-        </div>
-        <div class="row mb-2">
-            <div class="col">
-                <label for="descuentos_${data[i].id}">Descuentos (Puntos):</label>
-                <input type="text" id="descuentos_${data[i].id}" value="${puntosBna}" disabled>
-            </div>
-            <div class="col">
-                <label for="iva_${data[i].id}">IVA:</label>
-                <input type="text" id="iva_${data[i].id}" value="${data[i].iva2}" disabled>
-            </div>
-        </div>
-        <div class="row align-items-center mb-2">
-            <div class="col">
-                <label for="monto_envio_${data[i].id}">Monto de Envío:</label>
-                <input type="text" id="monto_envio_${data[i].id}" value="${data[i].monto_cobrado}" disabled>
-            </div>
-            <div class="col">
-                <label for="monto_total_${data[i].id}">Monto Total:</label>
-                <input type="text" id="monto_total_${data[i].id}" value="${total}" disabled>
-            </div>
-        </div>
+                <!-- Datos de Compra -->
+                <div class="card-facturacion-meli mb-3">
+                    <div class="card-header-facturacion-meli"><i class="bi bi-bag-fill"></i> Datos de Compra:</div>
+                    <div class="card-body-facturacion-meli">
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="codigo_promocion_${data[i].id}">Código Promoción:</label>
+                                <input type="text" id="codigo_promocion_${data[i].id}" value="${isMacro(storeCode) && data[i].marca_de_tarjeta?.trim().toLowerCase() === 'american_express' ? '5002' : (isMacro(storeCode) ? '5001' : '5000')}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="codigo_item_${data[i].id}">Código Item:</label>
+                                <input type="text" id="codigo_item_${data[i].id}" value="${data[i].sku}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="nombre_item_${data[i].id}">Nombre Item:</label>
+                                <input type="text" id="nombre_item_${data[i].id}" value="${cleanString(data[i].producto_nombre)}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="recargo_item_${data[i].id}">Recargo Item:</label>
+                                <input type="text" id="recargo_item_${data[i].id}" value="0" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="cantidad_item_${data[i].id}">Cantidad Item:</label>
+                                <input type="text" id="cantidad_item_${data[i].id}" value="${data[i].cantidad}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="precio_item_${data[i].id}">Precio Item:</label>
+                                <input type="text" id="precio_item_${data[i].id}" value="${data[i].precio_venta === "0.0" ? (data[i].precio_producto * data[i].cantidad) : data[i].precio_venta}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="descuentos_${data[i].id}">Descuentos (Puntos):</label>
+                                <input type="text" id="descuentos_${data[i].id}" value="${puntosBna}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="iva_${data[i].id}">IVA:</label>
+                                <input type="text" id="iva_${data[i].id}" value="${data[i].iva2}" disabled>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-2">
+                            <div class="col">
+                                <label for="monto_envio_${data[i].id}">Monto de Envío:</label>
+                                <input type="text" id="monto_envio_${data[i].id}" value="${data[i].monto_cobrado}" disabled>
+                            </div>
+                            <div class="col">
+                                <label for="monto_total_${data[i].id}">Monto Total:</label>
+                                <input type="text" id="monto_total_${data[i].id}" value="${total}" disabled>
+                            </div>
+                        </div>
 
-        <!-- Mensaje de descuento -->
-        <div id="mensaje_${data[i].id}" class="mensaje-desconto" style="display: none; margin-top: 10px; color: green;"></div>
-        
-    </div>
-</div>
+                        <!-- Mensaje de descuento -->
+                        <div id="mensaje_${data[i].id}" class="mensaje-desconto" style="display: none; margin-top: 10px; color: green;"></div>
+                        
+                    </div>
+                </div>
 
-        <!-- Pretty Checkbox para descontar envío -->
-        <div class="prettyContainer">
-        <div class="pretty p-default p-curve p-toggle">
-            <input type="checkbox" id="descontar_envio_${data[i].id}" 
-                   onclick="toggleShippingDiscount(this, '${data[i].id}')">
-            <div class="state p-success p-on">
-                <label>Descontar Envío</label>
-            </div>
-            <div class="state p-danger p-off">
-                <label>No Descontar Envío</label>
-            </div>
-        </div>
-        </div>
+                <!-- Pretty Checkbox para descontar envío -->
+                <div class="prettyContainer">
+                    <div class="pretty p-default p-curve p-toggle">
+                        <input type="checkbox" id="descontar_envio_${data[i].id}" 
+                               onclick="toggleShippingDiscount(this, '${data[i].id}')">
+                        <div class="state p-success p-on">
+                            <label>Descontar Envío</label>
+                        </div>
+                        <div class="state p-danger p-off">
+                            <label>No Descontar Envío</label>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Datos de Cliente -->
                 <div class="card-facturacion-meli mb-3">
@@ -1120,40 +1117,40 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             </div>
                         </div>
                         <div class="row mb-2">
-<div class="col">
-    <label for="condicion_iva_${data[i].id}">Condición IVA:</label>
-    <select id="condicion_iva_${data[i].id}" disabled>
-        <option value="IVA Responsable Inscripto" 
-            ${data[i].iva === 'IVA Responsable Inscripto' || (!data[i].iva && (!data[i].cuit || data[i].cuit.length > 7)) ? 'selected' : ''}>
-            IVA Responsable Inscripto
-        </option>
-        <option value="Consumidor Final" 
-            ${data[i].iva === 'Consumidor Final' || (!data[i].iva && data[i].cuit && data[i].cuit.length <= 7) ? 'selected' : ''}>
-            Consumidor Final
-        </option>
-        <option value="IVA Liberado - Ley N° 19.640" 
-            ${data[i].iva === 'IVA Liberado - Ley N° 19.640' ? 'selected' : ''}>
-            IVA Liberado - Ley N° 19.640
-        </option>
-        <option value="IVA Responsable Exento" 
-            ${data[i].iva === 'IVA Responsable Exento' ? 'selected' : ''}>
-            IVA Responsable Exento
-        </option>
-        <option value="IVA Responsable Inscripto - Agente de Percepción" 
-            ${data[i].iva === 'IVA Responsable Inscripto - Agente de Percepción' ? 'selected' : ''}>
-            IVA Responsable Inscripto - Agente de Percepción
-        </option>
-        <option value="IVA Responsable Monotributo" 
-            ${data[i].iva === 'IVA Responsable Monotributo' ? 'selected' : ''}>
-            IVA Responsable Monotributo
-        </option>
-        <option value="IVA Sujeto Exento" 
-            ${data[i].iva === 'IVA Sujeto Exento' ? 'selected' : ''}>
-            IVA Sujeto Exento
-        </option>
-    </select>
-</div>
-                    </div>
+                            <div class="col">
+                                <label for="condicion_iva_${data[i].id}">Condición IVA:</label>
+                                <select id="condicion_iva_${data[i].id}" disabled>
+                                    <option value="IVA Responsable Inscripto" 
+                                        ${data[i].iva === 'IVA Responsable Inscripto' || (!data[i].iva && (!data[i].cuit || data[i].cuit.length > 7)) ? 'selected' : ''}>
+                                        IVA Responsable Inscripto
+                                    </option>
+                                    <option value="Consumidor Final" 
+                                        ${data[i].iva === 'Consumidor Final' || (!data[i].iva && data[i].cuit && data[i].cuit.length <= 7) ? 'selected' : ''}>
+                                        Consumidor Final
+                                    </option>
+                                    <option value="IVA Liberado - Ley N° 19.640" 
+                                        ${data[i].iva === 'IVA Liberado - Ley N° 19.640' ? 'selected' : ''}>
+                                        IVA Liberado - Ley N° 19.640
+                                    </option>
+                                    <option value="IVA Responsable Exento" 
+                                        ${data[i].iva === 'IVA Responsable Exento' ? 'selected' : ''}>
+                                        IVA Responsable Exento
+                                    </option>
+                                    <option value="IVA Responsable Inscripto - Agente de Percepción" 
+                                        ${data[i].iva === 'IVA Responsable Inscripto - Agente de Percepción' ? 'selected' : ''}>
+                                        IVA Responsable Inscripto - Agente de Percepción
+                                    </option>
+                                    <option value="IVA Responsable Monotributo" 
+                                        ${data[i].iva === 'IVA Responsable Monotributo' ? 'selected' : ''}>
+                                        IVA Responsable Monotributo
+                                    </option>
+                                    <option value="IVA Sujeto Exento" 
+                                        ${data[i].iva === 'IVA Sujeto Exento' ? 'selected' : ''}>
+                                        IVA Sujeto Exento
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
 
                         <div class="row mb-2">
                             <div class="col">
@@ -1177,27 +1174,23 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         </div>
                         <div class="row mb-2">
                             <div class="col">
-    <label for="domicilio_fiscal_${data[i].id}">Domicilio Fiscal:</label>
-    <input type="text" id="domicilio_fiscal_${data[i].id}" value="" placeholder="Completar en caso de factura A" disabled>
-    </div>
-
-
+                                <label for="domicilio_fiscal_${data[i].id}">Domicilio Fiscal:</label>
+                                <input type="text" id="domicilio_fiscal_${data[i].id}" value="" placeholder="Completar en caso de factura A" disabled>
+                            </div>
                             <div class="col">
-                            <label for="email_${data[i].id}">Email:</label>
+                                <label for="email_${data[i].id}">Email:</label>
                                 <input type="text" id="email_${data[i].id}" value="${data[i].email}" disabled>
                             </div>
                         </div>
                         <div class="row mb-2">
                             <div class="col">
-                            <label for="calle_${data[i].id}">Calle:</label>
-                            <input type="text" id="calle_${data[i].id}" value="${data[i].calle !== undefined ? data[i].calle : data[i].calle2}" disabled>
+                                <label for="calle_${data[i].id}">Calle:</label>
+                                <input type="text" id="calle_${data[i].id}" value="${data[i].calle !== undefined ? data[i].calle : data[i].calle2}" disabled>
                             </div>
-
                             <div class="col">
-                            <label for="altura_${data[i].id}">Altura:</label>
+                                <label for="altura_${data[i].id}">Altura:</label>
                                 <input type="text" id="altura_${data[i].id}" value="${data[i].altura !== undefined ? data[i].altura : 0}" disabled>
                             </div>
-
                         </div>
                         <div class="row mb-2">
                             <div class="col">
@@ -1217,105 +1210,103 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             <div class="col">
                                 <label for="provincia_${data[i].id}">Provincia:</label>
                                 <input type="text" id="provincia_${data[i].id}" value="${data[i].provincia}" disabled>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Datos de Envío -->
-                <div class="card-facturacion-meli mb-3">
-                    <div class="card-header-facturacion-meli"><i class="bi bi-rocket-takeoff-fill"></i> Datos de Envio:</div>
-                    <div class="card-body-facturacion-meli">
-                        <div class="row mb-2">
-                            <div class="col">
-                                <label for="domicilio_envio_${data[i].id}">Domicilio de Envío:</label>
-                                <input type="text" id="domicilio_envio_${data[i].id}" value="${data[i].calle !== undefined ? data[i].calle : data[i].calle2}" disabled>
+    
+                    <!-- Datos de Envío -->
+                    <div class="card-facturacion-meli mb-3">
+                        <div class="card-header-facturacion-meli"><i class="bi bi-rocket-takeoff-fill"></i> Datos de Envío:</div>
+                        <div class="card-body-facturacion-meli">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <label for="domicilio_envio_${data[i].id}">Domicilio de Envío:</label>
+                                    <input type="text" id="domicilio_envio_${data[i].id}" value="${data[i].calle !== undefined ? data[i].calle : data[i].calle2}" disabled>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mb-2 oculto">
-                            <div class="col">
-                                <label for="numero_envio_${data[i].id}">Número de Envío:</label>
-                                <input type="text" id="numero_envio_${data[i].id}" value="Número del domicilio de envío" disabled>
+                            <div class="row mb-2 oculto">
+                                <div class="col">
+                                    <label for="numero_envio_${data[i].id}">Número de Envío:</label>
+                                    <input type="text" id="numero_envio_${data[i].id}" value="Número del domicilio de envío" disabled>
+                                </div>
+                                <div class="col">
+                                    <label for="piso_envio_${data[i].id}">Piso de Envío:</label>
+                                    <input type="text" id="piso_envio_${data[i].id}" value="Piso del domicilio de envío" disabled>
+                                </div>
                             </div>
-                            <div class="col">
-                                <label for="piso_envio_${data[i].id}">Piso de Envío:</label>
-                                <input type="text" id="piso_envio_${data[i].id}" value="Piso del domicilio de envío" disabled>
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <label for="localidad_envio_${data[i].id}">Localidad de Envío:</label>
+                                    <input type="text" id="localidad_envio_${data[i].id}" value="${data[i].localidad}" disabled>
+                                </div>
+                                <div class="col">
+                                    <label for="cp_envio_${data[i].id}">Código Postal de Envío:</label>
+                                    <input type="text" id="cp_envio_${data[i].id}" value="${data[i].cp}" disabled>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col">
-                                <label for="localidad_envio_${data[i].id}">Localidad de Envío:</label>
-                                <input type="text" id="localidad_envio_${data[i].id}" value="${data[i].localidad}" disabled>
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <label for="telefono_envio_${data[i].id}">Teléfono de Envío:</label>
+                                    <input type="text" id="telefono_envio_${data[i].id}" value="${data[i].telefono}" disabled>
+                                </div>
+                                <div class="col">
+                                    <label for="persona_autorizada_${data[i].id}">Persona Autorizada:</label>
+                                    <input type="text" id="persona_autorizada_${data[i].id}" value="${data[i].nombre_completo_envio}" disabled>
+                                </div>
                             </div>
-                            <div class="col">
-                                <label for="cp_envio_${data[i].id}">Código Postal de Envío:</label>
-                                <input type="text" id="cp_envio_${data[i].id}" value="${data[i].cp}" disabled>
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <label for="otros_comentarios_entrega_${data[i].id}">Otros Comentarios de Entrega:</label>
+                                    <input type="text" id="otros_comentarios_entrega_${data[i].id}" value="${isMacro(storeCode) ? 'GUIA OCA: ' + data[i].numeroSeguimiento : (data[i].otros_comentarios_entrega !== undefined ? data[i].otros_comentarios_entrega : `Coordinar a Línea ${data[i].telefono}`)}" disabled>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col">
-                                <label for="telefono_envio_${data[i].id}">Teléfono de Envío:</label>
-                                <input type="text" id="telefono_envio_${data[i].id}" value="${data[i].telefono}" disabled>
-                            </div>
-                            <div class="col">
-                                <label for="persona_autorizada_${data[i].id}">Persona Autorizada:</label>
-                                <input type="text" id="persona_autorizada_${data[i].id}" value="${data[i].nombre_completo_envio}" disabled>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col">
-                            <label for="otros_comentarios_entrega_${data[i].id}">Otros Comentarios de Entrega:</label>
-                            <input type="text" id="otros_comentarios_entrega_${data[i].id}" value="${isMacro(storeCode) ? 'GUIA OCA: ' + data[i].numeroSeguimiento : (data[i].otros_comentarios_entrega !== undefined ? data[i].otros_comentarios_entrega : `Coordinar a Línea ${data[i].telefono}`)}" disabled>
-                            </div>
-
                         </div>
                     </div>
+    
                 </div>
-
-            </div>
-            <div class="modal-footer">
-<input type="${data[i].datoFacturacion ? 'text' : 'password'}" 
-       id="clave-facturacion-${data[i].id}" 
-       placeholder="Clave de facturación" 
-       maxlength="4" 
-       class="form-control" 
-       ${data[i].datoFacturacion ? 'disabled' : ''} 
-       value="${data[i].datoFacturacion || ''}" />
-
-<div class="button-container-cds">
-    <button id="facturar-automata-${data[i].id}" 
-            class="btn ${data[i].cancelado ? 'btn-secondary' : (data[i].datoFacturacion ? 'btn-success' : 'btn-primary')}" 
-            onclick="marcarFacturado2('${data[i].id}', '${data[i].email}', '${data[i].nombre}', '${data[i].remito}')"
-            ${data[i].cancelado ? 'disabled' : (data[i].datoFacturacion ? 'disabled' : '')}>
-        ${data[i].cancelado ? '<i class="bi bi-x-octagon"></i> Sin facturar Cancelado' : (data[i].datoFacturacion ? '<i class="bi bi-check2-circle"></i> Ya Facturado' : '<i class="bi bi-robot"></i> Facturar')}
-    </button>
-
-    <button id="cancelar-venta-${data[i].id}" 
-        class="btn ${data[i].cancelado ? 'btn-success' : (data[i].datoFacturacion ? 'btn-secondary' : 'btn-danger')}" 
-        onclick="marcarCancelado2('${data[i].id}')"
-        ${data[i].datoFacturacion ? 'disabled' : ''}>
-    ${data[i].cancelado ? '<i class="bi bi-check2-circle"></i> Venta Cancelada' : '<i class="bi bi-x-square-fill"></i> Cancelar'}
-    </button>
-
-    <button type="button" 
-            id="editButton_${data[i].id}" 
-            class="btn btn-primary" 
-            onclick="toggleEdit('${data[i].id}')"
-            ${data[i].datoFacturacion ? 'disabled' : ''}>
-        <i class="bi bi-pen-fill"></i> Editar
-    </button>
-
-    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
-        <i class="bi bi-arrow-return-left"></i> Cerrar
-    </button>
-</div>
+                <div class="modal-footer">
+                    <input type="${data[i].datoFacturacion ? 'text' : 'password'}" 
+                           id="clave-facturacion-${data[i].id}" 
+                           placeholder="Clave de facturación" 
+                           maxlength="4" 
+                           class="form-control" 
+                           ${data[i].datoFacturacion ? 'disabled' : ''} 
+                           value="${data[i].datoFacturacion || ''}" />
+    
+                    <div class="button-container-cds">
+                        <button id="facturar-automata-${data[i].id}" 
+                                class="btn ${data[i].cancelado ? 'btn-secondary' : (data[i].datoFacturacion ? 'btn-success' : 'btn-primary')}" 
+                                onclick="marcarFacturado2('${data[i].id}', '${data[i].email}', '${data[i].nombre}', '${data[i].remito}')"
+                                ${data[i].cancelado ? 'disabled' : (data[i].datoFacturacion ? 'disabled' : '')}>
+                            ${data[i].cancelado ? '<i class="bi bi-x-octagon"></i> Sin facturar Cancelado' : (data[i].datoFacturacion ? '<i class="bi bi-check2-circle"></i> Ya Facturado' : '<i class="bi bi-robot"></i> Facturar')}
+                        </button>
+    
+                        <button id="cancelar-venta-${data[i].id}" 
+                                class="btn ${data[i].cancelado ? 'btn-success' : (data[i].datoFacturacion ? 'btn-secondary' : 'btn-danger')}" 
+                                onclick="marcarCancelado2('${data[i].id}')"
+                                ${data[i].datoFacturacion ? 'disabled' : ''}>
+                            ${data[i].cancelado ? '<i class="bi bi-check2-circle"></i> Venta Cancelada' : '<i class="bi bi-x-square-fill"></i> Cancelar'}
+                        </button>
+    
+                        <button type="button" 
+                                id="editButton_${data[i].id}" 
+                                class="btn btn-primary" 
+                                onclick="toggleEdit('${data[i].id}')"
+                                ${data[i].datoFacturacion ? 'disabled' : ''}>
+                            <i class="bi bi-pen-fill"></i> Editar
+                        </button>
+    
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                            <i class="bi bi-arrow-return-left"></i> Cerrar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- FIN MODAL FACTURACION -->
-
-
+    <!-- FIN MODAL FACTURACION -->
+    
                     <div class="card">
                         
                         <div class="card-body ${cardBodyClass}">
