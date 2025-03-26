@@ -3847,24 +3847,19 @@ div .form-check {
     color: red !important;
     font-weight: bold;
     background-color: rgba(255, 200, 47, 0.255);
+    font-size: .9rem;
 }
 
-.estado-despachado{
+.estado-despachado,
+.estado-entrega,
+.estado-entrega2 {
     color: green !important;
     font-weight: bold;
     background-color: rgba(172, 255, 47, 0.255);
-}
-
-.estado-entrega {
-    color: green !important;
-    font-weight: bold !important;
-    background-color: rgba(172, 255, 47, 0.255);
-}
-
-.estado-entrega2 {
-    color: green !important;
-    font-weight: bold !important;
-    background-color: rgba(172, 255, 47, 0.255);
+    font-size: 1rem;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
 }
 
 .estado-entrega2 > i {
@@ -4049,12 +4044,14 @@ div .form-check {
 .btn-novogar {
     background: linear-gradient(135deg, #717171, #323232); 
     color: white; 
+    font-size: .8rem !important;
 }
 
 .btn-novogar2 {
     background: linear-gradient(360deg, #ff8000, #ffb936); /* Tono amarillito ocaco */
     color: black; 
     font-weight: 400;
+    font-size: .8rem !important;
 }
 
 .btn-ios:hover {
