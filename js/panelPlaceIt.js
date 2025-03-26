@@ -26,10 +26,10 @@ document.getElementById('filterOldestBtn').addEventListener('click', function() 
     const filteredData = allData
         .filter(item => !item.fotoURL) // Filtrar elementos sin fotoURL
         .sort((a, b) => {
-            // Convertir las fechas a formato ISO para una comparación correcta
-            const dateA = new Date(a.fechaHora.split(', ')[0].split('/').reverse().join('-') + 'T' + a.fechaHora.split(', ')[1]);
-            const dateB = new Date(b.fechaHora.split(', ')[0].split('/').reverse().join('-') + 'T' + b.fechaHora.split(', ')[1]);
-            return dateA.getTime() - dateB.getTime(); // Ordenar de más antiguo a más reciente
+            // Ordenar por el número de remito (columna 4) de menor a mayor
+            const remitoA = parseInt(a.remito, 10); // Convertir a número
+            const remitoB = parseInt(b.remito, 10); // Convertir a número
+            return remitoA - remitoB; // Ordenar de menor a mayor
         });
 
     // Renderizar los datos filtrados
