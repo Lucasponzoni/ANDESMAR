@@ -5488,20 +5488,21 @@ async function verificarMensajes() {
                     continue; // Si ya fue procesado, saltar al siguiente mensaje
                 }
 
-                if (mensaje.user === `${chat}` && /^\(\d+(-reproceso-\d+)?\)/.test(mensaje.text)) {
+                // Verificar si el mensaje cumple con el formato esperado
+                if (mensaje.user === `${chat}` && /^\(\d+(-reproceso-\d+|-carrito-\d+)?\)/.test(mensaje.text)) {
                     let numero;
-                    const reprocesoMatch = mensaje.text.match(/^\((\d+)(?:-reproceso-(\d+))?\)/);
+                    const match = mensaje.text.match(/^\((\d+)(?:-(reproceso|carrito)-(\d+))?\)/);
 
-                    if (reprocesoMatch) {
-                        numero = reprocesoMatch[2] ? reprocesoMatch[2] : reprocesoMatch[1];
+                    if (match) {
+                        numero = match[3] ? match[3] : match[1];
                     } else {
                         console.error('No se encontró un formato válido en el mensaje:', mensaje.text);
                         continue;
                     }
 
-                    const errorMensaje = mensaje.text.replace(/^\(\d+(-reproceso-\d+)?\)\s*/, '');
+                    const errorMensaje = mensaje.text.replace(/^\(\d+(-reproceso-\d+|-carrito-\d+)?\)\s*/, '');
                     let nuevoNumero = numero;
-                    let reprocesoCount = 1;
+                    let contador = 1;
 
                     while (true) {
                         const snapshotErrores = await firebaseRefErrores.child(nuevoNumero).once('value');
@@ -5521,8 +5522,8 @@ async function verificarMensajes() {
 
                             break;
                         } else {
-                            reprocesoCount++;
-                            nuevoNumero = `${numero}-reproceso${reprocesoCount}`;
+                            contador++;
+                            nuevoNumero = `${numero}-${match[2] || 'reproceso'}-${contador}`;
                         }
                     }
 
