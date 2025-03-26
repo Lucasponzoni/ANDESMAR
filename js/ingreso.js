@@ -360,12 +360,12 @@ function eliminarFila(button) {
     Swal.fire({
         title: 'Ingrese la contraseña 🔒',
         input: 'password',
-        inputLabel: 'Contraseña de Eliminacion (Solicitela a Lucas)',
+        inputLabel: 'Contraseña de Eliminacion (Solicitela a Esperanza)',
         showCancelButton: true,
         confirmButtonText: 'Eliminar',
         cancelButtonText: 'Cancelar',
         preConfirm: (password) => {
-            if (password !== '6572') {
+            if (password !== '3733') {
                 Swal.showValidationMessage('Contraseña incorrecta');
             }
             return password;
