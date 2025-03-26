@@ -5433,7 +5433,7 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
         setTimeout(() => {
             spinner2.style.display = "none";
             // Ocultar el spinner y restaurar el botón
-            button.innerHTML = '<i class="bi bi-filetype-pdf"></i> Descaargar Etiqueta Novogar';
+            button.innerHTML = '<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar';
             button.disabled = false;
             window.open(pdfUrl, '_blank');
         }, 2000);
