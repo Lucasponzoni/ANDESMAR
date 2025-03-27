@@ -1309,7 +1309,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
     
                     <div class="card">
                         
-                        <div class="card-body ${cardBodyClass}">
+                    <div class="card-body ${cardBodyClass}">
 
 <div class="${(() => {
     const shopCode = data[i].orden_publica_.split('-').pop(); 
