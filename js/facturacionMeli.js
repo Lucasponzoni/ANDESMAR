@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        allData = Object.values(data).slice(-300); // Toma los últimos 400 registros
+        allData = Object.values(data).slice(-300);
         allData.reverse(); // Invertir el orden de los datos
 
         console.log(`Cantidad de datos recibidos: ${allData.length}`);
@@ -157,86 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.value = "";
         spinner.style.display = 'none';
 
-        let totalUpdated = 0;
-        let totalNotFound = 0;
-
-        // Verificar cada venta
-        const promises = allData.map(sale => {
-            if (sale.trackingNumber && !sale.cliente) {
-                const currentHour = new Date().getHours();
-                
-                if (currentHour >= 16) {
-                    return checkDespachosLogisticos(sale.trackingNumber, sale.idOperacion)
-                        .then(updated => {
-                            if (updated) totalUpdated++;
-                        })
-                        .catch(() => totalNotFound++);
-                } else {
-                    // Este log se ejecutará si la hora es menor a las 16hs
-                    console.log('La búsqueda de clientes se ejecutará luego de las 16hs');
-                    totalNotFound++;
-                    return Promise.resolve();
-                }
-            } else {
-                totalNotFound++;
-                return Promise.resolve();
-            }
-        });
-
-        // Esperar a que todas las promesas se resuelvan
-        Promise.all(promises).then(() => {
-            if (totalUpdated > 0 || totalNotFound > 0) {
-                console.log(`Resumen de actualizaciones: ${totalUpdated} actualizaciones realizadas, ${totalNotFound} no se encontraron.`);
-            }
-        })
-        .catch(error => {
-            console.error('Error al cargar los datos:', error);
-        });
-
     });
 });
-
-// Función para verificar en DespachosLogisticos
-function checkDespachosLogisticos(trackingNumber, idOperacion) {
-    return db.ref('DespachosLogisticos').limitToLast(1000).once('value')
-    .then(snapshot => {
-        const logisticData = snapshot.val();
-        let found = false;
-
-        if (logisticData) {
-            Object.values(logisticData).forEach(logistic => {
-                // Verificar si el número de envío coincide con el trackingNumber
-                if (logistic.numeroDeEnvio === trackingNumber) {
-                    found = true;
-                    const cliente = logistic.cliente || logistic.remitoVBA;
-
-                    // Preparar la actualización
-                    const updates = {};
-                    updates[`envios/${idOperacion}/cliente`] = cliente; 
-                    updates[`envios/${idOperacion}/remito`] = logistic.remito || logistic.remitoVBA;
-
-                    // Actualizar en Firebase
-                    return db.ref().update(updates)
-                    .then(() => true) // Retornar true si se actualizó
-                    .catch(error => {
-                        console.error('Error al actualizar en envios:', error);
-                        return false; // Retornar false si hubo un error
-                    });
-                }
-            });
-        }
-
-        if (!found) {
-            return false; 
-        }
-        
-        return false;
-    })
-    .catch(error => {
-        console.error('Error al cargar DespachosLogisticos:', error);
-        return false; 
-    });
-}
 
 // Obtener el valor de PasarAWebMonto antes de cargar las filas
 let pasarAWebMonto = 0;
