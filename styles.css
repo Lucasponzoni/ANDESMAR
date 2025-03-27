@@ -2421,7 +2421,7 @@ div.card-body > p > i{
     font-size: 0.75rem;
     text-transform: uppercase;
     padding: 5px;
-    border-radius: 0 0 5px 5px;
+    border-radius: 0;
     background-color: orange;
     border: cornflowerblue solid 1px; 
     color: white;
@@ -2429,7 +2429,7 @@ div.card-body > p > i{
     align-items: center;
     justify-content: center;
     margin-bottom: 5px !important;
-    z-index: -100;
+    z-index: 0;
 }
 
 .em-circle-ME2{
@@ -2438,7 +2438,7 @@ div.card-body > p > i{
     font-size: 0.75rem;
     text-transform: uppercase;
     padding: 5px;
-    border-radius: 0 0 5px 5px;
+    border-radius: 0;
     background-color: grey;
     border: cornflowerblue solid 1px;  
     color: white;
@@ -2446,7 +2446,7 @@ div.card-body > p > i{
     align-items: center;
     justify-content: center;
     margin-bottom: 5px !important;
-    z-index: -100;
+    z-index: 0;
 }
 
 .em-circle-isNotFraud::before {
@@ -3600,16 +3600,20 @@ div .form-check {
     font-size: small;
     border: 1px solid #ccc;
     background-color: #ecf0f1;
-    color: #34C759;
-    border-top: 2px solid #34C759;
+    color: #28831a;
+    border-top: 2px solid #28831a;
     font-family: "Rubik", sans-serif;
     padding: 2px 5px 15px 5px;
     border-radius: 15px 15px 0 0; 
     margin: 8px 0;
     margin-bottom: -10px;
     margin-top: 0;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;         
+    overflow: hidden;            
+    text-overflow: ellipsis;    
 }
+
 
 .card-text-isNotSkuIncludedPlaceIt {
     text-align: center;
@@ -3629,7 +3633,7 @@ div .form-check {
 
 .card-text-isSkuIncludedPlaceIt > i{
     font-size: 1.2rem;
-    color: #34C759;
+    color: #28831a;
 }
 
 .card-text-isSkuIncluded > i{
@@ -4129,8 +4133,8 @@ div .form-check {
     font-size: small;
     border: 1px solid #ccc;
     background-color: #ecf0f1;
-    color: #34C759;
-    border-top: 2px solid #34C759;
+    color: #28831a;
+    border-top: 2px solid #28831a;
     font-family: "Rubik", sans-serif;
     padding: 2px 5px 15px 5px;
     border-radius: 15px 15px 0 0; 
@@ -4219,6 +4223,7 @@ div .form-check {
     color: white;
     padding: 10px;
     border-radius: 10px 10px 0 0;
+    z-index: 0;
 }
 /* Fin Estilos del carrusel */
 
@@ -7030,6 +7035,22 @@ img.gray-filter {
     padding-top: 40px;
     margin-top: -40px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); 
+    z-index: -1;
+}
+
+.status-box-stock-tv-meli {
+    text-align: center;
+    padding: 3px 12px;
+    border-radius: 0 0 15px 15px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid cornflowerblue;
+    background-color: #ecf0f1;
+    margin-top: -6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); 
+    z-index: -1;
 }
 
 .icon-stock-tv {
@@ -7054,7 +7075,7 @@ img.gray-filter {
 }
 
 .stock-normal-stock-tv {
-    color: #34C759;
+    color: #28831a;
     font-family: "Rubik", sans-serif;
 }
 /* FIN STOCK PRECIO */
@@ -7075,9 +7096,9 @@ img.gray-filter {
 }
 
 .stock-normal-stock-Facturacion {
-    color: #34C759;
+    color: #28831a;
     font-family: "Rubik", sans-serif;
-    font-size: .8rem;
+    font-size: .75rem;
     font-weight: 400;
 }
 

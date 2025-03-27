@@ -40,8 +40,37 @@ const obtenerCredencialesCDS = async () => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+    await cargarPrecios();
     await obtenerCredencialesCDS();
+    await cargarDatos();
 });
+
+// CARGAR PRECIOS Y STOCK
+let preciosArray = [];
+
+// Función para cargar precios y stock
+async function cargarPrecios() {
+    return dbStock.ref('precios/').once('value')
+        .then(preciosSnapshot => {
+            // Verificamos si hay datos
+            if (preciosSnapshot.exists()) {
+                preciosSnapshot.forEach(childSnapshot => {
+                    const childData = childSnapshot.val();
+                    preciosArray.push({
+                        sku: childData.sku,
+                        stock: childData.stock
+                    });
+                });
+                console.log("Stock Sincronizado con éxito.");
+            } else {
+                console.log("No hay datos en la ruta especificada.");
+            }
+        })
+        .catch(error => {
+            console.error("Error al acceder a la base de datos:", error);
+        });
+}
+// FIN CARGAR PRECIOS Y STOCK
 
 // MODAL MELI LOCALIDADES
 document.getElementById('logisticaBsAsButton').addEventListener('click', () => {
@@ -206,7 +235,7 @@ Promise.all([
     cargarCpsLogSanNicolas(),
     cargarCpsLogCDS()
 ]).then(() => {
-    cargarDatos(); 
+    //cargarDatos(); 
 });
 // QUERY DE DATOS
 
@@ -398,7 +427,7 @@ searchInput.disabled = true;
 searchInput.value = "Aguardando que cargue la web ⏳";
 
 // Función para cargar datos de Firebase
-function cargarDatos() {
+async function cargarDatos() {
     const spinner = document.getElementById('spinner');
     const cardsContainer = document.getElementById('meli-cards');
     const paginationContainer = document.getElementById("pagination");
@@ -562,8 +591,46 @@ function crearCard(data) {
     return `$ ${Number(amount).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
-    const payment = data.payments?.[0] || {};
+            // VERIFICAR STOCK Y PRECIO
+        // Función para sanitizar el SKU
+        function sanitizeSku(sku) {
+            return sku.replace(/[^a-zA-Z0-9]/g, ''); // Eliminar caracteres especiales
+        }
 
+        // Obtener el SKU actual
+        const skuActual = data.SKU;
+
+        // Buscar el stock correspondiente en preciosArray
+        const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === sanitizeSku(skuActual));
+        const stock = precioItem ? precioItem.stock : 0; // Si no se encuentra, stock es 0
+
+        // Determinar mensaje y clase de estilo según el stock
+        let stockMessage, stockClass, stockIcon;
+
+        if (stock === 0) {
+            stockMessage = 'Sin Stock';
+            stockClass = 'sin-stock';
+            stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+        } else {
+            stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
+            stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
+            stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+        }
+
+        // Generar el HTML para el stock con clases CSS
+        let htmlstock = `
+        <div class="container-stock-tv">
+            <div class="status-box-stock-tv-meli">
+                <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
+                <p class="status-text-stock-tv ${stockClass}">
+                ${stock === 0 ? stockMessage : `${stockMessage} <strong>${skuActual}</strong>: <strong>${stock}</strong> u.`}
+                </p>
+            </div>
+        </div>
+        `;
+        // FIN VERIFICAR STOCK Y PRECIO
+
+const payment = data.payments?.[0] || {};
 let paymentMethodImage = '';
 let paymentDetails = '';
 
@@ -730,6 +797,8 @@ const paymentHTML = `
                 </div>
                 
                 <div class="em-circle-${data.shippingMode.toLowerCase() === 'me1' ? 'ME1' : 'ME2'}">${data.shippingMode.toUpperCase()}</div>
+
+                ${htmlstock}
 
                 <button class="btn btn-outline-secondary w-100 collapps-envio-meli" data-bs-toggle="collapse" data-bs-target="#collapseDetails${data.idOperacion}" aria-expanded="false" aria-controls="collapseDetails${data.idOperacion}">
                     <i class="bi bi-chevron-down"></i> Ver más detalles

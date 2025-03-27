@@ -329,7 +329,7 @@ function loadTable(data, estadoFilter = null) {
                     <div class="status-box-stock-Facturacion">
                         <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
                         <p class="status-text-stock-tv ${stockClass}">
-                        ${stock === 0 ? stockMessage : `${stockMessage} <strong>${stock}</strong> u.`}
+                        ${stock === 0 ? stockMessage : `${stockMessage} CD <strong>${stock}</strong> u.`}
                         </p>
                     </div>
                 </div>
