@@ -591,44 +591,58 @@ function crearCard(data) {
     return `$ ${Number(amount).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
-            // VERIFICAR STOCK Y PRECIO
-        // Función para sanitizar el SKU
-        function sanitizeSku(sku) {
-            return sku.replace(/[^a-zA-Z0-9]/g, ''); // Eliminar caracteres especiales
-        }
+// VERIFICAR STOCK Y PRECIO
+// Función para sanitizar el SKU
+function sanitizeSku(sku) {
+    if (typeof sku !== 'string') {
+        console.error('El SKU debe ser una cadena:', sku);
+        return ''; // Retorna una cadena vacía si no es válido
+    }
+    return sku.replace(/[^a-zA-Z0-9]/g, ''); // Eliminar caracteres especiales
+}
 
-        // Obtener el SKU actual
-        const skuActual = data.SKU;
+// Obtener el SKU actual
+const skuActual = data.SKU;
 
-        // Buscar el stock correspondiente en preciosArray
-        const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === sanitizeSku(skuActual));
-        const stock = precioItem ? precioItem.stock : 0; // Si no se encuentra, stock es 0
+if (skuActual === undefined || skuActual === null) {
+    console.error('SKU actual no definido:', skuActual);
+    return; // O maneja el error como desees
+}
 
-        // Determinar mensaje y clase de estilo según el stock
-        let stockMessage, stockClass, stockIcon;
+// Buscar el stock correspondiente en preciosArray
+const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === sanitizeSku(skuActual));
 
-        if (stock === 0) {
-            stockMessage = 'Sin Stock';
-            stockClass = 'sin-stock';
-            stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
-        } else {
-            stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
-            stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
-            stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
-        }
+if (!precioItem) {
+    console.warn('No se encontró el item para el SKU:', skuActual);
+}
 
-        // Generar el HTML para el stock con clases CSS
-        let htmlstock = `
-        <div class="container-stock-tv">
-            <div class="status-box-stock-tv-meli">
-                <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
-                <p class="status-text-stock-tv ${stockClass}">
-                ${stock === 0 ? stockMessage : `${stockMessage} <strong>${skuActual}</strong>: <strong>${stock}</strong> u.`}
-                </p>
-            </div>
-        </div>
-        `;
-        // FIN VERIFICAR STOCK Y PRECIO
+const stock = precioItem ? precioItem.stock : 0; // Si no se encuentra, stock es 0
+
+// Determinar mensaje y clase de estilo según el stock
+let stockMessage, stockClass, stockIcon;
+
+if (stock === 0) {
+    stockMessage = 'Sin Stock';
+    stockClass = 'sin-stock';
+    stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+} else {
+    stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
+    stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
+    stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+}
+
+// Generar el HTML para el stock con clases CSS
+let htmlstock = `
+<div class="container-stock-tv">
+    <div class="status-box-stock-tv-meli">
+        <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
+        <p class="status-text-stock-tv ${stockClass}">
+        ${stock === 0 ? stockMessage : `${stockMessage} <strong>${skuActual}</strong>: <strong>${stock}</strong> u.`}
+        </p>
+    </div>
+</div>
+`;
+// FIN VERIFICAR STOCK Y PRECIO
 
 const payment = data.payments?.[0] || {};
 let paymentMethodImage = '';
