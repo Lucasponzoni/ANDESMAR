@@ -3060,6 +3060,12 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         ? "CARGAS LOG RTO C Y SEGUIMIENTO"
         : "cargas remito conformado";
 
+    const random1 = Math.floor(Math.random() * 10) + 1; 
+    const random2 = Math.floor(Math.random() * 10) + 1; 
+    const random3 = Math.floor(Math.random() * 10) + 1; 
+        
+    const concatenatedNumbers = `${random1}${random2}${random3}`;
+
     const requestObj = {
         CalleRemitente: "Mendoza",
         CalleNroRemitente: "2799",
@@ -3070,7 +3076,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         CalleNroDestinatario: "S/N",
         TelefonoDestinatario: telefono,
         MailDestinatario: email,
-        NroRemito: "BNA" + remito,
+        NroRemito: "BNA" + remito + concatenatedNumbers,
         Bultos: bultos,
         Peso: peso * cantidad,
         ValorDeclarado: precio_venta * cantidad,
@@ -3387,7 +3393,11 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
         Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
     `);
 
-    const urlCds = `${corsh}https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenCm3}&peso=${peso}&codigopostal=${cp}&localidad=${localidad}&valor=${precio_venta}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${remito}&nombre=${nombre}&telefono=${telefono}&email=${email}&domicilio=${calle}&bultos=${bultos}&referencia=${remito}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
+    const random1 = Math.floor(Math.random() * 10) + 1;
+    const random2 = Math.floor(Math.random() * 10) + 1;
+    const random3 = Math.floor(Math.random() * 10) + 1;
+
+    const urlCds = `${corsh}https://api-ventaenlinea.cruzdelsur.com/api/NuevaCotXVolEntregaYDespacho?idcliente=${idCDS}&ulogin=${usuarioCDS}&uclave=${passCDS}&volumen=${volumenCm3}&peso=${peso}&codigopostal=${cp}&localidad=${localidad}&valor=${precio_venta}&contrareembolso=&items=&despacharDesdeDestinoSiTieneAlmacenamiento=&queentrega=${queEntregaCds}&quevia=T&documento=${remito}&nombre=${nombre}&telefono=${telefono}&email=${email}&domicilio=${calle}&bultos=${bultos}&referencia=${random1}${random2}${random3}OP${remito}&textosEtiquetasBultos&textoEtiquetaDocumentacion&devolverDatosParaEtiquetas=N`;
 
     const optionsCds = {
         method: 'GET',
