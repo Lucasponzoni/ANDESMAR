@@ -602,7 +602,7 @@ function sanitizeSku(sku) {
 }
 
 // Obtener el SKU actual
-const skuActual = data.SKU;
+const skuActual = data.SKU || "undefined";
 
 if (skuActual === undefined || skuActual === null) {
     console.error('SKU actual no definido:', skuActual);
@@ -624,7 +624,7 @@ let stockMessage, stockClass, stockIcon;
 if (stock === 0) {
     stockMessage = 'Sin Stock';
     stockClass = 'sin-stock';
-    stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+    stockIcon = 'bi-exclamation-circle-fill'; 
 } else {
     stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
     stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';

@@ -329,10 +329,12 @@ function crearCard(data) {
     function limpiarComentarios(observaciones) {
         return observaciones
             .replace(/[\n\r]/g, ' ') 
-            .replace(/[.,\/:;!@#$%^&*()_+|~=`{}\[\]<>?]/g, '')
+            .replace(/[.,\/:;!@#$%^&*()_+|~=`{}\[\]<>?]/g, '') 
             .replace(/'/g, "\\'") 
-            .replace(/"/g, '\\"');
-    }       
+            .replace(/"/g, '') 
+            .replace(/\s+/g, ' ') 
+            .trim(); 
+    }         
 
     // Función para formatear números en pesos
     function formatCurrency(amount) {
