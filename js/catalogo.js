@@ -413,7 +413,31 @@ async function cargarCatalogo() {
 
     meliCards.appendChild(tbody); // Agregar cuerpo de la tabla
     spinner.style.display = 'none'; // Ocultar el spinner
+
+    // Mostrar el botón de descarga
+    document.getElementById('downloadExcel').style.display = 'block';
 }
+
+// DESCARGAR EXCEL
+document.getElementById('downloadExcel').addEventListener('click', async () => {
+    const spinner = document.getElementById('spinner2');
+    spinner.style.display = 'flex'; // Mostrar el spinner
+
+    // Obtener los datos de la tabla
+    const table = document.getElementById('meli-cards');
+    const workbook = XLSX.utils.table_to_book(table, { sheet: "Catalogo" });
+
+    // Obtener la fecha y hora actual
+    const now = new Date();
+    const dateString = now.toISOString().slice(0, 19).replace(/:/g, '-'); // Formato: YYYY-MM-DDTHH-MM-SS
+    const fileName = `catalogo_productos_${dateString}.xlsx`; // Nombre del archivo con fecha y hora
+
+    // Generar el archivo Excel
+    XLSX.writeFile(workbook, fileName);
+
+    spinner.style.display = 'none'; // Ocultar el spinner
+});
+// FIN DESCARGAR EXCEL
 
 // Llamar a la función para cargar el catálogo al iniciar
 cargarCatalogo();

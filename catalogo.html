@@ -151,36 +151,40 @@
 
 </style>
 
-    <div class="container mt-5" id="cards-container">                   
+<div class="container mt-5" id="cards-container">                   
     
-        <div class="spinner-border spinner-border37892" role="status" id="spinner">
-            <img src="./Img/Novogar N.png" alt="Imagen" class="spinner-image">
-            <span class="sr-only">Cargando...</span>
-        </div>
+    <div class="spinner-border spinner-border37892" role="status" id="spinner">
+        <img src="./Img/Novogar N.png" alt="Imagen" class="spinner-image">
+        <span class="sr-only">Cargando...</span>
+    </div>
 
-        <div class="table-responsive" style="max-height: 600px; overflow-y: auto; overflow-x: auto;">
-            <table class="table table-striped" id="meli-cards">
-                <!-- Las filas de la tabla se generarán aquí -->
-            </table>
-        </div>
-           
-    </div> 
+    <div class="container mt-4">
+        <button id="downloadExcel" class="btn btn-light" style="display: none; color: green;">
+            <i class="bi bi-file-earmark-excel mr-1" style="font-size: 16px; color: green;"></i><strong>Descargar</strong> tabla en Excel
+        </button>
+    </div>
     
-    <div id="spinner2" class="spinner-container" style="display:none;">
-        <img id="spinnerImage" src="./Img/etiqueta-animada.gif" alt="Cargando..."></img>
-    </div>  
-    
+    <div class="table-responsive" style="max-height: 600px; overflow-y: auto; overflow-x: auto;">
+        <table class="table table-striped" id="meli-cards">
+            <!-- Las filas de la tabla se generarán aquí -->
+        </table>
+    </div>    
+       
+</div> 
 
+<div id="spinner2" class="spinner-container" style="display:none;">
+    <img id="spinnerImage" src="./Img/etiqueta-animada.gif" alt="Cargando..."></img>
+</div>  
 
-    <!-- Botón de flecha hacia arriba -->
-    <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
-        <i class="fas fa-arrow-up"></i>
-    </a>
+<!-- Botón de flecha hacia arriba -->
+<a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
+    <i class="fas fa-arrow-up"></i>
+</a>
 
-    <!-- Botón de flecha hacia Abajo -->
-    <a href="#" id="scrollToDown" class="btn btn-warning" style="display: none;">
-        <i class="fas fa-arrow-down"></i> <!-- Cambiar a flecha hacia abajo -->
-    </a>
+<!-- Botón de flecha hacia Abajo -->
+<a href="#" id="scrollToDown" class="btn btn-warning" style="display: none;">
+    <i class="fas fa-arrow-down"></i> <!-- Cambiar a flecha hacia abajo -->
+</a>
 
     <footer class="center">
         <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
@@ -205,6 +209,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
