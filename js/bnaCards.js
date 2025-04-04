@@ -1885,51 +1885,43 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
     const databaseRef = firebase.database().ref('enviosBNA');
     databaseRef.off();
 
-    // Mostrar el cuadro de diálogo para la contraseña
-    Swal.fire({
-        title: 'Clave de Preparación 🔒',
-        input: 'password',
-        inputLabel: 'Contraseña de facturación (Solicítela a Mauri Villan)',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar',
-        inputValidator: (value) => {
-            if (!value) {
-                return '¡Necesitas ingresar una contraseña!';
-            } else if (value !== '6572') {
-                return 'Contraseña incorrecta.';
-            }
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Verificar si el tipo de electrodoméstico ya existe
-            firebase.database().ref('enviosBNA/' + data[i].id).once('value').then((snapshot) => {
-                const tipoElectrodomesticoActual = snapshot.val().tipoElectrodomesticoBna;
+    // Verificar si el tipo de electrodoméstico ya existe
+    firebase.database().ref('enviosBNA/' + data[i].id).once('value').then((snapshot) => {
+        const tipoElectrodomesticoActual = snapshot.val().tipoElectrodomesticoBna;
 
-                // Solo actualizar si el tipo de electrodoméstico no existe
-                if (!tipoElectrodomesticoActual) {
-                    firebase.database().ref('enviosBNA/' + data[i].id).update({
-                        marcaPreparado: nuevoEstado,
-                        tipoElectrodomesticoBna: "bulto50"
-                    }).then(() => {
-                        console.log(`Estado de preparación actualizado a: ${nuevoEstado}`);
-                        
-                        // Actualizar el badge
-                        const contadorCards1 = document.getElementById('contadorCards1');
-                        if (contadorCards1) {
-                            const currentCount = parseInt(contadorCards1.innerText) || 0;
-                            contadorCards1.innerText = this.checked ? Math.max(currentCount - 1, 0) : currentCount + 1; // Resta si está marcado, suma si está desmarcado
-                        }
-                    }).catch(error => {
-                        console.error("Error al actualizar el estado de preparación: ", error);
-                    });
-                } else {
-                    console.log('El tipo de electrodoméstico ya existe, ignorando la actualización.');
+        // Solo actualizar si no existe o si está vacío
+        if (!tipoElectrodomesticoActual || tipoElectrodomesticoActual === "") {
+            firebase.database().ref('enviosBNA/' + data[i].id).update({
+                marcaPreparado: nuevoEstado,
+                tipoElectrodomesticoBna: "bulto50" // Actualiza también tipoElectrodomesticoBna
+            }).then(() => {
+                console.log(`Estado de preparación actualizado a: ${nuevoEstado}`);
+                
+                // Actualizar el badge
+                const contadorCards1 = document.getElementById('contadorCards1');
+                if (contadorCards1) {
+                    const currentCount = parseInt(contadorCards1.innerText) || 0;
+                    contadorCards1.innerText = this.checked ? Math.max(currentCount - 1, 0) : currentCount + 1; // Resta si está marcado, suma si está desmarcado
                 }
+            }).catch(error => {
+                console.error("Error al actualizar el estado de preparación: ", error);
             });
         } else {
-            // Revertir el estado del switch si se cancela o la contraseña es incorrecta
-            this.checked = !this.checked;
+            // Si ya existe y no está vacío, solo actualizar marcaPreparado
+            firebase.database().ref('enviosBNA/' + data[i].id).update({
+                marcaPreparado: nuevoEstado
+            }).then(() => {
+                console.log(`Estado de preparación actualizado a: ${nuevoEstado} sin cambiar tipoElectrodomesticoBna.`);
+                
+                // Actualizar el badge
+                const contadorCards1 = document.getElementById('contadorCards1');
+                if (contadorCards1) {
+                    const currentCount = parseInt(contadorCards1.innerText) || 0;
+                    contadorCards1.innerText = this.checked ? Math.max(currentCount - 1, 0) : currentCount + 1; // Resta si está marcado, suma si está desmarcado
+                }
+            }).catch(error => {
+                console.error("Error al actualizar el estado de preparación: ", error);
+            });
         }
     });
 });
