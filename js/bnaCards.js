@@ -52,10 +52,18 @@ function cargarSKUs(ref, listBodyId, loadingSpinnerId) {
     firebase.database().ref(ref).once('value').then(snapshot => {
         skuListBody.innerHTML = ''; // Limpiar la tabla
         snapshot.forEach(childSnapshot => {
-            const sku = childSnapshot.val().sku;
+            const sku = childSnapshot.val().sku; // Asegúrate que 'sku' sea la propiedad correcta
+            const stock = childSnapshot.val().stock || 0; // Obtener stock, default a 0 si no existe
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${sku}</td>
+                <td>
+                    <span style="flex: 1;">${sku}</span> <!-- Aquí se carga el SKU -->
+                </td>
+                <td>
+                    <span style="font-size: 0.75em; color: #2f3e51; background: #e8f0fe; padding: 4px 10px; border-radius: 6px; margin-left: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                    Stock: <strong style="font-weight: 800;">${stock}</strong>
+                    </span>
+                </td>
                 <td>
                     <button class="btn btn-danger" onclick="eliminarSKU('${ref}', '${childSnapshot.key}', '${listBodyId}', '${loadingSpinnerId}')">
                         <i class="fas fa-trash"></i>
@@ -86,7 +94,7 @@ function agregarSKU(ref, inputId, alertContainerId, loadingSpinnerId, listBodyId
                 mostrarAlerta(alertContainerId, 'El SKU ya existe en el listado', 'danger');
             } else {
                 // Agregar nuevo SKU
-                newRef.set({ sku: newSku })
+                newRef.set({ sku: newSku, stock: 0 }) // Puedes ajustar el stock inicial aquí
                     .then(() => {
                         console.log(`SKU agregado: ${newSku}`);
                         mostrarAlerta(alertContainerId, 'Se ha agregado el SKU al listado', 'success');
@@ -134,21 +142,28 @@ function eliminarSKU(ref, key, listBodyId, loadingSpinnerId) {
 $('#skuModal').on('show.bs.modal', () => {
     document.getElementById('newSkuInput').value = ''; // Limpiar el input
     cargarSKUs('imei', 'skuListBody', 'loadingSpinner'); // Cargar los SKU al abrir el modal
+    
+    // Agregar event listener para agregar SKU en el modal
+    const addSkuButton = document.getElementById('addSkuButton');
+    if (addSkuButton) {
+        addSkuButton.addEventListener('click', () => {
+            agregarSKU('imei', 'newSkuInput', 'alertContainer', 'loadingSpinner', 'skuListBody');
+        });
+    }
 });
 
 // Limpiar el input y cargar los SKU al abrir el modal PlaceIt
 $('#skuPlaceItModal').on('show.bs.modal', () => {
     document.getElementById('newSkuInputPlaceIt').value = ''; // Limpiar el input
     cargarSKUs('stockPlaceIt', 'skuPlaceItListBody', 'loadingSpinnerPlaceIt'); // Cargar los SKU al abrir el modal
-});
-
-// Event listeners para agregar SKU en ambos modales
-document.getElementById('addSkuButton').addEventListener('click', () => {
-    agregarSKU('imei', 'newSkuInput', 'alertContainer', 'loadingSpinner', 'skuListBody');
-});
-
-document.getElementById('addSkuButtonPlaceIt').addEventListener('click', () => {
-    agregarSKU('stockPlaceIt', 'newSkuInputPlaceIt', 'alertContainerPlaceIt', 'loadingSpinnerPlaceIt', 'skuPlaceItListBody');
+    
+    // Agregar event listener para agregar SKU en el modal PlaceIt
+    const addSkuButtonPlaceIt = document.getElementById('addSkuButtonPlaceIt');
+    if (addSkuButtonPlaceIt) {
+        addSkuButtonPlaceIt.addEventListener('click', () => {
+            agregarSKU('stockPlaceIt', 'newSkuInputPlaceIt', 'alertContainerPlaceIt', 'loadingSpinnerPlaceIt', 'skuPlaceItListBody');
+        });
+    }
 });
 // FIN CARGA SKU
 
