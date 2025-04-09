@@ -248,7 +248,6 @@ async function cargarCatalogo() {
     // Agregar CSS dinámicamente
     const style = document.createElement('style');
     style.textContent = `
-        /* Estilos para la tabla */
         table {
             border-collapse: collapse;
             width: 100%;
@@ -260,36 +259,33 @@ async function cargarCatalogo() {
             text-align: left;
         }
 
-        /* Colores de fondo para las filas */
         tbody tr:nth-child(even) {
-            background-color: #f2f2f2; /* Color claro */
+            background-color: #f2f2f2;
         }
 
         tbody tr:nth-child(odd) {
-            background-color: #e0e0e0; /* Color un poco más oscuro */
+            background-color: #e0e0e0;
         }
 
-        /* Colores de fondo para los encabezados */
         th:nth-child(odd) {
-            background-color: #d9edf7; /* Color claro para encabezados impares */
+            background-color: #d9edf7;
         }
 
         th:nth-child(even) {
-            background-color: #bce8f1; /* Color más oscuro para encabezados pares */
+            background-color: #bce8f1;
         }
     `;
-    document.head.appendChild(style); // Agregar el estilo al documento
+    document.head.appendChild(style);
 
     const catalogoRef = database.ref('catalogo');
     const snapshot = await catalogoRef.once('value');
 
-    // Contenedor de la tabla
     const meliCards = document.getElementById('meli-cards');
-    meliCards.innerHTML = ''; // Limpiar contenido previo
+    meliCards.innerHTML = '';
 
-    // Crear encabezados de la tabla
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
+
     const headers = [
         'Codigo', 'Nombre', 'Precio', 'Precio De Lista', 'Cod. Moneda',
         'Cod. Proveedor', 'Stock', 'Stock Min.', 'Cod. Categoria Padre',
@@ -300,28 +296,51 @@ async function cargarCatalogo() {
         'Alto de la caja', 'Profundidad de la caja', 'Bultos'
     ];
 
+    // Recolectar todos los atributos únicos
+    const uniqueAttributes = new Set();
+
+    snapshot.forEach(childSnapshot => {
+        const data = childSnapshot.val();
+        if (data.attributes) {
+            data.attributes.forEach(attribute => {
+                if (attribute.value_name) {
+                    uniqueAttributes.add(`FICHA: ${attribute.name}`);
+                }
+            });
+        }
+    });
+
+    // Agregar encabezados fijos
     headers.forEach(headerText => {
         const th = document.createElement('th');
         th.textContent = headerText;
         headerRow.appendChild(th);
     });
-    thead.appendChild(headerRow);
-    meliCards.appendChild(thead); // Agregar encabezado a la tabla
 
-    // Crear cuerpo de la tabla
+    // Agregar encabezados dinámicos de atributos
+    const fichaHeaders = Array.from(uniqueAttributes).sort();
+    fichaHeaders.forEach(ficha => {
+        const th = document.createElement('th');
+        th.textContent = ficha;
+        headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    meliCards.appendChild(thead);
+
     const tbody = document.createElement('tbody');
 
     snapshot.forEach(childSnapshot => {
         const data = childSnapshot.val();
+        if (!data.SKU || !data.SKU.trim()) return; // ⛔ Salta si no tiene SKU válido
+    
         const row = document.createElement('tr');
 
-        // Obtener medidas
         const medidas = data.medidas ? data.medidas.match(/(\d+(\.\d+)?)x(\d+(\.\d+)?)x(\d+(\.\d+)?)/) : [];
         const medida1 = medidas[1] || '';
         const medida2 = medidas[3] || '';
         const medida3 = medidas[5] || '';
 
-        // Crear las keywords
         const keywords = [
             data.Producto || '',
             data.marca || '',
@@ -331,10 +350,8 @@ async function cargarCatalogo() {
             data.categoryId || ''
         ].filter(Boolean).join(', ');
 
-        // Separar palabras del producto para keywords
         const productKeywords = (data.Producto || '').split(' ').join(', ');
 
-        // Crear celdas con los datos requeridos
         const rowData = [
             sanitizeSKU(data.SKU),
             data.Producto || '',
@@ -371,51 +388,30 @@ async function cargarCatalogo() {
             row.appendChild(td);
         });
 
-        // Agregar atributos dinámicamente
+        // Crear un diccionario con los atributos del producto
+        const atributosDelProducto = {};
         if (data.attributes) {
-            let attributeIndex = 1; // Para contar los atributos
-
             data.attributes.forEach(attribute => {
                 if (attribute.value_name) {
-                    // Crear encabezados si no existen
-                    const attrHeaderText = `Atributo ${attributeIndex}`;
-                    const valueHeaderText = `Valor ${attributeIndex}`;
-
-                    // Verificar si el encabezado ya existe
-                    if (!Array.from(headerRow.children).some(th => th.textContent === attrHeaderText)) {
-                        const attrHeader = document.createElement('th');
-                        attrHeader.textContent = attrHeaderText;
-                        headerRow.appendChild(attrHeader);
-                    }
-
-                    if (!Array.from(headerRow.children).some(th => th.textContent === valueHeaderText)) {
-                        const valueHeader = document.createElement('th');
-                        valueHeader.textContent = valueHeaderText;
-                        headerRow.appendChild(valueHeader);
-                    }
-
-                    // Crear celdas para el atributo y su valor
-                    const attrCell = document.createElement('td');
-                    attrCell.textContent = attribute.name;
-                    row.appendChild(attrCell);
-
-                    const valueCell = document.createElement('td');
-                    valueCell.textContent = attribute.value_name;
-                    row.appendChild(valueCell);
-
-                    attributeIndex++; // Incrementar el índice de atributos
+                    atributosDelProducto[`FICHA: ${attribute.name}`] = attribute.value_name;
                 }
             });
         }
 
+        // Agregar columnas de atributos en el orden correcto
+        fichaHeaders.forEach(ficha => {
+            const td = document.createElement('td');
+            td.textContent = atributosDelProducto[ficha] || '';
+            row.appendChild(td);
+        });
+
         tbody.appendChild(row);
     });
 
-    meliCards.appendChild(tbody); // Agregar cuerpo de la tabla
-    spinner.style.display = 'none'; // Ocultar el spinner
-
-    // Mostrar el botón de descarga
+    meliCards.appendChild(tbody);
+    spinner.style.display = 'none';
     document.getElementById('downloadExcel').style.display = 'block';
+    document.getElementById('downloadFotos').style.display = 'block';
 }
 
 // DESCARGAR EXCEL
@@ -438,6 +434,90 @@ document.getElementById('downloadExcel').addEventListener('click', async () => {
     spinner.style.display = 'none'; // Ocultar el spinner
 });
 // FIN DESCARGAR EXCEL
+
+document.getElementById('downloadFotos').addEventListener('click', async () => {
+    const btn = document.getElementById('downloadFotos');
+    const originalContent = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Preparando archivo...`;
+
+    const catalogoRef = database.ref('catalogo');
+    const snapshot = await catalogoRef.once('value');
+    const catalogo = snapshot.val() || {};
+
+    const JSZipInstance = new JSZip();
+    const maxConcurrentDownloads = 5;
+
+    const sanitizeFileName = (name) => name.replace(/[^a-zA-Z0-9-_]/g, '_');
+
+    // Función que limita la cantidad de descargas simultáneas
+    async function asyncPool(poolLimit, items, iteratorFn) {
+        const ret = [];
+        const executing = [];
+
+        for (const item of items) {
+            const p = Promise.resolve().then(() => iteratorFn(item));
+            ret.push(p);
+
+            if (poolLimit <= items.length) {
+                const e = p.then(() => executing.splice(executing.indexOf(e), 1));
+                executing.push(e);
+                if (executing.length >= poolLimit) await Promise.race(executing);
+            }
+        }
+
+        return Promise.all(ret);
+    }
+
+    let hasContent = false;
+    const downloadTasks = [];
+
+    for (const child of Object.values(catalogo)) {
+        const sku = sanitizeFileName(child.SKU || '');
+        const pictures = child.pictures || [];
+
+        if (!sku || pictures.length === 0) continue;
+
+        const folder = JSZipInstance.folder(sku);
+        pictures.forEach((pic, index) => {
+            downloadTasks.push({
+                url: pic.secure_url,
+                fileName: `foto${index + 1}.jpg`,
+                folder
+            });
+        });
+
+        hasContent = true;
+    }
+
+    if (!hasContent) {
+        alert("No hay imágenes disponibles para descargar.");
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+        return;
+    }
+
+    // Ejecutar tareas con límite de concurrencia
+    await asyncPool(maxConcurrentDownloads, downloadTasks, async ({ url, fileName, folder }) => {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Error con imagen ${url}`);
+            const blob = await res.blob();
+            folder.file(fileName, blob);
+        } catch (err) {
+            console.warn(`Error descargando ${url}:`, err.message);
+        }
+    });
+
+    const zipBlob = await JSZipInstance.generateAsync({ type: 'blob' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(zipBlob);
+    link.download = `fotos_catalogo_${new Date().toLocaleDateString('es-AR')}.zip`;
+    link.click();
+
+    btn.innerHTML = originalContent;
+    btn.disabled = false;
+});
 
 // Llamar a la función para cargar el catálogo al iniciar
 cargarCatalogo();

@@ -158,9 +158,14 @@
         <span class="sr-only">Cargando...</span>
     </div>
 
-    <div class="container mt-4">
+    <div class="container mt-4 d-flex" style="gap: 5px;">
         <button id="downloadExcel" class="btn btn-light" style="display: none; color: green;">
-            <i class="bi bi-file-earmark-excel mr-1" style="font-size: 16px; color: green;"></i><strong>Descargar</strong> tabla en Excel
+            <i class="bi bi-file-earmark-excel mr-1" style="font-size: 16px; color: green;"></i>
+            <strong>Descargar</strong> tabla en Excel
+        </button>
+        <button id="downloadFotos" class="btn btn-light" style="display: none; color: #17a2b8;">
+            <i class="bi bi-image mr-1" style="font-size: 16px; color: #17a2b8;"></i>
+            <strong>Descargar</strong> fotografías
         </button>
     </div>
     
@@ -201,6 +206,8 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 
     <!-- SweetAlert JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
