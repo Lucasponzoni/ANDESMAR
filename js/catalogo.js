@@ -475,20 +475,22 @@ document.getElementById('downloadFotos').addEventListener('click', async () => {
     for (const child of Object.values(catalogo)) {
         const sku = sanitizeFileName(child.SKU || '');
         const pictures = child.pictures || [];
-
+    
         if (!sku || pictures.length === 0) continue;
-
+    
         const folder = JSZipInstance.folder(sku);
         pictures.forEach((pic, index) => {
+            // Cambia el nombre del archivo a "SKU|número.jpg"
+            const fileName = `${child.SKU}|${index + 1}.jpg`;
             downloadTasks.push({
                 url: pic.secure_url,
-                fileName: `foto${index + 1}.jpg`,
+                fileName: fileName,
                 folder
             });
         });
-
+    
         hasContent = true;
-    }
+    }    
 
     if (!hasContent) {
         alert("No hay imágenes disponibles para descargar.");
