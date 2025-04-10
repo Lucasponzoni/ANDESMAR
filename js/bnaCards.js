@@ -42,6 +42,73 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadEnviosFromFirebase();
 });
 
+let logBsCps = []; // Array para almacenar los CPs de LogBsAs
+let logStaFeCps = []; // Array para almacenar los CPs de LogSantaFe
+let logRafaelaCps = []; // Array para almacenar los CPs de LogRafaela
+let logSanNicolasCps = []; // Array para almacenar los CPs de LogSanNicolas
+let logCDSCps = []; // Array para almacenar los CPs de Cruz del Sur
+
+// Función para cargar los CPs de LogBsAs
+function cargarCpsLogBsAs() {
+    return dbMeli.ref('LogBsAs').once('value').then(snapshot => {
+        const logBsData = snapshot.val();
+        if (logBsData) {
+            logBsCps = Object.keys(logBsData).map(cp => Number(cp));
+        }
+    });
+}
+
+// Función para cargar los CPs de LogSantaFe
+function cargarCpsLogStaFe() {
+    return dbMeli.ref('LogSantaFe').once('value').then(snapshot => {
+        const logStaFeData = snapshot.val();
+        if (logStaFeData) {
+            logStaFeCps = Object.keys(logStaFeData).map(cp => Number(cp));
+        }
+    });
+}
+
+// Función para cargar los CPs de LogRafaela
+function cargarCpsLogRafaela() {
+    return dbMeli.ref('LogRafaela').once('value').then(snapshot => {
+        const logRafaelaData = snapshot.val();
+        if (logRafaelaData) {
+            logRafaelaCps = Object.keys(logRafaelaData).map(cp => Number(cp));
+        }
+    });
+}
+
+// Función para cargar los CPs de LogSanNicolas
+function cargarCpsLogSanNicolas() {
+    return dbMeli.ref('LogSanNicolas').once('value').then(snapshot => {
+        const logSanNicolasData = snapshot.val();
+        if (logSanNicolasData) {
+            logSanNicolasCps = Object.keys(logSanNicolasData).map(cp => Number(cp));
+        }
+    });
+}
+
+// Función para cargar los CPs de LogCDS
+function cargarCpsLogCDS() {
+    return dbMeli.ref('LogCDS').once('value').then(snapshot => {
+        const logCDSData = snapshot.val();
+        if (logCDSData) {
+            logCDSCps = Object.keys(logCDSData).map(cp => Number(cp));
+        }
+    });
+}
+
+// Llamar a las funciones para cargar los CPs antes de cargar los datos
+Promise.all([
+    cargarCpsLogBsAs(),
+    cargarCpsLogStaFe(),
+    cargarCpsLogRafaela(),
+    cargarCpsLogSanNicolas(),
+    cargarCpsLogCDS()
+]).then(() => {
+    //cargarDatos(); 
+});
+
 // CARGA SKU
 // Función para cargar SKU desde Firebase
 function cargarSKUs(ref, listBodyId, loadingSpinnerId) {
@@ -1377,22 +1444,33 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             ${data[i].cp}, ${data[i].localidad}, ${data[i].provincia}
                             </p>
 
-                            
                             <p class="card-text correo-meli ${
-                            isMacro(storeCode) ? 'correo-oca' :
-                            cpsAndesmar.includes(Number(data[i].cp)) ? 'correo-andesmar' : 
-                            cpsCDS.includes(Number(data[i].cp)) ? 'correo-cds' : 
-                            'correo-andreani'
+                                logBsCps.includes(Number(data[i].cp)) ? 'correo-novogar' :
+                                logStaFeCps.includes(Number(data[i].cp)) ? 'correo-santafe' :
+                                logRafaelaCps.includes(Number(data[i].cp)) ? 'correo-rafaela' :
+                                logSanNicolasCps.includes(Number(data[i].cp)) ? 'correo-sannicolas' :
+                                isMacro(storeCode) ? 'correo-oca' :
+                                cpsCDS.includes(Number(data[i].cp)) ? 'correo-cds' :
+                                cpsAndesmar.includes(Number(data[i].cp)) ? 'correo-andesmar' :
+                                'correo-andreani'
                             }">
                                 ${
-                            isMacro(storeCode) ? 
-                            '<img src="Img/oca-tini.png" alt="OCA" width="20" height="20">' :
-                            cpsAndesmar.includes(Number(data[i].cp)) ? 
-                            '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
-                            cpsCDS.includes(Number(data[i].cp)) ? 
-                            '<img src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur" width="20" height="20">' : 
-                            '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
-                            }
+                                logBsCps.includes(Number(data[i].cp)) ? 
+                                '<img src="Img/novogar-tini.png" alt="Logística Novogar" width="20" height="20">Buenos Aires' :
+                                logStaFeCps.includes(Number(data[i].cp)) ? 
+                                '<img src="Img/novogar-tini.png" alt="Logística Santa Fe" width="20" height="20">Santa Fe' :
+                                logRafaelaCps.includes(Number(data[i].cp)) ? 
+                                '<img src="Img/novogar-tini.png" alt="Logística Rafaela" width="20" height="20">Rafaela' :
+                                logSanNicolasCps.includes(Number(data[i].cp)) ? 
+                                '<img src="Img/novogar-tini.png" alt="Logística San Nicolás" width="20" height="20">San Nicolás' :
+                                isMacro(storeCode) ? 
+                                '<img src="Img/oca-tini.png" alt="OCA" width="20" height="20">' :
+                                cpsCDS.includes(Number(data[i].cp)) ? 
+                                '<img src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur" width="20" height="20">' :
+                                cpsAndesmar.includes(Number(data[i].cp)) ? 
+                                '<img src="Img/andesmar-tini.png" alt="Andesmar" width="20" height="20">' : 
+                                '<img src="Img/andreani-tini.png" alt="Andreani" width="20" height="20">'
+                                }
                             </p>
 
                             <button class="btn btn-sm btn-" style="color: #007bff;" id="edit-localidad-${data[i].id}">
@@ -2950,6 +3028,9 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     const databaseRef = firebase.database().ref('enviosBNA');
     databaseRef.off();
 
+    // Redondear el precio_venta y convertirlo a un entero
+    const precioVentaRedondeado = Math.round(precio_venta);
+
     // Comprobar si los elementos existen
     if (!volumenCm3Elemento || !volumenM3Elemento) {
         Swal.fire({
@@ -3057,7 +3138,9 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
+    const remitoCliente = await solicitarNumeroRemito();
+    if (!cliente) return; 
+    if (!remitoCliente) return; 
 
     spinner.style.display = 'inline-block';
     text.innerText = 'Generando Etiqueta...';
@@ -3171,6 +3254,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
                 transportCompany: "Andesmar",
                 trackingLink: linkSeguimiento,
                 transportCompanyNumber: data.NroPedido,
+                remito: remitoCliente,
                 cliente: cliente
             };
             
@@ -3199,6 +3283,24 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             } else {
                 console.error(`El elemento con id estadoEnvio${id} no se encontró.`);
             }
+
+            // Agregar datos a "DespachosLogisticos"
+            const fechaHoraFormateada = formatearFechaHora(fechaHora); 
+
+            // Asegúrate de que la función sea async si estás usando await
+            await dbMeli.ref(`DespachosLogisticos/${remitoCliente}`).set({
+                cliente: cliente,
+                estado: "Pendiente de despacho",
+                fechaHora: fechaHoraFormateada,
+                operadorLogistico: "Pendiente",
+                remito: remitoCliente,
+                remitoVBA: remitoCliente,
+                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}` // Formatear como pesos argentinos
+            }).then(() => {
+                console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
+            }).catch(error => {
+                console.error('Error al actualizar en DespachosLogisticos:', error);
+            });
 
             // Enviar el email después de procesar el envío
             await sendEmail(Name, Subject, template, nombre, email, `BNA${remito}`, linkSeguimiento2, transporte);
@@ -3249,6 +3351,116 @@ function addUpdateObservacionesEvent() {
             });
         });
     });
+}
+
+// Función para solicitar el número de cliente usando SweetAlert
+async function solicitarCliente() {
+    const { value: numeroCliente } = await Swal.fire({
+        title: '¿Cuál es el número de cliente?',
+        html: `
+            <div class="input-container">
+                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
+                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroCliente');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroCliente').value;
+            // Validaciones
+            if (!/^\d{2,8}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
+                return false;
+            }
+            return input;
+        },
+        allowEnterKey: true
+    });
+
+    // Si el usuario cancela, salir de la función
+    if (!numeroCliente) {
+        return null; // Retorna null si se cancela
+    }
+    return numeroCliente;
+}
+
+// Función para solicitar el número de remito usando SweetAlert
+async function solicitarNumeroRemito() {
+    const { value: numeroRemito } = await Swal.fire({
+        title: '¿Cuál es el número de remito?',
+        html: `
+            <div class="input-container">
+                <input id="numeroRemito" class="swal2-input" placeholder="Número de Remito" maxlength="20" required>
+                <small class="input-description">Ingresar número de remito (mínimo 10 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroRemito');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroRemito').value;
+            // Validaciones
+            if (!/^\d{10,}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un número de remito válido');
+                return false;
+            }
+            return input;
+        },
+        allowEnterKey: true
+    });
+
+    // Si el usuario cancela, salir de la función
+    if (!numeroRemito) {
+        return null; // Retorna null si se cancela
+    }
+    return numeroRemito;
+}
+
+const fechaHora = new Date(); // Obtener la fecha y hora actual
+
+function formatearFechaHora(fechaHora) {
+    const dia = fechaHora.getDate();
+    const mes = fechaHora.getMonth() + 1; // Los meses son 0-11
+    const año = fechaHora.getFullYear();
+    const horas = fechaHora.getHours();
+    const minutos = fechaHora.getMinutes();
+    const segundos = fechaHora.getSeconds();
+
+    // Formatear con ceros a la izquierda
+    return `${dia}/${mes}/${año}, ${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
 }
 
 // BOTON CRUZ DEL SUR
@@ -3336,9 +3548,11 @@ async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, call
     
     console.log(`Volumen Total en m³: ${volumenTotalcds}`);
 
-    // Solicitar el cliente
-    const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
+        // Solicitar el cliente
+        const cliente = await solicitarCliente();
+        const remitoCliente = await solicitarNumeroRemito();
+        if (!cliente) return; 
+        if (!remitoCliente) return; 
 
     // Mostrar spinner y cambiar texto
     spinnerCDS.style.display = 'inline-block';
@@ -3448,25 +3662,44 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
             const numeroDeEnvioCDS = `NIC-${nicCds}`;
             trackingNumber = `${nicCds}`;
 
-                        // Pushear datos a Firebase
-                        const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
-                        const transportData = {
-                            transportCompany: "Cruz del Sur",
-                            trackingNumber: trackingNumber,
-                            trackingLink: trackingLink,
-                            cotizacion: numeroCotizacionCds,
-                            transportCompanyNumber: numeroDeEnvioCDS,
-                            cliente: cliente,
-                        };
-                        
-                          db.ref(`enviosBNA/${id}`).update(transportData)
-                            .then(() => {
-                                console.log("Datos actualizados en Firebase como Andreani:", transportData);
-                            })
-                            .catch((error) => {
-                                            console.error("Error al actualizar datos en Firebase:", error);
-                            });
-            
+            // Pushear datos a Firebase
+            const db = firebase.database(); // Asegúrate de que Firebase esté inicializado
+            const transportData = {
+                transportCompany: "Cruz del Sur",
+                trackingNumber: trackingNumber,
+                trackingLink: trackingLink,
+                cotizacion: numeroCotizacionCds,
+                transportCompanyNumber: numeroDeEnvioCDS,
+                remito: remitoCliente,
+                cliente: cliente,
+            };
+
+            // Actualizar datos en enviosBNA
+            db.ref(`enviosBNA/${id}`).update(transportData)
+                .then(() => {
+                    console.log("Datos actualizados en Firebase como Cruz del Sur:", transportData);
+                })
+                .catch(error => {
+                    console.error('Error al actualizar en Firebase:', error);
+                });
+
+            // Agregar datos a "DespachosLogisticos"
+            const fechaHoraFormateada = formatearFechaHora(fechaHora); 
+
+            // Asegúrate de que la función sea async si estás usando await
+            await dbMeli.ref(`DespachosLogisticos/${remitoCliente}`).set({
+                cliente: cliente,
+                estado: "Pendiente de despacho",
+                fechaHora: fechaHoraFormateada,
+                operadorLogistico: "Pendiente",
+                remito: remitoCliente,
+                remitoVBA: remitoCliente,
+                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+            }).then(() => {
+                console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
+            }).catch(error => {
+                console.error('Error al actualizar en DespachosLogisticos:', error);
+            });
             
                         // Cambiar el estado del envío
                         if (envioState) {
@@ -3475,7 +3708,7 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
                         }
 
                         const Name = `Confirmación de Envio Novogar`;
-                        const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
+                        const Subject = `Tu compra ${remitoCliente} ya fue preparada para despacho`;
                         const template = "emailTemplateAndreani";
                         const transporte = "Correo Cruz del Sur";
                         const numeroDeEnvio = `NIC-${nicCds}`;
@@ -3683,11 +3916,16 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
+    const remitoCliente = await solicitarNumeroRemito();
+    if (!cliente) return; 
+    if (!remitoCliente) return; 
 
     spinnerOca.style.display = 'inline-block';
     textOca.innerText = 'Generando Etiqueta...';
     button.disabled = true;
+
+    // Redondear el precio_venta y convertirlo a un entero
+    const precioVentaRedondeado = Math.round(precio_venta);
 
     // Parsear la fecha
     const [dia, mes, anio] = fecha.split(' ')[0].split('-');
@@ -3787,6 +4025,7 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
             // Pushear datos a Firebase
             const db = firebase.database();
             const transportData = {
+                remito: remitoCliente,
                 medio_de_envio: "oca",
                 trackingLink: linkSeguimiento,
                 numero_de_seguimiento: numeroDeEnvioOca,
@@ -3802,6 +4041,24 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
                 .catch((error) => {
                                 console.error("Error al actualizar datos en Firebase:", error);
                 });
+
+            // Agregar datos a "DespachosLogisticos"
+            const fechaHoraFormateada = formatearFechaHora(fechaHora); 
+
+            // Asegúrate de que la función sea async si estás usando await
+            await dbMeli.ref(`DespachosLogisticos/${remitoCliente}`).set({
+                cliente: cliente,
+                estado: "Pendiente de despacho",
+                fechaHora: fechaHoraFormateada,
+                operadorLogistico: "Pendiente",
+                remito: remitoCliente,
+                remitoVBA: remitoCliente,
+                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}` // Formatear como pesos argentinos
+            }).then(() => {
+                console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
+            }).catch(error => {
+                console.error('Error al actualizar en DespachosLogisticos:', error);
+            });
 
             const Name = `Confirmación de Envio Novogar`;
             const Subject = `Tu compra ${remito} ya fue preparada para despacho`;
@@ -3881,6 +4138,7 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
     const button = document.getElementById(`andesmarButton${id}`);
     const buttonAndr = document.getElementById(`andreaniButton${id}`);
     const spinnerAndr = document.getElementById(`spinnerAndreani${id}`);
+    const buttonCDS = document.getElementById(`CDSButton${id}`);
     const textAndr = document.getElementById(`andreaniText${id}`);
     const resultadoDiv = document.getElementById(`resultado${id}`);
     const envioState = document.getElementById(`estadoEnvio${id}`);
@@ -3905,12 +4163,15 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
+    const remitoCliente = await solicitarNumeroRemito();
+    if (!cliente) return; 
+    if (!remitoCliente) return; 
 
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
     textAndr.innerText = 'Generando Etiqueta...';
     button.disabled = true
+    buttonCDS.disabled = true
 
     const token = await getAuthToken();
 
@@ -4124,6 +4385,7 @@ if (isSplit) {
                 transportCompany: "Andreani",
                 trackingLink: linkSeguimiento,
                 transportCompanyNumber: numeroDeEnvio,
+                remito: remitoCliente,
                 cliente: cliente,
             };
             
@@ -4131,9 +4393,28 @@ if (isSplit) {
                 .then(() => {
                     console.log("Datos actualizados en Firebase como Andreani:", transportData);
                 })
+
                 .catch((error) => {
                                 console.error("Error al actualizar datos en Firebase:", error);
                 });
+
+            // Agregar datos a "DespachosLogisticos"
+            const fechaHoraFormateada = formatearFechaHora(fechaHora); 
+
+            // Asegúrate de que la función sea async si estás usando await
+            await dbMeli.ref(`DespachosLogisticos/${remitoCliente}`).set({
+                cliente: cliente,
+                estado: "Pendiente de despacho",
+                fechaHora: fechaHoraFormateada,
+                operadorLogistico: "Pendiente",
+                remito: remitoCliente,
+                remitoVBA: remitoCliente,
+                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+            }).then(() => {
+                console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
+            }).catch(error => {
+                console.error('Error al actualizar en DespachosLogisticos:', error);
+            });
 
             // Cambiar el estado del envío
             if (envioState) {
@@ -4149,15 +4430,17 @@ if (isSplit) {
             buttonAndr.innerText = "Error Andreani ⚠️"; 
             resultadoDiv.innerText = `Error Andreani: (Puede no existir el CP o Localidad en Andreani) ${response.statusText}`; 
             buttonAndr.disabled = true;
-            button.disabled = false
+            button.disabled = false;
+            buttonCDS.disabled = false
         }
     } catch (error) {
         console.error('Error al generar la etiqueta:', error);
 
-        button.innerText = "Error Andreani ⚠️"; 
+        buttonAndr.innerText = "Error Andreani ⚠️"; 
         resultadoDiv.innerText = `Error Andreani: (Puede no existir el CP o Localidad en Andreani) ${error.message}`; 
         buttonAndr.disabled = true;
-        button.disabled = false
+        button.disabled = false;
+        buttonCDS.disabled = false
     }
 }
 
@@ -5253,13 +5536,130 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
     const databaseRef = firebase.database().ref('enviosBNA');
     databaseRef.off();
 
-    // Solicitar el número de remito
-    const numeroRemito = await solicitarNumeroRemito();
-    if (!numeroRemito) return; // Si se cancela, salir de la función
+        // Obtener los días predeterminados desde Firebase
+        const diaPredeterminadoBsAs = await dbMeli.ref('DiaPredeterminadoBsAs').once('value').then(snapshot => snapshot.val());
+        const diaPredeterminadoStaFe = await dbMeli.ref('DiaPredeterminadoStaFe').once('value').then(snapshot => snapshot.val());
+        const diaPredeterminadoRafaela = await dbMeli.ref('DiaPredeterminadoRafaela').once('value').then(snapshot => snapshot.val());
+        const diaPredeterminadoSanNicolas = await dbMeli.ref('DiaPredeterminadoSanNicolas').once('value').then(snapshot => snapshot.val());
+    
+        function obtenerProximoDia(fecha, dia) {
+            const diasDeLaSemana = {
+                'lunes': 1,
+                'martes': 2,
+                'miercoles': 3,
+                'jueves': 4,
+                'viernes': 5,
+                'sabado': 6,
+                'domingo': 0
+            };
+    
+            const diaActual = fecha.getDay();
+            let diasParaSumar = (diasDeLaSemana[dia.toLowerCase()] - diaActual + 7) % 7;
+            if (diasParaSumar === 0) diasParaSumar = 7; // Si es hoy, sumar 7 días
+            const fechaProximoDia = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar);
+            const esManana = diasParaSumar === 1;
+            return { fechaProximoDia, esManana, diasParaSumar };
+        }
+    
+        function sumarDiasHabiles(fecha, dias) {
+            let diasAgregados = 0;
+            let nuevaFecha = new Date(fecha);
+    
+            while (diasAgregados < dias) {
+                nuevaFecha.setDate(nuevaFecha.getDate() + 1);
+                // Si no es domingo, sumar un día hábil
+                if (nuevaFecha.getDay() !== 0) {
+                    diasAgregados++;
+                }
+            }
+    
+            return nuevaFecha;
+        }
+    
+        function obtenerProximoSabado(fecha) {
+            const diaActual = fecha.getDay();
+            const diasParaSumar = (6 - diaActual + 7) % 7;
+            const fechaProximoSabado = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + diasParaSumar);
+            return fechaProximoSabado;
+        }
+
+        const cp2 = Number(cp);
+    
+        // Determinar la logística según el CP
+        const logistica = logBsCps.includes(Number(cp2)) ? 'Buenos Aires' :
+                          logStaFeCps.includes(Number(cp2)) ? 'Santa Fe' :
+                          logRafaelaCps.includes(Number(cp2)) ? 'Rafaela' :
+                          logSanNicolasCps.includes(Number(cp2)) ? 'San Nicolás' :
+                          'logística Propia';
+    
+        let diaPredeterminado;
+        if (logistica === 'Buenos Aires') {
+            diaPredeterminado = diaPredeterminadoBsAs;
+        } else if (logistica === 'Santa Fe') {
+            diaPredeterminado = diaPredeterminadoStaFe;
+        } else if (logistica === 'Rafaela') {
+            diaPredeterminado = diaPredeterminadoRafaela;
+        } else if (logistica === 'San Nicolás') {
+            diaPredeterminado = diaPredeterminadoSanNicolas;
+        }
+    
+        let diaFormateado;
+        if (cp2 === 2132 || cp2 === 2131 || cp2 === 2134) {
+            // Si el CP es de Funes, Roldán o Pérez, calcular el próximo sábado
+            const fechaProximoSabado = obtenerProximoSabado(new Date());
+            diaFormateado = fechaProximoSabado.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+            console.log(`CP ${cp2} es de Funes, Roldán o Pérez. Próximo sábado: ${diaFormateado}`);
+        } else if (logistica !== 'logística Propia') {
+            const { fechaProximoDia, esManana, diasParaSumar } = obtenerProximoDia(new Date(), diaPredeterminado);
+            console.log(`CP ${cp2} pertenece a la logística ${logistica}. Día predeterminado: ${diaPredeterminado}. Próximo día: ${fechaProximoDia}`);
+    
+            let diasParaSumarFinal = diasParaSumar; // Inicializar la variable
+            if (esManana) {
+                // Preguntar al usuario si es mañana
+                const { value: incluirMañana } = await Swal.fire({
+                    title: '¿Sale en el camión de mañana?',
+                    html: `
+                        <p class="logistica-propia-sweet-alert">
+                            <i class="bi bi-truck" style="font-size: 24px; color: #007bff;"></i>
+                            Hay programado un camión con Logística Propia a <strong style="color: #28a745;">${logistica}</strong> para el día de mañana.
+                        </p>
+                        <p>
+                            Si desea incluir el envío, presione <strong style="color: #28a745;">SÍ</strong>. De lo contrario, presione <strong style="color: #FF0000FF;">NO</strong> y se calculará para la próxima semana.
+                        </p>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí',
+                    cancelButtonText: 'No'
+                });
+    
+                // Determinar la cantidad de días a sumar
+                diasParaSumarFinal = incluirMañana ? 1 : diasParaSumar; // Usar la respuesta directamente
+            }
+    
+            const fechaProgramada = new Date(new Date().setDate(new Date().getDate() + diasParaSumarFinal)); // Sumar días directamente
+            diaFormateado = fechaProgramada.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+            console.log(`Fecha programada: ${diaFormateado}`);
+        } else {
+            // Si no está en ninguna de las logísticas, sumar 3 días hábiles
+            const fechaInicio = sumarDiasHabiles(new Date(), 1);
+            const fechaEntrega = sumarDiasHabiles(fechaInicio, 3);
+            const fechaInicioFormateada = fechaInicio.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+            const fechaEntregaFormateada = fechaEntrega.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+            diaFormateado = `Entre ${fechaInicioFormateada} y ${fechaEntregaFormateada}`;
+            console.log(`CP ${cp} no pertenece a ninguna logística específica. Fecha inicio: ${fechaInicioFormateada}, Fecha entrega: ${fechaEntregaFormateada}`);
+        }    
+
+    // Redondear el precio_venta y convertirlo a un entero
+    const precioVentaRedondeado = Math.round(precio_venta);
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();
     if (!cliente) return; // Si se cancela, salir de la función
+
+    // Solicitar el número de remito
+    const numeroRemito = await solicitarNumeroRemito();
+    if (!numeroRemito) return; // Si se cancela, salir de la función
 
     const { jsPDF } = window.jspdf;
 
@@ -5301,8 +5701,21 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
     const blob = await response.blob();
     const reader = new FileReader();
 
+
+    // Determinar la imagen según el CP
+    let logoSrc = './Img/Tiendas-Virtuales.png';
+    if (logBsCps.includes(Number(cp2))) {
+        logoSrc = './Img/Camion-BsAs-Novogar.png';
+    } else if (logStaFeCps.includes(Number(cp2))) {
+        logoSrc = './Img/Camion-Santa-fe-Novogar.png';
+    } else if (logRafaelaCps.includes(Number(cp2))) {
+        logoSrc = './Img/Camion-Rafaela-Novogar.png';
+    } else if (logSanNicolasCps.includes(Number(cp2))) {
+        logoSrc = './Img/Camion-SNicolas-Novogar.png';
+    }
+
     reader.onloadend = async function() {
-        const barcodeBase64 = reader.result;
+        const barcodeBase64 = reader.result
 
         // Contenido HTML
         const contenido = `
@@ -5391,13 +5804,14 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
         <body>
         <div class="etiqueta">
             <div class="logo">
-                <img src="./Img/Tiendas-Virtuales.png" alt="Logo">
+                    <img src="${logoSrc}" alt="Logo">
             </div>
             <div class="campo uppercase"><span>${cliente} ${nombre}</span></div>
             <div class="campo"><span>${cp}, ${localidad}, ${provincia}</span></div>
             <div class="campo uppercase"><span>${calle}</span></div>
             <div class="campo"><span>Teléfono: ${telefono}</span></div>
             <div class="campo"><span>${SKU}, ${productoLimitado}</span></div>
+            <div class="campo"><span>DIA DE VENCIMIENTO: ${diaFormateado}</span></div>
             <div class="campo"><span>ORDEN DE TIENDA: ${remito}</span></div>
             <div class="campo-extra">
                 <img src="${barcodeBase64}" alt="Código de Barras" />
@@ -5444,6 +5858,48 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
         const envioState = document.getElementById(`estadoEnvio${id}`);
         envioState.className = 'em-circle-state4';
         envioState.innerHTML = `Preparado`;
+
+                    // Agregar datos a "DespachosLogisticos"
+                    const fechaHoraFormateada = formatearFechaHora(fechaHora); 
+                    let subdato = null;
+        
+                    // Definir el subdato según el CP
+                    if (logSanNicolasCps.includes(Number(cp2))) {
+                        subdato = `Pendiente de confirmar en CAMION ${logistica} SANNICOLAS`;
+                        operadorLogistico = `Logística Novogar SanNicolas`;
+                        estado = `Se entrega el día ${diaFormateado}`;
+                    } else if (logStaFeCps.includes(Number(cp2))) {
+                        subdato = `Pendiente de confirmar en CAMION ${logistica} STAFE`;
+                        operadorLogistico = `Logística Novogar StaFe`;
+                        estado = `Se entrega el día ${diaFormateado}`;
+                    } else if (logBsCps.includes(Number(cp2))) {
+                        subdato = `Pendiente de confirmar en CAMION ${logistica} BSAS`;
+                        operadorLogistico = `Logística Novogar BsAs`;
+                        estado = `Se entrega el día ${diaFormateado}`;
+                    } else if (logRafaelaCps.includes(Number(cp2))) {
+                        subdato = `Pendiente de confirmar en CAMION ${logistica} RAFAELA`;
+                        operadorLogistico = `Logística Novogar Rafaela`;
+                        estado = `Se entrega el día ${diaFormateado}`;
+                    } else {
+                        subdato = `Camion Rosario`;
+                        operadorLogistico = `Logística Novogar`;
+                        estado = `(se entrega ${diaFormateado})`;
+                    }
+        
+                    await dbMeli.ref(`DespachosLogisticos/${numeroRemito}`).set({
+                        cliente: cliente,
+                        estado: estado,
+                        fechaHora: fechaHoraFormateada,
+                        remito: numeroRemito,
+                        operadorLogistico: operadorLogistico,
+                        remitoVBA: numeroRemito, 
+                        subdato: subdato,
+                        valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}` // Formatear como pesos argentinos
+                    }).then(() => {
+                        console.log(`Datos actualizados en DespachosLogisticos para el remito: ${numeroRemito}`);
+                    }).catch(error => {
+                        console.error('Error al actualizar en DespachosLogisticos:', error);
+                    });        
 
         // Crear un enlace para abrir el PDF en una nueva ventana
         const pdfUrl = URL.createObjectURL(pdfBlob);

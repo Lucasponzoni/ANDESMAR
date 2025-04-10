@@ -3865,8 +3865,7 @@ div .form-check {
     font-weight: bold;
     background-color: rgba(172, 255, 47, 0.255);
     font-size: 1rem;
-    white-space: nowrap; 
-    overflow: hidden; 
+    max-width: 600px;
     text-overflow: ellipsis;
 }
 

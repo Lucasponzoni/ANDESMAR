@@ -757,7 +757,7 @@ const paymentHTML = `
                             (logStaFeCps.includes(Number(data.Cp)) ? 
                             '<img src="Img/novogar-tini.png" alt="Logística Santa Fe" width="20" height="20">Santa Fe' : 
                             (logRafaelaCps.includes(Number(data.Cp)) ? 
-                            '<img src="Img/novogar-tini.png" alt="Logística Santa Fe" width="20" height="20">Santa Fe' : 
+                            '<img src="Img/novogar-tini.png" alt="Logística Rafaela" width="20" height="20">Rafaela' : 
                             (logCDSCps.includes(Number(data.Cp)) ? 
                             '<img src="Img/Cruz-del-Sur-tini.png" alt="Logística Cruz del Sur" width="20" height="20">' : 
                             (logSanNicolasCps.includes(Number(data.Cp)) ? 
@@ -910,7 +910,7 @@ const paymentHTML = `
         ${isAndesmar || isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''}
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}')`}">
+        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}')`}">
         <span id="CDSText${data.idOperacion}">
         ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
         </span>
@@ -926,7 +926,7 @@ const paymentHTML = `
         ${isAndreani || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}','${email}', '${recibeSinCaracteresEspeciales}')`}">
+        ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}','${email}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}')`}">
         <span id="andesmarText${data.idOperacion}">
             ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>'}
         </span>
@@ -950,7 +950,7 @@ const paymentHTML = `
         ${isAndesmar || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}')`}">
+        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}', '${formatCurrency(data.transactionAmount)}')`}">
         <span id="andreaniText${data.idOperacion}">
             ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
         </span>
@@ -967,7 +967,7 @@ const paymentHTML = `
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${recibeSinCaracteresEspeciales}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}')">
         <span>
             ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
         </span>
@@ -1736,7 +1736,7 @@ const clave = "BOM6765";
 const codigoCliente = "6765";
 
 // Función para enviar datos a la API de Andesmar
-async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto, localidad, provincia, email, recibe) {
+async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto, localidad, provincia, email, recibe, valor) {
     
     console.log({
         id,
@@ -1758,6 +1758,11 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         recibe
     });
 
+    const cliente = await solicitarCliente();
+    const remitoCliente = await solicitarNumeroRemito();
+    if (!cliente) return; 
+    if (!remitoCliente) return; 
+
     const resultadoDiv = document.getElementById(`resultado${id}`);
     const botonCDS = document.getElementById(`CDSButton${id}`);
     const button = document.getElementById(`andesmarButton${id}`);
@@ -1769,10 +1774,6 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
 
     // Eliminar el prefijo "200000" del idOperacion
     const idOperacionFinal = idOperacion.replace(/^20000[0-9]/, '');
-
-    // Solicitar el cliente
-    const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
 
     // Mostrar spinner y cambiar texto
     spinner.style.display = 'inline-block';
@@ -1890,6 +1891,22 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
                 cotizacion: "$ 10.000"
             }).then(() => {         
                 console.log("Entrada agregada correctamente.");
+                // Agregar datos a "DespachosLogisticos"
+            const fechaHoraFormateada = formatearFechaHora(fechaHora); 
+        
+            firebase.database().ref(`DespachosLogisticos/${remitoCliente}`).set({
+                cliente: cliente,
+                estado: "Pendiente de despacho",
+                fechaHora: fechaHoraFormateada,
+                operadorLogistico: "Pendiente",
+                remito: remitoCliente,
+                remitoVBA: remitoCliente,
+                valorDeclarado: valor 
+            }).then(() => {
+                console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
+            }).catch(error => {
+                console.error('Error al actualizar en DespachosLogisticos:', error);
+            });
             }).catch((error) => {
                 console.error("Error al agregar entrada a Firebase:", error);
             });
@@ -2004,7 +2021,7 @@ async function getAuthToken() {
     }
 }
 
-async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe, valor) 
+async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe, valor, valor2) 
 {    
     const botonCDS = document.getElementById(`CDSButton${id}`);
     const buttonAndr = document.getElementById(`andreaniButton${id}`);
@@ -2040,9 +2057,10 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
     // Eliminar el prefijo "200000" del idOperacion
     const idOperacionFinalAndreani = idOperacion.replace(/^20000[0-9]/, '');
 
-    // Solicitar el cliente
     const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
+    const remitoCliente = await solicitarNumeroRemito();
+    if (!cliente) return; 
+    if (!remitoCliente) return; 
 
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
@@ -2198,9 +2216,26 @@ for (let i = 0; i < cantidadFinal; i++) {
             transportCompany: "Andreani"
         }).then(() => {
             console.log(`Datos actualizados en Firebase para la operación: ${idOperacionFinalAndreani}`);
+        
+            // Agregar datos a "DespachosLogisticos"
+            const fechaHoraFormateada = formatearFechaHora(fechaHora); 
+        
+            firebase.database().ref(`DespachosLogisticos/${remitoCliente}`).set({
+                cliente: cliente,
+                estado: "Pendiente de despacho",
+                fechaHora: fechaHoraFormateada,
+                operadorLogistico: "Pendiente",
+                remito: remitoCliente,
+                remitoVBA: remitoCliente,
+                valorDeclarado: valor2 
+            }).then(() => {
+                console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
+            }).catch(error => {
+                console.error('Error al actualizar en DespachosLogisticos:', error);
+            });
         }).catch(error => {
-            console.error('Error al actualizar en Firebase:', error);
-        });    
+            console.error("Error al actualizar en Firebase:", error);
+        });        
 
         const nombre = NombreyApellido
         const remito = idOperacion.replace(/ME1$/, '');
@@ -2904,7 +2939,7 @@ if (prepararME2Btn) {
 // FIN QUERY DE DATOS MELI
 
 // ETIQUETA LOGISTICA PROPIA
-async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe) {
+async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, valor) {
     let button = document.getElementById(`LogPropiaMeliButton${id}`);
     let spinner = document.getElementById(`spinnerLogPropia${id}`);
     let spinner2 = document.getElementById("spinner2");
@@ -3036,6 +3071,51 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         console.log(`CP ${cp} no pertenece a ninguna logística específica. Fecha inicio: ${fechaInicioFormateada}, Fecha entrega: ${fechaEntregaFormateada}`);
     }
 
+    // SweetAlert para el número de cliente
+    const { value: numeroCliente } = await Swal.fire({
+        title: '¿Cuál es el número de cliente?',
+        html: `
+            <div class="input-container">
+                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
+                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false, // Eliminando el botón de cancelar
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroCliente');
+            input.focus(); // Hacer foco en el input al abrir el modal
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm(); // Simular clic en el botón de aceptar
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroCliente').value;
+            // Validaciones
+            if (!/^\d{2,8}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
+                return false; // Evita que se acepte el valor
+            }
+            return input; // Retorna el valor si es válido
+        },
+        allowEnterKey: true // Permitir que Enter funcione como aceptar
+    });
+
+    // Si el usuario cancela, salir de la función
+    if (!numeroCliente) {
+        return;
+    }
+
     const { value: numeroRemito } = await Swal.fire({
         title: '¿Cuál es el número de remito?',
         html: `
@@ -3080,51 +3160,6 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         spinner.style.display = "none";
         button.innerHTML = '<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>';
         button.disabled = false;  
-        return;
-    }
-
-    // SweetAlert para el número de cliente
-    const { value: numeroCliente } = await Swal.fire({
-        title: '¿Cuál es el número de cliente?',
-        html: `
-            <div class="input-container">
-                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
-                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
-            </div>
-        `,
-        icon: 'question',
-        showCancelButton: false, // Eliminando el botón de cancelar
-        confirmButtonText: 'Aceptar',
-        customClass: {
-            popup: 'macos-popup',
-            input: 'macos-input',
-            title: 'macos-title',
-            confirmButton: 'macos-button',
-        },
-        didOpen: () => {
-            const input = document.getElementById('numeroCliente');
-            input.focus(); // Hacer foco en el input al abrir el modal
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    Swal.clickConfirm(); // Simular clic en el botón de aceptar
-                }
-            });
-        },
-        preConfirm: () => {
-            const input = document.getElementById('numeroCliente').value;
-            // Validaciones
-            if (!/^\d{2,8}$/.test(input)) {
-                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
-                return false; // Evita que se acepte el valor
-            }
-            return input; // Retorna el valor si es válido
-        },
-        allowEnterKey: true // Permitir que Enter funcione como aceptar
-    });
-
-    // Si el usuario cancela, salir de la función
-    if (!numeroCliente) {
         return;
     }
 
@@ -3325,59 +3360,101 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 
             let trackingMessage = ''; // Inicializar la variable
 
-            // Generar el mensaje de seguimiento basado en la logística
-            if (logBsCps.includes(Number(Cp))) {
-                trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
-                Queremos informarte que vamos a visitarte el ${diaFormateado}.
-                Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
-                Cualquier consulta, estamos a tu servicio. ¡Gracias!
-                Equipo Posventa Novogar
-                ENVIO CON LOGISTICA BUENOS AIRES`;
+        // Generar el mensaje de seguimiento basado en la logística
+        if (logBsCps.includes(Number(Cp))) {
+            trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
+            Queremos informarte que vamos a visitarte el ${diaFormateado}.
+            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+            Cualquier consulta, estamos a tu servicio. ¡Gracias!
+            Equipo Posventa Novogar
+            ENVIO CON LOGISTICA BUENOS AIRES`;
+        } else if (logStaFeCps.includes(Number(Cp))) {
+            trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
+            Queremos informarte que vamos a visitarte el ${diaFormateado}.
+            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+            Cualquier consulta, estamos a tu servicio. ¡Gracias!
+            Equipo Posventa Novogar
+            ENVIO CON LOGISTICA SANTA FE`;
+        } else if (logSanNicolasCps.includes(Number(Cp))) {
+            trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
+            Queremos informarte que vamos a visitarte el ${diaFormateado}.
+            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+            Cualquier consulta, estamos a tu servicio. ¡Gracias!
+            Equipo Posventa Novogar
+            ENVIO CON LOGISTICA SAN NICOLAS`;
+        } else if (logRafaelaCps.includes(Number(Cp))) {
+            trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
+            Queremos informarte que vamos a visitarte el ${diaFormateado}.
+            Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
+            Cualquier consulta, estamos a tu servicio. ¡Gracias!
+            Equipo Posventa Novogar
+            ENVIO CON LOGISTICA RAFAELA`;
+        } else {
+            // Mensaje para otras zonas
+            trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
+            ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística: ${diaFormateado}. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
+            Estamos a tu servicio.
+            ¡Saludos!
+            Equipo Posventa Novogar`;
+        }
+
+        const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
+
+        // Actualizar en Firebase
+        firebase.database().ref('envios/' + idOperacionSinME1).update({
+            trackingNumber: "Logistica Novogar",
+            trackingLink: "Logistica Novogar",
+            trackingMessage: trackingMessage,
+            transportCompany: "Novogar",
+            cliente: numeroCliente,
+            remito: numeroRemito
+        }).then(() => {
+            console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
+            
+            // Agregar datos a "DespachosLogisticos"
+            const fechaHoraFormateada = formatearFechaHora(fechaHora); 
+            let subdato = null;
+
+            // Definir el subdato según el CP
+            if (logSanNicolasCps.includes(Number(Cp))) {
+                subdato = `Pendiente de confirmar en CAMION ${logistica} SANNICOLAS`;
+                operadorLogistico = `Logística Novogar SanNicolas`;
+                estado = `Se entrega el día ${diaFormateado}`;
             } else if (logStaFeCps.includes(Number(Cp))) {
-                trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
-                Queremos informarte que vamos a visitarte el ${diaFormateado}.
-                Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
-                Cualquier consulta, estamos a tu servicio. ¡Gracias!
-                Equipo Posventa Novogar
-                ENVIO CON LOGISTICA SANTA FE`;
-            } else if (logSanNicolasCps.includes(Number(Cp))) {
-                trackingMessage = `Hola ${NombreyApellido} ¡Gracias por tu compra!
-                Queremos informarte que vamos a visitarte el ${diaFormateado}.
-                Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
-                Cualquier consulta, estamos a tu servicio. ¡Gracias!
-                Equipo Posventa Novogar
-                ENVIO CON LOGISTICA SAN NICOLAS`;
+                subdato = `Pendiente de confirmar en CAMION ${logistica} STAFE`;
+                operadorLogistico = `Logística Novogar StaFe`;
+                estado = `Se entrega el día ${diaFormateado}`;
+            } else if (logBsCps.includes(Number(Cp))) {
+                subdato = `Pendiente de confirmar en CAMION ${logistica} BSAS`;
+                operadorLogistico = `Logística Novogar BsAs`;
+                estado = `Se entrega el día ${diaFormateado}`;
             } else if (logRafaelaCps.includes(Number(Cp))) {
-                trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
-                Queremos informarte que vamos a visitarte el ${diaFormateado}.
-                Por favor, confírmanos un 📞 actualizado para poder coordinar la entrega. Si no vas a estar ese día, podés autorizar a otra persona enviándonos por este medio su nombre completo y DNI. También podes brindarnos un domicilio alternativo.
-                Cualquier consulta, estamos a tu servicio. ¡Gracias!
-                Equipo Posventa Novogar
-                ENVIO CON LOGISTICA RAFAELA`;
+                subdato = `Pendiente de confirmar en CAMION ${logistica} RAFAELA`;
+                operadorLogistico = `Logística Novogar Rafaela`;
+                estado = `Se entrega el día ${diaFormateado}`;
             } else {
-                // Mensaje para otras zonas
-                trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
-                ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística: ${diaFormateado}. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
-                Estamos a tu servicio.
-                ¡Saludos!
-                Equipo Posventa Novogar`;
+                subdato = `Camion Rosario`;
+                operadorLogistico = `Logística Novogar`;
+                estado = `(se entrega ${diaFormateado})`;
             }
 
-            const idOperacionSinME1 = idOperacion.replace(/ME1$/, '');
-
-            // Actualizar en Firebase
-            firebase.database().ref('envios/' + idOperacionSinME1).update({
-                trackingNumber: "Logistica Novogar",
-                trackingLink: "Logistica Novogar",
-                trackingMessage: trackingMessage,
-                transportCompany: "Novogar",
+            firebase.database().ref(`DespachosLogisticos/${numeroRemito}`).set({
                 cliente: numeroCliente,
-                remito: numeroRemito
+                estado: estado,
+                fechaHora: fechaHoraFormateada,
+                remito: numeroRemito,
+                operadorLogistico: operadorLogistico,
+                remitoVBA: numeroRemito, 
+                subdato: subdato,
+                valorDeclarado: valor 
             }).then(() => {
-                console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
+                console.log(`Datos actualizados en DespachosLogisticos para el remito: ${numeroRemito}`);
             }).catch(error => {
-                console.error('Error al actualizar en Firebase:', error);
+                console.error('Error al actualizar en DespachosLogisticos:', error);
             });
+        }).catch(error => {
+            console.error("Error al actualizar en Firebase:", error);
+        });
 
             // Crear un enlace para abrir el PDF en una nueva ventana
             const pdfUrl = URL.createObjectURL(pdfBlob);

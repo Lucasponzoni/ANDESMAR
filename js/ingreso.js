@@ -516,9 +516,9 @@ function renderCards(data) {
         }                                 
 
         // Agregar estilo e ícono si el estado inicia con "(se entrega entre"
-        const entregaEntreClass = item.estado.startsWith("(se entrega entre") ? "estado-entrega" : "";
-        const entregaEntreIcon = item.estado.startsWith("(se entrega entre") ? '<i class="bi bi-check-circle-fill icon-state-ios"></i>' : '';
-
+        const entregaEntreClass = item.estado.toLowerCase().startsWith("(se entrega entre") ? "estado-entrega" : "";
+        const entregaEntreIcon = item.estado.toLowerCase().startsWith("(se entrega entre") ? '<i class="bi bi-check-circle-fill icon-state-ios"></i>' : '';
+        
         const comentarioClase = item.comentario ? 'btn-success' : 'btn-secondary';
 
         let subdatoTexto = '';
