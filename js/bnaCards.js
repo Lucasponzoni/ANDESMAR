@@ -5819,7 +5819,6 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
             <div class="contacto">
             <hr>
             <p><strong>💬 Posventa:</strong> (0341) 6680658 (WhatsApp)</p>
-            <p><strong>📧 Email:</strong> posventa@novogar.com.ar</p>
             </div>
         </div>
         </body>
@@ -5886,7 +5885,7 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
                         estado = `(se entrega ${diaFormateado})`;
                     }
         
-                    await dbMeli.ref(`DespachosLogisticos/${numeroRemito}`).set({
+                    dbMeli.ref(`DespachosLogisticos/${numeroRemito}`).set({
                         cliente: cliente,
                         estado: estado,
                         fechaHora: fechaHoraFormateada,
