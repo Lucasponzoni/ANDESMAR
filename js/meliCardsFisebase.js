@@ -910,7 +910,7 @@ const paymentHTML = `
         ${isAndesmar || isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''}
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}')`}">
+        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}')`}">
         <span id="CDSText${data.idOperacion}">
         ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
         </span>
@@ -1216,6 +1216,68 @@ async function solicitarCliente() {
     return numeroCliente;
 }
 
+// Función para solicitar el número de remito usando SweetAlert
+async function solicitarNumeroRemito() {
+    const { value: numeroRemito } = await Swal.fire({
+        title: '¿Cuál es el número de remito?',
+        html: `
+            <div class="input-container">
+                <input id="numeroRemito" class="swal2-input" placeholder="Número de Remito" maxlength="20" required>
+                <small class="input-description">Ingresar número de remito (mínimo 10 dígitos, solo números)</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: false,
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'macos-popup',
+            input: 'macos-input',
+            title: 'macos-title',
+            confirmButton: 'macos-button',
+        },
+        didOpen: () => {
+            const input = document.getElementById('numeroRemito');
+            input.focus();
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    Swal.clickConfirm();
+                }
+            });
+        },
+        preConfirm: () => {
+            const input = document.getElementById('numeroRemito').value;
+            // Validaciones
+            if (!/^\d{10,}$/.test(input)) {
+                Swal.showValidationMessage('Por favor, ingrese un número de remito válido');
+                return false;
+            }
+            return input;
+        },
+        allowEnterKey: true
+    });
+
+    // Si el usuario cancela, salir de la función
+    if (!numeroRemito) {
+        return null; // Retorna null si se cancela
+    }
+    return numeroRemito;
+}
+
+const fechaHora = new Date(); // Obtener la fecha y hora actual
+
+function formatearFechaHora(fechaHora) {
+    const dia = fechaHora.getDate();
+    const mes = fechaHora.getMonth() + 1; // Los meses son 0-11
+    const año = fechaHora.getFullYear();
+    const horas = fechaHora.getHours();
+    const minutos = fechaHora.getMinutes();
+    const segundos = fechaHora.getSeconds();
+
+    // Formatear con ceros a la izquierda
+    return `${dia}/${mes}/${año}, ${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+}
+
 async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
     const url = `https://proxy.cors.sh/https://apis.andreani.com/v2/ordenes-de-envio/${numeroDeEnvio}/etiquetas`;
     
@@ -1249,7 +1311,7 @@ async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
     }
 }
 
-async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe) {
+async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe, valor) {
 
     console.log('Parámetros enviados a enviarDatosCDS:');
     console.log({
@@ -1304,7 +1366,9 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();
-    if (!cliente) return; // Si se cancela, salir de la función
+    const remitoCliente = await solicitarNumeroRemito();
+    if (!cliente) return; 
+    if (!remitoCliente) return; 
 
     // Mostrar spinner y cambiar texto
     spinner.style.display = 'inline-block';
@@ -1365,7 +1429,7 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
         const nombre = NombreyApellido
         const remito = idOperacion.replace(/ME1$/, '');
         const Name = `Confirmación de envio Mercado Libre`;
-        const Subject = `Tu compra en Novogar ${remito} ya fue preparada para despacho con Cruz del Sur`;
+        const Subject = `Tu compra en Novogar ${remitoCliente} ya fue preparada para despacho con Cruz del Sur`;
         const template = "emailTemplateAndreani";
         const linkSeguimiento2 = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${nicCds}`;
         const transporte = "Cruz del Sur";
@@ -1373,7 +1437,7 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
         const email = emailCds
 
         await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
-        console.log(`Email enviado a ${email} con el remito ${remito} y número de envío ${numeroDeEnvio}`);
+        console.log(`Email enviado a ${email} con el remito ${remitoCliente} y número de envío ${numeroDeEnvio}`);
             // Guardar en Firebase
     const trackingMessage = `¡Hola, ${NombreyApellido || recibe}!
 
@@ -1400,9 +1464,27 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
             cotizacionCDS: numeroCotizacionCds
         }).then(() => {
             console.log(`Datos actualizados en Firebase para la operación: ${idOperacionSinME1}`);
+        
+            // Agregar datos a "DespachosLogisticos"
+            const fechaHoraFormateada = formatearFechaHora(fechaHora); 
+        
+            firebase.database().ref(`DespachosLogisticos/${remitoCliente}`).set({
+                cliente: cliente,
+                estado: "Pendiente de despacho",
+                fechaHora: fechaHoraFormateada,
+                operadorLogistico: "Pendiente",
+                remito: remitoCliente,
+                remitoVBA: remitoCliente,
+                valorDeclarado: valor 
+            }).then(() => {
+                console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
+            }).catch(error => {
+                console.error('Error al actualizar en DespachosLogisticos:', error);
+            });
+        
         }).catch(error => {
             console.error('Error al actualizar en Firebase:', error);
-        });    
+        });           
         } else {
             // Manejo de otros estados de error
             botonAndesmar.classList.remove('disabled');
@@ -2454,7 +2536,7 @@ const cpsAndesmar = [
     9400, 4000, 4101, 4103, 4105, 4107,
     4109, 4111, 4117, 4128, 4129, 4132,
     4142, 4144, 4152, 4153, 4158, 4166,
-    4168, 4178, 2000, 3500, 3100, 3400
+    4168, 4178, 2000, 6002, 6000, 5220,
 ];
 
 // QUERY DE DATOS MELI
