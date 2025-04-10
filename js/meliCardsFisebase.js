@@ -1467,7 +1467,6 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
         
             // Agregar datos a "DespachosLogisticos"
             const fechaHoraFormateada = formatearFechaHora(fechaHora); 
-            const remitoValue = idOperacionSinME1;
         
             firebase.database().ref(`DespachosLogisticos/${remitoCliente}`).set({
                 cliente: cliente,
