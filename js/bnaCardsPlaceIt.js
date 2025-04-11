@@ -1625,7 +1625,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             <button class="btn mt-1 btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
                             id="LogPropiButtonPlaceIt${data[i].id}" 
                             ${data[i].cancelado ? 'disabled' : ''} 
-                            onclick="generarPDFPlaceIt('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${data[i].cantidad}',)">
+                            onclick="generarPDFPlaceIt('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${data[i].cantidad}', '${ordenPublica}',)">
                             <span>
                             ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}</span>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
@@ -2800,7 +2800,7 @@ async function solicitarCliente() {
 }
 
 // ETIQUETA LOGISTICA PLACE IT
-async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrden, calle, numero, telefono, email, precio_venta, producto_nombre, SKU, cantidad) {
+async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrden, calle, numero, telefono, email, precio_venta, producto_nombre, SKU, cantidad, orden) {
     // Solicitar el número de remito
     const numeroRemito = await solicitarNumeroRemito();
     if (!numeroRemito) return; // Si se cancela, salir de la función
@@ -3012,6 +3012,11 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
             hour12: false
         });
 
+        // Función para formatear el precio
+        function formatPrice(price) {
+            return `$ ${price.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
+        }
+
         try {
             await dbMeli.ref(`DespachosLogisticos/${numeroRemito}`).set({
                 cliente: cliente,
@@ -3024,13 +3029,14 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
                 numeroDeEnvio: 123456,
                 remitoVBA: numeroRemito,
                 subdato: diaFormateadoPlaceIt,
-                valorDeclarado: precio_venta,
+                valorDeclarado: formatPrice(precio_venta), // Usar la función aquí
                 direccion: calle,
                 comentarios: "Coordinar en Línea: " + telefono,
                 telefono: telefono,
                 sku: SKU,
                 cantidad: cantidad,
                 cp: cp,
+                orden: orden,
                 tienda: "TIENDAS VIRTUALES",
                 localidad: localidad,
                 nombre: nombre,

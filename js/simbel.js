@@ -518,42 +518,54 @@ function crearCard(data) {
         `;
     }
 
-    // Crear el contenedor de productos
-    let productosHTML2 = '';
-    let productosTexto = '';
+// Crear el contenedor de productos
+let productosHTML2 = '';
+let productosTexto = '';
+let totalCantidad = 0; // Variable para almacenar la suma total
+let skus = []; // Array para almacenar los SKUs
 
-    // Verifica que data y sus propiedades existan
-    if (data && Array.isArray(data.items)) {
-        // Generar la lista de productos en un solo párrafo
-        const productos = data.items.map(item => {
-            const sku = item.cod_alfa === "110" ? "Envio" : item.cod_alfa; // Reemplazar "110" por "Envio"
-            return `
-                X <strong>${item.cantidad}</strong>u. 
-                <strong>${sku}</strong> 
-            `;
-        }).join(', '); // Separar los productos con una coma
+// Verifica que data y sus propiedades existan
+if (data && Array.isArray(data.items)) {
+    // Generar la lista de productos en un solo párrafo
+    const productos = data.items.map(item => {
+        const sku = item.cod_alfa === "110" ? "Envio" : item.cod_alfa; // Reemplazar "110" por "Envio"
+        
+        // Sumar cantidades y almacenar SKU si no es "110"
+        if (item.cod_alfa !== "110") {
+            totalCantidad += item.cantidad; // Sumar cantidad
+            skus.push(sku); // Agregar SKU al array
+        }
 
-        // Asignar el HTML al contenedor
-        productosHTML2 = `
-            <div class="macos-style2">
-                <strong><i class="bi bi-bag-fill"></i></strong> ${productos}
-            </div>
+        return `
+            X <strong>${item.cantidad}</strong>u. 
+            <strong>${sku}</strong> 
         `;
+    }).join(', '); // Separar los productos con una coma
 
-        // Asignar el texto plano
-        productosTexto = data.items.map(item => {
-            const sku = item.cod_alfa === "110" ? "Envio" : item.cod_alfa; // Reemplazar "110" por "Envio"
-            return `X ${item.cantidad}u. ${sku}`;
-        }).join(', '); // Separar los productos con una coma
-    } else {
-        // Mensaje si no hay productos
-        productosHTML2 = `
-            <div class="macos-style2">
-                <strong>No hay productos disponibles.</strong>
-            </div>
-        `;
-        productosTexto = 'No hay productos disponibles.';
-    }
+    // Asignar el HTML al contenedor
+    productosHTML2 = `
+        <div class="macos-style2">
+            <strong><i class="bi bi-bag-fill"></i></strong> ${productos}
+        </div>
+    `;
+
+    // Asignar el texto plano
+    productosTexto = data.items.map(item => {
+        const sku = item.cod_alfa === "110" ? "Envio" : item.cod_alfa; // Reemplazar "110" por "Envio"
+        return `X ${item.cantidad}u. ${sku}`;
+    }).join(', '); // Separar los productos con una coma
+} else {
+    // Mensaje si no hay productos
+    productosHTML2 = `
+        <div class="macos-style2">
+            <strong>No hay productos disponibles.</strong>
+        </div>
+    `;
+    productosTexto = 'No hay productos disponibles.';
+}
+
+// Obtener los SKUs como una cadena separada por comas
+const skusTexto = skus.join(', ');
 
     cardDiv.innerHTML = `
         <div class="card position-relative">
@@ -700,7 +712,7 @@ function crearCard(data) {
     <button class="mt-1 mb-0 btn btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', 'NOV${data.idOperacion}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}', '${productosTexto}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', 'NOV${data.idOperacion}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}', '${productosTexto}', '${skusTexto}', ${totalCantidad})">
         <span>
             ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
         </span>
@@ -959,7 +971,7 @@ async function solicitarCliente() {
 }
 
 // ETIQUETA LOGISTICA PROPIA
-async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, SKU, total, comentarios, productosTexto) {
+async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, SKU, total, comentarios, productosTexto, skus, cantidadTotal) {
     // Solicitar el número de remito
     const numeroRemito = await solicitarNumeroRemito();
     if (!numeroRemito) return; // Si se cancela, salir de la función
@@ -1188,8 +1200,9 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             direccion: calleDestinatario,
             comentarios: comentarios,
             telefono: telefonoDestinatario,
-            sku: SKU,
-            cantidad: cantidad,
+            sku: skus,
+            orden: "NOV" + id,
+            cantidad: cantidadTotal,
             cp: Cp,
             tienda: "WEB",
             localidad: localidad,

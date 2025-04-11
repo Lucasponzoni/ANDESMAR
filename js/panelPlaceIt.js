@@ -2300,7 +2300,7 @@ $(document).ready(function () {
         const headers = [
             "FECHAHORA", "ESTADO DE ENTREGA", "CLIENTE", "REMITO", "NOMBRE", "CP", "LOCALIDAD",
             "PROVINCIA", "SKU", "CANTIDAD", "VALORDECLARADO", "DIRECCION",
-            "TELEFONO", "COMENTARIOS", "SUBDATO", "TIENDA"
+            "TELEFONO", "COMENTARIOS", "SUBDATO", "TIENDA", "ORDEN"
         ];
     
         worksheet.addRow(headers);
@@ -2350,7 +2350,7 @@ $(document).ready(function () {
                 (item.nombre || '').toUpperCase(),
                 item.cp || '',
                 item.localidad || '',
-                item.provincia || '',
+                item.provincia ? item.provincia.toUpperCase() : '',
                 item.sku || '',
                 item.cantidad || '',
                 item.valorDeclarado || '',
@@ -2358,7 +2358,8 @@ $(document).ready(function () {
                 item.telefono || '',
                 item.comentarios || '',
                 item.subdato || '',
-                item.tienda || ''
+                item.tienda || '',
+                item.orden || ''
             ]);
     
             row.eachCell((cell, colNumber) => {
@@ -2410,6 +2411,10 @@ $(document).ready(function () {
         });
 
         worksheet.getColumn(2).width = 27;
+        worksheet.getColumn(8).width = 16;
+        worksheet.getColumn(9).width = 20;
+        worksheet.getColumn(16).width = 23;
+        worksheet.getColumn(17).width = 30;
     
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });

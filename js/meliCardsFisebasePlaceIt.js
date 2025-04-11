@@ -1081,6 +1081,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             sku: SKU,
             cantidad: cantidad,
             cp: Cp,
+            orden: id,
             tienda: "MELI",
             localidad: localidad,
             nombre: NombreyApellido,
