@@ -42,12 +42,14 @@ cargarPrecios()
 
 // CARGAR PRECIOS Y STOCK
 let preciosArray = [];
+let preciosPlaceItArray = [];
 
 // Función para cargar precios y stock
 function cargarPrecios() {
+    // Cargar precios
     return dbStock.ref('precios/').once('value')
         .then(preciosSnapshot => {
-            // Verificamos si hay datos
+            // Verificamos si hay datos en precios
             if (preciosSnapshot.exists()) {
                 preciosSnapshot.forEach(childSnapshot => {
                     const childData = childSnapshot.val();
@@ -56,9 +58,29 @@ function cargarPrecios() {
                         stock: childData.stock
                     });
                 });
-                console.log("Stock Sincronizado con éxito.");
+                console.log("Stock sincronizado con éxito.");
+                console.log("Contenido de preciosArray:", preciosArray); // Mostrar preciosArray
             } else {
-                console.log("No hay datos en la ruta especificada.");
+                console.log("No hay datos en la ruta especificada para precios.");
+            }
+
+            // Cargar precios de PlaceIt
+            return dbStock.ref('preciosPlaceIt/').once('value');
+        })
+        .then(preciosPlaceItSnapshot => {
+            // Verificamos si hay datos en preciosPlaceIt
+            if (preciosPlaceItSnapshot.exists()) {
+                preciosPlaceItSnapshot.forEach(childSnapshot => {
+                    const childData = childSnapshot.val();
+                    preciosPlaceItArray.push({
+                        sku: childData.sku,
+                        stock: childData.stock
+                    });
+                });
+                console.log("Precios de PlaceIt sincronizados con éxito.");
+                console.log("Contenido de preciosPlaceItArray:", preciosPlaceItArray); // Mostrar preciosPlaceItArray
+            } else {
+                console.log("No hay datos en la ruta especificada para precios de PlaceIt.");
             }
         })
         .catch(error => {
@@ -232,17 +254,41 @@ function loadTable(data, estadoFilter = null) {
                 const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === skuActual); // Asegúrate de sanitizar item.sku
                 const stock = precioItem ? precioItem.stock : 0; // Si no se encuentra, stock es 0
 
+                // Verificar si el SKU está en la lista de PlaceIt y si el Cp está en cpsPlaceIt
+                const isSkuInList = skusPlaceItList.includes(operation.SKU);
+                const isCpInCpsPlaceIt = cpsPlaceIt.includes(Number(operation.Cp));
+
                 // Determinar mensaje y clase de estilo según el stock
                 let stockMessage, stockClass, stockIcon;
+                let stockToDisplay = stock; // Variable para mostrar el stock correcto
 
-                if (stock === 0) {
-                    stockMessage = 'Sin Stock';
-                    stockClass = 'sin-stock-Facturacion';
-                    stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+                if (isSkuInList && isCpInCpsPlaceIt) {
+                    // Si el SKU y Cp están en las listas de PlaceIt, usar preciosPlaceItArray
+                    const precioPlaceItItem = preciosPlaceItArray.find(item => sanitizeSku(item.sku) === skuActual);
+                    const stockPlaceIt = precioPlaceItItem ? precioPlaceItItem.stock : 0; // Stock de preciosPlaceItArray
+
+                    stockToDisplay = stockPlaceIt; // Actualiza la variable para mostrar el stock de PlaceIt
+
+                    if (stockPlaceIt === 0) {
+                        stockMessage = 'Sin Stock PlaceIt';
+                        stockClass = 'sin-stock-Facturacion';
+                        stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+                    } else {
+                        stockClass = stockPlaceIt < 10 ? 'stock-pi-bajo-stock-Facturacion' : 'stock-pi-normal-stock-Facturacion';
+                        stockMessage = stockPlaceIt < 10 ? 'P-it bajo' : 'Stock P-it';
+                        stockIcon = stockPlaceIt < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+                    }
                 } else {
-                    stockClass = stock < 10 ? 'stock-bajo-stock-Facturacion' : 'stock-normal-stock-Facturacion';
-                    stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
-                    stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+                    // Determinar mensaje y clase de estilo según el stock original
+                    if (stock === 0) {
+                        stockMessage = 'Sin Stock';
+                        stockClass = 'sin-stock-Facturacion';
+                        stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+                    } else {
+                        stockClass = stock < 10 ? 'stock-bajo-stock-Facturacion' : 'stock-normal-stock-Facturacion';
+                        stockMessage = stock < 10 ? 'Stock bajo CD' : 'Stock CD';
+                        stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+                    }
                 }
 
                 // Generar el HTML para el stock con clases CSS
@@ -251,7 +297,7 @@ function loadTable(data, estadoFilter = null) {
                     <div class="status-box-stock-Facturacion">
                         <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
                         <p class="status-text-stock-tv ${stockClass}">
-                        ${stock === 0 ? stockMessage : `${stockMessage} CD <strong>${stock}</strong> u.`}
+                        ${stockToDisplay === 0 ? stockMessage : `${stockMessage} <strong>${stockToDisplay}</strong> u.`}
                         </p>
                     </div>
                 </div>

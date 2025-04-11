@@ -7101,7 +7101,21 @@ img.gray-filter {
     font-weight: 400;
 }
 
+.stock-pi-normal-stock-Facturacion {
+    color: purple;
+    font-family: "Rubik", sans-serif;
+    font-size: .75rem;
+    font-weight: 400;
+}
+
 .stock-bajo-stock-Facturacion {
+    color: #FF3B30;
+    font-family: "Rubik", sans-serif;
+    font-size: .7rem;
+    font-weight: 400;
+}
+
+.stock-pi-bajo-stock-Facturacion {
     color: #FF3B30;
     font-family: "Rubik", sans-serif;
     font-size: .7rem;
