@@ -3036,7 +3036,7 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
                 sku: SKU,
                 cantidad: cantidad,
                 cp: cp,
-                orden: orden,
+                orden: remitoOrden,
                 tienda: "TIENDAS VIRTUALES",
                 localidad: localidad,
                 nombre: nombre,
