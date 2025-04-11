@@ -7138,3 +7138,8 @@ img.gray-filter {
     font-size: .7rem;
     font-weight: 400;
 }
+
+#dateRangePicker.flatpickr-input{
+    max-width: 250px;
+}
+

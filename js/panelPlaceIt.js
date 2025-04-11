@@ -2241,5 +2241,184 @@ async function generarPDFNodo(remito, cliente, fechaEntrega, operadorLogistico, 
 }
 // FIN ETIQUETA NODOS
 
+// DESCARGAR REPORTE
+$(document).ready(function () {
+    $('#downloadExcel').on('click', function () {
+        // Cambiar el texto del botón a un spinner
+        $(this).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando reporte...').attr('disabled', true);
+
+        // Crear un contenedor para las fechas
+        const datePickerContainer = $('<input type="text" id="dateRangePicker" placeholder="Selecciona un rango de fechas" style="position: absolute; z-index: 9999;"/>').appendTo('body');
+
+        // Inicializar Flatpickr para el rango de fechas en español
+        flatpickr(datePickerContainer[0], {
+            mode: 'range',
+            dateFormat: 'd/m/Y',
+            maxDate: new Date(),
+            locale: 'es', // <- En español
+            onClose: function (selectedDates) {
+                if (selectedDates.length === 2) {
+                    const startDate = selectedDates[0];
+                    const endDate = selectedDates[1];
+                    cargarDatosYGenerarExcel(startDate, endDate);
+                }
+                datePickerContainer.remove();
+            }
+        });
+
+        // Posicionar el calendario sobre el botón
+        const offset = $(this).offset();
+        datePickerContainer.css({ top: offset.top + $(this).outerHeight(), left: offset.left });
+        datePickerContainer.focus();
+    });
+
+    async function cargarDatosYGenerarExcel(startDate, endDate) {
+        const endDateAdjusted = new Date(endDate);
+        endDateAdjusted.setHours(23, 59, 59, 999);
+    
+        const filteredData = allData.filter(item => {
+            const [date, time] = item.fechaHora.split(', ');
+            const [day, month, year] = date.split('/');
+            const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time.trim()}`;
+            const fechaHora = new Date(formattedDate);
+            return fechaHora >= startDate && fechaHora <= endDateAdjusted;
+        });
+    
+        if (filteredData.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sin datos',
+                text: 'No se encontraron datos en el rango de fechas seleccionado.',
+            });
+            $('#downloadExcel').html('<i class="bi bi-file-earmark-excel mr-1"></i> <strong>Descargar</strong> tabla en Excel').attr('disabled', false);
+            return;
+        }
+    
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Datos");
+    
+        const headers = [
+            "FECHAHORA", "ESTADO DE ENTREGA", "CLIENTE", "REMITO", "NOMBRE", "CP", "LOCALIDAD",
+            "PROVINCIA", "SKU", "CANTIDAD", "VALORDECLARADO", "DIRECCION",
+            "TELEFONO", "COMENTARIOS", "SUBDATO", "TIENDA"
+        ];
+    
+        worksheet.addRow(headers);
+    
+        const commonFont = { size: 12, name: "Arial" };
+        const borderStyle = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+        };
+    
+        const headerRow = worksheet.getRow(1);
+        headerRow.eachCell(cell => {
+            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFBFBFBF' }
+            };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.border = borderStyle;
+        });
+    
+        filteredData.forEach(item => {
+            // Determinar estado
+            let estado = '';
+            let estadoStyle = {};
+            if (item.fotoURL) {
+                estado = "ENTREGADO";
+                estadoStyle = { fillColor: 'FFB6D7A8' }; // verde claro
+            } else if (item.subdato && item.subdato2) {
+                estado = "EN REPARTO";
+                estadoStyle = { fillColor: 'FFFFE599' }; // naranja claro
+            } else if (item.subdato) {
+                estado = "SIN SALIR A REPARTO";
+                estadoStyle = { fillColor: 'FFD9D9D9' }; // gris claro
+            } else {
+                estado = '';
+            }
+    
+            const row = worksheet.addRow([
+                item.fechaHora || '',
+                estado,
+                item.cliente || '',
+                item.remito || '',
+                (item.nombre || '').toUpperCase(),
+                item.cp || '',
+                item.localidad || '',
+                item.provincia || '',
+                item.sku || '',
+                item.cantidad || '',
+                item.valorDeclarado || '',
+                item.direccion || '',
+                item.telefono || '',
+                item.comentarios || '',
+                item.subdato || '',
+                item.tienda || ''
+            ]);
+    
+            row.eachCell((cell, colNumber) => {
+                cell.font = { ...commonFont };
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                cell.border = borderStyle;
+    
+                if (row.number > 1) {
+                    if (colNumber === 4) { // REMITO
+                        cell.font = { ...commonFont, bold: true };
+                    }
+    
+                    if (colNumber === 9 || colNumber === 10) { // SKU y CANTIDAD
+                        cell.font = { ...commonFont, bold: true };
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFEFEFEF' }
+                        };
+                    }
+    
+                    if (colNumber === 11) { // VALORDECLARADO
+                        cell.font = { ...commonFont, color: { argb: 'FF008000' } };
+                    }
+    
+                    if (colNumber === 2) { // ESTADO DE ENTREGA
+                        if (estado) {
+                            const fillColor = estadoStyle.fillColor;
+                            cell.font = { ...commonFont, bold: true };
+                            cell.fill = {
+                                type: 'pattern',
+                                pattern: 'solid',
+                                fgColor: { argb: fillColor }
+                            };
+                            cell.value = estado.toUpperCase();
+                        }
+                    }
+                }
+            });
+        });
+    
+        worksheet.columns.forEach(col => {
+            let maxLength = 10;
+            col.eachCell({ includeEmpty: true }, cell => {
+                const val = cell.value ? cell.value.toString() : '';
+                maxLength = Math.max(maxLength, val.length);
+            });
+            col.width = maxLength + 2;
+        });
+
+        worksheet.getColumn(2).width = 27;
+    
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        saveAs(blob, "datos_despachos.xlsx");
+    
+        $('#downloadExcel').html('<i class="bi bi-file-earmark-excel mr-1"></i> <strong>Descargar</strong> tabla en Excel').attr('disabled', false);
+    }    
+});
+// FIN DESCARGAR REPORTE
+
 // Cargar datos al iniciar la página
 window.onload = cargarDatos;

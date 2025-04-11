@@ -1184,7 +1184,17 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             numeroDeEnvio: 123456,
             remitoVBA: numeroRemito,
             subdato: diaFormateadoPlaceIt,
-            valorDeclarado: total
+            valorDeclarado: total,
+            direccion: calleDestinatario,
+            comentarios: comentarios,
+            telefono: telefonoDestinatario,
+            sku: SKU,
+            cantidad: cantidad,
+            cp: Cp,
+            tienda: "WEB",
+            localidad: localidad,
+            nombre: NombreyApellido,
+            provincia: provincia
         }).then(() => {
             console.log(`Datos actualizados en Firebase (Logistica) para la operación: NOV${id}`);
             const Name = `Confirmación de Compra Novogar`;

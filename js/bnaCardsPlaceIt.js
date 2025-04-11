@@ -3024,7 +3024,17 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
                 numeroDeEnvio: 123456,
                 remitoVBA: numeroRemito,
                 subdato: diaFormateadoPlaceIt,
-                valorDeclarado: precio_venta
+                valorDeclarado: precio_venta,
+                direccion: calle,
+                comentarios: "Coordinar en Línea: " + telefono,
+                telefono: telefono,
+                sku: SKU,
+                cantidad: cantidad,
+                cp: cp,
+                tienda: "TIENDAS VIRTUALES",
+                localidad: localidad,
+                nombre: nombre,
+                provincia: provincia
             });
             console.log(`Datos actualizados en Firebase (Logistica) para la operación: ${remitoOrden}`);
         } catch (error) {
