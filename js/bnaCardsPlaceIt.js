@@ -3012,11 +3012,6 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
             hour12: false
         });
 
-        // Función para formatear el precio
-        function formatPrice(price) {
-            return `$ ${price.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
-        }
-
         try {
             await dbMeli.ref(`DespachosLogisticos/${numeroRemito}`).set({
                 cliente: cliente,
@@ -3063,6 +3058,12 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
 
     // Enviar el email después de procesar el envío
     await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
+}
+
+function formatPrice(price) {
+    const num = Number(price);
+    if (isNaN(num)) return '$ 0,00'; // o podés lanzar un error, o mostrar algo como "N/D"
+    return `$ ${num.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
 }
 
 // OBTENER FECHAS PLACE IT
