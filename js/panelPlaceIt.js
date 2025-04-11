@@ -2295,11 +2295,11 @@ $(document).ready(function () {
         }
     
         const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet("Datos");
+        const worksheet = workbook.addWorksheet("ENVIOS NOVOGAR - PLACE IT");
     
         const headers = [
             "FECHAHORA", "ESTADO DE ENTREGA", "CLIENTE", "REMITO", "NOMBRE", "CP", "LOCALIDAD",
-            "PROVINCIA", "SKU", "CANTIDAD", "VALORDECLARADO", "DIRECCION",
+            "PROVINCIA", "SKU", "CANTIDAD", "DECLARADO", "DIRECCION",
             "TELEFONO", "COMENTARIOS", "SUBDATO", "TIENDA", "ORDEN"
         ];
     
@@ -2315,7 +2315,7 @@ $(document).ready(function () {
     
         const headerRow = worksheet.getRow(1);
         headerRow.eachCell(cell => {
-            cell.font = { bold: true, color: { argb: 'FF000000' } };
+            cell.font = { bold: true, color: { argb: 'FF000000' }, name: "Arial", size: 12 };
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -2324,7 +2324,8 @@ $(document).ready(function () {
             cell.alignment = { horizontal: 'center', vertical: 'middle' };
             cell.border = borderStyle;
         });
-    
+        headerRow.height = 25;
+
         filteredData.forEach(item => {
             // Determinar estado
             let estado = '';
@@ -2416,7 +2417,16 @@ $(document).ready(function () {
         worksheet.getColumn(9).width = 20;
         worksheet.getColumn(16).width = 23;
         worksheet.getColumn(17).width = 30;
-    
+
+        worksheet.autoFilter = {
+            from: { row: 1, column: 1 },
+            to: { row: 1, column: headers.length }
+        };
+
+        worksheet.views = [
+            { state: 'frozen', ySplit: 1 }
+        ];
+
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
         const now = new Date();
