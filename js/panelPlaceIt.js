@@ -2413,7 +2413,9 @@ $(document).ready(function () {
     
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-        saveAs(blob, "datos_despachos.xlsx");
+        const now = new Date();
+        const fechaHoraStr = now.toLocaleString('es-AR').replaceAll('/', '-').replaceAll(',', '').replaceAll(':', '-').trim();
+        saveAs(blob, `datos_despachos_novogar_${fechaHoraStr}.xlsx`);        
     
         $('#downloadExcel').html('<i class="bi bi-file-earmark-excel mr-1"></i> <strong>Descargar</strong> tabla en Excel').attr('disabled', false);
     }    
