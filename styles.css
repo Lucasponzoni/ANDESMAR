@@ -7068,6 +7068,11 @@ img.gray-filter {
     font-family: "Rubik", sans-serif;
 }
 
+.stock-pi-bajo-stock-tv{
+    color: #FF3B30;
+    font-family: "Rubik", sans-serif;
+}
+
 .sin-stock{
     color: #FF3B30;
     font-family: "Rubik", sans-serif;
@@ -7075,6 +7080,11 @@ img.gray-filter {
 
 .stock-normal-stock-tv {
     color: #28831a;
+    font-family: "Rubik", sans-serif;
+}
+
+.stock-pi-normal-stock-tv {
+    color: purple;
     font-family: "Rubik", sans-serif;
 }
 /* FIN STOCK PRECIO */

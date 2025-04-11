@@ -465,12 +465,14 @@ function lowercaseWords(str) {
 
 // CARGAR PRECIOS Y STOCK
 let preciosArray = [];
+let preciosPlaceItArray = [];
 
 // Función para cargar precios y stock
-async function cargarPrecios() {
+function cargarPrecios() {
+    // Cargar precios
     return dbStock.ref('precios/').once('value')
         .then(preciosSnapshot => {
-            // Verificamos si hay datos
+            // Verificamos si hay datos en precios
             if (preciosSnapshot.exists()) {
                 preciosSnapshot.forEach(childSnapshot => {
                     const childData = childSnapshot.val();
@@ -479,9 +481,29 @@ async function cargarPrecios() {
                         stock: childData.stock
                     });
                 });
-                console.log("Stock Sincronizado con éxito.");
+                console.log("Stock sincronizado con éxito.");
+                console.log("Contenido de preciosArray:", preciosArray); // Mostrar preciosArray
             } else {
-                console.log("No hay datos en la ruta especificada.");
+                console.log("No hay datos en la ruta especificada para precios.");
+            }
+
+            // Cargar precios de PlaceIt
+            return dbStock.ref('preciosPlaceIt/').once('value');
+        })
+        .then(preciosPlaceItSnapshot => {
+            // Verificamos si hay datos en preciosPlaceIt
+            if (preciosPlaceItSnapshot.exists()) {
+                preciosPlaceItSnapshot.forEach(childSnapshot => {
+                    const childData = childSnapshot.val();
+                    preciosPlaceItArray.push({
+                        sku: childData.sku,
+                        stock: childData.stock
+                    });
+                });
+                console.log("Precios de PlaceIt sincronizados con éxito.");
+                console.log("Contenido de preciosPlaceItArray:", preciosPlaceItArray); // Mostrar preciosPlaceItArray
+            } else {
+                console.log("No hay datos en la ruta especificada para precios de PlaceIt.");
             }
         })
         .catch(error => {
@@ -897,30 +919,75 @@ const cpsPlaceIt = [
         const shopCode = data[i].orden_publica_.split('-').pop();
         const shopImage = getShopImage(shopCode);
 
+        // Verificar si el SKU está incluido en el listado
+        const isSkuIncluded = skusList.includes(data[i].sku);
+        const isSkuIncludedPlaceIt = skusPlaceItList.includes(data[i].sku);
+
+        const storeCode = data[i].orden_publica_.split('-').pop();
+
+        // Función para verificar si el storeCode es de Macro
+        const isMacro = (storeCode) => {
+            const macroCodes = ["1914", "1915"];
+            return macroCodes.includes(storeCode);
+        };
+
+        // Función para verificar si el storeCode es de BNA
+        const isBNA = (storeCode) => {
+            const bnaCodes = ["2941", "2942", "2943"];
+            return bnaCodes.includes(storeCode);
+        };
+
+        const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'card-body-macro' : '';
+
         // VERIFICAR STOCK Y PRECIO
         // Función para sanitizar el SKU
         function sanitizeSku(sku) {
-            return sku.replace(/[^a-zA-Z0-9]/g, ''); // Eliminar caracteres especiales
+            return sku ? sku.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : ''; // Eliminar caracteres especiales y pasar a minúsculas
         }
 
         // Obtener el SKU actual
-        const skuActual = data[i].sku;
+        const skuActual = sanitizeSku(data[i].sku); // Sanitiza el SKU actual
 
         // Buscar el stock correspondiente en preciosArray
-        const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === sanitizeSku(skuActual));
+        const precioItem = preciosArray.find(item => sanitizeSku(item.sku) === skuActual); // Sanitiza item.sku
         const stock = precioItem ? precioItem.stock : 0; // Si no se encuentra, stock es 0
+
+        // Verificar condiciones para PlaceIt
+        const isSkuInList = skusPlaceItList.includes(data[i].sku); // Verifica si el SKU está en la lista de PlaceIt
+        const isCpInCpsPlaceIt = cpsPlaceIt.includes(Number(data[i].cp)); // Verifica si el CP está en cpsPlaceIt
+        const isMacroStore = isMacro(storeCode); // Verifica si es un macro
 
         // Determinar mensaje y clase de estilo según el stock
         let stockMessage, stockClass, stockIcon;
+        let stockToDisplay = stock; // Variable para mostrar el stock correcto
 
-        if (stock === 0) {
-            stockMessage = 'Sin Stock';
-            stockClass = 'sin-stock';
-            stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+        if (isSkuInList && isCpInCpsPlaceIt) {
+            // Si el SKU y CP están en las listas de PlaceIt, usar preciosPlaceItArray
+            const precioPlaceItItem = preciosPlaceItArray.find(item => sanitizeSku(item.sku) === skuActual);
+            const stockPlaceIt = precioPlaceItItem ? precioPlaceItItem.stock : 0; // Stock de preciosPlaceItArray
+
+            stockToDisplay = stockPlaceIt; // Actualiza la variable para mostrar el stock de PlaceIt
+
+            if (stockPlaceIt === 0) {
+                stockMessage = 'Sin Stock PlaceIt';
+                stockClass = 'sin-stock';
+                stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+            } else {
+                stockClass = stockPlaceIt < 10 ? 'stock-pi-bajo-stock-tv' : 'stock-pi-normal-stock-tv';
+                stockMessage = stockPlaceIt < 10 ? 'P-it bajo' : 'Stock P-it';
+                stockIcon = stockPlaceIt < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+            }
         } else {
-            stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
-            stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
-            stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+            // Determinar mensaje y clase de estilo según el stock original
+            if (stock === 0) {
+                stockMessage = 'Sin Stock';
+                stockClass = 'sin-stock';
+                stockIcon = 'bi-exclamation-circle-fill'; // Puedes cambiar el ícono si lo deseas
+            } else {
+                stockClass = stock < 10 ? 'stock-bajo-stock-tv' : 'stock-normal-stock-tv';
+                stockMessage = stock < 10 ? 'Stock bajo' : 'Stock';
+                stockIcon = stock < 10 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+            }
         }
 
         // Generar el HTML para el stock con clases CSS
@@ -929,7 +996,7 @@ const cpsPlaceIt = [
             <div class="status-box-stock-tv">
                 <i class="bi ${stockIcon} icon-stock-tv ${stockClass}"></i>
                 <p class="status-text-stock-tv ${stockClass}">
-                ${stock === 0 ? stockMessage : `${stockMessage} <strong>${skuActual}</strong>: <strong>${stock}</strong> u.`}
+                ${stockToDisplay === 0 ? stockMessage : `${stockMessage} <strong>${skuActual}</strong>: <strong>${stockToDisplay}</strong> u.`}
                 </p>
             </div>
         </div>
@@ -982,26 +1049,6 @@ const descuentoContenido = data[i].equivalencia_puntos_pesos > 0 ? `
 <i class="bi bi-award-fill puntos-icon"></i>
 COMPRA CON USO DE PUNTOS BNA
 </p>` : '';
-
-// Verificar si el SKU está incluido en el listado
-const isSkuIncluded = skusList.includes(data[i].sku);
-const isSkuIncludedPlaceIt = skusPlaceItList.includes(data[i].sku);
-
-const storeCode = data[i].orden_publica_.split('-').pop();
-
-// Función para verificar si el storeCode es de Macro
-const isMacro = (storeCode) => {
-    const macroCodes = ["1914", "1915"];
-    return macroCodes.includes(storeCode);
-};
-
-// Función para verificar si el storeCode es de BNA
-const isBNA = (storeCode) => {
-    const bnaCodes = ["2941", "2942", "2943"];
-    return bnaCodes.includes(storeCode);
-};
-
-const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'card-body-macro' : '';
         
         // Agregar la tarjeta al contenedor
         cardsContainer.appendChild(card);
