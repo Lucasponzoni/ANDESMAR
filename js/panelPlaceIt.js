@@ -2315,7 +2315,7 @@ $(document).ready(function () {
     
         const headerRow = worksheet.getRow(1);
         headerRow.eachCell(cell => {
-            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            cell.font = { bold: true, color: { argb: 'FF000000' } };
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -2411,7 +2411,7 @@ $(document).ready(function () {
         });
 
         worksheet.getColumn(2).width = 27;
-        worksheet.getColumn(4).width = 40;
+        worksheet.getColumn(5).width = 40;
         worksheet.getColumn(8).width = 25;
         worksheet.getColumn(9).width = 20;
         worksheet.getColumn(16).width = 23;
