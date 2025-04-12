@@ -267,7 +267,7 @@ $(document).ready(function () {
                     cargarDatosYActualizarEstadisticas(startDate, endDate);
                 } else {
                     // Si no se seleccionan fechas, restaurar el botón
-                    $('#estadisticasEntrega').html('<i class="bi bi-graph-up mr-1"></i> <strong>Estadísticas</strong>').attr('disabled', false);
+                    $('#estadisticasEntrega').html('<i class="bi bi-graph-up mr-1"></i> Rango de <strong>Estadísticas</strong>').attr('disabled', false);
                 }
                 datePickerContainer.remove();
             }
