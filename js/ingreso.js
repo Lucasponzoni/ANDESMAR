@@ -940,7 +940,7 @@ function renderCards(data) {
                 console.warn(`El subdato no coincide con ninguna condición:`, ultimoSubdato);
             }
         } else {
-            console.warn(`No se encontró ningún subdato para el item:`, item);
+            // Nada
         }
 
         // Verificar si existe item.fotoURL y crear el botón de descarga
