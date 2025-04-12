@@ -6903,12 +6903,85 @@ img.gray-filter {
     width: fit-content;
 }
 
-.porcentaje-resaltado{
-    font-size: 1.2rem;
-    font-weight: 500;
-    font-family: "Rubik", sans-serif !important;
-    color: grey;
+.porcentaje-resaltado {
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Rubik", sans-serif;
+    color: #004085;
+    background: linear-gradient(to bottom, #e0f0ffcc, #cce5ffcc);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid #a4d0f5;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    display: inline-block;
+    line-height: 1.4;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
 }
+
+.badge-envios-total {
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Rubik", sans-serif;
+    color: #004085;
+    background: linear-gradient(to bottom, #e0f0ffcc, #cce5ffcc);
+    padding: 3px 10px;
+    border-radius: 6px;
+    border: 1px solid #a4d0f5;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    display: inline-block;
+    margin-left: 6px;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.estadisticas-header{
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Rubik", sans-serif;
+    color: #1c1c1e;
+    background: linear-gradient(to bottom, #ffffffcc, #f0f0f5cc);
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #d2d2d7;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    display: inline-block;
+    line-height: 1.4;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+}
+
+.btn-excel-log {
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Rubik", sans-serif;
+    color: #155724; 
+    background-color: #d4edda; 
+    padding: 3px 10px;
+    border-radius: 6px;
+    border: 1px solid #155724; 
+    box-shadow: 0 2px 4px rgba(21, 87, 36, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    display: inline-block;
+    margin-left: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-excel-log:hover {
+    background-color: #c3e6cb;
+    transform: scale(1.05);
+}
+
+.total-despachos{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 
 /* Estilo para la línea de tiempo PlaceIt*/
 .timeline {
@@ -7143,3 +7216,33 @@ img.gray-filter {
     max-width: 250px;
 }
 
+.tituloCorreo{
+    margin-left: 0 !important;
+}
+
+.tituloCorreo2{
+    font-size: .8rem;
+}
+
+.pie-chart33 {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #28a745 0% var(--paqueteria),
+        #dc3545 var(--paqueteria) var(--fin),
+        #e9ecef var(--fin) 100%
+    );
+}
+
+.pie-chart34 {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #ff0078 0% var(--paqueteria),
+        #17a2b8 var(--paqueteria) var(--fin),
+        #e9ecef var(--fin) 100%
+    );
+}
+    

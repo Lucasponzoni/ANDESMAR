@@ -11,6 +11,7 @@
     
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="./Img/caja.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -145,23 +146,23 @@
             <div id="porcentajes" class="d-flex flex-column flex-md-row justify-content-center align-items-center p-2">
                 <span class="percentage-card text-secondary mx-2 col-12 col-md-auto d-flex flex-column align-items-center text-center" id="andreaniPorcentaje">
                     <img src="./Img/loading-buffering.gif" alt="Spinner">
-                    <span class="ml-1">Calculando... <span id="andreaniValue"></span></span>
+                    <span class="ml-1 tituloCorreo">Calculando... <span id="andreaniValue"></span></span>
                 </span>
                 <span class="percentage-card text-secondary mx-2 col-12 col-md-auto d-flex flex-column align-items-center text-center" id="andesmarPorcentaje">
                     <img src="./Img/loading-buffering.gif" alt="Spinner">
-                    <span class="ml-1">Calculando... <span id="andesmarValue"></span></span>
+                    <span class="ml-1 tituloCorreo">Calculando... <span id="andesmarValue"></span></span>
                 </span>
                 <span class="percentage-card text-secondary mx-2 col-12 col-md-auto d-flex flex-column align-items-center text-center" id="cruzDelSurPorcentaje">
                     <img src="./Img/loading-buffering.gif" alt="Spinner">
-                    <span class="ml-1">Calculando... <span id="cruzDelSurValue"></span></span>
+                    <span class="ml-1 tituloCorreo">Calculando... <span id="cruzDelSurValue"></span></span>
                 </span>
                 <span class="percentage-card text-secondary mx-2 col-12 col-md-auto d-flex flex-column align-items-center text-center" id="ocaPorcentaje">
                     <img src="./Img/loading-buffering.gif" alt="Spinner">
-                    <span class="ml-1">Calculando... <span id="ocaValue"></span></span>
+                    <span class="ml-1 tituloCorreo">Calculando... <span id="ocaValue"></span></span>
                 </span>
                 <span class="percentage-card text-secondary mx-2 col-12 col-md-auto d-flex flex-column align-items-center text-center" id="placeItPorcentaje">
                     <img src="./Img/loading-buffering.gif" alt="Spinner">
-                    <span class="ml-1">Calculando... <span id="placeItValue"></span></span>
+                    <span class="ml-1 tituloCorreo">Calculando... <span id="placeItValue"></span></span>
                 </span>
                 <span class="macos-button-porcentaje" id="SinDespacharPorcentaje">
                     <i class="bi bi-calculator" style="font-size: 20px;"></i> Calculando en preparación...
@@ -169,9 +170,20 @@
             </div> 
         </div>   
         
-        <div id="estadisticas-header" class="estadisticas-header"><i class="bi bi-info-circle-fill"></i> Estadísticas de los últimos 30 días</div>                                  
+        <div class="total-despachos">
+            <div id="estadisticas-header" class="estadisticas-header"><i class="bi bi-info-circle-fill"></i> Cargando Estadísticas...</div>
+        </div> 
+                                    
 
 <div class="table-responsive">
+
+    <div class="container mt-4 d-flex" style="gap: 5px;">
+        <button id="estadisticasEntrega" class="btn btn-light" style="color: red;">
+            <i class="bi bi-graph-up mr-1" style="font-size: 16px; color: red;"></i>
+            Rango de <strong>Estadísticas</strong>
+        </button>
+    </div>    
+    
     <table id="data-table" class="table table-striped">
         <thead>
             <tr>
@@ -616,10 +628,20 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+    <!-- ExcelJS -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+
+    <!-- FileSaver para descargar el archivo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
     <!-- SweetAlert JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Cargar FlatPickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
     <!-- Cargar dompurify -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.4/purify.min.js"></script>
@@ -630,6 +652,13 @@
     
     <!-- Code39 Escaneo -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>  
+
+    <!-- jQuery y jQuery UI -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    
+    <!-- SheetJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
     <!-- Cargar jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

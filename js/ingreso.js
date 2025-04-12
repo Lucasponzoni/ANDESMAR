@@ -195,12 +195,11 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
 function cargarDatos() {
     // Inicializa el campo de búsqueda
     const searchInput = document.getElementById('searchDespachosLogistica');
-    // Mensaje inicial
     searchInput.value = "Aguardando que cargue la web ⏳";
     searchInput.disabled = true;
 
     db.ref('DespachosLogisticos').once('value').then(snapshot => {
-        allData = []; // Limpiar allData
+        let allData = []; // Limpiar allData
         const tableBody = document.querySelector('#data-table tbody');
         tableBody.innerHTML = ''; // Limpiar tabla
 
@@ -219,8 +218,17 @@ function cargarDatos() {
         // Invertir el orden para que quede del más nuevo al más viejo
         allData.reverse();
 
+        // Llamar a calcularPorcentajes con los últimos 30 días
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+        const filteredData = allData.filter(item => {
+            const [day, month, year] = item.fechaHora.split(',')[0].split('/');
+            const itemDate = new Date(`${year}-${month}-${day}`);
+            return itemDate >= thirtyDaysAgo; // Filtrar los últimos 30 días
+        });
+
         renderCards(allData);
-        calcularPorcentajes(allData);
+        calcularPorcentajes(filteredData);
         updatePagination(allData.length);
         
         // Ocultar el spinner al cargar los datos
@@ -236,123 +244,484 @@ function cargarDatos() {
     });
 }
 
-function calcularPorcentajes(data) {
+// ESTADISTICAS
+$(document).ready(function () {
+    // Cargar estadísticas al cargar la página
+    cargarDatos();
+
+    $('#estadisticasEntrega').on('click', function () {
+        // Cambiar el texto del botón a un spinner
+        $(this).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando consulta...').attr('disabled', true);
+
+        // Crear un contenedor para las fechas
+        const datePickerContainer = $('<input type="text" id="dateRangePicker" placeholder="Selecciona un rango de fechas" style="position: absolute; z-index: 9999;"/>').appendTo('body');
+
+        // Inicializar Flatpickr para el rango de fechas en español
+        flatpickr(datePickerContainer[0], {
+            mode: 'range',
+            dateFormat: 'd/m/Y',
+            maxDate: new Date(),
+            locale: 'es',
+            onClose: function (selectedDates) {
+                if (selectedDates.length === 2) {
+                    const startDate = selectedDates[0];
+                    const endDate = selectedDates[1];
+                    cargarDatosYActualizarEstadisticas(startDate, endDate);
+                } else {
+                    // Si no se seleccionan fechas, restaurar el botón
+                    $('#estadisticasEntrega').html('<i class="bi bi-graph-up mr-1"></i> <strong>Estadísticas</strong>').attr('disabled', false);
+                }
+                datePickerContainer.remove();
+            }
+        });
+
+        // Posicionar el calendario sobre el botón
+        const offset = $(this).offset();
+        datePickerContainer.css({ top: offset.top + $(this).outerHeight(), left: offset.left });
+        datePickerContainer.focus();
+    });
+});
+
+function cargarDatosYActualizarEstadisticas(startDate, endDate) {
+    // Mostrar spinner mientras se cargan los datos
+    $('#estadisticasEntrega').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando consulta...');
+
+    // Aquí puedes realizar la consulta a la base de datos con el rango de fechas
+    db.ref('DespachosLogisticos').once('value').then(snapshot => {
+        let allData = []; // Limpiar allData
+        snapshot.forEach(childSnapshot => {
+            const data = childSnapshot.val();
+            const itemDate = new Date(data.fechaHora.split(',')[0].split('/').reverse().join('-'));
+
+            // Filtrar los datos por el rango de fechas seleccionado
+            if (itemDate >= startDate && itemDate <= endDate) {
+                allData.push(data); // Almacenar datos en allData
+            }
+        });
+
+        // Actualizar estadísticas
+        calcularPorcentajes(allData, startDate, endDate);
+
+        // Restaurar el botón
+        $('#estadisticasEntrega').html('<i class="bi bi-graph-up mr-1"></i> <strong>Estadísticas</strong>').attr('disabled', false);
+    }).catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error al cargar datos',
+            text: error.message,
+        });
+        $('#estadisticasEntrega').html('<i class="bi bi-graph-up mr-1"></i> <strong>Estadísticas</strong>').attr('disabled', false);
+    });
+}
+
+// Función para formatear la fecha
+function formatDate(date) {
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return new Intl.DateTimeFormat('es-ES', options).format(date);
+}
+
+function calcularPorcentajes(data, startDate, endDate) {
     let countAndreani = 0;
+    let countAndreaniPaqueteria = 0; 
+    let countAndreaniBigger = 0; 
     let countAndesmar = 0;
     let countCruzDelSur = 0;
     let countOca = 0;
     let countPlaceIt = 0; 
     let countPendientes = 0;
+    let countPlaceItSolo = 0;
+    let countNovogar = 0;
 
-    const now = new Date();
-    const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000)); // Fecha de hace 30 días
-
+    // Si se pasa un rango de fechas, no necesitas filtrar aquí
     data.forEach(item => {
-        const [day, month, year] = item.fechaHora.split(',')[0].split('/');
-        const itemDate = new Date(`${year}-${month}-${day}`);
+        if (item.numeroDeEnvio) {
+            const numeroDeEnvio = item.numeroDeEnvio;
 
-        if (itemDate >= thirtyDaysAgo) {
-            if (item.numeroDeEnvio) {
-                const numeroDeEnvio = item.numeroDeEnvio;
-                
-                // Contar envíos de Andreani
-                if ((((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
-                    (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) || 
-                    (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('4')))) {
-                    countAndreani++;
-                } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) || 
-                           (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1'))) {
-                    countCruzDelSur++;
-                } else if (numeroDeEnvio.length === 19 && numeroDeEnvio.startsWith('4')) { 
-                    countOca++;
-                } else if (item.operadorLogistico !== "PlaceIt" && 
-                    item.operadorLogistico !== "Logística Novogar StaFe" && 
-                    item.operadorLogistico !== "Logística Novogar Rafaela" && 
-                    item.operadorLogistico !== "Logística Novogar BsAs" && 
-                    item.operadorLogistico !== "Logística Novogar SanNicolas" && 
-                    item.operadorLogistico !== "Logística Novogar") {
-               countAndesmar++;
-           }
-           
-            }
-        
-            // Contar envíos de PlaceIt
-            if (item.operadorLogistico === "PlaceIt") {
-                countPlaceIt++;
-            }
-        
-            // Contar los pendientes de despacho
-            if (item.estado === "Pendiente de despacho") {
-                countPendientes++;
+            // Contar envíos de Andreani
+            if ((((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('501')) || 
+                (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('36'))) || 
+                (numeroDeEnvio.length === 15 && numeroDeEnvio.startsWith('4')))) {
+                if (numeroDeEnvio.startsWith('36')) {
+                    countAndreaniPaqueteria++;
+                } else {
+                    countAndreaniBigger++;
+                }
+                countAndreani++;
+            } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) || 
+                       (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1'))) {
+                countCruzDelSur++;
+            } else if (numeroDeEnvio.length === 19 && numeroDeEnvio.startsWith('4')) { 
+                countOca++;
+            } else if (item.operadorLogistico !== "PlaceIt" && 
+                       item.operadorLogistico !== "Logística Novogar StaFe" && 
+                       item.operadorLogistico !== "Logística Novogar Rafaela" && 
+                       item.operadorLogistico !== "Logística Novogar BsAs" && 
+                       item.operadorLogistico !== "Logística Novogar SanNicolas" && 
+                       item.operadorLogistico !== "Logística Novogar") {
+                countAndesmar++;
             }
         }
-        
+
+        // Contar envíos de PlaceIt y Novogar
+        if (item.operadorLogistico === "PlaceIt") {
+            countPlaceIt++;
+            countPlaceItSolo++;
+        }
+
+        if (
+            item.operadorLogistico === "Logística Novogar StaFe" ||
+            item.operadorLogistico === "Logística Novogar Rafaela" ||
+            item.operadorLogistico === "Logística Novogar BsAs" ||
+            item.operadorLogistico === "Logística Novogar SanNicolas" ||
+            item.operadorLogistico === "Logística Novogar"
+        ) {
+            countPlaceIt++;
+            countNovogar++;
+        }
+
+        // Contar los pendientes de despacho
+        if (item.estado === "Pendiente de despacho") {
+            countPendientes++;
+        }
     });
 
-    const totalEnvios = countAndreani + countAndesmar + countCruzDelSur + countOca + countPlaceIt; // Incluir PlaceIt en total
+    const totalEnvios = countAndreaniPaqueteria + countAndreaniBigger + countAndesmar + countCruzDelSur + countOca + countNovogar + countPlaceItSolo;
+    const totalAndreani = countAndreaniPaqueteria + countAndreaniBigger;
 
     // Calcular porcentajes
-    const andreaniPorcentaje = totalEnvios > 0 ? ((countAndreani / totalEnvios) * 100).toFixed(2) : 0;
+    const andreaniPorcentaje = totalEnvios > 0 ? ((totalAndreani / totalEnvios) * 100).toFixed(2) : 0;
+
     const andesmarPorcentaje = totalEnvios > 0 ? ((countAndesmar / totalEnvios) * 100).toFixed(2) : 0;
     const cruzDelSurPorcentaje = totalEnvios > 0 ? ((countCruzDelSur / totalEnvios) * 100).toFixed(2) : 0;
-    const ocaPorcentaje = totalEnvios > 0 ? ((countOca / totalEnvios) * 100).toFixed(2) : 0; // Porcentaje de OCA
-    const placeItPorcentaje = totalEnvios > 0 ? ((countPlaceIt / totalEnvios) * 100).toFixed(2) : 0; // Porcentaje de PlaceIt
+    const ocaPorcentaje = totalEnvios > 0 ? ((countOca / totalEnvios) * 100).toFixed(2) : 0;
+    const placeItPorcentaje = totalEnvios > 0 ? ((countPlaceIt / totalEnvios) * 100).toFixed(2) : 0;
+
+    // Calcular porcentajes específicos para Paquetería y Bigger
+    const totalAndreaniPorcentaje = totalAndreani > 0 ? ((countAndreaniPaqueteria / totalEnvios) * 100).toFixed(2) : 0;
+    const totalBiggerPorcentaje = totalAndreani > 0 ? ((countAndreaniBigger / totalEnvios) * 100).toFixed(2) : 0;
+
+    // Andreani
+    const andreaniPorcentajeFloat = parseFloat(andreaniPorcentaje);
+    const paqueteriaPorcentaje = (andreaniPorcentajeFloat * totalAndreaniPorcentaje / 100).toFixed(2);
+    const biggerPorcentaje = (andreaniPorcentajeFloat * totalBiggerPorcentaje / 100).toFixed(2);
+    const finAndreani = (parseFloat(paqueteriaPorcentaje) + parseFloat(biggerPorcentaje)).toFixed(2);
+
+    // PlaceIt-Novogar
+    const placeItSoloPorcentaje = totalEnvios > 0 ? ((countPlaceItSolo / totalEnvios) * 100).toFixed(2) : 0;
+    const novogarPorcentaje = totalEnvios > 0 ? ((countNovogar / totalEnvios) * 100).toFixed(2) : 0;
+    const totalPlaceItPorcentaje = totalEnvios > 0 ? ((countPlaceIt / totalEnvios) * 100).toFixed(2) : 0;
+
+    const finPlaceIt = (parseFloat(placeItSoloPorcentaje) + parseFloat(novogarPorcentaje)).toFixed(2);
 
     // Actualizar el HTML
     document.getElementById('andreaniPorcentaje').innerHTML = `
     <img src="./Img/andreani-mini.png" alt="Andreani" class="gray-filter"> 
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">Andreani: <span class="porcentaje-resaltado">${andreaniPorcentaje}%</span></span>
+        <span class="ml-1 tituloCorreo" style="font-weight: bold;">Andreani: <br><span class="porcentaje-resaltado">${andreaniPorcentaje}%</span></span>
     </div>
     <span class="ml-1 conteo-Andreani" style="font-size: 0.9em;">${countAndreani} despachos</span>
-    <div class="pie-chart" style="--percentage: ${andreaniPorcentaje}; --color: #dc3545;"></div>
-    `;
+    <div class="pie-chart pie-chart33" 
+         style="--paqueteria: ${paqueteriaPorcentaje}%; 
+                --bigger: ${biggerPorcentaje}%; 
+                --fin: ${finAndreani}%;">
+    </div>
+    <div style="margin-top: 5px; line-height: 1.5;">
+        <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 5px;">
+            <div style="display: flex; align-items: center;">
+                <div style="width: 10px; height: 10px; background-color: #28a745; border-radius: 50%; margin-right: 5px;"></div>
+                <span>Paquetería (${totalAndreaniPorcentaje}%)</span>
+            </div>
+            <span style="
+                font-size: 0.75em; 
+                font-style: italic; 
+                margin-left: 15px; 
+                background: #f5f5f7; 
+                border: 1px solid #d1d1d6; 
+                border-radius: 5px; 
+                padding: 2px 8px; 
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+                margin-top: 3px;
+            ">${countAndreaniPaqueteria} envíos</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; align-items: center;">
+                <div style="width: 10px; height: 10px; background-color: #dc3545; border-radius: 50%; margin-right: 5px;"></div>
+                <span>Bigger (${totalBiggerPorcentaje}%)</span>
+            </div>
+            <span style="
+                font-size: 0.75em; 
+                font-style: italic; 
+                margin-left: 15px; 
+                background: #f5f5f7; 
+                border: 1px solid #d1d1d6; 
+                border-radius: 5px; 
+                padding: 2px 8px; 
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+                margin-top: 3px;
+            ">${countAndreaniBigger} envíos</span>
+        </div>
+    </div>
+    `;    
 
+    // Actualizar el HTML para Andesmar
     document.getElementById('andesmarPorcentaje').innerHTML = `
     <img src="./Img/andesmar-mini.png" alt="Andesmar" class="gray-filter">  
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">Andesmar: <span class="porcentaje-resaltado">${andesmarPorcentaje}%</span></span>
+        <span class="ml-1 tituloCorreo" style="font-weight: bold;">Andesmar:<br> 
+            <span class="porcentaje-resaltado">${andesmarPorcentaje}%</span>
+        </span>
     </div>
-        <span class="ml-1 conteo-andesmar" style="font-size: 0.9em;">${countAndesmar} despachos</span>
-        <div class="pie-chart" style="--percentage: ${andesmarPorcentaje}; --color: #007bff;"></div>
-    `;
+    <span class="ml-1 conteo-andesmar" style="font-size: 0.9em;">${countAndesmar} despachos</span>
+    <div class="pie-chart" style="--percentage: ${andesmarPorcentaje}; --color: #007bff;"></div>    
+    <div style="margin-top: 5px;">
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; align-items: center; margin-bottom: 2px;">
+                <div style="width: 10px; height: 10px; background-color: #007bff; border-radius: 50%; margin-right: 5px;"></div>
+                <span>Bigger (${andesmarPorcentaje}%)</span>
+            </div>
+            <span style="
+                font-size: 0.75em; 
+                font-style: italic; 
+                background: #f5f5f7; 
+                border: 1px solid #d1d1d6; 
+                border-radius: 5px; 
+                padding: 2px 8px; 
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            ">${countAndesmar} envíos</span>
+        </div>
+    </div>
+    `;       
 
+    // Actualizar el HTML para Cruz del Sur
     document.getElementById('cruzDelSurPorcentaje').innerHTML = `
     <img src="./Img/cds-mini.png" alt="Cruz del Sur" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">CDS: <span class="porcentaje-resaltado">${cruzDelSurPorcentaje}%</span></span>
+        <span class="ml-1 tituloCorreo" style="font-weight: bold;">Cruz del Sur:<br> 
+            <span class="porcentaje-resaltado">${cruzDelSurPorcentaje}%</span>
+        </span>
     </div>
-        <span class="ml-1 conteo-cds" style="font-size: 0.9em;">${countCruzDelSur} despachos</span>
-        <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #003366;"></div>
-    `;
+    <span class="ml-1 conteo-cds" style="font-size: 0.9em;">${countCruzDelSur} despachos</span>
+    <div class="pie-chart" style="--percentage: ${cruzDelSurPorcentaje}; --color: #003366;"></div>    
+    <div style="margin-top: 5px">
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; align-items: center; margin-bottom: 2px;">
+                <div style="width: 10px; height: 10px; background-color: #003366; border-radius: 50%; margin-right: 5px;"></div>
+                <span>Bigger (${cruzDelSurPorcentaje}%)</span>
+            </div>
+            <span style="
+                font-size: 0.75em; 
+                font-style: italic; 
+                background: #f5f5f7; 
+                border: 1px solid #d1d1d6; 
+                border-radius: 5px; 
+                padding: 2px 8px; 
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            ">${countCruzDelSur} envíos</span>
+        </div>
+    </div>
+    `;    
 
+    // Actualizar el HTML para OCA
     document.getElementById('ocaPorcentaje').innerHTML = `
     <img src="./Img/oca-mini.png" alt="OCA" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">OCA: <span class="porcentaje-resaltado">${ocaPorcentaje}%</span></span>
+        <span class="ml-1 tituloCorreo" style="font-weight: bold;">OCA:<br> 
+            <span class="porcentaje-resaltado">${ocaPorcentaje}%</span>
+        </span>
     </div>
-        <span class="ml-1 conteo-oca" style="font-size: 0.9em;">${countOca} despachos</span>
-        <div class="pie-chart" style="--percentage: ${ocaPorcentaje}; --color: #5B2B82;"></div>
+    <span class="ml-1 conteo-oca" style="font-size: 0.9em;">${countOca} despachos</span>
+<div class="pie-chart" style="--percentage: ${ocaPorcentaje}; --color: #5B2B82;"></div>
+    <div style="margin-top: 5px">
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; align-items: center; margin-bottom: 2px;">
+                <div style="width: 10px; height: 10px; background-color: #5B2B82; border-radius: 50%; margin-right: 5px;"></div>
+                <span>Bigger (${ocaPorcentaje}%)</span>
+            </div>
+            <span style="
+                font-size: 0.75em; 
+                font-style: italic; 
+                background: #f5f5f7; 
+                border: 1px solid #d1d1d6; 
+                border-radius: 5px; 
+                padding: 2px 8px; 
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            ">${countOca} envíos</span>
+        </div>
+    </div>
     `;
 
-    // Actualizar el HTML para PlaceIt
+    // Actualizar el HTML para PlaceIt-Novogar
     document.getElementById('placeItPorcentaje').innerHTML = `
     <img src="./Img/placeit-mini2.png" alt="PlaceIt" class="gray-filter">   
     <div class="d-flex align-items-center flex-wrap">
-        <span class="ml-1" style="font-weight: bold;">PlaceIt: <span class="porcentaje-resaltado">${placeItPorcentaje}%</span></span>
+        <span class="ml-1 tituloCorreo" style="font-weight: bold;">
+            PlaceIt + Novogar:<br> <span class="porcentaje-resaltado">${totalPlaceItPorcentaje}%</span>
+        </span>
     </div>
-        <span class="ml-1 conteo-oca" style="font-size: 0.9em;">${countPlaceIt} despachos</span>
-        <div class="pie-chart" style="--percentage: ${placeItPorcentaje}; --color: #ff0078;"></div>
-    `;
+    <span class="ml-1 conteo-oca" style="font-size: 0.9em;">${countPlaceIt} despachos</span>
+    
+    <div class="pie-chart pie-chart34"
+         style="--paqueteria: ${placeItSoloPorcentaje}%; 
+                --bigger: ${novogarPorcentaje}%; 
+                --fin: ${finPlaceIt}%;">
+    </div>
 
+    <div style="margin-top: 5px; line-height: 1.5;">
+        <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 5px;">
+            <div style="display: flex; align-items: center;">
+                <div style="width: 10px; height: 10px; background-color: #ff0078; border-radius: 50%; margin-right: 5px;"></div>
+                <span>PlaceIt (${placeItSoloPorcentaje}%)</span>
+            </div>
+            <span style="
+                font-size: 0.75em; 
+                font-style: italic; 
+                margin-left: 15px; 
+                background: #f5f5f7; 
+                border: 1px solid #d1d1d6; 
+                border-radius: 5px; 
+                padding: 2px 8px; 
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+                margin-top: 3px;
+            ">${countPlaceItSolo} envíos</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; align-items: center;">
+                <div style="width: 10px; height: 10px; background-color: #0096c7; border-radius: 50%; margin-right: 5px;"></div>
+                <span>Novogar (${novogarPorcentaje}%)</span>
+            </div>
+            <span style="
+                font-size: 0.75em; 
+                font-style: italic; 
+                margin-left: 15px; 
+                background: #f5f5f7; 
+                border: 1px solid #d1d1d6; 
+                border-radius: 5px; 
+                padding: 2px 8px; 
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+                margin-top: 3px;
+            ">${countNovogar} envíos</span>
+        </div>
+    </div>
+`;
+
+    // Actualizar el HTML para pendientes
     document.getElementById('SinDespacharPorcentaje').innerHTML = `
     <div class="macos-button-porcentaje">
         <span class="ml-1"><i class="bi bi-stopwatch-fill" style="font-size: 1.2em;"></i> Pendientes:</span> <span class="pill-preparacion">${countPendientes}</span> en preparación
     </div>
     `;
 
-    document.getElementById('estadisticas-header').innerHTML = `<i class="bi bi-info-circle-fill"></i> Estadísticas de los últimos 30 días sobre <strong>${totalEnvios} Envios</strong>`
+    if (!startDate || !endDate) {
+        endDate = new Date(); // Fecha de hoy
+        startDate = new Date();
+        startDate.setDate(endDate.getDate() - 30); // Fecha de hace 30 días
+    }
+
+    // Actualizar el encabezado con el rango de fechas y el total de envíos
+    document.getElementById('estadisticas-header').innerHTML = `
+        <i class="bi bi-info-circle-fill"></i> Estadísticas desde 
+        <span class="badge-envios-total">${formatDate(startDate)} hasta ${formatDate(endDate)}</span> sobre 
+        <span class="badge-envios-total">${totalEnvios} envíos</span>
+        <button class="btn-excel-log" id="btn-descargar-excel">
+            <i class="bi bi-file-earmark-excel"></i> Descargar Estadísticas
+        </button>
+    `;
+
+// GENERAR EXCEL
+document.getElementById('btn-descargar-excel').addEventListener('click', function () {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Estadísticas');
+
+    worksheet.columns = [
+        { header: 'CORREO', key: 'correo', width: 30 },
+        { header: 'PORCENTAJE TOTAL', key: 'porcentajeTotal', width: 20 },
+        { header: 'BIGGER', key: 'bigger', width: 20 },
+        { header: 'PAQUETERIA', key: 'paqueteria', width: 20 },
+        { header: 'TOTAL DE ENVÍOS', key: 'totalEnvios', width: 20 }
+    ];
+
+    const commonFont = { size: 12, name: "Arial" };
+    const borderStyle = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+    };
+
+    // Cabecera
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, name: "Arial", size: 12 }; // Letra blanca
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFBFBFBF' }
+        };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = borderStyle;
+    });
+
+    // Datos
+    const datos = [
+        { correo: 'ANDREANI', porcentajeTotal: `${andreaniPorcentaje}%`, bigger: `${totalBiggerPorcentaje}%`, paqueteria: `${totalAndreaniPorcentaje}%`, totalEnvios: countAndreani },
+        { correo: 'ANDESMAR', porcentajeTotal: `${andesmarPorcentaje}%`, bigger: `${andesmarPorcentaje}%`, paqueteria: '0%', totalEnvios: countAndesmar },
+        { correo: 'CRUZ DEL SUR', porcentajeTotal: `${cruzDelSurPorcentaje}%`, bigger: `${cruzDelSurPorcentaje}%`, paqueteria: '0%', totalEnvios: countCruzDelSur },
+        { correo: 'OCA', porcentajeTotal: `${ocaPorcentaje}%`, bigger: `${ocaPorcentaje}%`, paqueteria: '0%', totalEnvios: countOca },
+        { correo: 'PLACE IT', porcentajeTotal: `${placeItSoloPorcentaje}%`, bigger: `${placeItSoloPorcentaje}%`, paqueteria: '0%', totalEnvios: countPlaceItSolo },
+        { correo: 'LOGISTICA NOVOGAR', porcentajeTotal: `${novogarPorcentaje}%`, bigger: `${novogarPorcentaje}%`, paqueteria: '0%', totalEnvios: countNovogar }
+    ];
+
+    datos.forEach(dato => worksheet.addRow(dato));
+
+    const totalRow = worksheet.addRow({
+        correo: 'TOTAL',
+        porcentajeTotal: '',
+        bigger: '',
+        paqueteria: '',
+        totalEnvios: totalEnvios
+    });
+
+    // Estilo general a todas las celdas
+    worksheet.eachRow({ includeEmpty: true }, function (row, rowNumber) {
+        row.alignment = { vertical: 'middle', horizontal: 'center' };
+        row.font = commonFont;
+        row.eachCell(cell => {
+            cell.border = borderStyle;
+        });
+
+        const correoCell = row.getCell('correo');
+        if (correoCell.value === 'TOTAL') {
+            row.font = { bold: true, color: { argb: 'FFFF0000' }, name: "Arial", size: 12 }; // rojo
+        } else if (rowNumber > 1) {
+            correoCell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'D9EAF7' } // celestito claro
+            };
+            correoCell.font = { bold: true, name: "Arial", size: 12 };
+        }
+    });
+
+    // Filtro
+    worksheet.autoFilter = 'A1:E1';
+
+    // Nombre con fecha y hora
+    const now = new Date();
+    const formattedDate = now.toISOString().replace(/T/, '_').replace(/:/g, '-').split('.')[0];
+    const fileName = `Estadisticas-${formattedDate}.xlsx`;
+
+    // Descargar
+    workbook.xlsx.writeBuffer().then(function (data) {
+        const blob = new Blob([data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        saveAs(blob, fileName);
+    });
+});
+
 }
+// FIN ESTADISTICAS
 
 function eliminarFila(button) {
     const row = button.closest('tr');
@@ -547,7 +916,7 @@ function renderCards(data) {
                         <i class="bi bi-clock-history"></i> ${ultimoSubdato} ${ultimoSubdatoFecha}
                     </span>
                 `;
-            } else if (ultimoSubdato.startsWith('Pendiente de confirmar')) {
+            } else if (ultimoSubdato.startsWith('Pendiente de confirmar') || ultimoSubdato.startsWith('Camion Rosario')) {
                 subdatoTexto = `
                     <br>
                     <span class="subdato-texto1">
