@@ -212,12 +212,18 @@
             </div> 
         </div>
         </div>   
-        <div id="estadisticas-header" class="estadisticas-header"><i class="bi bi-info-circle-fill"></i> Estadísticas de los últimos 30 días</div> 
-                               
+
+        <div class="total-despachos">
+            <div id="estadisticas-header" class="estadisticas-header"><i class="bi bi-info-circle-fill"></i> Cargando Estadísticas...</div>
+        </div>                       
 
 <div class="table-responsive"> 
 
     <div class="container mt-4 d-flex" style="gap: 5px;">
+        <button id="estadisticasEntrega" class="btn btn-light" style="color: red;">
+            <i class="bi bi-graph-up mr-1" style="font-size: 16px; color: red;"></i>
+            Rango de <strong>Estadísticas</strong>
+        </button>
         <button id="downloadExcel" class="btn btn-light" style="color: green;">
             <i class="bi bi-file-earmark-excel mr-1" style="font-size: 16px; color: green;"></i>
             <strong>Descargar</strong> tabla en Excel

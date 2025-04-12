@@ -222,6 +222,15 @@ function cargarDatos() {
         // Invertir el orden para que quede del más nuevo al más viejo
         allData.reverse();
 
+        // Llamar a calcularPorcentajes con los últimos 30 días
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+        const filteredData = allData.filter(item => {
+        const [day, month, year] = item.fechaHora.split(',')[0].split('/');
+        const itemDate = new Date(`${year}-${month}-${day}`);
+         return itemDate >= thirtyDaysAgo; // Filtrar los últimos 30 días
+        });
+
         renderCards(allData);
         calcularPorcentajes(allData);
         updatePagination(allData.length);
@@ -239,7 +248,83 @@ function cargarDatos() {
     });
 }
 
-function calcularPorcentajes(data) {
+// ESTADISTICAS
+$(document).ready(function () {
+    // Cargar estadísticas al cargar la página
+    cargarDatos();
+
+    $('#estadisticasEntrega').on('click', function () {
+        // Cambiar el texto del botón a un spinner
+        $(this).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando consulta...').attr('disabled', true);
+
+        // Crear un contenedor para las fechas
+        const datePickerContainer = $('<input type="text" id="dateRangePicker" placeholder="Selecciona un rango de fechas" style="position: absolute; z-index: 9999;"/>').appendTo('body');
+
+        // Inicializar Flatpickr para el rango de fechas en español
+        flatpickr(datePickerContainer[0], {
+            mode: 'range',
+            dateFormat: 'd/m/Y',
+            maxDate: new Date(),
+            locale: 'es',
+            onClose: function (selectedDates) {
+                if (selectedDates.length === 2) {
+                    const startDate = selectedDates[0];
+                    const endDate = selectedDates[1];
+                    cargarDatosYActualizarEstadisticas(startDate, endDate);
+                } else {
+                    // Si no se seleccionan fechas, restaurar el botón
+                    $('#estadisticasEntrega').html('<i class="bi bi-graph-up mr-1"></i> <strong>Estadísticas</strong>').attr('disabled', false);
+                }
+                datePickerContainer.remove();
+            }
+        });
+
+        // Posicionar el calendario sobre el botón
+        const offset = $(this).offset();
+        datePickerContainer.css({ top: offset.top + $(this).outerHeight(), left: offset.left });
+        datePickerContainer.focus();
+    });
+});
+
+function cargarDatosYActualizarEstadisticas(startDate, endDate) {
+    // Mostrar spinner mientras se cargan los datos
+    $('#estadisticasEntrega').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando consulta...');
+
+    // Aquí puedes realizar la consulta a la base de datos con el rango de fechas
+    db.ref('DespachosLogisticos').once('value').then(snapshot => {
+        let allData = []; // Limpiar allData
+        snapshot.forEach(childSnapshot => {
+            const data = childSnapshot.val();
+            const itemDate = new Date(data.fechaHora.split(',')[0].split('/').reverse().join('-'));
+
+            // Filtrar los datos por el rango de fechas seleccionado
+            if (itemDate >= startDate && itemDate <= endDate) {
+                allData.push(data); // Almacenar datos en allData
+            }
+        });
+
+        // Actualizar estadísticas
+        calcularPorcentajes(allData, startDate, endDate);
+
+        // Restaurar el botón
+        $('#estadisticasEntrega').html('<i class="bi bi-graph-up mr-1"></i> <strong>Estadísticas</strong>').attr('disabled', false);
+    }).catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error al cargar datos',
+            text: error.message,
+        });
+        $('#estadisticasEntrega').html('<i class="bi bi-graph-up mr-1"></i> <strong>Estadísticas</strong>').attr('disabled', false);
+    });
+}
+
+// Función para formatear la fecha
+function formatDate(date) {
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return new Intl.DateTimeFormat('es-ES', options).format(date);
+}
+
+function calcularPorcentajes(data, startDate, endDate) {
     let countAndreani = 0;
     let countAndesmar = 0;
     let countCruzDelSur = 0;
@@ -446,7 +531,16 @@ function calcularPorcentajes(data) {
         <div class="pie-chart" style="--percentage: ${placeItPorcentaje}; --color: #65AD00FF;"></div>
     `;
 
-    document.getElementById('estadisticas-header').innerHTML = `<i class="bi bi-info-circle-fill"></i> Estadísticas de los últimos 30 días sobre <strong>${totalEnvios} Envios</strong>`
+    if (!startDate || !endDate) {
+        endDate = new Date(); // Fecha de hoy
+        startDate = new Date();
+        startDate.setDate(endDate.getDate() - 30); // Fecha de hace 30 días
+    }
+
+    document.getElementById('estadisticas-header').innerHTML = 
+        `<i class="bi bi-info-circle-fill"></i> Estadísticas desde 
+        <span class="badge-envios-total">${formatDate(startDate)} hasta ${formatDate(endDate)}</span> sobre 
+        <span class="badge-envios-total">${totalEnvios} envíos</span>`
 
     document.getElementById('estadisticas-2').innerHTML = `<i class="bi bi-clipboard2-pulse-fill ml-1"></i> Eficacia de entrega en <strong class="ml-1">${totalPost} Envios</strong>`
     document.getElementById('estadisticas-1').innerHTML = `<i class="bi bi-clipboard2-pulse-fill ml-1"></i> Estadisticas Pre-Entrega en <strong class="ml-1">${totalPre} Envios</strong>`
