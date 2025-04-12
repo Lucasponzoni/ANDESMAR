@@ -2255,7 +2255,7 @@ $(document).ready(function () {
             mode: 'range',
             dateFormat: 'd/m/Y',
             maxDate: new Date(),
-            locale: 'es', // <- En español
+            locale: 'es',
             onClose: function (selectedDates) {
                 if (selectedDates.length === 2) {
                     const startDate = selectedDates[0];
@@ -2298,9 +2298,9 @@ $(document).ready(function () {
         const worksheet = workbook.addWorksheet("ENVIOS NOVOGAR - PLACE IT");
     
         const headers = [
-            "FECHAHORA", "ESTADO DE ENTREGA", "CLIENTE", "REMITO", "NOMBRE", "CP", "LOCALIDAD",
+            "FECHA", "ESTADO DE ENTREGA", "CLIENTE", "REMITO", "NOMBRE", "CP", "LOCALIDAD",
             "PROVINCIA", "SKU", "CANTIDAD", "DECLARADO", "DIRECCION",
-            "TELEFONO", "COMENTARIOS", "SUBDATO", "TIENDA", "ORDEN"
+            "TELEFONO", "COMENTARIOS", "SUBDATO", "VISITAS", "TIENDA", "ORDEN"
         ];
     
         worksheet.addRow(headers);
@@ -2342,7 +2342,20 @@ $(document).ready(function () {
             } else {
                 estado = '';
             }
-    
+
+            // Contar visitas
+            let visitas = 0;
+            for (let i = 1; i <= 3; i++) { // Asumiendo que tienes subdato, subdato2, subdato3
+                if (item[`subdato${i}`] && item[`subdato${i}`].startsWith("En reparto")) {
+                    visitas++;
+                }
+            }
+
+            // Modificación: Si solo existe subdato y hay fotoURL, contar como 1 visita
+            if (item.subdato && !item.subdato2 && !item.subdato3 && item.fotoURL) {
+                visitas = 1;
+            }
+
             const row = worksheet.addRow([
                 item.fechaHora || '',
                 estado,
@@ -2359,6 +2372,7 @@ $(document).ready(function () {
                 item.telefono || '',
                 item.comentarios || '',
                 item.subdato || '',
+                visitas, 
                 item.tienda || '',
                 item.orden || ''
             ]);
@@ -2411,12 +2425,13 @@ $(document).ready(function () {
             col.width = maxLength + 2;
         });
 
-        worksheet.getColumn(2).width = 27;
-        worksheet.getColumn(5).width = 40;
-        worksheet.getColumn(8).width = 25;
-        worksheet.getColumn(9).width = 20;
-        worksheet.getColumn(16).width = 23;
-        worksheet.getColumn(17).width = 30;
+        // Ajustar el ancho de columnas específicas
+        worksheet.getColumn(2).width = 27; // ESTADO DE ENTREGA
+        worksheet.getColumn(5).width = 40; // NOMBRE
+        worksheet.getColumn(8).width = 25; // PROVINCIA
+        worksheet.getColumn(9).width = 20; // SKU
+        worksheet.getColumn(17).width = 30; // TIENDA
+        worksheet.getColumn(18).width = 35; // ORDEN
 
         worksheet.autoFilter = {
             from: { row: 1, column: 1 },
@@ -2434,7 +2449,7 @@ $(document).ready(function () {
         saveAs(blob, `datos_despachos_novogar_${fechaHoraStr}.xlsx`);        
     
         $('#downloadExcel').html('<i class="bi bi-file-earmark-excel mr-1"></i> <strong>Descargar</strong> tabla en Excel').attr('disabled', false);
-    }    
+    }     
 });
 // FIN DESCARGAR REPORTE
 
