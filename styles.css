@@ -6932,7 +6932,6 @@ img.gray-filter {
     border: 1px solid #a4d0f5;
     box-shadow: 0 2px 4px rgba(0, 123, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
     display: inline-block;
-    margin-left: 6px;
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
