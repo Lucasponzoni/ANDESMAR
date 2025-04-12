@@ -2261,6 +2261,9 @@ $(document).ready(function () {
                     const startDate = selectedDates[0];
                     const endDate = selectedDates[1];
                     cargarDatosYGenerarExcel(startDate, endDate);
+                } else {
+                    // Si no se seleccionan fechas, restaurar el botón
+                    $('#downloadExcel').html('<i class="bi bi-file-earmark-excel mr-1"></i> <strong>Descargar</strong> tabla en Excel').attr('disabled', false);
                 }
                 datePickerContainer.remove();
             }
