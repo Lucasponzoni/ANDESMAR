@@ -192,6 +192,7 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
     }
 });
 
+
 function cargarDatos() {
     // Inicializa el campo de búsqueda
     const searchInput = document.getElementById('searchDespachosLogistica');

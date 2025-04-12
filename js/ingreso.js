@@ -195,17 +195,17 @@ document.getElementById('ingresoForm').addEventListener('keypress', function (ev
 function cargarDatos() {
     // Inicializa el campo de búsqueda
     const searchInput = document.getElementById('searchDespachosLogistica');
+    // Mensaje inicial
     searchInput.value = "Aguardando que cargue la web ⏳";
     searchInput.disabled = true;
 
     db.ref('DespachosLogisticos').once('value').then(snapshot => {
-        let allData = []; // Limpiar allData
         const tableBody = document.querySelector('#data-table tbody');
         tableBody.innerHTML = ''; // Limpiar tabla
 
         snapshot.forEach(childSnapshot => {
             const data = childSnapshot.val();
-            allData.push(data); // Almacenar datos en allData
+            allData.push(data); 
         });
 
         // Ordenar allData por fecha del más viejo al más nuevo
@@ -218,7 +218,7 @@ function cargarDatos() {
         // Invertir el orden para que quede del más nuevo al más viejo
         allData.reverse();
 
-        // Llamar a calcularPorcentajes con los últimos 30 días
+        // Filtrar los últimos 30 días
         const now = new Date();
         const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
         const filteredData = allData.filter(item => {
@@ -227,8 +227,8 @@ function cargarDatos() {
             return itemDate >= thirtyDaysAgo; // Filtrar los últimos 30 días
         });
 
-        renderCards(allData);
-        calcularPorcentajes(filteredData);
+        renderCards(filteredData); // Cambiado para usar filteredData
+        calcularPorcentajes(filteredData); // Cambiado para usar filteredData
         updatePagination(allData.length);
         
         // Ocultar el spinner al cargar los datos
@@ -246,8 +246,6 @@ function cargarDatos() {
 
 // ESTADISTICAS
 $(document).ready(function () {
-    // Cargar estadísticas al cargar la página
-    cargarDatos();
 
     $('#estadisticasEntrega').on('click', function () {
         // Cambiar el texto del botón a un spinner
