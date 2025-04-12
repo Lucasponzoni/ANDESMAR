@@ -665,11 +665,11 @@ document.getElementById('btn-descargar-excel').addEventListener('click', functio
     // Datos
     const datos = [
         { correo: 'ANDREANI', porcentajeTotal: `${andreaniPorcentaje}%`, bigger: `${totalBiggerPorcentaje}%`, paqueteria: `${totalAndreaniPorcentaje}%`, totalEnvios: countAndreani },
-        { correo: 'ANDESMAR', porcentajeTotal: `${andesmarPorcentaje}%`, bigger: `${andesmarPorcentaje}%`, paqueteria: '0%', totalEnvios: countAndesmar },
-        { correo: 'CRUZ DEL SUR', porcentajeTotal: `${cruzDelSurPorcentaje}%`, bigger: `${cruzDelSurPorcentaje}%`, paqueteria: '0%', totalEnvios: countCruzDelSur },
-        { correo: 'OCA', porcentajeTotal: `${ocaPorcentaje}%`, bigger: `${ocaPorcentaje}%`, paqueteria: '0%', totalEnvios: countOca },
-        { correo: 'PLACE IT', porcentajeTotal: `${placeItSoloPorcentaje}%`, bigger: `${placeItSoloPorcentaje}%`, paqueteria: '0%', totalEnvios: countPlaceItSolo },
-        { correo: 'LOGISTICA NOVOGAR', porcentajeTotal: `${novogarPorcentaje}%`, bigger: `${novogarPorcentaje}%`, paqueteria: '0%', totalEnvios: countNovogar }
+        { correo: 'ANDESMAR', porcentajeTotal: `${andesmarPorcentaje}%`, bigger: `${andesmarPorcentaje}%`, paqueteria: '0.0%', totalEnvios: countAndesmar },
+        { correo: 'CRUZ DEL SUR', porcentajeTotal: `${cruzDelSurPorcentaje}%`, bigger: `${cruzDelSurPorcentaje}%`, paqueteria: '0.0%', totalEnvios: countCruzDelSur },
+        { correo: 'OCA', porcentajeTotal: `${ocaPorcentaje}%`, bigger: `${ocaPorcentaje}%`, paqueteria: '0.0%', totalEnvios: countOca },
+        { correo: 'PLACE IT', porcentajeTotal: `${placeItSoloPorcentaje}%`, bigger: `${placeItSoloPorcentaje}%`, paqueteria: '0.0%', totalEnvios: countPlaceItSolo },
+        { correo: 'LOGISTICA NOVOGAR', porcentajeTotal: `${novogarPorcentaje}%`, bigger: `${novogarPorcentaje}%`, paqueteria: '0.0%', totalEnvios: countNovogar }
     ];
 
     datos.forEach(dato => worksheet.addRow(dato));
