@@ -1928,7 +1928,7 @@ COMPRA CON USO DE PUNTOS BNA
                             <button class="btn mt-1 ${data[i].marcaPreparado === 'Si' ? 'btn-success' : 'btn-oca'} ${isMacro(storeCode) ? '' : 'hidden'}" 
                                     id="ocaButton${data[i].id}" 
                                     ${data[i].cancelado ? 'disabled' : ''} 
-                                    onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}', '${data[i].fechaDeCreacion}')">
+                                    onclick="enviarDatosOca('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${String(data[i].suborden_)}', '${data[i].fechaDeCreacion}', '${data[i].sku}', '${data[i].cantidad}')">
                                 <span id="OcaText${data[i].id}">
                                     ${data[i].marcaPreparado === 'Si' 
                                         ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].numeroSeguimiento}` 
@@ -1941,7 +1941,7 @@ COMPRA CON USO DE PUNTOS BNA
                             <button class="btn mt-1 btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
                                 id="CDSButton${data[i].id}" 
                                 ${isAndreani || isAndesmar || data[i].cancelado ? 'disabled' : ''}
-                                onclick="${isCDS ? `descargarEtiquetaCDS('${data[i].cotizacion}', '${data[i].trackingNumber}', '${data[i].id}')` : `enviarDatosCDS('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}')`}" >
+                                onclick="${isCDS ? `descargarEtiquetaCDS('${data[i].cotizacion}', '${data[i].trackingNumber}', '${data[i].id}')` : `enviarDatosCDS('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
                                 <span id="CDSText${data[i].id}">
                                 ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
                                 </span>
@@ -1952,7 +1952,7 @@ COMPRA CON USO DE PUNTOS BNA
                             <button class="btn mt-1 ${isAndesmar ? 'btn-success' : 'btn-primary'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}" 
                                 id="andesmarButton${data[i].id}" 
                                 ${isAndreani || isCDS || data[i].cancelado ? 'disabled' : ''} 
-                                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}')`}">
+                                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
                                 <span id="andesmarText${data[i].id}">
                                 ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
                                 </span>
@@ -1963,7 +1963,7 @@ COMPRA CON USO DE PUNTOS BNA
                             <button class="btn mt-1 btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
                                 id="andreaniButton${data[i].id}" 
                                 ${isAndesmar || isCDS || data[i].cancelado ? 'disabled' : ''} 
-                                onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}',)`}" >
+                                onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
                                 <span id="andreaniText${data[i].id}">
                                 ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
                                 </span>
@@ -3066,7 +3066,7 @@ const usuario = "BOM6765";
 const clave = "BOM6765";
 const codigoCliente = "6765";
 
-async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, suborden_total, precio_venta, producto_nombre) {
+async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, suborden_total, precio_venta, producto_nombre, sku) {
     // Obtener los elementos de volumen
     const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
     const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
@@ -3342,7 +3342,19 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
                 operadorLogistico: "Pendiente",
                 remito: remitoCliente,
                 remitoVBA: remitoCliente,
-                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}` // Formatear como pesos argentinos
+                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`,
+                email: email,
+                direccion: calle,
+                comentarios: "Coordinar en Línea: " + telefono,
+                telefono: telefono,
+                sku: sku,
+                cantidad: cantidad,
+                cp: cp,
+                orden: remito,
+                tienda: "TIENDAS VIRTUALES",
+                localidad: localidad,
+                nombre: nombre,
+                provincia: provincia
             }).then(() => {
                 console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
             }).catch(error => {
@@ -3511,7 +3523,7 @@ function formatearFechaHora(fechaHora) {
 }
 
 // BOTON CRUZ DEL SUR
-async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
+async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, sku) {
     
     // Desactivar la escucha de cambios
     const databaseRef = firebase.database().ref('enviosBNA');
@@ -3741,7 +3753,19 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
                 operadorLogistico: "Pendiente",
                 remito: remitoCliente,
                 remitoVBA: remitoCliente,
-                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`,
+                email: email,
+                direccion: calle,
+                comentarios: "Coordinar en Línea: " + telefono,
+                telefono: telefono,
+                sku: sku,
+                cantidad: cantidad,
+                cp: cp,
+                orden: remito,
+                tienda: "TIENDAS VIRTUALES",
+                localidad: localidad,
+                nombre: nombre,
+                provincia: provincia
             }).then(() => {
                 console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
             }).catch(error => {
@@ -3941,7 +3965,7 @@ function eliminarNodo(id) {
     });
 }
 
-async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, suborden, fecha) {
+async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, suborden, fecha, sku, cantidad) {
     const spinnerOca = document.getElementById(`spinnerOca${id}`);
     const textOca = document.getElementById(`OcaText${id}`);
     const button = document.getElementById(`ocaButton${id}`);
@@ -4100,7 +4124,19 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
                 operadorLogistico: "Pendiente",
                 remito: remitoCliente,
                 remitoVBA: remitoCliente,
-                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}` // Formatear como pesos argentinos
+                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`,
+                email: email,
+                direccion: calle,
+                comentarios: "Coordinar en Línea: " + telefono,
+                telefono: telefono,
+                sku: sku,
+                cantidad: cantidad,
+                cp: cp,
+                orden: remito,
+                tienda: "TIENDAS VIRTUALES",
+                localidad: localidad,
+                nombre: nombre,
+                provincia: provincia
             }).then(() => {
                 console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
             }).catch(error => {
@@ -4131,7 +4167,7 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
     }
 }
 
-async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre) {
+async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, sku) {
     
     // Redondear el precio_venta y convertirlo a un entero
     const precioVentaRedondeado = Math.round(precio_venta);
@@ -4456,7 +4492,19 @@ if (isSplit) {
                 operadorLogistico: "Pendiente",
                 remito: remitoCliente,
                 remitoVBA: remitoCliente,
-                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+                valorDeclarado: `$ ${precioVentaRedondeado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`,
+                email: email,
+                direccion: calle,
+                comentarios: "Coordinar en Línea: " + telefono,
+                telefono: telefono,
+                sku: sku,
+                cantidad: cantidad,
+                cp: cp,
+                orden: remito,
+                tienda: "TIENDAS VIRTUALES",
+                localidad: localidad,
+                nombre: nombre,
+                provincia: provincia
             }).then(() => {
                 console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
             }).catch(error => {

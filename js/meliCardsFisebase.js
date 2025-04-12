@@ -910,7 +910,7 @@ const paymentHTML = `
         ${isAndesmar || isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''}
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}')`}">
+        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}', '${data.SKU}')`}">
         <span id="CDSText${data.idOperacion}">
         ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
         </span>
@@ -926,7 +926,7 @@ const paymentHTML = `
         ${isAndreani || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}','${email}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}')`}">
+        ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}','${email}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}', '${data.SKU}')`}">
         <span id="andesmarText${data.idOperacion}">
             ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>'}
         </span>
@@ -950,7 +950,7 @@ const paymentHTML = `
         ${isAndesmar || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}', '${formatCurrency(data.transactionAmount)}')`}">
+        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}', '${formatCurrency(data.transactionAmount)}', '${data.Cantidad}', '${data.SKU}')`}">
         <span id="andreaniText${data.idOperacion}">
             ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
         </span>
@@ -980,7 +980,7 @@ const paymentHTML = `
     </div>
 
     <!-- Botón Repuesto Andreani -->
-    <button class="btn ${isAndreani ? 'btn-success' : 'btn-info'} btnAndreaniMeli2 mt-1" 
+    <button class="btn btn-info btnAndreaniMeli2 mt-1" 
             id="andreaniButton2${data.idOperacion}" 
             onclick="enviarDatosAndreani2(
                 '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '35.0x35.0x35.0', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}')">
@@ -1311,7 +1311,7 @@ async function obtenerEtiqueta2(numeroDeEnvio, token, id) {
     }
 }
 
-async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe, valor) {
+async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe, valor, sku) {
 
     console.log('Parámetros enviados a enviarDatosCDS:');
     console.log({
@@ -1475,7 +1475,19 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
                 operadorLogistico: "Pendiente",
                 remito: remitoCliente,
                 remitoVBA: remitoCliente,
-                valorDeclarado: valor 
+                valorDeclarado: valor,
+                email: email,
+                direccion: calleDestinatario + " " +alturaDestinatario,
+                comentarios: observaciones,
+                telefono: telefonoDestinatario,
+                sku: sku,
+                cantidad: cantidad,
+                cp: Cp,
+                orden: idOperacionSinME1,
+                tienda: "MELI",
+                localidad: localidad,
+                nombre: NombreyApellido,
+                provincia: Provincia 
             }).then(() => {
                 console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
             }).catch(error => {
@@ -1736,7 +1748,7 @@ const clave = "BOM6765";
 const codigoCliente = "6765";
 
 // Función para enviar datos a la API de Andesmar
-async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto, localidad, provincia, email, recibe, valor) {
+async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, Medidas, Producto, localidad, provincia, email, recibe, valor, sku) {
     
     console.log({
         id,
@@ -1901,7 +1913,19 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
                 operadorLogistico: "Pendiente",
                 remito: remitoCliente,
                 remitoVBA: remitoCliente,
-                valorDeclarado: valor 
+                valorDeclarado: valor,
+                email: email,
+                direccion: calleDestinatario + " " +alturaDestinatario,
+                comentarios: observaciones,
+                telefono: telefonoDestinatario,
+                sku: sku,
+                cantidad: cantidad,
+                cp: Cp,
+                orden: idOperacionSinME1,
+                tienda: "MELI",
+                localidad: localidad,
+                nombre: NombreyApellido,
+                provincia: provincia 
             }).then(() => {
                 console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
             }).catch(error => {
@@ -2021,7 +2045,7 @@ async function getAuthToken() {
     }
 }
 
-async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe, valor, valor2) 
+async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, observaciones, peso, volumenCM3, cantidad, medidas, Producto, recibe, valor, valor2, cantidad, sku) 
 {    
     const botonCDS = document.getElementById(`CDSButton${id}`);
     const buttonAndr = document.getElementById(`andreaniButton${id}`);
@@ -2227,7 +2251,19 @@ for (let i = 0; i < cantidadFinal; i++) {
                 operadorLogistico: "Pendiente",
                 remito: remitoCliente,
                 remitoVBA: remitoCliente,
-                valorDeclarado: valor2 
+                valorDeclarado: valor2,
+                email: email,
+                direccion: calleDestinatario + " " +alturaDestinatario,
+                comentarios: observaciones,
+                telefono: telefonoDestinatario,
+                sku: sku,
+                cantidad: cantidad,
+                cp: Cp,
+                orden: idOperacionSinME1,
+                tienda: "MELI",
+                localidad: localidad,
+                nombre: NombreyApellido,
+                provincia: Provincia 
             }).then(() => {
                 console.log(`Datos actualizados en DespachosLogisticos para el remito: ${remitoCliente}`);
             }).catch(error => {

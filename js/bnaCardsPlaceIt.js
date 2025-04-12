@@ -3019,12 +3019,12 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
                 fechaHora: fechaHora,
                 operadorLogistico: "PlaceIt",
                 remitoDigital: 0,
-                email: email,
                 remito: numeroRemito,
                 numeroDeEnvio: 123456,
                 remitoVBA: numeroRemito,
                 subdato: diaFormateadoPlaceIt,
                 valorDeclarado: formatPrice(precio_venta), // Usar la función aquí
+                email: email,
                 direccion: calle,
                 comentarios: "Coordinar en Línea: " + telefono,
                 telefono: telefono,
