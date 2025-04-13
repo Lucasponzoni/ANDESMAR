@@ -155,19 +155,55 @@
             </table>
         </div>
 
+        <style>
+            /* Estilos personalizados para el modal */
+            .modal-content {
+                border-radius: 0.5rem;
+            }
+    
+            /* Estilos para la alerta personalizada */
+            .custom-alert {
+                background-color: #e0f7fa;
+                border: 1px solid #b2ebf2;
+                padding: 20px;
+                border-radius: 0.5rem;
+                position: relative;
+                margin-bottom: 20px;
+            }
+    
+            .custom-alert i {
+                font-size: 24px;
+                position: absolute;
+                top: 15px;
+                left: 15px;
+                color: #007bff;
+            }
+    
+            .badge {
+                background-color: #007bff;
+                color: white;
+                margin-left: 10px;
+                font-size: 14px;
+                border-radius: 0.25rem;
+                padding: 0.25em 0.5em;
+            }
+        </style>
+    </head>
+    <body>
+    
         <!-- Modal de Importación -->
         <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document"> <!-- Modal más ancho -->
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="importModalLabel">Importar Archivo XLS</h5>
+                        <h5 class="modal-title" id="importModalLabel">Importar Archivo XLSX</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="row justify-content-center">
-                            <div class="col-lg-8 col-md-10 col-sm-12"> <!-- Aumentar el ancho -->
+                            <div class="col-lg-8 col-md-10 col-sm-12">
                                 <div class="input-group">
                                     <input type="file" id="fileInput" accept=".xls,.xlsx" class="form-control">
                                     <div class="input-group-append">
@@ -190,7 +226,7 @@
     </div>
 
     <!-- Spinner centrado con fondo difuminado -->
-    <div id="spinnerOverlay" class="import-spinner-overlay" style="display:none;">
+    <div id="spinnerOverlay" class="import-spinner-overlay justify-content-center align-items-center" style="display:none;">
         <div class="import-spinner-container">
             <img id="spinnerImage" src="./Img/etiqueta-animada.gif" alt="Cargando...">
             <div id="spinnerProgress" class="import-spinner-progress">0%</div>
@@ -277,6 +313,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+    <!-- Tailwind CSS -->
+        
     
     <!-- Cargar dompurify -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.4/purify.min.js"></script>
