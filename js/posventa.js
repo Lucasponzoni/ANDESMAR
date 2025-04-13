@@ -4,7 +4,7 @@ firebase.initializeApp({
     authDomain: "precios-novogar.firebaseapp.com",
     databaseURL: "https://precios-novogar-default-rtdb.firebaseio.com",
     projectId: "precios-novogar",
-    storageBucket: "precios-novogar.firebasestorage.app",
+    storageBucket: "precios-novogar.appspot.com",
     messagingSenderId: "355767952460",
     appId: "1:355767952460:web:32a785c718c5c88208c0e9",
     measurementId: "G-JPZW21X0L9"
@@ -58,6 +58,72 @@ firebase.initializeApp({
       sectionMap[i] = currentSection;
     }
   
+    // Función para limpiar fechas y valores variables
+    function limpiarEstadoVariable(texto) {
+      return texto
+        .toLowerCase()
+        .replace(/\d{1,2} de [a-záéíóú]+/gi, '')
+        .replace(/llegar[a-z]* el \d{1,2}/gi, '')
+        .replace(/\d{1,2}\/\d{1,2}\/\d{2,4}/g, '')
+        .replace(/\d+/g, '')
+        .replace(/[.,]/g, '')
+        .trim();
+    }
+  
+    // Lista de patrones conocidos
+    const patronesConocidos = [
+      "cobro devuelto", "reclamo abierto por resolver", "paquete cancelado por mercado libre",
+      "cancelaste la venta", "cancelada por el comprador", "la devolución llegará hoy",
+      "venta cancelada", "reclamo con devolución habilitada", "devolución en preparación",
+      "devolución en camino", "devolución reprogramada", "te devolveremos el paquete",
+      "en devolución", "reclamo cerrado con reembolso al comprador",
+      "devolución finalizada. te dimos el dinero.", "devolución no entregada. te dimos el dinero.",
+      "devolución finalizada con reembolso al comprador", "devolución con fecha actualizada",
+      "devolución para revisar", "mediación con mercado libre", "le devolvimos el dinero al comprador",
+      "tu comprador solicita cancelar", "mediación finalizada con reembolso al comprador",
+      "tu comprador reclama porque necesita el paquete", "venta cancelada. no despachés.",
+      "no entregado", "reclamo abierto", "reclamo abierto para resolver",
+      "mediación en espera de respuesta de mercado libre", "reclamo abierto. entregá el paquete",
+      "mediación para responder", "mediación en espera de respuesta", "devuelto"
+    ];
+  
+    const colEstadoIndex = headers.findIndex(h => h?.toLowerCase().trim().includes('estado'));
+    const estadosDetectados = new Set();
+  
+    for (let i = headerRowIndex + 1; i < json.length; i++) {
+      const row = json[i];
+      const estadoCrudo = (row[colEstadoIndex] || '').toString().toLowerCase().trim();
+  
+      if (estadoCrudo) {
+        const estadoLimpio = limpiarEstadoVariable(estadoCrudo);
+        let coincidencia = patronesConocidos.find(p =>
+          estadoLimpio.includes(p.toLowerCase())
+        );
+        if (coincidencia) {
+          estadosDetectados.add(coincidencia);
+        } else {
+          const nuevoPatron = estadoLimpio.split(' ').slice(0, 7).join(' ').replace(/[^À-ſa-zA-Z0-9_ ]/g, '');
+          estadosDetectados.add(nuevoPatron);
+        }
+      }
+    }
+  
+    const estadosRef = db.ref("/estados");
+    const estadosFirebase = (await estadosRef.once("value")).val() || {};
+    const nuevasEntradas = {};
+  
+    for (let estado of estadosDetectados) {
+      const claveEstado = limpiarClave(estado);
+      if (!estadosFirebase[claveEstado]) {
+        nuevasEntradas[claveEstado] = { nombre: estado };
+      }
+    }
+  
+    if (Object.keys(nuevasEntradas).length > 0) {
+      await estadosRef.update(nuevasEntradas);
+    }
+  
+    // Continúa procesamiento de ventas
     const allDataSnapshot = await db.ref('/posventa').once('value');
     const existingData = allDataSnapshot.val() || {};
   
@@ -136,87 +202,91 @@ firebase.initializeApp({
     }
   
     document.getElementById('spinnerOverlay').style.display = 'none';
-    
+  
+    const nuevosEstadosCreados = Object.values(nuevasEntradas).map(e => e.nombre);
+
     Swal.fire({
-        title: '📊 Importación MeLi Finalizada',
-        html: `
-          <style>
-            .macos-alert {
-              text-align: left;
-              line-height: 1.6;
-              color: #333;
-              font-size: 17px;
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            }
-      
-            .counter2 {
-              display: inline-block;
-              padding: 10px 20px;
-              border-radius: 20px;
-              color: white;
-              font-weight: bold;
-              font-size: 18px;
-              margin: 10px 0;
-              transition: transform 0.3s ease;
-              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
-      
-            .counter2:hover {
-              transform: scale(1.05);
-            }
-      
-            .counter2.imported {
-              background-color: #28a745;
-            }
-      
-            .counter2.changed {
-              background-color: #007bff;
-            }
-      
-            .swal2-macos-popup {
-              border-radius: 18px !important;
-              padding: 35px 30px !important;
-              background: #f9f9fb !important;
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-              font-size: 16px;
-              box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            }
-      
-            .swal2-macos-title {
-              font-size: 24px !important;
-              font-weight: 700 !important;
-              color: #2c2c2c !important;
-              margin-bottom: 25px !important;
-            }
-      
-            .swal2-macos-button {
-              border-radius: 12px !important;
-              padding: 10px 28px !important;
-              background-color: #007aff !important;
-              color: white !important;
-              font-weight: 600 !important;
-              font-size: 16px !important;
-              transition: background-color 0.2s ease;
-            }
-      
-            .swal2-macos-button:hover {
-              background-color: #005ecc !important;
-            }
-          </style>
-      
-          <div class="macos-alert">
-            <p>La operación ha concluido con éxito. A continuación te mostramos el resumen:</p>
-            ✅ Nuevas ventas importadas: <div class="counter2 imported"> ${nuevasVentas} </div><br>
-            🔄 Ventas actualizadas: <div class="counter2 changed"> ${ventasActualizadas} </div>
-          </div>
-        `,
-        confirmButtonText: 'Entendido',
-        customClass: {
-          popup: 'swal2-macos-popup',
-          title: 'swal2-macos-title',
-          confirmButton: 'swal2-macos-button'
-        }
-      });      
-      
-});
+      title: '📊 Importación MeLi Finalizada',
+      html: `
+        <style>
+          .macos-alert {
+            text-align: left;
+            line-height: 1.6;
+            color: #333;
+            font-size: 17px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+          }
+          .counter2 {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 10px 0;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          }
+          .counter2.imported {
+            background-color: #28a745;
+          }
+          .counter2.changed {
+            background-color: #007bff;
+          }
+          .estado-nuevo {
+            background: #f1f1f1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 4px 0;
+            font-size: 15px;
+            font-family: monospace;
+            color: #444;
+          }
+          .swal2-macos-popup {
+            border-radius: 18px !important;
+            padding: 35px 30px !important;
+            background: #f9f9fb !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-size: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+          }
+          .swal2-macos-title {
+            font-size: 24px !important;
+            font-weight: 700 !important;
+            color: #2c2c2c !important;
+            margin-bottom: 25px !important;
+          }
+          .swal2-macos-button {
+            border-radius: 12px !important;
+            padding: 10px 28px !important;
+            background-color: #007aff !important;
+            color: white !important;
+            font-weight: 600 !important;
+            font-size: 16px !important;
+            transition: background-color 0.2s ease;
+          }
+          .swal2-macos-button:hover {
+            background-color: #005ecc !important;
+          }
+        </style>
+    
+        <div class="macos-alert">
+          <p>La operación ha concluido con éxito. A continuación te mostramos el resumen:</p>
+          ✅ Nuevas ventas importadas: <div class="counter2 imported"> ${nuevasVentas} </div><br>
+          🔄 Ventas actualizadas: <div class="counter2 changed"> ${ventasActualizadas} </div>
+          ${nuevosEstadosCreados.length > 0 ? `
+            <hr style="margin: 20px 0;">
+            <p>📌 Estados nuevos creados:</p>
+            ${nuevosEstadosCreados.map(e => `<div class="estado-nuevo">• ${e}</div>`).join('')}
+          ` : ''}
+        </div>
+      `,
+      confirmButtonText: 'Entendido',
+      customClass: {
+        popup: 'swal2-macos-popup',
+        title: 'swal2-macos-title',
+        confirmButton: 'swal2-macos-button'
+      }
+    });    
+  });
   
