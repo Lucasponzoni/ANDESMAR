@@ -2240,12 +2240,6 @@ div.card-body > p > i{
     display: flex;
 }
 
-@media (max-width: 990px) {
-    .search-filter-container {
-        flex-direction: column;
-    }
-}
-
 /* ORDENAR MAS ANTIGUO Y NUEVO */
 .input-group {
     border: solid 1px rgba(128, 128, 128, 0.475);

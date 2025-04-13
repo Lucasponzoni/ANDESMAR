@@ -23,9 +23,17 @@
         .search-container-top {
             max-width: 85%; /* Aumentar ancho del contenedor de búsqueda */
         }
-        
+
         #cards-container {
             max-width: 85%; /* Aumentar ancho del contenedor de tarjetas */
+        }
+
+        /* Media query para pantallas de 950px o menos */
+        @media (max-width: 992px) {
+            .search-container-top,
+            #cards-container {
+                max-width: 100%; /* Cambiar a 100% en pantallas pequeñas */
+            }
         }
     </style>
     <script>

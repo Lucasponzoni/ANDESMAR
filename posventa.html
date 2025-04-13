@@ -34,9 +34,17 @@
         .search-container-top {
             max-width: 85%; /* Aumentar ancho del contenedor de búsqueda */
         }
-        
+
         #cards-container {
             max-width: 85%; /* Aumentar ancho del contenedor de tarjetas */
+        }
+
+        /* Media query para pantallas de 950px o menos */
+        @media (max-width: 992px) {
+            .search-container-top,
+            #cards-container {
+                max-width: 100%; /* Cambiar a 100% en pantallas pequeñas */
+            }
         }
     </style>
 
@@ -314,9 +322,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
-    <!-- Tailwind CSS -->
+    <!-- XLSX -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
         
-    
     <!-- Cargar dompurify -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.4/purify.min.js"></script>
     
