@@ -136,6 +136,87 @@ firebase.initializeApp({
     }
   
     document.getElementById('spinnerOverlay').style.display = 'none';
-    Swal.fire("Importación Completa", `Ventas nuevas: ${nuevasVentas}\nVentas actualizadas: ${ventasActualizadas}`, "success");
-  });
+    
+    Swal.fire({
+        title: '📊 Importación MeLi Finalizada',
+        html: `
+          <style>
+            .macos-alert {
+              text-align: left;
+              line-height: 1.6;
+              color: #333;
+              font-size: 17px;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            }
+      
+            .counter2 {
+              display: inline-block;
+              padding: 10px 20px;
+              border-radius: 20px;
+              color: white;
+              font-weight: bold;
+              font-size: 18px;
+              margin: 10px 0;
+              transition: transform 0.3s ease;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+      
+            .counter2:hover {
+              transform: scale(1.05);
+            }
+      
+            .counter2.imported {
+              background-color: #28a745;
+            }
+      
+            .counter2.changed {
+              background-color: #007bff;
+            }
+      
+            .swal2-macos-popup {
+              border-radius: 18px !important;
+              padding: 35px 30px !important;
+              background: #f9f9fb !important;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+              font-size: 16px;
+              box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            }
+      
+            .swal2-macos-title {
+              font-size: 24px !important;
+              font-weight: 700 !important;
+              color: #2c2c2c !important;
+              margin-bottom: 25px !important;
+            }
+      
+            .swal2-macos-button {
+              border-radius: 12px !important;
+              padding: 10px 28px !important;
+              background-color: #007aff !important;
+              color: white !important;
+              font-weight: 600 !important;
+              font-size: 16px !important;
+              transition: background-color 0.2s ease;
+            }
+      
+            .swal2-macos-button:hover {
+              background-color: #005ecc !important;
+            }
+          </style>
+      
+          <div class="macos-alert">
+            <p>La operación ha concluido con éxito. A continuación te mostramos el resumen:</p>
+            ✅ Nuevas ventas importadas: <div class="counter2 imported"> ${nuevasVentas} </div><br>
+            🔄 Ventas actualizadas: <div class="counter2 changed"> ${ventasActualizadas} </div>
+          </div>
+        `,
+        confirmButtonText: 'Entendido',
+        customClass: {
+          popup: 'swal2-macos-popup',
+          title: 'swal2-macos-title',
+          confirmButton: 'swal2-macos-button'
+        }
+      });      
+      
+});
   

@@ -6309,6 +6309,31 @@ img.gray-filter {
     background-color: #2196f3; /* Azul */
 }
 
+/* Estilo MacOS para SweetAlert2 */
+.swal2-macos-popup {
+    border-radius: 16px !important;
+    padding: 30px !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    background: #f4f4f7;
+}
+  
+.swal2-macos-title {
+    font-size: 22px !important;
+    color: #333 !important;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+  
+.swal2-macos-button {
+    border-radius: 8px !important;
+    padding: 8px 24px !important;
+    background-color: #007aff !important;
+    color: white !important;
+    font-weight: 500;
+    font-size: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
 /* ALERTAS FACTURACION MELI */
 .alert-ios-meli {
     position: fixed;
