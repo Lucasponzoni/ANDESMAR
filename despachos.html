@@ -18,6 +18,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Estilo específico para esta página */
+        .search-container-top {
+            max-width: 85%; /* Aumentar ancho del contenedor de búsqueda */
+        }
+        
+        #cards-container {
+            max-width: 85%; /* Aumentar ancho del contenedor de tarjetas */
+        }
+    </style>
     <script>
         // Verificación de acceso antes de cargar el contenido de la página
         const userType = localStorage.getItem('userType');
@@ -86,7 +96,7 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-4 search-container-top">
         <div class="row justify-content-between align-items-center search-filter-container">
             <div class="col-md-6 mb-3">
                 <div class="input-group">
