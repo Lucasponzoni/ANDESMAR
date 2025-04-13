@@ -461,8 +461,15 @@ function loadTable(data, estadoFilter = null) {
                                 confirmButtonText: 'Aceptar'
                             });
                         });
+
+                    // Agregar listener para escuchar cambios en estadoFacturacion
+                    db.ref('envios/' + operationId + '/estadoFacturacion').on('value', (snapshot) => {
+                        const newEstado = snapshot.val();
+                        // Actualizar el select en la fila correspondiente
+                        selectElement.value = newEstado; // Actualiza el select con el nuevo estado
+                        updateRowColor(); // Actualiza el color de la fila según el nuevo estado
+                    });
                 });
-    
                 // Fecha y hora
                 const dateCell = document.createElement('td');
                 dateCell.innerHTML = `${formatDate(operation.dateCreated)}, ${formatTime(operation.dateCreated)}`;
