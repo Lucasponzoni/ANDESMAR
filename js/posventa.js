@@ -12,6 +12,7 @@ firebase.initializeApp({
   
   const db = firebase.database();
   
+  // IMPORTACION DE VENTAS
   function limpiarClave(clave) {
     return clave.trim().replace(/[.#$/\[\]]/g, '').replace(/\s+/g, '_').toLowerCase();
   }
@@ -287,6 +288,353 @@ firebase.initializeApp({
         title: 'swal2-macos-title',
         confirmButton: 'swal2-macos-button'
       }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        location.reload(); // Recargar la página
+      }
+    });  
+  });
+  // FIN IMPORTACION DE VENTAS
+
+  // ANALISIS DE ESTADOS
+  const estadosRef = firebase.database().ref('estados');
+
+  document.getElementById('btnFiltrar').addEventListener('click', async () => {
+    const contenedor = document.getElementById('filtrarEstadosContenido');
+    const guardarBtn = document.getElementById('guardarEstadosBtn');
+
+    contenedor.innerHTML = `
+      <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+      </div>
+    `;
+    guardarBtn.style.display = 'none';
+
+    const snapshot = await estadosRef.once('value');
+    const estados = snapshot.val();
+
+    if (!estados) {
+      contenedor.innerHTML = `<p class="text-danger text-center">No se encontraron estados.</p>`;
+      return;
+    }
+
+    let html = `<div class="row">`;
+    let count = 0;
+    for (const [key, estado] of Object.entries(estados)) {
+      const seleccionado = estado.seleccionado !== false; // default true
+      html += `
+        <div class="col-md-4 mb-3">
+          <div class="form-check mac-check">
+            <input class="form-check-input estado-checkbox" type="checkbox" id="estado_${key}" data-key="${key}" ${seleccionado ? 'checked' : ''}>
+            <label class="form-check-label estado-nombre" for="estado_${key}">${estado.nombre}</label>
+          </div>
+        </div>
+      `;
+      count++;
+    }
+    html += `</div>`;
+    contenedor.innerHTML = html;
+
+    if (count > 0) {
+      guardarBtn.style.display = 'block';
+    }
+  });
+
+  document.getElementById('guardarEstadosBtn').addEventListener('click', async () => {
+    const checkboxes = document.querySelectorAll('.estado-checkbox');
+    const updates = {};
+
+    checkboxes.forEach(cb => {
+      const key = cb.dataset.key;
+      updates[`estados/${key}/seleccionado`] = cb.checked;
+    });
+
+    await firebase.database().ref().update(updates);
+    Swal.fire({
+        title: '✅ Cambios guardados',
+        text: 'Recargaré la página para cargar los nuevos estados seleccionados.',
+        icon: 'success'
+    }).then(() => {
+        $('#filtrarModal').modal('hide');
+        location.reload(); // Recarga la página para cargar los nuevos estados seleccionados
     });    
   });
-  
+  // FIN ANALISIS DE ESTADOS
+
+  function obtenerUltimoEstado(venta) {
+    const estados = Object.keys(venta.ventas)
+        .filter(key => key.startsWith('estado') && key !== 'estadoActual') // <-- Evita incluir estadoActual
+        .sort((a, b) => {
+            // Extrae los números para ordenar correctamente
+            const numA = parseInt(a.replace('estado', '')) || 0;
+            const numB = parseInt(b.replace('estado', '')) || 0;
+            return numA - numB;
+        })
+        .map(key => ({ clave: key, valor: venta.ventas[key] }));
+
+    const descripciones = Object.keys(venta.ventas)
+        .filter(key => key.startsWith('descripción_del_estado'))
+        .sort((a, b) => {
+            const numA = parseInt(a.replace('descripción_del_estado', '')) || 0;
+            const numB = parseInt(b.replace('descripción_del_estado', '')) || 0;
+            return numA - numB;
+        })
+        .map(key => ({ clave: key, valor: venta.ventas[key] }));
+
+    const ultimoEstado = estados[estados.length - 1]?.valor || '';
+    const ultimaDescripcion = descripciones[descripciones.length - 1]?.valor || '';
+
+    return { 
+        ultimoEstado, 
+        ultimaDescripcion, 
+        estados 
+    };
+}
+
+// RENDERIZADO DE LA TABLA
+document.addEventListener('DOMContentLoaded', async () => {
+    const spinner = document.getElementById('spinner');
+    spinner.style.display = 'block';
+
+    try {
+        const estadosSnapshot = await firebase.database().ref('estados').once('value');
+        const estadosData = estadosSnapshot.val() || {};
+
+        const estadosSeleccionados = Object.entries(estadosData)
+            .filter(([_, estado]) => estado.seleccionado !== false)
+            .map(([_, estado]) => estado.nombre.toLowerCase());
+
+        const posventaSnapshot = await firebase.database().ref('posventa').once('value');
+        const posventaData = posventaSnapshot.val() || {};
+
+        const ventasFiltradas = Object.entries(posventaData).filter(([ventaId, venta]) => {
+            const estado = venta?.ventas?.estado?.toLowerCase();
+            return estado && estadosSeleccionados.includes(estado);
+        });
+
+        const tbody = document.querySelector('#data-table tbody');
+        tbody.innerHTML = ''; // Limpiar anterior
+
+        ventasFiltradas.forEach(([ventaId, venta]) => {
+            const { ultimoEstado, ultimaDescripcion } = obtenerUltimoEstado(venta); // Obtener último estado y descripción
+        
+            const cantidadEstados = Object.keys(venta.ventas).filter(key => key.startsWith('estado') && key !== 'estadoActual').length;
+            const iconClass = cantidadEstados > 1 ? 'fas fa-history text-success' : 'fas fa-history';
+                                
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    ${ventaId} 
+                    <i class="${iconClass}" onclick="abrirModalTimeline('${ventaId}')" style="cursor: pointer;"></i>
+                    <select class="estado-select" data-venta-id="${ventaId}">
+                        <option value="">Selecciona un estado</option>
+                        <option value="CONTROL FINALIZADO">CONTROL FINALIZADO</option>
+                        <option value="TRANSFERIDO A FACTURACION">TRANSFERIDO A FACTURACION</option>
+                        <option value="LLEGO A NOVOGAR">LLEGO A NOVOGAR</option>
+                        <option value="SEGUIR RECLAMO EN FORMULARIO">SEGUIR RECLAMO EN FORMULARIO</option>
+                        <option value="ENTREGADO CON DEBITO">ENTREGADO CON DEBITO</option>
+                    </select>
+                </td>
+                <td>${ultimoEstado}</td>
+                <td>${ultimaDescripcion}</td>
+            `;
+            tbody.appendChild(row);
+
+            // Establecer el valor del select con el estado actual
+            const estadoGuardado = venta.ventas.estadoActual; // Cargar el estado actual
+            const estadoSelect = row.querySelector('.estado-select');
+            estadoSelect.value = estadoGuardado || ""; // Cargar el estado actual en el select
+
+            // Cambiar el color de la fila según el estado guardado
+            if (estadoGuardado) {
+                switch (estadoGuardado) {
+                    case "CONTROL FINALIZADO":
+                        row.style.backgroundColor = "#c8e6c9"; // Verde claro
+                        break;
+                    case "TRANSFERIDO A FACTURACION":
+                        row.style.backgroundColor = "#bbdefb"; // Azul claro
+                        break;
+                    case "LLEGO A NOVOGAR":
+                        row.style.backgroundColor = "#ffe0b2"; // Naranja claro
+                        break;
+                    case "SEGUIR RECLAMO EN FORMULARIO":
+                        row.style.backgroundColor = "#f8bbd0"; // Rosa claro
+                        break;
+                    case "ENTREGADO CON DEBITO":
+                        row.style.backgroundColor = "#d1c4e9"; // Lavanda claro
+                        break;
+                    default:
+                        row.style.backgroundColor = ""; // Sin color
+                }
+            }
+
+            // Agregar evento para el select
+            estadoSelect.addEventListener('change', async (event) => {
+                const nuevoEstado = event.target.value;
+                let mensajeUltimoEstado = "";
+
+                if (nuevoEstado) {
+                    // Establecer el mensaje correspondiente según el estado seleccionado
+                    switch (nuevoEstado) {
+                        case "CONTROL FINALIZADO":
+                            mensajeUltimoEstado = "Se ha finalizado el control de Posventa";
+                            mensajeUltimaDescripcion = "Control Finalizado";
+                            row.style.backgroundColor = "#c8e6c9"; // Verde claro
+                            break;
+                        case "TRANSFERIDO A FACTURACION":
+                            mensajeUltimoEstado = "Se ha transferido la operación por email al sector de facturación para su control";
+                            mensajeUltimaDescripcion = "Transferido a Facturacion";
+                            row.style.backgroundColor = "#bbdefb"; // Azul claro
+                            break;
+                        case "LLEGO A NOVOGAR":
+                            mensajeUltimoEstado = "La devolución llegó a NOVOGAR, se ha finalizado el control de posventa";
+                            mensajeUltimaDescripcion = "Llego a Novogar";
+                            row.style.backgroundColor = "#ffe0b2"; // Naranja claro
+                            break;
+                        case "SEGUIR RECLAMO EN FORMULARIO":
+                            mensajeUltimoEstado = "La devolución dejó de actualizar los estados, seguir fecha de retorno brindado en Caso.";
+                            mensajeUltimaDescripcion = "Seguir reclamo en formulario";
+                            row.style.backgroundColor = "#f8bbd0"; // Rosa claro
+                            break;
+                        case "ENTREGADO CON DEBITO":
+                            mensajeUltimoEstado = "Entregado al cliente con débito de dinero al vendedor";
+                            mensajeUltimaDescripcion = "Entregado con Debito (FRAUDE)";
+                            row.style.backgroundColor = "#d1c4e9"; // Lavanda claro
+                            break;
+                        default:
+                            row.style.backgroundColor = ""; // Sin color
+                    }
+
+                    // Obtener el índice del último estado
+                    const estadosExistentes = Object.keys(venta.ventas).filter(key => key.startsWith('estado'));
+                    const nuevoEstadoIndex = estadosExistentes.length + 1; // Incrementar el índice
+
+                    // Pushear el nuevo estado a Firebase
+                    const updates = {};
+                    updates[`/posventa/${ventaId}/ventas/estado${nuevoEstadoIndex}`] = mensajeUltimoEstado; // Guardar el nuevo estado
+                    updates[`/posventa/${ventaId}/ventas/descripción_del_estado${nuevoEstadoIndex}`] = mensajeUltimaDescripcion; // Guardar el nuevo estado
+                    updates[`/posventa/${ventaId}/ventas/estadoActual`] = nuevoEstado; // Guardar el estado actual
+
+                    await firebase.database().ref().update(updates);
+                    console.log(`Estado actualizado: ${nuevoEstado}`);
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error cargando datos:', error);
+        alert('Hubo un problema al cargar los datos');
+    } finally {
+        spinner.style.display = 'none';
+    }
+});
+// FIN RENDERIZADO DE LA TABLA
+
+// MODAL LINEA DE TIEMPO
+function abrirModalTimeline(ventaId) {
+    const timelineContent = document.getElementById('timelineContent');
+    timelineContent.innerHTML = ''; // Limpiar contenido previo
+
+    // Buscar la venta en Firebase
+    db.ref('posventa').child(ventaId).once('value', (snapshot) => {
+        if (snapshot.exists()) {
+            const item = snapshot.val();
+            const timeline = [];
+
+            // Agregar todos los estados y descripciones
+            const estados = [
+                { key: 'estado', descripcionKey: 'descripción_del_estado' },
+                { key: 'estado2', descripcionKey: 'descripción_del_estado2' },
+                { key: 'estado3', descripcionKey: 'descripción_del_estado3' },
+                { key: 'estado4', descripcionKey: 'descripción_del_estado4' },
+                { key: 'estado5', descripcionKey: 'descripción_del_estado5' },
+                { key: 'estado6', descripcionKey: 'descripción_del_estado6' },
+                { key: 'estado7', descripcionKey: 'descripción_del_estado7' },
+                { key: 'estado8', descripcionKey: 'descripción_del_estado8' },
+                { key: 'estado9', descripcionKey: 'descripción_del_estado9' },
+                { key: 'estado10', descripcionKey: 'descripción_del_estado10' },
+                { key: 'estado11', descripcionKey: 'descripción_del_estado11' },
+                { key: 'estado12', descripcionKey: 'descripción_del_estado12' },
+                { key: 'estado13', descripcionKey: 'descripción_del_estado13' },
+                { key: 'estado14', descripcionKey: 'descripción_del_estado14' },
+                { key: 'estado15', descripcionKey: 'descripción_del_estado15' },
+                { key: 'estado16', descripcionKey: 'descripción_del_estado16' },
+                { key: 'estado17', descripcionKey: 'descripción_del_estado17' },
+                { key: 'estado18', descripcionKey: 'descripción_del_estado18' },
+                { key: 'estado19', descripcionKey: 'descripción_del_estado19' },
+                { key: 'estado20', descripcionKey: 'descripción_del_estado20' },
+            ];
+
+            // Recorrer los estados definidos
+            estados.forEach((estadoObj, index) => {
+                const estado = item.ventas[estadoObj.key];
+                const descripcion = item.ventas[estadoObj.descripcionKey];
+
+                if (estado) {
+                    // Si hay un estado, se muestra normalmente
+                    timeline.push(`
+                        <li class="timeline-placeit-item">
+                            <div class="timeline-placeit-item-title"><strong>Estado ${index + 1}:</strong> ${estado}</div>
+                            <div class="timeline-placeit-item-date">${descripcion ? descripcion : ''}</div>
+                        </li>
+                    `);
+                } else if (descripcion) {
+                    // Si no hay estado pero hay descripción, se muestra "Actualización en Descripción"
+                    timeline.push(`
+                        <li class="timeline-placeit-item">
+                            <div class="timeline-placeit-item-title"><strong>Estado ${index + 1}:</strong> Actualización en Descripción</div>
+                            <div class="timeline-placeit-item-date">${descripcion}</div>
+                        </li>
+                    `);
+                }
+            });
+
+            // Insertar la línea de tiempo en el modal
+            timelineContent.innerHTML = `<ul class="timeline-placeit">${timeline.join('')}</ul>`;
+            timelineContent.style.display = 'block';
+
+            // Mostrar el modal
+            const modal = new bootstrap.Modal(document.getElementById('timelineModal'));
+            modal.show();
+        } else {
+            Swal.fire('Error', 'No se encontraron datos para esta venta.', 'error');
+        }
+    }).catch((error) => {
+        console.error('Error al buscar la venta en Firebase:', error);
+        Swal.fire('Error', 'Ocurrió un error al buscar la venta.', 'error');
+    });
+}
+// FIN MODAL LINEA DE TIEMPO
+
+firebase.database().ref('posventa').on('child_changed', (snapshot) => {
+    const ventaId = snapshot.key;
+    const venta = snapshot.val();
+
+    // Buscar la fila de la venta correspondiente
+    const row = [...document.querySelectorAll('#data-table tbody tr')]
+        .find(tr => tr.querySelector('.estado-select')?.dataset.ventaId === ventaId);
+
+    if (row && venta.ventas.estadoActual) {
+        const estadoActual = venta.ventas.estadoActual;
+        const estadoSelect = row.querySelector('.estado-select');
+
+        // Actualizar el select
+        estadoSelect.value = estadoActual;
+
+        // Pintar la fila según el nuevo estado
+        switch (estadoActual) {
+            case "CONTROL FINALIZADO":
+                row.style.backgroundColor = "#c8e6c9"; break;
+            case "TRANSFERIDO A FACTURACION":
+                row.style.backgroundColor = "#bbdefb"; break;
+            case "LLEGO A NOVOGAR":
+                row.style.backgroundColor = "#ffe0b2"; break;
+            case "SEGUIR RECLAMO EN FORMULARIO":
+                row.style.backgroundColor = "#f8bbd0"; break;
+            case "ENTREGADO CON DEBITO":
+                row.style.backgroundColor = "#d1c4e9"; break;
+            default:
+                row.style.backgroundColor = ""; break;
+        }
+    }
+});

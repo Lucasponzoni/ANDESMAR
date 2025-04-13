@@ -137,7 +137,11 @@
                 <!-- Botón para abrir el modal de importación -->
                 <button id="btnImportar" class="btn btn-light" data-toggle="modal" data-target="#importModal">
                     <i class="bi bi-file-earmark-plus-fill" style="font-size: 22px; color: #2d853c;"></i> Importar Datos
-                </button>                             
+                </button> 
+                
+                <button id="btnFiltrar" class="btn btn-light" data-toggle="modal" data-target="#filtrarModal">
+                    <i class="bi bi-check2-square" style="font-size: 22px; color: #3d2d85;"></i> Filtrar Estados
+                </button>  
             </div> 
         </div>
     </div>
@@ -154,9 +158,11 @@
             <table id="data-table" class="table table-striped">
                 <thead>
                     <tr>
-                        <!-- Aca va a ir la tabla -->   
+                        <th><i class="bi bi-calendar-check-fill"></i> Operacion</th>
+                        <th class="estado-column"><i class="bi bi-geo-alt-fill"></i> Estado</th>
+                        <th><i class="bi bi-person-badge-fill"></i> Descripcion de Estado</th>
                     </tr>
-                </thead>                      
+                </thead>
                 <tbody>
                     <!-- Los datos se llenarán aquí dinámicamente -->
                 </tbody>
@@ -202,7 +208,7 @@
         <!-- Modal de Importación -->
         <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
+                <div class="modal-content" style="border-radius: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;">
                     <div class="modal-header">
                         <h5 class="modal-title" id="importModalLabel">Importar Archivo XLSX</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -226,6 +232,50 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Filtrar Estados -->
+        <div class="modal fade" id="filtrarModal" tabindex="-1" role="dialog" aria-labelledby="filtrarModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="border-radius: 16px;">
+                <div class="modal-header">
+                <h5 class="modal-title" id="filtrarModalLabel">📋 Filtrar Estados</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body" id="filtrarEstadosContenido" style="min-height: 200px;">
+                <!-- Spinner y checkboxes se cargan por JS -->
+                </div>
+                <div class="modal-footer">
+                <button id="guardarEstadosBtn" class="btn btn-primary swal2-macos-button" style="display: none;">Guardar cambios</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Modal Línea de Tiempo -->
+        <div class="modal fade" id="timelineModal" tabindex="-1" aria-labelledby="timelineModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-light text-dark">
+                    <div class="modal-header bg-light text-dark">
+                        <h5 class="modal-title text-dark" id="timelineModalLabel">Línea de Tiempo Estados</h5>
+                    </div>
+                    <div class="modal-body">
+                        <ul id="timelineContent" class="timeline" style="display: none; list-style: none; padding: 0; margin: 0;">
+                            <!-- Los estados se agregarán dinámicamente aquí -->
+                        </ul>
+                    </div>
+
+                    <div class="modal-footer d-flex justify-content-center">
+                        <div class="alert-modal-Pi text-center">
+                            <span>Para cerrar haga click fuera de la ventana</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- Fin Modal Línea de Tiempo -->
 
         <!-- Pagination -->
         <nav aria-label="Page navigation">

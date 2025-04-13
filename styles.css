@@ -3499,7 +3499,7 @@ div .form-check {
 }
 
 .form-check-input:checked::before {
-    transform: translateX(25px); /* Ajustar la posición del círculo */
+    transform: translateX(38px); /* Ajustar la posición del círculo */
 }
 
 .form-check-input::before {
@@ -3512,8 +3512,23 @@ div .form-check {
     border-radius: 50%; /* Círculo perfecto */
     transition: transform 0.3s; /* Transición suave */
     top: -2.5px; /* Ajuste de posición */
-    left: 0;
+    left: -8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Sombra más pronunciada */
+}
+
+.form-check-input[type=checkbox] {
+    border-radius: 25px !important;
+}
+
+.estado-nombre {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    text-transform: capitalize;
+    text-align: center;
+}
+
+.text-success {
+    color: green;
 }
 
 .form-check-label {
