@@ -347,6 +347,19 @@
     </script>
     <!-- Fin info WiFi -->
 
+    <script>
+        document.getElementById('searchFacturacion').addEventListener('input', function () {
+            const searchValue = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#data-table tbody tr');
+    
+            rows.forEach(row => {
+                const textoFila = row.textContent.toLowerCase();
+                const coincide = textoFila.includes(searchValue);
+                row.style.display = coincide ? '' : 'none';
+            });
+        });
+    </script>    
+
     <!-- Footer -->
     <footer class="center">
         <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">

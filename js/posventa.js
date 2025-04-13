@@ -394,6 +394,9 @@ firebase.initializeApp({
 // RENDERIZADO DE LA TABLA
 document.addEventListener('DOMContentLoaded', async () => {
     const spinner = document.getElementById('spinner');
+    const searchInput = document.getElementById('searchFacturacion');
+    searchInput.value = "Aguardando que cargue la web ⏳";
+    searchInput.disabled = true;
     spinner.style.display = 'block';
 
     try {
@@ -526,6 +529,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert('Hubo un problema al cargar los datos');
     } finally {
         spinner.style.display = 'none';
+        searchInput.disabled = false;
+        searchInput.value = "";
     }
 });
 // FIN RENDERIZADO DE LA TABLA
