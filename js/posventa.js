@@ -140,55 +140,65 @@ firebase.initializeApp({
       const ventaData = {};
       let hayCambios = false;
   
-      for (let j = 0; j < headers.length; j++) {
-        const claveOriginal = headers[j]?.trim();
-        const clave = limpiarClave(claveOriginal);
-        const seccion = sectionMap[j] || "otros";
-        const valorNuevo = row[j];
-  
-        if (!clave) continue;
-        if (!ventaData[seccion]) ventaData[seccion] = {};
-  
-        if (seccion === 'ventas' && (clave === 'estado' || clave === 'descripción_del_estado')) {
-          const prevVenta = existingData[ventaId]?.ventas || {};
-          let version = 1;
-          while (prevVenta[`${clave}${version > 1 ? version : ''}`] !== undefined) {
-            version++;
-          }
-          const ultimaClave = `${clave}${version - 1 > 1 ? version - 1 : ''}`;
-          const valorPrevio = prevVenta[ultimaClave] || "";
-
-            // 🚫 NUEVA CONDICIÓN: Si el último estado es "CONTROL FINALIZADO", ignorar cualquier cambio
-            if (valorPrevio.trim().toUpperCase() === "CONTROL FINALIZADO") {
-            continue; // salta esta fila sin hacer nada
-          }
-  
-          if (valorNuevo !== valorPrevio) {
-            const nuevaClave = `${clave}${version}`;
-            ventaData[seccion][nuevaClave] = valorNuevo;
-            hayCambios = true;
-          }
-        } else {
-          const prevValor = existingData[ventaId]?.[seccion]?.[clave];
-          if (valorNuevo !== prevValor) {
-            ventaData[seccion][clave] = valorNuevo;
-            hayCambios = true;
-          }
+      for (let i = headerRowIndex + 1; i < json.length; i++) {
+        const row = json[i];
+        const ventaId = row[0];
+        if (!ventaId) continue;
+    
+        const ventaData = {};
+        let hayCambios = false;
+    
+        for (let j = 0; j < headers.length; j++) {
+            const claveOriginal = headers[j]?.trim();
+            const clave = limpiarClave(claveOriginal);
+            const seccion = sectionMap[j] || "otros";
+            const valorNuevo = row[j];
+    
+            if (!clave) continue;
+            if (!ventaData[seccion]) ventaData[seccion] = {};
+    
+            if (seccion === 'ventas' && (clave === 'estado' || clave === 'descripción_del_estado')) {
+                const prevVenta = existingData[ventaId]?.ventas || {};
+                let version = 1;
+                while (prevVenta[`${clave}${version > 1 ? version : ''}`] !== undefined) {
+                    version++;
+                }
+                const ultimaClave = `${clave}${version - 1 > 1 ? version - 1 : ''}`;
+                const valorPrevio = prevVenta[ultimaClave] || "";
+    
+                // Verificar si el último estado es "Se ha finalizado el control de Posventa"
+                if (valorPrevio === 'Se ha finalizado el control de Posventa') {
+                    // Ignorar la actualización y no contarla
+                    continue; // O puedes usar un flag aquí si necesitas más lógica
+                }
+    
+                if (valorNuevo !== valorPrevio) {
+                    const nuevaClave = `${clave}${version}`;
+                    ventaData[seccion][nuevaClave] = valorNuevo;
+                    hayCambios = true;
+                }
+            } else {
+                const prevValor = existingData[ventaId]?.[seccion]?.[clave];
+                if (valorNuevo !== prevValor) {
+                    ventaData[seccion][clave] = valorNuevo;
+                    hayCambios = true;
+                }
+            }
         }
-      }
-  
-      if (!existingData[ventaId]) {
-        updates[`/posventa/${ventaId}`] = ventaData;
-        nuevasVentas++;
-      } else if (hayCambios) {
-        for (const seccion in ventaData) {
-          for (const clave in ventaData[seccion]) {
-            updates[`/posventa/${ventaId}/${seccion}/${clave}`] = ventaData[seccion][clave];
-          }
+    
+        if (!existingData[ventaId]) {
+            updates[`/posventa/${ventaId}`] = ventaData;
+            nuevasVentas++;
+        } else if (hayCambios) {
+            for (const seccion in ventaData) {
+                for (const clave in ventaData[seccion]) {
+                    updates[`/posventa/${ventaId}/${seccion}/${clave}`] = ventaData[seccion][clave];
+                }
+            }
+            ventasActualizadas++; // Solo se incrementa si hay cambios
         }
-        ventasActualizadas++;
-      }
     }
+  }    
   
     const ventaIds = Object.keys(updates);
     const batchSize = 100;
@@ -416,21 +426,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const posventaData = posventaSnapshot.val() || {};
 
         const ventasFiltradas = Object.entries(posventaData).filter(([ventaId, venta]) => {
-          const ventasEstados = Object.entries(venta.ventas || {})
-              .filter(([key]) => key.startsWith('estado') && key !== 'estadoActual')
-              .sort(([a], [b]) => {
-                  const numA = parseInt(a.replace('estado', '')) || 0;
-                  const numB = parseInt(b.replace('estado', '')) || 0;
-                  return numB - numA; // Orden descendente
-              });
-      
-          if (ventasEstados.length === 0) return false;
-      
-          const ultimoEstadoValue = (ventasEstados[0][1] || "").toLowerCase();
-      
-          return estadosSeleccionados.some(estadoSel => ultimoEstadoValue.includes(estadoSel));
-      });        
+            const ventasEstados = Object.entries(venta.ventas || {})
+                .filter(([key]) => key.startsWith('estado') && key !== 'estadoActual')
+                .sort(([a], [b]) => {
+                    const numA = parseInt(a.replace('estado', '')) || 0;
+                    const numB = parseInt(b.replace('estado', '')) || 0;
+                    return numB - numA; // Orden descendente
+                });
 
+            if (ventasEstados.length === 0) return false;
+
+            const ultimoEstadoValue = (ventasEstados[0][1] || "").toLowerCase();
+
+            return estadosSeleccionados.some(estadoSel => ultimoEstadoValue.includes(estadoSel));
+        });
+  
         const tbody = document.querySelector('#data-table tbody');
         tbody.innerHTML = ''; // Limpiar anterior
 
@@ -493,55 +503,57 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Agregar evento para el select
             estadoSelect.addEventListener('change', async (event) => {
-                const nuevoEstado = event.target.value;
-                let mensajeUltimoEstado = "";
+              const nuevoEstado = event.target.value;
+              let mensajeUltimoEstado = "";
+              let mensajeUltimaDescripcion = ""; // Asegúrate de declarar esta variable
 
-                if (nuevoEstado) {
-                    // Establecer el mensaje correspondiente según el estado seleccionado
-                    switch (nuevoEstado) {
-                        case "CONTROL FINALIZADO":
-                            mensajeUltimoEstado = "Se ha finalizado el control de Posventa";
-                            mensajeUltimaDescripcion = "Control Finalizado";
-                            row.style.backgroundColor = "#c8e6c9"; // Verde claro
-                            break;
-                        case "TRANSFERIDO A FACTURACION":
-                            mensajeUltimoEstado = "Se ha transferido la operación por email al sector de facturación para su control";
-                            mensajeUltimaDescripcion = "Transferido a Facturacion";
-                            row.style.backgroundColor = "#bbdefb"; // Azul claro
-                            break;
-                        case "LLEGO A NOVOGAR":
-                            mensajeUltimoEstado = "La devolución llegó a NOVOGAR, se ha finalizado el control de posventa";
-                            mensajeUltimaDescripcion = "Llego a Novogar";
-                            row.style.backgroundColor = "#ffe0b2"; // Naranja claro
-                            break;
-                        case "SEGUIR RECLAMO EN FORMULARIO":
-                            mensajeUltimoEstado = "La devolución dejó de actualizar los estados, seguir fecha de retorno brindado en Caso.";
-                            mensajeUltimaDescripcion = "Seguir reclamo en formulario";
-                            row.style.backgroundColor = "#f8bbd0"; // Rosa claro
-                            break;
-                        case "ENTREGADO CON DEBITO":
-                            mensajeUltimoEstado = "Entregado al cliente con débito de dinero al vendedor";
-                            mensajeUltimaDescripcion = "Entregado con Debito (FRAUDE)";
-                            row.style.backgroundColor = "#d1c4e9"; // Lavanda claro
-                            break;
-                        default:
-                            row.style.backgroundColor = ""; // Sin color
-                    }
+              if (nuevoEstado) {
+                  // Establecer el mensaje correspondiente según el estado seleccionado
+                  switch (nuevoEstado) {
+                      case "CONTROL FINALIZADO":
+                          mensajeUltimoEstado = "Se ha finalizado el control de Posventa";
+                          mensajeUltimaDescripcion = "Control Finalizado";
+                          row.style.backgroundColor = "#c8e6c9"; // Verde claro
+                          break;
+                      case "TRANSFERIDO A FACTURACION":
+                          mensajeUltimoEstado = "Se ha transferido la operación por email al sector de facturación para su control";
+                          mensajeUltimaDescripcion = "Transferido a Facturacion";
+                          row.style.backgroundColor = "#bbdefb"; // Azul claro
+                          break;
+                      case "LLEGO A NOVOGAR":
+                          mensajeUltimoEstado = "La devolución llegó a NOVOGAR, se ha finalizado el control de posventa";
+                          mensajeUltimaDescripcion = "Llego a Novogar";
+                          row.style.backgroundColor = "#ffe0b2"; // Naranja claro
+                          break;
+                      case "SEGUIR RECLAMO EN FORMULARIO":
+                          mensajeUltimoEstado = "La devolución dejó de actualizar los estados, seguir fecha de retorno brindado en Caso.";
+                          mensajeUltimaDescripcion = "Seguir reclamo en formulario";
+                          row.style.backgroundColor = "#f8bbd0"; // Rosa claro
+                          break;
+                      case "ENTREGADO CON DEBITO":
+                          mensajeUltimoEstado = "Entregado al cliente con débito de dinero al vendedor";
+                          mensajeUltimaDescripcion = "Entregado con Debito (FRAUDE)";
+                          row.style.backgroundColor = "#d1c4e9"; // Lavanda claro
+                          break;
+                      default:
+                          row.style.backgroundColor = ""; // Sin color
+                  }
 
-                    // Obtener el índice del último estado
-                    const estadosExistentes = Object.keys(venta.ventas).filter(key => key.startsWith('estado'));
-                    const nuevoEstadoIndex = estadosExistentes.length + 1; // Incrementar el índice
+                  // Obtener el índice del último estado
+                  const estadosExistentes = Object.keys(venta.ventas).filter(key => key.startsWith('estado'));
+                  const nuevoEstadoIndex = estadosExistentes.length + 1; // Incrementar el índice
 
-                    // Pushear el nuevo estado a Firebase
-                    const updates = {};
-                    updates[`/posventa/${ventaId}/ventas/estado${nuevoEstadoIndex}`] = mensajeUltimoEstado; // Guardar el nuevo estado
-                    updates[`/posventa/${ventaId}/ventas/descripción_del_estado${nuevoEstadoIndex}`] = mensajeUltimaDescripcion; // Guardar el nuevo estado
-                    updates[`/posventa/${ventaId}/ventas/estadoActual`] = nuevoEstado; // Guardar el estado actual
+                  // Pushear el nuevo estado a Firebase
+                  const updates = {};
+                  updates[`/posventa/${ventaId}/ventas/estado${nuevoEstadoIndex}`] = mensajeUltimoEstado; // Guardar el nuevo estado
+                  updates[`/posventa/${ventaId}/ventas/descripción_del_estado${nuevoEstadoIndex}`] = mensajeUltimaDescripcion; // Guardar la descripción del nuevo estado
+                  updates[`/posventa/${ventaId}/ventas/estadoActual`] = nuevoEstado; // Guardar el estado actual
 
-                    await firebase.database().ref().update(updates);
-                    console.log(`Estado actualizado: ${nuevoEstado}`);
-                }
+                  await firebase.database().ref().update(updates);
+                  console.log(`Estado actualizado: ${nuevoEstado}`);
+              }
             });
+
         });
 
     } catch (error) {
