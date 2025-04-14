@@ -436,8 +436,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (ventasEstados.length === 0) return false;
 
-            const ultimoEstadoValue = (ventasEstados[0][1] || "").toLowerCase();
-
+            const ultimoEstadoValue = (ventasEstados[0][1] || "").toLowerCase().replace(/[.,;]/g, '');
+            
             return estadosSeleccionados.some(estadoSel => ultimoEstadoValue.includes(estadoSel));
         });
   
