@@ -427,7 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const row = document.createElement('tr');
             row.innerHTML = `
             <td>
-                <div class="mac-cell">
+                <div class="mac-cell mac-cell-posventa">
                     <div class="venta-id">
                         ${ventaId}
                         <i class="${iconClass}" onclick="abrirModalTimeline('${ventaId}')" style="cursor: pointer;"></i>
@@ -445,7 +445,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td style="vertical-align: middle;">${ultimoEstado}</td>
             <td style="vertical-align: middle;">${ultimaDescripcion}</td>
         `;
-            tbody.appendChild(row);
+        tbody.appendChild(row);        
 
             // Establecer el valor del select con el estado actual
             const estadoGuardado = venta.ventas.estadoActual; // Cargar el estado actual

@@ -7278,8 +7278,9 @@ img.gray-filter {
         #e9ecef var(--fin) 100%
     );
 }
-   
-.mac-cell {
+  
+/* CONTENEDOR POSVENTA */
+.mac-cell-posventa {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -7290,7 +7291,7 @@ img.gray-filter {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
-.mac-cell .venta-id {
+.mac-cell-posventa .venta-id {
     font-family: "Rubik", sans-serif;
     display: flex;
     justify-content: center;
@@ -7301,17 +7302,17 @@ img.gray-filter {
     gap: 10px;
 }
 
-.mac-cell .venta-id i {
+.mac-cell-posventa .venta-id i {
     font-size: 20px;
     cursor: pointer;
     transition: transform 0.2s;
 }
 
-.mac-cell .venta-id i:hover {
+.mac-cell-posventa .venta-id i:hover {
     transform: scale(1.2);
 }
 
-.mac-cell .estado-select {
+.mac-cell-posventa .estado-select {
     max-width: 250px;
     padding: 6px 10px;
     border-radius: 8px !important;
@@ -7323,6 +7324,7 @@ img.gray-filter {
     transition: border-color 0.2s;
 }
 
-.mac-cell .estado-select:focus {
+.mac-cell-posventa .estado-select:focus {
     border-color: #4caf50;
 }
+/* FIN CONTENEDOR POSVENTA */
