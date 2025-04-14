@@ -157,6 +157,11 @@ firebase.initializeApp({
           }
           const ultimaClave = `${clave}${version - 1 > 1 ? version - 1 : ''}`;
           const valorPrevio = prevVenta[ultimaClave] || "";
+
+            // 🚫 NUEVA CONDICIÓN: Si el último estado es "CONTROL FINALIZADO", ignorar cualquier cambio
+            if (valorPrevio.trim().toUpperCase() === "CONTROL FINALIZADO") {
+            continue; // salta esta fila sin hacer nada
+          }
   
           if (valorNuevo !== valorPrevio) {
             const nuevaClave = `${clave}${version}`;
@@ -411,9 +416,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const posventaData = posventaSnapshot.val() || {};
 
         const ventasFiltradas = Object.entries(posventaData).filter(([ventaId, venta]) => {
-            const estado = venta?.ventas?.estado?.toLowerCase();
-            return estado && estadosSeleccionados.includes(estado);
-        });
+          const ventasEstados = Object.entries(venta.ventas || {})
+              .filter(([key]) => key.startsWith('estado') && key !== 'estadoActual')
+              .sort(([a], [b]) => {
+                  const numA = parseInt(a.replace('estado', '')) || 0;
+                  const numB = parseInt(b.replace('estado', '')) || 0;
+                  return numB - numA; // Orden descendente
+              });
+      
+          if (ventasEstados.length === 0) return false;
+      
+          const ultimoEstadoValue = (ventasEstados[0][1] || "").toLowerCase();
+      
+          return estadosSeleccionados.some(estadoSel => ultimoEstadoValue.includes(estadoSel));
+      });        
 
         const tbody = document.querySelector('#data-table tbody');
         tbody.innerHTML = ''; // Limpiar anterior
