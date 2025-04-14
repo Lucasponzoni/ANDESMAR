@@ -7278,4 +7278,51 @@ img.gray-filter {
         #e9ecef var(--fin) 100%
     );
 }
-    
+   
+.mac-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: #f8f8f8;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+.mac-cell .venta-id {
+    font-family: "Rubik", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    gap: 10px;
+}
+
+.mac-cell .venta-id i {
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.mac-cell .venta-id i:hover {
+    transform: scale(1.2);
+}
+
+.mac-cell .estado-select {
+    max-width: 250px;
+    padding: 6px 10px;
+    border-radius: 8px !important;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background: #fff;
+    appearance: none;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.mac-cell .estado-select:focus {
+    border-color: #4caf50;
+}

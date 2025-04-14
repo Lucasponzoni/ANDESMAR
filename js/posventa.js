@@ -418,17 +418,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tbody = document.querySelector('#data-table tbody');
         tbody.innerHTML = ''; // Limpiar anterior
 
-        ventasFiltradas.forEach(([ventaId, venta]) => {
-            const { ultimoEstado, ultimaDescripcion } = obtenerUltimoEstado(venta); // Obtener último estado y descripción
-        
-            const cantidadEstados = Object.keys(venta.ventas).filter(key => key.startsWith('estado') && key !== 'estadoActual').length;
-            const iconClass = cantidadEstados > 1 ? 'fas fa-history text-success' : 'fas fa-history';
-                                
+          ventasFiltradas.forEach(([ventaId, venta]) => {
+          const { ultimoEstado, ultimaDescripcion } = obtenerUltimoEstado(venta); // Obtener último estado y descripción
+      
+          const cantidadEstados = Object.keys(venta.ventas).filter(key => key.startsWith('estado') && key !== 'estadoActual').length;
+          const iconClass = cantidadEstados > 1 ? 'fas fa-history text-success' : 'fas fa-history';
+      
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>
-                    ${ventaId} 
-                    <i class="${iconClass}" onclick="abrirModalTimeline('${ventaId}')" style="cursor: pointer;"></i>
+            <td>
+                <div class="mac-cell">
+                    <div class="venta-id">
+                        ${ventaId}
+                        <i class="${iconClass}" onclick="abrirModalTimeline('${ventaId}')" style="cursor: pointer;"></i>
+                    </div>
                     <select class="estado-select" data-venta-id="${ventaId}">
                         <option value="">Selecciona un estado</option>
                         <option value="CONTROL FINALIZADO">CONTROL FINALIZADO</option>
@@ -437,10 +440,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <option value="SEGUIR RECLAMO EN FORMULARIO">SEGUIR RECLAMO EN FORMULARIO</option>
                         <option value="ENTREGADO CON DEBITO">ENTREGADO CON DEBITO</option>
                     </select>
-                </td>
-                <td>${ultimoEstado}</td>
-                <td>${ultimaDescripcion}</td>
-            `;
+                </div>
+            </td>
+            <td style="vertical-align: middle;">${ultimoEstado}</td>
+            <td style="vertical-align: middle;">${ultimaDescripcion}</td>
+        `;
             tbody.appendChild(row);
 
             // Establecer el valor del select con el estado actual
