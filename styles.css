@@ -1930,10 +1930,10 @@ input[disabled] {
 
 .strong-costo2{
     font-weight: 900;
-    color: green;
+    color: green; 
 }
 
-.pago p:nth-child(8){
+.pago p:nth-child(9){
     color: white;
     font-weight: 800;
     background-color: red;
@@ -6789,7 +6789,9 @@ img.gray-filter {
 .import-spinner-progress {
     margin-top: 10px;
     color: white;
-    font-size: 24px;
+    font-size: 30px;
+    font-weight: 600;
+    font-family: "Rubik", sans-serif;
 }
 
 .spinner-container-colecta {

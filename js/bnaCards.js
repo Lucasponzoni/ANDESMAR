@@ -586,6 +586,7 @@ async function loadEnviosFromFirebase() {
                         trackingNumber: data.trackingNumber,
                         precio_venta: data.precio_venta,
                         cliente: data.cliente,
+                        cod_aut: data.cod_aut,
                         total_con_tasas_2: data.total_con_tasas_2,
                         precio_producto: data.precio_producto,
                         suborden_total: data.suborden_total,
@@ -1718,10 +1719,17 @@ COMPRA CON USO DE PUNTOS BNA
                             <!-- Contenido del colapso -->
                             <div class="collapse" id="collapseDetallePago-${data[i].id}">
                                 <div class="pago p-2 mt-2 mb-2"">
+                                
+                                <div class="${isMacro(storeCode) ? '' : 'hidden'}" style="background-color: #f0f0f5; border-radius: 12px; padding: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; max-width: 400px; margin-bottom: 5px; border: 1px solid #d0d0d5; ">
+                                    <h2 style="font-size: 20px; color: #333; margin-bottom: 15px;">Datos PayWay 💰</h2>
+                                    <p class="card-text-pago" style="color: #333; margin: 10px 0;"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
+                                    <p class="card-text-pago" style="color: #333; margin: 10px 0;"><strong>Código de Autorización:</strong> ${data[i].cod_aut}</p>
+                                </div>
+
                                     <p class="card-text-pago"><strong>Entidad:</strong> ${(data[i].brand_name && data[i].brand_name !== '0') ? data[i].brand_name : data[i].marca_de_tarjeta || 'N/A'}</p>
                                     <p class="card-text-pago"><strong>Cuotas:</strong> ${(data[i].cuotas && data[i].cuotas !== '0') ? data[i].cuotas : data[i].nro_de_cuotas || 'N/A'}</p>
-                                    <p class="card-text-pago"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
-                                    
+                                    <p class="card-text-pago ${isMacro(storeCode) ? 'hidden' : ''}"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
+     
 
                       <p class="card-text-pago">
                           <strong>Precio de Venta:</strong> $ ${(data[i].precio_venta * data[i].cantidad).toFixed(2)}
