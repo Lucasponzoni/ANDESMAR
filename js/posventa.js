@@ -218,7 +218,7 @@ firebase.initializeApp({
       } catch (error) {
         console.error(`Error en el batch ${i}-${i + batchSize}:`, error);
       }
-      const progress = Math.floor(((i + batchKeys.length) / ventaIds.length) * 1000);
+      const progress = Math.floor(((i + batchKeys.length) / ventaIds.length) * 100);
       document.getElementById('spinnerProgress').innerText = `${progress}%`;
     }
   
