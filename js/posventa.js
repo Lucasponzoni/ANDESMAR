@@ -141,53 +141,67 @@ firebase.initializeApp({
       let hayCambios = false;
   
       for (let j = 0; j < headers.length; j++) {
-          const claveOriginal = headers[j]?.trim();
-          const clave = limpiarClave(claveOriginal);
-          const seccion = sectionMap[j] || "otros";
-          const valorNuevo = row[j];
-  
-          if (!clave) continue;
-          if (!ventaData[seccion]) ventaData[seccion] = {};
-  
-          if (seccion === 'ventas' && (clave === 'estado' || clave === 'descripción_del_estado')) {
-              const prevVenta = existingData[ventaId]?.ventas || {};
-              const valorPrevio = prevVenta[clave] || "";
-  
-              // Verificar si el último estado es "Se ha finalizado el control de Posventa"
-              if (valorPrevio === 'Se ha finalizado el control de Posventa') {
-                  // Ignorar la actualización y no contarla
-                  continue; 
-              }
-  
-              if (valorNuevo !== valorPrevio) {
-                  // Si ya existe el estado, se incrementa el sufijo numérico
-                  let version = 1;
-                  while (prevVenta[`${clave}${version > 1 ? version : ''}`] !== undefined) {
-                      version++;
-                  }
-                  const nuevaClave = `${clave}${version > 1 ? version : ''}`;
-                  ventaData[seccion][nuevaClave] = valorNuevo; // Usar la nueva clave con sufijo
-                  hayCambios = true;
-              }
-          } else {
-              const prevValor = existingData[ventaId]?.[seccion]?.[clave];
-              if (valorNuevo !== prevValor) {
-                  ventaData[seccion][clave] = valorNuevo;
-                  hayCambios = true;
-              }
+        const claveOriginal = headers[j]?.trim();
+        const clave = limpiarClave(claveOriginal);
+        const seccion = sectionMap[j] || "otros";
+        const valorNuevo = row[j];
+      
+        if (!clave) continue;
+        if (!ventaData[seccion]) ventaData[seccion] = {};
+      
+        const prevVenta = existingData[ventaId]?.ventas || {};
+        const prevValor = existingData[ventaId]?.[seccion]?.[clave];
+      
+        if (seccion === 'ventas' && (clave === 'estado' || clave === 'descripción_del_estado')) {
+          // Buscar la última versión del campo: estado, estado2, estado3...
+          let version = 1;
+          let ultimaClave = clave;
+        
+          while (prevVenta[`${clave}${version === 1 ? '' : version}`] !== undefined) {
+            ultimaClave = `${clave}${version === 1 ? '' : version}`;
+            version++;
           }
-  
-          if (!existingData[ventaId]) {
-              updates[`/posventa/${ventaId}`] = ventaData;
-              nuevasVentas++;
-          } else if (hayCambios) {
-              for (const seccion in ventaData) {
-                  for (const clave in ventaData[seccion]) {
-                      updates[`/posventa/${ventaId}/${seccion}/${clave}`] = ventaData[seccion][clave];
-                  }
-              }
-              ventasActualizadas++; // Solo se incrementa si hay cambios
+        
+          const valorAnterior = prevVenta[ultimaClave] ?? '';
+        
+          // 🚫 Si el último estado es "Se ha finalizado el control de Posventa", no hacer nada de la fila
+          let versionEstado = 1;
+          let ultimaClaveEstado = 'estado';
+          while (prevVenta[`estado${versionEstado === 1 ? '' : versionEstado}`] !== undefined) {
+            ultimaClaveEstado = `estado${versionEstado === 1 ? '' : versionEstado}`;
+            versionEstado++;
           }
+          const estadoFinal = prevVenta[ultimaClaveEstado] ?? '';
+          if (estadoFinal === 'Se ha finalizado el control de Posventa') {
+            continue;
+          }
+        
+          if (valorNuevo !== valorAnterior) {
+            // Crear clave correcta: estado, estado2, estado3...
+            const nuevaClave = `${clave}${version === 1 ? '' : version}`;
+            ventaData[seccion][nuevaClave] = valorNuevo;
+            hayCambios = true;
+          }
+        
+        } else {
+          if (valorNuevo !== prevValor) {
+            ventaData[seccion][clave] = valorNuevo;
+            hayCambios = true;
+          }
+        }                                
+      }
+      
+      // Registro de actualizaciones si hay cambios
+      if (!existingData[ventaId]) {
+        updates[`/posventa/${ventaId}`] = ventaData;
+        nuevasVentas++;
+      } else if (hayCambios) {
+        for (const seccion in ventaData) {
+          for (const clave in ventaData[seccion]) {
+            updates[`/posventa/${ventaId}/${seccion}/${clave}`] = ventaData[seccion][clave];
+          }
+        }
+        ventasActualizadas++;
       }
   }  
   
