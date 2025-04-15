@@ -420,15 +420,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     spinner.style.display = 'block';
 
     try {
-        const estadosSnapshot = await firebase.database().ref('estados').once('value');
-        const estadosData = estadosSnapshot.val() || {};
+      const estadosSnapshot = await firebase.database().ref('estados').once('value');
+      const estadosData = estadosSnapshot.val() || {};
 
-        const estadosSeleccionados = Object.entries(estadosData)
-            .filter(([_, estado]) => estado.seleccionado !== false)
-            .map(([_, estado]) => estado.nombre.toLowerCase());
+      const estadosSeleccionados = Object.entries(estadosData)
+          .filter(([_, estado]) => estado.seleccionado !== false)
+          .map(([_, estado]) => estado.nombre.toLowerCase());
 
-        const posventaSnapshot = await firebase.database().ref('posventa').once('value');
-        const posventaData = posventaSnapshot.val() || {};
+      // Limitar a los últimos 30,000 registros
+      const posventaSnapshot = await firebase.database().ref('posventa').limitToLast(40000).once('value');
+      const posventaData = posventaSnapshot.val() || {};
 
         const ventasFiltradas = Object.entries(posventaData).filter(([ventaId, venta]) => {
             const ventasEstados = Object.entries(venta.ventas || {})
