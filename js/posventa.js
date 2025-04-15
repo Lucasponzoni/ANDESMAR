@@ -206,7 +206,7 @@ firebase.initializeApp({
   }  
   
     const ventaIds = Object.keys(updates);
-    const batchSize = 100;
+    const batchSize = 1000;
     for (let i = 0; i < ventaIds.length; i += batchSize) {
       const batchKeys = ventaIds.slice(i, i + batchSize);
       const batchUpdates = {};
@@ -218,7 +218,7 @@ firebase.initializeApp({
       } catch (error) {
         console.error(`Error en el batch ${i}-${i + batchSize}:`, error);
       }
-      const progress = Math.floor(((i + batchKeys.length) / ventaIds.length) * 100);
+      const progress = Math.floor(((i + batchKeys.length) / ventaIds.length) * 1000);
       document.getElementById('spinnerProgress').innerText = `${progress}%`;
     }
   

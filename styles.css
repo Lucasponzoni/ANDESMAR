@@ -1930,10 +1930,10 @@ input[disabled] {
 
 .strong-costo2{
     font-weight: 900;
-    color: green;
+    color: green; 
 }
 
-.pago p:nth-child(8){
+.pago p:nth-child(9){
     color: white;
     font-weight: 800;
     background-color: red;
@@ -6798,9 +6798,8 @@ img.gray-filter {
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
-  }
+}
   
-
 .spinner-container-colecta {
     position: relative;
     text-align: center;
