@@ -413,13 +413,13 @@ firebase.initializeApp({
 
 // RENDERIZADO DE LA TABLA
 document.addEventListener('DOMContentLoaded', async () => {
-    const spinner = document.getElementById('spinner');
-    const searchInput = document.getElementById('searchFacturacion');
-    searchInput.value = "Aguardando que cargue la web ⏳";
-    searchInput.disabled = true;
-    spinner.style.display = 'block';
+  const spinner = document.getElementById('spinner');
+  const searchInput = document.getElementById('searchFacturacion');
+  searchInput.value = "Aguardando que cargue la web ⏳";
+  searchInput.disabled = true;
+  spinner.style.display = 'block';
 
-    try {
+  try {
       const estadosSnapshot = await firebase.database().ref('estados').once('value');
       const estadosData = estadosSnapshot.val() || {};
 
@@ -427,88 +427,102 @@ document.addEventListener('DOMContentLoaded', async () => {
           .filter(([_, estado]) => estado.seleccionado !== false)
           .map(([_, estado]) => estado.nombre.toLowerCase());
 
-      // Limitar a los últimos 30,000 registros
+      // Limitar a los últimos 40,000 registros
       const posventaSnapshot = await firebase.database().ref('posventa').limitToLast(40000).once('value');
       const posventaData = posventaSnapshot.val() || {};
 
-        const ventasFiltradas = Object.entries(posventaData).filter(([ventaId, venta]) => {
-            const ventasEstados = Object.entries(venta.ventas || {})
-                .filter(([key]) => key.startsWith('estado') && key !== 'estadoActual')
-                .sort(([a], [b]) => {
-                    const numA = parseInt(a.replace('estado', '')) || 0;
-                    const numB = parseInt(b.replace('estado', '')) || 0;
-                    return numB - numA; // Orden descendente
-                });
+      const ventasFiltradas = Object.entries(posventaData).filter(([ventaId, venta]) => {
+          const ventasEstados = Object.entries(venta.ventas || {})
+              .filter(([key]) => key.startsWith('estado') && key !== 'estadoActual')
+              .sort(([a], [b]) => {
+                  const numA = parseInt(a.replace('estado', '')) || 0;
+                  const numB = parseInt(b.replace('estado', '')) || 0;
+                  return numB - numA; // Orden descendente
+              });
 
-            if (ventasEstados.length === 0) return false;
+          if (ventasEstados.length === 0) return false;
 
-            const ultimoEstadoValue = (ventasEstados[0][1] || "").toLowerCase().replace(/[.,;]/g, '');
-            
-            return estadosSeleccionados.some(estadoSel => ultimoEstadoValue.includes(estadoSel));
-        });
-  
-        const tbody = document.querySelector('#data-table tbody');
-        tbody.innerHTML = ''; // Limpiar anterior
+          const ultimoEstadoValue = (ventasEstados[0][1] || "").toLowerCase().replace(/[.,;]/g, '');
+          
+          return estadosSeleccionados.some(estadoSel => ultimoEstadoValue.includes(estadoSel));
+      });
 
-          ventasFiltradas.forEach(([ventaId, venta]) => {
+      // Ordenar ventasFiltradas por fecha
+      ventasFiltradas.sort((a, b) => {
+          const fechaA = new Date(a[1].ventas.fecha_de_venta);
+          const fechaB = new Date(b[1].ventas.fecha_de_venta);
+          return fechaB - fechaA; // Orden descendente por fecha
+      });
+
+      const tbody = document.querySelector('#data-table tbody');
+      tbody.innerHTML = ''; // Limpiar anterior
+
+      ventasFiltradas.forEach(([ventaId, venta]) => {
           const { ultimoEstado, ultimaDescripcion } = obtenerUltimoEstado(venta); // Obtener último estado y descripción
-      
+
           const cantidadEstados = Object.keys(venta.ventas).filter(key => key.startsWith('estado') && key !== 'estadoActual').length;
           const iconClass = cantidadEstados > 1 ? 'fas fa-history text-success' : 'fas fa-history';
-      
-            const row = document.createElement('tr');
-            row.innerHTML = `
-            <td>
-                <div class="mac-cell mac-cell-posventa">
-                    <div class="venta-id">
-                        ${ventaId}
-                        <i class="${iconClass}" onclick="abrirModalTimeline('${ventaId}')" style="cursor: pointer;"></i>
-                    </div>
-                    <select class="estado-select" data-venta-id="${ventaId}">
-                        <option value="">Selecciona un estado</option>
-                        <option value="CONTROL FINALIZADO">CONTROL FINALIZADO</option>
-                        <option value="TRANSFERIDO A FACTURACION">TRANSFERIDO A FACTURACION</option>
-                        <option value="LLEGO A NOVOGAR">LLEGO A NOVOGAR</option>
-                        <option value="SEGUIR RECLAMO EN FORMULARIO">SEGUIR RECLAMO EN FORMULARIO</option>
-                        <option value="ENTREGADO CON DEBITO">ENTREGADO CON DEBITO</option>
-                    </select>
-                </div>
-            </td>
-            <td style="vertical-align: middle;">${ultimoEstado}</td>
-            <td style="vertical-align: middle;">${ultimaDescripcion}</td>
-        `;
-        tbody.appendChild(row);        
 
-            // Establecer el valor del select con el estado actual
-            const estadoGuardado = venta.ventas.estadoActual; // Cargar el estado actual
-            const estadoSelect = row.querySelector('.estado-select');
-            estadoSelect.value = estadoGuardado || ""; // Cargar el estado actual en el select
+          const row = document.createElement('tr');
+// Modifica la parte donde se crea el HTML del row
+row.innerHTML = `
+    <td>
+        <div class="mac-cell mac-cell-posventa">
+            <div class="venta-id">
+                <a href="https://www.mercadolibre.com.ar/ventas/${ventaId}/detalle" target="_blank" style="text-decoration: none; color: #333;">
+                    ${ventaId}
+                </a>
+                <i class="bi bi-clipboard" id="clipboard-${ventaId}" onclick="copyToClipboard('${ventaId}', this)" style="cursor: pointer; font-size: 18px; color: #333;"></i>
+                <i class="${iconClass}" onclick="abrirModalTimeline('${ventaId}')" style="cursor: pointer;"></i>
+            </div>
+            <select class="estado-select" data-venta-id="${ventaId}">
+                <option value="">Selecciona un estado</option>
+                <option value="CONTROL FINALIZADO">CONTROL FINALIZADO</option>
+                <option value="TRANSFERIDO A FACTURACION">TRANSFERIDO A FACTURACION</option>
+                <option value="LLEGO A NOVOGAR">LLEGO A NOVOGAR</option>
+                <option value="SEGUIR RECLAMO EN FORMULARIO">SEGUIR RECLAMO EN FORMULARIO</option>
+                <option value="ENTREGADO CON DEBITO">ENTREGADO CON DEBITO</option>
+            </select>
+            <div class="fecha-venta" style="font-size: 12px; color: #777;">
+                ${venta.ventas.fecha_de_venta}
+            </div>
+        </div>
+    </td>
+    <td style="vertical-align: middle;">${ultimoEstado}</td>
+    <td style="vertical-align: middle;">${ultimaDescripcion}</td>
+`;
+          tbody.appendChild(row);
 
-            // Cambiar el color de la fila según el estado guardado
-            if (estadoGuardado) {
-                switch (estadoGuardado) {
-                    case "CONTROL FINALIZADO":
-                        row.style.backgroundColor = "#c8e6c9"; // Verde claro
-                        break;
-                    case "TRANSFERIDO A FACTURACION":
-                        row.style.backgroundColor = "#bbdefb"; // Azul claro
-                        break;
-                    case "LLEGO A NOVOGAR":
-                        row.style.backgroundColor = "#ffe0b2"; // Naranja claro
-                        break;
-                    case "SEGUIR RECLAMO EN FORMULARIO":
-                        row.style.backgroundColor = "#f8bbd0"; // Rosa claro
-                        break;
-                    case "ENTREGADO CON DEBITO":
-                        row.style.backgroundColor = "#d1c4e9"; // Lavanda claro
-                        break;
-                    default:
-                        row.style.backgroundColor = ""; // Sin color
-                }
-            }
+          // Establecer el valor del select con el estado actual
+          const estadoGuardado = venta.ventas.estadoActual; // Cargar el estado actual
+          const estadoSelect = row.querySelector('.estado-select');
+          estadoSelect.value = estadoGuardado || ""; // Cargar el estado actual en el select
 
-            // Agregar evento para el select
-            estadoSelect.addEventListener('change', async (event) => {
+          // Cambiar el color de la fila según el estado guardado
+          if (estadoGuardado) {
+              switch (estadoGuardado) {
+                  case "CONTROL FINALIZADO":
+                      row.style.backgroundColor = "#c8e6c9"; // Verde claro
+                      break;
+                  case "TRANSFERIDO A FACTURACION":
+                      row.style.backgroundColor = "#bbdefb"; // Azul claro
+                      break;
+                  case "LLEGO A NOVOGAR":
+                      row.style.backgroundColor = "#ffe0b2"; // Naranja claro
+                      break;
+                  case "SEGUIR RECLAMO EN FORMULARIO":
+                      row.style.backgroundColor = "#f8bbd0"; // Rosa claro
+                      break;
+                  case "ENTREGADO CON DEBITO":
+                      row.style.backgroundColor = "#d1c4e9"; // Lavanda claro
+                      break;
+                  default:
+                      row.style.backgroundColor = ""; // Sin color
+              }
+          }
+
+          // Agregar evento para el select
+          estadoSelect.addEventListener('change', async (event) => {
               const nuevoEstado = event.target.value;
               let mensajeUltimoEstado = "";
               let mensajeUltimaDescripcion = ""; // Asegúrate de declarar esta variable
@@ -558,19 +572,51 @@ document.addEventListener('DOMContentLoaded', async () => {
                   await firebase.database().ref().update(updates);
                   console.log(`Estado actualizado: ${nuevoEstado}`);
               }
-            });
+          });
+      });
 
-        });
-
-    } catch (error) {
-        console.error('Error cargando datos:', error);
-        alert('Hubo un problema al cargar los datos');
-    } finally {
-        spinner.style.display = 'none';
-        searchInput.disabled = false;
-        searchInput.value = "";
-    }
+  } catch (error) {
+      console.error('Error cargando datos:', error);
+      alert('Hubo un problema al cargar los datos');
+  } finally {
+      spinner.style.display = 'none';
+      searchInput.disabled = false;
+      searchInput.value = "";
+  }
 });
+
+// Modifica la función copyToClipboard
+function copyToClipboard(ventaId, iconElement) {
+  navigator.clipboard.writeText(ventaId).then(() => {
+      // Cambiar el icono a clipboard-check-fill
+      iconElement.className = 'bi bi-clipboard-check-fill green-clip';
+      
+      showAlert(`Se ha copiado al portapapeles la Operación ${ventaId}`);
+      
+      // Volver al icono original después de 5 segundos
+      setTimeout(() => {
+          iconElement.className = 'bi bi-clipboard';
+      }, 5000);
+  }).catch(err => {
+      console.error('Error al copiar al portapapeles: ', err);
+  });
+}
+
+// Función para mostrar la alerta
+function showAlert(message) {
+  const alertContainer = document.createElement('div');
+  alertContainer.className = 'alert-ios-meli';
+  alertContainer.innerHTML = `
+      <i class="bi bi-clipboard-check"></i>
+      ${message}
+      <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+  `;
+  document.body.appendChild(alertContainer);
+  
+  setTimeout(() => {
+      alertContainer.style.display = 'none';
+  }, 3000);
+}
 // FIN RENDERIZADO DE LA TABLA
 
 // MODAL LINEA DE TIEMPO
@@ -681,3 +727,5 @@ firebase.database().ref('posventa').on('child_changed', (snapshot) => {
         }
     }
 });
+
+

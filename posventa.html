@@ -32,11 +32,11 @@
         
         /* Estilo específico para esta página */
         .search-container-top {
-            max-width: 85% !important; /* Aumentar ancho del contenedor de búsqueda */
+            max-width: 85%; /* Aumentar ancho del contenedor de búsqueda */
         }
 
         #cards-container {
-            max-width: 85% !important; /* Aumentar ancho del contenedor de tarjetas */
+            max-width: 85%; /* Aumentar ancho del contenedor de tarjetas */
         }
 
         /* Media query para pantallas de 950px o menos */
@@ -290,6 +290,39 @@
             <div id="spinnerProgress" class="import-spinner-progress">0%</div>
         </div>
     </div>
+
+    <!-- Avatars -->  
+    <div class="avatar-container">
+        <!-- Avatares clickeables -->
+        <div class="avatar" onclick="selectAvatar('alexis_guidi.png', 'Alexis Guidi')">
+            <img src="./Img/alexis_guidi.png" alt="Alexis Guidi">
+        </div>
+        <div class="avatar" onclick="selectAvatar('elias_pignani.png', 'Elias Pignani')">
+            <img src="./Img/elias_pignani.png" alt="Elias Pignani">
+        </div>
+        <div class="avatar" onclick="selectAvatar('georgina_suarez.png', 'Georgina Suarez')">
+            <img src="./Img/georgina_suarez.png" alt="Georgina Suarez">
+        </div>
+        <div class="avatar" onclick="selectAvatar('joel_fernandez.png', 'Joel Fernandez')">
+            <img src="./Img/joel_fernandez.png" alt="Joel Fernandez">
+        </div>
+        <div class="avatar" onclick="selectAvatar('esperanza_toffalo.png', 'Esperanza Toffalo')">
+            <img src="./Img/esperanza_toffalo.png" alt="Esperanza Toffalo">
+        </div>
+        <div class="avatar" onclick="selectAvatar('lucas_ponzoni.png', 'Lucas Ponzoni')">
+            <img src="./Img/lucas_ponzoni.png" alt="Lucas Ponzoni">
+        </div>
+    </div>
+
+    <!-- Avatar Activo Siempre Abajo -->
+    <div class="selected-avatar-wrapper">
+        <div class="selected-avatar" id="selected-avatar">
+            <img id="active-avatar" src="./Img/avatar-black.png" alt="Avatar seleccionado">
+        </div>
+        <div class="online-indicator"></div>
+    </div>
+
+    <!-- Avatars -->  
     
     <!-- Botón de flecha hacia arriba -->
     <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
@@ -357,6 +390,34 @@
                 const coincide = textoFila.includes(searchValue);
                 row.style.display = coincide ? '' : 'none';
             });
+        });
+    </script>
+    
+    <script>
+        function selectAvatar(imgFileName, altText) {
+            const imgPath = `./Img/${imgFileName}`;
+            const activeAvatar = document.getElementById("active-avatar");
+            activeAvatar.src = imgPath;
+            activeAvatar.alt = altText;
+    
+            // Guardar en localStorage
+            localStorage.setItem("selectedAvatarImg", imgFileName);
+            localStorage.setItem("selectedAvatarAlt", altText);
+        }
+    
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedImg = localStorage.getItem("selectedAvatarImg");
+            const savedAlt = localStorage.getItem("selectedAvatarAlt");
+            const activeAvatar = document.getElementById("active-avatar");
+    
+            if (savedImg && savedAlt) {
+                activeAvatar.src = `./Img/${savedImg}`;
+                activeAvatar.alt = savedAlt;
+            } else {
+                // Por defecto, avatar negro
+                activeAvatar.src = "./Img/avatar-black.png";
+                activeAvatar.alt = "Avatar-selected";
+            }
         });
     </script>    
 

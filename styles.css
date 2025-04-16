@@ -7305,10 +7305,21 @@ img.gray-filter {
     justify-content: center;
     align-items: center;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 15px;
     color: #333;
     gap: 10px;
+    transition: background-color 0.3s, color 0.3s;
 }
+
+.mac-cell-posventa .venta-id:hover {
+    background-color: rgba(0, 122, 255, 0.1); 
+    border-radius: 5px; 
+}
+
+.green-clipboard {
+    color: #28a745 !important; 
+}
+
 
 .mac-cell-posventa .venta-id i {
     font-size: 20px;
@@ -7336,3 +7347,132 @@ img.gray-filter {
     border-color: #4caf50;
 }
 /* FIN CONTENEDOR POSVENTA */
+
+/* AVATARS */
+.avatar-container {
+    position: fixed;
+    right: 20px;
+    bottom: 200px;
+    height: auto;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.3s ease, margin-bottom 0.3s ease;
+    margin-bottom: -30px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.avatar:hover {
+    margin-bottom: 0;
+    border: 4px solid orange;
+}
+
+.avatar:hover img {
+    transform: scale(1.2);
+}
+
+/* Avatar seleccionado (el destacado abajo del todo) */
+.selected-avatar {
+    position: fixed;
+    right: 15px;
+    bottom: 110px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #32d554;
+    background-color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+    animation: pulseAvatar 2s infinite;
+}
+
+/* Efecto de pulso para el avatar seleccionado */
+@keyframes pulseAvatar {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 153, 255, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(0, 153, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 153, 255, 0);
+    }
+}
+
+/* Imagen del avatar */
+.selected-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Contenedor relativo para posicionar el indicador */
+.selected-avatar-wrapper {
+    position: fixed;
+    right: 15px;
+    bottom: 110px;
+    width: max-content;
+    height: max-content;
+    z-index: 1001;
+}
+
+/* Indicador online fuera del avatar */
+.online-indicator {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #32d554;
+    border: 3px solid white;
+    border-radius: 50%;
+    bottom: -10px;
+    right: -10px;
+    animation: pulseOnline 1.5s infinite;
+    z-index: 1002;
+}
+
+/* Efecto pulsante */
+@keyframes pulseOnline {
+    0% {
+        box-shadow: 0 0 0 0 rgba(50, 213, 84, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(50, 213, 84, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(50, 213, 84, 0);
+    }
+}
+
+/* Circulito verde (online) */
+.online-indicator {
+    position: absolute;
+    bottom: 0px;
+    right: 10px;
+    width: 22px;
+    height: 22px;
+    background-color: #32d554;
+    border: 3px solid white;
+    border-radius: 50%;
+    z-index: 1002;
+}
+/* FIN AVATARS */
