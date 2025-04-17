@@ -914,7 +914,7 @@ const cpsPlaceIt = [
         const montoCobrado = parseFloat(data[i].monto_cobrado);
         const equivalencia_puntos_pesos = parseFloat(data[i].equivalencia_puntos_pesos);
 
-        const total = (precioVenta * cantidad) + montoCobrado - equivalencia_puntos_pesos;
+        const total = (precioVenta + montoCobrado) - equivalencia_puntos_pesos;
         const puntosBna = (data[i].equivalencia_puntos_pesos);
 
         const shopCode = data[i].orden_publica_.split('-').pop();
@@ -1189,7 +1189,7 @@ COMPRA CON USO DE PUNTOS BNA
                             </div>
                             <div class="col">
                                 <label for="precio_item_${data[i].id}">Precio Item:</label>
-                                <input type="text" id="precio_item_${data[i].id}" value="${data[i].precio_venta === "0.0" ? (data[i].precio_producto * data[i].cantidad) : data[i].precio_venta}" disabled>
+                                <input type="text" id="precio_item_${data[i].id}" value="${data[i].precio_venta === "0.0" ? data[i].precio_producto : data[i].precio_venta}" disabled>
                             </div>
                         </div>
                         <div class="row mb-2">
@@ -1744,8 +1744,8 @@ COMPRA CON USO DE PUNTOS BNA
                        
                        <p class="card-text-pago">
                             <strong>Valor por producto:</strong> 
-                            <strong class="strong-costo">$ ${data[i].precio_venta === "0.0" ? (data[i].precio_producto * data[i].cantidad) : data[i].precio_venta}</strong>
-                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta === "0.0" ? (data[i].precio_producto * data[i].cantidad) : data[i].precio_venta}')">
+                            <strong class="strong-costo">$ ${data[i].precio_venta === "0.0" ? data[i].precio_producto : data[i].precio_venta}</strong>
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].precio_venta === "0.0" ? data[i].precio_producto : data[i].precio_venta}')">
                                 <i class="bi bi-clipboard"></i>
                             </button>
                         </p>
