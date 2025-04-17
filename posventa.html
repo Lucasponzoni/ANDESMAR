@@ -43,7 +43,7 @@
         @media (max-width: 992px) {
             .search-container-top,
             #cards-container {
-                max-width: 100%; /* Cambiar a 100% en pantallas pequeñas */
+                max-width: 100% !important; /* Cambiar a 100% en pantallas pequeñas */
             }
         }
     </style>
@@ -294,22 +294,25 @@
     <!-- Avatars -->  
     <div class="avatar-container">
         <!-- Avatares clickeables -->
-        <div class="avatar" onclick="selectAvatar('alexis_guidi.png', 'Alexis Guidi')">
+        <div class="avatar" onclick="selectAvatar('alexis_guidi.png', 'Alexis Guidi', this)">
             <img src="./Img/alexis_guidi.png" alt="Alexis Guidi">
         </div>
-        <div class="avatar" onclick="selectAvatar('elias_pignani.png', 'Elias Pignani')">
+        <div class="avatar" onclick="selectAvatar('elias_pignani.png', 'Elias Pignani', this)">
             <img src="./Img/elias_pignani.png" alt="Elias Pignani">
         </div>
-        <div class="avatar" onclick="selectAvatar('georgina_suarez.png', 'Georgina Suarez')">
+        <div class="avatar" onclick="selectAvatar('georgina_suarez.png', 'Georgina Suarez', this)">
             <img src="./Img/georgina_suarez.png" alt="Georgina Suarez">
         </div>
-        <div class="avatar" onclick="selectAvatar('joel_fernandez.png', 'Joel Fernandez')">
+        <div class="avatar" onclick="selectAvatar('alejo_aviles.png', 'Alejo Aviles', this)">
+            <img src="./Img/alejo_aviles.png" alt="Alejo Aviles">
+        </div>
+        <div class="avatar" onclick="selectAvatar('joel_fernandez.png', 'Joel Fernandez', this)">
             <img src="./Img/joel_fernandez.png" alt="Joel Fernandez">
         </div>
-        <div class="avatar" onclick="selectAvatar('esperanza_toffalo.png', 'Esperanza Toffalo')">
+        <div class="avatar" onclick="selectAvatar('esperanza_toffalo.png', 'Esperanza Toffalo', this)">
             <img src="./Img/esperanza_toffalo.png" alt="Esperanza Toffalo">
         </div>
-        <div class="avatar" onclick="selectAvatar('lucas_ponzoni.png', 'Lucas Ponzoni')">
+        <div class="avatar" onclick="selectAvatar('lucas_ponzoni.png', 'Lucas Ponzoni', this)">
             <img src="./Img/lucas_ponzoni.png" alt="Lucas Ponzoni">
         </div>
     </div>
@@ -321,7 +324,6 @@
         </div>
         <div class="online-indicator"></div>
     </div>
-
     <!-- Avatars -->  
     
     <!-- Botón de flecha hacia arriba -->
@@ -395,33 +397,65 @@
     
     <!-- Avatar -->
     <script>
-        function selectAvatar(imgFileName, altText) {
+        function selectAvatar(imgFileName, altText, selectedElement) {
             const imgPath = `./Img/${imgFileName}`;
             const activeAvatar = document.getElementById("active-avatar");
+            const onlineIndicator = document.querySelector(".online-indicator");
+
+            // Cambiar el avatar activo
             activeAvatar.src = imgPath;
             activeAvatar.alt = altText;
-    
+
+            // Cambiar color del indicador a verde
+            onlineIndicator.style.backgroundColor = "#32d554"; // Verde
+
             // Guardar en localStorage
             localStorage.setItem("selectedAvatarImg", imgFileName);
             localStorage.setItem("selectedAvatarAlt", altText);
+
+            // Ocultar todos los avatares
+            const avatars = document.querySelectorAll('.avatar');
+            avatars.forEach(avatar => {
+                avatar.style.display = 'block'; // Mostrar todos los avatares
+            });
+
+            // Ocultar el avatar seleccionado
+            selectedElement.style.display = 'none'; // Ocultar el avatar seleccionado
         }
-    
+
         window.addEventListener("DOMContentLoaded", () => {
             const savedImg = localStorage.getItem("selectedAvatarImg");
             const savedAlt = localStorage.getItem("selectedAvatarAlt");
             const activeAvatar = document.getElementById("active-avatar");
-    
+            const onlineIndicator = document.querySelector(".online-indicator");
+
             if (savedImg && savedAlt) {
                 activeAvatar.src = `./Img/${savedImg}`;
                 activeAvatar.alt = savedAlt;
+
+                // Cambiar color del indicador a verde
+                onlineIndicator.style.backgroundColor = "#32d554"; // Verde
+
+                // Ocultar el avatar guardado
+                const avatars = document.querySelectorAll('.avatar');
+                avatars.forEach(avatar => {
+                    avatar.style.display = 'block'; // Mostrar todos los avatares
+                });
+
+                // Ocultar el avatar guardado
+                const selectedAvatar = [...avatars].find(avatar => avatar.querySelector('img').src.includes(savedImg));
+                if (selectedAvatar) {
+                    selectedAvatar.style.display = 'none'; // Ocultar el avatar guardado
+                }
             } else {
-                // Por defecto, avatar negro
+                // Por defecto, avatar negro y color del indicador en rojo
                 activeAvatar.src = "./Img/avatar-black.png";
                 activeAvatar.alt = "Avatar-selected";
+                onlineIndicator.style.backgroundColor = "red"; // Rojo
             }
         });
     </script>
-    <!-- Avatar -->    
+    <!-- Avatar -->
 
     <!-- Footer -->
     <footer class="center">

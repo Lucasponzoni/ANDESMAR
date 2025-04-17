@@ -427,7 +427,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           .filter(([_, estado]) => estado.seleccionado !== false)
           .map(([_, estado]) => estado.nombre.toLowerCase());
 
-      // Limitar a los últimos 40,000 registros
       const posventaSnapshot = await firebase.database().ref('posventa').limitToLast(40000).once('value');
       const posventaData = posventaSnapshot.val() || {};
 
@@ -443,7 +442,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (ventasEstados.length === 0) return false;
 
           const ultimoEstadoValue = (ventasEstados[0][1] || "").toLowerCase().replace(/[.,;]/g, '');
-          
           return estadosSeleccionados.some(estadoSel => ultimoEstadoValue.includes(estadoSel));
       });
 
@@ -464,34 +462,45 @@ document.addEventListener('DOMContentLoaded', async () => {
           const iconClass = cantidadEstados > 1 ? 'fas fa-history text-success' : 'fas fa-history';
 
           const row = document.createElement('tr');
-// Modifica la parte donde se crea el HTML del row
-row.innerHTML = `
-    <td>
-        <div class="mac-cell mac-cell-posventa">
-            <div class="venta-id">
-                <a href="https://www.mercadolibre.com.ar/ventas/${ventaId}/detalle" target="_blank" style="text-decoration: none; color: #333;">
-                    ${ventaId}
-                </a>
-                <i class="bi bi-clipboard" id="clipboard-${ventaId}" onclick="copyToClipboard('${ventaId}', this)" style="cursor: pointer; font-size: 18px; color: #333;"></i>
-                <i class="${iconClass}" onclick="abrirModalTimeline('${ventaId}')" style="cursor: pointer;"></i>
-            </div>
-            <select class="estado-select" data-venta-id="${ventaId}">
-                <option value="">Selecciona un estado</option>
-                <option value="CONTROL FINALIZADO">CONTROL FINALIZADO</option>
-                <option value="TRANSFERIDO A FACTURACION">TRANSFERIDO A FACTURACION</option>
-                <option value="LLEGO A NOVOGAR">LLEGO A NOVOGAR</option>
-                <option value="SEGUIR RECLAMO EN FORMULARIO">SEGUIR RECLAMO EN FORMULARIO</option>
-                <option value="ENTREGADO CON DEBITO">ENTREGADO CON DEBITO</option>
-            </select>
-            <div class="fecha-venta" style="font-size: 12px; color: #777;">
-                ${venta.ventas.fecha_de_venta}
-            </div>
-        </div>
-    </td>
-    <td style="vertical-align: middle;">${ultimoEstado}</td>
-    <td style="vertical-align: middle;">${ultimaDescripcion}</td>
-`;
+          row.innerHTML = `
+              <td>
+                  <div class="mac-cell mac-cell-posventa" style="position: relative;">
+                      <div class="venta-id">
+                          <a href="https://www.mercadolibre.com.ar/ventas/${ventaId}/detalle" target="_blank" style="text-decoration: none; color: #333;">
+                              ${ventaId}
+                          </a>
+                          <i class="bi bi-clipboard" id="clipboard-${ventaId}" onclick="copyToClipboard('${ventaId}', this)" style="cursor: pointer; font-size: 18px; color: #333;"></i>
+                          <i class="${iconClass}" onclick="abrirModalTimeline('${ventaId}')" style="cursor: pointer;"></i>
+                          <i class="bi bi-plus-circle-fill icon-user-plus" onclick="controlarCaso('${ventaId}', this)"></i>
+                      </div>
+                      <select class="estado-select" data-venta-id="${ventaId}">
+                          <option value="">Selecciona un estado</option>
+                          <option value="CONTROL FINALIZADO">CONTROL FINALIZADO</option>
+                          <option value="TRANSFERIDO A FACTURACION">TRANSFERIDO A FACTURACION</option>
+                          <option value="LLEGO A NOVOGAR">LLEGO A NOVOGAR</option>
+                          <option value="SEGUIR RECLAMO EN FORMULARIO">SEGUIR RECLAMO EN FORMULARIO</option>
+                          <option value="ENTREGADO CON DEBITO">ENTREGADO CON DEBITO</option>
+                      </select>
+                      <div class="fecha-venta" style="font-size: 12px; color: #777;">
+                          ${venta.ventas.fecha_de_venta}
+                      </div>
+                  </div>
+              </td>
+              <td style="vertical-align: middle;">${ultimoEstado}</td>
+              <td style="vertical-align: middle;">${ultimaDescripcion}</td>
+          `;
           tbody.appendChild(row);
+
+          // Cargar el último control y mostrar el avatar
+          const controles = venta.control || {};
+          const ultimoControlKey = Object.keys(controles).pop(); // Obtener la última clave
+          const ultimoControl = controles[ultimoControlKey];
+
+          if (ultimoControl) {
+              const { operador, mensaje } = ultimoControl;
+              const macCell = row.querySelector('.mac-cell-posventa');
+              mostrarBurbujaControl(macCell, operador, mensaje); // Mostrar burbuja con el último control
+          }
 
           // Establecer el valor del select con el estado actual
           const estadoGuardado = venta.ventas.estadoActual; // Cargar el estado actual
@@ -584,6 +593,95 @@ row.innerHTML = `
       searchInput.value = "";
   }
 });
+
+// Definición del array de avatares
+const avatares = [
+    { imagen: 'alexis_guidi.png', nombre: 'Alexis Guidi' },
+    { imagen: 'elias_pignani.png', nombre: 'Elias Pignani' },
+    { imagen: 'georgina_suarez.png', nombre: 'Georgina Suarez' },
+    { imagen: 'alejo_aviles.png', nombre: 'Alejo Aviles' },
+    { imagen: 'joel_fernandez.png', nombre: 'Joel Fernandez' },
+    { imagen: 'esperanza_toffalo.png', nombre: 'Esperanza Toffalo' },
+    { imagen: 'lucas_ponzoni.png', nombre: 'Lucas Ponzoni' }
+];
+
+// Función para obtener la ruta del avatar por nombre
+function obtenerAvatarPorNombre(nombreOperador) {
+    const avatar = avatares.find(av => av.nombre === nombreOperador);
+    return avatar ? `./Img/${avatar.imagen}` : './Img/default_avatar.png'; // Retorna una imagen por defecto si no se encuentra
+}
+
+// Función para controlar el caso
+async function controlarCaso(ventaId, iconElement) {
+  const activeAvatar = document.getElementById("active-avatar");
+  const nombreOperador = activeAvatar.alt; // Obtiene el nombre del avatar activo
+  
+  // Obtener la fecha y hora actual en formato ISO y convertirla en un formato válido para Firebase
+  const fechaHora = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '_'); 
+
+  // Mensaje a mostrar
+  const mensaje = `${nombreOperador}: Lo controle ${new Date().toLocaleString()}`;
+
+  // Pushear datos a Firebase usando fecha y hora como nombre del nodo
+  const controlData = {
+      fechaHora: new Date().toLocaleString(),
+      mensaje: mensaje,
+      operador: nombreOperador
+  };
+
+  await firebase.database().ref(`/posventa/${ventaId}/control/${fechaHora}`).set(controlData);
+
+  // Crear avatar y burbuja de chat en el div correspondiente
+  const macCell = iconElement.closest('.mac-cell-posventa');
+  mostrarBurbujaControl(macCell, nombreOperador, mensaje);
+}
+
+function mostrarBurbujaControl(macCell, nombreOperador, mensaje) {
+  // Eliminar burbujas existentes
+  const burbujasExistentes = macCell.querySelectorAll('.bubble-filaDeDatos');
+  burbujasExistentes.forEach(burbuja => burbuja.remove());
+
+  const burbuja = document.createElement('div');
+  burbuja.className = 'bubble-filaDeDatos'; // Clase base
+
+  const avatarSrc = obtenerAvatarPorNombre(nombreOperador); // Obtener el avatar
+
+  // Crear div del mensaje
+  const mensajeDiv = document.createElement('div');
+  mensajeDiv.className = 'mensaje-filaDeDatos';
+  mensajeDiv.textContent = mensaje;
+
+  // Extraer y evaluar fecha del mensaje
+  const fechaRegex = /(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{1,2}:\d{2}:\d{2})$/;
+  const match = mensaje.match(fechaRegex);
+
+  if (match) {
+    const [_, dia, mes, anio, hora] = match;
+    const fechaMensaje = new Date(`${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T${hora}`);
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const fechaDelMensaje = new Date(fechaMensaje);
+    fechaDelMensaje.setHours(0, 0, 0, 0);
+
+    const diffDias = Math.floor((hoy - fechaDelMensaje) / (1000 * 60 * 60 * 24));
+
+    if (diffDias === 1) {
+      mensajeDiv.classList.add('orange-day');
+    } else if (diffDias >= 2) {
+      mensajeDiv.classList.add('red-day');
+    }
+  }
+
+  // Agregar contenido a la burbuja
+  burbuja.innerHTML = `
+    <img src="${avatarSrc}" alt="${nombreOperador}" class="avatar-filaDeDatos">
+  `;
+  burbuja.appendChild(mensajeDiv);
+
+  macCell.appendChild(burbuja);
+}
 
 // Modifica la función copyToClipboard
 function copyToClipboard(ventaId, iconElement) {
@@ -695,37 +793,58 @@ function abrirModalTimeline(ventaId) {
 }
 // FIN MODAL LINEA DE TIEMPO
 
+// LISTENERS EN TIEMPO REAL
 firebase.database().ref('posventa').on('child_changed', (snapshot) => {
-    const ventaId = snapshot.key;
-    const venta = snapshot.val();
+  const ventaId = snapshot.key;
+  const venta = snapshot.val();
 
-    // Buscar la fila de la venta correspondiente
-    const row = [...document.querySelectorAll('#data-table tbody tr')]
-        .find(tr => tr.querySelector('.estado-select')?.dataset.ventaId === ventaId);
+  // Buscar la fila de la venta correspondiente
+  const row = [...document.querySelectorAll('#data-table tbody tr')]
+      .find(tr => tr.querySelector('.estado-select')?.dataset.ventaId === ventaId);
 
-    if (row && venta.ventas.estadoActual) {
-        const estadoActual = venta.ventas.estadoActual;
-        const estadoSelect = row.querySelector('.estado-select');
+  if (row) {
+      // Actualizar el estado y color de la fila
+      actualizarEstadoFila(row, venta.ventas.estadoActual);
 
-        // Actualizar el select
-        estadoSelect.value = estadoActual;
-
-        // Pintar la fila según el nuevo estado
-        switch (estadoActual) {
-            case "CONTROL FINALIZADO":
-                row.style.backgroundColor = "#c8e6c9"; break;
-            case "TRANSFERIDO A FACTURACION":
-                row.style.backgroundColor = "#bbdefb"; break;
-            case "LLEGO A NOVOGAR":
-                row.style.backgroundColor = "#ffe0b2"; break;
-            case "SEGUIR RECLAMO EN FORMULARIO":
-                row.style.backgroundColor = "#f8bbd0"; break;
-            case "ENTREGADO CON DEBITO":
-                row.style.backgroundColor = "#d1c4e9"; break;
-            default:
-                row.style.backgroundColor = ""; break;
-        }
-    }
+      // Manejar la creación de la burbuja de control
+      manejarBurbujaControl(row, venta.control);
+  }
 });
 
+// Función para actualizar el estado y color de la fila
+function actualizarEstadoFila(row, estadoActual) {
+  if (estadoActual) {
+      const estadoSelect = row.querySelector('.estado-select');
+      estadoSelect.value = estadoActual;
+
+      // Pintar la fila según el nuevo estado
+      switch (estadoActual) {
+          case "CONTROL FINALIZADO":
+              row.style.backgroundColor = "#c8e6c9"; break;
+          case "TRANSFERIDO A FACTURACION":
+              row.style.backgroundColor = "#bbdefb"; break;
+          case "LLEGO A NOVOGAR":
+              row.style.backgroundColor = "#ffe0b2"; break;
+          case "SEGUIR RECLAMO EN FORMULARIO":
+              row.style.backgroundColor = "#f8bbd0"; break;
+          case "ENTREGADO CON DEBITO":
+              row.style.backgroundColor = "#d1c4e9"; break;
+          default:
+              row.style.backgroundColor = ""; break;
+      }
+  }
+}
+
+// Función para manejar la creación de la burbuja de control
+function manejarBurbujaControl(row, controles) {
+  const ultimoControlKey = Object.keys(controles || {}).pop(); // Obtener la última clave
+  const ultimoControl = controles[ultimoControlKey];
+
+  if (ultimoControl) {
+      const { operador, mensaje } = ultimoControl;
+      const macCell = row.querySelector('.mac-cell-posventa');
+      mostrarBurbujaControl(macCell, operador, mensaje); // Mostrar burbuja con el último control
+  }
+}
+// FIN LISTENERS EN TIEMPO REAL
 
