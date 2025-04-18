@@ -486,44 +486,43 @@ document.addEventListener('DOMContentLoaded', async () => {
                       </div>
                   </div>
               </td>
-<td style="vertical-align: middle; font-family: 'Rubik', sans-serif; font-size: 16px; padding: 15px;">
-    <div style="
-        display: inline-block;
-        padding: 10px 16px;
-        border-radius: 12px;
-        background: rgba(245, 245, 245, 0.7);
-        border: 1px solid rgba(200, 200, 200, 0.6);
-        font-weight: 600;
-        font-size: 18px;
-        color: ${venta.ventas['total_(ars)'] < 0 ? 'red' : venta.ventas['total_(ars)'] > 0 ? 'green' : 'orange'};
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-        backdrop-filter: blur(6px);
-    ">
-        ${venta.ventas['total_(ars)'] > 0 
-            ? '$' + venta.ventas['total_(ars)'].toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
-            : venta.ventas['total_(ars)'] < 0 
-                ? '$ -' + Math.abs(venta.ventas['total_(ars)']).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
-                : '<span style="color: orange;">$0</span>'
-        }
-    </div>
+              
+              <td style="vertical-align: middle; font-family: 'Rubik', sans-serif; font-size: 16px; padding: 15px;">
+                  <div style="
+                      display: inline-block;
+                      padding: 10px 16px;
+                      border-radius: 12px;
+                      background: rgba(245, 245, 245, 0.7);
+                      border: 1px solid rgba(200, 200, 200, 0.6);
+                      font-weight: 600;
+                      font-size: 18px;
+                      color: ${venta.ventas['total_(ars)'] < 0 ? 'red' : venta.ventas['total_(ars)'] > 0 ? 'green' : 'orange'};
+                      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+                      backdrop-filter: blur(6px);
+                  ">
+                      ${venta.ventas['total_(ars)'] > 0 
+                          ? '$' + venta.ventas['total_(ars)'].toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
+                          : venta.ventas['total_(ars)'] < 0 
+                              ? '$ -' + Math.abs(venta.ventas['total_(ars)']).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
+                              : '<span style="color: orange;">$0</span>'
+                      }
+                  </div>
 
-    <div style="margin-top: 10px; font-size: 14px; color: #555; line-height: 1.4;">
-        <div>
-          <span style="font-weight: bold; color: #555;">SKU:</span> 
-          <span style="color: #4a6fa5; font-weight: bold">${venta.publicaciones.sku}</span>
-        </div>
-        <div><span style="font-weight: bold;">Cantidad:</span> ${venta.ventas.unidades}</div>
-    </div>
+                  <div style="margin-top: 10px; font-size: 14px; color: #555; line-height: 1.4;">
+                      <div>
+                        <span style="font-weight: bold; color: #555;">SKU:</span> 
+                        <span style="color: #4a6fa5; font-weight: bold">${venta.publicaciones.sku}</span>
+                      </div>
+                      <div><span style="font-weight: bold;">Cantidad:</span> ${venta.ventas.unidades}</div>
+                  </div>
 
-            <div style="margin-top: 6px; font-size: 10px; color: #333; font-style: italic;">
-        ${venta.publicaciones.título_de_la_publicación.length > 60 
-            ? venta.publicaciones.título_de_la_publicación.substring(0, 60) + '...' 
-            : venta.publicaciones.título_de_la_publicación
-        }
-    </div>
-
-
-</td>
+                          <div style="margin-top: 6px; font-size: 10px; color: #333; font-style: italic;">
+                      ${venta.publicaciones.título_de_la_publicación.length > 60 
+                          ? venta.publicaciones.título_de_la_publicación.substring(0, 60) + '...' 
+                          : venta.publicaciones.título_de_la_publicación
+                      }
+                  </div>
+              </td>
 
               <td style="vertical-align: middle;">${ultimoEstado}</td>
               <td style="vertical-align: middle;">
