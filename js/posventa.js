@@ -486,10 +486,56 @@ document.addEventListener('DOMContentLoaded', async () => {
                       </div>
                   </div>
               </td>
+<td style="vertical-align: middle; font-family: 'Rubik', sans-serif; font-size: 16px; padding: 15px;">
+    <div style="
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 12px;
+        background: rgba(245, 245, 245, 0.7);
+        border: 1px solid rgba(200, 200, 200, 0.6);
+        font-weight: 600;
+        font-size: 18px;
+        color: ${venta.ventas['total_(ars)'] < 0 ? 'red' : venta.ventas['total_(ars)'] > 0 ? 'green' : 'orange'};
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(6px);
+    ">
+        ${venta.ventas['total_(ars)'] > 0 
+            ? '$' + venta.ventas['total_(ars)'].toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
+            : venta.ventas['total_(ars)'] < 0 
+                ? '$ -' + Math.abs(venta.ventas['total_(ars)']).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
+                : '<span style="color: orange;">$0</span>'
+        }
+    </div>
+
+    <div style="margin-top: 10px; font-size: 14px; color: #555; line-height: 1.4;">
+        <div>
+          <span style="font-weight: bold; color: #555;">SKU:</span> 
+          <span style="color: #4a6fa5; font-weight: bold">${venta.publicaciones.sku}</span>
+        </div>
+        <div><span style="font-weight: bold;">Cantidad:</span> ${venta.ventas.unidades}</div>
+    </div>
+
+            <div style="margin-top: 6px; font-size: 10px; color: #333; font-style: italic;">
+        ${venta.publicaciones.título_de_la_publicación.length > 60 
+            ? venta.publicaciones.título_de_la_publicación.substring(0, 60) + '...' 
+            : venta.publicaciones.título_de_la_publicación
+        }
+    </div>
+
+
+</td>
+
               <td style="vertical-align: middle;">${ultimoEstado}</td>
-              <td style="vertical-align: middle;">${ultimaDescripcion}</td>
+              <td style="vertical-align: middle;">
+                ${ultimaDescripcion}
+                <i class="bi bi-plus-circle-fill icon-user-plus" onclick="abrirSkillsModalFilas('${ventaId}')"></i>
+                <div class="div-skills-${ventaId}" style="margin-top: 10px;"></div>
+              </td>
+              <td style="vertical-align: middle;"></td>
           `;
           tbody.appendChild(row);
+
+          cargarSkillsDeFila(ventaId)
 
           // Cargar el último control y mostrar el avatar
           const controles = venta.control || {};
@@ -715,6 +761,116 @@ function showAlert(message) {
       alertContainer.style.display = 'none';
   }, 3000);
 }
+
+async function abrirSkillsModalFilas(ventaId) {
+  try {
+    const snapshot = await firebase.database().ref('/skills').once('value');
+    const skillsData = snapshot.val() || {};
+
+    const modalBody = document.getElementById("skillsModalFilasBody");
+    modalBody.innerHTML = '';
+
+    Object.entries(skillsData).forEach(([skillKey, skillObj]) => {
+      const badge = document.createElement('span');
+      const skillText = skillObj.text || skillKey;
+
+      badge.textContent = skillText.charAt(0).toUpperCase() + skillText.slice(1);
+      badge.style.backgroundColor = skillObj.backgroundColor;
+      badge.style.color = skillObj.textColor;
+      badge.style.border = `1px solid ${skillObj.textColor}`;
+      badge.style.padding = '8px 12px';
+      badge.style.borderRadius = '8px';
+      badge.style.margin = '5px';
+      badge.style.fontFamily = '"Rubik", sans-serif';
+      badge.style.fontWeight = '600';
+      badge.classList.add('badge');
+      badge.style.cursor = 'pointer';
+
+      // Al hacer clic, agregar a Firebase y renderizar
+      badge.addEventListener('click', async () => {
+        const skillRef = firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`);
+        await skillRef.set(true);
+
+        renderSkillEnFila(skillKey, ventaId, skillObj);
+      });
+
+      modalBody.appendChild(badge);
+    });
+
+    $('#skillsModalFilas').modal('show');
+  } catch (error) {
+    console.error("Error al cargar skills:", error);
+    alert("Error al cargar las skills desde Firebase.");
+  }
+}
+
+function renderSkillEnFila(skillKey, ventaId, estilo = {}) {
+  const targetDiv = document.querySelector(`.div-skills-${ventaId}`);
+  if (!targetDiv) return;
+
+  // Evitar duplicados
+  if (targetDiv.querySelector(`[data-skill="${skillKey}"]`)) return;
+
+  const badge = document.createElement('span');
+  badge.setAttribute('data-skill', skillKey);
+  badge.style.backgroundColor = estilo.backgroundColor || '#ddd';
+  badge.style.color = estilo.textColor || '#000';
+  badge.style.border = `1px solid ${estilo.textColor || '#000'}`;
+  badge.style.padding = '6px 10px';
+  badge.style.borderRadius = '8px';
+  badge.style.margin = '5px';
+  badge.style.display = 'inline-block';
+  badge.style.fontFamily = '"Rubik", sans-serif';
+  badge.style.fontWeight = '500';
+  badge.style.fontSize = '12px';
+
+  badge.textContent = skillKey.charAt(0).toUpperCase() + skillKey.slice(1);
+
+  const removeBtn = document.createElement('span');
+  removeBtn.innerHTML = '&times;';
+  removeBtn.style.marginLeft = '10px';
+  removeBtn.style.cursor = 'pointer';
+  removeBtn.style.fontWeight = 'bold';
+
+  removeBtn.addEventListener('click', () => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¡Esto eliminará el skill!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`).remove();
+        badge.remove();
+      }
+    });
+  });
+
+  badge.appendChild(removeBtn);
+  targetDiv.appendChild(badge);
+}
+
+async function cargarSkillsDeFila(ventaId) {
+  const skillsRef = firebase.database().ref('/skills');
+  const filaSkillsRef = firebase.database().ref(`/posventa/${ventaId}/skills`);
+
+  const [skillsSnap, filaSkillsSnap] = await Promise.all([
+    skillsRef.once('value'),
+    filaSkillsRef.once('value')
+  ]);
+
+  const estilosSkills = skillsSnap.val() || {};
+  const filaSkills = filaSkillsSnap.val() || {};
+
+  for (const skillKey in filaSkills) {
+    const estilo = estilosSkills[skillKey] || {};
+    renderSkillEnFila(skillKey, ventaId, estilo);
+  }
+}
 // FIN RENDERIZADO DE LA TABLA
 
 // MODAL LINEA DE TIEMPO
@@ -808,6 +964,13 @@ firebase.database().ref('posventa').on('child_changed', (snapshot) => {
 
       // Manejar la creación de la burbuja de control
       manejarBurbujaControl(row, venta.control);
+
+      // Skills
+      const skillsContainer = row.querySelector(`.div-skills-${ventaId}`);
+      if (skillsContainer) {
+        skillsContainer.innerHTML = ''; // Limpiar previos
+        cargarSkillsDeFila(ventaId);    // Reutiliza tu función async
+      }
   }
 });
 
@@ -845,6 +1008,74 @@ function manejarBurbujaControl(row, controles) {
       const macCell = row.querySelector('.mac-cell-posventa');
       mostrarBurbujaControl(macCell, operador, mensaje); // Mostrar burbuja con el último control
   }
+}
+
+async function cargarSkillsDeFila(ventaId) {
+  const skillsRef = firebase.database().ref('/skills');
+  const filaSkillsRef = firebase.database().ref(`/posventa/${ventaId}/skills`);
+
+  const [skillsSnap, filaSkillsSnap] = await Promise.all([
+    skillsRef.once('value'),
+    filaSkillsRef.once('value')
+  ]);
+
+  const estilosSkills = skillsSnap.val() || {};
+  const filaSkills = filaSkillsSnap.val() || {};
+
+  for (const skillKey in filaSkills) {
+    const estilo = estilosSkills[skillKey] || {};
+    renderSkillEnFila(skillKey, ventaId, estilo);
+  }
+}
+
+function renderSkillEnFila(skillKey, ventaId, estilo = {}) {
+  const targetDiv = document.querySelector(`.div-skills-${ventaId}`);
+  if (!targetDiv) return;
+
+  // Evitar duplicados
+  if (targetDiv.querySelector(`[data-skill="${skillKey}"]`)) return;
+
+  const badge = document.createElement('span');
+  badge.setAttribute('data-skill', skillKey);
+  badge.style.backgroundColor = estilo.backgroundColor || '#ddd';
+  badge.style.color = estilo.textColor || '#000';
+  badge.style.border = `1px solid ${estilo.textColor || '#000'}`;
+  badge.style.padding = '6px 10px';
+  badge.style.borderRadius = '8px';
+  badge.style.margin = '5px';
+  badge.style.display = 'inline-block';
+  badge.style.fontFamily = '"Rubik", sans-serif';
+  badge.style.fontWeight = '500';
+  badge.style.fontSize = '12px';
+
+  badge.textContent = skillKey.charAt(0).toUpperCase() + skillKey.slice(1);
+
+  const removeBtn = document.createElement('span');
+  removeBtn.innerHTML = '&times;';
+  removeBtn.style.marginLeft = '10px';
+  removeBtn.style.cursor = 'pointer';
+  removeBtn.style.fontWeight = 'bold';
+
+  removeBtn.addEventListener('click', () => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¡Esto eliminará el skill!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`).remove();
+        badge.remove();
+      }
+    });
+  });
+
+  badge.appendChild(removeBtn);
+  targetDiv.appendChild(badge);
 }
 // FIN LISTENERS EN TIEMPO REAL
 
@@ -944,5 +1175,3 @@ function getDarkerColor(hex) {
 
   return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`;
 }
-
-

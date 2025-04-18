@@ -7565,3 +7565,95 @@ img.gray-filter {
   }
   
 /* FIN AVATARS BURBUJAS */
+
+.filtro-menu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 8px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    width: 200px;
+    border-radius: 8px;
+  }
+  
+  .oculto {
+    display: none;
+  }
+  
+  th {
+    position: relative;
+  }
+  
+  #filtro-estado-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+  
+/* Estilo macOS para el dropdown de skills */
+.skill-filter-dropdown .dropdown-menu.custom-skill-menu {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0.3rem 0;
+    z-index: 1050;
+    width: max-content;
+    min-width: 100%;
+    white-space: nowrap;
+    border-radius: 12px 0 0 12px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dcdcdc;
+    backdrop-filter: saturate(180%) blur(20px); /* Estilo macOS */
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+.skill-filter-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border-radius: 8px;
+    text-transform: capitalize;
+}
+
+.skill-filter-dropdown .dropdown-item:hover {
+    background-color: rgba(0, 122, 255, 0.1) !important;
+    color: #007aff !important;
+    border: none !important;
+    cursor: pointer;
+}
+
+.skill-filter-dropdown .dropdown-item input[type="checkbox"] {
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: #007aff ;
+    transform: scale(1.1);
+}
+
+.skill-filter-dropdown .dropdown-item > input {
+    width: auto !important;
+}
+
+.tabla-posventa > thead > tr > th {
+    text-align: center;
+    vertical-align: middle; 
+}
+
+.tabla-posventa > thead > tr > th > .th-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+/* Estilo macOS para el dropdown de skills */
+
+
+

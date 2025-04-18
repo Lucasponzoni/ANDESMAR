@@ -159,21 +159,112 @@
             <span class="sr-only">Cargando...</span>
         </div>   
 
+        <style>
+            .estado-column {
+                width: 170px !important;
+                word-break: break-word;
+            }
+
+            .producto-column {
+                width: 170px !important;
+                word-break: break-word;
+            }
+        
+            .skill-filter-wrapper {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+        
+            .table th {
+                vertical-align: middle;
+            }
+        </style>
+        
         <div class="table-responsive">
-            <table id="data-table" class="table table-striped">
+            <table id="data-table" class="table table-striped tabla-posventa">
                 <thead>
                     <tr>
-                        <th><i class="bi bi-calendar-check-fill"></i> Operacion</th>
-                        <th class="estado-column"><i class="bi bi-geo-alt-fill"></i> Estado</th>
-                        <th><i class="bi bi-person-badge-fill"></i> Descripcion de Estado</th>
+                        <th><i class="bi bi-calendar-check-fill"></i> Operación</th>
+                        <th class="producto-column"><i class="bi bi-cart-check-fill"></i> Compra</th>
+                        <th style="font-size: 12px;" class="estado-column"><i class="bi bi-geo-alt-fill"></i> Estado</th>
+                        <th style="font-size: 12px;">
+                            <div class="skill-filter-wrapper">
+                                <i class="bi bi-info-circle-fill me-1"></i> Descripción de estado
+                                <div class="dropdown skill-filter-dropdown">
+                                    <button id="btn-filtrar-skills" class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Filtrar por skill
+                                    </button>
+                                    <ul id="skills-container" class="dropdown-menu custom-skill-menu mt-1"></ul>
+                                </div>
+                                <button id="clear-skill-filter" class="btn btn-outline-secondary">Limpiar filtro</button>
+                            </div>
+                        </th>
+                        <th><i class="bi bi-diagram-3-fill"></i> Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <!-- Los datos se llenarán aquí dinámicamente -->
                 </tbody>
             </table>
-        </div>
-
+        </div>                 
+        
+        <script>
+            document.getElementById("btn-filtrar-skills").addEventListener("click", () => {
+                const skillSet = new Set();
+        
+                // Recorremos todos los divs que tengan clase que empiece con "div-skills-"
+                document.querySelectorAll('div[class^="div-skills-"]').forEach(div => {
+                    div.querySelectorAll("span[data-skill]").forEach(span => {
+                        skillSet.add(span.getAttribute("data-skill"));
+                    });
+                });
+        
+                // Generar checkboxes en el dropdown
+                const container = document.getElementById("skills-container");
+                container.innerHTML = ""; // Limpia por si ya había algo
+        
+                skillSet.forEach(skill => {
+                    const id = `skill_${skill.replace(/\s+/g, "_")}`;
+                    container.innerHTML += `
+                        <li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" value="${skill}" id="${id}" onchange="aplicarFiltroSkills()"> ${skill}
+                            </label>
+                        </li>
+                    `;
+                });
+            });
+        
+            function aplicarFiltroSkills() {
+                const seleccionados = Array.from(document.querySelectorAll('#skills-container input:checked')).map(cb => cb.value);
+        
+                // Si no hay selección, mostrar todo
+                if (seleccionados.length === 0) {
+                    document.querySelectorAll("tr").forEach(row => row.style.display = "");
+                    return;
+                }
+        
+                document.querySelectorAll("tr").forEach(row => {
+                    const skillDiv = row.querySelector('div[class^="div-skills-"]');
+                    if (!skillDiv) return;
+        
+                    const skillsEnFila = Array.from(skillDiv.querySelectorAll("span[data-skill]")).map(span => span.getAttribute("data-skill"));
+                    const coincide = seleccionados.some(skill => skillsEnFila.includes(skill));
+                    row.style.display = coincide ? "" : "none";
+                });
+            }
+        
+            document.getElementById("clear-skill-filter").addEventListener("click", function() {
+                const checkboxes = document.querySelectorAll('#skills-container input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                aplicarFiltroSkills();
+            });
+        </script> 
+                        
         <style>
             /* Estilos personalizados para el modal */
             .modal-content {
@@ -238,6 +329,19 @@
             </div>
         </div>
 
+        <!-- Modal de Skills en Filas-->
+        <div class="modal fade" id="skillsModalFilas" tabindex="-1" aria-labelledby="skillsModalFilasLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="border-radius: 15px;">
+                <div class="modal-header">
+                <h5 class="modal-title" id="skillsModalFilasLabel">Seleccionar Skills</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="skillsModalFilasBody" style="display: flex; flex-wrap: wrap;"></div>
+            </div>
+            </div>
+        </div>
+  
         <!-- Modal de Skills -->
         <div class="modal fade" id="skillsModal" tabindex="-1" role="dialog" aria-labelledby="skillsModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
@@ -659,6 +763,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <!-- Scripts Bootstrap-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -668,6 +773,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <!-- Bootstrap JS (versión compatible con Bootstrap 5.1.3) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- XLSX -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
