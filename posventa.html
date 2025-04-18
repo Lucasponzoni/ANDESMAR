@@ -150,8 +150,10 @@
             </div>            
         </div>
     </div>
+    </head>
+    <body>
 
-    <!-- Contenedor de tarjetas -->
+            <!-- Contenedor de tarjetas -->
     <div class="container mt-5" id="cards-container">                   
         
         <div class="spinner-border spinner-border37892" role="status" id="spinner">
@@ -264,42 +266,6 @@
                 aplicarFiltroSkills();
             });
         </script> 
-                        
-        <style>
-            /* Estilos personalizados para el modal */
-            .modal-content {
-                border-radius: 0.5rem;
-            }
-    
-            /* Estilos para la alerta personalizada */
-            .custom-alert {
-                background-color: #e0f7fa;
-                border: 1px solid #b2ebf2;
-                padding: 20px;
-                border-radius: 0.5rem;
-                position: relative;
-                margin-bottom: 20px;
-            }
-    
-            .custom-alert i {
-                font-size: 24px;
-                position: absolute;
-                top: 15px;
-                left: 15px;
-                color: #007bff;
-            }
-    
-            .badge {
-                background-color: #007bff;
-                color: white;
-                margin-left: 10px;
-                font-size: 14px;
-                border-radius: 0.25rem;
-                padding: 0.25em 0.5em;
-            }
-        </style>
-    </head>
-    <body>
     
         <!-- Modal de Importación -->
         <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
@@ -328,6 +294,7 @@
                 </div>
             </div>
         </div>
+        <!-- Fin Modal de Importación -->
 
         <!-- Modal de Skills en Filas-->
         <div class="modal fade" id="skillsModalFilas" tabindex="-1" aria-labelledby="skillsModalFilasLabel" aria-hidden="true">
@@ -341,6 +308,7 @@
             </div>
             </div>
         </div>
+        <!-- Fin Modal de Skills en Filas -->
   
         <!-- Modal de Skills -->
         <div class="modal fade" id="skillsModal" tabindex="-1" role="dialog" aria-labelledby="skillsModalLabel" aria-hidden="true">
