@@ -870,6 +870,7 @@ function createBadge(skillText, backgroundColor, textColor, skillId) {
   badge.textContent = skillText.charAt(0).toUpperCase() + skillText.slice(1); // Capitalizar
   badge.style.backgroundColor = backgroundColor;
   badge.style.color = textColor;
+  badge.style.border = `1px solid ${textColor}`;
   badge.style.padding = '8px 12px';
   badge.style.borderRadius = '8px';
   badge.style.margin = '5px';
