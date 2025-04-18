@@ -412,6 +412,54 @@ firebase.initializeApp({
 }
 
 // RENDERIZADO DE LA TABLA
+function contarFilasSinControl(ventasFiltradas) {
+  // Contador total de filas
+  let totalFilas = 0;
+  // Contador para filas que tienen el green-day
+  let filasGreenDay = 0;
+
+  ventasFiltradas.forEach(([ventaId, venta]) => {
+      totalFilas += 1; // Incrementar total de filas
+
+      // Verificar si hay un mensaje en la venta
+      const mensajes = venta.control || {}; // Asegúrate de que esto es correcto
+      const ultimoControlKey = Object.keys(mensajes).pop(); // Obtener la última clave
+      const ultimoControl = mensajes[ultimoControlKey];
+
+      if (ultimoControl) {
+          const mensajeTexto = ultimoControl.mensaje; // Asegúrate de que esta propiedad existe
+          const fechaRegex = /(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{1,2}:\d{2}:\d{2})$/;
+          const match = mensajeTexto.match(fechaRegex);
+
+          if (match) {
+              const [_, dia, mes, anio, hora] = match;
+              const fechaMensaje = new Date(`${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T${hora}`);
+              const hoy = new Date();
+              hoy.setHours(0, 0, 0, 0);
+              const fechaDelMensaje = new Date(fechaMensaje);
+              fechaDelMensaje.setHours(0, 0, 0, 0);
+              const diffDias = Math.floor((hoy - fechaDelMensaje) / (1000 * 60 * 60 * 24));
+
+              // Contar filas con green-day
+              if (diffDias === 0) { // Si es el mismo día
+                  filasGreenDay += 1;
+              }
+          }
+      }
+  });
+
+  // Calcular filas sin controlar
+  const filasSinControl = totalFilas - filasGreenDay;
+
+  // Actualizar el botón 'sinRevisar'
+  const sinRevisarBtn = document.getElementById('sinRevisar');
+  sinRevisarBtn.innerHTML = `
+      <i class="bi bi-exclamation-circle-fill" style="color: orange;"></i> 
+      Sin Control: <span style="color: red; font-weight: bold;">${filasSinControl}</span>
+  `;
+  sinRevisarBtn.title = `Filas sin controlar: ${filasSinControl}`; // Actualizar el título
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const spinner = document.getElementById('spinner');
   const searchInput = document.getElementById('searchFacturacion');
@@ -486,7 +534,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                       </div>
                   </div>
               </td>
-              
+
               <td style="vertical-align: middle; font-family: 'Rubik', sans-serif; font-size: 16px; padding: 15px;">
                   <div style="
                       display: inline-block;
@@ -535,6 +583,20 @@ document.addEventListener('DOMContentLoaded', async () => {
           tbody.appendChild(row);
 
           cargarSkillsDeFila(ventaId)
+
+          // Llamar a la función para contar filas sin control
+          contarFilasSinControl(ventasFiltradas);
+
+          // Después de que se haya completado la carga de la tabla
+          const cantidadFilas = ventasFiltradas.length; // Obtener la cantidad de filas
+          const promedioBtn = document.getElementById('promedioBtn');
+
+          // Actualizar el texto y el icono del botón
+          promedioBtn.innerHTML = `
+              <i class="bi bi-bar-chart-line-fill"></i> 
+              Cantidad de filas <span style="color: red; font-weight: bold;">${cantidadFilas}</span>
+          `;
+          promedioBtn.title = `Promedio Despacho: ${cantidadFilas} filas`;
 
           // Cargar el último control y mostrar el avatar
           const controles = venta.control || {};

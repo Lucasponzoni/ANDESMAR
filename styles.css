@@ -4001,6 +4001,20 @@ div .form-check {
     z-index: 1000;
 }
 
+#sinRevisar {
+    right: 65px;
+    bottom: 60px;
+    position: fixed;
+    background-color: #f9f9f9;
+    color: #2c3e50; 
+    border: 1px solid #bdc3c7; 
+    border-radius: 8px; 
+    padding: 0.4rem 0.8rem; 
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
+    white-space: nowrap; 
+    z-index: 1000;
+}
+
 /* TRANSPORTE EN TABLAS */
 .img-transporte{
     width: 120px;
