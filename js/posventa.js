@@ -848,3 +848,100 @@ function manejarBurbujaControl(row, controles) {
 }
 // FIN LISTENERS EN TIEMPO REAL
 
+// Cargar skills desde Firebase al abrir el modal
+$('#skillsModal').on('show.bs.modal', function () {
+  const skillsContainer = document.getElementById('skillsContainer');
+  const spinner = document.getElementById('spinner');
+  skillsContainer.innerHTML = ''; // Limpiar el contenedor
+  spinner.style.display = 'block'; // Mostrar spinner
+
+  firebase.database().ref('/skills').once('value').then(snapshot => {
+      snapshot.forEach(childSnapshot => {
+          const skillData = childSnapshot.val();
+          createBadge(skillData.text, skillData.backgroundColor, skillData.textColor, childSnapshot.key);
+      });
+      spinner.style.display = 'none'; // Ocultar spinner
+  });
+});
+
+// Función para crear un badge
+function createBadge(skillText, backgroundColor, textColor, skillId) {
+  const badge = document.createElement('span');
+  badge.textContent = skillText.charAt(0).toUpperCase() + skillText.slice(1); // Capitalizar
+  badge.style.backgroundColor = backgroundColor;
+  badge.style.color = textColor;
+  badge.style.padding = '8px 12px';
+  badge.style.borderRadius = '8px';
+  badge.style.margin = '5px';
+  badge.style.fontFamily = '"Rubik", sans-serif'; // Aplicar la fuente
+  badge.style.fontWeight = '600'; // Peso de la fuente
+  badge.classList.add('badge');
+
+  // Crear el botón de eliminar
+  const removeButton = document.createElement('span');
+  removeButton.innerHTML = '&times;'; // "X" para eliminar
+  removeButton.style.cursor = 'pointer';
+  removeButton.style.marginLeft = '10px';
+  
+  removeButton.addEventListener('click', function () {
+      Swal.fire({
+          title: '¿Estás seguro?',
+          text: "¡Esto eliminará el skill!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, eliminar',
+          cancelButtonText: 'Cancelar'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              // Eliminar de Firebase
+              firebase.database().ref('/skills/' + skillId).remove();
+              // Eliminar el badge del DOM
+              badge.remove();
+          }
+      });
+  });
+
+  badge.appendChild(removeButton);
+  document.getElementById('skillsContainer').appendChild(badge);
+}
+
+// Agregar nuevo skill
+document.getElementById('addSkuButtonPlaceIt').addEventListener('click', function() {
+  const skillInput = document.getElementById('newSkuInputPlaceIt');
+  const colorPicker = document.getElementById('colorPicker');
+
+  const skillText = skillInput.value.trim().toLowerCase(); // Convertir a minúsculas
+  const selectedColor = colorPicker.value;
+
+  if (skillText) {
+      // Calcular el color de texto (más oscuro)
+      const textColor = getDarkerColor(selectedColor);
+
+      // Crear un badge
+      createBadge(skillText.charAt(0).toUpperCase() + skillText.slice(1), selectedColor, textColor, skillText); // Mostrar en mayúsculas
+
+      // Pushear a Firebase utilizando el nombre del skill como nodo
+      firebase.database().ref('/skills/' + skillText).set({
+          text: skillText,
+          backgroundColor: selectedColor,
+          textColor: textColor
+      });
+
+      // Limpiar el input
+      skillInput.value = '';
+  }
+});
+
+// Función para obtener un color más oscuro
+function getDarkerColor(hex) {
+  const color = hex.replace('#', '');
+  const r = parseInt(color.substring(0, 2), 16) * 0.5;
+  const g = parseInt(color.substring(2, 4), 16) * 0.5;
+  const b = parseInt(color.substring(4, 6), 16) * 0.5;
+
+  return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`;
+}
+
+
