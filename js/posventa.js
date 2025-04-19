@@ -1204,9 +1204,11 @@ function createBadge(skillText, backgroundColor, textColor, skillId) {
 document.getElementById('addSkuButtonPlaceIt').addEventListener('click', function() {
   const skillInput = document.getElementById('newSkuInputPlaceIt');
   const colorPicker = document.getElementById('colorPicker');
+  const descriptionInput = document.getElementById('skillDescription'); // Obtener el textarea
 
   const skillText = skillInput.value.trim().toLowerCase(); // Convertir a minúsculas
   const selectedColor = colorPicker.value;
+  const description = descriptionInput.value.trim().toLowerCase(); // Obtener descripción y convertir a minúsculas
 
   if (skillText) {
       // Calcular el color de texto (más oscuro)
@@ -1219,11 +1221,13 @@ document.getElementById('addSkuButtonPlaceIt').addEventListener('click', functio
       firebase.database().ref('/skills/' + skillText).set({
           text: skillText,
           backgroundColor: selectedColor,
-          textColor: textColor
+          textColor: textColor,
+          descripcion: description 
       });
 
-      // Limpiar el input
+      // Limpiar los inputs
       skillInput.value = '';
+      descriptionInput.value = ''; 
   }
 });
 
