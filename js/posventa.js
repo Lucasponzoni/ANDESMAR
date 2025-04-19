@@ -576,8 +576,53 @@ document.addEventListener('DOMContentLoaded', async () => {
                       }
                   </div>
               </td>
+              <td style="vertical-align: middle; font-family: 'Rubik', sans-serif;">
+                ${ultimoEstado}
+                ${venta.comentarios && venta.comentarios.numeroCaso && venta.comentarios.vencimientoDevolucion ? (() => {
+                    const vencimiento = venta.comentarios.vencimientoDevolucion || "No disponible";
+                    const numeroCaso = venta.comentarios.numeroCaso || "No disponible";
+                    const ventaId = venta.id || "No disponible";
 
-              <td style="vertical-align: middle;">${ultimoEstado}</td>
+                    const [dia, mes, anio] = vencimiento.split('/').map(n => parseInt(n));
+                    const fechaVencimiento = new Date(anio, mes - 1, dia);
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    const diffTime = fechaVencimiento.getTime() - hoy.getTime();
+                    const diffDias = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                    let divStyle = "background-color: #e8f5e9; border: 1px solid #c8e6c9;";
+                    let estadoTexto = `<span style='color: #4caf50; font-weight: bold;'>Faltan ${diffDias} día(s)</span>`;
+
+                    if (diffDias === 0) {
+                        divStyle = "background-color: #fff3e0; border: 1px solid #ffe0b2;";
+                        estadoTexto = `<span style='color: #fb8c00; font-weight: bold;'>🚨 VENCE HOY</span>`;
+                    } else if (diffDias < 0) {
+                        divStyle = "background-color: #ffebee; border: 1px solid #ffcdd2;";
+                        estadoTexto = `<span style='color: #e53935; font-weight: bold;'>❌ PLAZO VENCIDO hace ${Math.abs(diffDias)} día(s)</span>`;
+                    }
+
+                    return `
+                        <div onclick="handleDivClick('${ventaId}', '${vencimiento}', '${numeroCaso}', \`${estadoTexto}\`)" style="
+                            margin-top: 10px;
+                            ${divStyle}
+                            border-radius: 8px;
+                            padding: 12px 16px;
+                            font-size: 14px;
+                            font-weight: normal;
+                            color: #333;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                            transition: background-color 0.3s;
+                            cursor: pointer;
+                        ">
+                            <strong style="color: #1976d2;">📂 Reclamado en caso ${numeroCaso}</strong><br>
+                            <span style="color: #555;">🕒 vence ${vencimiento}</span>
+                            <div style="font-size: 12px; margin-top: 6px;">
+                                ${estadoTexto}
+                            </div>
+                        </div>
+                    `;
+                })() : ''}
+              </td>
               <td style="vertical-align: middle;">
                 ${ultimaDescripcion}
                 <i class="bi bi-plus-circle-fill icon-user-plus" onclick="abrirSkillsModalFilas('${ventaId}')"></i>
@@ -585,9 +630,9 @@ document.addEventListener('DOMContentLoaded', async () => {
               </td>
               <td style="vertical-align: middle;">
                   <i class="bi bi-chat-quote-fill" onclick="abrirModalComentario('${ventaId}', this)" style="cursor: pointer; color: ${venta.comentarios ? '#38B34DFF' : 'grey'}; font-size: 24px;"></i>
-                  <i class="bi bi-hammer ml-1" style="cursor: pointer; color: #4a6fa5; font-size: 24px;"></i>
-              </td>
-          `;
+<i class="bi bi-hammer ml-1" style="cursor: pointer; color: #4a6fa5; font-size: 24px;"
+   onclick="copyHammerData('${ventaId}', ${venta.comentarios ? `'${venta.comentarios.operacion}'` : "'No disponible'"}, '${venta.comentarios ? venta.comentarios.numeroCaso : "No disponible"}', '${venta.comentarios ? venta.comentarios.vencimientoDevolucion : "No disponible"}', '${ultimoEstado}', '${ultimaDescripcion}', '${venta.publicaciones.sku}', '${venta.ventas.unidades}', ${venta.ventas['total_(ars)']})"></i>
+                     `;
           tbody.appendChild(row);
 
           cargarSkillsDeFila(ventaId)
@@ -711,6 +756,128 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+window.handleDivClick = function(ventaId, vencimiento, numeroCaso, estadoTexto) {
+  const cleanEstado = estadoTexto.replace(/<[^>]*>?/gm, ''); // Elimina tags HTML
+  const alertMessage = `📝 Copiado:\nOperación ${ventaId}, plazo de vencimiento ${vencimiento}, reclamado en el caso ${numeroCaso}, estado actual: ${cleanEstado}`;
+  
+  navigator.clipboard.writeText(alertMessage).then(() => {
+      showAlert(alertMessage); // Asegurate de tener showAlert definido
+  }).catch(err => {
+      console.error('Error al copiar al portapapeles: ', err);
+  });
+};
+
+// Función para copiar datos al portapapeles al hacer clic en el ícono de hammer
+async function copyHammerData(ventaId, operacion, numeroCaso, vencimientoDevolucion, estadoActual, ultimaDescripcion, sku, unidades, total) {
+  // Obtener el nombre del operador
+  const activeAvatar = document.getElementById("active-avatar");
+  const nombreOperador = activeAvatar ? activeAvatar.alt : "Operador desconocido";
+
+  // Obtener la fecha del día
+  const fechaHoy = new Date();
+  const opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' };
+  const fechaFormateada = fechaHoy.toLocaleDateString('es-AR', opcionesFecha);
+
+  // Formateo del total en pesos argentinos
+  const totalFormateado = total ? total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }) : "$0,00";
+  let estadoCobro;
+
+  if (total === 0) {
+      estadoCobro = "DINERO DEBITADO";
+  } else if (total < 0) {
+      estadoCobro = "SE COBRÓ RETORNO DE LA DEVOLUCIÓN A NOVOGAR";
+  } else {
+      estadoCobro = "DINERO ACREDITADO";
+  }
+
+  // Obtener skills activas del ventaId
+  const activeSkills = await getActiveSkills(ventaId);
+  const skills = await getSkillsDescriptions(activeSkills); // Obtener descripciones de skills
+
+  let skillsMensaje = '';
+  if (skills.length > 0) {
+      skillsMensaje += `DETALLES POSVENTA:\n`;
+      skills.forEach(skill => {
+          const skillText = skill.text || "Sin nombre"; // Valor por defecto si text es undefined
+          const skillDescripcion = skill.descripcion || "Sin descripción"; // Valor por defecto si descripcion es undefined
+
+          skillsMensaje += `${skillText.toUpperCase()}: ${skillDescripcion.charAt(0).toUpperCase() + skillDescripcion.slice(1)}\n`;
+      });
+      skillsMensaje += `\n`;
+  }
+
+  // Construir el mensaje base
+  let mensaje = `Venta ID: ${ventaId}\n\n` +
+                `ESTADO:\n` +
+                `Estado Actual: ${estadoActual.charAt(0).toUpperCase() + estadoActual.slice(1).toLowerCase()}\n` +
+                `Descripción: ${ultimaDescripcion.charAt(0).toUpperCase() + ultimaDescripcion.slice(1).toLowerCase()}\n\n` +
+                `PRODUCTO: ${sku}\n` +
+                `CANTIDAD: X ${unidades} u.\n` +
+                `COBRO HASTA LA REVISIÓN: ${totalFormateado} (${estadoCobro})\n\n` +
+                skillsMensaje;
+
+  // Verificar si hay comentarios disponibles
+  const comentariosDisponibles = [operacion, numeroCaso, vencimientoDevolucion].some(comment => comment && comment !== "No disponible");
+
+  if (comentariosDisponibles) {
+      mensaje += `COMENTARIOS:\n` +
+                 `Comentarios: ${operacion ? operacion.charAt(0).toUpperCase() + operacion.slice(1).toLowerCase() : "No disponible"}\n` +
+                 `Número de Caso: ${numeroCaso ? numeroCaso.charAt(0).toUpperCase() + numeroCaso.slice(1).toLowerCase() : "No disponible"}\n` +
+                 `Vencimiento Devolución: ${vencimientoDevolucion ? vencimientoDevolucion.charAt(0).toUpperCase() + vencimientoDevolucion.slice(1).toLowerCase() : "No disponible"}\n\n`;
+  }
+
+  // Agregar "REVISADO POR" al final del mensaje
+  mensaje += `\nREVISADO POR: ${nombreOperador} - FECHA: ${fechaFormateada}\n`;
+
+  // Copiar al portapapeles y mostrar el alert
+  try {
+      await navigator.clipboard.writeText(mensaje);
+      showAlert(`📝 Copiado:\n${mensaje}`);
+  } catch (err) {
+      console.error('Error al copiar al portapapeles: ', err);
+  }
+}
+
+// Función para obtener las skills activas desde Firebase
+async function getActiveSkills(ventaId) {
+  const activeSkills = [];
+  const skillsRef = firebase.database().ref(`/posventa/${ventaId}/skills`);
+  const snapshot = await skillsRef.once('value');
+
+  if (snapshot.exists()) {
+      snapshot.forEach(childSnapshot => {
+          const skillName = childSnapshot.key; // Nombre de la skill
+          const isActive = childSnapshot.val(); // Valor booleano
+          if (isActive) {
+              activeSkills.push(skillName);
+          }
+      });
+  }
+
+  return activeSkills;
+}
+
+// Función para obtener las descripciones de las skills desde Firebase
+async function getSkillsDescriptions(activeSkills) {
+  const skillsDescriptions = [];
+  const skillsRef = firebase.database().ref('/skills');
+
+  const snapshot = await skillsRef.once('value');
+  snapshot.forEach(childSnapshot => {
+      const skillData = childSnapshot.val();
+      const skillName = childSnapshot.key;
+
+      if (activeSkills.includes(skillName)) {
+          skillsDescriptions.push({
+              text: skillName,
+              descripcion: skillData.descripcion || "Sin descripción" // Valor por defecto
+          });
+      }
+  });
+
+  return skillsDescriptions;
+}
+
 // Definición del array de avatares
 const avatares = [
     { imagen: 'alexis_guidi.png', nombre: 'Alexis Guidi' },
@@ -730,7 +897,12 @@ function obtenerAvatarPorNombre(nombreOperador) {
 
 async function controlarCaso(ventaId, iconElement) {
   const activeAvatar = document.getElementById("active-avatar");
+  const clienteElement = document.getElementById(`cliente-posventa-${ventaId}`);
   const nombreOperador = activeAvatar.alt;
+
+  // Obtener el número del cliente, o asignar "NO FACTURADO" si no existe
+  const numeroClienteElement = clienteElement ? clienteElement.querySelector("#nombre-cliente") : null;
+  const numeroCliente = numeroClienteElement ? numeroClienteElement.innerText : "NO FACTURADO";
 
   const fecha = new Date();
   const dia = String(fecha.getDate()).padStart(2, '0');
@@ -743,11 +915,14 @@ async function controlarCaso(ventaId, iconElement) {
   const fechaHoraFormateada = `${dia}/${mes}/${anio}, ${horas}:${minutos}:${segundos}`;
 
   const mensaje = `${nombreOperador}: Lo controle ${fechaHoraFormateada}`;
+  const mensajeMeli = `${mensaje} - CLIENTE: ${numeroCliente}`;
+
+  showAlert(`${mensajeMeli}`);
 
   const controlData = {
-    fechaHora: fechaHoraFormateada,
-    mensaje: mensaje,
-    operador: nombreOperador
+      fechaHora: fechaHoraFormateada,
+      mensaje: mensaje,
+      operador: nombreOperador
   };
 
   // Timestamp ISO seguro como nombre de nodo
@@ -757,6 +932,14 @@ async function controlarCaso(ventaId, iconElement) {
 
   const macCell = iconElement.closest('.mac-cell-posventa');
   mostrarBurbujaControl(macCell, nombreOperador, mensaje);
+
+  // Copiar el número de cliente al portapapeles
+  try {
+      await navigator.clipboard.writeText(mensajeMeli);
+      console.log(`"${mensajeMeli}" copiado al portapapeles.`);
+  } catch (err) {
+      console.error('Error al copiar el número de cliente: ', err);
+  }
 }
 
 function mostrarBurbujaControl(macCell, nombreOperador, mensaje) {
@@ -1057,11 +1240,11 @@ function buscarClientePosventa(venta, ventaId) {
 
     } else {
       divCliente.className = "clientePosventa-rojo";
-      divCliente.innerHTML = `NO FACTURADO`;
+      divCliente.innerHTML = `NO FACTURADO <i class="bi bi-exclamation-circle-fill"></i>`;
     }
   }).catch((error) => {
     divCliente.className = "clientePosventa-rojo";
-    divCliente.innerHTML = `NO FACTURADO`;
+    divCliente.innerHTML = `ERROR <i class="bi bi-exclamation-triangle-fill"></i>`;
     console.error("Error al buscar cliente en Firebase:", error);
   });
 }
@@ -1431,3 +1614,24 @@ function contarFilasSinControlDesdeDOM() {
   sinRevisarBtn.title = `Filas sin controlar: ${filasSinControl}`; // Actualizar el título
 }
 // FIN CONTAR FILAS SIN CONTROL
+
+    // Función para inicializar el contador al cargar las filas
+    function initializeContador() {
+      const filas = document.querySelectorAll('td'); // Selecciona todas las filas
+      filas.forEach(fila => {
+          const estado = fila.querySelector('div'); // Busca el div dentro de la fila
+          if (estado) {
+              const textoEstado = estado.innerHTML; // Obtiene el contenido del div
+              if (textoEstado.includes('Vence HOY') || textoEstado.includes('PLAZO VENCIDO')) {
+                  contadorVencidos++; // Incrementa el contador
+              }
+          }
+      });
+
+      // Actualiza el contador en el botón al cargar
+      const contadorBadge = document.getElementById('contadorvencidosButton');
+      contadorBadge.innerHTML = contadorVencidos > 0 ? contadorVencidos : '0';
+      if (contadorVencidos === 0) {
+          contadorBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; // Restaura el icono de carga si no hay vencidos
+      }
+  }
