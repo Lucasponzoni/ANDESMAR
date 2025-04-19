@@ -581,7 +581,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${venta.comentarios && venta.comentarios.numeroCaso && venta.comentarios.vencimientoDevolucion ? (() => {
                     const vencimiento = venta.comentarios.vencimientoDevolucion || "No disponible";
                     const numeroCaso = venta.comentarios.numeroCaso || "No disponible";
-                    const ventaId = venta.id || "No disponible";
+                    const ventaId = venta.ventas._de_venta || "No disponible";
 
                     const [dia, mes, anio] = vencimiento.split('/').map(n => parseInt(n));
                     const fechaVencimiento = new Date(anio, mes - 1, dia);
@@ -758,7 +758,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 window.handleDivClick = function(ventaId, vencimiento, numeroCaso, estadoTexto) {
   const cleanEstado = estadoTexto.replace(/<[^>]*>?/gm, ''); // Elimina tags HTML
-  const alertMessage = `📝 Copiado:\nOperación ${ventaId}, plazo de vencimiento ${vencimiento}, reclamado en el caso ${numeroCaso}, estado actual: ${cleanEstado}`;
+  const alertMessage = `📝:\nOperación ${ventaId}, plazo de vencimiento ${vencimiento}, reclamado en el caso ${numeroCaso}, estado actual: ${cleanEstado}`;
   
   navigator.clipboard.writeText(alertMessage).then(() => {
       showAlert(alertMessage); // Asegurate de tener showAlert definido
