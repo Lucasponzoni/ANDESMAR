@@ -580,7 +580,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               </td>
               <td style="vertical-align: middle;">
                   <i class="bi bi-chat-quote-fill" onclick="abrirModalComentario('${ventaId}', this)" style="cursor: pointer; color: ${venta.comentarios ? '#38B34DFF' : 'grey'}; font-size: 24px;"></i>
-                  <i class="bi bi-hammer" style="cursor: pointer; color: #4a6fa5; font-size: 24px;"></i>
+                  <i class="bi bi-hammer ml-1" style="cursor: pointer; color: #4a6fa5; font-size: 24px;"></i>
               </td>
           `;
           tbody.appendChild(row);
