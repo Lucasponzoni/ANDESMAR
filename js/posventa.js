@@ -725,20 +725,29 @@ async function controlarCaso(ventaId, iconElement) {
   const activeAvatar = document.getElementById("active-avatar");
   const nombreOperador = activeAvatar.alt; // Obtiene el nombre del avatar activo
   
-  // Obtener la fecha y hora actual en formato ISO y convertirla en un formato válido para Firebase
-  const fechaHora = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '_'); 
+  // Obtener la fecha y hora actual en el formato deseado
+  const fecha = new Date();
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses comienzan desde 0
+  const anio = fecha.getFullYear();
+  const horas = String(fecha.getHours()).padStart(2, '0');
+  const minutos = String(fecha.getMinutes()).padStart(2, '0');
+  const segundos = String(fecha.getSeconds()).padStart(2, '0');
+
+  // Formato de fecha y hora
+  const fechaHoraFormateada = `${dia}/${mes}/${anio}, ${horas}:${minutos}:${segundos}`;
 
   // Mensaje a mostrar
-  const mensaje = `${nombreOperador}: Lo controle ${new Date().toLocaleString()}`;
+  const mensaje = `${nombreOperador}: Lo controle ${fechaHoraFormateada}`;
 
   // Pushear datos a Firebase usando fecha y hora como nombre del nodo
   const controlData = {
-      fechaHora: new Date().toLocaleString(),
+      fechaHora: fechaHoraFormateada,
       mensaje: mensaje,
       operador: nombreOperador
   };
 
-  await firebase.database().ref(`/posventa/${ventaId}/control/${fechaHora}`).set(controlData);
+  await firebase.database().ref(`/posventa/${ventaId}/control/${fechaHoraFormateada}`).set(controlData);
 
   // Crear avatar y burbuja de chat en el div correspondiente
   const macCell = iconElement.closest('.mac-cell-posventa');
