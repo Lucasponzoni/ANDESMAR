@@ -909,8 +909,7 @@ const cpsPlaceIt = [
         const cupon = ordenPublica.substring(0, 13); 
         const autorizacion = ordenPublica.substring(ordenPublica.length - 4); 
 
-        const precioVenta = parseFloat(data[i].precio_venta === "0.0" ? (data[i].precio_producto * data[i].cantidad) : data[i].precio_venta);
-        const cantidad = parseFloat(data[i].cantidad);
+        const precioVenta = parseFloat(data[i].precio_venta * data[i].cantidad);
         const montoCobrado = parseFloat(data[i].monto_cobrado);
         const equivalencia_puntos_pesos = parseFloat(data[i].equivalencia_puntos_pesos);
 
