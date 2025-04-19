@@ -578,7 +578,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <i class="bi bi-plus-circle-fill icon-user-plus" onclick="abrirSkillsModalFilas('${ventaId}')"></i>
                 <div class="div-skills-${ventaId}" style="margin-top: 10px;"></div>
               </td>
-              <td style="vertical-align: middle;"></td>
+              <td style="vertical-align: middle;">
+                  <i class="bi bi-chat-quote-fill" onclick="abrirModalComentario('${ventaId}', this)" style="cursor: pointer; color: ${venta.comentarios ? '#38B34DFF' : 'grey'}; font-size: 24px;"></i>
+              </td>
           `;
           tbody.appendChild(row);
 
@@ -932,6 +934,81 @@ async function cargarSkillsDeFila(ventaId) {
     renderSkillEnFila(skillKey, ventaId, estilo);
   }
 }
+
+function abrirModalComentario(ventaId, iconElement) {
+  const comentarioModal = new bootstrap.Modal(document.getElementById('comentarioModal'));
+  const ventaIdInput = document.getElementById('ventaIdInput'); 
+  const comentarioOperacion = document.getElementById('comentarioOperacion'); 
+  const numeroCaso = document.getElementById('numeroCaso');
+  const vencimientoDevolucion = document.getElementById('vencimientoDevolucion'); 
+
+  // Asignar el ID de la venta al campo correspondiente
+  ventaIdInput.value = ventaId;
+
+  // Limpiar los campos antes de cargar nuevos datos
+  comentarioOperacion.value = '';
+  numeroCaso.value = '';
+  vencimientoDevolucion.value = ''; // Limpiar el campo de vencimiento de devolución
+
+  // Cargar comentarios previos desde Firebase
+  firebase.database().ref(`/posventa/${ventaId}/comentarios`).once('value').then(snapshot => {
+      const comentariosData = snapshot.val() || {};
+      
+      comentarioOperacion.value = comentariosData.operacion || '';
+      numeroCaso.value = comentariosData.numeroCaso || '';
+      vencimientoDevolucion.value = comentariosData.vencimientoDevolucion || ''; 
+  }).catch(error => {
+      console.error("Error al cargar comentarios:", error);
+  });
+
+  // Mostrar el modal
+  comentarioModal.show();
+}
+
+async function guardarComentario() {
+  const ventaId = document.getElementById('ventaIdInput').value;
+  const comentarioOperacion = document.getElementById('comentarioOperacion').value; 
+  const numeroCaso = document.getElementById('numeroCaso').value; 
+  const vencimientoDevolucion = document.getElementById('vencimientoDevolucion').value; 
+
+  // Convertir la cadena de fecha a un objeto Date
+  const vencimientoDevolucionFecha = new Date(vencimientoDevolucion); 
+  
+  // Sumar un día
+  vencimientoDevolucionFecha.setDate(vencimientoDevolucionFecha.getDate() + 1); 
+  
+  // Formatear la fecha de vencimiento a "DD-MM-YYYY"
+  const fechaVencimientoFormateada = vencimientoDevolucionFecha.toLocaleDateString('es-ES');  
+  
+  // Crear un objeto para los comentarios
+  const comentarioData = {
+      operacion: comentarioOperacion,
+      numeroCaso: numeroCaso,
+      fecha: new Date().toLocaleString(), 
+      vencimientoDevolucion: fechaVencimientoFormateada 
+  };
+
+  // Guardar los comentarios en Firebase
+  await firebase.database().ref(`/posventa/${ventaId}/comentarios`).set(comentarioData)
+      .then(() => {
+          // Mostrar alerta de éxito
+          showAlert(`Comentario guardado exitosamente para operación ${ventaId}`);
+
+          // Cambiar el color del ícono a verde
+          const iconoComentario = document.querySelector(`i[onclick="abrirModalComentario('${ventaId}', this)"]`);
+          if (iconoComentario) {
+              iconoComentario.style.color = '#38B34DFF';
+          }
+
+          // Cerrar el modal
+          const comentarioModal = bootstrap.Modal.getInstance(document.getElementById('comentarioModal'));
+          comentarioModal.hide();
+      })
+      .catch(error => {
+          console.error("Error al guardar comentario:", error);
+          showAlert('Error al guardar el comentario. Inténtalo de nuevo.');
+      });
+}
 // FIN RENDERIZADO DE LA TABLA
 
 // MODAL LINEA DE TIEMPO
@@ -1029,8 +1106,14 @@ firebase.database().ref('posventa').on('child_changed', (snapshot) => {
       // Skills
       const skillsContainer = row.querySelector(`.div-skills-${ventaId}`);
       if (skillsContainer) {
-        skillsContainer.innerHTML = ''; // Limpiar previos
-        cargarSkillsDeFila(ventaId);    // Reutiliza tu función async
+          skillsContainer.innerHTML = ''; // Limpiar previos
+          cargarSkillsDeFila(ventaId);    // Reutiliza tu función async
+      }
+
+      // Cambiar el color del ícono a verde si hay comentarios
+      const iconoComentario = document.querySelector(`i[onclick="abrirModalComentario('${ventaId}', this)"]`);
+      if (iconoComentario && venta.comentarios) {
+          iconoComentario.style.color = '#38B34DFF'; 
       }
   }
 });
