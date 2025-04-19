@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importar Clientes</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Importar Clientes a Firebase</h1>
+        <input type="file" id="fileInput" accept=".txt" class="form-control mb-3">
+        <button id="importButton" class="btn btn-primary">Importar</button>
+        <div id="spinner" class="spinner-border text-primary" role="status" style="display: none;">
+            <span class="sr-only">Cargando...</span>
+        </div>
+        <div id="message" class="mt-3"></div>
+    </div>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV2D4tiOfdVGqzmewM5mQ4GjGFJoAb2Pk",
+            authDomain: "clientes-novogar.firebaseapp.com",
+            databaseURL: "https://clientes-novogar-default-rtdb.firebaseio.com",
+            projectId: "clientes-novogar",
+            storageBucket: "clientes-novogar.firebasestorage.app",
+            messagingSenderId: "289083678694",
+            appId: "1:289083678694:web:726e641d4cb748ad900027",
+            measurementId: "G-04V91E4Q9K"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        document.getElementById('importButton').addEventListener('click', importarDatos);
+
+        function importarDatos() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                alert("Por favor, selecciona un archivo .txt para importar.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const contenido = event.target.result;
+                document.getElementById('spinner').style.display = 'block';
+                document.getElementById('message').innerHTML = '';
+
+                // Obtener los DNI existentes de Firebase
+                obtenerDnisExistentes().then(dnisExistentes => {
+                    // Procesar el contenido del archivo
+                    const lineas = contenido.split("\n");
+                    const clientes = {}; // Objeto para almacenar los nuevos clientes
+
+                    lineas.forEach(linea => {
+                        const partes = linea.split(",");
+                        if (partes.length === 3) {
+                            const numeroCliente = partes[0].trim();
+                            const nombre = partes[1].trim();
+                            const dni = partes[2].trim();
+                            const sanitizedDni = dni.replace(/[^a-zA-Z0-9_]/g, '');
+
+                            // Solo agregar si el DNI no existe
+                            if (sanitizedDni && !dnisExistentes.has(sanitizedDni)) {
+                                clientes[sanitizedDni] = {
+                                    cliente: numeroCliente,
+                                    nombre: nombre,
+                                    dni: dni
+                                };
+                            }
+                        }
+                    });
+
+                    // Enviar los nuevos datos a Firebase
+                    enviarLotes(clientes);
+                });
+            };
+
+            reader.readAsText(file);
+        }
+
+        function obtenerDnisExistentes() {
+            return new Promise((resolve, reject) => {
+                const dnisExistentes = new Set();
+                const clientesRef = `clientes.json`;
+
+                // Obtener todos los clientes de Firebase
+                fetch(`${firebaseConfig.databaseURL}/${clientesRef}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        for (const key in data) {
+                            if (data.hasOwnProperty(key)) {
+                                const cliente = data[key];
+                                dnisExistentes.add(cliente.dni);
+                            }
+                        }
+                        resolve(dnisExistentes);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener DNI existentes:', error);
+                        reject(error);
+                    });
+            });
+        }
+
+        function enviarLotes(clientes) {
+            const batchSize = 100; // Tamaño del lote
+            const keys = Object.keys(clientes);
+            let promises = [];
+
+            for (let i = 0; i < keys.length; i += batchSize) {
+                const lote = {};
+                for (let j = i; j < i + batchSize && j < keys.length; j++) {
+                    lote[keys[j]] = clientes[keys[j]];
+                }
+
+                const clientesRef = `clientes.json`;
+                const opciones = {
+                    method: 'PATCH', // Usar PATCH para actualizar o crear
+                    body: JSON.stringify(lote),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                // Enviar datos a Firebase
+                promises.push(fetch(`${firebaseConfig.databaseURL}/${clientesRef}`, opciones)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(`Respuesta de Firebase para lote ${i / batchSize}:`, data);
+                    }));
+            }
+
+            // Esperar a que todas las promesas se resuelvan
+            Promise.all(promises).then(() => {
+                document.getElementById('spinner').style.display = 'none';
+                document.getElementById('message').innerHTML = 'Datos enviados a Firebase exitosamente.';
+            }).catch(error => {
+                console.error('Error al enviar datos a Firebase:', error);
+                document.getElementById('spinner').style.display = 'none';
+                document.getElementById('message').innerHTML = 'Ocurrió un error al enviar los datos.';
+            });
+        }
+    </script>
+
+    <!-- Bootstrap JS (opcional) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -512,6 +512,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           const row = document.createElement('tr');
           row.innerHTML = `
               <td>
+                  <div class="clientePosventa-gris" id="cliente-posventa-${ventaId}">
+                    Buscando <div class="spinner-border text-secondary" role="status" style="width: 1rem; height: 1rem;">
+                      <span class="visually-hidden">Cargando...</span>
+                    </div>
+                  </div>
                   <div class="mac-cell mac-cell-posventa" style="position: relative;">
                       <div class="venta-id">
                           <a href="https://www.mercadolibre.com.ar/ventas/${ventaId}/detalle" target="_blank" style="text-decoration: none; color: #333;">
@@ -586,6 +591,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           tbody.appendChild(row);
 
           cargarSkillsDeFila(ventaId)
+
+          buscarClientePosventa(venta, ventaId);
 
           // Llamar a la función para contar filas sin control
           contarFilasSinControl(ventasFiltradas);
@@ -1015,6 +1022,48 @@ async function guardarComentario() {
           console.error("Error al guardar comentario:", error);
           showAlert('Error al guardar el comentario. Inténtalo de nuevo.');
       });
+}
+
+function obtenerSoloNumeros(str) {
+  return str.replace(/\D/g, '');
+}
+
+function buscarClientePosventa(venta, ventaId) {
+  const documentoCompleto = venta.facturación_al_comprador?.tipo_y_número_de_documento || "";
+  const dni = obtenerSoloNumeros(documentoCompleto);
+  const divCliente = document.getElementById(`cliente-posventa-${ventaId}`);
+
+  if (!dni || !divCliente) return;
+
+  window.dbClientes.ref("/clientes/" + dni).once("value").then((snapshot) => {
+    const cliente = snapshot.val();
+
+    if (cliente?.cliente) {
+      divCliente.className = "clientePosventa";
+      divCliente.innerHTML = `
+        <img src="Img/logo-presea.png" alt="PRESEA" width="20">
+        Cliente: <strong id="nombre-cliente">${cliente.cliente}</strong>
+      `;
+
+      // ✅ Agregamos evento para copiar al portapapeles
+      divCliente.style.cursor = 'pointer';
+      divCliente.addEventListener("click", () => {
+        navigator.clipboard.writeText(cliente.cliente).then(() => {
+          showAlert(`Se ha copiado a portapapeles el cliente: ${cliente.cliente}`);
+        }).catch((err) => {
+          console.error("Error al copiar al portapapeles:", err);
+        });
+      });
+
+    } else {
+      divCliente.className = "clientePosventa-rojo";
+      divCliente.innerHTML = `NO FACTURADO`;
+    }
+  }).catch((error) => {
+    divCliente.className = "clientePosventa-rojo";
+    divCliente.innerHTML = `NO FACTURADO`;
+    console.error("Error al buscar cliente en Firebase:", error);
+  });
 }
 // FIN RENDERIZADO DE LA TABLA
 

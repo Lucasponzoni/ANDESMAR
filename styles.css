@@ -748,6 +748,57 @@ button:hover {
     z-index: -100;
 }
 
+.clientePosventa {
+    width: fit-content;
+    text-align: center;
+    padding: 8px;
+    margin-bottom: -5px;
+    margin-left: 20px;
+    color: indigo;
+    font-weight: 500;
+    border-radius: 12px 12px 0 0;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background-color: rgb(231, 220, 255); 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fuente de macOS */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
+    z-index: -1;
+}
+
+.clientePosventa-gris {
+    width: fit-content;
+    text-align: center;
+    padding: 8px;
+    margin-bottom: -5px;
+    margin-left: 20px;
+    color: grey;
+    font-weight: 500;
+    border-radius: 12px 12px 0 0;
+    border: 1px solid #aaa; 
+    border-bottom: none;
+    background-color: rgb(220, 220, 220); 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fuente de macOS */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
+    z-index: -1;
+}
+
+.clientePosventa-rojo {
+    width: fit-content;
+    text-align: center;
+    padding: 8px;
+    margin-bottom: -5px;
+    margin-left: 20px;
+    color: red;
+    font-weight: 500;
+    border-radius: 12px 12px 0 0;
+    border: 1px solid #ff9999;
+    border-bottom: none;
+    background-color: rgb(255, 204, 204); 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fuente de macOS */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
+    z-index: -1;
+}
+
 .cliente3 {
     width: fit-content;
     text-align: center;
@@ -779,7 +830,19 @@ button:hover {
     width: 30px;
 }
 
+.clientePosventa-gris > img{
+    width: 30px;
+}
+
+.clientePosventa-rojo > img{
+    width: 30px;
+}
+
 .cliente2 > img{
+    width: 30px;
+}
+
+.clientePosventa > img{
     width: 30px;
 }
 
