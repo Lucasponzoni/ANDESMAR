@@ -1140,7 +1140,7 @@ function renderSkillEnFila(skillKey, ventaId, estilo = {}) {
 }
 // FIN LISTENERS EN TIEMPO REAL
 
-// Cargar skills desde Firebase al abrir el modal
+// SKILLS MODAL
 $('#skillsModal').on('show.bs.modal', function () {
   const skillsContainer = document.getElementById('skillsContainer');
   const spinner = document.getElementById('spinner');
@@ -1236,3 +1236,55 @@ function getDarkerColor(hex) {
 
   return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`;
 }
+// FIN SKILLS MODAL
+
+// CONTAR FILAS SIN CONTROL
+function contarFilasSinControlDesdeDOM() {
+  // Contador total de filas
+  let totalFilas = 0;
+  // Contador para filas que tienen el green-day
+  let filasGreenDay = 0;
+
+  // Obtener todas las filas de la tabla
+  const filas = document.querySelectorAll('#data-table tbody tr');
+
+  filas.forEach(row => {
+      // Obtener el mensaje de la primera columna (suponiendo que contiene la fecha)
+      const mensajeTexto = row.cells[0]?.innerText; // Ajusta según tu estructura
+
+      if (mensajeTexto) {
+          totalFilas += 1; // Incrementar total de filas
+
+          // Expresión regular para extraer la fecha
+          const fechaRegex = /(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{1,2}:\d{2}:\d{2})$/;
+          const match = mensajeTexto.match(fechaRegex);
+
+          if (match) {
+              const [_, dia, mes, anio, hora] = match;
+              const fechaMensaje = new Date(`${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T${hora}`);
+              const hoy = new Date();
+              hoy.setHours(0, 0, 0, 0);
+              const fechaDelMensaje = new Date(fechaMensaje);
+              fechaDelMensaje.setHours(0, 0, 0, 0);
+              const diffDias = Math.floor((hoy - fechaDelMensaje) / (1000 * 60 * 60 * 24));
+
+              // Contar filas con green-day
+              if (diffDias === 0) { // Si es el mismo día
+                  filasGreenDay += 1;
+              }
+          }
+      }
+  });
+
+  // Calcular filas sin controlar
+  const filasSinControl = totalFilas - filasGreenDay;
+
+  // Actualizar el botón 'sinRevisar'
+  const sinRevisarBtn = document.getElementById('sinRevisar');
+  sinRevisarBtn.innerHTML = `
+      <i class="bi bi-exclamation-circle-fill" style="color: orange;"></i> 
+      Sin Control: <span style="color: red; font-weight: bold;">${filasSinControl}</span>
+  `;
+  sinRevisarBtn.title = `Filas sin controlar: ${filasSinControl}`; // Actualizar el título
+}
+// FIN CONTAR FILAS SIN CONTROL
