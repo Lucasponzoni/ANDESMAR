@@ -11,6 +11,7 @@ firebase.initializeApp({
   });
   
   const db = firebase.database();
+  window.db = db;
   
   // IMPORTACION DE VENTAS
   function limpiarClave(clave) {
@@ -116,7 +117,10 @@ firebase.initializeApp({
     for (let estado of estadosDetectados) {
       const claveEstado = limpiarClave(estado);
       if (!estadosFirebase[claveEstado]) {
-        nuevasEntradas[claveEstado] = { nombre: estado };
+        nuevasEntradas[claveEstado] = { 
+          nombre: estado,
+          seleccionado: true
+        };
       }
     }
   
@@ -181,12 +185,24 @@ firebase.initializeApp({
             const nuevaClave = `${clave}${version === 1 ? '' : version}`;
             ventaData[seccion][nuevaClave] = valorNuevo;
             hayCambios = true;
+
+            console.log('valorNuevo:', valorNuevo, 'valorAnterior:', valorAnterior);
+
+              // Agregar la fecha de actualización
+              const fechaHoy = new Date().toLocaleDateString('es-ES'); // Formato DD/MM/YYYY
+              ventaData[seccion]['actualizoHoy'] = fechaHoy; // Agregar la fecha al objeto de venta
           }
         
         } else {
           if (valorNuevo !== prevValor) {
             ventaData[seccion][clave] = valorNuevo;
             hayCambios = true;
+
+            console.log('valorNuevo:', valorNuevo, 'valorAnterior:', prevValor);
+
+            // Agregar la fecha de actualización
+            const fechaHoy = new Date().toLocaleDateString('es-ES'); // Formato DD/MM/YYYY
+            ventaData[seccion]['actualizoHoy'] = fechaHoy; // Agregar la fecha al objeto de venta
           }
         }                                
       }
@@ -526,6 +542,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                           <i class="${iconClass}" onclick="abrirModalTimeline('${ventaId}')" style="cursor: pointer;"></i>
                           <i class="bi bi-plus-circle-fill icon-user-plus" onclick="controlarCaso('${ventaId}', this)"></i>
                       </div>
+
+                      <!-- Verificación de fecha -->
+                      ${venta.ventas.actualizoHoy && venta.ventas.actualizoHoy === new Date().toLocaleDateString('es-AR') ? `
+                      <div class="mac-notification" style="background-color: #4cd964; color: white; border-radius: 8px; padding: 2px; margin-bottom: 2px; font-family: 'Rubik', sans-serif; text-transform: uppercase; font-weight: bold;">
+                          Actualizó hoy <i class="bi bi-check-circle" style="color: white;"></i>
+                      </div>
+                      ` : ''}
+
                       <select class="estado-select" data-venta-id="${ventaId}">
                           <option value="">Selecciona un estado</option>
                           <option value="CONTROL FINALIZADO">CONTROL FINALIZADO</option>
@@ -629,15 +653,79 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="div-skills-${ventaId}" style="margin-top: 10px;"></div>
               </td>
               <td style="vertical-align: middle;">
-                  <i class="bi bi-chat-quote-fill" onclick="abrirModalComentario('${ventaId}', this)" style="cursor: pointer; color: ${venta.comentarios ? '#38B34DFF' : 'grey'}; font-size: 24px;"></i>
-<i class="bi bi-hammer ml-1" style="cursor: pointer; color: #4a6fa5; font-size: 24px;"
-   onclick="copyHammerData('${ventaId}', ${venta.comentarios ? `'${venta.comentarios.operacion}'` : "'No disponible'"}, '${venta.comentarios ? venta.comentarios.numeroCaso : "No disponible"}', '${venta.comentarios ? venta.comentarios.vencimientoDevolucion : "No disponible"}', '${ultimoEstado}', '${ultimaDescripcion}', '${venta.publicaciones.sku}', '${venta.ventas.unidades}', ${venta.ventas['total_(ars)']})"></i>
-                     `;
+                <div style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 12px;
+                  padding: 8px;
+                  background: linear-gradient(145deg, #f5f5fa, #e6e6ec);
+                  border-radius: 14px;
+                  box-shadow: inset 2px 2px 6px #d1d1d8, inset -2px -2px 6px #ffffff;
+                  transition: all 0.3s ease;
+                  min-width: 60px;
+                ">
+                  <!-- Comentario -->
+                  <i class="bi bi-chat-quote-fill"
+                    title="Comentario"
+                    onclick="abrirModalComentario('${ventaId}', this)"
+                    style="
+                      cursor: pointer;
+                      color: ${venta.comentarios ? '#38B34D' : '#bbb'};
+                      font-size: 28px;
+                      transition: color 0.2s ease;
+                    "></i>
+
+                  <!-- Tracking -->
+                  <i id="tracking-posventa-${ventaId}"
+                    class="bi bi-geo-alt-fill"
+                    title="Tracking"
+                    style="
+                      font-size: 28px;
+                      color: ${venta.ventas.transportCompany 
+                                ? (venta.ventas.transportCompany === 'Novogar' || venta.ventas.transportCompany === 'PlaceIt'
+                                    ? '#d9534f'
+                                    : '#28a745') 
+                                : '#EB981C'};
+                      ${venta.ventas.transportCompany === 'Novogar' || venta.ventas.transportCompany === 'PlaceIt'
+                          ? 'pointer-events: none; opacity: 0.5;'
+                          : 'cursor: pointer;'}
+                      transition: all 0.3s ease;
+                    "
+                    ${venta.ventas.transportCompany && venta.ventas.transportCompany !== 'Novogar' && venta.ventas.transportCompany !== 'PlaceIt'
+                      ? `onclick="window.open('${venta.ventas.trackingLink}', '_blank')"`
+                      : ''}
+                  ></i>
+
+                  <!-- Herramienta -->
+                  <i class="bi bi-hammer"
+                    title="Herramienta"
+                    style="
+                      cursor: pointer;
+                      color: #4a6fa5;
+                      font-size: 28px;
+                      transition: color 0.2s ease;
+                    "
+                    onclick="copyHammerData('${ventaId}', 
+                      ${venta.comentarios ? `'${venta.comentarios.operacion}'` : "'No disponible'"}, 
+                      '${venta.comentarios ? venta.comentarios.numeroCaso : "No disponible"}', 
+                      '${venta.comentarios ? venta.comentarios.vencimientoDevolucion : "No disponible"}', 
+                      '${ultimoEstado}', 
+                      '${ultimaDescripcion}', 
+                      '${venta.publicaciones.sku}', 
+                      '${venta.ventas.unidades}', 
+                      ${venta.ventas['total_(ars)']}
+                    )"></i>
+                </div>
+              </td>
+                 `;
           tbody.appendChild(row);
 
           cargarSkillsDeFila(ventaId)
 
           buscarClientePosventa(venta, ventaId);
+
+          buscarTrackingPosventa(venta, ventaId);
 
           // Llamar a la función para contar filas sin control
           contarFilasSinControl(ventasFiltradas);
@@ -755,6 +843,104 @@ document.addEventListener('DOMContentLoaded', async () => {
       searchInput.value = "";
   }
 });
+
+function buscarTrackingPosventa(venta, ventaId) {
+  const divTracking = document.getElementById(`tracking-posventa-${ventaId}`);
+  if (!divTracking) return;
+
+  const trackingIconLoading = 'fas fa-spinner fa-spin';
+  const trackingIconFound = 'bi bi-geo-alt-fill';
+  const trackingIconNotFound = 'bi bi-geo-alt-fill';
+
+  // Si ya tiene transportCompany o shippingMode me2, no seguimos
+  if (venta.ventas.transportCompany || venta.ventas.shippingMode === "me2") {
+    return;
+  }
+
+  // Mostrar spinner mientras carga
+  divTracking.className = trackingIconLoading;
+  divTracking.style.color = '#EB981CFF';
+  divTracking.style.cursor = 'default';
+  divTracking.onclick = null;
+
+  window.dbMeli.ref(`/envios/${ventaId}`).once("value")
+    .then((snapshot) => {
+      const envio = snapshot.val();
+      const skillsRef = window.db.ref(`/posventa/${ventaId}/skills`);
+      const skills = {};
+
+      if (!envio) {
+        skills["No en LogiPaq (Base de Datos)"] = true;
+        skillsRef.update(skills).catch(console.error);
+        divTracking.className = trackingIconNotFound;
+        divTracking.style.color = '#6c757d';
+        divTracking.style.cursor = 'default';
+        divTracking.onclick = null;
+        return;
+      }
+
+      const { transportCompany, trackingNumber, trackingLink, shippingMode } = envio;
+
+      if (shippingMode === "me1") skills["me1"] = true;
+      if (shippingMode === "me2") skills["me2"] = true;
+
+      if (transportCompany) {
+        const companyLower = transportCompany.toLowerCase();
+        if (companyLower.includes("cruz del sur")) skills["cruz del sur"] = true;
+        if (companyLower.includes("andesmar")) skills["andesmar"] = true;
+        if (companyLower.includes("andreani")) skills["andreani"] = true;
+        if (companyLower.includes("placeit")) skills["placeit"] = true;
+        if (companyLower.includes("novogar")) skills["novogar"] = true;
+      }
+
+      if (Object.keys(skills).length > 0) {
+        skillsRef.update(skills).catch(console.error);
+      }
+
+      // Si hay datos válidos de tracking
+      if (transportCompany && trackingNumber && trackingLink) {
+        window.db.ref(`/posventa/${ventaId}/ventas`).update({
+          transportCompany,
+          trackingNumber,
+          trackingLink,
+          shippingMode,
+        }).then(() => {
+          const isDisabledCompany = ["Novogar", "PlaceIt"].includes(transportCompany);
+          divTracking.className = trackingIconFound;
+          divTracking.style.fontSize = '24px';
+
+          if (isDisabledCompany) {
+            divTracking.style.color = 'red';
+            divTracking.style.pointerEvents = 'none';
+            divTracking.style.opacity = '0.6';
+            divTracking.onclick = null;
+          } else {
+            divTracking.style.color = '#28a745';
+            divTracking.style.cursor = 'pointer';
+            divTracking.onclick = () => window.open(trackingLink, '_blank');
+          }
+        }).catch((error) => {
+          console.error("🔥 Error al guardar tracking:", error);
+          divTracking.className = trackingIconNotFound;
+          divTracking.style.color = '#6c757d';
+          divTracking.style.cursor = 'default';
+          divTracking.onclick = null;
+        });
+      } else {
+        divTracking.className = trackingIconNotFound;
+        divTracking.style.color = '#6c757d';
+        divTracking.style.cursor = 'default';
+        divTracking.onclick = null;
+      }
+    })
+    .catch((error) => {
+      console.error("🔥 Error buscando tracking en MELI:", error);
+      divTracking.className = trackingIconNotFound;
+      divTracking.style.color = '#6c757d';
+      divTracking.style.cursor = 'default';
+      divTracking.onclick = null;
+    });
+}
 
 window.handleDivClick = function(ventaId, vencimiento, numeroCaso, estadoTexto) {
   const cleanEstado = estadoTexto.replace(/<[^>]*>?/gm, ''); // Elimina tags HTML
@@ -1381,15 +1567,21 @@ function actualizarEstadoFila(row, estadoActual) {
   }
 }
 
-// Función para manejar la creación de la burbuja de control
 function manejarBurbujaControl(row, controles) {
-  const ultimoControlKey = Object.keys(controles || {}).pop(); // Obtener la última clave
+  // Validación para evitar errores si controles no es un objeto o está vacío
+  if (!controles || typeof controles !== 'object' || Object.keys(controles).length === 0) {
+    return; // Nada que mostrar
+  }
+
+  const ultimoControlKey = Object.keys(controles).pop(); // Obtener la última clave
   const ultimoControl = controles[ultimoControlKey];
 
   if (ultimoControl) {
-      const { operador, mensaje } = ultimoControl;
-      const macCell = row.querySelector('.mac-cell-posventa');
+    const { operador, mensaje } = ultimoControl;
+    const macCell = row.querySelector('.mac-cell-posventa');
+    if (macCell) {
       mostrarBurbujaControl(macCell, operador, mensaje); // Mostrar burbuja con el último control
+    }
   }
 }
 
@@ -1528,7 +1720,7 @@ document.getElementById('addSkuButtonPlaceIt').addEventListener('click', functio
   const colorPicker = document.getElementById('colorPicker');
   const descriptionInput = document.getElementById('skillDescription'); // Obtener el textarea
 
-  const skillText = skillInput.value.trim().toLowerCase(); // Convertir a minúsculas
+  const skillText = skillInput.value.trim() // Convertir a minúsculas
   const selectedColor = colorPicker.value;
   const description = descriptionInput.value.trim().toLowerCase(); // Obtener descripción y convertir a minúsculas
 

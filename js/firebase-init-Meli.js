@@ -1,6 +1,7 @@
 const firebaseConfigMeli = {
     apiKey: "AIzaSyCMu2vPvNzhv0cM3b4RItmqZybRhhR_HJM",
     authDomain: "despachos-meli-novogar.firebaseapp.com",
+    databaseURL: "https://despachos-meli-novogar-default-rtdb.firebaseio.com",
     projectId: "despachos-meli-novogar",
     storageBucket: "despachos-meli-novogar.appspot.com",
     messagingSenderId: "774252628334",
@@ -8,7 +9,12 @@ const firebaseConfigMeli = {
     measurementId: "G-E0E9K4TEDW"
 };
 
-const appMeli = firebase.initializeApp(firebaseConfigMeli, "appMeli");
-const dbMeli = appMeli.database();
+let appMeli;
+try {
+    appMeli = firebase.app("appMeli"); // Intenta obtener la app existente
+} catch (error) {
+    appMeli = firebase.initializeApp(firebaseConfigMeli, "appMeli"); // Si no existe, inicializa
+}
 
+const dbMeli = appMeli.database();
 window.dbMeli = dbMeli;
