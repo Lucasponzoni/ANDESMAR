@@ -1091,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 ? (venta.ventas.transportCompany === 'Novogar' || venta.ventas.transportCompany === 'PlaceIt'
                                     ? '#d9534f'
                                     : '#28a745') 
-                                : '#EB981C'};
+                                    : '#EB981C'};
                       ${venta.ventas.transportCompany === 'Novogar' || venta.ventas.transportCompany === 'PlaceIt'
                           ? 'pointer-events: none; opacity: 0.5;'
                           : 'cursor: pointer;'}
