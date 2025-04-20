@@ -1364,7 +1364,7 @@ window.handleDivClick = function(ventaId, vencimiento, numeroCaso, estadoTexto) 
 };
 
 // MARTILLO GENERAL
-async function copyHammerData(ventaId, estadoActual, ultimaDescripcion, sku, unidades, total) {
+async function copyHammerData(ventaId, sinUso1, sinUso2, sinUso3, estadoActual, ultimaDescripcion, sku, unidades, total) {
   // Obtener el nombre del operador
   const activeAvatar = document.getElementById("active-avatar");
   const nombreOperador = activeAvatar ? activeAvatar.alt : "Operador desconocido";
