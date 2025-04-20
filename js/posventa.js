@@ -1720,7 +1720,7 @@ document.getElementById('addSkuButtonPlaceIt').addEventListener('click', functio
   const colorPicker = document.getElementById('colorPicker');
   const descriptionInput = document.getElementById('skillDescription'); // Obtener el textarea
 
-  const skillText = skillInput.value.trim() // Convertir a minúsculas
+  const skillText = skillInput.value.trim().toLowerCase(); // Convertir a minúsculas
   const selectedColor = colorPicker.value;
   const description = descriptionInput.value.trim().toLowerCase(); // Obtener descripción y convertir a minúsculas
 
