@@ -519,11 +519,123 @@ document.addEventListener('DOMContentLoaded', async () => {
       const tbody = document.querySelector('#data-table tbody');
       tbody.innerHTML = ''; // Limpiar anterior
 
+      // Aquí comienza el filtrado para ventas canceladas
+      const estadosFiltrados = ventasFiltradas.filter(([ventaId, venta]) => {
+          const ultimoEstado = obtenerUltimoEstado(venta).ultimoEstado.toLowerCase();
+          const transferido = venta.ventas.transferido === true; // Verificar si ya está transferido
+
+          return !transferido && [
+            "cancelaste la venta",
+            "venta cancelada. no despachés",
+            "cancelada por el comprador",
+            "venta cancelada",
+            "paquete cancelado",
+            "cancelá la venta",
+            "cancelamos la venta",
+            "paquete cancelado por mercado libre"
+        ].some(frase => ultimoEstado.startsWith(frase));
+    });
+
+    // Crear tabla con ventas canceladas
+    if (estadosFiltrados.length > 0) {
+        let htmlTabla = `
+            <table class="table mac-os-table" style="width: 100%; border-collapse: collapse;">
+                <thead style="background-color: #007aff; color: white;">
+                    <tr>
+                        <th style="padding: 10px;">Operación</th>
+                        <th style="padding: 10px;">Estado</th>
+                        <th style="padding: 10px;">Descripción</th>
+                        <th style="padding: 10px;">CUIT / DNI</th>
+                        <th style="padding: 10px;">Producto y Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        estadosFiltrados.forEach(([ventaId, venta]) => {
+            const { ultimoEstado, ultimaDescripcion } = obtenerUltimoEstado(venta);
+            const cuitDni = venta.facturación_al_comprador.tipo_y_número_de_documento || "No disponible";
+            const productoCantidad = `${venta.publicaciones.sku}, X ${venta.ventas.unidades} u.`;
+
+            htmlTabla += `
+                <tr style="border: 1px solid #e0e0e0;">
+                    <td style="padding: 10px; text-align: center;"><a href="https://www.mercadolibre.com.ar/ventas/${ventaId}/detalle" target="_blank">${ventaId}</a></td>
+                    <td style="padding: 10px; text-align: center;">${ultimoEstado}</td>
+                    <td style="padding: 10px; text-align: center;">${ultimaDescripcion}</td>
+                    <td style="padding: 10px; text-align: center;">${cuitDni}</td>
+                    <td style="padding: 10px; text-align: center;">${productoCantidad}</td>
+                </tr>
+            `;
+        });
+
+        htmlTabla += `
+                </tbody>
+            </table>
+        `;
+
+        // Aquí se envía el correo con los detalles de las ventas canceladas
+        const destinatarioEmail = "lucasponzoni@gmail.com"; 
+        const nombreDestinatario = "Posventa Web";
+        const nombreTanda = "Tanda de Ventas Canceladas";
+        const horaSubida = new Date().toLocaleTimeString();
+
+        const emailBody = `
+            <html>
+            <head>
+                <style>
+                    body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; padding: 20px; }
+                    .container { max-width: 800px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+                    h2 { color: #333333; }
+                    p { color: #333333; }
+                    .footer { margin-top: 20px; font-size: 12px; color: #777; text-align: center; }
+                    .header { background-color: #007aff; color: white; padding: 10px; text-align: center; border-radius: 10px }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { padding: 10px; text-align: center; border: 1px solid #e0e0e0; }
+                    th { background-color: #007aff; color: white; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                    tr:hover { background-color: #f1f1f1; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h2>Informe de Ventas Canceladas</h2>
+                    </div>
+                    <h3>Hola ${nombreDestinatario} 👋,</h3>
+                    <p>Tienes disponible una nueva tanda de ventas canceladas. 📉</p>
+                    ${htmlTabla}
+                    <p style="color: #333333;">Saludos,</p>
+                    <p style="color: #333333;">Equipo de Posventa Novogar 🍏</p>
+                    <div class="footer">Este es un mensaje automático, por favor no respondas.</div>
+                </div>
+            </body>
+            </html>
+        `;
+
+          await enviarCorreoConDetalles("esperanza.toffalo@novogar.com.ar", "Esperanza Toffalo", nombreTanda, horaSubida, emailBody);
+          await enviarCorreoConDetalles("marina.braidotti@novogar.com.ar", "Marina Braidotti", nombreTanda, horaSubida, emailBody);
+          await enviarCorreoConDetalles("posventanovogar@gmail.com", "Posventa Web", nombreTanda, horaSubida, emailBody);
+          await enviarCorreoConDetalles("agustina.benedetto@novogar.com.ar", "Agustina Benedetto", nombreTanda, horaSubida, emailBody);
+          await enviarCorreoConDetalles("natalia.rodriguez@novogar.com.ar", "Natalia Rodriguez", nombreTanda, horaSubida, emailBody);
+          await enviarCorreoConDetalles("mauricio.daffonchio@novogar.com.ar", "Mauricio Daffonchio", nombreTanda, horaSubida, emailBody);
+
+          // Actualizar Firebase para cada venta
+          for (const [ventaId] of estadosFiltrados) {
+              await firebase.database().ref(`/posventa/${ventaId}/ventas`).update({
+                  transferido: true
+              });
+          }
+          // NO HACER NADA, solo enviar el correo
+      } else {
+          console.log("No hay ventas canceladas para mostrar.");
+      }
+
       ventasFiltradas.forEach(([ventaId, venta]) => {
           const { ultimoEstado, ultimaDescripcion } = obtenerUltimoEstado(venta); // Obtener último estado y descripción
 
           const cantidadEstados = Object.keys(venta.ventas).filter(key => key.startsWith('estado') && key !== 'estadoActual').length;
           const iconClass = cantidadEstados > 1 ? 'fas fa-history text-success' : 'fas fa-history';
+          
 
           const row = document.createElement('tr');
           row.innerHTML = `
@@ -545,7 +657,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                       <!-- Verificación de fecha -->
                       ${venta.ventas.actualizoHoy && venta.ventas.actualizoHoy === new Date().toLocaleDateString('es-AR') ? `
-                      <div class="mac-notification" style="background-color: #4cd964; color: white; border-radius: 8px; padding: 2px; margin-bottom: 2px; font-family: 'Rubik', sans-serif; text-transform: uppercase; font-weight: bold;">
+                      <div class="mac-notification" style="background-color: #007bff; color: white; border-radius: 8px; padding: 2px; margin-bottom: 2px; font-family: 'Rubik', sans-serif; text-transform: uppercase; font-weight: bold;">
                           Actualizó hoy <i class="bi bi-check-circle" style="color: white;"></i>
                       </div>
                       ` : ''}
@@ -844,6 +956,121 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+// ENVIAR EMAIL CON VENTAS CANCELADAS
+async function enviarCorreoConDetalles(destinatarioEmail, nombreDestinatario, nombreTanda, horaSubida, emailBody) {
+  const fecha = new Date().toLocaleDateString();
+  const Subject = `Nueva Tanda de Ventas Canceladas - ${nombreTanda} - ${fecha}`;
+  const smtpU = 's154745_3';
+  const smtpP = 'QbikuGyHqJ';
+
+  const emailData = {
+      "Html": {
+          "DocType": null,
+          "Head": null,
+          "Body": emailBody,
+          "BodyTag": "<body>"
+      },
+      "Text": "",
+      "Subject": Subject,
+      "From": {
+          "Name": "Posventa Novogar",
+          "Email": "posventa@novogar.com.ar"
+      },
+      "To": [
+          {
+              "Name": nombreDestinatario,
+              "Email": destinatarioEmail
+          }
+      ],
+      "Cc": [],
+      "Bcc": ["webnovagar@gmail.com", "posventa@novogar.com.ar"],
+      "CharSet": "utf-8",
+      "User": {
+          "Username": smtpU,
+          "Secret": smtpP,
+      }
+  };
+
+  try {
+      const response = await fetch('https://proxy.cors.sh/https://send.mailup.com/API/v2.0/messages/sendmessage', {
+          method: 'POST',
+          headers: {
+              'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(emailData)
+      });
+
+      const result = await response.json();
+      if (result.Status === 'done') {
+          console.log(`Email enviado a ${destinatarioEmail} a las ${horaSubida}`);
+          showAlertPosventa(`Email enviado a ${destinatarioEmail} con las ventas canceladas.`);
+      } else {
+          console.log(`Error al enviar el email: ${result.Message}`);
+          showAlertErrorPosventa(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${horaSubida}`);
+      }
+  } catch (error) {
+      console.error('Error al enviar el email:', error);
+      showAlertErrorPosventa(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${horaSubida}`);
+  }
+}
+// FIN ENVIAR EMAIL CON VENTAS CANCELADAS
+
+// ALERT EMAIL
+function showAlertPosventa(message) {
+  const alertElement = document.createElement('div');
+  alertElement.className = 'alert';
+  alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
+  document.body.appendChild(alertElement);
+  alertElement.style.bottom = `${20 + alertCount * 70}px`;
+  setTimeout(() => {
+      alertElement.classList.add('show');
+  }, 10);
+  alertElement.querySelector('.close').onclick = () => {
+      closeAlert(alertElement);
+  };
+  setTimeout(() => {
+      closeAlert(alertElement);
+  }, 8000);
+  alertCount++;
+}
+
+function showAlertErrorPosventa(message) {
+  const alertElement = document.createElement('div');
+  alertElement.className = 'alertError';
+  alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
+  document.body.appendChild(alertElement);
+  alertElement.style.bottom = `${20 + alertCount * 70}px`;
+  setTimeout(() => {
+      alertElement.classList.add('show');
+  }, 10);
+  alertElement.querySelector('.close').onclick = () => {
+      closeAlert(alertElement);
+  };
+  setTimeout(() => {
+      closeAlert(alertElement);
+  }, 8000);
+  alertCount++;
+}
+
+function closeAlert(alertElement) {
+  alertElement.classList.remove('show');
+  setTimeout(() => {
+      document.body.removeChild(alertElement);
+      alertCount--;
+      updateAlertPositions();
+  }, 300);
+}
+
+function updateAlertPositions() {
+  const alerts = document.querySelectorAll('.alert, .alertError');
+  alerts.forEach((alert, index) => {
+      alert.style.bottom = `${20 + index * 70}px`;
+  });
+}
+// FIN ALERT EMAIL
+
+// BUSCAR TRACKING POSVENTA
 function buscarTrackingPosventa(venta, ventaId) {
   const divTracking = document.getElementById(`tracking-posventa-${ventaId}`);
   if (!divTracking) return;
@@ -941,6 +1168,7 @@ function buscarTrackingPosventa(venta, ventaId) {
       divTracking.onclick = null;
     });
 }
+// FIN BUSCAR TRACKING POSVENTA
 
 window.handleDivClick = function(ventaId, vencimiento, numeroCaso, estadoTexto) {
   const cleanEstado = estadoTexto.replace(/<[^>]*>?/gm, ''); // Elimina tags HTML
@@ -953,6 +1181,7 @@ window.handleDivClick = function(ventaId, vencimiento, numeroCaso, estadoTexto) 
   });
 };
 
+// MARTILLO GENERAL
 // Función para copiar datos al portapapeles al hacer clic en el ícono de hammer
 async function copyHammerData(ventaId, operacion, numeroCaso, vencimientoDevolucion, estadoActual, ultimaDescripcion, sku, unidades, total) {
   // Obtener el nombre del operador
@@ -1023,6 +1252,7 @@ async function copyHammerData(ventaId, operacion, numeroCaso, vencimientoDevoluc
       console.error('Error al copiar al portapapeles: ', err);
   }
 }
+// FIN MARTILLO GENERAL
 
 // Función para obtener las skills activas desde Firebase
 async function getActiveSkills(ventaId) {
@@ -1827,3 +2057,58 @@ function contarFilasSinControlDesdeDOM() {
           contadorBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; // Restaura el icono de carga si no hay vencidos
       }
   }
+  let alertCount = 0;
+
+// ALERT EMAIL
+function showAlertPosventa(message) {
+    const alertElement = document.createElement('div');
+    alertElement.className = 'alert';
+    alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
+    document.body.appendChild(alertElement);
+    alertElement.style.bottom = `${20 + alertCount * 70}px`;
+    setTimeout(() => {
+        alertElement.classList.add('show');
+    }, 10);
+    alertElement.querySelector('.close').onclick = () => {
+        closeAlert(alertElement);
+    };
+    setTimeout(() => {
+        closeAlert(alertElement);
+    }, 8000);
+    alertCount++;
+}
+
+function showAlertErrorPosventa(message) {
+    const alertElement = document.createElement('div');
+    alertElement.className = 'alertError';
+    alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
+    document.body.appendChild(alertElement);
+    alertElement.style.bottom = `${20 + alertCount * 70}px`;
+    setTimeout(() => {
+        alertElement.classList.add('show');
+    }, 10);
+    alertElement.querySelector('.close').onclick = () => {
+        closeAlert(alertElement);
+    };
+    setTimeout(() => {
+        closeAlert(alertElement);
+    }, 8000);
+    alertCount++;
+}
+
+function closeAlert(alertElement) {
+    alertElement.classList.remove('show');
+    setTimeout(() => {
+        document.body.removeChild(alertElement);
+        alertCount--;
+        updateAlertPositions();
+    }, 300);
+}
+
+function updateAlertPositions() {
+    const alerts = document.querySelectorAll('.alert, .alertError');
+    alerts.forEach((alert, index) => {
+        alert.style.bottom = `${20 + index * 70}px`;
+    });
+}
+// FIN ALERT EMAIL
