@@ -1,13 +1,13 @@
 // Inicializa Firebase
 firebase.initializeApp({
-      apiKey: "AIzaSyDI9exOVBtsUlMg2DhkITPMMCGFCy5ZWnA",
-      authDomain: "posventa-novogar.firebaseapp.com",
-      databaseURL: "https://posventa-novogar-default-rtdb.firebaseio.com",
-      projectId: "posventa-novogar",
-      storageBucket: "posventa-novogar.firebasestorage.app",
-      messagingSenderId: "1065784925699",
-      appId: "1:1065784925699:web:47c291fa4e4d6e484e3836",
-      measurementId: "G-FNZ4PW5L35"
+    apiKey: "AIzaSyBKN4rYQg1vwkikHoB9d8GmKvGJA8FS-OU",
+    authDomain: "planilla-posventa.firebaseapp.com",
+    databaseURL: "https://planilla-posventa-default-rtdb.firebaseio.com",
+    projectId: "planilla-posventa",
+    storageBucket: "planilla-posventa.firebasestorage.app",
+    messagingSenderId: "402134259405",
+    appId: "1:402134259405:web:d65d4a234672086b50bb84",
+    measurementId: "G-B5WXWBQNE8"
   });
   
   const db = firebase.database();
@@ -521,10 +521,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // ENVIO DE EMAIL CANCELADAS
       const estadosFiltrados = ventasFiltradas.filter(([ventaId, venta]) => {
-          const ultimoEstado = obtenerUltimoEstado(venta).ultimoEstado.toLowerCase();
-          const transferido = venta.ventas.transferido === true; // Verificar si ya está transferido
+        const ultimoEstado = obtenerUltimoEstado(venta).ultimoEstado.toLowerCase();
+        const transferido = venta.ventas.transferido === true; // Verificar si ya está transferido
 
-          return !transferido && [
+        return !transferido && [
             "cancelaste la venta",
             "venta cancelada. no despachés",
             "cancelada por el comprador",
@@ -534,10 +534,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             "cancelamos la venta",
             "paquete cancelado por mercado libre"
         ].some(frase => ultimoEstado.startsWith(frase));
-    });
+      });
 
-    // Crear tabla con ventas canceladas
-    if (estadosFiltrados.length > 0) {
+      // Crear tabla con ventas canceladas
+      if (estadosFiltrados.length > 0) {
         let htmlTabla = `
             <table class="table mac-os-table" style="width: 100%; border-collapse: collapse;">
                 <thead style="background-color: #007aff; color: white;">
@@ -559,7 +559,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             htmlTabla += `
                 <tr style="border: 1px solid #e0e0e0;">
-                    <td style="padding: 10px; text-align: center;"><a href="https://www.mercadolibre.com.ar/ventas/${ventaId}/detalle" target="_blank">${ventaId}</a></td>
+                    <td style="padding: 10px; text-align: center;">
+                        <a href="https://www.mercadolibre.com.ar/ventas/${ventaId}/detalle" target="_blank">${ventaId}</a>
+                    </td>
                     <td style="padding: 10px; text-align: center;">${ultimoEstado}</td>
                     <td style="padding: 10px; text-align: center;">${ultimaDescripcion}</td>
                     <td style="padding: 10px; text-align: center;">${cuitDni}</td>
@@ -611,57 +613,64 @@ document.addEventListener('DOMContentLoaded', async () => {
             </html>
         `;
 
+        try {
           await enviarCorreoConDetalles("esperanza.toffalo@novogar.com.ar", "Esperanza Toffalo", nombreTanda, horaSubida, emailBody);
           await enviarCorreoConDetalles("marina.braidotti@novogar.com.ar", "Marina Braidotti", nombreTanda, horaSubida, emailBody);
           await enviarCorreoConDetalles("posventanovogar@gmail.com", "Posventa Web", nombreTanda, horaSubida, emailBody);
           await enviarCorreoConDetalles("agustina.benedetto@novogar.com.ar", "Agustina Benedetto", nombreTanda, horaSubida, emailBody);
           await enviarCorreoConDetalles("natalia.rodriguez@novogar.com.ar", "Natalia Rodriguez", nombreTanda, horaSubida, emailBody);
-          await enviarCorreoConDetalles("mauricio.daffonchio@novogar.com.ar", "Mauricio Daffonchio", nombreTanda, horaSubida, emailBody);
+          await enviarCorreoConDetalles("mauricio.daffonchio@novogar.com.ar", "Mauricio Daffonchio", nombreTanda, horaSubida, emailBody);            
+        } catch (error) {
+            console.error("Error al enviar el correo de ventas canceladas:", error);
+        }
+      } else {
+        console.log("No hay Canceladas para revisar.");
+      }
 
-          // Actualizar Firebase para cada venta
-          for (const [ventaId] of estadosFiltrados) {
-            const ventaRef = firebase.database().ref(`/posventa/${ventaId}/ventas`);
-            const skillsRef = firebase.database().ref(`/posventa/${ventaId}/skills`);
+      // Actualizar Firebase para cada venta
+      for (const [ventaId] of estadosFiltrados) { // Asegúrate de usar estadosFiltrados
+        const ventaRef = firebase.database().ref(`/posventa/${ventaId}/ventas`);
+        const skillsRef = firebase.database().ref(`/posventa/${ventaId}/skills`);
 
-            // Obtener los datos actuales para identificar el último estado y descripción
-            const snapshot = await ventaRef.once('value');
-            const data = snapshot.val();
+        // Obtener los datos actuales para identificar el último estado y descripción
+        const snapshot = await ventaRef.once('value');
+        const data = snapshot.val();
 
-            let ultimoEstado = 1; // Comenzamos desde 1 para saltar a 2
-            let ultimoDescripcion = 1; // Comenzamos desde 1 para saltar a 2
+        let ultimoEstado = 1;
+        let ultimoDescripcion = 1;
 
-            // Buscar el último estado existente
-            while (data[`estado${ultimoEstado + 1}`]) {
-                ultimoEstado++;
-            }
+        // Buscar el último estado existente
+        while (data[`estado${ultimoEstado + 1}`]) {
+            ultimoEstado++;
+        }
 
-            // Buscar el último descripción existente
-            while (data[`descripción_del_estado${ultimoDescripcion + 1}`]) {
-                ultimoDescripcion++;
-            }
+        // Buscar el último descripción existente
+        while (data[`descripción_del_estado${ultimoDescripcion + 1}`]) {
+            ultimoDescripcion++;
+        }
 
-            // Crear el nuevo estado y descripción
-            const nuevoEstado = ultimoEstado + 1; // Esto comenzará desde 2
-            const nuevoDescripcion = ultimoDescripcion + 1; // Esto comenzará desde 2
+        const estadoTexto = "Se ha finalizado el control de Posventa";
+        const descripcionTexto = "Control Finalizado";
 
-            const estadoTexto = "Se ha transferido la operación por email al sector de facturación para su control";
-            const descripcionTexto = "Transferido a Facturacion";
-
-            // Actualizar Firebase con el nuevo estado y descripción
+        // Actualizar Firebase con el nuevo estado y descripción
+        try {
             await ventaRef.update({
                 transferido: true,
-                [`estado${nuevoEstado}`]: estadoTexto,
-                [`descripción_del_estado${nuevoDescripcion}`]: descripcionTexto,
-                estadoActual: "TRANSFERIDO A FACTURACION"
+                [`estado${ultimoEstado + 1}`]: estadoTexto,
+                [`descripción_del_estado${ultimoDescripcion + 1}`]: descripcionTexto,
+                estadoActual: "CONTROL FINALIZADO"
             });
+        } catch (error) {
+            console.error("Error al actualizar ventaRef:", error);
+        }
 
+        try {
             await skillsRef.update({
-              "transferido a facturacion": true
+                "transferido a facturacion": true
             });
-          }
-        // NO HACER NADA, solo enviar el correo
-      } else {
-          console.log("No hay ventas canceladas para mostrar.");
+        } catch (error) {
+            console.error("Error al actualizar skillsRef:", error);
+        }
       }
       // FIN ENVIO DE EMAIL CANCELADAS
 
@@ -787,8 +796,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const nuevoEstado = ultimoEstado + 1;
         const nuevoDescripcion = ultimoDescripcion + 1;
 
-        const estadoTexto = "La devolución llegó a NOVOGAR, se ha finalizado el control de posventa";
-        const descripcionTexto = "Llego a Novogar";
+        const estadoTexto = "Se ha finalizado el control de Posventa";
+        const descripcionTexto = "Control Finalizado";
 
         // Actualizar Firebase con el nuevo estado y descripción
         try {
@@ -796,7 +805,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 transferido: true,
                 [`estado${nuevoEstado}`]: estadoTexto,
                 [`descripción_del_estado${nuevoDescripcion}`]: descripcionTexto,
-                estadoActual: "LLEGO A NOVOGAR"
+                estadoActual: "CONTROL FINALIZADO"
             });
         } catch (error) {
             console.error("Error al actualizar ventaRef:", error);
