@@ -1308,7 +1308,7 @@ function buscarTrackingPosventa(venta, ventaId) {
         if (companyLower.includes("andesmar")) skills["andesmar"] = true;
         if (companyLower.includes("andreani")) skills["andreani"] = true;
         if (companyLower.includes("placeit")) skills["place it"] = true;
-        if (companyLower.includes("novogar")) skills["Logistica novogar"] = true;
+        if (companyLower.includes("novogar")) skills["logistica novogar"] = true;
       }
 
       if (Object.keys(skills).length > 0) {
