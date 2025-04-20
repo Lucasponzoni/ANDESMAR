@@ -519,7 +519,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const tbody = document.querySelector('#data-table tbody');
       tbody.innerHTML = ''; // Limpiar anterior
 
-      // Aquí comienza el filtrado para ventas canceladas
+      // ENVIO DE EMAIL CANCELADAS
       const estadosFiltrados = ventasFiltradas.filter(([ventaId, venta]) => {
           const ultimoEstado = obtenerUltimoEstado(venta).ultimoEstado.toLowerCase();
           const transferido = venta.ventas.transferido === true; // Verificar si ya está transferido
@@ -574,7 +574,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
 
         // Aquí se envía el correo con los detalles de las ventas canceladas
-        const destinatarioEmail = "lucasponzoni@gmail.com"; 
         const nombreDestinatario = "Posventa Web";
         const nombreTanda = "Tanda de Ventas Canceladas";
         const horaSubida = new Date().toLocaleTimeString();
@@ -621,14 +620,197 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           // Actualizar Firebase para cada venta
           for (const [ventaId] of estadosFiltrados) {
-              await firebase.database().ref(`/posventa/${ventaId}/ventas`).update({
-                  transferido: true
-              });
+            const ventaRef = firebase.database().ref(`/posventa/${ventaId}/ventas`);
+            const skillsRef = firebase.database().ref(`/posventa/${ventaId}/skills`);
+
+            // Obtener los datos actuales para identificar el último estado y descripción
+            const snapshot = await ventaRef.once('value');
+            const data = snapshot.val();
+
+            let ultimoEstado = 1; // Comenzamos desde 1 para saltar a 2
+            let ultimoDescripcion = 1; // Comenzamos desde 1 para saltar a 2
+
+            // Buscar el último estado existente
+            while (data[`estado${ultimoEstado + 1}`]) {
+                ultimoEstado++;
+            }
+
+            // Buscar el último descripción existente
+            while (data[`descripción_del_estado${ultimoDescripcion + 1}`]) {
+                ultimoDescripcion++;
+            }
+
+            // Crear el nuevo estado y descripción
+            const nuevoEstado = ultimoEstado + 1; // Esto comenzará desde 2
+            const nuevoDescripcion = ultimoDescripcion + 1; // Esto comenzará desde 2
+
+            const estadoTexto = "Se ha transferido la operación por email al sector de facturación para su control";
+            const descripcionTexto = "Transferido a Facturacion";
+
+            // Actualizar Firebase con el nuevo estado y descripción
+            await ventaRef.update({
+                transferido: true,
+                [`estado${nuevoEstado}`]: estadoTexto,
+                [`descripción_del_estado${nuevoDescripcion}`]: descripcionTexto,
+                estadoActual: "TRANSFERIDO A FACTURACION"
+            });
+
+            await skillsRef.update({
+              "transferido a facturacion": true
+            });
           }
-          // NO HACER NADA, solo enviar el correo
+        // NO HACER NADA, solo enviar el correo
       } else {
           console.log("No hay ventas canceladas para mostrar.");
       }
+      // FIN ENVIO DE EMAIL CANCELADAS
+
+      // ENVIO DE EMAIL DEVOLUCIONES
+      // Filtrar estados que comienzan con "devolución para revisar" o "devuelto"
+      const devolucionesFiltradas = ventasFiltradas.filter(([ventaId, venta]) => {
+        const ultimoEstado = obtenerUltimoEstado(venta).ultimoEstado.toLowerCase();
+        const transferido = venta.ventas.transferido === true; // Verificar si ya está transferido
+
+      return !transferido && [
+        "devolución para revisar",
+        "devolución finalizada el producto no está apto",
+        "devuelto"
+          ].some(frase => ultimoEstado.startsWith(frase));
+        });
+
+      // Crear tabla para devoluciones
+      let htmlTablaDevoluciones = '';
+      if (devolucionesFiltradas.length > 0) {
+        htmlTablaDevoluciones = `
+            <table class="table mac-os-table" style="width: 100%; border-collapse: collapse;">
+                <thead style="background-color: #007aff; color: white;">
+                    <tr>
+                        <th style="padding: 10px;">Operación</th>
+                        <th style="padding: 10px;">Estado</th>
+                        <th style="padding: 10px;">Descripción</th>
+                        <th style="padding: 10px;">CUIT / DNI</th>
+                        <th style="padding: 10px;">Producto y Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        devolucionesFiltradas.forEach(([ventaId, venta]) => {
+            const { ultimoEstado, ultimaDescripcion } = obtenerUltimoEstado(venta);
+            const cuitDni = venta.facturación_al_comprador.tipo_y_número_de_documento || "No disponible";
+            const productoCantidad = `${venta.publicaciones.sku}, X ${venta.ventas.unidades} u.`;
+
+            htmlTablaDevoluciones += `
+                <tr style="border: 1px solid #e0e0e0;">
+                    <td style="padding: 10px; text-align: center;"><a href="https://www.mercadolibre.com.ar/ventas/${ventaId}/detalle" target="_blank">${ventaId}</a></td>
+                    <td style="padding: 10px; text-align: center;">${ultimoEstado}</td>
+                    <td style="padding: 10px; text-align: center;">${ultimaDescripcion}</td>
+                    <td style="padding: 10px; text-align: center;">${cuitDni}</td>
+                    <td style="padding: 10px; text-align: center;">${productoCantidad}</td>
+                </tr>
+            `;
+        });
+
+        htmlTablaDevoluciones += `
+                </tbody>
+            </table>
+        `;
+
+        // Enviar el correo para devoluciones
+        const nombreTandaDevoluciones = "Nuevas Devoluciones para Revisar";
+        const horaSubidaDevoluciones = new Date().toLocaleTimeString();
+
+        const emailBodyDevoluciones = `
+            <html>
+            <head>
+                <style>
+                    body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; padding: 20px; }
+                    .container { max-width: 800px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+                    h2 { color: #333333; }
+                    p { color: #333333; }
+                    .footer { margin-top: 20px; font-size: 12px; color: #777; text-align: center; }
+                    .header { background-color: #007aff; color: white; padding: 10px; text-align: center; border-radius: 10px }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { padding: 10px; text-align: center; border: 1px solid #e0e0e0; }
+                    th { background-color: #007aff; color: white; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                    tr:hover { background-color: #f1f1f1; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h2>Informe de Nuevas Devoluciones para Revisar</h2>
+                    </div>
+                    <h3>Hola Elias Pignani 👋,</h3>
+                    <p>Tienes disponible una nueva tanda de devoluciones para revisar. 📉</p>
+                    ${htmlTablaDevoluciones}
+                    <p style="color: #333333;">Saludos,</p>
+                    <p style="color: #333333;">Equipo de Posventa Novogar 🍏</p>
+                    <div class="footer">Este es un mensaje automático, por favor no respondas.</div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        await enviarCorreoConDetalles("elias.pignani@novogar.com.ar", "Elias Pignani", nombreTandaDevoluciones, horaSubidaDevoluciones, emailBodyDevoluciones);
+        await enviarCorreoConDetalles("esperanza.toffalo@novogar.com.ar", "Esperanza Toffalo", nombreTandaDevoluciones, horaSubidaDevoluciones, emailBodyDevoluciones);
+        await enviarCorreoConDetalles("posventanovogar@gmail.com", "Posventa Web", nombreTandaDevoluciones, horaSubidaDevoluciones, emailBodyDevoluciones);
+
+      } else {
+        console.log("No hay devoluciones para revisar.");
+      }
+
+      // Actualizar Firebase para cada venta
+      for (const [ventaId] of devolucionesFiltradas) { // Asegúrate de usar devolucionesFiltradas
+        const ventaRef = firebase.database().ref(`/posventa/${ventaId}/ventas`);
+        const skillsRef = firebase.database().ref(`/posventa/${ventaId}/skills`);
+
+        // Obtener los datos actuales para identificar el último estado y descripción
+        const snapshot = await ventaRef.once('value');
+        const data = snapshot.val();
+
+        let ultimoEstado = 1;
+        let ultimoDescripcion = 1;
+
+        // Buscar el último estado existente
+        while (data[`estado${ultimoEstado + 1}`]) {
+            ultimoEstado++;
+        }
+
+        // Buscar el último descripción existente
+        while (data[`descripción_del_estado${ultimoDescripcion + 1}`]) {
+            ultimoDescripcion++;
+        }
+
+        // Crear el nuevo estado y descripción
+        const nuevoEstado = ultimoEstado + 1;
+        const nuevoDescripcion = ultimoDescripcion + 1;
+
+        const estadoTexto = "La devolución llegó a NOVOGAR, se ha finalizado el control de posventa";
+        const descripcionTexto = "Llego a Novogar";
+
+        // Actualizar Firebase con el nuevo estado y descripción
+        try {
+            await ventaRef.update({
+                transferido: true,
+                [`estado${nuevoEstado}`]: estadoTexto,
+                [`descripción_del_estado${nuevoDescripcion}`]: descripcionTexto,
+                estadoActual: "LLEGO A NOVOGAR"
+            });
+        } catch (error) {
+            console.error("Error al actualizar ventaRef:", error);
+        }
+
+        try {
+            await skillsRef.update({
+                "transferido a devoluciones": true
+            });
+        } catch (error) {
+            console.error("Error al actualizar skillsRef:", error);
+        }
+      }
+      // FIN ENVIO DE EMAIL DEVOLUCIONES
 
       ventasFiltradas.forEach(([ventaId, venta]) => {
           const { ultimoEstado, ultimaDescripcion } = obtenerUltimoEstado(venta); // Obtener último estado y descripción
@@ -959,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ENVIAR EMAIL CON VENTAS CANCELADAS
 async function enviarCorreoConDetalles(destinatarioEmail, nombreDestinatario, nombreTanda, horaSubida, emailBody) {
   const fecha = new Date().toLocaleDateString();
-  const Subject = `Nueva Tanda de Ventas Canceladas - ${nombreTanda} - ${fecha}`;
+  const Subject = `LogiPaq - ${nombreTanda} - ${fecha}`;
   const smtpU = 's154745_3';
   const smtpP = 'QbikuGyHqJ';
 
@@ -1003,8 +1185,8 @@ async function enviarCorreoConDetalles(destinatarioEmail, nombreDestinatario, no
 
       const result = await response.json();
       if (result.Status === 'done') {
-          console.log(`Email enviado a ${destinatarioEmail} a las ${horaSubida}`);
-          showAlertPosventa(`Email enviado a ${destinatarioEmail} con las ventas canceladas.`);
+          console.log(`Email enviado a ${destinatarioEmail}, Motivo: ${nombreTanda}`);
+          showAlertPosventa(`Email enviado a ${destinatarioEmail}, Motivo: ${nombreTanda}`);
       } else {
           console.log(`Error al enviar el email: ${result.Message}`);
           showAlertErrorPosventa(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${horaSubida}`);
