@@ -827,7 +827,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const cantidadEstados = Object.keys(venta.ventas).filter(key => key.startsWith('estado') && key !== 'estadoActual').length;
           const iconClass = cantidadEstados > 1 ? 'fas fa-history text-success' : 'fas fa-history';
 
-          // PROCESAR FECHAS EN ESTADO
+          // PROCESAR FECHAS ESTADO Y DESCRIPCION
           const procesarUltimoEstado = (estado, venta) => {
             // Si existe número de caso, no mostrar nada
             if (venta?.comentarios?.numeroCaso) return '';
@@ -926,7 +926,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
             return '';
         };                  
-        // FIN PROCESAR FECHAS EN ESTADO
+        // FIN PROCESAR FECHAS EN ESTADO Y DESCRIPCION
 
           const row = document.createElement('tr');
           row.innerHTML = `
