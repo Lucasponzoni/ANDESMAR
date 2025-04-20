@@ -897,32 +897,37 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
         
                 return `
+                <div style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                ">
                     <div style="
-                        margin-top: 12px;
+                        margin-top: 5px;
                         background: ${bg};
                         border-radius: 12px;
-                        padding: 12px 18px;
+                        padding: 5px 10px;
                         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                         font-size: 12.5px;
                         color: ${color};
-                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
                         display: flex;
+                        max-width: fit-content;
                         flex-direction: column;
                         text-align: center;
-                        gap: 4px;
                     ">
-                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; font-weight: 500;">
+                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 500;">
                             <span style="font-size: 14px;">${icon}</span> ${mensaje}
                         </div>
                         <div style="font-size: 11px; color: #666;">🗓 Fecha límite: ${fechaFormateada}</div>
                     </div>
-                `;
+                </div>
+            `;            
             }
         
             return '';
         };                  
         // FIN PROCESAR FECHAS EN ESTADO
-        
+
           const row = document.createElement('tr');
           row.innerHTML = `
               <td>
@@ -1000,8 +1005,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               </td>
               <td style="vertical-align: middle; font-family: 'Rubik', sans-serif;">
                 ${ultimoEstado}
-                ${procesarUltimoEstado(ultimoEstado)}
-                ${procesarUltimoEstado(ultimaDescripcion)}
                 ${venta.comentarios && venta.comentarios.numeroCaso && venta.comentarios.vencimientoDevolucion ? (() => {
                     const vencimiento = venta.comentarios.vencimientoDevolucion || "No disponible";
                     const numeroCaso = venta.comentarios.numeroCaso || "No disponible";
@@ -1048,6 +1051,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 })() : ''}
               </td>
               <td style="vertical-align: middle;">
+                ${procesarUltimoEstado(ultimoEstado)}
+                ${procesarUltimoEstado(ultimaDescripcion)}
                 ${ultimaDescripcion}
                 <i class="bi bi-plus-circle-fill icon-user-plus" onclick="abrirSkillsModalFilas('${ventaId}')"></i>
                 <div class="div-skills-${ventaId}" style="margin-top: 10px;"></div>
