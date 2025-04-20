@@ -1364,8 +1364,7 @@ window.handleDivClick = function(ventaId, vencimiento, numeroCaso, estadoTexto) 
 };
 
 // MARTILLO GENERAL
-// Función para copiar datos al portapapeles al hacer clic en el ícono de hammer
-async function copyHammerData(ventaId, operacion, numeroCaso, vencimientoDevolucion, estadoActual, ultimaDescripcion, sku, unidades, total) {
+async function copyHammerData(ventaId, estadoActual, ultimaDescripcion, sku, unidades, total) {
   // Obtener el nombre del operador
   const activeAvatar = document.getElementById("active-avatar");
   const nombreOperador = activeAvatar ? activeAvatar.alt : "Operador desconocido";
@@ -1403,6 +1402,9 @@ async function copyHammerData(ventaId, operacion, numeroCaso, vencimientoDevoluc
       skillsMensaje += `\n`;
   }
 
+  // Obtener comentarios desde Firebase
+  const comentarios = await getComentarios(ventaId);
+
   // Construir el mensaje base
   let mensaje = `Venta ID: ${ventaId}\n\n` +
                 `ESTADO:\n` +
@@ -1414,13 +1416,11 @@ async function copyHammerData(ventaId, operacion, numeroCaso, vencimientoDevoluc
                 skillsMensaje;
 
   // Verificar si hay comentarios disponibles
-  const comentariosDisponibles = [operacion, numeroCaso, vencimientoDevolucion].some(comment => comment && comment !== "No disponible");
-
-  if (comentariosDisponibles) {
+  if (comentarios && comentarios.length > 0) {
       mensaje += `COMENTARIOS:\n` +
-                 `Comentarios: ${operacion ? operacion.charAt(0).toUpperCase() + operacion.slice(1).toLowerCase() : "No disponible"}\n` +
-                 `Número de Caso: ${numeroCaso ? numeroCaso.charAt(0).toUpperCase() + numeroCaso.slice(1).toLowerCase() : "No disponible"}\n` +
-                 `Vencimiento Devolución: ${vencimientoDevolucion ? vencimientoDevolucion.charAt(0).toUpperCase() + vencimientoDevolucion.slice(1).toLowerCase() : "No disponible"}\n\n`;
+                 `Comentarios: ${comentarios[2] || "No disponible"}\n` + // Primer comentario
+                 `Número de Caso: ${comentarios[1] || "No disponible"}\n` + // Segundo comentario
+                 `Vencimiento Devolución: ${comentarios[3] === 'Invalid Date' ? "No corresponde ser reclamado aún" : (comentarios[2] || "No disponible")}\n\n`;
   }
 
   // Agregar "REVISADO POR" al final del mensaje
@@ -1434,7 +1434,22 @@ async function copyHammerData(ventaId, operacion, numeroCaso, vencimientoDevoluc
       console.error('Error al copiar al portapapeles: ', err);
   }
 }
-// FIN MARTILLO GENERAL
+
+// Función para obtener los comentarios desde Firebase
+async function getComentarios(ventaId) {
+  const comentarios = [];
+  const comentariosRef = firebase.database().ref(`/posventa/${ventaId}/comentarios`);
+  const snapshot = await comentariosRef.once('value');
+
+  if (snapshot.exists()) {
+      snapshot.forEach(childSnapshot => {
+          const comentario = childSnapshot.val();
+          comentarios.push(comentario);
+      });
+  }
+
+  return comentarios;
+}
 
 // Función para obtener las skills activas desde Firebase
 async function getActiveSkills(ventaId) {
@@ -1475,6 +1490,7 @@ async function getSkillsDescriptions(activeSkills) {
 
   return skillsDescriptions;
 }
+// FIN MARTILLO GENERAL
 
 // Definición del array de avatares
 const avatares = [
