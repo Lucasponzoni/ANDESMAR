@@ -826,8 +826,103 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           const cantidadEstados = Object.keys(venta.ventas).filter(key => key.startsWith('estado') && key !== 'estadoActual').length;
           const iconClass = cantidadEstados > 1 ? 'fas fa-history text-success' : 'fas fa-history';
-          
 
+          // PROCESAR FECHAS EN ESTADO
+          const procesarUltimoEstado = (estado, venta) => {
+            // Si existe número de caso, no mostrar nada
+            if (venta?.comentarios?.numeroCaso) return '';
+        
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+        
+            const seisMesesAtras = new Date(hoy);
+            seisMesesAtras.setMonth(hoy.getMonth() - 6);
+        
+            const meses = [
+                "enero", "febrero", "marzo", "abril", "mayo", "junio",
+                "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+            ];
+        
+            const regexFechas = /(?:antes del|entre)?\s*(\d{1,2})(?:\s*(?:y|al)\s*(\d{1,2}))?\s+de\s+(\w+)/i;
+            const match = estado.match(regexFechas);
+        
+            if (match) {
+                let dia1 = parseInt(match[1]);
+                let dia2 = match[2] ? parseInt(match[2]) : null;
+                let mesTexto = match[3].toLowerCase();
+                let mes = meses.indexOf(mesTexto);
+                if (mes === -1) return '';
+        
+                const anioActual = hoy.getFullYear();
+                let fechas = [];
+        
+                [dia1, dia2].forEach(dia => {
+                    if (dia !== null) {
+                        let fecha = new Date(anioActual, mes, dia);
+                        if (fecha < seisMesesAtras) fecha.setFullYear(anioActual - 1);
+                        fechas.push(fecha);
+                    }
+                });
+        
+                const fechaMax = new Date(Math.max(...fechas.map(f => f.getTime())));
+                const diffTime = fechaMax.getTime() - hoy.getTime();
+                const diffDias = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+                let color = '';
+                let bg = '';
+                let icon = '';
+                let mensaje = '';
+        
+                if (diffDias > 0) {
+                    bg = "#f0fdf4";
+                    color = "#2e7d32";
+                    icon = "🕓";
+                    mensaje = `Plazo máximo en ${diffDias} día(s)`;
+                } else if (diffDias === 0) {
+                    bg = "#fffde7";
+                    color = "#f9a825";
+                    icon = "⚠️";
+                    mensaje = `¡Vence hoy!`;
+                } else {
+                    bg = "#fff1f2";
+                    color = "#d32f2f";
+                    icon = "❌";
+                    mensaje = `Venció hace ${Math.abs(diffDias)} día(s)`;
+                }
+        
+                const fechaFormateada = fechaMax.toLocaleDateString('es-AR', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
+        
+                return `
+                    <div style="
+                        margin-top: 12px;
+                        background: ${bg};
+                        border-radius: 12px;
+                        padding: 12px 18px;
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        font-size: 12.5px;
+                        color: ${color};
+                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+                        display: flex;
+                        flex-direction: column;
+                        text-align: center;
+                        gap: 4px;
+                    ">
+                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; font-weight: 500;">
+                            <span style="font-size: 14px;">${icon}</span> ${mensaje}
+                        </div>
+                        <div style="font-size: 11px; color: #666;">🗓 Fecha límite: ${fechaFormateada}</div>
+                    </div>
+                `;
+            }
+        
+            return '';
+        };                  
+        // FIN PROCESAR FECHAS EN ESTADO
+        
           const row = document.createElement('tr');
           row.innerHTML = `
               <td>
@@ -905,6 +1000,8 @@ document.addEventListener('DOMContentLoaded', async () => {
               </td>
               <td style="vertical-align: middle; font-family: 'Rubik', sans-serif;">
                 ${ultimoEstado}
+                ${procesarUltimoEstado(ultimoEstado)}
+                ${procesarUltimoEstado(ultimaDescripcion)}
                 ${venta.comentarios && venta.comentarios.numeroCaso && venta.comentarios.vencimientoDevolucion ? (() => {
                     const vencimiento = venta.comentarios.vencimientoDevolucion || "No disponible";
                     const numeroCaso = venta.comentarios.numeroCaso || "No disponible";
