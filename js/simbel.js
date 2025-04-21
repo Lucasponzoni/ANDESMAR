@@ -1268,8 +1268,8 @@ function obtenerFechas() {
     console.log("Próximo día hábil:", fechaEntrega);
 
     // Sumar 48 horas a la fecha de entrega
-    fechaEntrega.setHours(fechaEntrega.getHours() + 24);
-    console.log("Fecha de entrega después de sumar 48 horas:", fechaEntrega);
+    fechaEntrega.setHours(fechaEntrega.getHours() + 72);
+    console.log("Fecha de entrega después de sumar 96 horas:", fechaEntrega);
 
     // Asegurarse de que la fecha de entrega sea un día hábil
     while (fechaEntrega.getDay() === 0 || fechaEntrega.getDay() === 6) { // 0 = domingo, 6 = sábado
