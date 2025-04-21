@@ -821,7 +821,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       // FIN ENVIO DE EMAIL DEVOLUCIONES
 
+      let filaNumero = 1; // Contador para el número de fila
+
       ventasFiltradas.forEach(([ventaId, venta]) => {
+
           const { ultimoEstado, ultimaDescripcion } = obtenerUltimoEstado(venta); // Obtener último estado y descripción
 
           const cantidadEstados = Object.keys(venta.ventas).filter(key => key.startsWith('estado') && key !== 'estadoActual').length;
@@ -931,6 +934,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           const row = document.createElement('tr');
           row.innerHTML = `
               <td>
+                  <div class="mac-os-cell" style="
+                      padding: 5px; 
+                      background-color: #007aff; 
+                      border-radius: 8px; 
+                      color: white; 
+                      font-family: 'Helvetica Neue', Arial, sans-serif;
+                      text-align: center;
+                      margin-bottom: 3px;
+                      max-width: fit-content;
+                      font-weight: bold;
+                  ">
+                      Fila ${filaNumero++}
+                  </div>
                   <div class="clientePosventa-gris" id="cliente-posventa-${ventaId}">
                     Buscando <div class="spinner-border text-secondary" role="status" style="width: 1rem; height: 1rem;">
                       <span class="visually-hidden">Cargando...</span>
