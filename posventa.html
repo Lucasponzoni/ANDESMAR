@@ -135,6 +135,12 @@
             </div>
             
             <div class="col-md-12 mb-3 d-flex justify-content-start ingreso-egreso trio-de-botones" style="overflow-x: auto; white-space: nowrap; padding-top: 20px;">
+    
+                <!-- Botón dinámico "Ir atrás" -->
+                <button id="btnIrAtras" class="btn btn-secondary d-none">
+                    <i class="bi bi-arrow-left-circle-fill" style="font-size: 22px;"></i> Ir atrás
+                </button>
+            
                 <!-- Botón para abrir el modal de importación -->
                 <button id="btnImportar" class="btn btn-light" data-toggle="modal" data-target="#importModal">
                     <i class="bi bi-file-earmark-plus-fill" style="font-size: 22px; color: #2d853c;"></i> Importar Datos
@@ -148,15 +154,21 @@
                 <button id="btnSkills" class="btn btn-light" data-toggle="modal" data-target="#skillsModal">
                     <i class="bi bi-bookmarks-fill" style="font-size: 22px; color: #007bff;"></i> Skills
                 </button>
-
+            
+                <!-- Botón Pendientes de controlar -->
+                <button id="btnPendientesControlar" class="btn btn-light">
+                    <i class="bi bi-eye-slash-fill" style="font-size: 22px; color: #d9534f;"></i> Pendientes de controlar
+                </button>
+            
                 <button class="btn btn-light ml-2" id="sinRevisar" title="Promedio Despacho: Xd Yh Zm" onclick="contarFilasSinControlDesdeDOM()">
                     <i class="bi bi-calculator"></i> Calculando sin Revisar...
                 </button>                
-
+            
                 <button class="btn btn-light ml-2" id="promedioBtn" title="Promedio Despacho: Xd Yh Zm">
                     <i class="bi bi-calculator"></i> Contando Filas...
                 </button>     
-            </div>            
+            </div>
+                    
         </div>
     </div>
     </head>
@@ -270,6 +282,49 @@
                 aplicarFiltroSkills();
             });
         </script> 
+
+        <script>
+            document.getElementById("btnPendientesControlar").addEventListener("click", function () {
+                const hoy = new Date();
+                const dia = String(hoy.getDate()).padStart(2, '0');
+                const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+                const anio = hoy.getFullYear();
+                const fechaHoy = `${dia}/${mes}/${anio}`;
+            
+                const filas = document.querySelectorAll("#data-table tbody tr");
+            
+                filas.forEach(fila => {
+                    const mensaje = fila.querySelector(".mensaje-filaDeDatos");
+            
+                    if (!mensaje) {
+                        fila.style.display = ""; // mostrar (pendiente)
+                    } else {
+                        const texto = mensaje.innerText;
+                        const match = texto.match(/(\d{2}\/\d{2}\/\d{4})/);
+            
+                        if (!match || match[1] !== fechaHoy) {
+                            fila.style.display = ""; // mostrar (fecha distinta)
+                        } else {
+                            fila.style.display = "none"; // ocultar (controlado hoy)
+                        }
+                    }
+                });
+            
+                // Mostrar botón "Ir atrás"
+                document.getElementById("btnIrAtras").classList.remove("d-none");
+            });
+            
+            document.getElementById("btnIrAtras").addEventListener("click", function () {
+                const filas = document.querySelectorAll("#data-table tbody tr");
+            
+                filas.forEach(fila => {
+                    fila.style.display = ""; // volver a mostrar todo
+                });
+            
+                // Ocultar el botón de volver
+                this.classList.add("d-none");
+            });
+        </script>      
     
         <!-- Modal de Importación -->
         <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
@@ -350,114 +405,98 @@
         <!-- Modal de Skills -->
         <div class="modal fade" id="skillsModal" tabindex="-1" role="dialog" aria-labelledby="skillsModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content" style="border-radius: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;">
-                <div class="modal-header">
-                <h5 class="modal-title" id="skillsModalLabel">Agregar Skills</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                </div>
-                <div class="modal-body">
-                <div class="sku-input-group mb-3 d-flex">
-                    <input type="text" class="form-control sku-input" id="newSkuInputPlaceIt" placeholder="Ingrese el nombre del skill" aria-label="Nuevo Skill" aria-describedby="addSkuButtonPlaceIt">
-                    <button id="addSkuButtonPlaceIt" class="btn btn-primary">Agregar Skill</button>
-                </div>
-        
-                <div class="color-picker-container mb-1">
-                    <label class="form-label fw-semibold">🎨 Colores Rápidos:</label>
-                    <div class="d-flex flex-wrap gap-2 mb-3">
-                
-                        <!-- Paleta pastel extendida -->
-                        <button class="color-swatch" style="background-color: #ffd1dc;" data-color="#ffd1dc"></button>
-                        <button class="color-swatch" style="background-color: #ff9fbf;" data-color="#ff9fbf"></button>
-                        <button class="color-swatch" style="background-color: #ff7f9f;" data-color="#ff7f9f"></button>
-                        <button class="color-swatch" style="background-color: #ff4d7f;" data-color="#ff4d7f"></button>
-                
-                        <button class="color-swatch" style="background-color: #f6eac2;" data-color="#f6eac2"></button>
-                        <button class="color-swatch" style="background-color: #e2c85a;" data-color="#e2c85a"></button>
-                        <button class="color-swatch" style="background-color: #d1b24d;" data-color="#d1b24d"></button>
-                        <button class="color-swatch" style="background-color: #a78a3c;" data-color="#a78a3c"></button>
-                
-                        <button class="color-swatch" style="background-color: #bae1ff;" data-color="#bae1ff"></button>
-                        <button class="color-swatch" style="background-color: #8ab8ff;" data-color="#8ab8ff"></button>
-                        <button class="color-swatch" style="background-color: #6a9aff;" data-color="#6a9aff"></button>
-                        <button class="color-swatch" style="background-color: #3f7cff;" data-color="#3f7cff"></button>
-                
-                        <button class="color-swatch" style="background-color: #e0c3fc;" data-color="#e0c3fc"></button>
-                        <button class="color-swatch" style="background-color: #b78cfc;" data-color="#b78cfc"></button>
-                        <button class="color-swatch" style="background-color: #9b6efc;" data-color="#9b6efc"></button>
-                        <button class="color-swatch" style="background-color: #7a5eea;" data-color="#7a5eea"></button>
-                
-                        <button class="color-swatch" style="background-color: #ffe3a3;" data-color="#ffe3a3"></button>
-                        <button class="color-swatch" style="background-color: #ffcc7a;" data-color="#ffcc7a"></button>
-                        <button class="color-swatch" style="background-color: #ffb34d;" data-color="#ffb34d"></button>
-                        <button class="color-swatch" style="background-color: #ff9f1a;" data-color="#ff9f1a"></button>
-                
-                        <button class="color-swatch" style="background-color: #e2f0cb;" data-color="#e2f0cb"></button>
-                        <button class="color-swatch" style="background-color: #b3d68f;" data-color="#b3d68f"></button>
-                        <button class="color-swatch" style="background-color: #8bbf5f;" data-color="#8bbf5f"></button>
-                        <button class="color-swatch" style="background-color: #6da03a;" data-color="#6da03a"></button>
-                
-                        <button class="color-swatch" style="background-color: #fcd5ce;" data-color="#fcd5ce"></button>
-                        <button class="color-swatch" style="background-color: #f9a3a3;" data-color="#f9a3a3"></button>
-                        <button class="color-swatch" style="background-color: #f97c7c;" data-color="#f97c7c"></button>
-                        <button class="color-swatch" style="background-color: #f94c4c;" data-color="#f94c4c"></button>
-                
-                        <button class="color-swatch" style="background-color: #cce5ff;" data-color="#cce5ff"></button>
-                        <button class="color-swatch" style="background-color: #99c2ff;" data-color="#99c2ff"></button>
-                        <button class="color-swatch" style="background-color: #66a3ff;" data-color="#66a3ff"></button>
-                        <button class="color-swatch" style="background-color: #2e7eff;" data-color="#2e7eff"></button>
-                
-                        <button class="color-swatch" style="background-color: #d5f4e6;" data-color="#d5f4e6"></button>
-                        <button class="color-swatch" style="background-color: #aee3d5;" data-color="#aee3d5"></button>
-                        <button class="color-swatch" style="background-color: #7bd0c4;" data-color="#7bd0c4"></button>
-                        <button class="color-swatch" style="background-color: #4ab8a3;" data-color="#4ab8a3"></button>
-                
-                        <button class="color-swatch" style="background-color: #f9f7cf;" data-color="#f9f7cf"></button>
-                        <button class="color-swatch" style="background-color: #e4e1a1;" data-color="#e4e1a1"></button>
-                        <button class="color-swatch" style="background-color: #d1d08f;" data-color="#d1d08f"></button>
-                        <button class="color-swatch" style="background-color: #b0b05f;" data-color="#b0b05f"></button>        
-                
-                        <button class="color-swatch" style="background-color: #ffb3e6;" data-color="#ffb3e6"></button>
-                        <button class="color-swatch" style="background-color: #ff80e1;" data-color="#ff80e1"></button>
-                        <button class="color-swatch" style="background-color: #ff4db3;" data-color="#ff4db3"></button>
-                        <button class="color-swatch" style="background-color: #ff1a8a;" data-color="#ff1a8a"></button>
-                
-                        <button class="color-swatch" style="background-color: #ffe6b3;" data-color="#ffe6b3"></button>
-                        <button class="color-swatch" style="background-color: #ffdb80;" data-color="#ffdb80"></button>
-                        <button class="color-swatch" style="background-color: #ffcc33;" data-color="#ffcc33"></button>
-                        <button class="color-swatch" style="background-color: #ffb300;" data-color="#ffb300"></button>
-                
-                        <button class="color-swatch" style="background-color: #b3ffe0;" data-color="#b3ffe0"></button>
-                        <button class="color-swatch" style="background-color: #80ffcc;" data-color="#80ffcc"></button>
-                        <button class="color-swatch" style="background-color: #33ff99;" data-color="#33ff99"></button>
-                        <button class="color-swatch" style="background-color: #00ff66;" data-color="#00ff66"></button>
-                
-                        <button class="color-swatch" style="background-color: #b3e0ff;" data-color="#b3e0ff"></button>
-                        <button class="color-swatch" style="background-color: #80c2ff;" data-color="#80c2ff"></button>
-                
+                <div class="modal-content" style="border-radius: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="skillsModalLabel">Agregar Skills</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                </div>                
-        
-                    <label for="colorPicker" class="form-label fw-semibold">🌈 Color Personalizado:</label>
-                    <div class="custom-color-wrapper">
-                    <div class="custom-color-label">Haz clic para abrir la paleta</div>
-                    <input type="color" id="colorPicker" value="#007bff" class="custom-color-input">
-                    </div>
-                </div>
+                    <div class="modal-body">
+                        <div class="sku-input-group mb-3 d-flex">
+                            <input type="text" class="form-control sku-input" id="newSkuInputPlaceIt" placeholder="Ingrese el nombre del skill" aria-label="Nuevo Skill" aria-describedby="addSkuButtonPlaceIt">
+                            <button id="addSkuButtonPlaceIt" class="btn btn-primary">Agregar Skill</button>
+                        </div>
 
-                <label for="skillDescription" class="form-label fw-semibold">📝 Descripción del skill:</label>
-                <textarea id="skillDescription" class="form-control mb-3" rows="3" placeholder="Escribe la descripción del skill aquí... (Esto servirá para el armado del Martillo)" style="border-radius: 10px !important;"></textarea>
-        
-                <div id="spinner" class="text-center" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only">Cargando...</span>
+                        <div class="color-picker-container mb-1">
+                            <label class="form-label fw-semibold">🎨 Colores Rápidos:</label>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <!-- Paleta pastel extendida -->
+                                <button class="color-swatch" style="background-color: #ffd1dc;" data-color="#ffd1dc"></button>
+                                <button class="color-swatch" style="background-color: #ff9fbf;" data-color="#ff9fbf"></button>
+                                <button class="color-swatch" style="background-color: #ff7f9f;" data-color="#ff7f9f"></button>
+                                <button class="color-swatch" style="background-color: #ff4d7f;" data-color="#ff4d7f"></button>
+                                <button class="color-swatch" style="background-color: #f6eac2;" data-color="#f6eac2"></button>
+                                <button class="color-swatch" style="background-color: #e2c85a;" data-color="#e2c85a"></button>
+                                <button class="color-swatch" style="background-color: #d1b24d;" data-color="#d1b24d"></button>
+                                <button class="color-swatch" style="background-color: #a78a3c;" data-color="#a78a3c"></button>
+                                <button class="color-swatch" style="background-color: #bae1ff;" data-color="#bae1ff"></button>
+                                <button class="color-swatch" style="background-color: #8ab8ff;" data-color="#8ab8ff"></button>
+                                <button class="color-swatch" style="background-color: #6a9aff;" data-color="#6a9aff"></button>
+                                <button class="color-swatch" style="background-color: #3f7cff;" data-color="#3f7cff"></button>
+                                <button class="color-swatch" style="background-color: #e0c3fc;" data-color="#e0c3fc"></button>
+                                <button class="color-swatch" style="background-color: #b78cfc;" data-color="#b78cfc"></button>
+                                <button class="color-swatch" style="background-color: #9b6efc;" data-color="#9b6efc"></button>
+                                <button class="color-swatch" style="background-color: #7a5eea;" data-color="#7a5eea"></button>
+                                <button class="color-swatch" style="background-color: #ffe3a3;" data-color="#ffe3a3"></button>
+                                <button class="color-swatch" style="background-color: #ffcc7a;" data-color="#ffcc7a"></button>
+                                <button class="color-swatch" style="background-color: #ffb34d;" data-color="#ffb34d"></button>
+                                <button class="color-swatch" style="background-color: #ff9f1a;" data-color="#ff9f1a"></button>
+                                <button class="color-swatch" style="background-color: #e2f0cb;" data-color="#e2f0cb"></button>
+                                <button class="color-swatch" style="background-color: #b3d68f;" data-color="#b3d68f"></button>
+                                <button class="color-swatch" style="background-color: #8bbf5f;" data-color="#8bbf5f"></button>
+                                <button class="color-swatch" style="background-color: #6da03a;" data-color="#6da03a"></button>
+                                <button class="color-swatch" style="background-color: #fcd5ce;" data-color="#fcd5ce"></button>
+                                <button class="color-swatch" style="background-color: #f9a3a3;" data-color="#f9a3a3"></button>
+                                <button class="color-swatch" style="background-color: #f97c7c;" data-color="#f97c7c"></button>
+                                <button class="color-swatch" style="background-color: #f94c4c;" data-color="#f94c4c"></button>
+                                <button class="color-swatch" style="background-color: #cce5ff;" data-color="#cce5ff"></button>
+                                <button class="color-swatch" style="background-color: #99c2ff;" data-color="#99c2ff"></button>
+                                <button class="color-swatch" style="background-color: #66a3ff;" data-color="#66a3ff"></button>
+                                <button class="color-swatch" style="background-color: #2e7eff;" data-color="#2e7eff"></button>
+                                <button class="color-swatch" style="background-color: #d5f4e6;" data-color="#d5f4e6"></button>
+                                <button class="color-swatch" style="background-color: #aee3d5;" data-color="#aee3d5"></button>
+                                <button class="color-swatch" style="background-color: #7bd0c4;" data-color="#7bd0c4"></button>
+                                <button class="color-swatch" style="background-color: #4ab8a3;" data-color="#4ab8a3"></button>
+                                <button class="color-swatch" style="background-color: #f9f7cf;" data-color="#f9f7cf"></button>
+                                <button class="color-swatch" style="background-color: #e4e1a1;" data-color="#e4e1a1"></button>
+                                <button class="color-swatch" style="background-color: #d1d08f;" data-color="#d1d08f"></button>
+                                <button class="color-swatch" style="background-color: #b0b05f;" data-color="#b0b05f"></button>        
+                                <button class="color-swatch" style="background-color: #ffb3e6;" data-color="#ffb3e6"></button>
+                                <button class="color-swatch" style="background-color: #ff80e1;" data-color="#ff80e1"></button>
+                                <button class="color-swatch" style="background-color: #ff4db3;" data-color="#ff4db3"></button>
+                                <button class="color-swatch" style="background-color: #ff1a8a;" data-color="#ff1a8a"></button>
+                                <button class="color-swatch" style="background-color: #ffe6b3;" data-color="#ffe6b3"></button>
+                                <button class="color-swatch" style="background-color: #ffdb80;" data-color="#ffdb80"></button>
+                                <button class="color-swatch" style="background-color: #ffcc33;" data-color="#ffcc33"></button>
+                                <button class="color-swatch" style="background-color: #ffb300;" data-color="#ffb300"></button>
+                                <button class="color-swatch" style="background-color: #b3ffe0;" data-color="#b3ffe0"></button>
+                                <button class="color-swatch" style="background-color: #80ffcc;" data-color="#80ffcc"></button>
+                                <button class="color-swatch" style="background-color: #33ff99;" data-color="#33ff99"></button>
+                                <button class="color-swatch" style="background-color: #00ff66;" data-color="#00ff66"></button>
+                                <button class="color-swatch" style="background-color: #b3e0ff;" data-color="#b3e0ff"></button>
+                                <button class="color-swatch" style="background-color: #80c2ff;" data-color="#80c2ff"></button>
+                            </div>
+                        </div>
+
+                        <label for="colorPicker" class="form-label fw-semibold">🌈 Color Personalizado:</label>
+                        <div class="custom-color-wrapper">
+                            <div class="custom-color-label">Haz clic para abrir la paleta</div>
+                            <input type="color" id="colorPicker" value="#007bff" class="custom-color-input">
+                        </div>
+
+                        <label for="skillDescription" class="form-label fw-semibold">📝 Descripción del skill:</label>
+                        <textarea id="skillDescription" class="form-control mb-3" rows="3" placeholder="Escribe la descripción del skill aquí... (Esto servirá para el armado del Martillo)" style="border-radius: 10px !important;"></textarea>
+
+                        <div id="spinner" class="text-center" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Cargando...</span>
+                            </div>
+                        </div>
+
+                        <div id="skillsContainer" class="d-flex flex-wrap"></div>
                     </div>
                 </div>
-        
-                <div id="skillsContainer" class="d-flex flex-wrap"></div>
-                </div>
-            </div>
             </div>
         </div>
         
