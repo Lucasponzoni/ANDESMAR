@@ -111,7 +111,7 @@ const emailTemplatePlaceIt = (Name, Subject, templateName, nombre, email, remito
             <h1 style="color: #333; font-size: 24px;">&iexcl;Tu compra ha sido preparada para despacho!</h1>
         </div>
         <div style="margin: 20px 0; text-align: center;">
-            <p style="font-size: 16px; color: #333;">Dentro de las pr&oacute;ximas <strong style="color: #28a745;">48 horas h&aacute;biles</strong>, recibir&aacute;s tu compra con env&iacute;o expr&eacute;s directamente desde nuestro almac&eacute;n en Capital hasta tu domicilio.</p><!-- Sección de Fecha de Entrega -->
+            <p style="font-size: 16px; color: #333;">Dentro de las pr&oacute;ximas <strong style="color: #28a745;">96 horas h&aacute;biles</strong>, recibir&aacute;s tu compra con env&iacute;o expr&eacute;s directamente desde nuestro almac&eacute;n en Capital hasta tu domicilio.</p><!-- Sección de Fecha de Entrega -->
             <div style="background-color: #ffffff; border: 1px solid #d1d1d1; border-radius: 12px; padding: 15px; margin: 20px 0; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
                 <p style="font-weight: bold; margin: 5px 0;"><span style="color: rgb(61, 142, 185); font-size: 16px; background-color: #e7f3ff; border-radius: 4px; padding: 4px 8px; display: inline-block;">&nbsp;Recibilo entre ${numeroDeEnvio}&nbsp;</span></p>
             </div><!-- Sección de Transporte, Cliente y Remito -->
