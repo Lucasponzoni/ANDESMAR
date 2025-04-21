@@ -875,30 +875,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let bg = '';
                 let icon = '';
                 let mensaje = '';
-        
+                let border = '';
+                
                 if (diffDias > 0) {
                     bg = "#f0fdf4";
                     color = "#2e7d32";
                     icon = "🕓";
                     mensaje = `Plazo máximo en ${diffDias} día(s)`;
+                    border = "1px solid #c8e6c9";
                 } else if (diffDias === 0) {
                     bg = "#fffde7";
                     color = "#f9a825";
                     icon = "⚠️";
                     mensaje = `¡Vence hoy!`;
+                    border = "1px solid #ffe082";
                 } else {
                     bg = "#fff1f2";
                     color = "#d32f2f";
                     icon = "❌";
                     mensaje = `Venció hace ${Math.abs(diffDias)} día(s)`;
+                    border = "1px solid #ef9a9a";
                 }
-        
+                
                 const fechaFormateada = fechaMax.toLocaleDateString('es-AR', {
                     day: '2-digit',
                     month: 'long',
                     year: 'numeric'
                 });
-        
+                
                 return `
                 <div style="
                     display: flex;
@@ -906,27 +910,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                     align-items: center;
                 ">
                     <div style="
-                        margin-top: 5px;
+                        margin-top: 8px;
                         background: ${bg};
-                        border-radius: 12px;
-                        padding: 5px 10px;
+                        border: ${border};
+                        border-radius: 10px;
+                        padding: 10px 16px;
                         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                        font-size: 12.5px;
+                        font-size: 13px;
                         color: ${color};
                         display: flex;
-                        max-width: fit-content;
                         flex-direction: column;
+                        margin-bottom: 5px;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+                        backdrop-filter: blur(4px);
+                        max-width: 240px;
                         text-align: center;
                     ">
-                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 500;">
-                            <span style="font-size: 14px;">${icon}</span> ${mensaje}
+                        <div style="display: flex; flex-direction: column; align-items: center; font-weight: 500;">
+                            <span style="font-size: 16px; margin-bottom: 4px;">${icon}</span>
+                            ${mensaje}
                         </div>
-                        <div style="font-size: 11px; color: #666;">🗓 Fecha límite: ${fechaFormateada}</div>
+                        <div style="font-size: 11.5px; color: #777; margin-top: 4px;">
+                            🗓 Fecha límite: ${fechaFormateada}
+                        </div>
                     </div>
                 </div>
-            `;            
-            }
-        
+                `;
+                
+            }     
             return '';
         };                  
         // FIN PROCESAR FECHAS EN ESTADO Y DESCRIPCION
@@ -938,14 +949,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                       padding: 12px; 
                       background-color: #e0f7fa; 
                       border: 1px solid #b0bec5; /* Borde gris clarito */
-                      border-radius: 12px; 
+                      border-radius: 0 12px 12px 0; 
+                      margin-left: -8px;
                       color: #004d40; 
                       font-family: 'Helvetica Neue', Arial, sans-serif;
                       text-align: center;
                       margin-bottom: 5px;
                       max-width: fit-content;
                       font-weight: bold;
-                      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.296));
                       transition: background-color 0.3s ease, transform 0.2s ease;
                   ">
                       Fila ${filaNumero++}
