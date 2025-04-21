@@ -156,9 +156,12 @@
                 </button>
             
                 <!-- Botón Pendientes de controlar -->
-                <button id="btnPendientesControlar" class="btn btn-light">
+                <button id="btnPendientesControlar" class="btn btn-light position-relative">
                     <i class="bi bi-eye-slash-fill" style="font-size: 22px; color: #d9534f;"></i> Pendientes de controlar
-                </button>
+                    <span id="contadorCards2" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </button>                
             
                 <button class="btn btn-light ml-2" id="sinRevisar" title="Promedio Despacho: Xd Yh Zm" onclick="contarFilasSinControlDesdeDOM()">
                     <i class="bi bi-calculator"></i> Calculando sin Revisar...
@@ -284,6 +287,46 @@
         </script> 
 
         <script>
+            function contarFilasPendientes() {
+                const hoy = new Date();
+                const dia = String(hoy.getDate()).padStart(2, '0');
+                const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+                const anio = hoy.getFullYear();
+                const fechaHoy = `${dia}/${mes}/${anio}`;
+            
+                const filas = document.querySelectorAll("#data-table tbody tr");
+                let contadorPendientes = 0;
+            
+                filas.forEach(fila => {
+                    const mensaje = fila.querySelector(".mensaje-filaDeDatos");
+            
+                    if (!mensaje) {
+                        contadorPendientes++;
+                    } else {
+                        const texto = mensaje.innerText;
+                        const match = texto.match(/(\d{2}\/\d{2}\/\d{4})/);
+            
+                        if (!match || match[1] !== fechaHoy) {
+                            contadorPendientes++;
+                        }
+                    }
+                });
+            
+                const badge = document.getElementById("contadorCards2");
+                badge.innerHTML = contadorPendientes;
+            }
+            
+            // Mostrar spinner al iniciar
+            document.getElementById("contadorCards2").innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            // Conteo inicial
+            setTimeout(contarFilasPendientes, 15000);
+            
+            // Repetir cada 5 segundos para mantener actualizado
+            setInterval(contarFilasPendientes, 15000);
+            
+            
+            // Modo filtro y "ir atrás"
             document.getElementById("btnPendientesControlar").addEventListener("click", function () {
                 const hoy = new Date();
                 const dia = String(hoy.getDate()).padStart(2, '0');
@@ -293,39 +336,43 @@
             
                 const filas = document.querySelectorAll("#data-table tbody tr");
             
+                let algunaPendiente = false;
+            
                 filas.forEach(fila => {
                     const mensaje = fila.querySelector(".mensaje-filaDeDatos");
             
                     if (!mensaje) {
-                        fila.style.display = ""; // mostrar (pendiente)
+                        fila.style.display = "";
+                        algunaPendiente = true;
                     } else {
                         const texto = mensaje.innerText;
                         const match = texto.match(/(\d{2}\/\d{2}\/\d{4})/);
             
                         if (!match || match[1] !== fechaHoy) {
-                            fila.style.display = ""; // mostrar (fecha distinta)
+                            fila.style.display = "";
+                            algunaPendiente = true;
                         } else {
-                            fila.style.display = "none"; // ocultar (controlado hoy)
+                            fila.style.display = "none";
                         }
                     }
                 });
             
-                // Mostrar botón "Ir atrás"
-                document.getElementById("btnIrAtras").classList.remove("d-none");
+                if (algunaPendiente) {
+                    document.getElementById("btnIrAtras").classList.remove("d-none");
+                }
             });
             
             document.getElementById("btnIrAtras").addEventListener("click", function () {
                 const filas = document.querySelectorAll("#data-table tbody tr");
             
                 filas.forEach(fila => {
-                    fila.style.display = ""; // volver a mostrar todo
+                    fila.style.display = "";
                 });
             
-                // Ocultar el botón de volver
                 this.classList.add("d-none");
             });
-        </script>      
-    
+            </script>    
+     
         <!-- Modal de Importación -->
         <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
