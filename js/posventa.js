@@ -935,17 +935,21 @@ document.addEventListener('DOMContentLoaded', async () => {
           row.innerHTML = `
               <td>
                   <div class="mac-os-cell" style="
-                      padding: 5px; 
-                      background-color: #007aff; 
-                      border-radius: 8px; 
-                      color: white; 
+                      padding: 12px; 
+                      background-color: #e0f7fa; 
+                      border: 1px solid #b0bec5; /* Borde gris clarito */
+                      border-radius: 12px; 
+                      color: #004d40; 
                       font-family: 'Helvetica Neue', Arial, sans-serif;
                       text-align: center;
-                      margin-bottom: 3px;
+                      margin-bottom: 5px;
                       max-width: fit-content;
                       font-weight: bold;
+                      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                      transition: background-color 0.3s ease, transform 0.2s ease;
                   ">
                       Fila ${filaNumero++}
+                  </div>
                   </div>
                   <div class="clientePosventa-gris" id="cliente-posventa-${ventaId}">
                     Buscando <div class="spinner-border text-secondary" role="status" style="width: 1rem; height: 1rem;">
