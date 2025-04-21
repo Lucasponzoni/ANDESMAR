@@ -949,6 +949,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                       padding: 12px; 
                       background-color: #e0f7fa; 
                       border: 1px solid #b0bec5; /* Borde gris clarito */
+                      border-left: none;
                       border-radius: 0 12px 12px 0; 
                       margin-left: -8px;
                       color: #004d40; 
@@ -957,7 +958,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                       margin-bottom: 5px;
                       max-width: fit-content;
                       font-weight: bold;
-                      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.296));
+                      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
                       transition: background-color 0.3s ease, transform 0.2s ease;
                   ">
                       Fila ${filaNumero++}
@@ -1276,6 +1277,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       alert('Hubo un problema al cargar los datos');
   } finally {
       spinner.style.display = 'none';
+      // Conteo inicial
+      contarFilasPendientes();
+            
+      // Repetir cada 5 segundos para mantener actualizado
+      setInterval(contarFilasPendientes, 15000);
+
       searchInput.disabled = false;
       searchInput.value = "";
   }

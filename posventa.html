@@ -318,14 +318,7 @@
             
             // Mostrar spinner al iniciar
             document.getElementById("contadorCards2").innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            
-            // Conteo inicial
-            setTimeout(contarFilasPendientes, 15000);
-            
-            // Repetir cada 5 segundos para mantener actualizado
-            setInterval(contarFilasPendientes, 15000);
-            
-            
+
             // Modo filtro y "ir atrás"
             document.getElementById("btnPendientesControlar").addEventListener("click", function () {
                 const hoy = new Date();
