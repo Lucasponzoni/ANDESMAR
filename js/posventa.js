@@ -1975,43 +1975,64 @@ function obtenerSoloNumeros(str) {
   return str.replace(/\D/g, '');
 }
 
+
+// BUSCAR CLIENTES
 function buscarClientePosventa(venta, ventaId) {
   const documentoCompleto = venta.facturación_al_comprador?.tipo_y_número_de_documento || "";
-  const dni = obtenerSoloNumeros(documentoCompleto);
+  const dniOriginal = obtenerSoloNumeros(documentoCompleto);
   const divCliente = document.getElementById(`cliente-posventa-${ventaId}`);
 
-  if (!dni || !divCliente) return;
+  if (!dniOriginal || !divCliente) return;
 
-  window.dbClientes.ref("/clientes/" + dni).once("value").then((snapshot) => {
-    const cliente = snapshot.val();
+  const posiblesDnis = [dniOriginal];
+  if (dniOriginal.startsWith("0")) {
+    posiblesDnis.push(dniOriginal.replace(/^0+/, "")); // sin ceros adelante
+  } else {
+    posiblesDnis.push("0" + dniOriginal); // agregarle un 0 por si en Firebase está con cero
+  }
 
-    if (cliente?.cliente) {
-      divCliente.className = "clientePosventa";
-      divCliente.innerHTML = `
-        <img src="Img/logo-presea.png" alt="PRESEA" width="20">
-        Cliente: <strong id="nombre-cliente">${cliente.cliente}</strong>
-      `;
-
-      // ✅ Agregamos evento para copiar al portapapeles
-      divCliente.style.cursor = 'pointer';
-      divCliente.addEventListener("click", () => {
-        navigator.clipboard.writeText(cliente.cliente).then(() => {
-          showAlert(`Se ha copiado a portapapeles el cliente: ${cliente.cliente}`);
-        }).catch((err) => {
-          console.error("Error al copiar al portapapeles:", err);
-        });
-      });
-
-    } else {
+  // Buscar cliente probando las variantes
+  function intentarBuscarCliente(index) {
+    if (index >= posiblesDnis.length) {
       divCliente.className = "clientePosventa-rojo";
       divCliente.innerHTML = `NO FACTURADO <i class="bi bi-exclamation-circle-fill"></i>`;
+      return;
     }
-  }).catch((error) => {
-    divCliente.className = "clientePosventa-rojo";
-    divCliente.innerHTML = `ERROR <i class="bi bi-exclamation-triangle-fill"></i>`;
-    console.error("Error al buscar cliente en Firebase:", error);
-  });
+
+    const dni = posiblesDnis[index];
+    window.dbClientes.ref("/clientes/" + dni).once("value").then((snapshot) => {
+      const cliente = snapshot.val();
+
+      if (cliente?.cliente) {
+        divCliente.className = "clientePosventa";
+        divCliente.innerHTML = `
+          <img src="Img/logo-presea.png" alt="PRESEA" width="20">
+          Cliente: <strong id="nombre-cliente">${cliente.cliente}</strong>
+        `;
+
+        divCliente.style.cursor = 'pointer';
+        divCliente.addEventListener("click", () => {
+          navigator.clipboard.writeText(cliente.cliente).then(() => {
+            showAlert(`Se ha copiado a portapapeles el cliente: ${cliente.cliente}`);
+          }).catch((err) => {
+            console.error("Error al copiar al portapapeles:", err);
+          });
+        });
+      } else {
+        // Si no se encontró, probar con la siguiente variante
+        intentarBuscarCliente(index + 1);
+      }
+    }).catch((error) => {
+      divCliente.className = "clientePosventa-rojo";
+      divCliente.innerHTML = `ERROR <i class="bi bi-exclamation-triangle-fill"></i>`;
+      console.error("Error al buscar cliente en Firebase:", error);
+    });
+  }
+
+  intentarBuscarCliente(0);
 }
+// FIN BUSCAR CLIENTES
+
 // FIN RENDERIZADO DE LA TABLA
 
 // MODAL LINEA DE TIEMPO
