@@ -1786,13 +1786,71 @@ function showAlert(message) {
   }, 3000);
 }
 
+// SKILLS EN FILAS
 async function abrirSkillsModalFilas(ventaId) {
   try {
     const snapshot = await firebase.database().ref('/skills').once('value');
     const skillsData = snapshot.val() || {};
+    
+    const skillCount = {};
+    let totalSkillsUsed = 0;
+
+    const ignoredSkills = ["me1", "me2", "andreani", "andesmar", "cruz del sur", "logistica propia", "oca", "No en LogiPaq (Base de Datos)"];
+    const TOP_SKILLS_LIMIT = 15;
+
+    const rows = document.querySelectorAll('#data-table tbody tr');
+    rows.forEach(row => {
+      const skillDivs = row.querySelectorAll('[class^="div-skills"]');
+      skillDivs.forEach(div => {
+        const skillSpans = div.querySelectorAll('[data-skill]');
+        skillSpans.forEach(span => {
+          const skillKey = span.getAttribute('data-skill');
+          if (skillKey && !ignoredSkills.includes(skillKey)) {
+            skillCount[skillKey] = (skillCount[skillKey] || 0) + 1;
+            totalSkillsUsed++;
+          }
+        });
+      });
+    });
+
+    const mostUsedSkills = Object.entries(skillCount)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, TOP_SKILLS_LIMIT);
+
+    const acumuladoTopSkills = mostUsedSkills.reduce((acc, [, count]) => acc + count, 0);
+    const porcentajeAcumulado = ((acumuladoTopSkills / totalSkillsUsed) * 100).toFixed(2);
 
     const modalBody = document.getElementById("skillsModalFilasBody");
     modalBody.innerHTML = '';
+
+    const containerDiv = document.createElement('div');
+    containerDiv.style.borderRadius = '15px';
+    containerDiv.style.padding = '20px';
+    containerDiv.style.backgroundColor = '#f8f9fa';
+
+    // === Encabezado "Más utilizados 📊" ===
+    const mostUsedDiv = document.createElement('div');
+    mostUsedDiv.innerHTML = `
+      <div style="${macTitleStyle()}">Top ${TOP_SKILLS_LIMIT} más utilizados 📊</div><br>`;
+
+    mostUsedSkills.forEach(([skillKey, count]) => {
+      const badge = crearBadge(skillsData, skillKey, count, totalSkillsUsed, ventaId);
+      badge.style.cursor = 'pointer'; // <-- le agregamos el cursor pointer
+      mostUsedDiv.appendChild(badge);
+    });
+
+    // Agrega el porcentaje acumulado con estilo Mac + emoji
+    const porcentajeText = document.createElement('div');
+    porcentajeText.textContent = `📌 Estos ${TOP_SKILLS_LIMIT} skills representan el ${porcentajeAcumulado}% del uso total.`;
+    porcentajeText.style.cssText = macTitleStyle() + 'font-size:14px;margin-top:15px;font-style:italic;';
+    mostUsedDiv.appendChild(porcentajeText);
+
+    containerDiv.appendChild(mostUsedDiv);
+
+    // === Encabezado "Listado Completo 📋" ===
+    const allSkillsDiv = document.createElement('div');
+    allSkillsDiv.innerHTML = `
+      <br><div style="${macTitleStyle()}">Listado Completo 📋</div><br>`;
 
     Object.entries(skillsData).forEach(([skillKey, skillObj]) => {
       const badge = document.createElement('span');
@@ -1807,18 +1865,56 @@ async function abrirSkillsModalFilas(ventaId) {
       badge.style.margin = '5px';
       badge.style.fontFamily = '"Rubik", sans-serif';
       badge.style.fontWeight = '600';
-      badge.classList.add('badge');
       badge.style.cursor = 'pointer';
+      badge.classList.add('badge');
 
-      // Al hacer clic, agregar a Firebase y renderizar
       badge.addEventListener('click', async () => {
         const skillRef = firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`);
         await skillRef.set(true);
-
         renderSkillEnFila(skillKey, ventaId, skillObj);
       });
 
-      modalBody.appendChild(badge);
+      allSkillsDiv.appendChild(badge);
+    });
+
+    containerDiv.appendChild(allSkillsDiv);
+
+    // === Encabezado "Estadísticas 📈" ===
+    const statsDiv = document.createElement('div');
+    statsDiv.innerHTML = `<br><div style="${macTitleStyle()}">Estadísticas 📈</div>
+                          <p style="margin-top:10px;">Total de skills utilizados: ${totalSkillsUsed}</p>`;
+    
+    const ctx = document.createElement('canvas');
+    ctx.style.maxHeight = '300px';
+    statsDiv.appendChild(ctx);
+    
+    containerDiv.appendChild(statsDiv);
+    modalBody.appendChild(containerDiv);
+
+    const labels = mostUsedSkills.map(([skillKey]) => skillsData[skillKey]?.text || skillKey);
+    const data = mostUsedSkills.map(([, count]) => count);
+    const backgroundColors = mostUsedSkills.map(([skillKey]) => skillsData[skillKey]?.backgroundColor || 'rgba(54, 162, 235, 0.2)');
+    const borderColors = mostUsedSkills.map(([skillKey]) => skillsData[skillKey]?.textColor || 'rgba(54, 162, 235, 1)');
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Frecuencia de Skills Utilizados',
+          data: data,
+          backgroundColor: backgroundColors,
+          borderColor: borderColors,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true }
+        },
+        responsive: true,
+        maintainAspectRatio: false
+      }
     });
 
     $('#skillsModalFilas').modal('show');
@@ -1826,7 +1922,48 @@ async function abrirSkillsModalFilas(ventaId) {
     console.error("Error al cargar skills:", error);
     alert("Error al cargar las skills desde Firebase.");
   }
+
+  function crearBadge(skillsData, skillKey, count, totalSkillsUsed, ventaId) {
+    const badge = document.createElement('span');
+    const skillText = skillsData[skillKey]?.text || skillKey;
+    const percentage = ((count / totalSkillsUsed) * 100).toFixed(2);
+
+    badge.textContent = `${skillText} (${percentage}%)`;
+    badge.style.backgroundColor = skillsData[skillKey]?.backgroundColor || '#e7f3fe';
+    badge.style.color = skillsData[skillKey]?.textColor || '#31708f';
+    badge.style.border = `1px solid ${skillsData[skillKey]?.textColor || '#31708f'}`;
+    badge.style.padding = '6px 10px';
+    badge.style.borderRadius = '8px';
+    badge.style.margin = '5px';
+    badge.style.display = 'inline-block';
+    badge.style.fontFamily = '"Rubik", sans-serif';
+    badge.style.fontWeight = '500';
+    badge.style.fontSize = '12px';
+    badge.style.cursor = 'pointer';
+
+    badge.onclick = async () => {
+      const skillRef = firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`);
+      await skillRef.set(true);
+      renderSkillEnFila(skillKey, ventaId, skillsData[skillKey]);
+    };
+
+    return badge;
+  }
+
+  function macTitleStyle() {
+    return `display: inline-block;
+      margin-bottom: 8px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: rgba(245, 245, 245, 0.7);
+      border: 1px solid rgba(200, 200, 200, 0.6);
+      font-weight: 600;
+      font-size: 18px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(6px);`;
+  }
 }
+// FIN SKILLS EN FILAS
 
 function renderSkillEnFila(skillKey, ventaId, estilo = {}) {
   const targetDiv = document.querySelector(`.div-skills-${ventaId}`);
@@ -1974,7 +2111,6 @@ async function guardarComentario() {
 function obtenerSoloNumeros(str) {
   return str.replace(/\D/g, '');
 }
-
 
 // BUSCAR CLIENTES
 function buscarClientePosventa(venta, ventaId) {

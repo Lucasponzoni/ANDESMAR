@@ -242,11 +242,14 @@
                     });
                 });
         
+                // Convertimos el Set a un array y lo ordenamos alfabéticamente
+                const sortedSkills = Array.from(skillSet).sort();
+        
                 // Generar checkboxes en el dropdown
                 const container = document.getElementById("skills-container");
                 container.innerHTML = ""; // Limpia por si ya había algo
         
-                skillSet.forEach(skill => {
+                sortedSkills.forEach(skill => {
                     const id = `skill_${skill.replace(/\s+/g, "_")}`;
                     container.innerHTML += `
                         <li>
@@ -284,9 +287,9 @@
                 });
                 aplicarFiltroSkills();
             });
-        </script> 
+            </script>
 
-        <script>
+            <script>
             function contarFilasPendientes() {
                 const hoy = new Date();
                 const dia = String(hoy.getDate()).padStart(2, '0');
@@ -892,6 +895,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <!-- Cargar jsPDF -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="./js/firebase-init-Meli.js"></script>
     <script src="./js/firebase-init-cliente.js"></script>
