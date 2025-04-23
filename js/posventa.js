@@ -682,7 +682,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       return !transferido && [
         "devolución para revisar",
-        "devolución finalizada",
+        "devolución finalizada el producto no está apto",
         "devuelto"
           ].some(frase => ultimoEstado.startsWith(frase));
         });
@@ -958,7 +958,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                       margin-bottom: 5px;
                       max-width: fit-content;
                       font-weight: bold;
-                      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+                      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.539));
                       transition: background-color 0.3s ease, transform 0.2s ease;
                   ">
                       Fila ${filaNumero++}
@@ -1034,44 +1034,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                           ? venta.publicaciones.título_de_la_publicación.substring(0, 60) + '...' 
                           : venta.publicaciones.título_de_la_publicación
                       }
-                  </div>
-
-                  <!-- Bloque de Mediación -->
-                  <div style="
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      margin-top: 10px;
-                      padding: 10px 16px;
-                      border-radius: 12px;
-                      background: ${venta.reclamos.con_mediación === 'Sí' ? 'rgba(255, 204, 204, 0.6)' : 'rgba(204, 255, 204, 0.6)'};
-                      border: 1px solid ${venta.reclamos.con_mediación === 'Sí' ? '#ccc' : '#ccc'};
-                      font-weight: 600;
-                      font-size: 14px;
-                      color: ${venta.reclamos.con_mediación === 'Sí' ? '#b71c1c' : '#1b5e20'};
-                      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-                      backdrop-filter: blur(6px);
-                  ">
-                      ${venta.reclamos.con_mediación === 'Sí' ? '📣 En Mediación' : '✅ Sin Mediación'}
-                  </div>
-
-                  <!-- Bloque de Reclamo -->
-                  <div style="
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      margin-top: 10px;
-                      padding: 10px 16px;
-                      border-radius: 12px;
-                      background: ${venta.reclamos.reclamo_abierto === 'Sí' ? 'rgba(255, 204, 204, 0.6)' : 'rgba(204, 255, 204, 0.6)'};
-                      border: 1px solid ${venta.reclamos.reclamo_abierto === 'Sí' ? '#ccc' : '#ccc'};
-                      font-weight: 600;
-                      font-size: 14px;
-                      color: ${venta.reclamos.reclamo_abierto === 'Sí' ? '#b71c1c' : '#1b5e20'};
-                      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-                      backdrop-filter: blur(6px);
-                  ">
-                      ${venta.reclamos.reclamo_abierto === 'Sí' ? '📣 Con Reclamo' : '✅ Sin Reclamo'}
                   </div>
               </td>
               <td style="vertical-align: middle; font-family: 'Rubik', sans-serif;">
@@ -1183,9 +1145,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                       transition: color 0.2s ease;
                     "
                     onclick="copyHammerData('${ventaId}', 
-                      ${venta.comentarios ? `'${venta.comentarios.operacion}'` : "'No disponible'"}, 
-                      '${venta.comentarios ? venta.comentarios.numeroCaso : "No disponible"}', 
-                      '${venta.comentarios ? venta.comentarios.vencimientoDevolucion : "No disponible"}', 
                       '${ultimoEstado}', 
                       '${ultimaDescripcion}', 
                       '${venta.publicaciones.sku}', 
@@ -1552,7 +1511,7 @@ window.handleDivClick = function(ventaId, vencimiento, numeroCaso, estadoTexto) 
 };
 
 // MARTILLO GENERAL
-async function copyHammerData(ventaId, sinUso1, sinUso2, sinUso3, estadoActual, ultimaDescripcion, sku, unidades, total) {
+async function copyHammerData(ventaId, estadoActual, ultimaDescripcion, sku, unidades, total) {
   // Obtener el nombre del operador
   const activeAvatar = document.getElementById("active-avatar");
   const nombreOperador = activeAvatar ? activeAvatar.alt : "Operador desconocido";
@@ -1564,52 +1523,19 @@ async function copyHammerData(ventaId, sinUso1, sinUso2, sinUso3, estadoActual, 
 
   // Formateo del total en pesos argentinos
   const totalFormateado = total ? total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }) : "$0,00";
-  let estadoCobro;
-
-  if (total === 0) {
-      estadoCobro = "DINERO DEBITADO";
-  } else if (total < 0) {
-      estadoCobro = "SE COBRÓ RETORNO DE LA DEVOLUCIÓN A NOVOGAR";
-  } else {
-      estadoCobro = "DINERO ACREDITADO";
-  }
+  const estadoCobro = getEstadoCobro(total);
 
   // Obtener skills activas del ventaId
   const activeSkills = await getActiveSkills(ventaId);
   const skills = await getSkillsDescriptions(activeSkills); // Obtener descripciones de skills
 
-  let skillsMensaje = '';
-  if (skills.length > 0) {
-      skillsMensaje += `DETALLES POSVENTA:\n`;
-      skills.forEach(skill => {
-          const skillText = skill.text || "Sin nombre"; // Valor por defecto si text es undefined
-          const skillDescripcion = skill.descripcion || "Sin descripción"; // Valor por defecto si descripcion es undefined
-
-          skillsMensaje += `${skillText.toUpperCase()}: ${skillDescripcion.charAt(0).toUpperCase() + skillDescripcion.slice(1)}\n`;
-      });
-      skillsMensaje += `\n`;
-  }
+  const skillsMensaje = construirMensajeSkills(skills);
 
   // Obtener comentarios desde Firebase
   const comentarios = await getComentarios(ventaId);
 
   // Construir el mensaje base
-  let mensaje = `Venta ID: ${ventaId}\n\n` +
-                `ESTADO:\n` +
-                `Estado Actual: ${estadoActual.charAt(0).toUpperCase() + estadoActual.slice(1).toLowerCase()}\n` +
-                `Descripción: ${ultimaDescripcion.charAt(0).toUpperCase() + ultimaDescripcion.slice(1).toLowerCase()}\n\n` +
-                `PRODUCTO: ${sku}\n` +
-                `CANTIDAD: X ${unidades} u.\n` +
-                `COBRO HASTA LA REVISIÓN: ${totalFormateado} (${estadoCobro})\n\n` +
-                skillsMensaje;
-
-  // Verificar si hay comentarios disponibles
-  if (comentarios && comentarios.length > 0) {
-      mensaje += `COMENTARIOS:\n` +
-                 `Comentarios: ${comentarios[2] || "No disponible"}\n` + // Primer comentario
-                 `Número de Caso: ${comentarios[1] || "No disponible"}\n` + // Segundo comentario
-                 `Vencimiento Devolución: ${comentarios[3] === 'Invalid Date' ? "No corresponde ser reclamado aún" : (comentarios[2] || "No disponible")}\n\n`;
-  }
+  let mensaje = construirMensajeBase(ventaId, estadoActual, ultimaDescripcion, sku, unidades, totalFormateado, estadoCobro, skillsMensaje, comentarios);
 
   // Agregar "REVISADO POR" al final del mensaje
   mensaje += `\nREVISADO POR: ${nombreOperador} - FECHA: ${fechaFormateada}\n`;
@@ -1623,7 +1549,59 @@ async function copyHammerData(ventaId, sinUso1, sinUso2, sinUso3, estadoActual, 
   }
 }
 
-// Función para obtener los comentarios desde Firebase
+// Función para determinar el estado de cobro
+function getEstadoCobro(total) {
+  if (total === 0) {
+      return "DINERO DEBITADO";
+  } else if (total < 0) {
+      return "SE COBRÓ RETORNO DE LA DEVOLUCIÓN A NOVOGAR";
+  } else {
+      return "DINERO ACREDITADO";
+  }
+}
+
+// Función para construir el mensaje de skills
+function construirMensajeSkills(skills) {
+  if (skills.length === 0) return '';
+
+  let skillsMensaje = `DETALLES POSVENTA:\n`;
+  skills.forEach(skill => {
+      const skillText = skill.text || "Sin nombre"; // Valor por defecto si text es undefined
+      const skillDescripcion = skill.descripcion || "Sin descripción"; // Valor por defecto si descripcion es undefined
+      skillsMensaje += `${skillText.toUpperCase()}: ${skillDescripcion.charAt(0).toUpperCase() + skillDescripcion.slice(1)}\n`;
+  });
+  skillsMensaje += `\n`;
+  return skillsMensaje;
+}
+
+// Función para construir el mensaje base
+function construirMensajeBase(ventaId, estadoActual, ultimaDescripcion, sku, unidades, totalFormateado, estadoCobro, skillsMensaje, comentarios) {
+  let mensaje = `Venta ID: ${ventaId}\n\n` +
+                `ESTADO:\n` +
+                `Estado Actual: ${capitalizar(estadoActual)}\n` +
+                `Descripción: ${capitalizar(ultimaDescripcion)}\n\n` +
+                `PRODUCTO: ${sku}\n` +
+                `CANTIDAD: X ${unidades} u.\n` +
+                `COBRO HASTA LA REVISIÓN: ${totalFormateado} (${estadoCobro})\n\n` +
+                skillsMensaje;
+
+  // Verificar si hay comentarios disponibles
+  if (comentarios && comentarios.length > 0) {
+      mensaje += `COMENTARIOS:\n` +
+                 `Comentarios: ${comentarios[0]?.operacion || "No disponible"}\n` + // Primer comentario
+                 `Número de Caso: ${comentarios[1] || "No disponible"}\n` + // Segundo comentario
+                 `Vencimiento Devolución: ${comentarios[2] === 'Invalid Date' ? "No corresponde ser reclamado aún" : (comentarios[2] || "No disponible")}\n\n`;
+  }
+
+  return mensaje;
+}
+
+// Función para capitalizar la primera letra de una cadena
+function capitalizar(texto) {
+  return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+}
+
+// Función para obtener comentarios desde Firebase
 async function getComentarios(ventaId) {
   const comentarios = [];
   const comentariosRef = firebase.database().ref(`/posventa/${ventaId}/comentarios`);
@@ -1632,6 +1610,14 @@ async function getComentarios(ventaId) {
   if (snapshot.exists()) {
       snapshot.forEach(childSnapshot => {
           const comentario = childSnapshot.val();
+          // Sanitizar el campo 'operacion'
+          if (comentario.operacion) {
+              // Reemplazar saltos de línea y comillas dobles
+              comentario.operacion = comentario.operacion
+                  .replace(/[\r\n]+/g, ' ') // Reemplazar saltos de línea por espacios
+                  .replace(/"/g, "'") // Reemplazar comillas dobles por comillas simples
+                  .trim(); // Eliminar espacios al inicio y al final
+          }
           comentarios.push(comentario);
       });
   }
@@ -1824,71 +1810,13 @@ function showAlert(message) {
   }, 3000);
 }
 
-// SKILLS EN FILAS
 async function abrirSkillsModalFilas(ventaId) {
   try {
     const snapshot = await firebase.database().ref('/skills').once('value');
     const skillsData = snapshot.val() || {};
-    
-    const skillCount = {};
-    let totalSkillsUsed = 0;
-
-    const ignoredSkills = ["me1", "me2", "andreani", "andesmar", "cruz del sur", "logistica propia", "oca", "No en LogiPaq (Base de Datos)"];
-    const TOP_SKILLS_LIMIT = 15;
-
-    const rows = document.querySelectorAll('#data-table tbody tr');
-    rows.forEach(row => {
-      const skillDivs = row.querySelectorAll('[class^="div-skills"]');
-      skillDivs.forEach(div => {
-        const skillSpans = div.querySelectorAll('[data-skill]');
-        skillSpans.forEach(span => {
-          const skillKey = span.getAttribute('data-skill');
-          if (skillKey && !ignoredSkills.includes(skillKey)) {
-            skillCount[skillKey] = (skillCount[skillKey] || 0) + 1;
-            totalSkillsUsed++;
-          }
-        });
-      });
-    });
-
-    const mostUsedSkills = Object.entries(skillCount)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, TOP_SKILLS_LIMIT);
-
-    const acumuladoTopSkills = mostUsedSkills.reduce((acc, [, count]) => acc + count, 0);
-    const porcentajeAcumulado = ((acumuladoTopSkills / totalSkillsUsed) * 100).toFixed(2);
 
     const modalBody = document.getElementById("skillsModalFilasBody");
     modalBody.innerHTML = '';
-
-    const containerDiv = document.createElement('div');
-    containerDiv.style.borderRadius = '15px';
-    containerDiv.style.padding = '20px';
-    containerDiv.style.backgroundColor = '#f8f9fa';
-
-    // === Encabezado "Más utilizados 📊" ===
-    const mostUsedDiv = document.createElement('div');
-    mostUsedDiv.innerHTML = `
-      <div style="${macTitleStyle()}">Top ${TOP_SKILLS_LIMIT} más utilizados 📊</div><br>`;
-
-    mostUsedSkills.forEach(([skillKey, count]) => {
-      const badge = crearBadge(skillsData, skillKey, count, totalSkillsUsed, ventaId);
-      badge.style.cursor = 'pointer'; // <-- le agregamos el cursor pointer
-      mostUsedDiv.appendChild(badge);
-    });
-
-    // Agrega el porcentaje acumulado con estilo Mac + emoji
-    const porcentajeText = document.createElement('div');
-    porcentajeText.textContent = `📌 Estos ${TOP_SKILLS_LIMIT} skills representan el ${porcentajeAcumulado}% del uso total.`;
-    porcentajeText.style.cssText = macTitleStyle() + 'font-size:14px;margin-top:15px;font-style:italic;';
-    mostUsedDiv.appendChild(porcentajeText);
-
-    containerDiv.appendChild(mostUsedDiv);
-
-    // === Encabezado "Listado Completo 📋" ===
-    const allSkillsDiv = document.createElement('div');
-    allSkillsDiv.innerHTML = `
-      <br><div style="${macTitleStyle()}">Listado Completo 📋</div><br>`;
 
     Object.entries(skillsData).forEach(([skillKey, skillObj]) => {
       const badge = document.createElement('span');
@@ -1903,56 +1831,18 @@ async function abrirSkillsModalFilas(ventaId) {
       badge.style.margin = '5px';
       badge.style.fontFamily = '"Rubik", sans-serif';
       badge.style.fontWeight = '600';
-      badge.style.cursor = 'pointer';
       badge.classList.add('badge');
+      badge.style.cursor = 'pointer';
 
+      // Al hacer clic, agregar a Firebase y renderizar
       badge.addEventListener('click', async () => {
         const skillRef = firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`);
         await skillRef.set(true);
+
         renderSkillEnFila(skillKey, ventaId, skillObj);
       });
 
-      allSkillsDiv.appendChild(badge);
-    });
-
-    containerDiv.appendChild(allSkillsDiv);
-
-    // === Encabezado "Estadísticas 📈" ===
-    const statsDiv = document.createElement('div');
-    statsDiv.innerHTML = `<br><div style="${macTitleStyle()}">Estadísticas 📈</div>
-                          <p style="margin-top:10px;">Total de skills utilizados: ${totalSkillsUsed}</p>`;
-    
-    const ctx = document.createElement('canvas');
-    ctx.style.maxHeight = '300px';
-    statsDiv.appendChild(ctx);
-    
-    containerDiv.appendChild(statsDiv);
-    modalBody.appendChild(containerDiv);
-
-    const labels = mostUsedSkills.map(([skillKey]) => skillsData[skillKey]?.text || skillKey);
-    const data = mostUsedSkills.map(([, count]) => count);
-    const backgroundColors = mostUsedSkills.map(([skillKey]) => skillsData[skillKey]?.backgroundColor || 'rgba(54, 162, 235, 0.2)');
-    const borderColors = mostUsedSkills.map(([skillKey]) => skillsData[skillKey]?.textColor || 'rgba(54, 162, 235, 1)');
-
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Frecuencia de Skills Utilizados',
-          data: data,
-          backgroundColor: backgroundColors,
-          borderColor: borderColors,
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: { beginAtZero: true }
-        },
-        responsive: true,
-        maintainAspectRatio: false
-      }
+      modalBody.appendChild(badge);
     });
 
     $('#skillsModalFilas').modal('show');
@@ -1960,48 +1850,7 @@ async function abrirSkillsModalFilas(ventaId) {
     console.error("Error al cargar skills:", error);
     alert("Error al cargar las skills desde Firebase.");
   }
-
-  function crearBadge(skillsData, skillKey, count, totalSkillsUsed, ventaId) {
-    const badge = document.createElement('span');
-    const skillText = skillsData[skillKey]?.text || skillKey;
-    const percentage = ((count / totalSkillsUsed) * 100).toFixed(2);
-
-    badge.textContent = `${skillText} (${percentage}%)`;
-    badge.style.backgroundColor = skillsData[skillKey]?.backgroundColor || '#e7f3fe';
-    badge.style.color = skillsData[skillKey]?.textColor || '#31708f';
-    badge.style.border = `1px solid ${skillsData[skillKey]?.textColor || '#31708f'}`;
-    badge.style.padding = '6px 10px';
-    badge.style.borderRadius = '8px';
-    badge.style.margin = '5px';
-    badge.style.display = 'inline-block';
-    badge.style.fontFamily = '"Rubik", sans-serif';
-    badge.style.fontWeight = '500';
-    badge.style.fontSize = '12px';
-    badge.style.cursor = 'pointer';
-
-    badge.onclick = async () => {
-      const skillRef = firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`);
-      await skillRef.set(true);
-      renderSkillEnFila(skillKey, ventaId, skillsData[skillKey]);
-    };
-
-    return badge;
-  }
-
-  function macTitleStyle() {
-    return `display: inline-block;
-      margin-bottom: 8px;
-      padding: 10px 16px;
-      border-radius: 12px;
-      background: rgba(245, 245, 245, 0.7);
-      border: 1px solid rgba(200, 200, 200, 0.6);
-      font-weight: 600;
-      font-size: 18px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-      backdrop-filter: blur(6px);`;
-  }
 }
-// FIN SKILLS EN FILAS
 
 function renderSkillEnFila(skillKey, ventaId, estilo = {}) {
   const targetDiv = document.querySelector(`.div-skills-${ventaId}`);
@@ -2150,63 +1999,43 @@ function obtenerSoloNumeros(str) {
   return str.replace(/\D/g, '');
 }
 
-// BUSCAR CLIENTES
 function buscarClientePosventa(venta, ventaId) {
   const documentoCompleto = venta.facturación_al_comprador?.tipo_y_número_de_documento || "";
-  const dniOriginal = obtenerSoloNumeros(documentoCompleto);
+  const dni = obtenerSoloNumeros(documentoCompleto);
   const divCliente = document.getElementById(`cliente-posventa-${ventaId}`);
 
-  if (!dniOriginal || !divCliente) return;
+  if (!dni || !divCliente) return;
 
-  const posiblesDnis = [dniOriginal];
-  if (dniOriginal.startsWith("0")) {
-    posiblesDnis.push(dniOriginal.replace(/^0+/, "")); // sin ceros adelante
-  } else {
-    posiblesDnis.push("0" + dniOriginal); // agregarle un 0 por si en Firebase está con cero
-  }
+  window.dbClientes.ref("/clientes/" + dni).once("value").then((snapshot) => {
+    const cliente = snapshot.val();
 
-  // Buscar cliente probando las variantes
-  function intentarBuscarCliente(index) {
-    if (index >= posiblesDnis.length) {
+    if (cliente?.cliente) {
+      divCliente.className = "clientePosventa";
+      divCliente.innerHTML = `
+        <img src="Img/logo-presea.png" alt="PRESEA" width="20">
+        Cliente: <strong id="nombre-cliente">${cliente.cliente}</strong>
+      `;
+
+      // ✅ Agregamos evento para copiar al portapapeles
+      divCliente.style.cursor = 'pointer';
+      divCliente.addEventListener("click", () => {
+        navigator.clipboard.writeText(cliente.cliente).then(() => {
+          showAlert(`Se ha copiado a portapapeles el cliente: ${cliente.cliente}`);
+        }).catch((err) => {
+          console.error("Error al copiar al portapapeles:", err);
+        });
+      });
+
+    } else {
       divCliente.className = "clientePosventa-rojo";
       divCliente.innerHTML = `NO FACTURADO <i class="bi bi-exclamation-circle-fill"></i>`;
-      return;
     }
-
-    const dni = posiblesDnis[index];
-    window.dbClientes.ref("/clientes/" + dni).once("value").then((snapshot) => {
-      const cliente = snapshot.val();
-
-      if (cliente?.cliente) {
-        divCliente.className = "clientePosventa";
-        divCliente.innerHTML = `
-          <img src="Img/logo-presea.png" alt="PRESEA" width="20">
-          Cliente: <strong id="nombre-cliente">${cliente.cliente}</strong>
-        `;
-
-        divCliente.style.cursor = 'pointer';
-        divCliente.addEventListener("click", () => {
-          navigator.clipboard.writeText(cliente.cliente).then(() => {
-            showAlert(`Se ha copiado a portapapeles el cliente: ${cliente.cliente}`);
-          }).catch((err) => {
-            console.error("Error al copiar al portapapeles:", err);
-          });
-        });
-      } else {
-        // Si no se encontró, probar con la siguiente variante
-        intentarBuscarCliente(index + 1);
-      }
-    }).catch((error) => {
-      divCliente.className = "clientePosventa-rojo";
-      divCliente.innerHTML = `ERROR <i class="bi bi-exclamation-triangle-fill"></i>`;
-      console.error("Error al buscar cliente en Firebase:", error);
-    });
-  }
-
-  intentarBuscarCliente(0);
+  }).catch((error) => {
+    divCliente.className = "clientePosventa-rojo";
+    divCliente.innerHTML = `ERROR <i class="bi bi-exclamation-triangle-fill"></i>`;
+    console.error("Error al buscar cliente en Firebase:", error);
+  });
 }
-// FIN BUSCAR CLIENTES
-
 // FIN RENDERIZADO DE LA TABLA
 
 // MODAL LINEA DE TIEMPO
