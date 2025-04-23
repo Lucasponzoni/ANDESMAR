@@ -682,7 +682,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       return !transferido && [
         "devolución para revisar",
-        "devolución finalizada el producto no está apto",
+        "devolución finalizada",
         "devuelto"
           ].some(frase => ultimoEstado.startsWith(frase));
         });
