@@ -1044,6 +1044,7 @@ try {
                 </div>
 
                 <!-- Bloque de Mediación -->
+                ${venta.reclamos.con_mediación === 'Sí' ? `
                 <div style="
                     display: flex;
                     align-items: center;
@@ -1051,18 +1052,20 @@ try {
                     margin-top: 10px;
                     padding: 10px 16px;
                     border-radius: 12px;
-                    background: ${venta.reclamos.con_mediación === 'Sí' ? 'rgba(255, 204, 204, 0.6)' : 'rgba(204, 255, 204, 0.6)'};
-                    border: 1px solid ${venta.reclamos.con_mediación === 'Sí' ? '#ccc' : '#ccc'};
+                    background: rgba(255, 204, 204, 0.6);
+                    border: 1px solid #ccc;
                     font-weight: 600;
                     font-size: 14px;
-                    color: ${venta.reclamos.con_mediación === 'Sí' ? '#b71c1c' : '#1b5e20'};
+                    color: #b71c1c;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
                     backdrop-filter: blur(6px);
                 ">
-                    ${venta.reclamos.con_mediación === 'Sí' ? '📣 En Mediación' : '✅ Sin Mediación'}
+                    📣 En Mediación
                 </div>
+                ` : ''}
 
                 <!-- Bloque de Reclamo -->
+                ${venta.reclamos.reclamo_abierto === 'Sí' ? `
                 <div style="
                     display: flex;
                     align-items: center;
@@ -1070,16 +1073,17 @@ try {
                     margin-top: 10px;
                     padding: 10px 16px;
                     border-radius: 12px;
-                    background: ${venta.reclamos.reclamo_abierto === 'Sí' ? 'rgba(255, 204, 204, 0.6)' : 'rgba(204, 255, 204, 0.6)'};
-                    border: 1px solid ${venta.reclamos.reclamo_abierto === 'Sí' ? '#ccc' : '#ccc'};
+                    background: rgba(255, 204, 204, 0.6);
+                    border: 1px solid #ccc;
                     font-weight: 600;
                     font-size: 14px;
-                    color: ${venta.reclamos.reclamo_abierto === 'Sí' ? '#b71c1c' : '#1b5e20'};
+                    color: #b71c1c;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
                     backdrop-filter: blur(6px);
                 ">
-                    ${venta.reclamos.reclamo_abierto === 'Sí' ? '📣 Con Reclamo' : '✅ Sin Reclamo'}
+                    📣 Con Reclamo
                 </div>
+                ` : ''}
             </td>
             <td style="vertical-align: middle; font-family: 'Rubik', sans-serif;">
               ${ultimoEstado}
@@ -1130,7 +1134,6 @@ try {
             </td>
             <td style="vertical-align: middle;">
               ${procesarUltimoEstado(ultimoEstado) ? procesarUltimoEstado(ultimoEstado) : procesarUltimoEstado(ultimaDescripcion)}
-              ${ultimaDescripcion}
               ${ultimaDescripcion}
               <i class="bi bi-plus-circle-fill icon-user-plus" onclick="abrirSkillsModalFilas('${ventaId}')"></i>
               <div class="div-skills-${ventaId}" style="margin-top: 10px;"></div>
