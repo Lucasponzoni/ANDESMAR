@@ -2119,82 +2119,105 @@ for (const skillKey in filaSkills) {
 }
 
 function abrirModalComentario(ventaId, iconElement) {
-const comentarioModal = new bootstrap.Modal(document.getElementById('comentarioModal'));
-const ventaIdInput = document.getElementById('ventaIdInput'); 
-const comentarioOperacion = document.getElementById('comentarioOperacion'); 
-const numeroCaso = document.getElementById('numeroCaso');
-const vencimientoDevolucion = document.getElementById('vencimientoDevolucion'); 
+  const comentarioModal = new bootstrap.Modal(document.getElementById('comentarioModal'));
+  const ventaIdInput = document.getElementById('ventaIdInput'); 
+  const comentarioOperacion = document.getElementById('comentarioOperacion'); 
+  const numeroCaso = document.getElementById('numeroCaso');
+  const vencimientoDevolucion = document.getElementById('vencimientoDevolucion'); 
 
-// Asignar el ID de la venta al campo correspondiente
-ventaIdInput.value = ventaId;
+  // Asignar el ID de la venta al campo correspondiente
+  ventaIdInput.value = ventaId;
 
-// Limpiar los campos antes de cargar nuevos datos
-comentarioOperacion.value = '';
-numeroCaso.value = '';
-vencimientoDevolucion.value = ''; // Limpiar el campo de vencimiento de devolución
+  // Limpiar los campos antes de cargar nuevos datos
+  comentarioOperacion.value = '';
+  numeroCaso.value = '';
+  vencimientoDevolucion.value = ''; // Limpiar el campo de vencimiento de devolución
 
-// Cargar comentarios previos desde Firebase
-firebase.database().ref(`/posventa/${ventaId}/comentarios`).once('value').then(snapshot => {
-    const comentariosData = snapshot.val() || {};
-    
-    comentarioOperacion.value = comentariosData.operacion || '';
-    numeroCaso.value = comentariosData.numeroCaso || '';
-    vencimientoDevolucion.value = comentariosData.vencimientoDevolucion || ''; 
-}).catch(error => {
-    console.error("Error al cargar comentarios:", error);
-});
+  // Cargar comentarios previos desde Firebase
+  firebase.database().ref(`/posventa/${ventaId}/comentarios`).once('value').then(snapshot => {
+      const comentariosData = snapshot.val() || {};
+      
+      comentarioOperacion.value = comentariosData.operacion || '';
+      numeroCaso.value = comentariosData.numeroCaso || '';
+      
+      // Convertir la fecha de vencimiento a formato YYYY-MM-DD
+      if (comentariosData.vencimientoDevolucion) {
+          const fechaParts = comentariosData.vencimientoDevolucion.split('/');
+          if (fechaParts.length === 3) {
+              // Asegurarse de que la fecha sea en el formato correcto
+              vencimientoDevolucion.value = `${fechaParts[2]}-${fechaParts[1].padStart(2, '0')}-${fechaParts[0].padStart(2, '0')}`; // YYYY-MM-DD
+          } else {
+              vencimientoDevolucion.value = ''; // En caso de formato inesperado
+          }
+      } else {
+          vencimientoDevolucion.value = '';
+      }
+  }).catch(error => {
+      console.error("Error al cargar comentarios:", error);
+  });
 
-// Mostrar el modal
-comentarioModal.show();
+  // Mostrar el modal
+  comentarioModal.show();
 }
 
 async function guardarComentario() {
-const ventaId = document.getElementById('ventaIdInput').value;
-const comentarioOperacion = document.getElementById('comentarioOperacion').value; 
-const numeroCaso = document.getElementById('numeroCaso').value; 
-const vencimientoDevolucion = document.getElementById('vencimientoDevolucion').value; 
+  const ventaId = document.getElementById('ventaIdInput').value;
+  const comentarioOperacion = document.getElementById('comentarioOperacion').value; 
+  const numeroCaso = document.getElementById('numeroCaso').value; 
+  const vencimientoDevolucion = document.getElementById('vencimientoDevolucion').value; 
 
-// Convertir la cadena de fecha a un objeto Date
-const vencimientoDevolucionFecha = new Date(vencimientoDevolucion); 
+  let fechaVencimientoFormateada = "Invalid Date"; // Valor por defecto
 
-// Sumar un día
-vencimientoDevolucionFecha.setDate(vencimientoDevolucionFecha.getDate() + 1); 
+  // Verificar si se ha ingresado una fecha
+  if (vencimientoDevolucion) {
+      // Convertir la cadena de fecha a un objeto Date
+      const vencimientoDevolucionFecha = new Date(vencimientoDevolucion); 
 
-// Formatear la fecha de vencimiento a "DD-MM-YYYY"
-const fechaVencimientoFormateada = vencimientoDevolucionFecha.toLocaleDateString('es-ES');  
+      // Verificar que la fecha sea válida
+      if (isNaN(vencimientoDevolucionFecha)) {
+          console.error("Fecha de vencimiento inválida:", vencimientoDevolucion);
+          showAlert('Fecha de vencimiento inválida. Se guardará como "Invalid Date".');
+      } else {
+          // Sumar un día
+          vencimientoDevolucionFecha.setDate(vencimientoDevolucionFecha.getDate() + 1); 
 
-// Crear un objeto para los comentarios
-const comentarioData = {
-    operacion: comentarioOperacion,
-    numeroCaso: numeroCaso,
-    fecha: new Date().toLocaleString(), 
-    vencimientoDevolucion: fechaVencimientoFormateada 
-};
+          // Formatear la fecha de vencimiento a "DD/MM/YYYY"
+          fechaVencimientoFormateada = `${vencimientoDevolucionFecha.getDate()}/${vencimientoDevolucionFecha.getMonth() + 1}/${vencimientoDevolucionFecha.getFullYear()}`;  
+      }
+  }
 
-// Guardar los comentarios en Firebase
-await firebase.database().ref(`/posventa/${ventaId}/comentarios`).set(comentarioData)
-    .then(() => {
-        // Mostrar alerta de éxito
-        showAlert(`Comentario guardado exitosamente para operación ${ventaId}`);
+  // Crear un objeto para los comentarios
+  const comentarioData = {
+      operacion: comentarioOperacion,
+      numeroCaso: numeroCaso,
+      fecha: new Date().toLocaleString(), 
+      vencimientoDevolucion: fechaVencimientoFormateada // Guardar "Invalid Date" si no se selecciona fecha
+  };
 
-        // Cambiar el color del ícono a verde
-        const iconoComentario = document.querySelector(`i[onclick="abrirModalComentario('${ventaId}', this)"]`);
-        if (iconoComentario) {
-            iconoComentario.style.color = '#38B34DFF';
-        }
+  // Guardar los comentarios en Firebase
+  await firebase.database().ref(`/posventa/${ventaId}/comentarios`).set(comentarioData)
+      .then(() => {
+          // Mostrar alerta de éxito
+          showAlert(`Comentario guardado exitosamente para operación ${ventaId}`);
 
-        // Cerrar el modal
-        const comentarioModal = bootstrap.Modal.getInstance(document.getElementById('comentarioModal'));
-        comentarioModal.hide();
-    })
-    .catch(error => {
-        console.error("Error al guardar comentario:", error);
-        showAlert('Error al guardar el comentario. Inténtalo de nuevo.');
-    });
+          // Cambiar el color del ícono a verde
+          const iconoComentario = document.querySelector(`i[onclick="abrirModalComentario('${ventaId}', this)"]`);
+          if (iconoComentario) {
+              iconoComentario.style.color = '#38B34DFF';
+          }
+
+          // Cerrar el modal
+          const comentarioModal = bootstrap.Modal.getInstance(document.getElementById('comentarioModal'));
+          comentarioModal.hide();
+      })
+      .catch(error => {
+          console.error("Error al guardar comentario:", error);
+          showAlert('Error al guardar el comentario. Inténtalo de nuevo.');
+      });
 }
 
 function obtenerSoloNumeros(str) {
-return str.replace(/\D/g, '');
+  return str.replace(/\D/g, '');
 }
 
 // BUSCAR CLIENTES
