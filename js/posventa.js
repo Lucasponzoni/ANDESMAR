@@ -1035,6 +1035,44 @@ document.addEventListener('DOMContentLoaded', async () => {
                           : venta.publicaciones.título_de_la_publicación
                       }
                   </div>
+
+                  <!-- Bloque de Mediación -->
+                  <div style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      margin-top: 10px;
+                      padding: 10px 16px;
+                      border-radius: 12px;
+                      background: ${venta.reclamos.con_mediación === 'Sí' ? 'rgba(255, 204, 204, 0.6)' : 'rgba(204, 255, 204, 0.6)'};
+                      border: 1px solid ${venta.reclamos.con_mediación === 'Sí' ? '#ccc' : '#ccc'};
+                      font-weight: 600;
+                      font-size: 14px;
+                      color: ${venta.reclamos.con_mediación === 'Sí' ? '#b71c1c' : '#1b5e20'};
+                      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+                      backdrop-filter: blur(6px);
+                  ">
+                      ${venta.reclamos.con_mediación === 'Sí' ? '📣 En Mediación' : '✅ Sin Mediación'}
+                  </div>
+
+                  <!-- Bloque de Reclamo -->
+                  <div style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      margin-top: 10px;
+                      padding: 10px 16px;
+                      border-radius: 12px;
+                      background: ${venta.reclamos.reclamo_abierto === 'Sí' ? 'rgba(255, 204, 204, 0.6)' : 'rgba(204, 255, 204, 0.6)'};
+                      border: 1px solid ${venta.reclamos.reclamo_abierto === 'Sí' ? '#ccc' : '#ccc'};
+                      font-weight: 600;
+                      font-size: 14px;
+                      color: ${venta.reclamos.reclamo_abierto === 'Sí' ? '#b71c1c' : '#1b5e20'};
+                      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+                      backdrop-filter: blur(6px);
+                  ">
+                      ${venta.reclamos.reclamo_abierto === 'Sí' ? '📣 Con Reclamo' : '✅ Sin Reclamo'}
+                  </div>
               </td>
               <td style="vertical-align: middle; font-family: 'Rubik', sans-serif;">
                 ${ultimoEstado}
