@@ -834,113 +834,120 @@ try {
         const procesarUltimoEstado = (estado, venta) => {
           // Si existe número de caso, no mostrar nada
           if (venta?.comentarios?.numeroCaso) return '';
-      
+
           const hoy = new Date();
           hoy.setHours(0, 0, 0, 0);
-      
+
           const seisMesesAtras = new Date(hoy);
           seisMesesAtras.setMonth(hoy.getMonth() - 6);
-      
+
           const meses = [
               "enero", "febrero", "marzo", "abril", "mayo", "junio",
               "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
           ];
-      
-          const regexFechas = /(?:antes del|entre)?\s*(\d{1,2})(?:\s*(?:y|al)\s*(\d{1,2}))?\s+de\s+(\w+)/i;
-          const match = estado.match(regexFechas);
-      
-          if (match) {
+
+          // Modificar la expresión regular para capturar rangos
+          const regexFechas = /(?:antes del|entre)?\s*(\d{1,2})(?:\s*(?:y|al)\s*(\d{1,2}))?\s+de\s+(\w+)/ig;
+          const matches = [...estado.matchAll(regexFechas)];
+
+          let fechas = [];
+
+          matches.forEach(match => {
               let dia1 = parseInt(match[1]);
               let dia2 = match[2] ? parseInt(match[2]) : null;
               let mesTexto = match[3].toLowerCase();
               let mes = meses.indexOf(mesTexto);
-              if (mes === -1) return '';
-      
+              if (mes === -1) return;
+
               const anioActual = hoy.getFullYear();
-              let fechas = [];
-      
-              [dia1, dia2].forEach(dia => {
-                  if (dia !== null) {
-                      let fecha = new Date(anioActual, mes, dia);
-                      if (fecha < seisMesesAtras) fecha.setFullYear(anioActual - 1);
-                      fechas.push(fecha);
-                  }
-              });
-      
-              const fechaMax = new Date(Math.max(...fechas.map(f => f.getTime())));
-              const diffTime = fechaMax.getTime() - hoy.getTime();
-              const diffDias = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      
-              let color = '';
-              let bg = '';
-              let icon = '';
-              let mensaje = '';
-              let border = '';
-              
-              if (diffDias > 0) {
-                  bg = "#f0fdf4";
-                  color = "#2e7d32";
-                  icon = "🕓";
-                  mensaje = `Plazo máximo en ${diffDias} día(s)`;
-                  border = "1px solid #c8e6c9";
-              } else if (diffDias === 0) {
-                  bg = "#fffde7";
-                  color = "#f9a825";
-                  icon = "⚠️";
-                  mensaje = `¡Vence hoy!`;
-                  border = "1px solid #ffe082";
-              } else {
-                  bg = "#fff1f2";
-                  color = "#d32f2f";
-                  icon = "❌";
-                  mensaje = `Venció hace ${Math.abs(diffDias)} día(s)`;
-                  border = "1px solid #ef9a9a";
+
+              // Agregar ambas fechas a la lista de fechas
+              if (dia1 !== null) {
+                  let fecha1 = new Date(anioActual, mes, dia1);
+                  if (fecha1 < seisMesesAtras) fecha1.setFullYear(anioActual - 1);
+                  fechas.push(fecha1);
               }
-              
-              const fechaFormateada = fechaMax.toLocaleDateString('es-AR', {
-                  day: '2-digit',
-                  month: 'long',
-                  year: 'numeric'
-              });
-              
-              return `
+              if (dia2 !== null) {
+                  let fecha2 = new Date(anioActual, mes, dia2);
+                  if (fecha2 < seisMesesAtras) fecha2.setFullYear(anioActual - 1);
+                  fechas.push(fecha2);
+              }
+          });
+
+          if (fechas.length === 0) return '';
+
+          // Calcular la fecha máxima
+          const fechaMax = new Date(Math.max(...fechas.map(f => f.getTime())));
+          const diffTime = fechaMax.getTime() - hoy.getTime();
+          const diffDias = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+          let color = '';
+          let bg = '';
+          let icon = '';
+          let mensaje = '';
+          let border = '';
+
+          if (diffDias > 0) {
+              bg = "#f0fdf4";
+              color = "#2e7d32";
+              icon = "🕓";
+              mensaje = `Plazo máximo en ${diffDias} día(s)`;
+              border = "1px solid #c8e6c9";
+          } else if (diffDias === 0) {
+              bg = "#fffde7";
+              color = "#f9a825";
+              icon = "⚠️";
+              mensaje = `¡Vence hoy!`;
+              border = "1px solid #ffe082";
+          } else {
+              bg = "#fff1f2";
+              color = "#d32f2f";
+              icon = "❌";
+              mensaje = `Venció hace ${Math.abs(diffDias)} día(s)`;
+              border = "1px solid #ef9a9a";
+          }
+
+          const fechaFormateada = fechaMax.toLocaleDateString('es-AR', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric'
+          });
+
+          return `
+          <div style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+          ">
               <div style="
+                  margin-top: 8px;
+                  background: ${bg};
+                  border: ${border};
+                  border-radius: 10px;
+                  padding: 10px 16px;
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                  font-size: 13px;
+                  color: ${color};
                   display: flex;
-                  justify-content: center;
-                  align-items: center;
+                  flex-direction: column;
+                  margin-bottom: 5px;
+                  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+                  backdrop-filter: blur(4px);
+                  max-width: 240px;
+                  text-align: center;
               ">
-                  <div style="
-                      margin-top: 8px;
-                      background: ${bg};
-                      border: ${border};
-                      border-radius: 10px;
-                      padding: 10px 16px;
-                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                      font-size: 13px;
-                      color: ${color};
-                      display: flex;
-                      flex-direction: column;
-                      margin-bottom: 5px;
-                      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-                      backdrop-filter: blur(4px);
-                      max-width: 240px;
-                      text-align: center;
-                  ">
-                      <div style="display: flex; flex-direction: column; align-items: center; font-weight: 500;">
-                          <span style="font-size: 16px; margin-bottom: 4px;">${icon}</span>
-                          ${mensaje}
-                      </div>
-                      <div style="font-size: 11.5px; color: #777; margin-top: 4px;">
-                          🗓 Fecha límite: ${fechaFormateada}
-                      </div>
+                  <div style="display: flex; flex-direction: column; align-items: center; font-weight: 500;">
+                      <span style="font-size: 16px; margin-bottom: 4px;">${icon}</span>
+                      ${mensaje}
+                  </div>
+                  <div style="font-size: 11.5px; color: #777; margin-top: 4px;">
+                      🗓 Fecha límite: ${fechaFormateada}
                   </div>
               </div>
-              `;
-              
-          }     
-          return '';
-      };                  
-      // FIN PROCESAR FECHAS EN ESTADO Y DESCRIPCION
+          </div>
+          `;
+        };                  
+        // FIN PROCESAR FECHAS EN ESTADO Y DESCRIPCION
 
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -1122,8 +1129,8 @@ try {
               })() : ''}
             </td>
             <td style="vertical-align: middle;">
-              ${procesarUltimoEstado(ultimoEstado)}
-              ${procesarUltimoEstado(ultimaDescripcion)}
+              ${procesarUltimoEstado(ultimoEstado) ? procesarUltimoEstado(ultimoEstado) : procesarUltimoEstado(ultimaDescripcion)}
+              ${ultimaDescripcion}
               ${ultimaDescripcion}
               <i class="bi bi-plus-circle-fill icon-user-plus" onclick="abrirSkillsModalFilas('${ventaId}')"></i>
               <div class="div-skills-${ventaId}" style="margin-top: 10px;"></div>
