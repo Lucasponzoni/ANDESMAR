@@ -955,24 +955,6 @@ try {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
-                <div class="mac-os-cell" style="
-                    padding: 12px; 
-                    background-color: #e0f7fa; 
-                    border: 1px solid #b0bec5; /* Borde gris clarito */
-                    border-left: none;
-                    border-radius: 0 12px 12px 0; 
-                    margin-left: -8px;
-                    color: #004d40; 
-                    font-family: 'Helvetica Neue', Arial, sans-serif;
-                    text-align: center;
-                    margin-bottom: 5px;
-                    max-width: fit-content;
-                    font-weight: bold;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-                    transition: background-color 0.3s ease, transform 0.2s ease;
-                ">
-                    Fila ${filaNumero++}
-                </div>
                 </div>
                 <div class="clientePosventa-gris" id="cliente-posventa-${ventaId}">
                   Buscando <div class="spinner-border text-secondary" role="status" style="width: 1rem; height: 1rem;">
@@ -1162,67 +1144,89 @@ try {
               <div class="div-skills-${ventaId}" style="margin-top: 10px;"></div>
             </td>
             <td style="vertical-align: middle;">
-              <div style="
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 12px;
-                padding: 8px;
-                background: linear-gradient(145deg, #f5f5fa, #e6e6ec);
-                border-radius: 14px;
-                box-shadow: inset 2px 2px 6px #d1d1d8, inset -2px -2px 6px #ffffff;
-                transition: all 0.3s ease;
-                min-width: 60px;
-              ">
-                <!-- Comentario -->
-                <i class="bi bi-chat-quote-fill"
-                  title="Comentario"
-                  onclick="abrirModalComentario('${ventaId}', this)"
-                  style="
-                    cursor: pointer;
-                    color: ${venta.comentarios ? '#38B34D' : '#bbb'};
-                    font-size: 28px;
-                    transition: color 0.2s ease;
-                  "></i>
+                <div style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 12px;
+                  padding: 12px;
+                  background: rgba(245, 245, 245, 0.7);
+                  border-radius: 14px;
+                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+                  backdrop-filter: blur(6px);
+                  transition: all 0.3s ease;
+                  min-width: 60px;
+                  font-family: 'Rubik', sans-serif;
+                  border: 1px solid rgba(200, 200, 200, 0.6);
+                ">
+                  <!-- Comentario -->
+                  <i class="bi bi-chat-quote-fill"
+                    title="Comentario"
+                    onclick="abrirModalComentario('${ventaId}', this)"
+                    style="
+                      cursor: pointer;
+                      color: ${venta.comentarios ? '#38B34D' : '#bbb'};
+                      font-size: 28px;
+                      transition: color 0.2s ease;
+                    "></i>
 
-                <!-- Tracking -->
-                <i id="tracking-posventa-${ventaId}"
-                  class="bi bi-geo-alt-fill"
-                  title="Tracking"
-                  style="
-                    font-size: 28px;
-                    color: ${venta.ventas.transportCompany 
-                              ? (venta.ventas.transportCompany === 'Novogar' || venta.ventas.transportCompany === 'PlaceIt'
-                                  ? '#d9534f'
-                                  : '#28a745') 
-                                  : '#EB981C'};
-                    ${venta.ventas.transportCompany === 'Novogar' || venta.ventas.transportCompany === 'PlaceIt'
-                        ? 'pointer-events: none; opacity: 0.5;'
-                        : 'cursor: pointer;'}
-                    transition: all 0.3s ease;
-                  "
-                  ${venta.ventas.transportCompany && venta.ventas.transportCompany !== 'Novogar' && venta.ventas.transportCompany !== 'PlaceIt'
-                    ? `onclick="window.open('${venta.ventas.trackingLink}', '_blank')"`
-                    : ''}
-                ></i>
+                  <!-- Tracking -->
+                  <i id="tracking-posventa-${ventaId}"
+                    class="bi bi-geo-alt-fill"
+                    title="Tracking"
+                    style="
+                      font-size: 28px;
+                      color: ${venta.ventas.transportCompany 
+                                ? (venta.ventas.transportCompany === 'Novogar' || venta.ventas.transportCompany === 'PlaceIt'
+                                    ? '#d9534f'
+                                    : '#28a745') 
+                                    : '#EB981C'};
+                      ${venta.ventas.transportCompany === 'Novogar' || venta.ventas.transportCompany === 'PlaceIt'
+                          ? 'pointer-events: none; opacity: 0.5;'
+                          : 'cursor: pointer;'}
+                      transition: all 0.2s ease;
+                    "
+                    ${venta.ventas.transportCompany && venta.ventas.transportCompany !== 'Novogar' && venta.ventas.transportCompany !== 'PlaceIt'
+                      ? `onclick="window.open('${venta.ventas.trackingLink}', '_blank')"`
+                      : ''}
+                  ></i>
 
-                <!-- Herramienta -->
-                <i class="bi bi-hammer"
-                  title="Herramienta"
-                  style="
-                    cursor: pointer;
-                    color: #4a6fa5;
-                    font-size: 28px;
-                    transition: color 0.2s ease;
-                  "
-                  onclick="copyHammerData('${ventaId}', 
-                    '${ultimoEstado}', 
-                    '${ultimaDescripcion}', 
-                    '${venta.publicaciones.sku}', 
-                    '${venta.ventas.unidades}', 
-                    ${venta.ventas['total_(ars)']}
-                  )"></i>
-              </div>
+                  <!-- Herramienta -->
+                  <i class="bi bi-hammer"
+                    title="Herramienta"
+                    style="
+                      cursor: pointer;
+                      color: #4a6fa5;
+                      font-size: 28px;
+                      transition: color 0.2s ease;
+                    "
+                    onclick="copyHammerData('${ventaId}', 
+                      '${ultimoEstado}', 
+                      '${ultimaDescripcion}', 
+                      '${venta.publicaciones.sku}', 
+                      '${venta.ventas.unidades}', 
+                      ${venta.ventas['total_(ars)']}
+                    )"></i>
+                </div>
+
+                <div class="mac-os-cell" style="
+                      padding: 12px;
+                      background: rgba(245, 245, 245, 0.7);
+                      border: 1px solid rgba(200, 200, 200, 0.6);
+                      border-radius: 12px;
+                      color: #004d40;
+                      font-family: 'Rubik', sans-serif;
+                      text-align: center;
+                      margin-bottom: 5px;
+                      margin-top: 5px;
+                      max-width: 100%;
+                      font-weight: 500;
+                      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+                      backdrop-filter: blur(6px);
+                      transition: background-color 0.3s ease, transform 0.2s ease;
+                    ">
+                    Fila ${filaNumero++}
+                </div>
             </td>
                `;
         tbody.appendChild(row);
