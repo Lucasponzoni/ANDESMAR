@@ -1654,12 +1654,11 @@ async function copyHammerData(ventaId, estadoActual, ultimaDescripcion, sku, uni
       }
 
       // Solo incluir la línea de vencimiento si no es "No disponible" o una fecha inválida
-      if (
-        vencimientoDevolucion !== "No disponible" &&
-        vencimientoDevolucion !== "Invalid Date"
-      ) {
-        comentariosMensaje += `VENCIMIENTO DE DEVOLUCION: ${vencimientoDevolucion}\n\n`;
+      const valoresInvalidos = ["No disponible", "Invalid Date"];
+      if (!valoresInvalidos.includes(vencimientoDevolucion)) {
+          comentariosMensaje += `VENCIMIENTO DE DEVOLUCION: ${vencimientoDevolucion}\n\n`;
       }
+      
   }
 
   // Construir el mensaje base
