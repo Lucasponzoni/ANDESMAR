@@ -1635,20 +1635,7 @@ async function copyHammerData(ventaId, estadoActual, ultimaDescripcion, sku, uni
   let comentariosMensaje = '';
   const comentario1 = comentarios[2] || "No disponible";
   const numeroCaso = comentarios[1] || "No disponible";
-  const vencimientoDevolucionRaw = comentarios[3]; // Vencimiento de devolución crudo
-
-  // Formatear la fecha de vencimiento de devolución
-  let vencimientoDevolucion = "No disponible";
-  if (vencimientoDevolucionRaw && vencimientoDevolucionRaw !== 'Invalid Date') {
-      // Validar que el formato sea correcto
-      const match = vencimientoDevolucionRaw.match(/^(\d{1,2})(\d{1,2})(\d{4})$/);
-      if (match) {
-          const dia = match[1];
-          const mes = match[2];
-          const anio = match[3];
-          vencimientoDevolucion = `${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}/${anio}`;
-      }
-  }
+  const vencimientoDevolucion = comentarios[3] || "No disponible";
 
   // Verificar si hay algún comentario válido
   if (comentario1 !== "No disponible" || numeroCaso !== "No disponible" || vencimientoDevolucion !== "No disponible") {
@@ -1666,9 +1653,12 @@ async function copyHammerData(ventaId, estadoActual, ultimaDescripcion, sku, uni
           comentariosMensaje += `NUMERO DE CASO: ${numeroCaso}\n\n`;
       }
 
-      // Solo incluir la línea de vencimiento si no es "No disponible"
-      if (vencimientoDevolucion !== "No disponible") {
-          comentariosMensaje += `VENCIMIENTO DE DEVOLUCION: ${vencimientoDevolucion}\n\n`;
+      // Solo incluir la línea de vencimiento si no es "No disponible" o una fecha inválida
+      if (
+        vencimientoDevolucion !== "No disponible" &&
+        vencimientoDevolucion !== "Invalid Date"
+      ) {
+        comentariosMensaje += `VENCIMIENTO DE DEVOLUCION: ${vencimientoDevolucion}\n\n`;
       }
   }
 
