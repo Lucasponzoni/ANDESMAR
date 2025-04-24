@@ -2820,7 +2820,7 @@ sinRevisarBtn.title = `Filas sin controlar: ${filasSinControl}`; // Actualizar e
         if (estado) {
             const textoEstado = estado.innerHTML; // Obtiene el contenido del div
             if (textoEstado.includes('Vence HOY') || textoEstado.includes('PLAZO VENCIDO')) {
-                contadorVencidos++; // Incrementa el contador
+                contadorVencidos++;
             }
         }
     });
