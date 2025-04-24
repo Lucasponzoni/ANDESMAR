@@ -1713,7 +1713,7 @@ async function getComentarios(ventaId) {
           // Sanitizar comentario
           comentario = comentario
               .replace(/[\n\r]/g, '') // Eliminar saltos de línea
-              .replace(/[^a-zA-Z0-9\s]/g, '') // Eliminar caracteres especiales
+              .replace(/[^a-zA-Z0-9\s\-\/]/g, '') // Eliminar caracteres especiales, manteniendo guiones y barras
               .toLowerCase(); // Convertir a minúsculas
           comentario = comentario.charAt(0).toUpperCase() + comentario.slice(1); // Primera letra en mayúscula
           comentarios.push(comentario);
