@@ -915,37 +915,40 @@ try {
 
           return `
           <div style="
-              display: flex;
-              justify-content: center;
-              align-items: center;
+            display: inline-flex;
+            align-items: center;
+            background: rgba(245, 245, 245, 0.7);
+            border: 1px solid rgba(200, 200, 200, 0.6);
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-family: 'Rubik', sans-serif;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(6px);
+            margin: 5px;
+            width: fit-content;
+            max-width: 100%;
           ">
-              <div style="
-                  margin-top: 8px;
-                  background: ${bg};
-                  border: ${border};
-                  border-radius: 10px;
-                  padding: 10px 16px;
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                  font-size: 13px;
-                  color: ${color};
-                  display: flex;
-                  flex-direction: column;
-                  margin-bottom: 5px;
-                  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-                  backdrop-filter: blur(4px);
-                  max-width: 240px;
-                  text-align: center;
-              ">
-                  <div style="display: flex; flex-direction: column; align-items: center; font-weight: 500;">
-                      <span style="font-size: 16px; margin-bottom: 4px;">${icon}</span>
-                      ${mensaje}
-                  </div>
-                  <div style="font-size: 11.5px; color: #777; margin-top: 4px;">
-                      🗓 Fecha límite: ${fechaFormateada}
-                  </div>
+            <div style="
+              font-size: 24px;
+              margin-right: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 32px;
+              height: 32px;
+            ">${icon}</div>
+        
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+              <div style="font-weight: 500; font-size: 15px; color: ${color};">
+                ${mensaje}
               </div>
+              <div style="font-size: 12px; color: #666;">
+                🗓 Fecha límite: ${fechaFormateada}
+              </div>
+            </div>
           </div>
-          `;
+          <br>
+        `;        
         };                  
         // FIN PROCESAR FECHAS EN ESTADO Y DESCRIPCION
 
@@ -1111,24 +1114,44 @@ try {
                   }
 
                   return `
-                      <div onclick="handleDivClick('${ventaId}', '${vencimiento}', '${numeroCaso}', \`${estadoTexto}\`)" style="
-                          margin-top: 10px;
-                          ${divStyle}
-                          border-radius: 8px;
-                          padding: 12px 16px;
-                          font-size: 14px;
-                          font-weight: normal;
-                          color: #333;
-                          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                          transition: background-color 0.3s;
-                          cursor: pointer;
-                      ">
-                          <strong style="color: #1976d2;">📂 Reclamado en caso ${numeroCaso}</strong><br>
-                          <span style="color: #555;">🕒 vence ${vencimiento}</span>
-                          <div style="font-size: 12px; margin-top: 6px;">
-                              ${estadoTexto}
-                          </div>
+                  <div onclick="handleDivClick('${ventaId}', '${vencimiento}', '${numeroCaso}', \`${estadoTexto}\`)" style="
+                    display: inline-flex;
+                    align-items: center;
+                    background: rgba(245, 245, 245, 0.7);
+                    border: 1px solid rgba(200, 200, 200, 0.6);
+                    border-radius: 10px;
+                    padding: 12px 16px;
+                    font-family: 'Rubik', sans-serif;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+                    backdrop-filter: blur(6px);
+                    margin-top: 10px;
+                    cursor: pointer;
+                    width: fit-content;
+                    max-width: 100%;
+                    transition: background-color 0.3s;
+                  ">
+                    <div style="
+                      font-size: 22px;
+                      margin-right: 12px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      width: 32px;
+                      height: 32px;
+                    ">📂</div>
+                
+                    <div style="display: flex; flex-direction: column; justify-content: center;">
+                      <div style="font-size: 14px; color: #1976d2; font-weight: 500;">
+                        Caso ${numeroCaso}
                       </div>
+                      <div style="font-size: 13px; color: #555;">
+                        🕒 Vence ${vencimiento}
+                      </div>
+                      <div style="font-size: 12px; margin-top: 6px;">
+                        ${estadoTexto}
+                      </div>
+                    </div>
+                  </div>
                   `;
               })() : ''}
             </td>
@@ -1947,30 +1970,65 @@ try {
   allSkillsDiv.innerHTML = `
     <br><div style="${macTitleStyle()}">Listado Completo 📋</div><br>`;
 
-  Object.entries(skillsData).forEach(([skillKey, skillObj]) => {
-    const badge = document.createElement('span');
-    const skillText = skillObj.text || skillKey;
-
-    badge.textContent = skillText.charAt(0).toUpperCase() + skillText.slice(1);
-    badge.style.backgroundColor = skillObj.backgroundColor;
-    badge.style.color = skillObj.textColor;
-    badge.style.border = `1px solid ${skillObj.textColor}`;
-    badge.style.padding = '8px 12px';
-    badge.style.borderRadius = '8px';
-    badge.style.margin = '5px';
-    badge.style.fontFamily = '"Rubik", sans-serif';
-    badge.style.fontWeight = '600';
-    badge.style.cursor = 'pointer';
-    badge.classList.add('badge');
-
-    badge.addEventListener('click', async () => {
-      const skillRef = firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`);
-      await skillRef.set(true);
-      renderSkillEnFila(skillKey, ventaId, skillObj);
+    Object.entries(skillsData).forEach(([skillKey, skillObj]) => {
+      const badge = document.createElement('span');
+      const skillText = skillObj.text || skillKey;
+      const estilo = {
+        textColor: skillObj.textColor || '#000',
+        backgroundColor: skillObj.backgroundColor || '#ccc',
+      };
+    
+      badge.setAttribute('data-skill', skillKey);
+      badge.textContent = skillText.charAt(0).toUpperCase() + skillText.slice(1);
+      badge.style.backgroundColor = 'rgba(245, 245, 245, 0.7)';
+      badge.style.color = estilo.textColor;
+      badge.style.border = `1px solid rgba(200, 200, 200, 0.6)`;
+      badge.style.padding = '8px 12px';
+      badge.style.borderRadius = '10px';
+      badge.style.width = 'fit-content';
+      badge.style.margin = '5px';
+      badge.style.fontFamily = '"Rubik", sans-serif';
+      badge.style.fontWeight = '400';
+      badge.style.fontSize = '14px';
+      badge.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.08)';
+      badge.style.backdropFilter = 'blur(6px)';
+      badge.style.display = 'inline-flex';
+      badge.style.cursor = 'pointer';
+      badge.style.alignItems = 'center';
+      badge.style.justifyContent = 'center';
+      badge.classList.add('badge');
+    
+      // Crear el círculo de color
+      const circle = document.createElement('span');
+      circle.style.display = 'inline-block';
+      circle.style.width = '20px';
+      circle.style.height = '20px';
+      circle.style.backgroundColor = estilo.backgroundColor;
+      circle.style.borderRadius = '50%';
+      circle.style.marginLeft = '8px';
+    
+      // Crear el botón para eliminar
+      const removeBtn = document.createElement('span');
+      removeBtn.innerHTML = '&times;';
+      removeBtn.style.cursor = 'pointer';
+      removeBtn.style.fontSize = '18px';
+      removeBtn.style.lineHeight = '18px';
+      removeBtn.style.marginLeft = '8px';
+      removeBtn.style.fontWeight = 'bold';
+    
+      // Lógica del clic al badge
+      badge.addEventListener('click', async () => {
+        const skillRef = firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`);
+        await skillRef.set(true);
+        renderSkillEnFila(skillKey, ventaId, skillObj);
+      });
+    
+      // Añadir elementos al badge
+      badge.appendChild(circle);
+      badge.appendChild(removeBtn);
+      allSkillsDiv.appendChild(badge);
     });
-
-    allSkillsDiv.appendChild(badge);
-  });
+    
 
   containerDiv.appendChild(allSkillsDiv);
 
@@ -2022,25 +2080,59 @@ function crearBadge(skillsData, skillKey, count, totalSkillsUsed, ventaId) {
   const badge = document.createElement('span');
   const skillText = skillsData[skillKey]?.text || skillKey;
   const percentage = ((count / totalSkillsUsed) * 100).toFixed(2);
+  const estilo = {
+    textColor: skillsData[skillKey]?.textColor || '#000',
+    backgroundColor: skillsData[skillKey]?.backgroundColor || '#ccc',
+  };
 
+  badge.setAttribute('data-skill', skillKey);
   badge.textContent = `${skillText} (${percentage}%)`;
-  badge.style.backgroundColor = skillsData[skillKey]?.backgroundColor || '#e7f3fe';
-  badge.style.color = skillsData[skillKey]?.textColor || '#31708f';
-  badge.style.border = `1px solid ${skillsData[skillKey]?.textColor || '#31708f'}`;
-  badge.style.padding = '6px 10px';
-  badge.style.borderRadius = '8px';
+  badge.style.backgroundColor = 'rgba(245, 245, 245, 0.7)';
+  badge.style.color = estilo.textColor;
+  badge.style.border = `1px solid rgba(200, 200, 200, 0.6)`;
+  badge.style.padding = '8px 12px';
+  badge.style.borderRadius = '10px';
+  badge.style.width = 'fit-content';
   badge.style.margin = '5px';
-  badge.style.display = 'inline-block';
   badge.style.fontFamily = '"Rubik", sans-serif';
-  badge.style.fontWeight = '500';
-  badge.style.fontSize = '12px';
-  badge.style.cursor = 'pointer';
+  badge.style.textTransform = 'capitalize';
+  badge.style.fontWeight = '400';
+  badge.style.fontSize = '14px';
+  badge.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.08)';
+  badge.style.backdropFilter = 'blur(6px)';
+  badge.style.display = 'inline-flex';
+  badge.style.alignItems = 'center';
+  badge.style.justifyContent = 'center';
+  badge.classList.add('badge');
 
+  // Crear el círculo de color
+  const circle = document.createElement('span');
+  circle.style.display = 'inline-block';
+  circle.style.width = '20px';
+  circle.style.height = '20px';
+  circle.style.backgroundColor = estilo.backgroundColor;
+  circle.style.borderRadius = '50%';
+  circle.style.marginLeft = '8px';
+
+  // Crear el botón para eliminar
+  const removeBtn = document.createElement('span');
+  removeBtn.innerHTML = '&times;';
+  removeBtn.style.cursor = 'pointer';
+  removeBtn.style.fontSize = '18px';
+  removeBtn.style.lineHeight = '18px';
+  removeBtn.style.marginLeft = '8px';
+  removeBtn.style.fontWeight = 'bold';
+
+  // Evento al hacer clic en el badge
   badge.onclick = async () => {
     const skillRef = firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`);
     await skillRef.set(true);
     renderSkillEnFila(skillKey, ventaId, skillsData[skillKey]);
   };
+
+  // Añadir elementos al badge
+  badge.appendChild(circle);
+  badge.appendChild(removeBtn);
 
   return badge;
 }
@@ -2061,53 +2153,71 @@ function macTitleStyle() {
 // FIN SKILLS EN FILAS
 
 function renderSkillEnFila(skillKey, ventaId, estilo = {}) {
-const targetDiv = document.querySelector(`.div-skills-${ventaId}`);
-if (!targetDiv) return;
+  const targetDiv = document.querySelector(`.div-skills-${ventaId}`);
+  if (!targetDiv) return;
 
-// Evitar duplicados
-if (targetDiv.querySelector(`[data-skill="${skillKey}"]`)) return;
+  // Evitar duplicados
+  if (targetDiv.querySelector(`[data-skill="${skillKey}"]`)) return;
 
-const badge = document.createElement('span');
-badge.setAttribute('data-skill', skillKey);
-badge.style.backgroundColor = estilo.backgroundColor || '#ddd';
-badge.style.color = estilo.textColor || '#000';
-badge.style.border = `1px solid ${estilo.textColor || '#000'}`;
-badge.style.padding = '6px 10px';
-badge.style.borderRadius = '8px';
-badge.style.margin = '5px';
-badge.style.display = 'inline-block';
-badge.style.fontFamily = '"Rubik", sans-serif';
-badge.style.fontWeight = '500';
-badge.style.fontSize = '12px';
+  // Crear el badge
+  const badge = document.createElement('span');
+  badge.setAttribute('data-skill', skillKey);
+  badge.textContent = skillKey.charAt(0).toUpperCase() + skillKey.slice(1);
+  badge.style.backgroundColor = 'rgba(245, 245, 245, 0.7)';
+  badge.style.color = estilo.textColor || '#000';
+  badge.style.border = `1px solid rgba(200, 200, 200, 0.6)`;
+  badge.style.padding = '10px 16px';
+  badge.style.borderRadius = '12px';
+  badge.style.margin = '5px';
+  badge.style.fontFamily = '"Rubik", sans-serif';
+  badge.style.fontWeight = '400';
+  badge.style.fontSize = '16px';
+  badge.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.08)';
+  badge.style.backdropFilter = 'blur(6px)';
+  badge.style.display = 'flex';
+  badge.style.alignItems = 'center';
+  badge.classList.add('badge');
 
-badge.textContent = skillKey.charAt(0).toUpperCase() + skillKey.slice(1);
+  // Crear el círculo de color
+  const circle = document.createElement('span');
+  circle.style.display = 'inline-block';
+  circle.style.width = '20px';
+  circle.style.height = '20px';
+  circle.style.backgroundColor = estilo.backgroundColor || '#ccc';
+  circle.style.borderRadius = '50%';
+  circle.style.marginLeft = '10px';
 
-const removeBtn = document.createElement('span');
-removeBtn.innerHTML = '&times;';
-removeBtn.style.marginLeft = '10px';
-removeBtn.style.cursor = 'pointer';
-removeBtn.style.fontWeight = 'bold';
+  // Botón para eliminar
+  const removeBtn = document.createElement('span');
+  removeBtn.innerHTML = '&times;';
+  removeBtn.style.cursor = 'pointer';
+  removeBtn.style.fontSize = '20px';
+  removeBtn.style.lineHeight = '20px';
+  removeBtn.style.marginLeft = '10px';
+  removeBtn.style.fontWeight = 'bold';
 
-removeBtn.addEventListener('click', () => {
-  Swal.fire({
-    title: '¿Estás seguro?',
-    text: "¡Esto eliminará el skill!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Sí, eliminar',
-    cancelButtonText: 'Cancelar'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`).remove();
-      badge.remove();
-    }
+  removeBtn.addEventListener('click', () => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¡Esto eliminará el skill!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`).remove();
+        badge.remove();
+      }
+    });
   });
-});
 
-badge.appendChild(removeBtn);
-targetDiv.appendChild(badge);
+  // Agregar elementos al badge
+  badge.appendChild(circle);
+  badge.appendChild(removeBtn);
+  targetDiv.appendChild(badge);
 }
 
 async function cargarSkillsDeFila(ventaId) {
@@ -2457,53 +2567,73 @@ for (const skillKey in filaSkills) {
 }
 
 function renderSkillEnFila(skillKey, ventaId, estilo = {}) {
-const targetDiv = document.querySelector(`.div-skills-${ventaId}`);
-if (!targetDiv) return;
+  const targetDiv = document.querySelector(`.div-skills-${ventaId}`);
+  if (!targetDiv) return;
 
-// Evitar duplicados
-if (targetDiv.querySelector(`[data-skill="${skillKey}"]`)) return;
+  // Evitar duplicados
+  if (targetDiv.querySelector(`[data-skill="${skillKey}"]`)) return;
 
-const badge = document.createElement('span');
-badge.setAttribute('data-skill', skillKey);
-badge.style.backgroundColor = estilo.backgroundColor || '#ddd';
-badge.style.color = estilo.textColor || '#000';
-badge.style.border = `1px solid ${estilo.textColor || '#000'}`;
-badge.style.padding = '6px 10px';
-badge.style.borderRadius = '8px';
-badge.style.margin = '5px';
-badge.style.display = 'inline-block';
-badge.style.fontFamily = '"Rubik", sans-serif';
-badge.style.fontWeight = '500';
-badge.style.fontSize = '12px';
+  // Crear el badge
+  const badge = document.createElement('span');
+  badge.setAttribute('data-skill', skillKey);
+  badge.textContent = skillKey.charAt(0).toUpperCase() + skillKey.slice(1);
+  badge.style.backgroundColor = 'rgba(245, 245, 245, 0.7)';
+  badge.style.color = estilo.textColor || '#000';
+  badge.style.border = `1px solid rgba(200, 200, 200, 0.6)`;
+  badge.style.padding = '8px 12px'; 
+  badge.style.borderRadius = '10px'; 
+  badge.style.width = 'fit-content';
+  badge.style.margin = '5px';
+  badge.style.fontFamily = '"Rubik", sans-serif';
+  badge.style.fontWeight = '400';
+  badge.style.fontSize = '14px';
+  badge.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.08)';
+  badge.style.backdropFilter = 'blur(6px)';
+  badge.style.display = 'inline-flex';
+  badge.style.alignItems = 'center';
+  badge.style.justifyContent = 'center';
+  badge.classList.add('badge');
 
-badge.textContent = skillKey.charAt(0).toUpperCase() + skillKey.slice(1);
+  // Crear el círculo de color
+  const circle = document.createElement('span');
+  circle.style.display = 'inline-block';
+  circle.style.width = '20px';
+  circle.style.height = '20px';
+  circle.style.backgroundColor = estilo.backgroundColor || '#ccc';
+  circle.style.borderRadius = '50%';
+  circle.style.marginLeft = '8px';
+  
+  // Botón para eliminar
+  const removeBtn = document.createElement('span');
+  removeBtn.innerHTML = '&times;';
+  removeBtn.style.cursor = 'pointer';
+  removeBtn.style.fontSize = '18px'; 
+  removeBtn.style.lineHeight = '18px'; 
+  removeBtn.style.marginLeft = '8px'; 
+  removeBtn.style.fontWeight = 'bold';
 
-const removeBtn = document.createElement('span');
-removeBtn.innerHTML = '&times;';
-removeBtn.style.marginLeft = '10px';
-removeBtn.style.cursor = 'pointer';
-removeBtn.style.fontWeight = 'bold';
-
-removeBtn.addEventListener('click', () => {
-  Swal.fire({
-    title: '¿Estás seguro?',
-    text: "¡Esto eliminará el skill!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Sí, eliminar',
-    cancelButtonText: 'Cancelar'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`).remove();
-      badge.remove();
-    }
+  removeBtn.addEventListener('click', () => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¡Esto eliminará el skill!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        firebase.database().ref(`/posventa/${ventaId}/skills/${skillKey}`).remove();
+        badge.remove();
+      }
+    });
   });
-});
 
-badge.appendChild(removeBtn);
-targetDiv.appendChild(badge);
+  // Agregar el círculo y el botón al badge
+  badge.appendChild(circle);
+  badge.appendChild(removeBtn);
+  targetDiv.appendChild(badge);
 }
 // FIN LISTENERS EN TIEMPO REAL
 
@@ -2525,46 +2655,64 @@ firebase.database().ref('/skills').once('value').then(snapshot => {
 
 // Función para crear un badge
 function createBadge(skillText, backgroundColor, textColor, skillId) {
-const badge = document.createElement('span');
-badge.textContent = skillText.charAt(0).toUpperCase() + skillText.slice(1); // Capitalizar
-badge.style.backgroundColor = backgroundColor;
-badge.style.color = textColor;
-badge.style.border = `1px solid ${textColor}`;
-badge.style.padding = '8px 12px';
-badge.style.borderRadius = '8px';
-badge.style.margin = '5px';
-badge.style.fontFamily = '"Rubik", sans-serif'; // Aplicar la fuente
-badge.style.fontWeight = '600'; // Peso de la fuente
-badge.classList.add('badge');
+  const badge = document.createElement('span');
+  badge.textContent = skillText.charAt(0).toUpperCase() + skillText.slice(1);
+  badge.style.backgroundColor = 'rgba(245, 245, 245, 0.7)'; 
+  badge.style.color = textColor; 
+  badge.style.border = `1px solid rgba(200, 200, 200, 0.6)`;
+  badge.style.padding = '10px 16px';
+  badge.style.borderRadius = '12px';
+  badge.style.margin = '5px';
+  badge.style.fontFamily = '"Rubik", sans-serif';
+  badge.style.fontWeight = '400'; 
+  badge.style.fontSize = '16px'; 
+  badge.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.08)';
+  badge.style.backdropFilter = 'blur(6px)';
+  badge.style.display = 'flex'; 
+  badge.style.alignItems = 'center'; 
+  badge.classList.add('badge');
 
-// Crear el botón de eliminar
-const removeButton = document.createElement('span');
-removeButton.innerHTML = '&times;'; // "X" para eliminar
-removeButton.style.cursor = 'pointer';
-removeButton.style.marginLeft = '10px';
+  // Crear el círculo
+  const circle = document.createElement('span');
+  circle.style.display = 'inline-block';
+  circle.style.width = '20px';
+  circle.style.height = '20px'; 
+  circle.style.backgroundColor = backgroundColor; 
+  circle.style.borderRadius = '50%';
+  circle.style.marginLeft = '5px'; 
 
-removeButton.addEventListener('click', function () {
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: "¡Esto eliminará el skill!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Eliminar de Firebase
-            firebase.database().ref('/skills/' + skillId).remove();
-            // Eliminar el badge del DOM
-            badge.remove();
-        }
-    });
-});
+  // Crear el botón de eliminar
+  const removeButton = document.createElement('span');
+  removeButton.innerHTML = '&times;'; 
+  removeButton.style.cursor = 'pointer';
+  removeButton.style.fontSize = '20px'; 
+  removeButton.style.lineHeight = '20px'; 
+  removeButton.style.marginLeft = '3px';
 
-badge.appendChild(removeButton);
-document.getElementById('skillsContainer').appendChild(badge);
+  removeButton.addEventListener('click', function () {
+      Swal.fire({
+          title: '¿Estás seguro?',
+          text: "¡Esto eliminará el skill!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, eliminar',
+          cancelButtonText: 'Cancelar'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              // Eliminar de Firebase
+              firebase.database().ref('/skills/' + skillId).remove();
+              // Eliminar el badge del DOM
+              badge.remove();
+          }
+      });
+  });
+
+  // Añadir el círculo y el botón de eliminar al badge
+  badge.appendChild(circle);
+  badge.appendChild(removeButton);
+  document.getElementById('skillsContainer').appendChild(badge);
 }
 
 // Agregar nuevo skill
