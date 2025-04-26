@@ -2876,3 +2876,272 @@ function updateAlertPositions() {
   });
 }
 // FIN ALERT EMAIL
+
+
+document.getElementById('btnMinutas').addEventListener('click', function() {
+  // Mostrar el spinner
+  document.getElementById('spinner4').style.display = 'block';
+  document.getElementById('tableContainer').style.display = 'none';
+  document.getElementById('tableContainer').innerHTML = ''; // Limpio antes de volver a cargar
+
+  db.ref('posventa').limitToLast(40000).once('value')
+  .then(snapshot => {
+      let rows = [];
+
+      snapshot.forEach(childSnapshot => {
+          const ventas = childSnapshot.val().ventas;
+          const totalArs = ventas['total_(ars)'];
+
+          if (totalArs <= 0) {
+              const minutaExists = ventas.minuta === true;
+              if (!minutaExists) {
+                  const row = {
+                      fecha: ventas.fecha_de_venta || 'Sin fecha',
+                      id: childSnapshot.key,
+                      cliente: childSnapshot.val().facturación_al_comprador?.tipo_y_número_de_documento || "No disponible",
+                      totalArs: totalArs,
+                      sku: childSnapshot.val().publicaciones?.sku || 'Sin SKU',
+                      descripcion: childSnapshot.val().publicaciones?.título_de_la_publicación || 'Sin descripción'
+                  };
+                  rows.push(row);
+              }
+          }
+      });
+
+      createTable(rows);
+  })
+  .catch(error => {
+      console.error('Error al cargar las minutas:', error);
+      document.getElementById('tableContainer').innerHTML = '<p>Error al cargar los datos.</p>';
+  })
+  .finally(() => {
+      // Siempre ocultar el spinner al terminar
+      document.getElementById('spinner4').style.display = 'none';
+      document.getElementById('tableContainer').style.display = 'block';
+  });
+});
+
+function createTable(rows) {
+  if (rows.length === 0) {
+      document.getElementById('tableContainer').innerHTML = '<p>No se encontraron registros.</p>';
+      return;
+  }
+
+  let tableHTML = `<table class="table table-hover table-sm" style="border-radius: 12px; overflow: hidden; font-size: 0.9rem; background: #f8f9fa;">
+                      <thead style="position: sticky; top: 0; background-color: #fff;">
+                          <tr>
+                              <th><i class="bi bi-calendar-event"></i> Fecha</th>
+                              <th><i class="bi bi-file-earmark-text"></i> Operación</th>
+                              <th><i class="bi bi-person-circle"></i> Cliente</th>
+                              <th><i class="bi bi-cash-stack"></i> Total ARS</th>
+                              <th><i class="bi bi-box"></i> SKU</th>
+                              <th><i class="bi bi-info-circle"></i> Descripción</th>
+                          </tr>
+                      </thead>
+                      <tbody>`;
+
+  rows.forEach((row, index) => {
+      const totalColor = row.totalArs === 0 ? 'orange' : 'red';
+      const operacionLink = `https://www.mercadolibre.com.ar/ventas/${row.id}/detalle`;
+
+      tableHTML += `<tr style="vertical-align: middle;">
+                      <td>${row.fecha}</td>
+                      <td><a href="${operacionLink}" target="_blank">${row.id}</a></td>
+                      <td id="cliente-${index}">
+                          <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                      </td>
+                      <td style="color: ${totalColor}; font-weight: bold;">
+                          ${row.totalArs.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}
+                      </td>
+                      <td>${row.sku}</td>
+                      <td style="word-break: break-word; max-width: 300px;">${row.descripcion}</td>
+                  </tr>`;
+  });
+
+  tableHTML += `</tbody></table>`;
+  document.getElementById('tableContainer').innerHTML = tableHTML;
+
+  // Ahora empezar la búsqueda progresiva
+  procesarClientes(rows);
+}
+
+async function procesarClientes(rows) {
+  const batchSize = 10; // 10 filas al mismo tiempo
+  for (let i = 0; i < rows.length; i += batchSize) {
+      const batch = rows.slice(i, i + batchSize);
+      await Promise.all(batch.map((row, indexInBatch) => buscarCliente(row, i + indexInBatch)));
+  }
+}
+
+async function buscarCliente(row, index) {
+  const celdaCliente = document.getElementById(`cliente-${index}`);
+  if (!celdaCliente) return;
+
+  const tipoYNro = row.cliente?.toString().trim();
+  if (!tipoYNro || tipoYNro === "No disponible") {
+      celdaCliente.innerHTML = `<span class="badge bg-warning text-dark">VALIDAR MANUALMENTE</span>`;
+      return;
+  }
+
+  const dniOriginal = tipoYNro.replace(/\D/g, ""); // solo números
+  const posiblesDnis = [dniOriginal];
+
+  if (dniOriginal.startsWith("0")) {
+      posiblesDnis.push(dniOriginal.replace(/^0+/, ""));
+  } else {
+      posiblesDnis.push("0" + dniOriginal);
+  }
+
+  let encontrado = false;
+  for (let dni of posiblesDnis) {
+      try {
+          const snapshot = await window.dbClientes.ref("/clientes/" + dni).once("value");
+          const clienteData = snapshot.val();
+          if (clienteData) {
+              celdaCliente.innerHTML = `<span class="badge bg-success">✅ ${clienteData.cliente || 'Cliente encontrado'}</span>`;
+              encontrado = true;
+              break;
+          }
+      } catch (error) {
+          console.error(`Error buscando DNI ${dni}:`, error);
+      }
+  }
+
+  if (!encontrado) {
+      celdaCliente.innerHTML = `<span class="badge bg-danger">NO FACTURADO (${tipoYNro})</span>`;
+  }
+}
+
+document.getElementById('enviarEmailBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('enviarEmailBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando datos...`;
+
+  const nombreTanda = "Control de Minutas";
+  const horaSubida = new Date().toLocaleTimeString('es-AR');
+
+  const tablaOriginal = document.querySelector('#tableContainer table');
+  if (!tablaOriginal) {
+      Swal.fire({
+          icon: 'warning',
+          title: 'No hay tabla para enviar',
+          text: 'Por favor, asegúrate de que haya datos disponibles para enviar.',
+          confirmButtonText: 'Aceptar'
+      });
+      btn.disabled = false;
+      btn.innerHTML = `<i class="bi bi-envelope-fill"></i> Enviar Email de Control`;
+      return;
+  }
+
+  const filas = tablaOriginal.querySelectorAll('tbody tr');
+  if (filas.length === 0) {
+      Swal.fire({
+          icon: 'warning',
+          title: 'No hay operaciones con débito',
+          text: 'No hay operaciones disponibles para controlar.',
+          confirmButtonText: 'Aceptar'
+      });
+      btn.disabled = false;
+      btn.innerHTML = `<i class="bi bi-envelope-fill"></i> Enviar Email de Control`;
+      return;
+  }  
+
+  // Armar nueva tabla más linda para el mail
+  let tablaHTML = crearTablaHTML(filas);
+
+  const advertenciaHTML = crearAdvertenciaHTML();
+  const emailBodyBase = crearEmailBodyBase(advertenciaHTML, tablaHTML, horaSubida);
+
+  const destinatarios = [
+      { email: "lucasponzoninovogar@gmail.com", nombre: "LUCAS PONZONI" },
+      { email: "esperanza.toffalo@novogar.com.ar", nombre: "ESPERANZA TOFFALO" },
+      { email: "agustina.benedetto@novogar.com.ar", nombre: "AGUSTINA BENEDETTO" },
+      { email: "natalia.rodriguez@novogar.com.ar", nombre: "NATALIA RODRIGUEZ" },
+      { email: "eliaspignani@gmail.com", nombre: "ELIAS PIGNANI" },
+      { email: "marina.braidotti@novogar.com.ar", nombre: "MARINA BRAIDOTTI" },
+      { email: "mauricio.daffonchio@novogar.com.ar", nombre: "MAURICIO DAFFONCHIO" }
+  ];
+
+  try {
+      for (const fila of filas) {
+          const operacionId = fila.cells[1].innerText; // Suponiendo que la operación está en la segunda celda
+          await actualizarMinuta(operacionId);
+      }
+
+      for (const destinatario of destinatarios) {
+          const emailBodyPersonalizado = emailBodyBase.replace('{nombreDestinatario}', destinatario.nombre);
+          await enviarCorreoConDetalles(destinatario.email, destinatario.nombre, nombreTanda, horaSubida, emailBodyPersonalizado);
+      }
+      showAlert("Correos enviados correctamente ✅");
+  } catch (error) {
+      console.error("Error enviando correos:", error);
+      showAlert("Hubo un error al enviar los correos ❌");
+  } finally {
+      limpiarTabla();
+      btn.disabled = false;
+      btn.innerHTML = `<i class="bi bi-envelope-fill"></i> Enviar Email de Control`;
+  }
+});
+
+async function actualizarMinuta(operacionId) {
+    await db.ref(`posventa/${operacionId}/ventas`).update({ minuta: true });
+}
+
+function limpiarTabla() {
+    const tableContainer = document.getElementById('tableContainer');
+    tableContainer.innerHTML = ''; // Limpia el contenido de la tabla
+}
+
+function crearTablaHTML(filas) {
+    let tablaHTML = `
+    <table style="border-collapse: collapse; width: 100%; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; border-radius: 8px; overflow: hidden;">
+        <thead style="background-color: #1976d2; color: #ffffff;">
+            <tr>
+                <th style="padding: 10px; border: 1px solid #ddd;">Fecha</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Operación</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Cliente</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Total ARS</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">SKU</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Descripción</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+    filas.forEach(tr => {
+        tablaHTML += `<tr>`;
+        tr.querySelectorAll('td').forEach(td => {
+            tablaHTML += `<td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${td.innerHTML}</td>`;
+        });
+        tablaHTML += `</tr>`;
+    });
+
+    tablaHTML += `</tbody></table>`;
+    return tablaHTML;
+}
+
+function crearAdvertenciaHTML() {
+    return `
+        <div style="background-color: #ffebee; color: #c62828; padding: 16px; border-radius: 12px; margin: 20px 0; font-size: 15px;">
+            <strong>⚠️ IMPORTANTE:</strong><br><br>
+            Lo que indique <b>NO FACTURADO</b> hace referencia a que al momento del control NO se localizó al cliente en PRESEA.<br><br>
+            Recordá que la base de datos se actualiza cada 1 hora, por lo que pudo estar desactualizada al momento del control.<br><br>
+            En caso de encontrarse facturado, deberás verificar la existencia de la minuta, ya que el débito de dinero fue realizado en Mercado Libre.<br><br>
+            Verificá siempre que el cliente no posea compras duplicadas y que coincida el número de operación.
+        </div>
+    `;
+}
+
+function crearEmailBodyBase(advertenciaHTML, tablaHTML, horaSubida) {
+    return `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f4f6f8; padding: 20px; border-radius: 12px; color: #333;">
+            <h2 style="color: #0d47a1; font-size: 24px; margin-bottom: 16px;">📢 Control de Minutas - LogiPaq</h2>
+            <p style="font-size: 16px;">Estimado/a <strong>{nombreDestinatario}</strong>,</p>
+            <p style="font-size: 15px;">Te compartimos a continuación el reporte de control correspondiente al día de hoy:</p>
+            ${advertenciaHTML}
+            <div style="margin-top: 30px;">
+                ${tablaHTML}
+            </div>
+            <p style="font-size: 13px; color: #666; margin-top: 40px;">🕓 Hora de control: ${horaSubida}</p>
+        </div>
+    `;
+}

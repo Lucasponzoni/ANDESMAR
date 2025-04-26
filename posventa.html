@@ -154,6 +154,11 @@
                 <button id="btnSkills" class="btn btn-light" data-toggle="modal" data-target="#skillsModal">
                     <i class="bi bi-bookmarks-fill" style="font-size: 22px; color: #007bff;"></i> Skills
                 </button>
+
+                <!-- Botón para Minutas -->
+                <button id="btnMinutas" class="btn btn-light" data-toggle="modal" data-target="#minutasModal">
+                    <i class="bi bi-receipt" style="font-size: 22px; color: #ff8400;"></i> Control de Minutas
+                </button>
             
                 <!-- Botón Pendientes de controlar -->
                 <button id="btnPendientesControlar" class="btn btn-light position-relative">
@@ -367,7 +372,36 @@
             
                 this.classList.add("d-none");
             });
-            </script>    
+            </script> 
+            
+        <!-- Modal de Control de Minutas -->
+        <div class="modal fade" id="minutasModal" tabindex="-1" role="dialog" aria-labelledby="minutasModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content" style="border-radius: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;">
+                    <div class="modal-header" style="border-bottom: none;">
+                        <h5 class="modal-title" id="minutasModalLabel">📝 Control de Minutas</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="font-size: 2rem;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div id="spinner4" class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="sr-only">Cargando...</span>
+                        </div>
+                        <div id="tableContainer" style="display:none; max-height: 65vh; overflow-y: auto; padding: 10px;">
+                            <!-- Tabla generada dinámicamente -->
+                        </div>
+                        <div class="modal-footer">
+                            <!-- Botón para enviar email -->
+                            <button id="enviarEmailBtn" class="btn btn-primary">
+                                <i class="bi bi-envelope-fill"></i> Enviar Email de Control
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Fin Modal de Control de Minutas -->
      
         <!-- Modal de Importación -->
         <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
