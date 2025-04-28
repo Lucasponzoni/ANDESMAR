@@ -2877,7 +2877,7 @@ function updateAlertPositions() {
 }
 // FIN ALERT EMAIL
 
-
+// CONTROL MINUTAS
 document.getElementById('btnMinutas').addEventListener('click', function() {
   // Mostrar el spinner
   document.getElementById('spinner4').style.display = 'block';
@@ -2892,8 +2892,9 @@ document.getElementById('btnMinutas').addEventListener('click', function() {
           const ventas = childSnapshot.val().ventas;
           const totalArs = ventas['total_(ars)'];
 
-          if (totalArs <= 0) {
-              const minutaExists = ventas.minuta === true;
+          // Verificar que totalArs sea menor que 0 y que minuta no esté vacío
+          if (totalArs < 0) {
+              const minutaExists = ventas.minuta !== undefined && ventas.minuta !== "";
               if (!minutaExists) {
                   const row = {
                       fecha: ventas.fecha_de_venta || 'Sin fecha',
@@ -3145,3 +3146,4 @@ function crearEmailBodyBase(advertenciaHTML, tablaHTML, horaSubida) {
         </div>
     `;
 }
+// FIN CONTROL MINUTAS
