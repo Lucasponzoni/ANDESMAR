@@ -3058,7 +3058,7 @@ document.getElementById('enviarEmailBtn').addEventListener('click', async () => 
       { email: "esperanza.toffalo@novogar.com.ar", nombre: "ESPERANZA TOFFALO" },
       { email: "agustina.benedetto@novogar.com.ar", nombre: "AGUSTINA BENEDETTO" },
       { email: "natalia.rodriguez@novogar.com.ar", nombre: "NATALIA RODRIGUEZ" },
-      { email: "eliaspignani@gmail.com", nombre: "ELIAS PIGNANI" },
+      { email: "elias.pignani@gmail.com", nombre: "ELIAS PIGNANI" },
       { email: "marina.braidotti@novogar.com.ar", nombre: "MARINA BRAIDOTTI" },
       { email: "mauricio.daffonchio@novogar.com.ar", nombre: "MAURICIO DAFFONCHIO" }
   ];
