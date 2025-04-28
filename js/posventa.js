@@ -2890,11 +2890,11 @@ document.getElementById('btnMinutas').addEventListener('click', function() {
 
       snapshot.forEach(childSnapshot => {
           const ventas = childSnapshot.val().ventas;
-          const totalArs = ventas['total_(ars)'];
+          const totalArsRaw = ventas['total_(ars)'];
+          const totalArs = parseFloat(totalArsRaw); // Forzar a número
 
-          // Verificar que totalArs sea menor que 0 y que minuta no esté vacío
-          if (totalArs < 0) {
-              const minutaExists = ventas.minuta !== undefined && ventas.minuta !== "";
+          if (!isNaN(totalArs) && totalArsRaw !== "" && totalArs <= 0) {
+              const minutaExists = ventas.minuta === true;
               if (!minutaExists) {
                   const row = {
                       fecha: ventas.fecha_de_venta || 'Sin fecha',
