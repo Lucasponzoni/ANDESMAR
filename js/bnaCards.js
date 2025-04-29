@@ -974,7 +974,7 @@ const cpsPlaceIt = [
         let stockMessage, stockClass, stockIcon;
         let stockToDisplay = stock; // Variable para mostrar el stock correcto
 
-        if (isSkuInList && isCpInCpsPlaceIt) {
+        if (isSkuInList && isCpInCpsPlaceIt && !isMacroStore) {
             // Si el SKU y CP están en las listas de PlaceIt, usar preciosPlaceItArray
             const precioPlaceItItem = preciosPlaceItArray.find(item => sanitizeSku(item.sku) === skuActual);
             const stockPlaceIt = precioPlaceItItem ? precioPlaceItItem.stock : 0; // Stock de preciosPlaceItArray
