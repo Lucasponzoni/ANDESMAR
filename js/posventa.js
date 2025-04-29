@@ -1644,9 +1644,9 @@ async function copyHammerData(ventaId, estadoActual, ultimaDescripcion, sku, uni
                             `------------------------------------------\n`;
 
       // Solo incluir el comentario si no es "No disponible"
-      if (comentario1 !== "No disponible") {
-          comentariosMensaje += `COMENTARIOS: ${comentario1 !== "Invalid Date" ? comentario1 : "No disponible"}\n\n`;
-      }
+      if (comentario1 !== "No disponible" && comentario1 !== "Invalid Date") {
+        comentariosMensaje += `COMENTARIOS: ${comentario1}\n\n`;
+    }    
 
       // Solo incluir el número de caso si no es "No disponible"
       if (numeroCaso !== "No disponible") {
