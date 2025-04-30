@@ -616,6 +616,7 @@ try {
       try {
         await enviarCorreoConDetalles("esperanza.toffalo@novogar.com.ar", "Esperanza Toffalo", nombreTanda, horaSubida, emailBody);
         await enviarCorreoConDetalles("alexis.guidi@novogar.com.ar", "Alexis Guidi", nombreTanda, horaSubida, emailBody);
+        await enviarCorreoConDetalles("elias.pignani@novogar.com.ar", "Elias Pignani", nombreTanda, horaSubida, emailBody);
         await enviarCorreoConDetalles("marina.braidotti@novogar.com.ar", "Marina Braidotti", nombreTanda, horaSubida, emailBody);
         await enviarCorreoConDetalles("posventanovogar@gmail.com", "Posventa Web", nombreTanda, horaSubida, emailBody);
         await enviarCorreoConDetalles("agustina.benedetto@novogar.com.ar", "Agustina Benedetto", nombreTanda, horaSubida, emailBody);
@@ -3061,7 +3062,7 @@ document.getElementById('enviarEmailBtn').addEventListener('click', async () => 
       { email: "alexis.guidi@novogar.com.ar", nombre: "ALEXIS GUIDI" },
       { email: "agustina.benedetto@novogar.com.ar", nombre: "AGUSTINA BENEDETTO" },
       { email: "natalia.rodriguez@novogar.com.ar", nombre: "NATALIA RODRIGUEZ" },
-      { email: "elias.pignani@gmail.com", nombre: "ELIAS PIGNANI" },
+      { email: "elias.pignani@novogar.com.ar", nombre: "ELIAS PIGNANI" },
       { email: "marina.braidotti@novogar.com.ar", nombre: "MARINA BRAIDOTTI" },
       { email: "mauricio.daffonchio@novogar.com.ar", nombre: "MAURICIO DAFFONCHIO" }
   ];
