@@ -235,47 +235,44 @@ $('#skuPlaceItModal').on('show.bs.modal', () => {
 // FIN CARGA SKU
 
 // VERIFICA ORDENES DUPLICADAS
-// Referencia a la base de datos
-const databaseRef = firebase.database().ref('enviosBNA');
 
-// Función para verificar duplicados en 'remito' (data.orden_)
+// Referencias separadas
+const baseRef = firebase.database().ref('enviosBNA'); // Para actualizar
+const databaseRef = baseRef.limitToLast(1000); // Para leer
+
 function verificarRemitosDuplicados() {
     let remitoCount = {};
     let remitosDuplicados = [];
 
-    // Obtener todos los datos de 'enviosBNA'
     databaseRef.once('value', (snapshot) => {
         snapshot.forEach((childSnapshot) => {
             const data = childSnapshot.val();
             const remito = data.orden_;
 
             if (remito) {
-                // Contar cada remito
                 if (remitoCount[remito]) {
                     remitoCount[remito]++;
-                    remitosDuplicados.push(remito); // Guardar el remito duplicado
+                    remitosDuplicados.push(remito);
                 } else {
                     remitoCount[remito] = 1;
                 }
             }
         });
 
-        // Actualizar todos los nodos que tienen el remito duplicado
         Object.keys(remitoCount).forEach((remito) => {
             if (remitoCount[remito] > 1) {
                 snapshot.forEach((childSnapshot) => {
                     const data = childSnapshot.val();
                     if (data.orden_ === remito) {
-                        databaseRef.child(childSnapshot.key).update({ carritoCompra2: true });
+                        // Usar baseRef (sin limitToLast) para actualizar
+                        baseRef.child(childSnapshot.key).update({ carritoCompra2: true });
                     }
                 });
-                // console.log(`La Orden ${remito} está duplicada ${remitoCount[remito]} veces.`);
             }
         });
     });
 }
 
-// Llamada a la función para iniciar la verificación
 verificarRemitosDuplicados();
 // FIN VERIFICA ORDENES DUPLICADAS
 
@@ -543,7 +540,7 @@ async function loadEnviosFromFirebase() {
             });
 
             // Escuchar cambios en 'enviosBNA'
-            const databaseRef = firebase.database().ref('enviosBNA');
+            const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
             databaseRef.on('value', snapshot => {
                 allData = [];
                 let sinPrepararCount = 0;
@@ -1016,45 +1013,52 @@ const cpsPlaceIt = [
         `;
         // FIN VERIFICAR STOCK Y PRECIO
 
-        // Agregar la tarjeta al contenedor
-        const carritoContenido = data[i].carrito ? `
-        <p class="carrito">
+// Agregar la tarjeta al contenedor
+const carritoContenido = data[i].carrito ? `
+    <p class="carrito">
         <i class="bi bi-cart-fill carrito-icon"></i>
         COMPRA EN CARRITO
-        </p>` : '';
+    </p>` : '';
 
-        const tooltip = data[i].errorSlack !== undefined ? (data[i].errorSlack ? `
-            <div class="slack-error-container container-slack-${data[i].id}" style="position: relative; z-index: 1; background-color: #f8d7da;">
-                <div class="slack-error-header">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" alt="Logo de Slack" class="slack-error-logo">
-                    <span>Error de Slack</span>
-                </div>
-                <div class="slack-error-message">
-                    ${data[i].errorSlackMensaje}
-                </div>
-
-                <button class="btn btn-primary mt-1" onclick="marcarFacturado3('${data[i].id}', '${data[i].email}', '${data[i].nombre}', '${data[i].remito}')">
-                    <i class="bi bi-arrow-repeat"></i> Reprocesar
-                </button>
-
-                <button class="btn btn-danger slack-error-button mt-1" onclick="handleCorrection('${data[i].id}')">
-                    <i class="bi bi-exclamation-circle"></i> Marcar Corrección Manual
-                </button>
-                
+const tooltip = data[i].errorSlack !== undefined ? (data[i].errorSlack ? `
+    <div class="slack-error-container container-slack-${data[i].id}" style="position: relative; z-index: 1; background-color: #f8d7da;">
+        <div class="slack-error-header d-flex justify-content-between align-items-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" alt="Logo de Slack" class="slack-error-logo">
+            <span>Error de Slack</span>
+            <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapse-${data[i].id}">
+                <i class="bi bi-chevron-down"></i>
+            </button>
+        </div>
+        <div class="collapse" id="collapse-${data[i].id}">
+            <div class="slack-error-message">
+                ${data[i].errorSlackMensaje}
             </div>
-            ` : `
-            <div class="slack-error-container container-slack-${data[i].id}" style="position: relative; z-index: 1; background-color: #d4edda;">
-                <div class="slack-error-header2">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" alt="Logo de Slack" class="slack-error-logo">
-                    <span>Error Solucionado</span>
-                </div>
-                <div class="slack-error-message2">
-                    ${data[i].errorSlackMensaje}
-                </div>
-                <button class="btn btn-success slack-error-button mt-1" disabled>
-                    <i class="bi bi-check-circle" style="color: #FFFFFF;"></i> ${data[i].correccionSlack ? data[i].correccionSlack : "Reprocesado por Automata"}
-                </button>
-            </div>`) : '';        
+            <button class="btn btn-primary mt-2" onclick="marcarFacturado3('${data[i].id}', '${data[i].email}', '${data[i].nombre}', '${data[i].remito}')">
+                <i class="bi bi-arrow-repeat"></i> Reprocesar
+            </button>
+            <button class="btn btn-danger mt-2" onclick="handleCorrection('${data[i].id}')">
+                <i class="bi bi-exclamation-circle"></i> Marcar Corrección Manual
+            </button>
+        </div>
+    </div>
+` : `
+    <div class="slack-error-container container-slack-${data[i].id}" style="position: relative; z-index: 1; background-color: #d4edda;">
+        <div class="slack-error-header2 d-flex justify-content-between align-items-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/1200px-Slack_icon_2019.svg.png" alt="Logo de Slack" class="slack-error-logo">
+            <span>Error Solucionado</span>
+            <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapse-${data[i].id}">
+                <i class="bi bi-chevron-down"></i>
+            </button>
+        </div>
+        <div class="collapse" id="collapse-${data[i].id}">
+            <div class="slack-error-message2">
+                ${data[i].errorSlackMensaje}
+            </div>
+            <button class="btn btn-success mt-2" disabled>
+                <i class="bi bi-check-circle" style="color: #FFFFFF;"></i> ${data[i].correccionSlack ? data[i].correccionSlack : "Reprocesado por Automata"}
+            </button>
+        </div>
+    </div>`) : '';
         
 // Agregar la tarjeta al contenedor
 const descuentoContenido = data[i].equivalencia_puntos_pesos > 0 ? `
@@ -2043,7 +2047,7 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
     const nuevoEstado = this.checked ? 'Si' : 'No';
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
     databaseRef.off();
 
     // Verificar si el tipo de electrodoméstico ya existe
@@ -2092,7 +2096,7 @@ document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', 
     const nuevoEstado = this.checked ? 'Si' : 'No';
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
     databaseRef.off();
 
     // Actualizar en Firebase
@@ -2708,7 +2712,7 @@ async function marcarFacturado2(id, email, nombre, remito) {
     const clave = claveInput.value;
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
     databaseRef.off(); // Desactiva la escucha
 
     // Comprobación de la clave y formateo de la fecha y hora
@@ -3092,7 +3096,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
     const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
     databaseRef.off();
 
     // Redondear el precio_venta y convertirlo a un entero
@@ -3546,7 +3550,7 @@ function formatearFechaHora(fechaHora) {
 async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, sku) {
     
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
     databaseRef.off();
 
     // Redondear el precio_venta y convertirlo a un entero
@@ -3992,7 +3996,7 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
     const NroEnvio = document.getElementById(`numeroDeEnvioGeneradoBNA${id}`);
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
     databaseRef.off();
 
     if (!spinnerOca || !textOca || !button) {
@@ -4193,7 +4197,7 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
     const precioVentaRedondeado = Math.round(precio_venta);
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
     databaseRef.off();
 
     // Calcular el precio sin IVA (suponiendo un IVA del 21%)
@@ -4599,7 +4603,7 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
     medidasDiv.innerHTML = '';
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
     databaseRef.off();
 
     // Si no es una carga inicial, mostrar el alert y actualizar Firebase
@@ -5129,7 +5133,7 @@ function updatePagination(totalItems) {
     if (currentPageGroup > 0) {
         const backItem = document.createElement("li");
         backItem.className = "page-item";
-        backItem.innerHTML = `<a class="page-link" href="#"></a>`;
+        backItem.innerHTML = `<a class="page-link" href="#">Atrás</a>`;
         backItem.addEventListener("click", (e) => {
             e.preventDefault();
             currentPageGroup -= 6;
@@ -5139,7 +5143,6 @@ function updatePagination(totalItems) {
         paginationContainer.appendChild(backItem);
     }
 }
-
 // FIN PAGINATION
 
 // INICIO SWITCHS BOTÓNES
@@ -5259,7 +5262,7 @@ function updateFilteredCards(data) {
 // Modificación del evento click del botón switch para entregados
 document.getElementById('btnSwitch').addEventListener('click', () => {
 
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
 
     databaseRef.on('value', snapshot => {
         loadEnviosFromFirebase(); 
@@ -5291,7 +5294,7 @@ document.getElementById('btnSwitch').addEventListener('click', () => {
 // Modificación del evento click del botón switch para preparados
 document.getElementById('btnSwitch1').addEventListener('click', () => {
 
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
 
     databaseRef.on('value', snapshot => {
         loadEnviosFromFirebase(); 
@@ -5461,7 +5464,7 @@ function showNoDataMessage() {
 
 // VOLVER ATRAS
 function createBackButton() {
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
     databaseRef.off(); // Desactiva la escucha
 
     // Verificar si ya existe el botón de volver
@@ -5648,7 +5651,7 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
     let spinner2 = document.getElementById("spinner2");
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
     databaseRef.off();
 
         // Obtener los días predeterminados desde Firebase
@@ -6250,5 +6253,186 @@ function toggleShippingDiscount(checkbox, id) {
     totalCostElement.value = currentTotal.toFixed(2);
 }
 
-// Llamar a la función cuando se carga la página
-window.onload = loadEnviosFromFirebase;
+// BUSQUEDA AVANZADA
+const subOrderInput = document.getElementById('subOrderInput');
+const spinnerBusqueda = document.getElementById('spinnerBusquedaAvanzada');
+
+subOrderInput.addEventListener('input', async function () {
+    const value = subOrderInput.value.trim();
+    const validFormat = /^(\d+)(-\d+)*$/.test(value);
+
+    if (!validFormat) return;
+
+    // Mostrar el spinner antes de iniciar la búsqueda
+    spinnerBusqueda.style.display = 'block';
+
+    try {
+        // Llamar a la función para cargar envíos desde Firebase
+        await loadEnviosFromFirebaseAvanzado(value);
+    } catch (error) {
+        console.error('Error en la búsqueda avanzada:', error);
+        Swal.fire('Error', 'Ocurrió un error al buscar la orden. Inténtalo de nuevo.', 'error');
+    } finally {
+        // Ocultar el spinner después de la búsqueda
+        spinnerBusqueda.style.display = 'none';
+    }
+});
+
+async function loadEnviosFromFirebaseAvanzado(subOrderValue) {
+    const cardsContainer = document.getElementById('meli-cards');
+    const spinner = document.getElementById('spinner');
+
+    if (cardsContainer) {
+        cardsContainer.innerHTML = '';
+    }
+
+    searchInput.disabled = true;
+    searchInput.value = "Aguardando que cargue la web ⏳";
+
+    if (spinner) {
+        spinner.style.display = 'block';
+    }
+
+    try {
+        // Cargar datos de IMEI
+        const skuSnapshot = await firebase.database().ref('imei/').once('value');
+        skusList = [];
+        skuSnapshot.forEach(childSnapshot => {
+            skusList.push(childSnapshot.val().sku);
+        });
+
+        // Cargar datos de stockPlaceIt
+        const stockSnapshot = await firebase.database().ref('stockPlaceIt/').once('value');
+        skusPlaceItList = [];
+        stockSnapshot.forEach(childSnapshot => {
+            skusPlaceItList.push(childSnapshot.val().sku);
+        });
+
+        // Buscar el envío específico basado en subOrderValue
+        const snapshot = await firebase.database().ref('enviosBNA').once('value');
+        const allData = [];
+
+        snapshot.forEach(childSnapshot => {
+            const data = childSnapshot.val();
+            // Verificar si el envío coincide con el valor de búsqueda
+            if ((data.orden_ && data.orden_.toString().includes(subOrderValue)) ||
+                (data.orden_publica_ && data.orden_publica_.toString().includes(subOrderValue))) {
+                allData.push({
+                    id: childSnapshot.key,
+                    altura: data.altura,
+                    cancelado: data.cancelado,
+                    nombreFacturacion: capitalizeWords(data.nombre) || capitalizeWords(data.Nombre),
+                    apellidoFacturacion: capitalizeWords(data.apellido) || capitalizeWords(data.Apellido),
+                    nombre: capitalizeWords(data.nombre_completo_envio),
+                    cp: data.codigo_postal,
+                    localidad: capitalizeWords(data.ciudad),
+                    provincia: capitalizeWords(data.provincia),
+                    calle: data.calle,
+                    calle2: capitalizeWords(data.direccion ? data.direccion.replace(/"/g, '') : ''),
+                    telefono: data.telefono,
+                    telefono_facturacion: data.telefono_facturacion,
+                    email: lowercaseWords(data.email),
+                    remito: data.orden_,
+                    carrito: data.carritoCompra2,
+                    diaPlaceIt: data.diaPlaceIt,
+                    observaciones: data.observaciones,
+                    orden_publica_: data.orden_publica_,
+                    brand_name: capitalizeWords(data.brand_name),
+                    marca_de_tarjeta: capitalizeWords(data.marca_de_tarjeta),
+                    cuotas: data.cuotas,
+                    nro_de_cuotas: data.nro_de_cuotas,
+                    envio: data.medio_de_envio,
+                    cupon: data.cupon,
+                    numeroSeguimiento: data.numero_de_seguimiento,
+                    cotizacion: data.cotizacion,
+                    trackingNumber: data.trackingNumber,
+                    precio_venta: data.precio_venta,
+                    cliente: data.cliente,
+                    cod_aut: data.cod_aut,
+                    total_con_tasas_2: data.total_con_tasas_2,
+                    precio_producto: data.precio_producto,
+                    suborden_total: data.suborden_total,
+                    suborden_: data.suborden_,
+                    numeros_tarjeta: data.numeros_tarjeta,
+                    orden_publica: data.orden_publica_,
+                    sku: data.sku_externo.toUpperCase(),
+                    cantidad: data.cantidad,
+                    errorSlack: data.errorSlack,
+                    correccionSlack: data.correccionSlack,
+                    errorSlackMensaje: data.errorSlackMensaje,
+                    fechaDeCreacion: data.fecha_creacion_orden,
+                    datoFacturacion: data.datoFacturacion,
+                    producto_nombre: capitalizeWords(data.producto_nombre),
+                    tipoElectrodomesticoBna: data.tipoElectrodomesticoBna,
+                    trackingLink: data.trackingLink,
+                    transportCompany: data.transportCompany,
+                    transportCompanyNumber: data.transportCompanyNumber,
+                    razon_social: capitalizeWords(data.razon_social),
+                    cuit: data.cuit,
+                    marcaEntregado: data.marcaEntregado,
+                    marcaPreparado: data.marcaPreparado,
+                    direccion: capitalizeWords(data.direccion.replace(/"/g, '').replace(/:\s*-?\s*/i, '')),
+                    direccion_facturacion: capitalizeWords(data.direccion_facturacion ? data.direccion_facturacion.replace(/Dpto:\s*-?\s*/i, '') : ''),
+                    ciudad_facturacion: capitalizeWords(data.ciudad_facturacion),
+                    ciudad_factura: capitalizeWords(data.ciudad_factura),
+                    dni: data.dni,
+                    nombre_factura: capitalizeWords(data.nombre_factura),
+                    estadoEnvio: data.estado_del_envio,
+                    codigo_postal_facturacion: data.codigo_postal_facturacion,
+                    codigo_postal_factura: data.codigo_postal_factura,
+                    otros_comentarios_entrega: data.otros_comentarios_entrega,
+                    iva: data.condicion_iva,
+                    iva2: data.iva,
+                    equivalencia_puntos_pesos: data.equivalencia_puntos_pesos || data['equivalencia_puntos_-_pesos'],
+                    nombre_completo_envio: capitalizeWords(data.nombre_completo_envio),
+                    monto_cobrado: data.monto_cobrado
+                });
+            }
+        });
+
+        // Verificar si no se encontraron datos
+        if (allData.length === 0) {
+            const paginationDiv = document.getElementById('pagination');
+            if (paginationDiv) {
+                paginationDiv.style.display = 'none'; // Oculta el div de paginación
+            }
+
+            const noDataMessage = document.createElement('div');
+            noDataMessage.textContent = "🧐 No encuentro órdenes con los datos buscados. 📭";
+            noDataMessage.className = 'no-data-message'; 
+            noDataMessage.style.textAlign = 'center';
+            noDataMessage.style.fontSize = '24px'; 
+            noDataMessage.style.marginTop = '30px';
+            noDataMessage.style.marginBottom = '30px'; 
+            noDataMessage.style.padding = '30px'; 
+            noDataMessage.style.borderRadius = '12px'; 
+            noDataMessage.style.backgroundColor = '#E6F0FF'; 
+            noDataMessage.style.color = '#333'; 
+            noDataMessage.style.fontWeight = 'bold';
+            noDataMessage.style.transition = '0.3s';
+            noDataMessage.style.cursor = 'default'; 
+            noDataMessage.style.borderRadius = '15px'; 
+
+            cardsContainer.appendChild(noDataMessage);
+        } else {
+            // Renderizar las tarjetas y la paginación
+            allData.reverse();
+            renderCards(allData);
+            updatePagination(allData.length);
+        }
+
+        // Habilitar el buscador después de cargar los datos
+        searchInput.disabled = false;
+        searchInput.value = "";
+
+        if (spinner) {
+            spinner.remove(); // Ocultar spinner después de cargar los datos
+        }
+    } catch (error) {
+        console.error("Error al cargar los envíos desde Firebase: ", error);
+        if (spinner) {
+            spinner.remove();
+        }
+    }
+}
+// FIN BUSQUEDA AVANZADA

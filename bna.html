@@ -102,7 +102,31 @@
                             <i class="fas fa-search" style="font-size: 22px;"></i>
                         </button>
                     </div>
+                    <button class="btn btn-secondary" id="btnBusquedaAvanzada" type="button">
+                        <i class="fas fa-filter" style="font-size: 22px;"></i> Avanzada
+                    </button>
                 </div>
+            <!-- Busqueda Avanzada -->
+            <div id="advancedSearchInput" class="mt-3" style="display: none;">
+                <input type="text" class="form-control mb-2" id="subOrderInput" placeholder="📦 Ingrese número de sub orden o orden pública">
+                <div id="spinnerBusquedaAvanzada" class="text-center mt-2" style="display: none;">
+                    <div class="spinner-border text-primary mt-1 mb-1" role="status" style="width: 35px; height: 35px;">
+                        <span class="sr-only">Buscando...</span>
+                    </div>
+                </div>
+                <div id="meli-cards-AdvancedError">
+                    <!-- Aquí se agregarán los mensajes de error -->
+                </div>                              
+                <small style="display: block; padding: 12px; background-color: #f6f6f8; border-radius: 10px; border: 1px solid #ddd; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #333;">
+                  ℹ️ La web muestra las últimas <strong>1000 ventas</strong>. Con esta búsqueda podés ver el <strong>histórico completo</strong> de pedidos.<br>
+                  🧾 Buscá por <strong>Orden</strong> o <strong>Orden Pública</strong>.<br>
+                  📌 Ejemplo: <code>993803</code> o <code>993803-1034700-2941</code>
+                </small>
+                <!-- Mensaje de alerta personalizado -->
+                <div style=" background-color: #fedddd; color: #da2c29; border: 1px solid #ebccd1; border-radius: 10px; padding: 10px; margin-top: 10px; font-size: 14px;">
+                    ⚠️ Para salir de la búsqueda avanzada, haz clic en "Avanzada" nuevamente.
+                </div>
+              </div>
             </div>
             <div class="col-md-3 mb-3 d-flex align-items-center">
                 <!-- Botones -->
@@ -158,6 +182,28 @@
             </div>
         </div>
     </div>    
+
+    <script>
+        document.getElementById('btnBusquedaAvanzada').addEventListener('click', function() {
+            let advancedInput = document.getElementById('advancedSearchInput');
+            let subOrderInput = document.getElementById('subOrderInput'); // Input de búsqueda avanzada
+            let searchBna = document.getElementById('searchBna');
+    
+            // Verificar si el input avanzado está oculto o visible
+            if (window.getComputedStyle(advancedInput).display === 'none') {
+                // Limpiar el contenido de advancedInput al mostrar
+                subOrderInput.value = '';
+                advancedInput.style.display = 'block';
+            } else {
+                // Limpiar el contenido de advancedInput al ocultar
+                subOrderInput.value = '';
+                // Ocultar el input avanzado
+                advancedInput.style.display = 'none';
+                // Simular un clic en el input de búsqueda
+                searchBna.click();
+            }
+        });
+    </script>       
     
     <div class="container mt-5" id="cards-container">
 
@@ -186,6 +232,7 @@
             <span class="sr-only">Cargando...</span>
         </div>
         
+
         <div class="row mt-4" id="meli-cards">
             <!-- Aquí se agregarán las tarjetas -->
         </div>

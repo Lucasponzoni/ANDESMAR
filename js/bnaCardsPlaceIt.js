@@ -136,47 +136,44 @@ $('#skuModal').on('show.bs.modal', () => {
 // FIN CARGA SKU
 
 // VERIFICA ORDENES DUPLICADAS
-// Referencia a la base de datos
-const databaseRef = firebase.database().ref('enviosBNA');
 
-// Función para verificar duplicados en 'remito' (data.orden_)
+// Referencias separadas
+const baseRef = firebase.database().ref('enviosBNA'); // Para actualizar
+const databaseRef = baseRef.limitToLast(1000); // Para leer
+
 function verificarRemitosDuplicados() {
     let remitoCount = {};
     let remitosDuplicados = [];
 
-    // Obtener todos los datos de 'enviosBNA'
     databaseRef.once('value', (snapshot) => {
         snapshot.forEach((childSnapshot) => {
             const data = childSnapshot.val();
             const remito = data.orden_;
 
             if (remito) {
-                // Contar cada remito
                 if (remitoCount[remito]) {
                     remitoCount[remito]++;
-                    remitosDuplicados.push(remito); // Guardar el remito duplicado
+                    remitosDuplicados.push(remito);
                 } else {
                     remitoCount[remito] = 1;
                 }
             }
         });
 
-        // Actualizar todos los nodos que tienen el remito duplicado
         Object.keys(remitoCount).forEach((remito) => {
             if (remitoCount[remito] > 1) {
                 snapshot.forEach((childSnapshot) => {
                     const data = childSnapshot.val();
                     if (data.orden_ === remito) {
-                        databaseRef.child(childSnapshot.key).update({ carritoCompra2: true });
+                        // Usar baseRef (sin limitToLast) para actualizar
+                        baseRef.child(childSnapshot.key).update({ carritoCompra2: true });
                     }
                 });
-                // console.log(`La Orden ${remito} está duplicada ${remitoCount[remito]} veces.`);
             }
         });
     });
 }
 
-// Llamada a la función para iniciar la verificación
 verificarRemitosDuplicados();
 // FIN VERIFICA ORDENES DUPLICADAS
 
@@ -388,7 +385,7 @@ function loadEnviosFromFirebase() {
             });
 
             // Escuchar cambios en 'enviosBNA'
-            const databaseRef = firebase.database().ref('enviosBNA');
+            const databaseRef = firebase.database().ref('enviosBNA').limitToLast(300);
             databaseRef.on('value', snapshot => {
                 allData = [];
                 let sinPrepararCount = 0;
@@ -1661,7 +1658,7 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
     const nuevoEstado = this.checked ? 'Si' : 'No';
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(300);
     databaseRef.off();
 
     // Mostrar el cuadro de diálogo para la contraseña
@@ -1718,7 +1715,7 @@ document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', 
     const nuevoEstado = this.checked ? 'Si' : 'No';
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(300);
     databaseRef.off();
 
     // Actualizar en Firebase
@@ -2330,7 +2327,7 @@ async function marcarFacturado2(id, email, nombre, remito) {
     const clave = claveInput.value;
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(300);
     databaseRef.off(); // Desactiva la escucha
 
     // Comprobación de la clave y formateo de la fecha y hora
@@ -3157,7 +3154,7 @@ function rellenarMedidas(selectElement, id, isInitialLoad = false) {
     medidasDiv.innerHTML = '';
 
     // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(300);
     databaseRef.off();
 
     // Si no es una carga inicial, mostrar el alert y actualizar Firebase
@@ -3815,7 +3812,7 @@ function updateFilteredCards(data) {
 // Modificación del evento click del botón switch para entregados
 document.getElementById('btnSwitch').addEventListener('click', () => {
 
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(300);
 
     databaseRef.on('value', snapshot => {
         loadEnviosFromFirebase(); 
@@ -3847,7 +3844,7 @@ document.getElementById('btnSwitch').addEventListener('click', () => {
 // Modificación del evento click del botón switch para preparados
 document.getElementById('btnSwitch1').addEventListener('click', () => {
 
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(300);
 
     databaseRef.on('value', snapshot => {
         loadEnviosFromFirebase(); 
@@ -4015,7 +4012,7 @@ function showNoDataMessage() {
 
 // VOLVER ATRAS
 function createBackButton() {
-    const databaseRef = firebase.database().ref('enviosBNA');
+    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(300);
     databaseRef.off(); // Desactiva la escucha
 
     // Verificar si ya existe el botón de volver
