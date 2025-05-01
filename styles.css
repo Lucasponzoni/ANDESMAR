@@ -7729,3 +7729,14 @@ img.gray-filter {
     gap: 6px;
 }
 /* Estilo macOS para el dropdown de skills */
+
+/* Ocultar el encabezado de la columna Stock */
+.stock-header {
+    display: none;
+}
+
+.sku-table2 th:nth-child(2),
+.sku-table2 td:nth-child(2) { 
+    display: none;
+}
+/* Ocultar el encabezado de la columna Stock */
