@@ -6256,6 +6256,10 @@ async function loadEnviosFromFirebaseAvanzado(subOrderValue) {
 
     if (cardsContainer) {
         cardsContainer.innerHTML = '';
+        
+        // Eliminar mensajes de "no data" anteriores
+        const existingNoDataMessages = document.querySelectorAll('.no-data-message');
+        existingNoDataMessages.forEach(message => message.remove());
     }
 
     searchInput.disabled = true;
@@ -6378,8 +6382,7 @@ async function loadEnviosFromFirebaseAvanzado(subOrderValue) {
             noDataMessage.style.marginBottom = '30px'; 
             noDataMessage.style.padding = '30px'; 
             noDataMessage.style.borderRadius = '12px'; 
-            noDataMessage.style.backgroundColor = '#E6F0FF'; 
-            noDataMessage.style.color = '#333'; 
+            noDataMessage.style.color = '#007aff'; 
             noDataMessage.style.fontWeight = 'bold';
             noDataMessage.style.transition = '0.3s';
             noDataMessage.style.cursor = 'default'; 
