@@ -381,8 +381,25 @@
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <!-- Toasts-->
     </div>
-    
 
+    <!-- CHATBOT-->    
+    <div class="circuloBot hidden" id="bot">
+        <img src="./bot/bot1-close-chat.gif" alt="Imagen" class="imagenBot">
+    </div>
+    <div class="chat" id="chat">
+        <div class="chat-header">Logi-Chat 🗨️</div>
+        <div class="chat-messageBot" id="chat-messageBot">
+            <!-- Mensajes se añadirán aquí -->
+        </div>
+        <div class="chat-input-container">
+            <input type="text" placeholder="Escribe un mensaje..." class="chat-input" id="chat-input">
+            <button class="send-button" id="send-button">
+                <i class="bi bi-send"></i> 
+            </button>
+        </div>
+    </div> 
+    <!-- CHATBOT-->   
+    
     <footer class="center">
         <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
         <a class="www" href="https://novogar.com.ar/" target="_blank">NOVOGAR</a>
@@ -419,6 +436,8 @@
     <script src="./js/firebase-init.js"></script>
     <script src="./js/firebase-init-stock"></script>
     <script src="./js/firebase-init-Meli.js"></script>
+    <script src="./js/firebase-init-Bot.js"></script>
+    <script src="./js/bot.js"></script>
     <script src="./js/bnaCards.js"></script>
     <script src="./js/features.js"></script>
     <script src="./js/ciudades.js"></script>

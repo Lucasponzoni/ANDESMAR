@@ -37,6 +37,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet">
 
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="styles.css">
@@ -511,6 +512,24 @@
         <span class="close-btn-ios-wifi" onclick="closeNotification()">✖</span>
         <button id="retry-button-ios-wifi" class="retry-button-ios-wifi" onclick="reloadPage()">Reintentar</button>
     </div>
+
+    <!-- CHATBOT-->    
+    <div class="circuloBot" id="bot">
+        <img src="./bot/bot1-close-chat.gif" alt="Imagen" class="imagenBot">
+    </div>
+    <div class="chat" id="chat">
+        <div class="chat-header">Logi-Chat 🗨️</div>
+        <div class="chat-messageBot" id="chat-messageBot">
+            <!-- Mensajes se añadirán aquí -->
+        </div>
+        <div class="chat-input-container">
+            <input type="text" placeholder="Escribe un mensaje..." class="chat-input" id="chat-input">
+            <button class="send-button" id="send-button">
+                <i class="bi bi-send"></i> 
+            </button>
+        </div>
+    </div> 
+    <!-- CHATBOT-->          
     
     <script>
         let isOnline = navigator.onLine;
@@ -550,7 +569,6 @@
     </script>
     <!-- Fin info WiFi -->
 
-        
     <footer class="center">
         <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
         <a class="www" href="https://novogar.com.ar/" target="_blank">NOVOGAR</a>
@@ -569,6 +587,8 @@
     <script src="./js/formulario-cds.js"></script>
     <script src="./js/cotizadorCDS.js"></script>
     <script src="./js/cotizadorAndesmar.js"></script>
+    <script src="./js/firebase-init-Bot.js"></script>
+    <script src="./js/bot.js"></script>
     <script src="./js/cotizadorAndreani.js" defer></script>
     <script src="./js/bultos.js"></script>
     <script src="./js/ciudades.js"></script>

@@ -7740,3 +7740,189 @@ img.gray-filter {
     display: none;
 }
 /* Ocultar el encabezado de la columna Stock */
+
+/* BOT */
+.circuloBot {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    position: fixed;
+    bottom: 110px;
+    right: 10px;
+    background: radial-gradient(closest-side, white, white, orange);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición suave para el transform y box-shadow */
+}
+
+.circuloBot:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25); /* Aumentar la sombra en hover */
+}
+
+/* Anillo giratorio azul Apple */
+.circuloBot::before {
+    content: "";
+    position: absolute;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    border: 5px solid lightskyblue;
+    border-top: 5px solid #007aff; 
+    border-left: 5px solid #007aff;
+    animation: spinBorder 2s linear infinite;
+    z-index: 1;
+    transition: border 0.5s ease;
+}
+
+.circuloBot.active::before {
+    border: 5px solid lightgreen; 
+    border-top: 5px solid #28a745; 
+    border-left: 5px solid #28a745; 
+}
+
+/* Imagen central del bot */
+.imagenBot {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ajustar la imagen sin distorsión */
+    clip-path: circle(40px at center); /* Recortar la imagen en forma de círculo */
+    position: relative;
+    z-index: 2;
+}
+
+/* Animación del borde */
+@keyframes spinBorder {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+/* BOT */
+
+/* CHAT BOT */
+.chat {
+    display: none;
+    position: fixed;
+    bottom: 210px; 
+    right: 10px;
+    width: 400px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 4px 10px rgba(255, 255, 255, 0.7); 
+    animation: slideIn 0.3s ease forwards; 
+    z-index: 1001;
+}
+
+/* Estilos para pantallas pequeñas (mobile) */
+@media (max-width: 600px) {
+    .chat {
+        width: 100%;
+        left: 0;
+        right: 0;
+        border-radius: 20px 20px 20px 20px;
+    }
+}
+
+/* Estilos para la cabecera del chat */
+.chat-header {
+    background: #34c759; 
+    color: white;
+    padding: 10px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    font-weight: bold;
+}
+
+.chat-messageBot {
+    max-height: 350px;
+    overflow-y: auto; 
+    padding: 10px;
+    overflow-x: hidden;
+}
+
+/* Estilos para los mensajes */
+.messageBot {
+    border-radius: 18px;
+    padding: 12px 18px;
+    margin: 8px 0;
+    max-width: 75%;
+    position: relative;
+    font-size: 15px;
+    font-weight: 500;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 
+                0 4px 10px rgba(0, 0, 0, 0.15);
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0));
+}
+
+/* Mensaje del bot (azul iMessage) */
+.bot-messageBot {
+    background-color: #0a84ff;
+    color: white;
+    margin-left: auto;
+}
+
+/* Mensaje del usuario (verde iMessage) */
+.user-messageBot {
+    background-color: #34c759;
+    color: white;
+    font-weight: bold;
+    margin-right: auto;
+}
+
+/* Estilos para la entrada de texto y botón */
+.chat-input-container {
+    display: flex;
+    padding: 10px;
+}
+
+.chat-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    height: 40px;
+}
+
+.send-button {
+    background: #007aff;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    padding: 0 15px;
+    cursor: pointer;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+/* Animación de apertura */
+@keyframes slideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Animación de cierre */
+@keyframes slideOut {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+}
+/* FIN CHAT BOT */
