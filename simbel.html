@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
+    <script>
+          const savedTimestamp = localStorage.getItem('loginTimestamp');
+          const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 28800000;
+          if (isExpired) {
+            window.location.replace('logipaq.html');
+          }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Envios</title>
@@ -47,20 +56,10 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            checkLogin();
             checkAccess();
             showAccessDeniedAlert();
             showReturnButton();  // Asegúrate de llamar a esta función aquí
         });
-    
-        function checkLogin() {
-            const savedTimestamp = localStorage.getItem('loginTimestamp');
-            const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 28800000;
-    
-            if (isExpired) {
-                window.location.href = 'logipaq.html'; 
-            }
-        }
     
         function checkAccess() {
             const userType = localStorage.getItem('userType');
