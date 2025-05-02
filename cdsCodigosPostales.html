@@ -15,14 +15,14 @@
   <script>
     // Configuración de Firebase
     const firebaseConfig = {
-      apiKey: "AIzaSyCMu2vPvNzhv0cM3b4RItmqZybRhhR_HJM",
-      authDomain: "despachos-meli-novogar.firebaseapp.com",
-      databaseURL: "https://despachos-meli-novogar-default-rtdb.firebaseio.com",
-      projectId: "despachos-meli-novogar",
-      storageBucket: "despachos-meli-novogar.appspot.com",
-      messagingSenderId: "774252628334",
-      appId: "1:774252628334:web:623aa84bc3b1cebd3f997f",
-      measurementId: "G-E0E9K4TEDW"
+      apiKey: "AIzaSyBMFvhw6_7Ik9JBdEkUaTsRaKxqZyhTxIM",
+      authDomain: "logisticas-novogar.firebaseapp.com",
+      databaseURL: "https://logisticas-novogar-default-rtdb.firebaseio.com",
+      projectId: "logisticas-novogar",
+      storageBucket: "logisticas-novogar.firebasestorage.app",
+      messagingSenderId: "586666149655",
+      appId: "1:586666149655:web:e0501d1e6c6e0f6c451952",
+      measurementId: "G-B2BCF934YJ"
     };
 
     // Inicializar Firebase
@@ -31,41 +31,65 @@
 
     // Array de códigos postales
     const cpsCDS = [
-      8300, 8305, 8318, 9037, 9203, 8328, 9033, 8345, 8353, 8354,
-      8305, 8312, 8313, 9001, 8324, 8306, 8400, 8353, 9011, 9111,
-      8305, 9420, 9013, 8349, 9303, 8309, 8326, 8366, 8326, 8337,
-      8364, 8360, 9217, 8353, 8303, 8324, 8332, 8333, 9020, 8307,
-      8418, 9000, 9002, 9003, 9004, 9005, 9006, 9008, 9010, 8301,
-      8349, 8416, 9201, 8364, 8351, 8332, 8328, 8322, 8364, 8319,
-      9009, 8402, 9107, 8430, 9405, 9050, 9301, 8353, 9017, 8431,
-      8349, 9019, 9210, 8319, 8307, 9211, 9200, 8361, 8300, 9420,
-      9421, 9105, 9121, 9007, 9121, 8503, 8336, 8325, 8332, 9223,
-      9311, 9201, 9207, 8353, 8334, 9220, 9407, 8371, 9019, 8134,
-      9407, 8370, 8370, 8370, 9431, 8363, 9107, 8430, 8521, 9017,
-      8307, 8347, 8353, 8355, 9101, 9213, 8305, 8300, 8349, 9127,
-      9041, 8424, 9017, 8326, 9001, 8422, 8370, 8416, 8300, 8302,
-      8415, 8416, 4190, 8332, 9000, 9310, 9207, 9201, 9040, 9015,
-      8313, 8315, 9103, 8532, 8318, 8316, 8363, 9050, 9120, 9120,
-      9310, 9300, 8319, 9405, 9300, 8370, 9001, 9103, 8319, 8415,
-      8138, 9400, 9402, 9403, 9420, 9030, 9225, 9407, 9407, 8520,
-      8370, 8305, 9420, 8305, 9020, 8320, 8305, 8534, 8532, 8353,
-      9201, 9121, 9420, 9412, 9100, 9203, 9410, 9007, 8536, 9107,
-      9408, 8500, 8311, 8407, 8308, 8345, 8336, 8403, 8309, 8300,
-      8300, 8318, 8318, 9400, 9400, 9400, 8319, 8307, 8307, 8319,
-      8324, 8319, 9400, 8305, 8319, 8300, 9400, 8332, 9400, 9420,
-      9400, 8305, 8319, 8318, 8318, 8300, 8322, 8353, 8318, 9001,
-      8307, 8318, 8340
-    ];
+    8300,
+    8302,
+    8304,
+    8303,
+    2124,
+    2105,
+    2918,
+    2920,
+    2103,
+    2215,
+    3017,
+    2132,
+    2101,
+    2107,
+    2130,
+    2128,
+    2126,
+    2127,
+    2152,
+    2143,
+    2000,
+    2121,
+    2129,
+    2001,
+    2002,
+    2003,
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2108,
+    2125,
+    2206,
+    2216,
+    2209,
+    2156,
+    2154,
+    2202,
+    2204,
+    2200,
+    2201,
+    2134,
+    2527];
 
     // Eliminar todo en LogCDS y luego subir
-    db.ref('LogCDS').remove()
+    db.ref('CamionRosario').remove()
       .then(() => {
         const updates = {};
         const uniqueCps = [...new Set(cpsCDS)]; // Eliminar duplicados
         uniqueCps.forEach(cp => {
           updates[cp] = { cp: cp };
         });
-        return db.ref('LogCDS').update(updates);
+        return db.ref('CamionRosario').update(updates);
       })
       .then(() => {
         console.log("✅ Códigos postales subidos correctamente.");
