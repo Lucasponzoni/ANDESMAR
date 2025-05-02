@@ -1631,38 +1631,41 @@ async function copyHammerData(ventaId, estadoActual, ultimaDescripcion, sku, uni
       });
   }
 
-  // Obtener comentarios desde Firebase
   const comentarios = await getComentarios(ventaId);
 
-  // Inicializar el bloque de comentarios
   let comentariosMensaje = '';
   const comentario1 = comentarios[2] || "No disponible";
   const numeroCaso = comentarios[1] || "No disponible";
-  const vencimientoDevolucion = comentarios[3] || "No disponible";
-
-  // Verificar si hay algún comentario válido
-  if (comentario1 !== "No disponible" || numeroCaso !== "No disponible" || vencimientoDevolucion !== "No disponible") {
+  const vencimientoDevolucionRaw = comentarios[3] || "No disponible";
+  
+  // Normalizar a minúsculas para evitar errores de comparación
+  const vencimientoDevolucion = vencimientoDevolucionRaw.toLowerCase() === "invalid date" ? "No disponible" : vencimientoDevolucionRaw;
+  
+  // Verificar si hay datos válidos
+  const hayComentariosValidos =
+      (comentario1 && comentario1 !== "No disponible" && comentario1.toLowerCase() !== "invalid date") ||
+      (numeroCaso && numeroCaso !== "No disponible") ||
+      (vencimientoDevolucion && vencimientoDevolucion !== "No disponible");
+  
+  if (hayComentariosValidos) {
       comentariosMensaje += `------------------------------------------\n` +
                             `COMENTARIOS:\n` +
                             `------------------------------------------\n`;
-
-      // Solo incluir el comentario si no es "No disponible"
-      if (comentario1 !== "No disponible" && comentario1 !== "Invalid Date") {
-        comentariosMensaje += `COMENTARIOS: ${comentario1}\n\n`;
-    }    
-
-      // Solo incluir el número de caso si no es "No disponible"
+  
+      if (comentario1 !== "No disponible" && comentario1.toLowerCase() !== "invalid date") {
+          comentariosMensaje += `COMENTARIOS: ${comentario1}\n\n`;
+      }
+  
       if (numeroCaso !== "No disponible") {
           comentariosMensaje += `NUMERO DE CASO: ${numeroCaso}\n\n`;
       }
-
-      // Solo incluir la línea de vencimiento si no es "No disponible" o una fecha inválida
-      const valoresInvalidos = ["No disponible", "Invalid Date"];
-      if (!valoresInvalidos.includes(vencimientoDevolucion)) {
+  
+      if (vencimientoDevolucion !== "No disponible") {
           comentariosMensaje += `VENCIMIENTO DE DEVOLUCION: ${vencimientoDevolucion}\n\n`;
       }
-      
   }
+  
+  console.log(comentariosMensaje);  
 
   // Construir el mensaje base
   let mensaje = `Venta ID: ${ventaId}\n\n` +
