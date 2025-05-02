@@ -604,6 +604,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div id="spinner2" class="spinner-container" style="display:none;">
                     <img src="./Img/etiqueta-animada.gif" alt="Cargando...">
                 </div>
+
+    <!-- CHATBOT-->    
+    <div class="circuloBot hidden" id="bot">
+        <img src="./bot/bot1-close-chat.gif" alt="Imagen" class="imagenBot">
+    </div>
+    <div class="chat" id="chat">
+        <div class="chat-header">Logi-Chat 🗨️</div>
+        <div class="chat-messageBot" id="chat-messageBot">
+            <!-- Mensajes se añadirán aquí -->
+        </div>
+        <div class="chat-input-container">
+            <input type="text" placeholder="Escribe un mensaje..." class="chat-input" id="chat-input">
+            <button class="send-button" id="send-button">
+                <i class="bi bi-send"></i> 
+            </button>
+        </div>
+    </div> 
+    <!-- CHATBOT-->    
     
                 <footer class="center">
                     <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
@@ -640,6 +658,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="./js/firebase-init-stock"></script>
+    <script src="./js/firebase-init-Bot.js"></script>
+    <script src="./js/bot.js"></script>
     <script src="./js/features.js"></script>
     <script src="./js/ciudades.js"></script>
     <script src="./js/meliCardsFisebase.js"></script>

@@ -7747,7 +7747,7 @@ img.gray-filter {
     height: 80px;
     border-radius: 50%;
     position: fixed;
-    bottom: 110px;
+    bottom: 120px;
     right: 10px;
     background: radial-gradient(closest-side, white, white, orange);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
