@@ -342,13 +342,25 @@ function closeChat() {
     chat.style.animation = 'slideOut 0.3s ease forwards';
     setTimeout(() => {
         chat.style.display = 'none'; // Ocultar después de la animación
-        bot.querySelector('img').src = './bot/bot1-close-chat.gif'; // Restaurar imagen del bot
+
+        // Elegir imagen aleatoria para el bot
+        const imagenes = [
+            './bot/bot1-close-chat.gif',
+            './bot/bot12-maracas.gif',
+            './bot/bot14-clown.gif',
+            './bot/bot11-hello.gif',
+            './bot/bot9-hipnosis.gif'
+        ];
+        const imagenAlAzar = imagenes[Math.floor(Math.random() * imagenes.length)];
+        bot.querySelector('img').src = imagenAlAzar; // Usar imagen aleatoria
+
         // Cambiar el fondo del círculo con animación
         bot.style.transition = 'background 0.3s ease'; // Añadir transición
-        bot.style.background = 'radial-gradient(closest-side, white, white, white, orange)'; // Restaurar color
+        bot.style.background = 'radial-gradient(closest-side, white, beige, #F5DEB3)'; // Restaurar color
         bot.classList.remove('active');
     }, 300); // Tiempo de la animación
 }
+
 
 function resetInactivityTimer() {
     clearTimeout(inactivityTimeout);

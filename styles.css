@@ -7749,7 +7749,7 @@ img.gray-filter {
     position: fixed;
     bottom: 120px;
     right: 10px;
-    background: radial-gradient(closest-side, white, white, orange);
+    background: radial-gradient(closest-side, white, beige, #F5DEB3);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
