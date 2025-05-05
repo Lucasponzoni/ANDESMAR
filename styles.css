@@ -3655,7 +3655,7 @@ div .form-check {
     text-align: center;
     font-size: small;
     border: 1px solid #ccc;
-    background-color: #ecf0f1;
+    background-color: #ffeef5;
     color: crimson;
     border-top: 2px solid crimson;
     font-family: "Rubik", sans-serif;
@@ -3671,7 +3671,7 @@ div .form-check {
     text-align: center;
     font-size: small;
     border: 1px solid #ccc;
-    background-color: #ecf0f1;
+    background-color: #e5ffe5;
     color: #28831a;
     border-top: 2px solid #28831a;
     font-family: "Rubik", sans-serif;
@@ -4217,9 +4217,9 @@ div .form-check {
     text-align: center;
     font-size: small;
     border: 1px solid #ccc;
-    background-color: #ecf0f1;
-    color: #28831a;
-    border-top: 2px solid #28831a;
+    background-color: #e9f6fc;
+    color: #1a6b8a;
+    border-top: 2px solid #1a6b8a;  
     font-family: "Rubik", sans-serif;
     padding: 2px 5px 15px 5px;
     border-radius: 15px 15px 0 0; 
@@ -4232,7 +4232,7 @@ div .form-check {
 .puntos-icon {
     margin-right: 10px;
     font-size: 1.5em;
-    color: green; 
+    color: #1a6b8a; 
 }
 
 .carrito-icon {
@@ -7852,7 +7852,7 @@ img.gray-filter {
     border-radius: 18px;
     padding: 12px 18px;
     margin: 8px 0;
-    max-width: 75%;
+    max-width: 85%;
     position: relative;
     font-size: 15px;
     font-weight: 500;

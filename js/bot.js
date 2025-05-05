@@ -1,5 +1,5 @@
 const bot = document.getElementById('bot');
-const chat = document.getElementById('chat');
+const chatt = document.getElementById('chat');
 const chatInput = document.getElementById('chat-input');
 const chatMessages = document.getElementById('chat-messageBot');
 const sendButton = document.getElementById('send-button');
@@ -25,9 +25,9 @@ const welcomeMessages = [
 let inactivityTimeout;
 
 bot.addEventListener('click', () => {
-    if (chat.style.display === 'none' || chat.style.display === '') {
-        chat.style.display = 'block';
-        chat.style.animation = 'slideIn 0.3s ease forwards'; 
+    if (chatt.style.display === 'none' || chatt.style.display === '') {
+        chatt.style.display = 'block';
+        chatt.style.animation = 'slideIn 0.3s ease forwards'; 
         bot.querySelector('img').src = './bot/bot2-texting.gif';
         bot.classList.add('active');
         bot.style.background = 'radial-gradient(closest-side, white, white, white, #34c759)';
@@ -180,7 +180,7 @@ function restaurarImagenBot() {
 }
 
 // Restaurar también si el usuario comienza a escribir
-document.querySelector('#inputMessage').addEventListener('input', () => {
+document.querySelector('#chat-input').addEventListener('input', () => {
     bot.querySelector('img').src = './bot/bot2-texting.gif';
     clearTimeout(window.botTimer); // Cancelar temporizador si empieza a escribir
 });
@@ -339,9 +339,9 @@ function preguntarAyuda() {
 }
 
 function closeChat() {
-    chat.style.animation = 'slideOut 0.3s ease forwards';
+    chatt.style.animation = 'slideOut 0.3s ease forwards';
     setTimeout(() => {
-        chat.style.display = 'none'; // Ocultar después de la animación
+        chatt.style.display = 'none'; // Ocultar después de la animación
 
         // Elegir imagen aleatoria para el bot
         const imagenes = [
