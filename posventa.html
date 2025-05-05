@@ -151,6 +151,11 @@
                 <button id="btnMinutas" class="btn btn-light" data-toggle="modal" data-target="#minutasModal">
                     <i class="bi bi-receipt" style="font-size: 22px; color: #ff8400;"></i> Control de Minutas
                 </button>
+
+                <!-- Botón para Control rápido -->
+                <button id="btnMinutas" class="btn btn-light" onclick="ejecutarControlRapido()">
+                    <i class="bi bi-exclamation-circle-fill" style="font-size: 22px; color: green;"></i> Control rápido
+                </button>
             
                 <!-- Botón Pendientes de controlar -->
                 <button id="btnPendientesControlar" class="btn btn-light position-relative">
@@ -226,7 +231,7 @@
                     <!-- Los datos se llenarán aquí dinámicamente -->
                 </tbody>
             </table>
-        </div>                 
+        </div>     
         
         <script>
             document.getElementById("btn-filtrar-skills").addEventListener("click", () => {

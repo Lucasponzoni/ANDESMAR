@@ -942,7 +942,7 @@ try {
             ">${icon}</div>
         
             <div style="display: flex; flex-direction: column; justify-content: center;">
-              <div style="font-weight: 500; font-size: 15px; color: ${color};">
+              <div class="vencimientoPlazoDiv" style="font-weight: 500; font-size: 15px; color: ${color};">
                 ${mensaje}
               </div>
               <div style="font-size: 12px; color: #666;">
@@ -3154,3 +3154,68 @@ function crearEmailBodyBase(advertenciaHTML, tablaHTML, horaSubida) {
     `;
 }
 // FIN CONTROL MINUTAS
+
+// CONTROL RAPIDO
+function ejecutarControlRapido() {
+  const tableRows = document.querySelectorAll('#data-table tbody tr');
+  let count = 0;
+  const idsToControl = [];
+  const hoy = new Date(); // Obtener la fecha actual
+  hoy.setHours(0, 0, 0, 0); // Ajustar a la medianoche para la comparación
+
+  tableRows.forEach(row => {
+      const estadoDiv = row.querySelector('.vencimientoPlazoDiv');
+      const mensajeDiv = row.querySelector('.mensaje-filaDeDatos'); 
+      const textoFila = row.textContent.trim(); // Obtener todo el texto de la fila y eliminar espacios
+
+      // Verificar que el div de estado existe y que su texto contiene "Plazo máximo" o "¡Vence hoy!"
+      const estadoValido = estadoDiv && (estadoDiv.textContent.includes('Plazo máximo') || estadoDiv.textContent.includes('¡Vence hoy!'));
+
+      // Verificar que el div de mensaje existe y extraer la fecha
+      let fechaValida = false;
+      if (mensajeDiv) {
+          const textoMensaje = mensajeDiv.textContent.trim();
+          // Extraer la fecha del mensaje
+          const fechaTexto = textoMensaje.match(/(\d{2}\/\d{2}\/\d{4})/); // Busca el formato DD/MM/YYYY
+          if (fechaTexto) {
+              const fechaMensaje = new Date(fechaTexto[0]); // Convertir a objeto Date
+              fechaMensaje.setHours(0, 0, 0, 0); // Ajustar a la medianoche para la comparación
+              // Comprobar si la fecha es distinta a hoy
+              fechaValida = fechaMensaje.getTime() !== hoy.getTime();
+          }
+      }
+
+      // Verificar que el texto de la fila contenga "Llega entre" o "No pudimos entregar"
+      const mensajeValido = textoFila.includes('Llega entre') || textoFila.includes('No pudimos entregar el producto a la persona que lo compró');
+
+      // Contar solo si todas las condiciones son válidas
+      if (estadoValido && mensajeValido && fechaValida) {
+          count++;
+          const ventaId = row.querySelector('.venta-id a').textContent.trim(); // Obtener ID de venta
+          idsToControl.push(ventaId);
+      }
+  });
+
+  // Mostrar Sweet Alert si hay filas que cumplen la condición
+  if (count > 0) {
+      Swal.fire({
+          title: `Se encontraron ${count} casos que se pueden controlar rápidamente.`,
+          text: "Esto actualizará el estado de los casos seleccionados, indicando como controlardor su nombre. Aceptando la responsabilidad de que el control fue realizado.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Control rápido',
+          cancelButtonText: 'Cancelar'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              idsToControl.forEach(id => controlarCaso(id));
+          }
+      });
+  } else {
+      Swal.fire({
+          title: 'No se encontraron casos.',
+          text: 'No hay filas que requieran atención.',
+          icon: 'info'
+      });
+  }
+}
+// CONTROL RAPIDO
