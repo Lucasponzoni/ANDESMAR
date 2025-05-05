@@ -3200,7 +3200,7 @@ function ejecutarControlRapido() {
   if (count > 0) {
       Swal.fire({
           title: `Se encontraron ${count} casos que se pueden controlar rápidamente.`,
-          text: "Esto actualizará el estado de los casos seleccionados, indicando como controlardor su nombre. Aceptando la responsabilidad de que el control fue realizado.",
+          text: "Esto actualizará el estado de los casos seleccionados, indicando como controlador su nombre. Aceptando la responsabilidad de que el control fue realizado.",
           icon: 'warning',
           showCancelButton: true,
           confirmButtonText: 'Control rápido',
