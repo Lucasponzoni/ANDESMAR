@@ -7926,3 +7926,120 @@ img.gray-filter {
     }
 }
 /* FIN CHAT BOT */
+
+.contenedor-macos-tipeo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; 
+    justify-content: space-between;
+    padding: 8px; 
+    background: rgba(250, 250, 250, 0.75);
+    border: 1px solid rgba(200, 200, 200, 0.6);
+    border-radius: 16px; 
+    font-family: "Rubik", sans-serif;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(5px); 
+}
+
+.tarjeta-tipeo {
+    flex: 1 1 calc(25% - 8px); 
+    border-radius: 16px; 
+    padding: 10px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(220, 220, 220, 0.5);
+}
+
+.tarjeta-tipeo:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); 
+}
+
+.bloque-info-tipeo {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 6px 10px; 
+    border-radius: 10px;
+    margin-bottom: 6px;
+    width: 100%;
+    justify-content: center;
+    backdrop-filter: blur(6px); 
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.2s ease;
+}
+
+.bloque-info-tipeo:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+}
+
+.bloque-info-tipeo-doble {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+}
+
+.icono-tipeo {
+    margin-right: 6px; 
+    font-size: 22px; 
+    color: #2e2e2e;
+}
+
+.numero-tipeo {
+    font-weight: 500;
+    font-size: 25px; 
+    color: #2e2e2e;
+    font-family: "Rubik", sans-serif;
+}
+
+.botones-tipeo {
+    display: flex;
+    gap: 8px; 
+    margin-top: 8px; 
+}
+
+.botones-tipeo .btn {
+    border-radius: 50%;
+    padding: 2px 7px; 
+    font-size: 20px; 
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    color: #2e2e2e;
+}
+
+.botones-tipeo .btn:hover {
+    background-color: rgba(200, 200, 200, 0.2);
+    color: white;
+}
+
+.contenedor-tipeo-andreani {
+    display: flex;
+    justify-content: space-around;
+    padding: 8px; 
+    background-color: #f7f7fa;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); 
+}
+
+.rojo-tipeo { background-color: #D32F2F; }
+.azul-tipeo { background-color: #1976D2; }
+.lila-tipeo { background-color: #7B1FA2; }
+.azul-oscuro-tipeo { background-color: #0D47A1; }
+
+@media (max-width: 1024px) {
+    .tarjeta-tipeo {
+        flex: 1 1 calc(50% - 8px);
+    }
+}
+
+@media (max-width: 600px) {
+    .tarjeta-tipeo {
+        flex: 1 1 100%;
+    }
+}
