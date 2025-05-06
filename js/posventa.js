@@ -1099,7 +1099,7 @@ try {
                   }
 
                   return `
-                  <div onclick="handleDivClick('${ventaId}', '${vencimiento}', '${numeroCaso}', \`${estadoTexto}\`)" style="
+                  <div class="contenedorCasos" onclick="handleDivClick('${ventaId}', '${vencimiento}', '${numeroCaso}', \`${estadoTexto}\`)" style="
                     display: inline-flex;
                     align-items: center;
                     background: rgba(245, 245, 245, 0.7);
@@ -3157,65 +3157,77 @@ function crearEmailBodyBase(advertenciaHTML, tablaHTML, horaSubida) {
 
 // CONTROL RAPIDO
 function ejecutarControlRapido() {
-  const tableRows = document.querySelectorAll('#data-table tbody tr');
-  let count = 0;
-  const idsToControl = [];
-  const hoy = new Date(); // Obtener la fecha actual
-  hoy.setHours(0, 0, 0, 0); // Ajustar a la medianoche para la comparación
+    const tableRows = document.querySelectorAll('#data-table tbody tr');
+    let count = 0;
+    const idsToControl = [];
 
-  tableRows.forEach(row => {
-      const estadoDiv = row.querySelector('.vencimientoPlazoDiv');
-      const mensajeDiv = row.querySelector('.mensaje-filaDeDatos'); 
-      const textoFila = row.textContent.trim(); // Obtener todo el texto de la fila y eliminar espacios
+    const hoy = new Date();
+    const diaHoy = hoy.getDate().toString().padStart(2, '0');
+    const mesHoy = (hoy.getMonth() + 1).toString().padStart(2, '0');
+    const anioHoy = hoy.getFullYear();
+    const fechaHoyStr = `${diaHoy}/${mesHoy}/${anioHoy}`; // Formato DD/MM/YYYY
 
-      // Verificar que el div de estado existe y que su texto contiene "Plazo máximo" o "¡Vence hoy!"
-      const estadoValido = estadoDiv && (estadoDiv.textContent.includes('Plazo máximo') || estadoDiv.textContent.includes('¡Vence hoy!'));
+tableRows.forEach(row => {
+    const estadoDiv = row.querySelector('.vencimientoPlazoDiv');
+    const mensajeDiv = row.querySelector('.mensaje-filaDeDatos');
+    const contenedorCasos = row.querySelector('.contenedorCasos');
+    const textoFila = row.textContent.trim();
+    const ventaId = row.querySelector('.venta-id a')?.textContent.trim();
 
-      // Verificar que el div de mensaje existe y extraer la fecha
-      let fechaValida = false;
-      if (mensajeDiv) {
-          const textoMensaje = mensajeDiv.textContent.trim();
-          // Extraer la fecha del mensaje
-          const fechaTexto = textoMensaje.match(/(\d{2}\/\d{2}\/\d{4})/); // Busca el formato DD/MM/YYYY
-          if (fechaTexto) {
-              const fechaMensaje = new Date(fechaTexto[0]); // Convertir a objeto Date
-              fechaMensaje.setHours(0, 0, 0, 0); // Ajustar a la medianoche para la comparación
-              // Comprobar si la fecha es distinta a hoy
-              fechaValida = fechaMensaje.getTime() !== hoy.getTime();
-          }
-      }
+    let tieneFechaDeHoy = false;
 
-      // Verificar que el texto de la fila contenga "Llega entre" o "No pudimos entregar"
-      const mensajeValido = textoFila.includes('Llega entre') || textoFila.includes('No pudimos entregar el producto a la persona que lo compró');
+    if (mensajeDiv) {
+        const textoMensaje = mensajeDiv.textContent.trim();
+        const matchFecha = textoMensaje.match(/(\d{2}\/\d{2}\/\d{4})/);
+        if (matchFecha) {
+            const fechaExtraida = matchFecha[1];
+            if (fechaExtraida === fechaHoyStr) {
+                tieneFechaDeHoy = true;
+            }
+        }
+    }
 
-      // Contar solo si todas las condiciones son válidas
-      if (estadoValido && mensajeValido && fechaValida) {
-          count++;
-          const ventaId = row.querySelector('.venta-id a').textContent.trim(); // Obtener ID de venta
-          idsToControl.push(ventaId);
-      }
-  });
+    // ✅ VALIDACIÓN 2: "Faltan" + fecha distinta de hoy
+    if (contenedorCasos && contenedorCasos.innerText.includes('Faltan') && !tieneFechaDeHoy && ventaId) {
+        count++;
+        idsToControl.push(ventaId);
+        return; // Evita doble conteo si cumple también la otra condición
+    }
 
-  // Mostrar Sweet Alert si hay filas que cumplen la condición
-  if (count > 0) {
-      Swal.fire({
-          title: `Se encontraron ${count} casos que se pueden controlar rápidamente.`,
-          text: "Esto actualizará el estado de los casos seleccionados, indicando como controlador su nombre. Aceptando la responsabilidad de que el control fue realizado.",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Control rápido',
-          cancelButtonText: 'Cancelar'
-      }).then((result) => {
-          if (result.isConfirmed) {
-              idsToControl.forEach(id => controlarCaso(id));
-          }
-      });
-  } else {
-      Swal.fire({
-          title: 'No se encontraron casos.',
-          text: 'No hay filas que requieran atención.',
-          icon: 'info'
-      });
-  }
+    // ✅ VALIDACIÓN 1: Estado válido + frase clave + fecha distinta de hoy
+    const estadoValido = estadoDiv && (
+        estadoDiv.textContent.includes('Plazo máximo') ||
+        estadoDiv.textContent.includes('¡Vence hoy!')
+    );
+
+    const mensajeValido = textoFila.includes('Llega entre') ||
+                          textoFila.includes('No pudimos entregar el producto a la persona que lo compró');
+
+    if (estadoValido && mensajeValido && !tieneFechaDeHoy && ventaId) {
+        count++;
+        idsToControl.push(ventaId);
+    }
+});
+
+    if (count > 0) {
+        Swal.fire({
+            title: `Se encontraron ${count} casos que se pueden controlar rápidamente.`,
+            text: "Esto actualizará el estado de los casos seleccionados, indicando como controlador su nombre. Aceptando la responsabilidad de que el control fue realizado.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Control rápido',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                idsToControl.forEach(id => controlarCaso(id));
+            }
+        });
+    } else {
+        Swal.fire({
+            title: 'No se encontraron casos.',
+            text: 'No hay filas que requieran control rápido',
+            icon: 'info'
+        });
+    }
 }
 // CONTROL RAPIDO
