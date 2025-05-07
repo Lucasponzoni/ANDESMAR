@@ -207,27 +207,26 @@
         <button class="btn btn-light btn-sm"><i class="bi bi-graph-up"></i></button>
       </div>
     </div>
-
-    <!-- TABLA -->
-    <table class="table table-bordered table-striped">
-        <thead class="thead-dark">
-          <tr>
-            <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
-            <th><i class="bi bi-truck"></i> Logistica</th>
-            <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
-            <th><i class="bi bi-box-seam"></i> Bultos</th>
-            <th><i class="bi bi-receipt"></i> Remito</th>
-            <th><i class="bi bi-cash"></i> Valor</th>
-            <th><i class="bi bi-info-circle"></i> Info</th>
-          </tr>
-        </thead>
-        <tbody id="tabla-despacho-body">
-        </tbody>
-      </table>
-      <!-- TABLA -->
-
   </div>  
-<!-- FIN CONTENEDORES TIPEO -->
+  <!-- FIN CONTENEDORES TIPEO -->
+
+<!-- TABLA -->
+<table class="table table-bordered table-striped">
+    <thead class="thead-dark">
+        <tr>
+        <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
+        <th><i class="bi bi-truck"></i> Logistica</th>
+        <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
+        <th><i class="bi bi-box-seam"></i> Bultos</th>
+        <th><i class="bi bi-receipt"></i> Remito</th>
+        <th><i class="bi bi-cash"></i> Valor</th>
+        <th><i class="bi bi-info-circle"></i> Info</th>
+        </tr>
+    </thead>
+    <tbody id="tabla-despacho-body">
+    </tbody>
+</table>
+<!-- TABLA -->
 
 <!-- SPINNER -->
 <div class="spinner-border spinner-border37892 mt-2" role="status" id="spinner">
@@ -257,7 +256,7 @@
         <div class="modal-content">
             <div class="modal-header sku-modal-header">
             <h5 class="modal-title sku-modal-title" id="modalDespachoLabel">Agregar Datos de Despacho</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
             </div>
             <div class="modal-body">
             <form id="formDespacho">
@@ -402,6 +401,9 @@
 
     <!-- BOT -->
     <script src="./js/firebase-init-Bot.js"></script>
+
+    <!-- TIPEO -->
+    <script src="./js/firebase-init-tipeo.js"></script>
     <script src="./js/bot.js"></script>
     <script src="./js/tipeoWeb.js"></script>
     
