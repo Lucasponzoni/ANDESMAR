@@ -159,7 +159,11 @@
       </div>
       <div class="botones-tipeo">
         <button class="btn btn-light btn-sm"><i class="bi bi-envelope-fill"></i></button>
-        <button class="btn btn-light btn-sm"><i class="bi bi-arrows-fullscreen"></i></button>
+        <button class="btn btn-light btn-sm modal-andreani" 
+            data-logistica="Andreani" 
+            onclick="abrirModalTabla('Andreani')">
+            <i class="bi bi-arrows-fullscreen"></i>
+        </button>
         <button class="btn btn-light btn-sm"><i class="bi bi-graph-up"></i></button>
       </div>
     </div>
@@ -186,7 +190,11 @@
       </div>
       <div class="botones-tipeo">
         <button class="btn btn-light btn-sm"><i class="bi bi-envelope-fill"></i></button>
-        <button class="btn btn-light btn-sm"><i class="bi bi-arrows-fullscreen"></i></button>
+        <button class="btn btn-light btn-sm modal-Andesmar" 
+            data-logistica="Andesmar" 
+            onclick="abrirModalTabla('Andesmar')">
+            <i class="bi bi-arrows-fullscreen"></i>
+        </button>
         <button class="btn btn-light btn-sm"><i class="bi bi-graph-up"></i></button>
       </div>
     </div>
@@ -213,7 +221,11 @@
       </div>
       <div class="botones-tipeo">
         <button class="btn btn-light btn-sm"><i class="bi bi-envelope-fill"></i></button>
-        <button class="btn btn-light btn-sm"><i class="bi bi-arrows-fullscreen"></i></button>
+        <button class="btn btn-light btn-sm modal-Oca" 
+            data-logistica="Oca" 
+            onclick="abrirModalTabla('Oca')">
+            <i class="bi bi-arrows-fullscreen"></i>
+        </button>
         <button class="btn btn-light btn-sm"><i class="bi bi-graph-up"></i></button>
       </div>
     </div>
@@ -240,7 +252,11 @@
       </div>
       <div class="botones-tipeo">
         <button class="btn btn-light btn-sm"><i class="bi bi-envelope-fill"></i></button>
-        <button class="btn btn-light btn-sm"><i class="bi bi-arrows-fullscreen"></i></button>
+        <button class="btn btn-light btn-sm modal-cds" 
+            data-logistica="Cruz del Sur" 
+            onclick="abrirModalTabla('Cruz del Sur')">
+            <i class="bi bi-arrows-fullscreen"></i>
+        </button>
         <button class="btn btn-light btn-sm"><i class="bi bi-graph-up"></i></button>
       </div>
     </div>
@@ -344,6 +360,46 @@
         </div>
     </div>
     <!-- Modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="modalDespachoPorLogistica" tabindex="-1" role="dialog" aria-labelledby="modalDespachoPorLogisticaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header sku-modal-header">
+                <h5 class="modal-title sku-modal-title" id="modalDespachoPorLogisticaLabel">Datos de Despacho</h5>
+                <button type="button" class="btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="spinnerPorLogistica" class="spinner-border text-primary" role="status" style="display: none; margin: auto;">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <div class="table-responsive" id="tabla-container-xLogistica" style="display: none;">
+                    <table class="table table-bordered table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
+                                <th><i class="bi bi-truck"></i></th>
+                                <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
+                                <th><i class="bi bi-box-seam"></i> Bultos</th>
+                                <th><i class="bi bi-receipt"></i> Remito</th>
+                                <th><i class="bi bi-cash"></i> Valor</th>
+                                <th><i class="bi bi-info-circle"></i> Info</th>
+                                <th><i class="bi bi-trash3-fill"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-despacho-xLogistica-body">
+                            <!-- Aquí se llenarán las filas dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
 
     <script>
         modalDespacho.addEventListener('shown.bs.modal', () => {

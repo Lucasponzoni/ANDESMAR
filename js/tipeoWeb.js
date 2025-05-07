@@ -77,6 +77,52 @@ function formatearPesos2(valor) {
 }
 // FIN CALCULO DE TOTALES
 
+// RENDERIZADO DE TABLA POR LOGISTICA EN MODAL
+function abrirModalTabla(logistica) {
+    const spinner = document.getElementById('spinnerPorLogistica');
+    const tablaContainer = document.getElementById('tabla-container-xLogistica');
+    const tablaBody = document.getElementById('tabla-despacho-xLogistica-body');
+
+    // Cambiar el título del modal
+    const modalTitle = $('#modalDespachoPorLogistica').find('.modal-title');
+    modalTitle.text(`Datos de Despacho - ${logistica}`);
+
+    spinner.style.display = 'block'; // Mostrar el spinner
+    tablaContainer.style.display = 'none'; // Ocultar la tabla
+
+    // Cargar datos desde Firebase
+    cargarDespachosPorLogistica(logistica, tablaBody, spinner, tablaContainer);
+    
+    // Abrir el modal
+    $('#modalDespachoPorLogistica').modal('show');
+}
+
+function cargarDespachosPorLogistica(logistica, tablaBody, spinner, tablaContainer) {
+    console.log("Cargando despachos para la logística:", logistica); // Agrega esta línea
+    dbTipeo.ref('despachosDelDia').orderByChild('logistica').equalTo(logistica).on('value', (snapshot) => {
+        const data = snapshot.val();
+        console.log("Datos obtenidos de Firebase:", data); // Agrega esta línea para ver los datos
+
+        tablaBody.innerHTML = ''; // Limpiar la tabla antes de volver a cargar
+
+        if (data) {
+            Object.keys(data).forEach((remito) => {
+                const despacho = data[remito];
+                const tablaBodyModal = document.getElementById('tabla-despacho-xLogistica-body');
+                agregarFilaTabla(remito, despacho, tablaBodyModal);
+            });
+            tablaContainer.style.display = 'block'; 
+        } else {
+            mostrarMensajeNoHayDespachos(); 
+        }
+        spinner.style.display = 'none';
+    }, (error) => {
+        console.error("Error al cargar despachos:", error);
+        spinner.style.display = 'none';
+    });
+}
+// FIN RENDERIZADO DE TABLA POR LOGISTICA EN MODAL
+
 // RENDERIZADO DE FILAS EN LA TABLA
 window.onload = async () => {
     cargarDespachos(); 
@@ -89,7 +135,8 @@ function cargarDespachos() {
         if (data) {
             Object.keys(data).forEach((remito) => {
                 const despacho = data[remito];
-                agregarFilaTabla(remito, despacho);
+                const tablaBody = document.getElementById('tabla-despacho-body');
+                agregarFilaTabla(remito, despacho, tablaBody);
             });
         } else {
             mostrarMensajeNoHayDespachos();
@@ -100,7 +147,7 @@ function cargarDespachos() {
     });
 }
 
-function agregarFilaTabla(remito, despacho) {
+function agregarFilaTabla(remito, despacho, tablaBody) {
     const fecha = new Date(despacho.fecha).toLocaleString('es-AR');
     const row = document.createElement('tr');
 
@@ -145,7 +192,7 @@ function agregarFilaTabla(remito, despacho) {
 
     logisticaDiv.appendChild(logisticaTexto); // Agregar el texto al contenedor
     logisticaDiv.appendChild(circuloDiv); // Agregar el círculo al contenedor
-    // Modificación aquí para agregar "NIC-" si la logística es "Cruz del Sur"
+
     const etiquetaConPrefijo = logistica === 'Cruz del Sur' ? `NIC-${despacho.etiqueta}` : despacho.etiqueta;
 
     row.innerHTML = `
@@ -160,7 +207,7 @@ function agregarFilaTabla(remito, despacho) {
             </div>
         </td>
         <td class="bultos-tabla-despacho">
-        <div class="bultos-box" data-bultos="${despacho.bultos}">${despacho.bultos}</div>
+            <div class="bultos-box" data-bultos="${despacho.bultos}">${despacho.bultos}</div>
         </td>
         <td class="remito-tabla-despacho">${remito}</td>
         <td>
@@ -168,8 +215,9 @@ function agregarFilaTabla(remito, despacho) {
         </td>
         <td class="info-tabla-despacho">OK</td>
         <td class="delete-tabla-despacho">
-            <button class="btn btn-danger btn-sm" onclick="confirmarEliminacion('${remito}')">
-                <i class="bi bi-trash3-fill"></i>
+            <button class="btn btn-danger btn-sm"  
+                    onclick="confirmarEliminacion('${remito}')">
+                <i class="ml-1 bi bi-trash3-fill"></i>
             </button>
         </td>
     `;
@@ -179,7 +227,7 @@ function agregarFilaTabla(remito, despacho) {
     logisticaCell.appendChild(logisticaDiv);
 
     tablaBody.appendChild(row);
-    actualizarTotales();
+    actualizarTotales(); 
 }
 
 function mostrarMensajeNoHayDespachos() {
