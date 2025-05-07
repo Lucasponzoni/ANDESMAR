@@ -290,46 +290,60 @@
     <!-- Modal -->
     <div class="modal fade" id="modalDespacho" tabindex="-1" role="dialog" aria-labelledby="modalDespachoLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header sku-modal-header">
-            <h5 class="modal-title sku-modal-title" id="modalDespachoLabel">Agregar Datos de Despacho</h5>
-            <button type="button" class="btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
-            </div>
-            <div class="modal-body">
-            <form id="formDespacho">
-                <div class="mb-3">
-                <label for="inputRemito" class="form-label">Número de Remito</label>
-                <input type="text" class="form-control" id="inputRemito" required>
-                <div class="invalid-feedback">Remito inválido. Debe iniciar con 83, 89, 230, 231, 233 o 254 y tener entre 10 y 11 caracteres.</div>
+            <div class="modal-content">
+                <div class="modal-header sku-modal-header">
+                    <h5 class="modal-title sku-modal-title" id="modalDespachoLabel">Agregar Datos de Despacho</h5>
+                    <button type="button" class="btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
                 </div>
-                <div class="mb-3">
-                <label for="inputEtiqueta" class="form-label">Número de Etiqueta</label>
-                <input type="text" class="form-control" id="inputEtiqueta" required>
-                <div class="invalid-feedback">Etiqueta inválida o formato desconocido.</div>
+                <div class="modal-body">
+                    <form id="formDespacho">
+                        <div class="mb-3">
+                            <label for="inputRemito" class="form-label">Número de Remito 📦</label>
+                            <input type="text" class="form-control" id="inputRemito" required>
+                            <div class="invalid-feedback">Remito inválido. Debe iniciar con 83, 89, 230, 231, 233 o 254 y tener entre 10 y 11 caracteres.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputEtiqueta" class="form-label">Número de Etiqueta 🏷️</label>
+                            <input type="text" class="form-control" id="inputEtiqueta" required>
+                            <div class="invalid-feedback">Etiqueta inválida o formato desconocido.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputBultos" class="form-label">Número de Bultos 📦📦</label>
+                            <input type="number" class="form-control" id="inputBultos">
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputValor" class="form-label">Valor Declarado 💵</label>
+                            <input type="text" class="form-control" id="inputValor" required>
+                            <div class="invalid-feedback">Valor inválido.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputLogistica" class="form-label">Logística 🚚</label>
+                            <input type="text" class="form-control" id="inputLogistica" disabled>
+                        </div>
+                    </form>                    
                 </div>
-                <div class="mb-3">
-                <label for="inputBultos" class="form-label">Número de Bultos</label>
-                <input type="number" class="form-control" id="inputBultos">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="btnAgregarDespacho">Agregar a tabla</button>
                 </div>
-                <div class="mb-3">
-                <label for="inputValor" class="form-label">Valor Declarado</label>
-                <input type="text" class="form-control" id="inputValor" required>
-                <div class="invalid-feedback">Valor inválido.</div>
-                </div>
-                <div class="mb-3">
-                <label for="inputLogistica" class="form-label">Logística</label>
-                <input type="text" class="form-control" id="inputLogistica" disabled>
-                </div>
-            </form>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn btn-primary" id="btnAgregarDespacho">Agregar a tabla</button>
             </div>
         </div>
-        </div>
-  </div>
-  <!-- Modal -->
+    </div>
+    <!-- Modal -->
+
+    <script>
+        modalDespacho.addEventListener('shown.bs.modal', () => {
+        // Limpiar los campos
+        document.getElementById('inputRemito').value = '';
+        document.getElementById('inputEtiqueta').value = '';
+        document.getElementById('inputBultos').value = '';
+        document.getElementById('inputValor').value = '';
+        document.getElementById('inputLogistica').value = '';
+        document.getElementById('inputBultos').disabled = false;
+        document.getElementById('inputRemito').focus();
+        });
+    </script>
+
 
     <!-- Info WiFi -->
     <div id="notification-ios-wifi" class="notification-ios-wifi">

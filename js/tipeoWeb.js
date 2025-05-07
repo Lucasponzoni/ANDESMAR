@@ -145,13 +145,14 @@ function agregarFilaTabla(remito, despacho) {
 
     logisticaDiv.appendChild(logisticaTexto); // Agregar el texto al contenedor
     logisticaDiv.appendChild(circuloDiv); // Agregar el círculo al contenedor
+    // Modificación aquí para agregar "NIC-" si la logística es "Cruz del Sur"
+    const etiquetaConPrefijo = logistica === 'Cruz del Sur' ? `NIC-${despacho.etiqueta}` : despacho.etiqueta;
 
     row.innerHTML = `
         <td class="fecha-tabla-despacho">${fecha}</td>
         <td class="logistica-tabla-despacho"></td> <!-- Se dejará vacío para insertar el contenedor -->
         <td class="seguimiento-tabla-despacho">
-            <a href="${getSeguimientoLink(despacho.logistica, despacho.etiqueta)}" target="_blank">${despacho.etiqueta}</a>
-        </td>
+            <a href="${getSeguimientoLink(despacho.logistica, despacho.etiqueta)}" target="_blank">${etiquetaConPrefijo}</a>        </td>
         <td class="bultos-tabla-despacho">${despacho.bultos}</td>
         <td class="remito-tabla-despacho">${remito}</td>
         <td class="valor-tabla-despacho">${despacho.valor}</td>
@@ -236,6 +237,55 @@ function eliminarDespacho(remito) {
 // FIN RENDERIZADO DE FILAS EN LA TABLA
 
 // TIPEO DE DESPACHO
+const verificarRemitoYEtiqueta = async (remito, etiqueta) => {
+    try {
+      // Verificar remito en Firebase
+      const remitoSnapshot = await dbTipeo.ref(`despachosHistoricosRemitos/${remito}`).once('value');
+      const remitoExiste = remitoSnapshot.exists();
+  
+      // Verificar etiqueta en Firebase
+      const etiquetaSnapshot = await dbTipeo.ref(`despachosHistoricosEtiquetas/${etiqueta}`).once('value');
+      const etiquetaExiste = etiquetaSnapshot.exists();
+  
+      // Verificar si el remito ya está en la tabla
+      const filas = tablaBody.getElementsByTagName('tr');
+      const remitoEnTabla = Array.from(filas).some(row => row.querySelector('.remito-tabla-despacho').textContent === remito);
+      const etiquetaEnTabla = Array.from(filas).some(row => row.querySelector('.seguimiento-tabla-despacho a').textContent === etiqueta);
+  
+      // Si el remito o la etiqueta ya existen, mostrar un error
+      if (remitoExiste || remitoEnTabla) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'El remito ya fue despachado anteriormente. Esta acción fue notificada por email.',
+          allowOutsideClick: false
+        });
+        return false; // Indicar que la verificación falló
+      }
+  
+      if (etiquetaExiste || etiquetaEnTabla) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'La etiqueta ya fue utilizada antes. Esta acción fue notificada por email.',
+          allowOutsideClick: false
+        });
+        return false; // Indicar que la verificación falló
+      }
+  
+      return true; // Todo está bien
+    } catch (error) {
+      console.error("Error al verificar remito y etiqueta:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ocurrió un error al verificar los datos.',
+        allowOutsideClick: false
+      });
+      return false; // Indicar que hubo un error
+    }
+};
+  
 const inputRemito = document.getElementById('inputRemito');
 const inputEtiqueta = document.getElementById('inputEtiqueta');
 const inputBultos = document.getElementById('inputBultos');
@@ -251,68 +301,86 @@ const formatearPesos = (valor) => {
   return num.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
 };
 
-inputRemito.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    const val = inputRemito.value.trim();
-    const esValido = validPrefixes.some(pref => val.startsWith(pref)) && val.length >= 10 && val.length <= 11;
-    if (!esValido) {
-      inputRemito.classList.add('is-invalid');
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Remito inválido. Debe iniciar con 83, 89, 230, 231, 233 o 254 y tener entre 10 y 11 caracteres.',
-        allowOutsideClick: false // Evitar que se cierre el modal
-      });
+inputRemito.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const val = inputRemito.value.trim();
+      const esValido = validPrefixes.some(pref => val.startsWith(pref)) && val.length >= 10 && val.length <= 11;
+      
+      if (!esValido) {
+        inputRemito.classList.add('is-invalid');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Remito inválido. Debe iniciar con 83, 89, 230, 231, 233 o 254 y tener entre 10 y 11 caracteres.',
+          allowOutsideClick: false
+        });
+        e.preventDefault();
+        return;
+      }
+  
+      const etiqueta = inputEtiqueta.value.trim();
+      const verificacion = await verificarRemitoYEtiqueta(val, etiqueta);
+      if (!verificacion) {
+        e.preventDefault();
+        return; // Detener el flujo si hay un error
+      }
+  
+      inputRemito.classList.remove('is-invalid');
       e.preventDefault();
-      return;
+      inputEtiqueta.focus();
     }
-    inputRemito.classList.remove('is-invalid');
-    e.preventDefault();
-    inputEtiqueta.focus();
-  }
 });
 
-inputEtiqueta.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    const val = inputEtiqueta.value.trim();
-    let logistica = '';
-
-    if (/^36\d{13}$/.test(val)) {
-      logistica = 'Andreani';
-      inputBultos.value = '1'; // Establecer bulto en 1
-      inputBultos.disabled = true; // Deshabilitar el campo de bultos
-      inputValor.focus(); // Saltar al campo de valor
-    } else if (/^40\d{13}$/.test(val)) {
-      logistica = 'Andreani';
-      inputBultos.disabled = false; // Habilitar el campo de bultos
-      inputBultos.focus(); // Hacer foco en bultos
-    } else if (/^1141\d{8}\d{4}$/.test(val)) {
-      logistica = 'Cruz del Sur';
-      inputBultos.value = parseInt(val.slice(-4), 10); // Establecer el bulto
-      inputBultos.disabled = true; // Deshabilitar el campo de bultos
-      inputEtiqueta.value = val.slice(4, -4); // Solo toma "78406107"
-      inputValor.focus(); // Saltar al campo de valor
-    } else if (/^4146\d{15,}-\d+$/.test(val)) {
-      logistica = 'Oca';
-      const partes = val.split('-');
-      inputEtiqueta.value = partes[0];
-      inputBultos.value = parseInt(partes[1], 10);
-      inputBultos.disabled = true; // Deshabilitar el campo de bultos
-      inputValor.focus(); // Saltar al campo de valor
-    } else if (/^(NOV|BNA|ME1)/.test(val)) {
-      logistica = 'Andesmar';
-      inputBultos.focus(); // Enfocar el campo de bultos
-    } else {
-      inputEtiqueta.classList.add('is-invalid');
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Etiqueta inválida o formato desconocido.',
-        allowOutsideClick: false // Evitar que se cierre el modal
-      });
-      e.preventDefault();
-      return;
-    }
+inputEtiqueta.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const val = inputEtiqueta.value.trim();
+      let logistica = '';
+  
+      // Verificar remito y etiqueta antes de continuar
+      const remito = inputRemito.value.trim();
+      const verificacion = await verificarRemitoYEtiqueta(remito, val);
+      if (!verificacion) {
+        e.preventDefault();
+        return; // Detener el flujo si hay un error
+      }
+  
+      // Lógica existente para determinar la logística
+      if (/^36\d{13}$/.test(val)) {
+        logistica = 'Andreani';
+        inputBultos.value = '1'; // Establecer bulto en 1
+        inputBultos.disabled = true; // Deshabilitar el campo de bultos
+        inputValor.focus(); // Saltar al campo de valor
+      } else if (/^40\d{13}$/.test(val)) {
+        logistica = 'Andreani';
+        inputBultos.disabled = false; // Habilitar el campo de bultos
+        inputBultos.focus(); // Hacer foco en bultos
+      } else if (/^1141\d{8}\d{4}$/.test(val)) {
+        logistica = 'Cruz del Sur';
+        inputBultos.value = parseInt(val.slice(-4), 10); // Establecer el bulto
+        inputBultos.disabled = true; // Deshabilitar el campo de bultos
+        inputEtiqueta.value = val.slice(4, -4); // Solo toma "78406107"
+        inputValor.focus(); // Saltar al campo de valor
+      } else if (/^4146\d{15,}-\d+$/.test(val)) {
+        logistica = 'Oca';
+        const partes = val.split('-');
+        inputEtiqueta.value = partes[0];
+        inputBultos.value = parseInt(partes[1], 10);
+        inputBultos.disabled = true; // Deshabilitar el campo de bultos
+        inputValor.focus(); // Saltar al campo de valor
+      } else if (/^(NOV|BNA|ME1)/.test(val)) {
+        logistica = 'Andesmar';
+        inputBultos.focus(); // Enfocar el campo de bultos
+      } else {
+        inputEtiqueta.classList.add('is-invalid');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Etiqueta inválida o formato desconocido.',
+          allowOutsideClick: false // Evitar que se cierre el modal
+        });
+        e.preventDefault();
+        return;
+      }
 
     if (!logistica) {
       inputEtiqueta.classList.add('is-invalid');
@@ -376,6 +444,8 @@ inputValor.addEventListener('keydown', (e) => {
 
     agregarDespacho(remito, etiqueta, bultos, valorFormateado, logistica);
 
+    const etiquetaConPrefijo = logistica === 'Cruz del Sur' ? `NIC-${etiqueta}` : etiqueta;
+
     const fecha = new Date().toLocaleString('es-AR');
     let seguimientoLink = etiqueta;
 
@@ -396,7 +466,7 @@ inputValor.addEventListener('keydown', (e) => {
       <td class="fecha-tabla-despacho">${fecha}</td>
       <td class="logistica-tabla-despacho"></td> <!-- Se dejará vacío para insertar el contenedor -->
       <td class="seguimiento-tabla-despacho">
-          <a href="${seguimientoLink}" target="_blank">${logistica === 'Cruz del Sur' ? `NIC-${etiqueta}` : etiqueta}</a>
+          <a href="${seguimientoLink}" target="_blank">${etiquetaConPrefijo}</a>
       </td>
       <td class="bultos-tabla-despacho">${bultos}</td>
       <td class="remito-tabla-despacho">${remito}</td>
