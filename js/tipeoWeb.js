@@ -131,7 +131,7 @@ window.onload = async () => {
 function cargarDespachos() {
     dbTipeo.ref('despachosDelDia').on('value', (snapshot) => {
         const data = snapshot.val();
-        tablaBody.innerHTML = ''; // Limpiar la tabla antes de volver a cargar
+        tablaBody.innerHTML = ''; 
         if (data) {
             Object.keys(data).forEach((remito) => {
                 const despacho = data[remito];
@@ -141,7 +141,7 @@ function cargarDespachos() {
         } else {
             mostrarMensajeNoHayDespachos();
         }
-        spinner.style.display = 'none'; // Ocultar el spinner
+        spinner.style.display = 'none'; 
     }, (error) => {
         console.error("Error al cargar despachos:", error);
     });
@@ -185,13 +185,12 @@ function agregarFilaTabla(remito, despacho, tablaBody) {
 
     circuloDiv.appendChild(img);
 
-    // Crear un span para el texto de logística y ocultarlo
     const logisticaTexto = document.createElement('span');
-    logisticaTexto.textContent = logistica; // Agregar el texto de logística
-    logisticaTexto.classList.add('logistica-texto'); // Clase para aplicar estilos
+    logisticaTexto.textContent = logistica; 
+    logisticaTexto.classList.add('logistica-texto'); 
 
-    logisticaDiv.appendChild(logisticaTexto); // Agregar el texto al contenedor
-    logisticaDiv.appendChild(circuloDiv); // Agregar el círculo al contenedor
+    logisticaDiv.appendChild(logisticaTexto); 
+    logisticaDiv.appendChild(circuloDiv); 
 
     const etiquetaConPrefijo = logistica === 'Cruz del Sur' ? `NIC-${despacho.etiqueta}` : despacho.etiqueta;
 
@@ -331,7 +330,7 @@ const verificarRemitoYEtiqueta = async (remito, etiqueta) => {
         return false; // Indicar que la verificación falló
       }
   
-      return true; // Todo está bien
+      return true;
     } catch (error) {
       console.error("Error al verificar remito y etiqueta:", error);
       Swal.fire({
@@ -416,7 +415,7 @@ inputEtiqueta.addEventListener('keydown', async (e) => {
         logistica = 'Cruz del Sur';
         inputBultos.value = parseInt(val.slice(-4), 10); // Establecer el bulto
         inputBultos.disabled = true; // Deshabilitar el campo de bultos
-        inputEtiqueta.value = val.slice(4, -4); // Solo toma "78406107"
+        inputEtiqueta.value = val.slice(4, -4); // Solo toma "78406107 VALOR DEL MEDIO"
         inputValor.focus(); // Saltar al campo de valor
       } else if (/^4146\d{15,}-\d+$/.test(val)) {
         logistica = 'Oca';
@@ -463,9 +462,9 @@ inputBultos.addEventListener('keydown', (e) => {
     const val = inputBultos.value.trim();
     // Tomar los últimos 3 caracteres y convertir a número, eliminando ceros a la izquierda
     const bultosFinal = val.slice(-3).replace(/^0+/, '');
-    inputBultos.value = bultosFinal || '1'; // Si no hay valor, establecer en 1
-    inputBultos.disabled = true; // Deshabilitar el campo de bultos
-    inputValor.focus(); // Saltar al campo de valor
+    inputBultos.value = bultosFinal || '1'; 
+    inputBultos.disabled = true; 
+    inputValor.focus(); 
   }
 });
 
@@ -567,17 +566,14 @@ inputValor.addEventListener('keydown', (e) => {
   function crearCirculo(logistica) {
     if (!logistica) return null;
 
-    // Crear el contenedor principal
     const logisticaDiv = document.createElement('div');
     logisticaDiv.classList.add('logistica-contenedor');
 
-    // Crear el span con el texto
     const logisticaTexto = document.createElement('span');
     logisticaTexto.textContent = logistica;
-    logisticaTexto.classList.add('logistica-texto'); // Clase opcional para estilo
+    logisticaTexto.classList.add('logistica-texto'); 
     logisticaDiv.appendChild(logisticaTexto);
 
-    // Crear el círculo con la imagen
     const circuloDiv = document.createElement('div');
     circuloDiv.classList.add('logistica-circulo');
 
@@ -605,19 +601,17 @@ inputValor.addEventListener('keydown', (e) => {
     }
 
     circuloDiv.appendChild(img);
-    circuloDiv.classList.add('logistica-circulo-oculto'); // Ocultar círculo si es necesario
+    circuloDiv.classList.add('logistica-circulo-oculto');
     logisticaDiv.appendChild(circuloDiv);
 
     return logisticaDiv;
 }
 });
 
-// Función para limpiar el feedback de validación
 const limpiarValidacion = (input) => {
   input.classList.remove('is-invalid');
 };
 
-// Limpia el feedback de validación al escribir
 [inputRemito, inputEtiqueta, inputBultos, inputValor].forEach(input => {
   input.addEventListener('input', () => limpiarValidacion(input));
 });
@@ -627,14 +621,13 @@ modalDespacho.addEventListener('shown.bs.modal', () => {
   inputRemito.focus();
 });
 
-// Función para agregar datos a la base de datos
 function agregarDespacho(remito, etiqueta, bultos, valor, logistica) {
     const despachoData = {
         etiqueta: etiqueta,
         bultos: bultos,
         valor: valor,
         logistica: logistica,
-        fecha: new Date().toISOString() // Agrega la fecha actual
+        fecha: new Date().toISOString() 
     };
 
     dbTipeo.ref(`despachosDelDia/${remito}`).set(despachoData)
