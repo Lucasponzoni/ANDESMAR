@@ -1,20 +1,20 @@
-const firebaseConfigTipeo = {
-    apiKey: "AIzaSyDjssphJi5ckC20OsEZ89banOWMfWs6Nfc",
-    authDomain: "despachos-logistica-web.firebaseapp.com",
-    databaseURL: "https://despachos-logistica-web-default-rtdb.firebaseio.com",
-    projectId: "despachos-logistica-web",
-    storageBucket: "despachos-logistica-web.firebasestorage.app",
-    messagingSenderId: "791774587796",
-    appId: "1:791774587796:web:c267f4f4a8a7ee41f73d81",
-    measurementId: "G-7XZ2SYW1GS"
+const firebaseConfigMeli = {
+    apiKey: "AIzaSyCMu2vPvNzhv0cM3b4RItmqZybRhhR_HJM",
+    authDomain: "despachos-meli-novogar.firebaseapp.com",
+    databaseURL: "https://despachos-meli-novogar-default-rtdb.firebaseio.com",
+    projectId: "despachos-meli-novogar",
+    storageBucket: "despachos-meli-novogar.appspot.com",
+    messagingSenderId: "774252628334",
+    appId: "1:774252628334:web:623aa84bc3b1cebd3f997f",
+    measurementId: "G-E0E9K4TEDW"
 };
 
-let appTipeo;
+let appMeli;
 try {
-    appTipeo = firebase.app("appTipeo"); // Intenta obtener la app existente
+    appMeli = firebase.app("appMeli"); // Intenta obtener la app existente
 } catch (error) {
-    appTipeo = firebase.initializeApp(firebaseConfigTipeo, "appTipeo"); // Si no existe, inicializa
+    appMeli = firebase.initializeApp(firebaseConfigMeli, "appMeli"); // Si no existe, inicializa
 }
 
-const dbTipeo = appTipeo.database();
-window.dbTipeo = dbTipeo;
+const dbMeli = appMeli.database();
+window.dbMeli = dbMeli;

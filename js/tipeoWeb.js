@@ -78,10 +78,9 @@ function formatearPesos2(valor) {
 }
 
 // Ejecutar la función al cargar la página y después de agregar datos a la tabla
-window.onload = () => {
-    cargarDespachos(); // Asegúrate de definir esta función según tus necesidades
+window.onload = async () => {
+    cargarDespachos(); 
 };
-
 
 function cargarDespachos() {
     dbTipeo.ref('despachosDelDia').once('value')
@@ -415,3 +414,4 @@ function agregarDespacho(remito, etiqueta, bultos, valor, logistica) {
         });
 }
 // FIN TIPEO DE DESPACHO
+

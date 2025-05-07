@@ -8050,3 +8050,19 @@ img.gray-filter {
         flex: 1 1 100%;
     }
 }
+
+.total-monto-oca,
+.total-monto-andreani, 
+.total-monto-cds,
+.total-monto-andesmar,
+.total-monto-icon {
+    color: #149c36;
+}
+
+.total-monto-contenedor {
+    display: flex;
+    padding: 8px;
+    background-color: rgba(230, 244, 234, 0.7);
+    border-radius: 8px;
+    border: 1px solid #a5d6a7; 
+}
