@@ -77,29 +77,27 @@ function formatearPesos2(valor) {
 }
 // FIN CALCULO DE TOTALES
 
+// RENDERIZADO DE FILAS EN LA TABLA
 window.onload = async () => {
     cargarDespachos(); 
 };
 
 function cargarDespachos() {
-    dbTipeo.ref('despachosDelDia').once('value')
-        .then((snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                Object.keys(data).forEach((remito) => {
-                    const despacho = data[remito];
-                    agregarFilaTabla(remito, despacho);
-                });
-            } else {
-                mostrarMensajeNoHayDespachos();
-            }
-        })
-        .catch((error) => {
-            console.error("Error al cargar despachos:", error);
-        })
-        .finally(() => {
-            spinner.style.display = 'none'; // Ocultar el spinner
-        });
+    dbTipeo.ref('despachosDelDia').on('value', (snapshot) => {
+        const data = snapshot.val();
+        tablaBody.innerHTML = ''; // Limpiar la tabla antes de volver a cargar
+        if (data) {
+            Object.keys(data).forEach((remito) => {
+                const despacho = data[remito];
+                agregarFilaTabla(remito, despacho);
+            });
+        } else {
+            mostrarMensajeNoHayDespachos();
+        }
+        spinner.style.display = 'none'; // Ocultar el spinner
+    }, (error) => {
+        console.error("Error al cargar despachos:", error);
+    });
 }
 
 function agregarFilaTabla(remito, despacho) {
@@ -176,7 +174,7 @@ function agregarFilaTabla(remito, despacho) {
 function mostrarMensajeNoHayDespachos() {
     const row = document.createElement('tr');
     row.innerHTML = `
-        <td colspan="7" class="text-center">
+        <td colspan="8" class="text-center">
             No hay despachos para cargar <i class="bi bi-exclamation-circle"></i>
         </td>
     `;
@@ -192,7 +190,7 @@ function getSeguimientoLink(logistica, etiqueta) {
         case 'Oca':
             return `https://www.aftership.com/es/track/oca-ar/${etiqueta}`;
         case 'Cruz del Sur':
-            return `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=NIC-${etiqueta}`;
+            return `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${etiqueta}`;
         default:
             return '#';
     }
@@ -220,13 +218,6 @@ function confirmarEliminacion(remito) {
 function eliminarDespacho(remito) {
     dbTipeo.ref(`despachosDelDia/${remito}`).remove()
         .then(() => {
-            // Eliminar la fila de la tabla
-            const filas = document.querySelectorAll('#tabla-despacho-body tr');
-            filas.forEach((fila) => {
-                if (fila.querySelector('.remito-tabla-despacho').textContent === remito) {
-                    fila.remove();
-                }
-            });
             Swal.fire(
                 'Borrado!',
                 'El despacho ha sido eliminado.',
