@@ -1111,7 +1111,7 @@ COMPRA CON USO DE PUNTOS BNA
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="numero_tarjeta_visible_${data[i].id}">Número de Tarjeta Visible:</label>
-                                <input type="text" id="numero_tarjeta_visible_${data[i].id}" value="${data[i].numeros_tarjeta}" disabled>
+                                <input type="text" id="numero_tarjeta_visible_${data[i].id}" value="${data[i].numeros_tarjeta.replace(/\D/g, '')}" disabled>
                             </div>
                             <div class="col">
                                 <label for="codigo_pago_${data[i].id}">Código de Pago:</label>
@@ -1729,13 +1729,13 @@ COMPRA CON USO DE PUNTOS BNA
                                 
                                 <div class="${isMacro(storeCode) ? '' : 'hidden'}" style="background-color: #f0f0f5; border-radius: 12px; padding: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; max-width: 400px; margin-bottom: 5px; border: 1px solid #d0d0d5; ">
                                     <h2 style="font-size: 20px; color: #333; margin-bottom: 15px;">Datos PayWay 💰</h2>
-                                    <p class="card-text-pago" style="color: #333; margin: 10px 0;"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
+                                    <p class="card-text-pago" style="color: #333; margin: 10px 0;"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta.replace(/\D/g, '')}</p>
                                     <p class="card-text-pago" style="color: #333; margin: 10px 0;"><strong>Código de Autorización:</strong> ${data[i].cod_aut}</p>
                                 </div>
 
                                     <p class="card-text-pago"><strong>Entidad:</strong> ${(data[i].brand_name && data[i].brand_name !== '0') ? data[i].brand_name : data[i].marca_de_tarjeta || 'N/A'}</p>
                                     <p class="card-text-pago"><strong>Cuotas:</strong> ${(data[i].cuotas && data[i].cuotas !== '0') ? data[i].cuotas : data[i].nro_de_cuotas || 'N/A'}</p>
-                                    <p class="card-text-pago ${isMacro(storeCode) ? 'hidden' : ''}"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta}</p>
+                                    <p class="card-text-pago ${isMacro(storeCode) ? 'hidden' : ''}"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta.replace(/\D/g, '')}</p>
      
 
                       <p class="card-text-pago">
