@@ -1,7 +1,87 @@
-// RENDERIZADO DE FILAS EN LA TABLA
+// Función para calcular y actualizar los totales
+function actualizarTotales() {
+    // Inicializar contadores
+    let totalAndreani = 0, totalAndesmar = 0, totalOCA = 0, totalCDS = 0;
+    let bultosAndreani = { bigger: 0, paqueteria: 0 };
+    let bultosAndesmar = 0, bultosOCA = 0, bultosCDS = 0;
+    let montoAndreani = 0, montoAndesmar = 0, montoOCA = 0, montoCDS = 0;
+
+    const filas = document.querySelectorAll('#tabla-despacho-body tr');
+
+    filas.forEach(fila => {
+        const logistica = fila.querySelector('.logistica-tabla-despacho').textContent.trim();
+        const seguimiento = fila.querySelector('.seguimiento-tabla-despacho').textContent.trim(); // Asegúrate de tener esta clase
+        const bultos = parseInt(fila.querySelector('.bultos-tabla-despacho').textContent) || 0;
+        const valorTexto = fila.querySelector('.valor-tabla-despacho').textContent;
+
+        // Extraer solo el número del valor
+        const valorNumerico = parseFloat(valorTexto.replace(/\$|\.|\,/g, '').replace(/(\d+)(\d{2})$/, '$1.$2')) || 0;
+
+        // Sumar totales por logística
+        if (logistica === 'Andreani') {
+            totalAndreani += 1; // Contar la fila
+
+            // Sumar bultos según el prefijo del seguimiento
+            if (seguimiento.startsWith('36')) {
+                bultosAndreani.paqueteria += bultos; // Incrementar bultos de paquetería
+            } else if (seguimiento.startsWith('40')) {
+                bultosAndreani.bigger += bultos; // Incrementar bultos más grandes
+            }
+
+            montoAndreani += valorNumerico;
+        } else if (logistica === 'Andesmar') {
+            totalAndesmar += 1;
+            bultosAndesmar += bultos;
+            montoAndesmar += valorNumerico;
+        } else if (logistica === 'Oca') {
+            totalOCA += 1;
+            bultosOCA += bultos;
+            montoOCA += valorNumerico;
+        } else if (logistica === 'Cruz del Sur') {
+            totalCDS += 1;
+            bultosCDS += bultos;
+            montoCDS += valorNumerico;
+        }
+    });
+
+    // Actualizar los elementos en el DOM
+    document.querySelector('.total-andreani').textContent = totalAndreani || 0;
+    document.querySelector('.total-bigger-andreani').textContent = bultosAndreani.bigger || 0;
+    document.querySelector('.total-paqueteria-andreani').textContent = bultosAndreani.paqueteria || 0;
+    document.querySelector('.total-andesmar').textContent = totalAndesmar || 0;
+    document.querySelector('.total-bigger-andesmar').textContent = bultosAndesmar || 0;
+    document.querySelector('.total-oca').textContent = totalOCA || 0;
+    document.querySelector('.total-bigger-oca').textContent = bultosOCA || 0;
+    document.querySelector('.total-cds').textContent = totalCDS || 0;
+    document.querySelector('.total-bigger-cds').textContent = bultosCDS || 0;
+
+    document.querySelector('.total-monto-andreani').textContent = formatearPesos2(montoAndreani);
+    document.querySelector('.total-monto-andesmar').textContent = formatearPesos2(montoAndesmar);
+    document.querySelector('.total-monto-oca').textContent = formatearPesos2(montoOCA);
+    document.querySelector('.total-monto-cds').textContent = formatearPesos2(montoCDS);
+}
+
+// Función para formatear el monto en pesos argentinos
+function formatearPesos2(valor) {
+    // Convertir el valor a un número entero de centavos
+    const valorEntero = Math.floor(valor);
+    const valorDecimal = Math.round((valor - valorEntero) * 100);
+
+    // Formatear la parte entera
+    const parteEnteraFormateada = valorEntero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    // Formatear la parte decimal
+    const parteDecimalFormateada = valorDecimal > 0 ? `,${valorDecimal.toString().padStart(2, '0')}` : '';
+
+    // Devolver el resultado final
+    return `$ ${parteEnteraFormateada}${parteDecimalFormateada}`;
+}
+
+// Ejecutar la función al cargar la página y después de agregar datos a la tabla
 window.onload = () => {
-    cargarDespachos();
+    cargarDespachos(); // Asegúrate de definir esta función según tus necesidades
 };
+
 
 function cargarDespachos() {
     dbTipeo.ref('despachosDelDia').once('value')
@@ -44,6 +124,7 @@ function agregarFilaTabla(remito, despacho) {
         </td>
     `;
     tablaBody.appendChild(row);
+    actualizarTotales();
 }
 
 function mostrarMensajeNoHayDespachos() {
@@ -287,6 +368,7 @@ inputValor.addEventListener('keydown', (e) => {
       </td>
     `;
     tablaBody.prepend(row);
+    actualizarTotales();
 
     // Reset
     inputRemito.value = '';

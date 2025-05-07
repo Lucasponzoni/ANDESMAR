@@ -8027,6 +8027,13 @@ img.gray-filter {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); 
 }
 
+.texto-etiquetas {
+    font-size: 1.2rem;
+    margin-left: 5px;
+    margin-right: 5px;
+    font-family: "Rubik", sans-serif;
+  }  
+
 .rojo-tipeo { background-color: #D32F2F; }
 .azul-tipeo { background-color: #1976D2; }
 .lila-tipeo { background-color: #7B1FA2; }
