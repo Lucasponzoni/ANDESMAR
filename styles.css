@@ -8066,3 +8066,59 @@ img.gray-filter {
     border-radius: 8px;
     border: 1px solid #a5d6a7; 
 }
+
+/* CIRCULOS LOGISTICA */
+.logistica-circulo {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    margin-left: 8px;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.4), rgba(255,255,255,0));
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.3),
+                0 1px 3px rgba(0,0,0,0.2);
+    border-radius: 50%;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+
+.logistica-circulo img {
+    width: 75%;
+    height: auto;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.andreani-tablita {
+    background: linear-gradient(to bottom, #D32F2F, #B71C1C);
+    border: 1px solid #E57373;
+}
+
+.andesmar-tablita {
+    background: linear-gradient(to bottom, #1976D2, #0D47A1);
+    border: 1px solid #64B5F6;
+}
+
+.oca-tablita {
+    background: linear-gradient(to bottom, #7B1FA2, #4A148C);
+    border: 1px solid #BA68C8;
+}
+
+.cruz-del-sur-tablita {
+    background: linear-gradient(to bottom, #0D47A1, #002171);
+    border: 1px solid #42A5F5;
+}
+
+.logistica-texto {
+    display: none;
+}
+
+.logistica-contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* FIN CIRCULOS LOGISTICA */

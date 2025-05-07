@@ -1,6 +1,5 @@
-// Función para calcular y actualizar los totales
+// CALCULO DE TOTALES
 function actualizarTotales() {
-    // Inicializar contadores
     let totalAndreani = 0, totalAndesmar = 0, totalOCA = 0, totalCDS = 0;
     let bultosAndreani = { bigger: 0, paqueteria: 0 };
     let bultosAndesmar = 0, bultosOCA = 0, bultosCDS = 0;
@@ -25,7 +24,7 @@ function actualizarTotales() {
             if (seguimiento.startsWith('36')) {
                 bultosAndreani.paqueteria += bultos; // Incrementar bultos de paquetería
             } else if (seguimiento.startsWith('40')) {
-                bultosAndreani.bigger += bultos; // Incrementar bultos más grandes
+                bultosAndreani.bigger += bultos; // Incrementar bultos bigger
             }
 
             montoAndreani += valorNumerico;
@@ -76,8 +75,8 @@ function formatearPesos2(valor) {
     // Devolver el resultado final
     return `$ ${parteEnteraFormateada}${parteDecimalFormateada}`;
 }
+// FIN CALCULO DE TOTALES
 
-// Ejecutar la función al cargar la página y después de agregar datos a la tabla
 window.onload = async () => {
     cargarDespachos(); 
 };
@@ -106,9 +105,52 @@ function cargarDespachos() {
 function agregarFilaTabla(remito, despacho) {
     const fecha = new Date(despacho.fecha).toLocaleString('es-AR');
     const row = document.createElement('tr');
+
+    // Crear el contenedor para el texto y el círculo
+    const logisticaDiv = document.createElement('div');
+    logisticaDiv.classList.add('logistica-contenedor');
+
+    // Crear el círculo
+    let circuloDiv = document.createElement('div');
+    circuloDiv.classList.add('logistica-circulo');
+
+    let img = document.createElement('img');
+    const logistica = despacho.logistica;
+
+    switch (logistica) {
+        case 'Andreani':
+            circuloDiv.classList.add('andreani-tablita');
+            img.src = './Img/andreani-tini.png';
+            break;
+        case 'Andesmar':
+            circuloDiv.classList.add('andesmar-tablita');
+            img.src = './Img/andesmar-tini.png';
+            break;
+        case 'Oca':
+            circuloDiv.classList.add('oca-tablita');
+            img.src = './Img/oca-tini.png';
+            break;
+        case 'Cruz del Sur':
+            circuloDiv.classList.add('cruz-del-sur-tablita');
+            img.src = './Img/Cruz-del-Sur-tini.png';
+            break;
+        default:
+            return;
+    }
+
+    circuloDiv.appendChild(img);
+
+    // Crear un span para el texto de logística y ocultarlo
+    const logisticaTexto = document.createElement('span');
+    logisticaTexto.textContent = logistica; // Agregar el texto de logística
+    logisticaTexto.classList.add('logistica-texto'); // Clase para aplicar estilos
+
+    logisticaDiv.appendChild(logisticaTexto); // Agregar el texto al contenedor
+    logisticaDiv.appendChild(circuloDiv); // Agregar el círculo al contenedor
+
     row.innerHTML = `
         <td class="fecha-tabla-despacho">${fecha}</td>
-        <td class="logistica-tabla-despacho">${despacho.logistica}</td>
+        <td class="logistica-tabla-despacho"></td> <!-- Se dejará vacío para insertar el contenedor -->
         <td class="seguimiento-tabla-despacho">
             <a href="${getSeguimientoLink(despacho.logistica, despacho.etiqueta)}" target="_blank">${despacho.etiqueta}</a>
         </td>
@@ -122,6 +164,11 @@ function agregarFilaTabla(remito, despacho) {
             </button>
         </td>
     `;
+
+    // Insertar el contenedor en la celda correspondiente
+    const logisticaCell = row.querySelector('.logistica-tabla-despacho');
+    logisticaCell.appendChild(logisticaDiv);
+
     tablaBody.appendChild(row);
     actualizarTotales();
 }
@@ -352,23 +399,34 @@ inputValor.addEventListener('keydown', (e) => {
     }
 
     const row = document.createElement('tr');
+    const circuloDiv = crearCirculo(logistica); // Llama a la función para crear el círculo
+    
     row.innerHTML = `
       <td class="fecha-tabla-despacho">${fecha}</td>
-      <td class="logistica-tabla-despacho">${logistica}</td>
-      <td class="seguimiento-tabla-despacho"><a href="${seguimientoLink}" target="_blank">${logistica === 'Cruz del Sur' ? `NIC-${etiqueta}` : etiqueta}</a></td>
+      <td class="logistica-tabla-despacho"></td> <!-- Se dejará vacío para insertar el contenedor -->
+      <td class="seguimiento-tabla-despacho">
+          <a href="${seguimientoLink}" target="_blank">${logistica === 'Cruz del Sur' ? `NIC-${etiqueta}` : etiqueta}</a>
+      </td>
       <td class="bultos-tabla-despacho">${bultos}</td>
       <td class="remito-tabla-despacho">${remito}</td>
       <td class="valor-tabla-despacho">${valorFormateado}</td>
       <td class="info-tabla-despacho">OK</td>
       <td class="delete-tabla-despacho">
-        <button class="btn btn-danger btn-sm" onclick="confirmarEliminacion('${remito}')">
-                <i class="bi bi-trash3-fill"></i>
-        </button>
+          <button class="btn btn-danger btn-sm" onclick="confirmarEliminacion('${remito}')">
+              <i class="bi bi-trash3-fill"></i>
+          </button>
       </td>
     `;
+    
+    // Insertar el círculo en la celda correspondiente
+    const logisticaCell = row.querySelector('.logistica-tabla-despacho');
+    if (circuloDiv) {
+        logisticaCell.appendChild(circuloDiv);
+    }
+    
     tablaBody.prepend(row);
-    actualizarTotales();
-
+    actualizarTotales();    
+    
     // Reset
     inputRemito.value = '';
     inputEtiqueta.value = '';
@@ -378,6 +436,53 @@ inputValor.addEventListener('keydown', (e) => {
     inputBultos.disabled = false;
     inputRemito.focus();
   }
+
+  function crearCirculo(logistica) {
+    if (!logistica) return null;
+
+    // Crear el contenedor principal
+    const logisticaDiv = document.createElement('div');
+    logisticaDiv.classList.add('logistica-contenedor');
+
+    // Crear el span con el texto
+    const logisticaTexto = document.createElement('span');
+    logisticaTexto.textContent = logistica;
+    logisticaTexto.classList.add('logistica-texto'); // Clase opcional para estilo
+    logisticaDiv.appendChild(logisticaTexto);
+
+    // Crear el círculo con la imagen
+    const circuloDiv = document.createElement('div');
+    circuloDiv.classList.add('logistica-circulo');
+
+    const img = document.createElement('img');
+
+    switch (logistica) {
+        case 'Andreani':
+            circuloDiv.classList.add('andreani-tablita');
+            img.src = './Img/andreani-tini.png';
+            break;
+        case 'Andesmar':
+            circuloDiv.classList.add('andesmar-tablita');
+            img.src = './Img/andesmar-tini.png';
+            break;
+        case 'Oca':
+            circuloDiv.classList.add('oca-tablita');
+            img.src = './Img/oca-tini.png';
+            break;
+        case 'Cruz del Sur':
+            circuloDiv.classList.add('cruz-del-sur-tablita');
+            img.src = './Img/Cruz-del-Sur-tini.png';
+            break;
+        default:
+            return null;
+    }
+
+    circuloDiv.appendChild(img);
+    circuloDiv.classList.add('logistica-circulo-oculto'); // Ocultar círculo si es necesario
+    logisticaDiv.appendChild(circuloDiv);
+
+    return logisticaDiv;
+}
 });
 
 // Función para limpiar el feedback de validación
