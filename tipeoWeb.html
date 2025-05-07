@@ -247,23 +247,36 @@
   </div>  
   <!-- FIN CONTENEDORES TIPEO -->
 
+  <style>
+    .table th, .table td {
+    white-space: nowrap;
+    }
+
+    .table i {
+        margin-right: 5px;
+    }
+  </style>
+
 <!-- TABLA -->
-<table class="table table-bordered table-striped">
-    <thead class="thead-dark">
-        <tr>
-        <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
-        <th><i class="bi bi-truck"></i></th>
-        <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
-        <th><i class="bi bi-box-seam"></i> Bultos</th>
-        <th><i class="bi bi-receipt"></i> Remito</th>
-        <th><i class="bi bi-cash"></i> Valor</th>
-        <th><i class="bi bi-info-circle"></i> Info</th>
-        <th><i class="bi bi-trash3-fill"></i></th>
-        </tr>
-    </thead>
-    <tbody id="tabla-despacho-body">
-    </tbody>
-</table>
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
+                <th><i class="bi bi-truck"></i></th>
+                <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
+                <th><i class="bi bi-box-seam"></i> Bultos</th>
+                <th><i class="bi bi-receipt"></i> Remito</th>
+                <th><i class="bi bi-cash"></i> Valor</th>
+                <th><i class="bi bi-info-circle"></i> Info</th>
+                <th><i class="bi bi-trash3-fill"></i></th>
+            </tr>
+        </thead>
+        <tbody id="tabla-despacho-body">
+            <!-- Aquí se llenarán las filas dinámicamente -->
+        </tbody>
+    </table>
+</div>
 <!-- TABLA -->
 
 <!-- SPINNER -->

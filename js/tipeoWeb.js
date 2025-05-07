@@ -152,13 +152,20 @@ function agregarFilaTabla(remito, despacho) {
         <td class="fecha-tabla-despacho">${fecha}</td>
         <td class="logistica-tabla-despacho"></td> <!-- Se dejará vacío para insertar el contenedor -->
         <td class="seguimiento-tabla-despacho">
-            <a href="${getSeguimientoLink(despacho.logistica, despacho.etiqueta)}" target="_blank">${etiquetaConPrefijo}</a>        
+            <div class="seguimiento-contenedor">
+                <a href="${getSeguimientoLink(despacho.logistica, despacho.etiqueta)}" target="_blank">
+                    ${etiquetaConPrefijo} 
+                    <i class="bi bi-box-arrow-up-right"></i>
+                </a>
+            </div>
         </td>
         <td class="bultos-tabla-despacho">
         <div class="bultos-box" data-bultos="${despacho.bultos}">${despacho.bultos}</div>
         </td>
         <td class="remito-tabla-despacho">${remito}</td>
-        <td class="valor-tabla-despacho">${despacho.valor}</td>
+        <td>
+            <div class="valor-tabla-despacho">${despacho.valor}</div>
+        </td>
         <td class="info-tabla-despacho">OK</td>
         <td class="delete-tabla-despacho">
             <button class="btn btn-danger btn-sm" onclick="confirmarEliminacion('${remito}')">
@@ -469,13 +476,20 @@ inputValor.addEventListener('keydown', (e) => {
       <td class="fecha-tabla-despacho">${fecha}</td>
       <td class="logistica-tabla-despacho"></td> <!-- Se dejará vacío para insertar el contenedor -->
       <td class="seguimiento-tabla-despacho">
-          <a href="${seguimientoLink}" target="_blank">${etiquetaConPrefijo}</a>
+        <div class="seguimiento-contenedor">
+            <a href="${getSeguimientoLink(logistica, etiqueta)}" target="_blank">
+                ${etiquetaConPrefijo} 
+                <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+        </div>
       </td>
       <td class="bultos-tabla-despacho">
       <div class="bultos-box" data-bultos="${bultos}">${bultos}</div>
       </td>
       <td class="remito-tabla-despacho">${remito}</td>
-      <td class="valor-tabla-despacho">${valorFormateado}</td>
+      <td>
+            <div class="valor-tabla-despacho">${valorFormateado}</div>
+      </td>
       <td class="info-tabla-despacho">OK</td>
       <td class="delete-tabla-despacho">
           <button class="btn btn-danger btn-sm" onclick="confirmarEliminacion('${remito}')">
