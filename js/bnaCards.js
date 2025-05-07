@@ -2017,7 +2017,7 @@ COMPRA CON USO DE PUNTOS BNA
                                 ''
                             }
                             ${data[i].diaPlaceIt ? 
-                                `<div>Se entrega con PlaceIt entre ${data[i].diaPlaceIt}</div>` : 
+                                `<div>PlaceIt: Se entrega entre ${data[i].diaPlaceIt}</div>` : 
                                 ''
                             }
                         </div>
