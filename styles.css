@@ -8121,3 +8121,61 @@ img.gray-filter {
     justify-content: center;
 }
 /* FIN CIRCULOS LOGISTICA */
+
+/* BULTOS LOGISTICA */
+.bultos-tabla-despacho .bultos-box {
+    padding: 6px 12px 6px 38px; /* espacio para el ícono */
+    border: 1px solid;
+    border-radius: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
+    text-align: left;
+    display: inline-block;
+    min-width: 50px;
+    font-size: 15px;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+  
+  /* Círculo + emoji */
+  .bultos-tabla-despacho .bultos-box::before {
+    content: "✔️";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    width: 22px;
+    height: 22px;
+    background-color: #ccc;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: normal;
+  }
+  
+  /* Estilo para bultos = 1 */
+  .bultos-tabla-despacho .bultos-box[data-bultos="1"] {
+    background-color: #f2f2f2;
+    color: #333;
+    border-color: #999;
+  }
+  .bultos-tabla-despacho .bultos-box[data-bultos="1"]::before {
+    content: "➖";
+    background-color: lightgray; /* verde */
+    color: #fff;
+  }
+  
+  /* Estilo para bultos > 1 */
+  .bultos-tabla-despacho .bultos-box[data-bultos]:not([data-bultos="1"]) {
+    background-color: #ffe6e6;
+    color: #a00000;
+    border-color: #d00000;
+  }
+  .bultos-tabla-despacho .bultos-box[data-bultos]:not([data-bultos="1"])::before {
+    content: "➕";
+    background-color: #ec91a1;
+    color: #fff;
+  }
+/* FIN BULTOS LOGISTICA */

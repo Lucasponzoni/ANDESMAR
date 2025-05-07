@@ -152,8 +152,11 @@ function agregarFilaTabla(remito, despacho) {
         <td class="fecha-tabla-despacho">${fecha}</td>
         <td class="logistica-tabla-despacho"></td> <!-- Se dejará vacío para insertar el contenedor -->
         <td class="seguimiento-tabla-despacho">
-            <a href="${getSeguimientoLink(despacho.logistica, despacho.etiqueta)}" target="_blank">${etiquetaConPrefijo}</a>        </td>
-        <td class="bultos-tabla-despacho">${despacho.bultos}</td>
+            <a href="${getSeguimientoLink(despacho.logistica, despacho.etiqueta)}" target="_blank">${etiquetaConPrefijo}</a>        
+        </td>
+        <td class="bultos-tabla-despacho">
+        <div class="bultos-box" data-bultos="${despacho.bultos}">${despacho.bultos}</div>
+        </td>
         <td class="remito-tabla-despacho">${remito}</td>
         <td class="valor-tabla-despacho">${despacho.valor}</td>
         <td class="info-tabla-despacho">OK</td>
@@ -163,7 +166,7 @@ function agregarFilaTabla(remito, despacho) {
             </button>
         </td>
     `;
-
+      
     // Insertar el contenedor en la celda correspondiente
     const logisticaCell = row.querySelector('.logistica-tabla-despacho');
     logisticaCell.appendChild(logisticaDiv);
@@ -468,7 +471,9 @@ inputValor.addEventListener('keydown', (e) => {
       <td class="seguimiento-tabla-despacho">
           <a href="${seguimientoLink}" target="_blank">${etiquetaConPrefijo}</a>
       </td>
-      <td class="bultos-tabla-despacho">${bultos}</td>
+      <td class="bultos-tabla-despacho">
+      <div class="bultos-box" data-bultos="${bultos}">${bultos}</div>
+      </td>
       <td class="remito-tabla-despacho">${remito}</td>
       <td class="valor-tabla-despacho">${valorFormateado}</td>
       <td class="info-tabla-despacho">OK</td>
@@ -478,7 +483,7 @@ inputValor.addEventListener('keydown', (e) => {
           </button>
       </td>
     `;
-    
+
     // Insertar el círculo en la celda correspondiente
     const logisticaCell = row.querySelector('.logistica-tabla-despacho');
     if (circuloDiv) {
