@@ -1,4 +1,4 @@
-// Cargar datos de Firebase al cargar la página
+// RENDERIZADO DE FILAS EN LA TABLA
 window.onload = () => {
     cargarDespachos();
 };
@@ -37,6 +37,11 @@ function agregarFilaTabla(remito, despacho) {
         <td class="remito-tabla-despacho">${remito}</td>
         <td class="valor-tabla-despacho">${despacho.valor}</td>
         <td class="info-tabla-despacho">OK</td>
+        <td class="delete-tabla-despacho">
+            <button class="btn btn-danger btn-sm" onclick="confirmarEliminacion('${remito}')">
+                <i class="bi bi-trash3-fill"></i>
+            </button>
+        </td>
     `;
     tablaBody.appendChild(row);
 }
@@ -65,6 +70,52 @@ function getSeguimientoLink(logistica, etiqueta) {
             return '#';
     }
 }
+
+// Confirmar eliminación del despacho
+function confirmarEliminacion(remito) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "No podrás deshacer esta acción.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, borrar',
+        cancelButtonText: 'No, cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            eliminarDespacho(remito);
+        }
+    });
+}
+
+// Eliminar despacho de Firebase y de la tabla
+function eliminarDespacho(remito) {
+    dbTipeo.ref(`despachosDelDia/${remito}`).remove()
+        .then(() => {
+            // Eliminar la fila de la tabla
+            const filas = document.querySelectorAll('#tabla-despacho-body tr');
+            filas.forEach((fila) => {
+                if (fila.querySelector('.remito-tabla-despacho').textContent === remito) {
+                    fila.remove();
+                }
+            });
+            Swal.fire(
+                'Borrado!',
+                'El despacho ha sido eliminado.',
+                'success'
+            );
+        })
+        .catch((error) => {
+            console.error("Error al eliminar despacho:", error);
+            Swal.fire(
+                'Error!',
+                'No se pudo eliminar el despacho.',
+                'error'
+            );
+        });
+}
+// FIN RENDERIZADO DE FILAS EN LA TABLA
 
 // TIPEO DE DESPACHO
 const inputRemito = document.getElementById('inputRemito');
@@ -229,6 +280,11 @@ inputValor.addEventListener('keydown', (e) => {
       <td class="remito-tabla-despacho">${remito}</td>
       <td class="valor-tabla-despacho">${valorFormateado}</td>
       <td class="info-tabla-despacho">OK</td>
+      <td class="delete-tabla-despacho">
+        <button class="btn btn-danger btn-sm" onclick="confirmarEliminacion('${remito}')">
+                <i class="bi bi-trash3-fill"></i>
+        </button>
+      </td>
     `;
     tablaBody.prepend(row);
 
