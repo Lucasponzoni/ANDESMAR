@@ -78,7 +78,7 @@ function formatearPesos2(valor) {
 // FIN CALCULO DE TOTALES
 
 // IMPRESION DE TABLA
-async function imprimirTabla() {
+function imprimirTabla() {
     const now = new Date();
     const fechaHoraStr = now.toLocaleString('es-AR', {
         year: 'numeric',
@@ -113,20 +113,14 @@ async function imprimirTabla() {
 
     const contenedor = $('<div></div>').append(contenido);
 
-    // 🔁 Convertir imágenes a base64 dentro del contenido
-    const imgElements = contenedor.find('img');
-    for (let i = 0; i < imgElements.length; i++) {
-        const img = imgElements[i];
-        const src = img.getAttribute('src');
-        if (src && !src.startsWith('data:')) {
-            try {
-                const base64 = await getImageAsBase64(src);
-                img.setAttribute('src', base64);
-            } catch (e) {
-                console.warn(`No se pudo convertir la imagen: ${src}`, e);
-            }
+    // 🖼️ Reforzar el src absoluto de imágenes para asegurar carga
+    contenedor.find('img').each(function () {
+        let src = $(this).attr('src');
+        if (src && !src.startsWith('http') && !src.startsWith('/')) {
+            // Asume ruta relativa a la raíz del sitio
+            $(this).attr('src', window.location.origin + '/' + src.replace('./', ''));
         }
-    }
+    });
 
     contenedor.printThis({
         importCSS: true,
@@ -143,16 +137,6 @@ async function imprimirTabla() {
     });
 
     ultimaColumna.show();
-}
-
-function getImageAsBase64(imgSrc) {
-    return fetch(imgSrc)
-        .then(res => res.blob())
-        .then(blob => new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.readAsDataURL(blob);
-        }));
 }
 // FIN IMPRESION DE TABLA
 
