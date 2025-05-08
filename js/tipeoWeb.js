@@ -1411,3 +1411,141 @@ document.getElementById('EmailBody').addEventListener('click', function(event) {
     }
 });
 // FIN MODAL EMAILS
+
+// DESCARGAR TABLA EN EXCEL
+function descargarTablaExcel() {
+    const modalTitle = document.getElementById('modalDespachoPorLogisticaLabel').innerText;
+    const transportista = modalTitle.split('-')[1].trim();
+    const fechaHora = new Date().toLocaleString();
+    const nombreArchivo = `Datos de Despacho - ${transportista} ${fechaHora}.xlsx`;
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Datos de Despacho');
+
+    const headers = ['Fecha y hora', 'Transporte', 'Seguimiento', 'Bultos', 'Remito', 'Valor', 'Info'];
+    worksheet.addRow(headers);
+
+    const borderStyle = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+    };
+
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: 'FF000000' }, name: "Arial", size: 12 };
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFBFBFBF' }
+        };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = borderStyle;
+    });
+    headerRow.height = 25;
+
+    const filas = document.querySelectorAll('#tabla-despacho-xLogistica-body tr');
+    filas.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        const rowData = [];
+
+        celdas.forEach((celda, index) => {
+            if (index === 1) {
+                // Transporte
+                rowData.push(transportista);
+            } else if (index < celdas.length - 1) {
+                if (index === 2) {
+                    const link = celda.querySelector('a');
+                    if (link) {
+                        rowData.push({
+                            text: link.innerText.trim(),
+                            hyperlink: link.href
+                        });
+                    } else {
+                        rowData.push(celda.innerText.trim());
+                    }
+                } else {
+                    rowData.push(celda.innerText.trim());
+                }
+            }
+        });
+
+        const nuevaFila = worksheet.addRow(rowData);
+
+        // Colores según transportista
+        let colorTransporte = 'FFFFFFFF'; // blanco por defecto
+        if (transportista === 'Andreani') colorTransporte = 'FFFFE0E0';       // rojo claro
+        else if (transportista === 'Andesmar') colorTransporte = 'FFB2EBF2';  // celeste claro
+        else if (transportista === 'Cruz del Sur') colorTransporte = 'FF90CAF9'; // azul claro
+        else if (transportista === 'Oca') colorTransporte = 'FFE6E6FA';       // lila claro
+
+        // Aplicar color al campo "Transporte" (columna 2)
+        const transporteCell = nuevaFila.getCell(2);
+        transporteCell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: colorTransporte }
+        };
+
+        // Aplicar color al campo "Bultos" (columna 4) si es mayor a 1
+        const bultosCell = nuevaFila.getCell(4);
+        const bultos = parseInt(bultosCell.value);
+        if (!isNaN(bultos) && bultos > 1) {
+            bultosCell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFF0F0' } // rojo claro para bultos > 1
+            };
+        }
+
+        // Estilo de hipervínculo en columna 3 si lo hay
+        const seguimientoCell = nuevaFila.getCell(3);
+        if (typeof seguimientoCell.value === 'object' && seguimientoCell.value.hyperlink) {
+            seguimientoCell.font = {
+                color: { argb: 'FF0000FF' }, // azul
+                underline: true
+            };
+        }
+    });
+
+    // Bordes y alineación a todas las celdas
+    const lastRow = worksheet.lastRow.number;
+    for (let rowNumber = 1; rowNumber <= lastRow; rowNumber++) {
+        const row = worksheet.getRow(rowNumber);
+        row.eachCell(cell => {
+            cell.border = borderStyle;
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        });
+    }
+
+    // Autoajustar ancho
+    worksheet.columns.forEach(column => {
+        let maxLength = 0;
+        column.eachCell({ includeEmpty: true }, cell => {
+            if (cell.value) {
+                const value = typeof cell.value === 'object' ? cell.value.text : cell.value;
+                maxLength = Math.max(maxLength, value.toString().length);
+            }
+        });
+        column.width = maxLength + 2;
+    });
+
+    // Filtro y congelar cabecera
+    worksheet.autoFilter = {
+        from: { row: 1, column: 1 },
+        to: { row: 1, column: headers.length }
+    };
+    worksheet.views = [{ state: 'frozen', ySplit: 1 }];
+
+    workbook.xlsx.writeBuffer().then(buffer => {
+        const blob = new Blob([buffer], { type: 'application/octet-stream' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = nombreArchivo;
+        link.click();
+    }).catch(error => {
+        console.error('Error al generar el archivo Excel:', error);
+    });
+}
+// FIN DESCARGAR TABLA EN EXCEL
