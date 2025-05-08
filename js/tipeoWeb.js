@@ -132,47 +132,40 @@ function imprimirTabla() {
         contenido.append(pie);
     }
 
-    // Reemplazar logos en la tabla clonada con círculo negro de fondo
     contenido.find('.logistica-tabla-despacho').each(function () {
         const original = $(this);
         const texto = original.find('.logistica-texto').text().trim().toLowerCase();
-
-        let claseLogo = '', src = '';
+    
+        let src = '';
         if (texto === 'andreani') {
-            claseLogo = 'andreani-tablita';
-            src = 'https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Logisticas%2Fandreani-tini.png?alt=media&token=1cbaa3f8-9d2f-48b7-82e6-9106b129f95b';
+            src = './Img/andreani-tini.png';
         } else if (texto === 'andesmar') {
-            claseLogo = 'andesmar-tablita';
-            src = 'https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Logisticas%2Fandesmar-tini.png?alt=media&token=8245eda2-faca-4552-b81d-656b7e6b2320';
+            src = './Img/andesmar-tini.png';
         } else if (texto === 'oca') {
-            claseLogo = 'oca-tablita';
-            src = 'https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Logisticas%2Foca-tini.png?alt=media&token=4c117d20-9ffc-4c35-a22a-fed0a061d1cb';
+            src = './Img/oca-tini.png';
         } else if (texto === 'cruz del sur') {
-            claseLogo = 'cruz-del-sur-tablita';
-            src = 'https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Logisticas%2FCruz-del-Sur-tini.png?alt=media&token=3a10c61b-5d85-453e-b476-6ad489bfaac0';
+            src = './Img/Cruz-del-Sur-tini.png';
         }
-
-        if (claseLogo && src) {
+    
+        if (src) {
             const nuevoLogo = `
-                <div class="logistica-contenedor" style="display: flex; align-items: center; gap: 6px;">
-                    <span class="logistica-texto" style="text-transform: capitalize;">${texto}</span>
-                    <div style="
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 50%;
-                        border: 2px solid #000;
-                        background-color: black;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    ">
-                        <img src="${src}" style="width: 22px; height: auto; filter: invert(1);">
-                    </div>
+                <div style="
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    border: 2px solid #000;
+                    background-color: black;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: auto;
+                ">
+                    <img src="${src}" style="width: 22px; height: auto; filter: invert(1);">
                 </div>
             `;
             original.html(nuevoLogo);
         }
-    });
+    });    
 
     // Contenedor para imprimir
     const contenedor = $('<div></div>').append(contenido);
