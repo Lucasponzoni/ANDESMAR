@@ -368,9 +368,11 @@
         <div class="modal-content">
             <div class="modal-header sku-modal-header">
                 <h5 class="modal-title sku-modal-title" id="modalDespachoPorLogisticaLabel">Datos de Despacho</h5>
-                <button id="btnImprimirTabla" class="btn btn-outline-dark me-2" onclick="imprimirTabla()">🖨️ Imprimir</button>
                 <button type="button" class="btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
-            </div>            
+            </div>    
+            <div class="modal-footer" style="margin-bottom: -45px; z-index: 1000;">
+                <button id="btnImprimirTabla" class="btn btn-outline-dark me-2" onclick="imprimirTabla()">🖨️ Imprimir</button>
+            </div>        
             <div class="modal-body">
                 <div id="spinnerPorLogistica" class="spinner-border text-primary" role="status" style="display: none; margin: auto; width: 3rem; height: 3rem;"></div>                    
                 <div class="table-responsive" id="tabla-container-xLogistica" style="display: none;">
@@ -410,9 +412,6 @@
                     </div>                                      
 
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
