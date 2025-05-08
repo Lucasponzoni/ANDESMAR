@@ -1282,7 +1282,8 @@ document.getElementById('remitoLogistica').addEventListener('keypress', function
         const remitoValue = this.value;
 
         // Verificar si el remito es válido
-        if (/^23[0-9]\d{8}$/.test(remitoValue)) {
+        if (/^(23|83)[0-9]\d{7,8}$/.test(remitoValue))
+            {
             // Buscar en Firebase
             db.ref('DespachosLogisticos').orderByChild('remito').equalTo(remitoValue).once('value', snapshot => {
                 if (snapshot.exists()) {
@@ -1628,7 +1629,7 @@ function confirmarLogistica() {
         return;
     }
 
-    if (!/^(230|231|232|233|234|235|236|237|238|239)\d{8}$/.test(remito)) {
+    if (!/^(83|230|231|232|233|234|235|236|237|238|239)\d{8}$/.test(remito)) {
         Swal.fire('Error', 'El valor ingresado no corresponde a un remito válido.', 'error');
         return;
     }
