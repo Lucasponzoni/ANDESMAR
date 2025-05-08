@@ -1421,6 +1421,38 @@ try {
     showAlertErrorPosventa(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${horaSubida}`);
 }
 }
+
+async function obtenerCorreosPorLogistica(logistica) {
+  const rutaCorreos = `Emails${logistica.charAt(0).toUpperCase() + logistica.slice(1)}`;
+  const snapshot = await dbTipeo.ref(rutaCorreos).once('value');
+  const correos = [];
+
+  snapshot.forEach(child => {
+      correos.push(child.val());
+  });
+
+  return correos;
+}
+
+function generarCuerpoEmail(tablaBody) {
+  let cuerpoEmail = '<table style="width: 100%; border-collapse: collapse;">';
+  cuerpoEmail += '<tr><th>Fecha/Hora</th><th>Camión</th><th>Seguimiento</th><th>Bultos</th><th>Remito</th><th>Valor</th><th>Info</th></tr>';
+
+  const filas = tablaBody.querySelectorAll('tr');
+  filas.forEach(fila => {
+      cuerpoEmail += '<tr>';
+      const columnas = fila.querySelectorAll('td');
+      columnas.forEach(columna => {
+          cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px;">${columna.textContent.trim()}</td>`;
+      });
+      cuerpoEmail += '</tr>';
+  });
+
+  cuerpoEmail += '</table>';
+  return cuerpoEmail;
+}
+
+
 // FIN ENVIAR EMAIL CON VENTAS CANCELADAS
 
 // ALERT EMAIL

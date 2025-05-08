@@ -236,7 +236,7 @@ function cargarDespachosPorLogistica(logistica, tablaBody, spinner, tablaContain
     });
 }
 
-function finalizarColecta() {
+async function finalizarColecta() {
     const tablaBody = document.getElementById('tabla-despacho-xLogistica-body');
     const filas = tablaBody.querySelectorAll('tr');
     if (filas.length === 0) {
@@ -293,6 +293,8 @@ function finalizarColecta() {
                 }
             </style>
             <div class="macos-header">📋 Información del Transportista 🚛</div>
+            <input id="cantidadDePallets" class="swal2-input" placeholder="🪵Pallets utilizados" required>
+            <hr>
             <input id="nombreTransportista" class="swal2-input" placeholder="👤 Nombre del transportista" required>
             <input id="dniTransportista" class="swal2-input" placeholder="🪪 DNI del transportista" required>
             <input id="marcaCamion" class="swal2-input" placeholder="🚚 Marca del camión" required>
@@ -324,16 +326,18 @@ function finalizarColecta() {
             document.getElementById('nombreTransportista').focus();
         },
         preConfirm: () => {
+            const pallets = document.getElementById('cantidadDePallets').value;
             const nombre = document.getElementById('nombreTransportista').value;
             const dni = document.getElementById('dniTransportista').value;
             const marcaCamion = document.getElementById('marcaCamion').value;
             const patenteCamion = document.getElementById('patenteCamion').value;
-    
-            if (!nombre || !dni || !marcaCamion || !patenteCamion) {
+
+            if (!pallets || !nombre || !dni || !marcaCamion || !patenteCamion) {
                 Swal.showValidationMessage('⚠️ Por favor, completá todos los campos obligatorios.');
             }
-    
+
             return {
+                pallets,
                 nombre,
                 dni,
                 marcaCamion,
@@ -342,7 +346,7 @@ function finalizarColecta() {
                 patenteChasis: document.getElementById('patenteChasis').value
             };
         }  
-    }).then((result) => {
+    }).then(async (result) => {
         $('#modalDespachoPorLogistica').modal('show');
 
         filas.forEach(fila => {
@@ -351,7 +355,8 @@ function finalizarColecta() {
         });
 
         if (result.isConfirmed) {
-            const { nombre, dni, marcaCamion, patenteCamion } = result.value;
+            const { pallets, nombre, dni, marcaCamion, patenteCamion } = result.value;
+            const Totalpallets = document.getElementById('cantidadDePallets').value || '';
             const marcaChasis = document.getElementById('marcaChasis').value || '';
             const patenteChasis = document.getElementById('patenteChasis').value || '';
             const fechaHoy = new Date();
@@ -408,7 +413,7 @@ function finalizarColecta() {
                     });
                 });
 
-                Promise.all(promises).then(() => {
+                Promise.all(promises).then(async () => {
                     // Guardar los remitos directamente bajo el camión
                     despachos.forEach(despacho => {
                         const remito = despacho.remito;
@@ -430,6 +435,7 @@ function finalizarColecta() {
                         viaje: "Alvear, Santa Fe",
                         planta: logisticaActual,
                         kmArecorrer: "Varios",
+                        pallets: Totalpallets,
                         claseDeMercaderia: "ELECTRODOMESTICOS"
                     };
 
@@ -444,6 +450,14 @@ function finalizarColecta() {
 
                     if (carpetaLogistica) {
                         dbTipeo.ref(`${carpetaLogistica}/${fechaFormateada}/${nuevoCamion}/`).set(viajeData);
+                    }
+
+                    // Enviar correos electrónicos
+                    const correos = await obtenerCorreosPorLogistica(logisticaActual);
+                    const emailBody = generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpallets);
+
+                    for (const destinatarioEmail of correos) {
+                        await enviarCorreoConDetalles(destinatarioEmail, destinatarioEmail.split('@')[0], `Logística: ${logisticaActual}, Camión: ${nuevoCamion}, Fecha: ${fechaFormateada}`, new Date().toLocaleString(), emailBody);
                     }
 
                     Swal.fire({
@@ -471,6 +485,204 @@ function finalizarColecta() {
     });
 }
 
+async function enviarCorreoConDetalles(destinatarioEmail, nombreDestinatario, nombreTanda, horaSubida, emailBody) {
+    const fecha = new Date().toLocaleDateString();
+    const Subject = `📦NOVOGAR: LogiPaq - ${nombreTanda}`;
+    const smtpU = 's154745_3';
+    const smtpP = 'QbikuGyHqJ';
+
+    const emailData = {
+        "Html": {
+            "DocType": null,
+            "Head": null,
+            "Body": emailBody,
+            "BodyTag": "<body>"
+        },
+        "Text": "",
+        "Subject": Subject,
+        "From": {
+            "Name": "Posventa Novogar",
+            "Email": "posventa@novogar.com.ar"
+        },
+        "To": [
+            {
+                "Name": nombreDestinatario,
+                "Email": destinatarioEmail
+            }
+        ],
+        "Cc": [],
+        "Bcc": ["webnovagar@gmail.com", "posventa@novogar.com.ar"],
+        "CharSet": "utf-8",
+        "User": {
+            "Username": smtpU,
+            "Secret": smtpP,
+        }
+    };
+
+    try {
+        const response = await fetch('https://proxy.cors.sh/https://send.mailup.com/API/v2.0/messages/sendmessage', {
+            method: 'POST',
+            headers: {
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(emailData)
+        });
+
+        const result = await response.json();
+        if (result.Status === 'done') {
+            console.log(`Email enviado a ${destinatarioEmail}, Motivo: ${nombreTanda}`);
+            showAlertPosventa(`Email enviado a ${destinatarioEmail}, Motivo: ${nombreTanda}`);
+        } else {
+            console.log(`Error al enviar el email: ${result.Message}`);
+            showAlertErrorPosventa(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${horaSubida}`);
+        }
+    } catch (error) {
+        console.error('Error al enviar el email:', error);
+        showAlertErrorPosventa(`<i class="bi bi-exclamation-square-fill"></i> Error al enviar email a ${destinatarioEmail} a las ${horaSubida}`);
+    }
+}
+
+function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpallets) {
+    let totalBultos = 0;
+    let totalBultosBigger = 0;
+    let totalBultosPaqueteria = 0;
+    let totalEtiquetas = 0;
+    let totalValor = 0;
+
+    const filas = tablaBody.querySelectorAll('tr');
+    totalEtiquetas = filas.length; // Total de filas
+
+    filas.forEach(fila => {
+        const columnas = fila.querySelectorAll('td');
+        const bultos = parseInt(columnas[3].textContent.trim());
+        const valor = parseFloat(columnas[5].textContent.replace(/[$.]/g, '').replace(',', '.').trim());
+
+        totalBultos += bultos;
+        totalValor += valor;
+
+        // Contar bultos según el tipo para Andreani
+        if (logisticaActual === 'Andreani') {
+            if (columnas[2].textContent.trim().startsWith('40')) {
+                totalBultosBigger += bultos;
+            } else if (columnas[2].textContent.trim().startsWith('36')) {
+                totalBultosPaqueteria += bultos;
+            }
+        }
+    });
+
+    let cuerpoEmail = `
+    <div style="margin-bottom: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <h2 style="color: #007aff; text-align: center;">Detalles de Envío 📦</h2>
+        <div style="background-color: #e0f7fa; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #b2ebf2;">
+            <strong>Total de Etiquetas:</strong> <strong style="color: #007aff;">${totalEtiquetas} 🏷️</strong>
+        </div>
+        <div style="background-color: #ffe0b2; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #ffcc80;">
+            <strong>Total de Bultos:</strong> <strong style="color: #d32f2f;">${totalBultos} 📦</strong>
+        </div>
+        <div style="background-color: #d1c4e9; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #b39ddb;">
+            <strong>Valor Declarado:</strong> <strong style="color: #4a148c;">${montoFormateado} 💰</strong>
+        </div>
+        <hr>
+        <div style="background-color: #9B9B9BFF; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #828282FF;">
+            <strong>Pallets Utilizados:</strong> <strong style="color: #484848FF;">${Totalpallets} 🪵</strong>
+        </div>
+    </div>
+    `;
+
+    if (logisticaActual === 'Andreani') {
+        cuerpoEmail += `
+            <div style="margin-bottom: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <h3 style="color: #007aff; text-align: center;">Detalles de Bultos Andreani</h3>
+                <div style="background-color: #c8e6c9; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #a5d6a7;">
+                    <strong>Total Bultos Bigger:</strong> <strong style="color: #388e3c;">${totalBultosBigger} 📦</strong>
+                </div>
+                <div style="background-color: #ffccbc; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #ffab91;">
+                    <strong>Total Bultos Paquetería:</strong> <strong style="color: #d32f2f;">${totalBultosPaqueteria} 📦</strong>
+                </div>
+            </div>
+        `;
+    }
+
+    cuerpoEmail += `
+        <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <thead>
+                <tr style="background-color: #007aff; color: #ffffff;">
+                    <th style="border: 1px solid #ccc; padding: 8px;">Fecha/Hora</th>
+                    <th style="border: 1px solid #ccc; padding: 8px;">Camión</th>
+                    <th style="border: 1px solid #ccc; padding: 8px;">Seguimiento</th>
+                    <th style="border: 1px solid #ccc; padding: 8px;">Bultos</th>
+                    <th style="border: 1px solid #ccc; padding: 8px;">Remito</th>
+                    <th style="border: 1px solid #ccc; padding: 8px;">Valor</th>
+                    <th style="border: 1px solid #ccc; padding: 8px;">Info</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    filas.forEach(fila => {
+        cuerpoEmail += '<tr>';
+        const columnas = fila.querySelectorAll('td');
+
+        // Iterar solo hasta la penúltima columna para omitir la última
+        for (let index = 0; index < columnas.length - 1; index++) {
+            const columna = columnas[index];
+            if (index === 2) {
+                // Extraer el hipervínculo en la tercera columna
+                const link = columna.querySelector('a');
+                if (link) {
+                    cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px;"><a href="${link.href}" style="text-decoration: none; color: #007aff;">${link.textContent.trim()}</a></td>`;
+                } else {
+                    cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px;">${columna.textContent.trim()}</td>`;
+                }
+            } else if (index === 3) {
+                // Estilo para la columna "Bultos"
+                const bultos = parseInt(columna.textContent.trim());
+                const color = bultos === 1 ? 'gray' : 'red';
+                const textColor = 'white';
+                const textBold = 'bold';
+                cuerpoEmail += `
+                    <td style="border: 1px solid #ccc; padding: 8px;">
+                        <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${color}; display: inline-block; text-align: center; line-height: 20px; color: ${textColor}; font-weight: ${textBold};">
+                            ${bultos}
+                        </div>
+                    </td>
+                `;
+            } else if (index === 4) {
+                // Estilo para la columna "Remito"
+                const remito = columna.textContent.trim();
+                cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">${remito}</td>`;
+            } else if (index === 5) {
+                // Estilo para la columna "Valor"
+                const valor = columna.textContent.trim();
+                cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px; color: green; font-weight: bold;">${valor}</td>`;
+            } else {
+                cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px;">${columna.textContent.trim()}</td>`;
+            }
+        }
+        
+        cuerpoEmail += '</tr>';
+    });
+
+    cuerpoEmail += `
+            </tbody>
+        </table>
+    `;
+    return cuerpoEmail;
+}
+
+async function obtenerCorreosPorLogistica(logistica) {
+    const rutaCorreos = `Emails${logistica.charAt(0).toUpperCase() + logistica.slice(1)}`;
+    const snapshot = await dbTipeo.ref(rutaCorreos).once('value');
+    const correos = [];
+
+    snapshot.forEach(child => {
+        correos.push(child.val());
+    });
+
+    return correos;
+}
+
 function limpiarDespachosDelDia2() {
     dbTipeo.ref('despachosDelDia')
         .orderByChild('logistica')
@@ -482,6 +694,62 @@ function limpiarDespachosDelDia2() {
         });
 }
 // FIN RENDERIZADO DE TABLA POR LOGISTICA EN MODAL
+
+// ALERT EMAIL
+let alertCount = 0;
+
+function showAlertPosventa(message) {
+    const alertElement = document.createElement('div');
+    alertElement.className = 'alert';
+    alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
+    document.body.appendChild(alertElement);
+    alertElement.style.bottom = `${20 + alertCount * 70}px`;
+    setTimeout(() => {
+        alertElement.classList.add('show');
+    }, 10);
+    alertElement.querySelector('.close').onclick = () => {
+        closeAlert(alertElement);
+    };
+    setTimeout(() => {
+        closeAlert(alertElement);
+    }, 8000);
+    alertCount++;
+    }
+    
+    function showAlertErrorPosventa(message) {
+    const alertElement = document.createElement('div');
+    alertElement.className = 'alertError';
+    alertElement.innerHTML = `${message} <span class="close">&times;</span>`;
+    document.body.appendChild(alertElement);
+    alertElement.style.bottom = `${20 + alertCount * 70}px`;
+    setTimeout(() => {
+        alertElement.classList.add('show');
+    }, 10);
+    alertElement.querySelector('.close').onclick = () => {
+        closeAlert(alertElement);
+    };
+    setTimeout(() => {
+        closeAlert(alertElement);
+    }, 8000);
+    alertCount++;
+    }
+    
+    function closeAlert(alertElement) {
+    alertElement.classList.remove('show');
+    setTimeout(() => {
+        document.body.removeChild(alertElement);
+        alertCount--;
+        updateAlertPositions();
+    }, 300);
+    }
+
+    function updateAlertPositions() {
+        const alerts = document.querySelectorAll('.alert, .alertError');
+        alerts.forEach((alert, index) => {
+            alert.style.bottom = `${20 + index * 70}px`;
+        });
+    }
+// FIN ALERT EMAIL
 
 // RENDERIZADO DE FILAS EN LA TABLA
 window.onload = async () => {
