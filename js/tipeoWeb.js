@@ -80,6 +80,8 @@ function formatearPesos2(valor) {
 // IMPRESION DE TABLA
 function imprimirTabla() {
     const now = new Date();
+
+    // Fecha y hora en formato 24hs
     const fechaHoraStr = now.toLocaleString('es-AR', {
         year: 'numeric',
         month: '2-digit',
@@ -89,39 +91,93 @@ function imprimirTabla() {
         hour12: false
     });
 
+    // Asignar fecha de impresión a cada campo
     document.querySelectorAll('.fecha-impresion').forEach(el => {
         el.innerText = fechaHoraStr;
     });
 
+    // Obtener el título del modal
     const tituloModal = document.getElementById('modalDespachoPorLogisticaLabel')?.innerText.trim() || 'Impresión';
     const tituloFinal = `${tituloModal} - ${fechaHoraStr}`;
 
+    // Ocultar la última columna
     const tabla = $('#tabla-container-xLogistica');
     const ultimaColumna = tabla.find('tr').find('td:last-child, th:last-child');
     ultimaColumna.hide();
 
+    // Verificar si hay filas en la tabla
     const filas = tabla.find('tr').not(':empty');
+    console.log(filas.length); 
     if (filas.length === 0) {
         alert('No hay contenido para imprimir.');
         ultimaColumna.show();
-        return;
+        return; 
     }
 
+    const printFrames = window.frames; 
+    for (let i = 0; i < printFrames.length; i++) {
+        if (printFrames[i].document.body.innerHTML.includes("contenido imprimible")) {
+            printFrames[i].document.body.innerHTML = ''; 
+        }
+    }
+
+    // Clonar tabla + pie
     const contenido = tabla.clone();
     const pie = $('.pie-por-hoja-print').clone();
-    if (filas.length > 0) contenido.append(pie);
 
-    const contenedor = $('<div></div>').append(contenido);
 
-    // 🖼️ Reforzar el src absoluto de imágenes para asegurar carga
-    contenedor.find('img').each(function () {
-        let src = $(this).attr('src');
-        if (src && !src.startsWith('http') && !src.startsWith('/')) {
-            // Asume ruta relativa a la raíz del sitio
-            $(this).attr('src', window.location.origin + '/' + src.replace('./', ''));
+    // Solo agregar el pie si hay contenido
+    if (filas.length > 0) {
+        console.log('Añadiendo pie de página');
+        contenido.append(pie);
+    }
+
+    // Reemplazar logos en la tabla clonada con círculo negro de fondo
+    contenido.find('.logistica-tabla-despacho').each(function () {
+        const original = $(this);
+        const texto = original.find('.logistica-texto').text().trim().toLowerCase();
+
+        let claseLogo = '', src = '';
+        if (texto === 'andreani') {
+            claseLogo = 'andreani-tablita';
+            src = './Img/andreani-tini.png';
+        } else if (texto === 'andesmar') {
+            claseLogo = 'andesmar-tablita';
+            src = './Img/andesmar-tini.png';
+        } else if (texto === 'oca') {
+            claseLogo = 'oca-tablita';
+            src = './Img/oca-tini.png';
+        } else if (texto === 'cruz del sur') {
+            claseLogo = 'cruz-del-sur-tablita';
+            src = './Img/Cruz-del-Sur-tini.png';
+        }
+
+        if (claseLogo && src) {
+            const nuevoLogo = `
+                <div class="logistica-contenedor" style="display: flex; align-items: center; gap: 6px;">
+                    <span class="logistica-texto" style="text-transform: capitalize;">${texto}</span>
+                    <div style="
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        border: 2px solid #000;
+                        background-color: black;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <img src="${src}" style="width: 22px; height: auto; filter: invert(1);">
+                    </div>
+                </div>
+            `;
+            original.html(nuevoLogo);
         }
     });
 
+    // Contenedor para imprimir
+    const contenedor = $('<div></div>').append(contenido);
+
+    // Configuración de impresión
     contenedor.printThis({
         importCSS: true,
         importStyle: true,
@@ -136,6 +192,7 @@ function imprimirTabla() {
         debug: false
     });
 
+    // Mostrar la última columna nuevamente
     ultimaColumna.show();
 }
 // FIN IMPRESION DE TABLA
