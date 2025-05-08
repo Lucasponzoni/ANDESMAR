@@ -254,46 +254,94 @@ function finalizarColecta() {
     $('#modalDespachoPorLogistica').modal('hide');
 
     Swal.fire({
-        title: 'Información del Transportista 🚚',
+        title: '',
         html: `
             <style>
-                .swal2-input {
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                    padding: 10px;
-                    margin: 5px 0;
-                    font-size: 14px;
-                    width: 95%;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                }
-                .swal2-title {
-                    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                .macos-header {
+                    background: linear-gradient(135deg, #f2f2f7, #ffffff);
+                    padding: 15px;
+                    border-radius: 12px;
+                    margin-bottom: 20px;
+                    box-shadow: inset 0 -1px 0 rgba(0,0,0,0.05), 0 4px 10px rgba(0,0,0,0.06);
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
                     font-size: 18px;
+                    color: #1d1d1f;
+                    text-align: center;
+                    font-weight: 500;
+                }
+                .swal2-input {
+                    border: 1px solid #d1d1d1;
+                    border-radius: 8px;
+                    padding: 10px 14px;
+                    margin: 6px 0;
+                    font-size: 15px;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                    width: 100%;
+                    background-color: #f9f9f9;
+                    transition: border-color 0.2s;
+                }
+                .swal2-input:focus {
+                    border-color: #007aff;
+                    outline: none;
+                    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
                 }
                 .swal2-popup {
-                    border-radius: 10px;
-                    padding: 20px;
+                    border-radius: 14px;
+                    padding: 25px;
+                    background: #ffffff;
+                    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
                 }
             </style>
-            <input id="nombreTransportista" class="swal2-input" placeholder="Nombre del transportista" required>
-            <input id="dniTransportista" class="swal2-input" placeholder="DNI del transportista" required>
-            <input id="marcaCamion" class="swal2-input" placeholder="Marca del camión" required>
-            <input id="patenteCamion" class="swal2-input" placeholder="Patente del camión" required>
-            <input id="marcaChasis" class="swal2-input" placeholder="Marca del chasis (Si posee)">
-            <input id="patenteChasis" class="swal2-input" placeholder="Patente del chasis (Si posee)">
+            <div class="macos-header">📋 Información del Transportista 🚛</div>
+            <input id="nombreTransportista" class="swal2-input" placeholder="👤 Nombre del transportista" required>
+            <input id="dniTransportista" class="swal2-input" placeholder="🪪 DNI del transportista" required>
+            <input id="marcaCamion" class="swal2-input" placeholder="🚚 Marca del camión" required>
+            <input id="patenteCamion" class="swal2-input" placeholder="🔠 Patente del camión" required>
+            <input id="marcaChasis" class="swal2-input" placeholder="🛠️ Marca del chasis (opcional)">
+            <input id="patenteChasis" class="swal2-input" placeholder="🔡 Patente del chasis (opcional)">
+            <script>
+                const ids = ['nombreTransportista','dniTransportista','marcaCamion','patenteCamion','marcaChasis','patenteChasis'];
+                ids.forEach((id, i) => {
+                    setTimeout(() => {
+                        const input = document.getElementById(id);
+                        if (input) {
+                            input.addEventListener('keydown', e => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    const next = document.getElementById(ids[i+1]);
+                                    if (next) next.focus();
+                                }
+                            });
+                        }
+                    }, 50);
+                });
+            </script>
         `,
+        confirmButtonText: 'Guardar 🚀',
+        confirmButtonColor: '#007aff',
         focusConfirm: false,
+        didOpen: () => {
+            document.getElementById('nombreTransportista').focus();
+        },
         preConfirm: () => {
             const nombre = document.getElementById('nombreTransportista').value;
             const dni = document.getElementById('dniTransportista').value;
             const marcaCamion = document.getElementById('marcaCamion').value;
             const patenteCamion = document.getElementById('patenteCamion').value;
-
+    
             if (!nombre || !dni || !marcaCamion || !patenteCamion) {
-                Swal.showValidationMessage('Por favor, completa todos los campos obligatorios.');
+                Swal.showValidationMessage('⚠️ Por favor, completá todos los campos obligatorios.');
             }
-            return { nombre, dni, marcaCamion, patenteCamion };
-        }
+    
+            return {
+                nombre,
+                dni,
+                marcaCamion,
+                patenteCamion,
+                marcaChasis: document.getElementById('marcaChasis').value,
+                patenteChasis: document.getElementById('patenteChasis').value
+            };
+        }  
     }).then((result) => {
         $('#modalDespachoPorLogistica').modal('show');
 
