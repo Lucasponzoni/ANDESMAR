@@ -174,7 +174,7 @@ function imprimirTabla() {
     contenedor.printThis({
         importCSS: true,
         importStyle: true,
-        loadCSS: "styles.css",
+        loadCSS: "",
         pageTitle: tituloFinal,
         header: `<h2 style="text-align:center; margin-bottom:20px;">${tituloFinal}</h2>`,
         footer: "",
