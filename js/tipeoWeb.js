@@ -192,6 +192,7 @@ function imprimirTabla() {
 
 // RENDERIZADO DE TABLA POR LOGISTICA EN MODAL
 function abrirModalTabla(logistica) {
+    logisticaActual = logistica;
     const spinner = document.getElementById('spinnerPorLogistica');
     const tablaContainer = document.getElementById('tabla-container-xLogistica');
     const tablaBody = document.getElementById('tabla-despacho-xLogistica-body');
@@ -233,6 +234,204 @@ function cargarDespachosPorLogistica(logistica, tablaBody, spinner, tablaContain
         console.error("Error al cargar despachos:", error);
         spinner.style.display = 'none';
     });
+}
+
+function finalizarColecta() {
+    const tablaBody = document.getElementById('tabla-despacho-xLogistica-body');
+    const filas = tablaBody.querySelectorAll('tr');
+    if (filas.length === 0) {
+        Swal.fire('Atención', 'No hay despachos para finalizar.', 'warning');
+        return;
+    }
+
+    // Deshabilitar inputs
+    filas.forEach(fila => {
+        const inputs = fila.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => input.disabled = true);
+    });
+
+    // Cerrar modal inicial
+    $('#modalDespachoPorLogistica').modal('hide');
+
+    Swal.fire({
+        title: 'Información del Transportista 🚚',
+        html: `
+            <style>
+                .swal2-input {
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    padding: 10px;
+                    margin: 5px 0;
+                    font-size: 14px;
+                    width: 95%;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                }
+                .swal2-title {
+                    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                    font-size: 18px;
+                }
+                .swal2-popup {
+                    border-radius: 10px;
+                    padding: 20px;
+                }
+            </style>
+            <input id="nombreTransportista" class="swal2-input" placeholder="Nombre del transportista" required>
+            <input id="dniTransportista" class="swal2-input" placeholder="DNI del transportista" required>
+            <input id="marcaCamion" class="swal2-input" placeholder="Marca del camión" required>
+            <input id="patenteCamion" class="swal2-input" placeholder="Patente del camión" required>
+            <input id="marcaChasis" class="swal2-input" placeholder="Marca del chasis (Si posee)">
+            <input id="patenteChasis" class="swal2-input" placeholder="Patente del chasis (Si posee)">
+        `,
+        focusConfirm: false,
+        preConfirm: () => {
+            const nombre = document.getElementById('nombreTransportista').value;
+            const dni = document.getElementById('dniTransportista').value;
+            const marcaCamion = document.getElementById('marcaCamion').value;
+            const patenteCamion = document.getElementById('patenteCamion').value;
+
+            if (!nombre || !dni || !marcaCamion || !patenteCamion) {
+                Swal.showValidationMessage('Por favor, completa todos los campos obligatorios.');
+            }
+            return { nombre, dni, marcaCamion, patenteCamion };
+        }
+    }).then((result) => {
+        $('#modalDespachoPorLogistica').modal('show');
+
+        filas.forEach(fila => {
+            const inputs = fila.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => input.disabled = false);
+        });
+
+        if (result.isConfirmed) {
+            const { nombre, dni, marcaCamion, patenteCamion } = result.value;
+            const marcaChasis = document.getElementById('marcaChasis').value || '';
+            const patenteChasis = document.getElementById('patenteChasis').value || '';
+            const fechaHoy = new Date();
+            const fechaFormateada = `${fechaHoy.getFullYear()}-${(fechaHoy.getMonth() + 1).toString().padStart(2, '0')}-${fechaHoy.getDate().toString().padStart(2, '0')}`;
+            const rutaBase = `DespachosHistoricos${logisticaActual.replace(/\s/g, '')}/${fechaFormateada}`;
+            const despachos = [];
+            let entregasNotificadas = 0;
+            let montoTotal = 0;
+
+            filas.forEach(fila => {
+                const columnas = fila.querySelectorAll('td');
+                const valor = parseFloat(columnas[5].textContent.replace(/\./g, '').replace(',', '.').replace('$', '').trim());
+                montoTotal += valor;
+                const despacho = {
+                    fechaHora: columnas[0].textContent.trim(),
+                    camion: columnas[1].textContent.trim(),
+                    seguimiento: columnas[2].textContent.trim(),
+                    bultos: columnas[3].textContent.trim(),
+                    remito: columnas[4].textContent.trim(),
+                    valor: columnas[5].textContent.trim(),
+                    info: columnas[6].textContent.trim()
+                };
+                despachos.push(despacho);
+            });
+
+            dbTipeo.ref(rutaBase).once('value', snapshot => {
+                const nuevoCamion = `CAMION ${Object.keys(snapshot.val() || {}).length + 1}`;
+
+                Swal.fire({
+                    title: "Despachando en Logipaq...",
+                    html: "Por favor, espere mientras se actualizan los despachos.",
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const promises = despachos.map(despacho => {
+                    const remito = despacho.remito;
+                    const seguimiento = despacho.seguimiento;
+
+                    return dbMeli.ref(`/DespachosLogisticos/${remito}`).once('value').then(snapshot => {
+                        if (snapshot.exists()) {
+                            const fechaHoraDeDespacho = new Date().toLocaleString('es-ES', { timeZone: 'UTC' });
+                            return dbMeli.ref(`/DespachosLogisticos/${remito}`).update({
+                                operadorLogistico: logisticaActual,
+                                fechaHoraDeDespacho: fechaHoraDeDespacho,
+                                numeroDeEnvio: seguimiento,
+                                estado: "Despachado"
+                            }).then(() => {
+                                entregasNotificadas++;
+                            });
+                        }
+                    });
+                });
+
+                Promise.all(promises).then(() => {
+                    // Guardar los remitos directamente bajo el camión
+                    despachos.forEach(despacho => {
+                        const remito = despacho.remito;
+                        dbTipeo.ref(`${rutaBase}/${nuevoCamion}/${remito}`).set(despacho);
+                    });
+
+                    // Formatear el monto total en formato argentino sin decimales
+                    const montoFormateado = `$ ${montoTotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
+
+                    const viajeData = {
+                        nombreTransportista: nombre,
+                        dniTransportista: dni,
+                        marcaCamion: marcaCamion,
+                        patenteCamion: patenteCamion,
+                        marcaChasis: marcaChasis,
+                        patenteChasis: patenteChasis,
+                        montoTotal: montoFormateado,
+                        fecha: fechaFormateada,
+                        viaje: "Alvear, Santa Fe",
+                        planta: logisticaActual,
+                        kmArecorrer: "Varios",
+                        claseDeMercaderia: "ELECTRODOMESTICOS"
+                    };
+
+                    // Push a carpeta especial según la logística
+                    let carpetaLogistica = '';
+                    switch (logisticaActual.toLowerCase()) {
+                        case 'andreani': carpetaLogistica = 'seguroAndreani'; break;
+                        case 'cruz del sur': carpetaLogistica = 'seguroCDS'; break;
+                        case 'andesmar': carpetaLogistica = 'SeguroAndesmar'; break;
+                        case 'oca': carpetaLogistica = 'SeguroOca'; break;
+                    }
+
+                    if (carpetaLogistica) {
+                        dbTipeo.ref(`${carpetaLogistica}/${fechaFormateada}/${nuevoCamion}/`).set(viajeData);
+                    }
+
+                    Swal.fire({
+                        title: '¡Finalizado con Éxito!',
+                        html: `
+                            <div style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                                <div style="background-color: #e3f2fd; padding: 20px; border-radius: 15px;">
+                                    <p style="font-size: 16px; color: #333;">Guardada como <strong>"${nuevoCamion}"</strong> en <strong>${fechaFormateada}</strong>.</p>
+                                    <div style="background-color: #A3D8FDFF; padding: 15px; border-radius: 10px; margin-top: 10px; color: #0d47a1; border: 1px solid #71BFFFFF;">
+                                        <span style="font-size: 20px;">📦 Total de entregas notificadas: <strong>${entregasNotificadas}</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        icon: 'success',
+                        showCloseButton: true,
+                        focusConfirm: false,
+                        confirmButtonText: 'Aceptar'
+                    });
+
+                    limpiarDespachosDelDia();
+                });
+            });
+        }
+    });
+}
+
+function limpiarDespachosDelDia2() {
+    dbTipeo.ref('despachosDelDia')
+        .orderByChild('logistica')
+        .equalTo(logisticaActual)
+        .once('value', snapshot => {
+            snapshot.forEach(child => {
+                dbTipeo.ref(`despachosDelDia/${child.key}`).remove();
+            });
+        });
 }
 // FIN RENDERIZADO DE TABLA POR LOGISTICA EN MODAL
 
@@ -770,3 +969,118 @@ function agregarDespacho(remito, etiqueta, bultos, valor, logistica) {
 }
 // FIN TIPEO DE DESPACHO
 
+// MODAL EMAILS
+// Función para mostrar alertas
+function mostrarAlerta(alertContainerId, mensaje, tipo) {
+    const alertContainer = document.getElementById(alertContainerId);
+    alertContainer.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            <i class="${tipo === 'danger' ? 'fas fa-exclamation-triangle' : 'fas fa-check'}"></i>
+            ${mensaje}
+        </div>
+    `;
+    alertContainer.style.display = 'block'; // Mostrar alerta
+
+    // Ocultar alerta después de 5 segundos
+    setTimeout(() => {
+        alertContainer.style.display = 'none';
+    }, 3000);
+}
+
+// Función para cargar emails desde Firebase
+function cargarEmails(logistica) {
+    const emailBody = document.getElementById('EmailBody');
+    emailBody.innerHTML = ''; // Limpiar la tabla
+
+    dbTipeo.ref(`/Emails${logistica}`).once('value').then(snapshot => {
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const email = childSnapshot.val();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${email}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm deleteEmail" data-id="${childSnapshot.key}"><i class="ml-1 bi bi-trash3-fill"></i></button>
+                    </td>
+                `;
+                emailBody.appendChild(row);
+            });
+        } else {
+            const noEmailsRow = document.createElement('tr');
+            noEmailsRow.innerHTML = `<td colspan="2">No hay Emails de notificaciones para esta logística <i class="bi bi-exclamation-circle"></i></td>`;
+            emailBody.appendChild(noEmailsRow);
+        }
+    });
+}
+
+// Evento para abrir el modal y cargar datos
+document.querySelectorAll('.btn.emailAndreani, .btn.emailAndesmar, .btn.emailOca, .btn.emailCDS').forEach(button => {
+    button.addEventListener('click', function() {
+        const logistica = this.getAttribute('data-logistica');
+        const modalTitle = document.getElementById('modalTitle');
+        modalTitle.textContent = `Emails de notificaciones - ${logistica}`;
+
+        // Mostrar el spinner
+        const loadingSpinner = document.getElementById('loadingSpinnerPlaceIt');
+        loadingSpinner.style.display = 'block';
+
+        // Cargar los datos desde Firebase
+        cargarEmails(logistica);
+        loadingSpinner.style.display = 'none'; // Ocultar el spinner
+    });
+});
+
+// Evento para agregar emails
+document.getElementById('addEmailPorLogistica').addEventListener('click', function() {
+    const newEmail = document.getElementById('newEmailPorLogistica').value;
+    const logistica = document.getElementById('modalTitle').textContent.split('-')[1].trim();
+
+    dbTipeo.ref(`/Emails${logistica}`).once('value').then(snapshot => {
+        let emailExists = false;
+        snapshot.forEach(childSnapshot => {
+            if (childSnapshot.val() === newEmail) {
+                emailExists = true;
+            }
+        });
+
+        if (emailExists) {
+            mostrarAlerta('alertContainerEmail', 'El Email ya existe en el listado', 'danger');
+        } else {
+            // Agregar el email a Firebase y obtener un ID único
+            dbTipeo.ref(`/Emails${logistica}`).push(newEmail).then(() => {
+                mostrarAlerta('alertContainerEmail', 'Se ha agregado el Email al listado', 'success');
+                cargarEmails(logistica); // Recargar la tabla
+                document.getElementById('newEmailPorLogistica').value = ''; // Limpiar el campo de entrada
+            });
+        }
+    });
+});
+
+// Evento para eliminar emails
+document.getElementById('EmailBody').addEventListener('click', function(event) {
+    const deleteBtn = event.target.closest('.deleteEmail');
+    if (deleteBtn) {
+        const idToDelete = deleteBtn.getAttribute('data-id');
+        const logistica = document.getElementById('modalTitle').textContent.split('-')[1].trim();
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "No podrás deshacer esta acción!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dbTipeo.ref(`/Emails${logistica}/${idToDelete}`).remove().then(() => {
+                    mostrarAlerta('alertContainerEmail', 'Email eliminado con éxito', 'success');
+                    cargarEmails(logistica); // Recargar la tabla
+                }).catch(error => {
+                    mostrarAlerta('alertContainerEmail', 'Error al eliminar el Email: ' + error.message, 'danger');
+                });
+            }
+        });
+    }
+});
+// FIN MODAL EMAILS

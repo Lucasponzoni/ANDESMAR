@@ -5306,13 +5306,13 @@ input[disabled] {
     display: flex;
     align-items: stretch; 
 }
-.sku-input {
+.sku-input , #newEmailPorLogistica {
     border-radius: 10px 0px 0px 10px !important;
     flex: 1;
     margin-right: 0;
     height: 48px !important; 
 }
-#addSkuButton, #addSkuButtonPlaceIt {
+#addSkuButton, #addSkuButtonPlaceIt, #addEmailPorLogistica {
     border-radius: 0px 10px 10px 0px !important;
     height: 48px !important; 
 }

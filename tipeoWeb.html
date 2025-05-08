@@ -159,7 +159,9 @@
           </div>
       </div>
       <div class="botones-tipeo">
-        <button class="btn btn-light btn-sm"><i class="bi bi-envelope-fill"></i></button>
+        <button class="btn btn-light btn-sm emailAndreani" data-logistica="Andreani" data-toggle="modal" data-target="#EmailModal">
+            <i class="bi bi-envelope-fill"></i>
+        </button>
         <button class="btn btn-light btn-sm modal-andreani" 
             data-logistica="Andreani" 
             onclick="abrirModalTabla('Andreani')">
@@ -190,7 +192,9 @@
           </div>
       </div>
       <div class="botones-tipeo">
-        <button class="btn btn-light btn-sm"><i class="bi bi-envelope-fill"></i></button>
+        <button class="btn btn-light btn-sm emailAndesmar" data-logistica="Andesmar" data-toggle="modal" data-target="#EmailModal">
+            <i class="bi bi-envelope-fill"></i>
+        </button>
         <button class="btn btn-light btn-sm modal-Andesmar" 
             data-logistica="Andesmar" 
             onclick="abrirModalTabla('Andesmar')">
@@ -221,7 +225,9 @@
           </div>
       </div>
       <div class="botones-tipeo">
-        <button class="btn btn-light btn-sm"><i class="bi bi-envelope-fill"></i></button>
+        <button class="btn btn-light btn-sm emailOca" data-logistica="Oca" data-toggle="modal" data-target="#EmailModal">
+            <i class="bi bi-envelope-fill"></i>
+        </button>
         <button class="btn btn-light btn-sm modal-Oca" 
             data-logistica="Oca" 
             onclick="abrirModalTabla('Oca')">
@@ -252,7 +258,9 @@
           </div>
       </div>
       <div class="botones-tipeo">
-        <button class="btn btn-light btn-sm"><i class="bi bi-envelope-fill"></i></button>
+        <button class="btn btn-light btn-sm emailCDS" data-logistica="CDS" data-toggle="modal" data-target="#EmailModal">
+            <i class="bi bi-envelope-fill"></i>
+        </button>
         <button class="btn btn-light btn-sm modal-cds" 
             data-logistica="Cruz del Sur" 
             onclick="abrirModalTabla('Cruz del Sur')">
@@ -318,6 +326,40 @@
         <i class="fas fa-arrow-down"></i>
     </a>
 
+    <!-- Modal para Agregar Emails -->
+    <div class="modal fade" id="EmailModal" tabindex="-1" role="dialog" aria-labelledby="EmailModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header sku-modal-header">
+                    <h5 class="modal-title sku-modal-title" id="modalTitle">Emails de notificaciones</h5>
+                    <button type="button" class="btn-danger btn-close" data-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="sku-input-group">
+                        <input type="text" class="form-control" id="newEmailPorLogistica" placeholder="Ingrese el Email">
+                        <button id="addEmailPorLogistica" class="btn btn-primary">Agregar</button>
+                    </div>
+                    <div class="spinner-border" id="loadingSpinnerPlaceIt" role="status" style="display: none;">
+                        <span class="sr-only">Cargando...</span>
+                    </div>
+                    <div id="alertContainerEmail" style="display: none;"></div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="EmailBody">
+                            <!-- Los Emails se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fin Modal para Agregar Emails -->
+
     <!-- Modal -->
     <div class="modal fade" id="modalDespacho" tabindex="-1" role="dialog" aria-labelledby="modalDespachoLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -362,62 +404,71 @@
     </div>
     <!-- Modal -->
 
-<!-- Modal -->
-<div class="modal fade" id="modalDespachoPorLogistica" tabindex="-1" role="dialog" aria-labelledby="modalDespachoPorLogisticaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header sku-modal-header">
-                <h5 class="modal-title sku-modal-title" id="modalDespachoPorLogisticaLabel">Datos de Despacho</h5>
-                <button type="button" class="btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
-            </div>    
-            <div class="modal-footer" style="margin-bottom: -45px; z-index: 1000;">
-                <button id="btnImprimirTabla" class="btn btn-outline-dark me-2" onclick="imprimirTabla()">🖨️ Imprimir</button>
-            </div>        
-            <div class="modal-body">
-                <div id="spinnerPorLogistica" class="spinner-border text-primary" role="status" style="display: none; margin: auto; width: 3rem; height: 3rem;"></div>                    
-                <div class="table-responsive" id="tabla-container-xLogistica" style="display: none;">
-                    <table class="table table-bordered table-striped" id="tablaDespacho">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
-                                <th><i class="bi bi-truck"></i></th>
-                                <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
-                                <th><i class="bi bi-box-seam"></i> Bultos</th>
-                                <th><i class="bi bi-receipt"></i> Remito</th>
-                                <th><i class="bi bi-cash"></i> Valor</th>
-                                <th><i class="bi bi-info-circle"></i> Info</th>
-                                <th><i class="bi bi-trash3-fill"></i></th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabla-despacho-xLogistica-body">
-                            <!-- Aquí se llenarán las filas dinámicamente -->
-                        </tbody>
-                    </table>
+    <!-- Modal Impresion -->
+    <div class="modal fade" id="modalDespachoPorLogistica" tabindex="-1" role="dialog" aria-labelledby="modalDespachoPorLogisticaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header sku-modal-header">
+                    <h5 class="modal-title sku-modal-title" id="modalDespachoPorLogisticaLabel">Datos de Despacho</h5>
+                    <button type="button" class="btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+                </div>    
+                <div class="modal-footer" style="margin-bottom: -45px; z-index: 1000;">
+                    <button id="btnImprimirTabla" class="btn btn-outline-dark me-2" onclick="imprimirTabla()">
+                        <i class="bi bi-printer-fill"></i> Imprimir
+                    </button>
+                    <button id="btnDescargarExcel" class="btn btn-outline-success me-2" onclick="descargarTablaExcel()">
+                        <i class="bi bi-file-earmark-spreadsheet-fill"></i> Descargar Tabla en Excel
+                    </button>
+                    <button id="btnFinalizarColecta" class="btn btn-outline-danger" onclick="finalizarColecta()">
+                        <i class="bi bi-x-circle-fill"></i> Finalizar Colecta
+                    </button>
+                </div>                                      
+                <div class="modal-body">
+                    <div id="spinnerPorLogistica" class="spinner-border text-primary" role="status" style="display: none; margin: auto; width: 3rem; height: 3rem;"></div>                    
+                    <div class="table-responsive" id="tabla-container-xLogistica" style="display: none;">
+                        <table class="table table-bordered table-striped" id="tablaDespacho">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
+                                    <th><i class="bi bi-truck"></i></th>
+                                    <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
+                                    <th><i class="bi bi-box-seam"></i> Bultos</th>
+                                    <th><i class="bi bi-receipt"></i> Remito</th>
+                                    <th><i class="bi bi-cash"></i> Valor</th>
+                                    <th><i class="bi bi-info-circle"></i> Info</th>
+                                    <th><i class="bi bi-trash3-fill"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-despacho-xLogistica-body">
+                                <!-- Aquí se llenarán las filas dinámicamente -->
+                            </tbody>
+                        </table>
 
-                    <div class="pie-por-hoja-print" style="display: none;">
-                        <div class="firma-container">
-                            <div class="firma-bloque">
-                                <h5 class="mb-3">Datos del Transportista</h5>
-                                <p>Firma: ________________________________</p>
-                                <p>Aclaracion: ___________________________</p>
-                                <p>Fecha: <span class="fecha-impresion"></span></p>
+                        <div class="pie-por-hoja-print" style="display: none;">
+                            <div class="firma-container">
+                                <div class="firma-bloque">
+                                    <h5 class="mb-3">Datos del Transportista</h5>
+                                    <p>Firma: ________________________________</p>
+                                    <p>Aclaracion: ___________________________</p>
+                                    <p>Fecha: <span class="fecha-impresion"></span></p>
+                                </div>
+                                <div class="firma-bloque">
+                                    <h5 class="mb-3">Datos del Preparador</h5>
+                                    <p>Firma: ________________________________</p>
+                                    <p>Aclaracion: ___________________________</p>
+                                    <p>Fecha: <span class="fecha-impresion"></span></p>
+                                </div>
                             </div>
-                            <div class="firma-bloque">
-                                <h5 class="mb-3">Datos del Preparador</h5>
-                                <p>Firma: ________________________________</p>
-                                <p>Aclaracion: ___________________________</p>
-                                <p>Fecha: <span class="fecha-impresion"></span></p>
-                            </div>
-                        </div>
-                    </div>                                      
+                        </div>                                      
 
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Modal -->
+    <!-- Fin Modal Impresion -->
 
+<!-- CSS IMPORT MODAL IMPRESION -->
 <style>
     @media print {
         .pie-por-hoja-print {
@@ -633,7 +684,8 @@
         }
 
     }
-    </style>    
+    </style>
+    <!-- FIN CSS IMPORT MODAL IMPRESION -->    
     
     <script>
         modalDespacho.addEventListener('shown.bs.modal', () => {
@@ -761,6 +813,7 @@
     <script src="./js/firebase-init-Bot.js"></script>
 
     <!-- TIPEO -->
+    <script src="./js/firebase-init-Meli.js"></script>
     <script src="./js/firebase-init-tipeo.js"></script>
     <script src="./js/bot.js"></script>
     <script src="./js/tipeoWeb.js"></script>

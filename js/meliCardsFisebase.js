@@ -3436,6 +3436,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
             // Mensaje para otras zonas
             trackingMessage = `Hola ${NombreyApellido || recibe} ¡Gracias por tu compra!
             ¡Tenemos buenas noticias!🎉 Tu producto ya está listo para ser enviado por nuestra logística: ${diaFormateado}. Ten en cuenta que la fecha de entrega es estimativa, por lo que podrías recibirlo un poco antes. Te recomendamos estar atento a tu teléfono, ya que te contactaremos 20 minutos antes de llegar.
+            (Si tu localidad es Perez o Roldan solo realizamos entregas los dias sábados por la mañana.)
             Estamos a tu servicio.
             ¡Saludos!
             Equipo Posventa Novogar`;
