@@ -197,27 +197,24 @@ function abrirModalTabla(logistica) {
     const tablaContainer = document.getElementById('tabla-container-xLogistica');
     const tablaBody = document.getElementById('tabla-despacho-xLogistica-body');
 
-    // Cambiar el título del modal
     const modalTitle = $('#modalDespachoPorLogistica').find('.modal-title');
     modalTitle.text(`Datos de Despacho - ${logistica}`);
 
-    spinner.style.display = 'block'; // Mostrar el spinner
-    tablaContainer.style.display = 'none'; // Ocultar la tabla
+    spinner.style.display = 'block'; 
+    tablaContainer.style.display = 'none'; 
 
-    // Cargar datos desde Firebase
     cargarDespachosPorLogistica(logistica, tablaBody, spinner, tablaContainer);
     
-    // Abrir el modal
     $('#modalDespachoPorLogistica').modal('show');
 }
 
 function cargarDespachosPorLogistica(logistica, tablaBody, spinner, tablaContainer) {
-    console.log("Cargando despachos para la logística:", logistica); // Agrega esta línea
+    console.log("Cargando despachos para la logística:", logistica); 
     dbTipeo.ref('despachosDelDia').orderByChild('logistica').equalTo(logistica).on('value', (snapshot) => {
         const data = snapshot.val();
-        console.log("Datos obtenidos de Firebase:", data); // Agrega esta línea para ver los datos
+        console.log("Datos obtenidos de Firebase:", data); 
 
-        tablaBody.innerHTML = ''; // Limpiar la tabla antes de volver a cargar
+        tablaBody.innerHTML = ''; 
 
         if (data) {
             Object.keys(data).forEach((remito) => {
@@ -418,6 +415,22 @@ async function finalizarColecta() {
                     despachos.forEach(despacho => {
                         const remito = despacho.remito;
                         dbTipeo.ref(`${rutaBase}/${nuevoCamion}/${remito}`).set(despacho);
+                    });
+
+                    // Guardar los remitos en despachosHistoricosRemitos
+                    despachos.forEach(despacho => {
+                        const remito = despacho.remito;
+                        dbTipeo.ref(`/despachosHistoricosRemitos/${remito}`).update({
+                            remito: remito // Guardar el remito
+                        });
+                    });
+
+                    // Guardar solo el seguimiento en despachosHistoricosEtiquetas
+                    despachos.forEach(despacho => {
+                        const seguimiento = despacho.seguimiento;
+                        dbTipeo.ref(`/despachosHistoricosEtiquetas/${seguimiento}`).update({
+                            seguimiento: despacho.seguimiento // Guardar el seguimiento
+                        });
                     });
 
                     // Formatear el monto total en formato argentino sin decimales
@@ -642,12 +655,10 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
                 const textColor = 'white';
                 const textBold = 'bold';
                 cuerpoEmail += `
-                    <td style="border: 1px solid #ccc; padding: 8px;">
-                        <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${color}; display: inline-block; text-align: center; line-height: 20px; color: ${textColor}; font-weight: ${textBold};">
-                            ${bultos}
-                        </div>
-                    </td>
-                `;
+                                <td style="border: 1px solid #ccc; padding: 8px; color: ${color}; font-weight: bold;">
+                                    ${bultos}
+                                </td>
+                            `;
             } else if (index === 4) {
                 // Estilo para la columna "Remito"
                 const remito = columna.textContent.trim();
@@ -683,7 +694,7 @@ async function obtenerCorreosPorLogistica(logistica) {
     return correos;
 }
 
-function limpiarDespachosDelDia2() {
+function limpiarDespachosDelDia() {
     dbTipeo.ref('despachosDelDia')
         .orderByChild('logistica')
         .equalTo(logisticaActual)
