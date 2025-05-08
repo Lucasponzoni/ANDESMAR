@@ -138,13 +138,13 @@ function imprimirTabla() {
     
         let src = '';
         if (texto === 'andreani') {
-            src = './Img/andreani-tini.png';
+            src = '/Img/andreani-tini.png';
         } else if (texto === 'andesmar') {
-            src = './Img/andesmar-tini.png';
+            src = '/Img/oca-tini.png';
         } else if (texto === 'oca') {
-            src = './Img/oca-tini.png';
+            src = '/Img/oca-tini.png';
         } else if (texto === 'cruz del sur') {
-            src = './Img/Cruz-del-Sur-tini.png';
+            src = '/Img/Cruz-del-Sur-tini.png';
         }
     
         if (src) {
