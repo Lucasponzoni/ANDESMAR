@@ -174,7 +174,7 @@ function imprimirTabla() {
     contenedor.printThis({
         importCSS: true,
         importStyle: true,
-        loadCSS: "",
+        loadCSS: "https://lucasponzoni.github.io/ANDESMAR/styles.css",
         pageTitle: tituloFinal,
         header: `<h2 style="text-align:center; margin-bottom:20px;">${tituloFinal}</h2>`,
         footer: "",
