@@ -78,10 +78,8 @@ function formatearPesos2(valor) {
 // FIN CALCULO DE TOTALES
 
 // IMPRESION DE TABLA
-function imprimirTabla() {
+async function imprimirTabla() {
     const now = new Date();
-
-    // Fecha y hora en formato 24hs
     const fechaHoraStr = now.toLocaleString('es-AR', {
         year: 'numeric',
         month: '2-digit',
@@ -91,50 +89,45 @@ function imprimirTabla() {
         hour12: false
     });
 
-    // Asignar fecha de impresión a cada campo
     document.querySelectorAll('.fecha-impresion').forEach(el => {
         el.innerText = fechaHoraStr;
     });
 
-    // Obtener el título del modal
     const tituloModal = document.getElementById('modalDespachoPorLogisticaLabel')?.innerText.trim() || 'Impresión';
     const tituloFinal = `${tituloModal} - ${fechaHoraStr}`;
 
-    // Ocultar la última columna
     const tabla = $('#tabla-container-xLogistica');
     const ultimaColumna = tabla.find('tr').find('td:last-child, th:last-child');
     ultimaColumna.hide();
 
-    // Verificar si hay filas en la tabla
     const filas = tabla.find('tr').not(':empty');
-    console.log(filas.length); 
     if (filas.length === 0) {
         alert('No hay contenido para imprimir.');
         ultimaColumna.show();
-        return; 
+        return;
     }
 
-    const printFrames = window.frames; 
-    for (let i = 0; i < printFrames.length; i++) {
-        if (printFrames[i].document.body.innerHTML.includes("contenido imprimible")) {
-            printFrames[i].document.body.innerHTML = ''; 
+    const contenido = tabla.clone();
+    const pie = $('.pie-por-hoja-print').clone();
+    if (filas.length > 0) contenido.append(pie);
+
+    const contenedor = $('<div></div>').append(contenido);
+
+    // 🔁 Convertir imágenes a base64 dentro del contenido
+    const imgElements = contenedor.find('img');
+    for (let i = 0; i < imgElements.length; i++) {
+        const img = imgElements[i];
+        const src = img.getAttribute('src');
+        if (src && !src.startsWith('data:')) {
+            try {
+                const base64 = await getImageAsBase64(src);
+                img.setAttribute('src', base64);
+            } catch (e) {
+                console.warn(`No se pudo convertir la imagen: ${src}`, e);
+            }
         }
     }
 
-    // Clonar tabla + pie
-    const contenido = tabla.clone();
-    const pie = $('.pie-por-hoja-print').clone();
-
-    // Solo agregar el pie si hay contenido
-    if (filas.length > 0) {
-        console.log('Añadiendo pie de página');
-        contenido.append(pie);
-    }
-
-    // Contenedor para imprimir
-    const contenedor = $('<div></div>').append(contenido);
-
-    // Configuración de impresión
     contenedor.printThis({
         importCSS: true,
         importStyle: true,
@@ -149,8 +142,17 @@ function imprimirTabla() {
         debug: false
     });
 
-    // Mostrar la última columna nuevamente
     ultimaColumna.show();
+}
+
+function getImageAsBase64(imgSrc) {
+    return fetch(imgSrc)
+        .then(res => res.blob())
+        .then(blob => new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+        }));
 }
 // FIN IMPRESION DE TABLA
 
