@@ -138,13 +138,13 @@ function imprimirTabla() {
     
         let src = '';
         if (texto === 'andreani') {
-            src = '/Img/andreani-tini.png';
+            src = 'https://lucasponzoni.github.io/ANDESMAR/Img/andreani-tini.png';
         } else if (texto === 'andesmar') {
-            src = '/Img/oca-tini.png';
+            src = 'https://lucasponzoni.github.io/ANDESMAR/Img/andesmar-tini.png';
         } else if (texto === 'oca') {
-            src = '/Img/oca-tini.png';
+            src = 'https://lucasponzoni.github.io/ANDESMAR/Img/oca-tini.png';
         } else if (texto === 'cruz del sur') {
-            src = '/Img/Cruz-del-Sur-tini.png';
+            src = 'https://lucasponzoni.github.io/ANDESMAR/Img/Cruz-del-Sur-tini.png';
         }
     
         if (src) {
