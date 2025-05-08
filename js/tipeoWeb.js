@@ -77,6 +77,83 @@ function formatearPesos2(valor) {
 }
 // FIN CALCULO DE TOTALES
 
+// IMPRESION DE TABLA
+function imprimirTabla() {
+    const now = new Date();
+
+    // Fecha y hora en formato 24hs
+    const fechaHoraStr = now.toLocaleString('es-AR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
+
+    // Asignar fecha de impresión a cada campo
+    document.querySelectorAll('.fecha-impresion').forEach(el => {
+        el.innerText = fechaHoraStr;
+    });
+
+    // Obtener el título del modal
+    const tituloModal = document.getElementById('modalDespachoPorLogisticaLabel')?.innerText.trim() || 'Impresión';
+    const tituloFinal = `${tituloModal} - ${fechaHoraStr}`;
+
+    // Ocultar la última columna
+    const tabla = $('#tabla-container-xLogistica');
+    const ultimaColumna = tabla.find('tr').find('td:last-child, th:last-child');
+    ultimaColumna.hide();
+
+    // Verificar si hay filas en la tabla
+    const filas = tabla.find('tr').not(':empty');
+    console.log(filas.length); 
+    if (filas.length === 0) {
+        alert('No hay contenido para imprimir.');
+        ultimaColumna.show();
+        return; 
+    }
+
+    const printFrames = window.frames; 
+    for (let i = 0; i < printFrames.length; i++) {
+        if (printFrames[i].document.body.innerHTML.includes("contenido imprimible")) {
+            printFrames[i].document.body.innerHTML = ''; 
+        }
+    }
+
+    // Clonar tabla + pie
+    const contenido = tabla.clone();
+    const pie = $('.pie-por-hoja-print').clone();
+
+    // Solo agregar el pie si hay contenido
+    if (filas.length > 0) {
+        console.log('Añadiendo pie de página');
+        contenido.append(pie);
+    }
+
+    // Contenedor para imprimir
+    const contenedor = $('<div></div>').append(contenido);
+
+    // Configuración de impresión
+    contenedor.printThis({
+        importCSS: true,
+        importStyle: true,
+        loadCSS: "",
+        pageTitle: tituloFinal,
+        header: `<h2 style="text-align:center; margin-bottom:20px;">${tituloFinal}</h2>`,
+        footer: "",
+        base: false,
+        removeInline: false,
+        printDelay: 500,
+        canvas: true,
+        debug: false
+    });
+
+    // Mostrar la última columna nuevamente
+    ultimaColumna.show();
+}
+// FIN IMPRESION DE TABLA
+
 // RENDERIZADO DE TABLA POR LOGISTICA EN MODAL
 function abrirModalTabla(logistica) {
     const spinner = document.getElementById('spinnerPorLogistica');
@@ -148,7 +225,15 @@ function cargarDespachos() {
 }
 
 function agregarFilaTabla(remito, despacho, tablaBody) {
-    const fecha = new Date(despacho.fecha).toLocaleString('es-AR');
+    const fecha = new Date(despacho.fecha).toLocaleString('es-AR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });    
     const row = document.createElement('tr');
 
     // Crear el contenedor para el texto y el círculo
@@ -503,7 +588,16 @@ inputValor.addEventListener('keydown', (e) => {
 
     const etiquetaConPrefijo = logistica === 'Cruz del Sur' ? `NIC-${etiqueta}` : etiqueta;
 
-    const fecha = new Date().toLocaleString('es-AR');
+    const fecha = new Date().toLocaleString('es-AR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+    
     let seguimientoLink = etiqueta;
 
     if (logistica === 'Andreani') {
