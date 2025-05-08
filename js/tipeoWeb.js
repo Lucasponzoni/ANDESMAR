@@ -9,7 +9,7 @@ function actualizarTotales() {
 
     filas.forEach(fila => {
         const logistica = fila.querySelector('.logistica-tabla-despacho').textContent.trim();
-        const seguimiento = fila.querySelector('.seguimiento-tabla-despacho').textContent.trim(); // Asegúrate de tener esta clase
+        const seguimiento = fila.querySelector('.seguimiento-tabla-despacho').textContent.trim();
         const bultos = parseInt(fila.querySelector('.bultos-tabla-despacho').textContent) || 0;
         const valorTexto = fila.querySelector('.valor-tabla-despacho').textContent;
 
@@ -941,55 +941,113 @@ function eliminarDespacho(remito) {
 // FIN RENDERIZADO DE FILAS EN LA TABLA
 
 // TIPEO DE DESPACHO
+const emailsError = [
+  { nombre: "Lucas Ponzoni", email: "lucas.ponzoni@novogar.com.ar" },
+  { nombre: "Lucas Ponzoni", email: "lucasponzoninovogar@gmail.com" },
+  { nombre: "Esperanza Toffalo", email: "esperanza.toffalo@novogar.com.ar" },
+  { nombre: "Mauricio Daffonchio", email: "mauricio.daffonchio@novogar.com.ar" }
+];
+
 const verificarRemitoYEtiqueta = async (remito, etiqueta) => {
-    try {
-      // Verificar remito en Firebase
-      const remitoSnapshot = await dbTipeo.ref(`despachosHistoricosRemitos/${remito}`).once('value');
-      const remitoExiste = remitoSnapshot.exists();
-  
-      // Verificar etiqueta en Firebase
-      const etiquetaSnapshot = await dbTipeo.ref(`despachosHistoricosEtiquetas/${etiqueta}`).once('value');
-      const etiquetaExiste = etiquetaSnapshot.exists();
-  
-      // Verificar si el remito ya está en la tabla
-      const filas = tablaBody.getElementsByTagName('tr');
-      const remitoEnTabla = Array.from(filas).some(row => row.querySelector('.remito-tabla-despacho').textContent === remito);
-      const etiquetaEnTabla = Array.from(filas).some(row => row.querySelector('.seguimiento-tabla-despacho a').textContent === etiqueta);
-  
-      // Si el remito o la etiqueta ya existen, mostrar un error
-      if (remitoExiste || remitoEnTabla) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'El remito ya fue despachado anteriormente. Esta acción fue notificada por email.',
-          allowOutsideClick: false
-        });
-        return false; // Indicar que la verificación falló
-      }
-  
-      if (etiquetaExiste || etiquetaEnTabla) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'La etiqueta ya fue utilizada antes. Esta acción fue notificada por email.',
-          allowOutsideClick: false
-        });
-        return false; // Indicar que la verificación falló
-      }
-  
-      return true;
-    } catch (error) {
-      console.error("Error al verificar remito y etiqueta:", error);
+  try {
+    const filas = tablaBody.getElementsByTagName('tr');
+
+    const remitoEnTabla = Array.from(filas).some(row =>
+      row.querySelector('.remito-tabla-despacho')?.textContent.trim() === remito
+    );
+
+    const etiquetaEnTabla = Array.from(filas).some(row =>
+      row.querySelector('.seguimiento-tabla-despacho a')?.textContent.trim() === etiqueta
+    );
+
+    const remitosSnapshot = await dbTipeo.ref('despachosHistoricosRemitos').once('value');
+    const etiquetasSnapshot = await dbTipeo.ref('despachosHistoricosEtiquetas').once('value');
+
+    const remitoExiste = Object.keys(remitosSnapshot.val() || {}).some(key =>
+      remitosSnapshot.val()[key]?.remito === remito
+    );
+
+    const etiquetaExiste = Object.keys(etiquetasSnapshot.val() || {}).some(key =>
+      etiquetasSnapshot.val()[key]?.seguimiento === etiqueta
+    );
+
+    // Remito usado
+    if (remitoEnTabla || remitoExiste) {
       Swal.fire({
         icon: 'error',
-        title: 'Error',
-        text: 'Ocurrió un error al verificar los datos.',
+        title: 'Remito duplicado 📦',
+        text: 'El remito ya fue despachado anteriormente.',
         allowOutsideClick: false
       });
-      return false; // Indicar que hubo un error
+
+      const emailBody = generarEmailErrorHTML(remito, etiqueta, remitoExiste, remitoEnTabla, false, false);
+      enviarCorreosDeError("Remito duplicado", emailBody);
+      return false;
     }
+
+    // Etiqueta usada
+    if (etiquetaEnTabla || etiquetaExiste) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Etiqueta duplicada 🏷️',
+        text: 'La etiqueta ya fue utilizada antes.',
+        allowOutsideClick: false
+      });
+
+      const emailBody = generarEmailErrorHTML(remito, etiqueta, false, false, etiquetaExiste, etiquetaEnTabla);
+      enviarCorreosDeError("Etiqueta duplicada", emailBody);
+      return false;
+    }
+
+    return true;
+
+  } catch (error) {
+    console.error("Error en la verificación:", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Ocurrió un error al verificar remito o etiqueta.',
+      allowOutsideClick: false
+    });
+
+    const emailBody = `<h2 style="color: #d32f2f; font-size: 22px; margin-bottom: 8px;">📢 LogiPaq Informa</h2>
+    <p style="font-family: monospace; color: #555;">❌ Se produjo un error inesperado verificando el remito <strong>${remito}</strong> y la etiqueta <strong>${etiqueta}</strong>.</p>
+    <p><strong>Error técnico:</strong> ${error.message}</p>`;
+
+    enviarCorreosDeError("Error de sistema", emailBody);
+    return false;
+  }
 };
-  
+
+const enviarCorreosDeError = async (nombreTanda, emailBody) => {
+  const hora = new Date().toLocaleTimeString();
+  for (const contacto of emailsError) {
+    await enviarCorreoConDetalles(contacto.email, contacto.nombre, nombreTanda, hora, emailBody);
+  }
+};
+
+const generarEmailErrorHTML = (remito, etiqueta, remitoFirebase, remitoTabla, etiquetaFirebase, etiquetaTabla) => {
+  let contenido = `<h2 style="color: #d32f2f; font-size: 22px; margin-bottom: 8px;">📢 LogiPaq Informa</h2>
+  <p style="font-family: 'Menlo', monospace; color: #333;">🔍 Se escaneó:</p>
+  <ul style="color: #333;">
+    <li>📦 <strong>Remito:</strong> ${remito}</li>
+    <li>🏷️ <strong>Etiqueta:</strong> ${etiqueta}</li>
+  </ul>
+  <p style="font-family: 'Menlo', monospace; color: #555;">Resultado de verificación:</p>
+  <ul style="color: #d32f2f;">`;
+
+  if (remitoFirebase) contenido += `<li>✅ Remito ya existe en Firebase (<code>despachosHistoricosRemitos</code>)</li>`;
+  if (remitoTabla) contenido += `<li>✅ Remito ya está en la tabla actual</li>`;
+  if (etiquetaFirebase) contenido += `<li>✅ Etiqueta ya existe en Firebase (<code>despachosHistoricosEtiquetas</code>)</li>`;
+  if (etiquetaTabla) contenido += `<li>✅ Etiqueta ya está en la tabla actual</li>`;
+
+  contenido += `</ul>
+  <p style="color: #333;">⚠️ Esta acción fue bloqueada automáticamente.</p>
+  <p style="font-size: 13px; color: #999;">Enviado por LogiPaq - ${new Date().toLocaleString()}</p>`;
+
+  return contenido;
+};
+
 const inputRemito = document.getElementById('inputRemito');
 const inputEtiqueta = document.getElementById('inputEtiqueta');
 const inputBultos = document.getElementById('inputBultos');
