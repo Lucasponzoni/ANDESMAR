@@ -140,16 +140,16 @@ function imprimirTabla() {
         let claseLogo = '', src = '';
         if (texto === 'andreani') {
             claseLogo = 'andreani-tablita';
-            src = './Img/andreani-tini.png';
+            src = 'https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Logisticas%2Fandreani-tini.png?alt=media&token=1cbaa3f8-9d2f-48b7-82e6-9106b129f95b';
         } else if (texto === 'andesmar') {
             claseLogo = 'andesmar-tablita';
-            src = './Img/andesmar-tini.png';
+            src = 'https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Logisticas%2Fandesmar-tini.png?alt=media&token=8245eda2-faca-4552-b81d-656b7e6b2320';
         } else if (texto === 'oca') {
             claseLogo = 'oca-tablita';
-            src = './Img/oca-tini.png';
+            src = 'https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Logisticas%2Foca-tini.png?alt=media&token=4c117d20-9ffc-4c35-a22a-fed0a061d1cb';
         } else if (texto === 'cruz del sur') {
             claseLogo = 'cruz-del-sur-tablita';
-            src = './Img/Cruz-del-Sur-tini.png';
+            src = 'https://firebasestorage.googleapis.com/v0/b/despachos-meli-novogar.appspot.com/o/Logisticas%2FCruz-del-Sur-tini.png?alt=media&token=3a10c61b-5d85-453e-b476-6ad489bfaac0';
         }
 
         if (claseLogo && src) {
