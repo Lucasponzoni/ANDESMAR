@@ -1122,12 +1122,12 @@ inputEtiqueta.addEventListener('keydown', async (e) => {
         logistica = 'Andreani';
         inputBultos.disabled = false; // Habilitar el campo de bultos
         inputBultos.focus(); // Hacer foco en bultos
-      } else if (/^1141\d{8}\d{4}$/.test(val)) {
+      } else if (/^\d{16}$/.test(val)) {
         logistica = 'Cruz del Sur';
-        inputBultos.value = parseInt(val.slice(-4), 10); // Establecer el bulto
-        inputBultos.disabled = true; // Deshabilitar el campo de bultos
-        inputEtiqueta.value = val.slice(4, -4); // Solo toma "78406107 VALOR DEL MEDIO"
-        inputValor.focus(); // Saltar al campo de valor
+        inputBultos.value = parseInt(val.slice(-4), 10);        // últimos 4 dígitos
+        inputBultos.disabled = true;
+        inputEtiqueta.value = val.slice(4, -4);                 // 5º al 12º dígito (8 caracteres)
+        inputValor.focus();    
       } else if (/^4146\d{15,}-\d+$/.test(val)) {
         logistica = 'Oca';
         const partes = val.split('-');
