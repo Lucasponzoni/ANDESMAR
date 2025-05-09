@@ -1140,7 +1140,7 @@ inputEtiqueta.addEventListener('input', (e) => {
         inputBultos.value = parseInt(partes[1], 10);
         inputBultos.disabled = true; 
         inputValor.focus(); 
-      } else if (/^NOV/.test(val) || /^BNA/.test(val) || /ME1$/.test(val)) {
+      } else if (/^NOV/.test(val) || /^PTO/.test(val) || /^BNA/.test(val) || /ME1$/.test(val)) {
         logistica = 'Andesmar';
         inputBultos.focus(); // Enfocar el campo de bultos
       } else {
