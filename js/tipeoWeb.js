@@ -1799,3 +1799,26 @@ function getSeguimientoLink(logistica, etiqueta) {
     }
 }
 // FIN CALENDARIO HISTORIAL DE TIPEO
+
+// BUSCADOR
+document.getElementById('searchDespachosLogistica').addEventListener('input', function () {
+    const filtro = this.value.trim().toLowerCase();
+    const filas = document.querySelectorAll('#tabla-despacho-body tr');
+
+    filas.forEach(fila => {
+        const textoFila = fila.textContent.toLowerCase();
+        if (textoFila.includes(filtro)) {
+            fila.style.display = '';
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+
+    // Si se borra el input, mostrar todas las filas
+    if (filtro === '') {
+        filas.forEach(fila => {
+            fila.style.display = '';
+        });
+    }
+});
+// FIN BUSCADOR

@@ -8285,3 +8285,12 @@ img.gray-filter {
 .tabla-historial-tipeo td {
     vertical-align: middle;
 }
+
+mark {
+    background-color: #ffc107 !important;
+    color: black !important;
+    padding: 0 2px;
+    font-weight: bold;
+    border-radius: 3px;
+  }
+  
