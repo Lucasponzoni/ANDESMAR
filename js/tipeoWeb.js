@@ -769,7 +769,8 @@ function showAlertPosventa(message) {
 
 // RENDERIZADO DE FILAS EN LA TABLA
 window.onload = async () => {
-    cargarDespachos(); 
+    cargarDespachos();
+    actualizarTotal(); 
 };
 
 function cargarDespachos() {
