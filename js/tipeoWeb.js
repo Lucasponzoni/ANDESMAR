@@ -1607,3 +1607,189 @@ function descargarTablaExcel() {
     });
 }
 // FIN DESCARGAR TABLA EN EXCEL
+
+// Evento al hacer clic en los botones de historial
+$('.historial-Andreani, .historial-Andesmar, .historial-oca, .historial-cds').on('click', function () {
+    const btn = $(this);
+    const offset = btn.offset();
+
+    // Detectar la logística
+    let logistica = '';
+    if (btn.hasClass('historial-Andreani')) logistica = 'DespachosHistoricosAndreani';
+    else if (btn.hasClass('historial-Andesmar')) logistica = 'DespachosHistoricosAndesmar';
+    else if (btn.hasClass('historial-oca')) logistica = 'DespachosHistoricosOca';
+    else if (btn.hasClass('historial-cds')) logistica = 'DespachosHistoricosCruzdelSur';
+
+    const datePickerContainer = $('<input type="text" style="position:absolute; z-index:-1; width:0; height:0; opacity:0; pointer-events:none;">');
+    $('body').append(datePickerContainer);
+
+    dbTipeo.ref(logistica).once('value', function (snapshot) {
+        const fechasConCamiones = {};
+
+        snapshot.forEach(child => {
+            const fecha = child.key;
+            const camiones = Object.keys(child.val());
+            fechasConCamiones[fecha] = camiones;
+        });
+
+        flatpickr(datePickerContainer[0], {
+            mode: 'single',
+            dateFormat: 'Y-m-d',
+            maxDate: new Date(),
+            locale: 'es',
+            onDayCreate: function (dObj, dStr, fp, dayElem) {
+                const fechaStr = dayElem.dateObj.toISOString().split('T')[0];
+                if (fechasConCamiones[fechaStr]) {
+                    const cantidad = fechasConCamiones[fechaStr].length;
+                    const badge = document.createElement('span');
+                    badge.textContent = cantidad;
+                    badge.className = 'badge-camiones-historial-tipeo';
+                    dayElem.appendChild(badge);
+                }
+            },
+            onClose: function (selectedDates) {
+                const fechaKey = selectedDates[0].toISOString().split('T')[0];
+                const camiones = fechasConCamiones[fechaKey];
+
+                if (camiones && camiones.length > 0) {
+                    mostrarSelectorDeCamiones(camiones, fechaKey, logistica);
+                } else {
+                    Swal.fire('Sin datos', 'No hay camiones para esta fecha.', 'info');
+                }
+                datePickerContainer.remove();
+            }
+        });
+
+        datePickerContainer.css({ top: offset.top + btn.outerHeight(), left: offset.left }).focus();
+    });
+});
+
+function mostrarSelectorDeCamiones(camiones, fechaKey, logistica) {
+    camiones.sort((a, b) => {
+        const numeroA = parseInt(a.replace(/\D/g, ''));  // Extraer el número de "camion X"
+        const numeroB = parseInt(b.replace(/\D/g, ''));
+        return numeroA - numeroB;  // Ordenar por el número
+    });
+
+    let htmlCamiones = '<div class="selector-camiones-historial-tipeo">';
+    camiones.forEach(camion => {
+        const camionNombre = camion.charAt(0).toUpperCase() + camion.slice(1).toLowerCase();
+        htmlCamiones += `
+            <button class="btn btn-outline-primary camion-opcion-historial-tipeo" data-camion="${camion}">
+                <i class="bi bi-box-seam-fill"></i> ${camionNombre}
+            </button>
+        `;
+    });
+    htmlCamiones += '</div>';
+
+    Swal.fire({
+        title: 'Seleccionar camión',
+        html: htmlCamiones,
+        showConfirmButton: false
+    });
+
+    $(document).off('click', '.camion-opcion-historial-tipeo').on('click', '.camion-opcion-historial-tipeo', function () {
+        const camionSeleccionado = $(this).data('camion');
+        cargarYMostrarTabla(camionSeleccionado, fechaKey, logistica);
+        Swal.close();
+    });
+}
+
+function cargarYMostrarTabla(camion, fechaKey, logistica) {
+    dbTipeo.ref(`${logistica}/${fechaKey}/${camion}`).once('value', snapshot => {
+        let rowsHTML = '';
+        snapshot.forEach(child => {
+            const despacho = child.val();
+
+            const imgSrc = {
+                'Andreani': './Img/andreani-tini.png',
+                'Andesmar': './Img/andesmar-tini.png',
+                'Oca': './Img/oca-tini.png',
+                'Cruz del Sur': './Img/Cruz-del-Sur-tini.png'
+            }[despacho.camion] || '';
+
+            const iconClass = {
+                'Andreani': 'andreani-tablita',
+                'Andesmar': 'andesmar-tablita',
+                'Oca': 'oca-tablita',
+                'Cruz del Sur': 'cruz-del-sur-tablita'
+            }[despacho.camion] || '';
+
+            const etiqueta = despacho.camion === 'Cruz del Sur' ? `${despacho.seguimiento}` : despacho.seguimiento;
+
+            rowsHTML += `
+                <tr>
+                    <td>${despacho.fechaHora}</td>
+                    <td>
+                        <div class="logistica-contenedor">
+                            <span class="logistica-texto">${despacho.camion}</span>
+                            <div class="logistica-circulo ${iconClass}">
+                                <img src="${imgSrc}" alt="${despacho.camion}">
+                            </div>
+                        </div>
+                    </td>
+                    <td class="seguimiento-tabla-despacho">
+                        <div class="seguimiento-contenedor">
+                            <a href="${getSeguimientoLink(despacho.camion, despacho.seguimiento)}" target="_blank">${etiqueta}</a>
+                            <i class="bi bi-box-arrow-up-right ml-1 text-primary"></i>
+                        </div>
+                    </td>
+                    <td class="bultos-tabla-despacho">
+                        <div class="bultos-box" data-bultos="${despacho.bultos}">${despacho.bultos}</div>
+                    </td>
+                    <td>${despacho.remito}</td>
+                    <td>
+                        <div class="valor-tabla-despacho">${despacho.valor}</div>
+                    </td>
+                    <td>${despacho.info}</td>
+                </tr>
+            `;
+        });
+
+        const tablaHTML = `
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
+                            <th><i class="bi bi-truck"></i></th>
+                            <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
+                            <th><i class="bi bi-box-seam"></i> Bultos</th>
+                            <th><i class="bi bi-receipt"></i> Remito</th>
+                            <th><i class="bi bi-cash"></i> Valor</th>
+                            <th><i class="bi bi-info-circle"></i> Info</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHTML}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        Swal.fire({
+            title: `Historial: ${camion}`,
+            html: tablaHTML,
+            width: '90%',
+            customClass: 'swal-wide',
+            showCloseButton: true
+        });
+    });
+}
+
+function getSeguimientoLink(logistica, etiqueta) {
+    switch (logistica) {
+        case 'Andreani':
+            return `https://www.andreani.com/#!/informacion-envio/${etiqueta}`;
+        case 'Andesmar':
+            return `https://andesmarcargas.com/seguimiento.html?numero=${etiqueta}&tipo=remito&cod=`;
+        case 'Oca':
+            return `aftership.com/es/track/oca-ar/${etiqueta}`;
+        case 'Cruz del Sur':
+        // Eliminar el prefijo "NIC-" si está presente
+        const etiquetaSinNic = etiqueta.startsWith('NIC-') ? etiqueta.substring(4) : etiqueta;
+        return `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${etiquetaSinNic}`;
+        default:
+            return '#';
+    }
+}

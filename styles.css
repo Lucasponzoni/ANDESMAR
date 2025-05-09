@@ -8232,3 +8232,56 @@ img.gray-filter {
     cursor: pointer;
 }
 
+.badge-camiones-historial-tipeo {
+    position: absolute;
+    top: -2px;
+    right: 0px;
+    background-color: red;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px;
+    border-radius: 50%;
+    text-align: center;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.selector-camiones-historial-tipeo {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.camion-opcion-historial-tipeo {
+    text-transform: capitalize;
+    padding: 10px 12px;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.logistica-contenedor-historial-tipeo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logistica-texto-historial-tipeo {
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.logistica-circulo-historial-tipeo {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.tabla-historial-tipeo th,
+.tabla-historial-tipeo td {
+    vertical-align: middle;
+}
