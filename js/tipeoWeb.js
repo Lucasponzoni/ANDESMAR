@@ -200,32 +200,37 @@ function abrirModalTabla(logistica) {
     const modalTitle = $('#modalDespachoPorLogistica').find('.modal-title');
     modalTitle.text(`Datos de Despacho - ${logistica}`);
 
-    spinner.style.display = 'block'; 
-    tablaContainer.style.display = 'none'; 
+    spinner.style.display = 'block';
+    tablaContainer.style.display = 'none';
 
     cargarDespachosPorLogistica(logistica, tablaBody, spinner, tablaContainer);
-    
-    $('#modalDespachoPorLogistica').modal('show');
 }
 
 function cargarDespachosPorLogistica(logistica, tablaBody, spinner, tablaContainer) {
-    console.log("Cargando despachos para la logística:", logistica); 
-    dbTipeo.ref('despachosDelDia').orderByChild('logistica').equalTo(logistica).on('value', (snapshot) => {
+    console.log("Cargando despachos para la logística:", logistica);
+    dbTipeo.ref('despachosDelDia').orderByChild('logistica').equalTo(logistica).once('value', (snapshot) => {
         const data = snapshot.val();
-        console.log("Datos obtenidos de Firebase:", data); 
+        console.log("Datos obtenidos de Firebase:", data);
 
-        tablaBody.innerHTML = ''; 
+        tablaBody.innerHTML = '';
 
         if (data) {
             Object.keys(data).forEach((remito) => {
                 const despacho = data[remito];
-                const tablaBodyModal = document.getElementById('tabla-despacho-xLogistica-body');
-                agregarFilaTabla(remito, despacho, tablaBodyModal);
+                agregarFilaTabla(remito, despacho, tablaBody);
             });
-            tablaContainer.style.display = 'block'; 
+
+            tablaContainer.style.display = 'block';
+            $('#modalDespachoPorLogistica').modal('show'); // SOLO SE ABRE SI HAY DATOS
         } else {
-            mostrarMensajeNoHayDespachos(); 
+            Swal.fire({
+                icon: 'info',
+                title: 'Sin datos logísticos',
+                text: 'No hay datos logísticos cargados para el día.',
+                confirmButtonColor: '#3085d6'
+            });
         }
+
         spinner.style.display = 'none';
     }, (error) => {
         console.error("Error al cargar despachos:", error);
