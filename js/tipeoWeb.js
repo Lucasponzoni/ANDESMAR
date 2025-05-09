@@ -1130,7 +1130,7 @@ inputEtiqueta.addEventListener('keydown', async (e) => {
         inputValor.focus();    
       } else if (/^4146\d{15,}-\d+$/.test(val)) {
         logistica = 'Oca';
-        const partes = val.split('-');
+        const partes = val.split(/[-']/);
         inputEtiqueta.value = partes[0];
         inputBultos.value = parseInt(partes[1], 10);
         inputBultos.disabled = true; // Deshabilitar el campo de bultos
