@@ -1060,7 +1060,7 @@ const inputValor = document.getElementById('inputValor');
 const inputLogistica = document.getElementById('inputLogistica');
 const tablaBody = document.getElementById('tabla-despacho-body');
 
-const validPrefixes = ['83', '89', '230', '231', '233', '254'];
+const validPrefixes = ['83', '89', '230', '238', '231', '233', '254'];
 
 const formatearPesos = (valor) => {
   const num = parseFloat(valor.replace(/\./g, '').replace(',', '.'));
@@ -1269,8 +1269,6 @@ inputValor.addEventListener('keydown', (e) => {
     if (circuloDiv) {
         logisticaCell.appendChild(circuloDiv);
     }
-    
-    tablaBody.prepend(row); 
     
     // Reset
     inputRemito.value = '';
