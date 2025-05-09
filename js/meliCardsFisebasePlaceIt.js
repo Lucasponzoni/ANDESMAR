@@ -25,6 +25,34 @@ const firebaseConfig2 = {
     measurementId: "G-64DDP7D6Q2"
 };
 
+const obtenerCredencialesCDS = async () => {
+    try {
+        const snapshot = await window.dbCDS.ref('LogiPaq').once('value');
+        const data = snapshot.val();
+        idCDS = data[3];
+        usuarioCDS = data[4];
+        passCDS = data[5];
+        HookTv = data[14];
+        HookMd = data[10];
+        live = data[7];
+        corsh = data[6];
+        token = data[11];
+        channel = data[8];
+        chat = data[15];
+        brainsysUser = data[16];
+        brainsysPass = data[17];
+        brainsysPoint = data[18];
+        console.log(`Credentials OK`);
+    } catch (error) {
+        console.error('Error al obtener cred de Fire:', error);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await obtenerCredencialesCDS();
+    await obtenerSesionBrainsys();
+  });
+
 function clickPageOne() {
     const pagination = document.getElementById('pagination');
     
@@ -1219,6 +1247,61 @@ function updatePagination(totalItems) {
         paginationContainer.appendChild(backItem);
     }
 }
+
+//SESION BRAINSYS
+async function obtenerSesionBrainsys() {
+    const storageKey = 'brainsysSesion';
+    const timestampKey = 'brainsysSesionTimestamp';
+    const ahora = Date.now();
+    const cincoHoras = 5 * 60 * 60 * 1000;
+  
+    let sesion = null;
+  
+    try {
+      const sesionGuardada = localStorage.getItem(storageKey);
+      const timestampGuardado = localStorage.getItem(timestampKey);
+  
+      if (sesionGuardada && timestampGuardado && (ahora - parseInt(timestampGuardado)) < cincoHoras) {
+        console.log("⏳ Sesión válida BrainSys encontrada.");
+        sesion = JSON.parse(sesionGuardada);
+        return sesion;
+      }
+  
+      console.log("🔁 No hay sesión BrainSys válida, autenticando...");
+  
+      const authData = {
+        usuario: brainsysUser,
+        contrasenia: brainsysPass
+      };
+  
+      const response = await fetch(`${brainsysPoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'x-cors-api-key': `${live}`,
+        },
+        body: JSON.stringify(authData)
+      });
+  
+      const result = await response.json();
+  
+      if (result.d.tipo === 0) {
+        sesion = result.d.sesion;
+        console.log("✅ Autenticación exitosa BrainSys");
+  
+        localStorage.setItem(storageKey, JSON.stringify(sesion));
+        localStorage.setItem(timestampKey, ahora.toString());
+      } else {
+        console.warn("⚠️ Error en autenticación:", result.d.mensaje);
+      }
+  
+    } catch (error) {
+      console.error("❌ Error al autenticar:", error);
+    }
+  
+    return sesion;
+  }
+//SESION BRAINSYS  
 
 // Llama a cargarDatos para iniciar el proceso
 cargarDatos();

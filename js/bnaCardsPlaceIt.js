@@ -29,7 +29,10 @@ const obtenerCredencialesCDS = async () => {
         token = data[11];
         channel = data[8];
         chat = data[15];
-        console.log(`CDS Credentials OK`);
+        brainsysUser = data[16];
+        brainsysPass = data[17];
+        brainsysPoint = data[18];
+        console.log(`Credentials OK`);
     } catch (error) {
         console.error('Error al obtener cred de Fire:', error);
     }
@@ -37,7 +40,8 @@ const obtenerCredencialesCDS = async () => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await obtenerCredencialesCDS();
-});
+    await obtenerSesionBrainsys();
+  });
 
 // CARGA SKU
 // Función para cargar SKU desde Firebase
@@ -2778,6 +2782,35 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
     const cliente = await solicitarCliente();
     if (!cliente) return; // Si se cancela, salir de la función
 
+    // Formatear SKU
+    const skuFormateado = SKU.toUpperCase().padStart(15, '0');
+
+    // Obtener fechas
+    const hoy = new Date();
+    const fechadeOrigen = obtenerFechaFormatoPlaceIt(new Date(hoy));
+    const fechaEntregaDate = sumarDiasHabiles(hoy, 3); // suma 3 días hábiles
+    const fechadeEntrega = obtenerFechaFormatoPlaceIt(fechaEntregaDate);
+
+    // Enviar el pedido de forma asíncrona
+    enviarPedidoBrainsys(
+        nombre,
+        cp,
+        provincia,
+        numeroRemito,
+        cliente,
+        calle,
+        numero,
+        telefono,
+        email,
+        precio_venta,
+        producto_nombre,
+        skuFormateado,
+        cantidad,
+        fechadeOrigen,
+        fechadeEntrega
+    );
+
+    // Continuar con la generación del PDF
     const { jsPDF } = window.jspdf;
 
     spinner2.style.display = "flex";
@@ -3015,6 +3048,9 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
         document.body.removeChild(tempDiv);
     };
 
+    reader.readAsDataURL(blob);
+
+    // Enviar el email después de procesar el envío
     const Name = `Confirmación de Compra Novogar`;
     const Subject = `Tu compra con envio Express ${numeroRemito} ya fue preparada para despacho`;
     const template = "emailTemplatePlaceIt";
@@ -3023,9 +3059,7 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
     const linkSeguimiento2 = cliente;
     const remito = numeroRemito;
 
-    reader.readAsDataURL(blob);
-
-    // Enviar el email después de procesar el envío
+    // Enviar el email
     await sendEmail(Name, Subject, template, nombre, email, remito, linkSeguimiento2, transporte, numeroDeEnvio);
 }
 
@@ -3045,8 +3079,6 @@ function obtenerFechas() {
     const utcDate = hoy.getTime() + (hoy.getTimezoneOffset() * 60 * 1000);
     const fechaActual = new Date(utcDate + (offset * 60 * 1000));
 
-    console.log("Fecha actual (Argentina):", fechaActual);
-
     // Determinar el próximo día hábil
     let fechaEntrega = new Date(fechaActual);
 
@@ -3059,18 +3091,13 @@ function obtenerFechas() {
         fechaEntrega.setDate(fechaActual.getDate() + 1); // Avanzar al siguiente día
     }
 
-    console.log("Próximo día hábil:", fechaEntrega);
-
     // Sumar 48 horas a la fecha de entrega
     fechaEntrega.setHours(fechaEntrega.getHours() + 72);
-    console.log("Fecha de entrega después de sumar 96 horas:", fechaEntrega);
 
     // Asegurarse de que la fecha de entrega sea un día hábil
     while (fechaEntrega.getDay() === 0 || fechaEntrega.getDay() === 6) { // 0 = domingo, 6 = sábado
         fechaEntrega.setDate(fechaEntrega.getDate() + 1);
     }
-
-    console.log("Fecha final de entrega:", fechaEntrega);
 
     // Formatear las fechas
     const diaActual = `${diasDeLaSemana[fechaActual.getDay()]} ${fechaActual.getDate()} de ${fechaActual.toLocaleString('default', { month: 'long' })}`;
@@ -3085,6 +3112,25 @@ function obtenerFechas() {
 // Ejecutar la función para probar
 console.log(obtenerFechas());
 // FIN OBTENER FECHAS PLACE IT
+
+// FECHA PLACE IT
+function obtenerFechaFormatoPlaceIt(date) {
+    return new Date(date).toISOString();
+}
+  
+  function sumarDiasHabiles(fecha, diasHabiles) {
+    let resultado = new Date(fecha);
+    let sumados = 0;
+    while (sumados < diasHabiles) {
+      resultado.setDate(resultado.getDate() + 1);
+      const dia = resultado.getDay();
+      if (dia !== 0 && dia !== 6) { // 0 = Domingo, 6 = Sábado
+        sumados++;
+      }
+    }
+    return resultado;
+  }
+// FECHA BRAINSYS
 
 function addUpdateObservacionesEvent() {
     const updateButtons = document.querySelectorAll('.update-observaciones');
@@ -4099,6 +4145,141 @@ function toggleShippingDiscount(checkbox, id) {
     }
 
     totalCostElement.value = currentTotal.toFixed(2);
+}
+
+//SESION BRAINSYS
+async function obtenerSesionBrainsys() {
+    const storageKey = 'brainsysSesion';
+    const timestampKey = 'brainsysSesionTimestamp';
+    const ahora = Date.now();
+    const cincoHoras = 5 * 60 * 60 * 1000;
+  
+    let sesion = null;
+  
+    try {
+      const sesionGuardada = localStorage.getItem(storageKey);
+      const timestampGuardado = localStorage.getItem(timestampKey);
+  
+      if (sesionGuardada && timestampGuardado && (ahora - parseInt(timestampGuardado)) < cincoHoras) {
+        console.log("⏳ Sesión válida BrainSys encontrada.");
+        sesion = JSON.parse(sesionGuardada);
+        return sesion;
+      }
+  
+      console.log("🔁 No hay sesión BrainSys válida, autenticando...");
+  
+      const authData = {
+        usuario: brainsysUser,
+        contrasenia: brainsysPass
+      };
+  
+      const response = await fetch(`${brainsysPoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'x-cors-api-key': `${live}`,
+        },
+        body: JSON.stringify(authData)
+      });
+  
+      const result = await response.json();
+  
+      if (result.d.tipo === 0) {
+        sesion = result.d.sesion;
+        console.log("✅ Autenticación exitosa BrainSys");
+  
+        localStorage.setItem(storageKey, JSON.stringify(sesion));
+        localStorage.setItem(timestampKey, ahora.toString());
+      } else {
+        console.warn("⚠️ Error en autenticación:", result.d.mensaje);
+      }
+  
+    } catch (error) {
+      console.error("❌ Error al autenticar:", error);
+    }
+  
+    return sesion;
+  }
+//SESION BRAINSYS  
+
+async function enviarPedidoBrainsys(nombre, cp, provincia, numeroRemito, cliente, calle, numero, telefono, email, precio_venta, producto_nombre, sku, cantidad, fechadeOrigen, fechadeEntrega) {
+    
+    const sesion = localStorage.getItem('sesion');
+    const depositoId = "001";
+    const remitoTransformado = numeroRemito.slice(3).replace(/^0000/, '');
+
+    const producto = {
+        codigo: sku,
+        companiaCodigo: "NOG",
+        loteCodigo: "001", 
+        vencimiento: "", 
+        loteUnico: false,
+        estadoCodigo: "DIS",
+        cantidad: cantidad,
+        entregaParcial: true
+    };
+
+    await enviarPedido(
+        sesion,
+        depositoId,
+        "DEP",
+        "PLA",
+        "PNG",
+        "R",
+        "0254",
+        Number(remitoTransformado),
+        fechadeOrigen,
+        fechadeEntrega,
+        "NOG",
+        "ENO",
+        nombre,
+        "ARG",
+        provincia,
+        cp,
+        calle,
+        "001",
+        "001",
+        1,
+        false,
+        precio_venta,
+        1,
+        1,
+        `Cliente: ${cliente}`, 
+        `Remito: ${numeroRemito}`, 
+        `Coordinar con línea ${telefono}, Producto: ${sku} ${producto_nombre}`,
+        producto 
+    );
+    
+    console.log(
+        sesion,
+        depositoId,
+        "DEP",
+        "PLA",
+        "PNG",
+        "R",
+        "0254",
+        Number(remitoTransformado),
+        fechadeOrigen,
+        fechadeEntrega,
+        "NOG",
+        "ENO",
+        nombre,
+        "ARG",
+        provincia,
+        cp,
+        calle,
+        "001",
+        "001",
+        1,
+        false,
+        precio_venta,
+        1,
+        1,
+        `Cliente: ${cliente}`, 
+        `Remito: ${numeroRemito}`, 
+        `Coordinar con línea ${telefono}, Producto: ${sku} ${producto_nombre}`,
+        producto 
+    );
 }
 
 // Llamar a la función cuando se carga la página
