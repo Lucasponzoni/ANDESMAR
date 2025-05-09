@@ -1099,9 +1099,14 @@ inputRemito.addEventListener('keydown', async (e) => {
     }
 });
 
-inputEtiqueta.addEventListener('keydown', async (e) => {
+inputEtiqueta.addEventListener('input', (e) => {
+    // Reemplazar comillas simples por guiones y convertir a mayúsculas en el input
+    inputEtiqueta.value = inputEtiqueta.value.trim().replace(/'/g, '-').toUpperCase();
+  });
+  
+  inputEtiqueta.addEventListener('keydown', async (e) => {
     if (e.key === 'Enter') {
-      const val = inputEtiqueta.value.trim();
+      const val = inputEtiqueta.value.trim(); // No es necesario procesar de nuevo
       let logistica = '';
   
       // Verificar remito y etiqueta antes de continuar
@@ -1130,11 +1135,11 @@ inputEtiqueta.addEventListener('keydown', async (e) => {
         inputValor.focus();    
       } else if (/^4146\d{15,}-\d+$/.test(val)) {
         logistica = 'Oca';
-        const partes = val.split(/[-']/);
+        const partes = val.split('-');
         inputEtiqueta.value = partes[0];
         inputBultos.value = parseInt(partes[1], 10);
-        inputBultos.disabled = true; // Deshabilitar el campo de bultos
-        inputValor.focus(); // Saltar al campo de valor
+        inputBultos.disabled = true; 
+        inputValor.focus(); 
       } else if (/^NOV/.test(val) || /^BNA/.test(val) || /ME1$/.test(val)) {
         logistica = 'Andesmar';
         inputBultos.focus(); // Enfocar el campo de bultos
