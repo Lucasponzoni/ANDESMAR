@@ -1,4 +1,4 @@
-async function enviarPedido(sesion, depositoId, almacenCodigo, emplazamientoCodigo, tipoCodigo, letra, centroEmisor, numero, fechaEmision, fechaEntrega, clienteCodigo, destinatarioCodigo, razonSocial, pais, provincia, localidadCodigo, domicilio, centroCostoCodigo, darsenaCodigo, numeroRuteo, entregaParcial, importeFactura, contraReembolso, prioridad, referencia, referenciaAdicional, observaciones, ...productos) {
+async function enviarPedido(sesion, depositoId, almacenCodigo, emplazamientoCodigo, tipoCodigo, letra, centroEmisor, numero, fechaEmision, fechaEntrega, clienteCodigo, destinatarioCodigo, razonSocial, pais, provincia, localidadCodigo, domicilio, centroCostoCodigo, darsenaCodigo, numeroRuteo, entregaParcial, importeFactura, contraReembolso, prioridad, referencia, referenciaAdicional, observaciones, observacionesMeli, ...productos) {
 
     const detalles = productos.map((producto, index) => ({
         linea: index + 1,

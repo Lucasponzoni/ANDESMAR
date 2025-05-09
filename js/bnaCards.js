@@ -2019,7 +2019,7 @@ COMPRA CON USO DE PUNTOS BNA
                                 ''
                             }
                             ${data[i].diaPlaceIt ? 
-                                `<div>PlaceIt: Se entrega entre ${data[i].diaPlaceIt}</div>` : 
+                                `<div>PlaceIt: ${data[i].diaPlaceIt}</div>` : 
                                 ''
                             }
                         </div>

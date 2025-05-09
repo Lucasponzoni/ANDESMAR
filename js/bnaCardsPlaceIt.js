@@ -1612,7 +1612,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                                 ''
                             }
                             ${data[i].diaPlaceIt ? 
-                                `<div>Se entrega entre ${data[i].diaPlaceIt}</div>` : 
+                                `<div>${data[i].diaPlaceIt}</div>` : 
                                 ''
                             }
                         </div>
@@ -4147,7 +4147,7 @@ function toggleShippingDiscount(checkbox, id) {
     totalCostElement.value = currentTotal.toFixed(2);
 }
 
-//SESION BRAINSYS
+// SESION BRAINSYS
 async function obtenerSesionBrainsys() {
     const storageKey = 'brainsysSesion';
     const timestampKey = 'brainsysSesionTimestamp';
@@ -4200,9 +4200,10 @@ async function obtenerSesionBrainsys() {
   
     return sesion;
   }
-//SESION BRAINSYS  
+// SESION BRAINSYS  
 
-async function enviarPedidoBrainsys(nombre, cp, provincia, numeroRemito, cliente, calle, numero, telefono, email, precio_venta, producto_nombre, sku, cantidad, fechadeOrigen, fechadeEntrega) {
+// ENVIAR PEDIDO BRAINSYS  
+async function enviarPedidoBrainsys(nombre, cp, provincia, numeroRemito, cliente, calle, numero, telefono, email, precio_venta, producto_nombre, sku, cantidad, fechadeOrigen, fechadeEntrega, observacionesMeli) {
     
     const sesion = localStorage.getItem('sesion');
     const depositoId = "001";
@@ -4247,6 +4248,7 @@ async function enviarPedidoBrainsys(nombre, cp, provincia, numeroRemito, cliente
         `Cliente: ${cliente}`, 
         `Remito: ${numeroRemito}`, 
         `Coordinar con línea ${telefono}, Producto: ${sku} ${producto_nombre}`,
+        observacionesMeli,
         producto 
     );
     
@@ -4275,12 +4277,14 @@ async function enviarPedidoBrainsys(nombre, cp, provincia, numeroRemito, cliente
         precio_venta,
         1,
         1,
-        `Cliente: ${cliente}`, 
+        `Cliente: ${cliente}, Coordinar con línea ${telefono}, Producto: ${sku} ${producto_nombre}`, 
         `Remito: ${numeroRemito}`, 
         `Coordinar con línea ${telefono}, Producto: ${sku} ${producto_nombre}`,
+        observacionesMeli,
         producto 
     );
 }
+// FIN ENVIAR PEDIDO BRAINSYS  
 
 // Llamar a la función cuando se carga la página
 window.onload = loadEnviosFromFirebase;

@@ -875,6 +875,35 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     const cliente = await solicitarCliente();
     if (!cliente) return; // Si se cancela, salir de la función
 
+        // Formatear SKU
+    const skuFormateado = SKU.toUpperCase().padStart(15, '0');
+
+    // Obtener fechas
+    const hoy = new Date();
+    const fechadeOrigen = obtenerFechaFormatoPlaceIt(new Date(hoy));
+    const fechaEntregaDate = sumarDiasHabiles(hoy, 3); // suma 3 días hábiles
+    const fechadeEntrega = obtenerFechaFormatoPlaceIt(fechaEntregaDate);
+
+    // Enviar el pedido de forma asíncrona
+    enviarPedidoBrainsys(
+        NombreyApellido,
+        Cp,
+        provincia,
+        numeroRemito,
+        cliente,
+        calleDestinatario,
+        alturaDestinatario,
+        telefonoDestinatario,
+        email,
+        total,
+        producto,
+        skuFormateado,
+        cantidad,
+        fechadeOrigen,
+        fechadeEntrega,
+        observaciones
+    );
+
     const { jsPDF } = window.jspdf;
 
     spinner2.style.display = "flex";
@@ -1147,6 +1176,25 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 }
 // FIN GENERAR ETIQUETA LOGISTICA PLACE IT
 
+// FECHA PLACE IT
+function obtenerFechaFormatoPlaceIt(date) {
+    return new Date(date).toISOString();
+}
+  
+  function sumarDiasHabiles(fecha, diasHabiles) {
+    let resultado = new Date(fecha);
+    let sumados = 0;
+    while (sumados < diasHabiles) {
+      resultado.setDate(resultado.getDate() + 1);
+      const dia = resultado.getDay();
+      if (dia !== 0 && dia !== 6) { // 0 = Domingo, 6 = Sábado
+        sumados++;
+      }
+    }
+    return resultado;
+  }
+// FECHA BRAINSYS
+
 // OBTENER FECHAS PLACE IT
 function obtenerFechas() {
     const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
@@ -1301,7 +1349,91 @@ async function obtenerSesionBrainsys() {
   
     return sesion;
   }
-//SESION BRAINSYS  
+//SESION BRAINSYS
+
+// ENVIAR PEDIDO BRAINSYS  
+async function enviarPedidoBrainsys(NombreyApellido, Cp, provincia, numeroRemito, cliente, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, total, producto, skuFormateado, cantidad, fechadeOrigen, fechadeEntrega, observacionesMeli) {
+    
+    const sesion = localStorage.getItem('sesion');
+    const depositoId = "001";
+    const remitoTransformado = numeroRemito.slice(3).replace(/^0000/, '');
+
+    const productoObj = {
+        codigo: skuFormateado,
+        companiaCodigo: "NOG",
+        loteCodigo: "001", 
+        vencimiento: "", 
+        loteUnico: false,
+        estadoCodigo: "DIS",
+        cantidad: cantidad,
+        entregaParcial: true
+    };
+
+    await enviarPedido(
+        sesion,
+        depositoId,
+        "DEP",
+        "PLA",
+        "PNG",
+        "R",
+        "0254",
+        Number(remitoTransformado),
+        fechadeOrigen,
+        fechadeEntrega,
+        "NOG",
+        "ENO",
+        NombreyApellido,
+        "ARG",
+        provincia,
+        Cp,
+        `${calleDestinatario} ${alturaDestinatario}`,
+        "001",
+        "001",
+        1,
+        false,
+        total,
+        1,
+        1,
+        `Cliente: ${cliente}`, 
+        `Remito: ${numeroRemito}`, 
+        `${observacionesMeli}. Coordinar con línea ${telefonoDestinatario}, Producto: ${skuFormateado} ${producto}`,
+        observacionesMeli,
+        productoObj 
+    );
+    
+    console.log(
+        sesion,
+        depositoId,
+        "DEP",
+        "PLA",
+        "PNG",
+        "R",
+        "0254",
+        Number(remitoTransformado),
+        fechadeOrigen,
+        fechadeEntrega,
+        "NOG",
+        "ENO",
+        NombreyApellido,
+        "ARG",
+        provincia,
+        Cp,
+        `${calleDestinatario} ${alturaDestinatario}`,
+        "001",
+        "001",
+        1,
+        false,
+        total,
+        1,
+        1,
+        `Cliente: ${cliente}`, 
+        `Remito: ${numeroRemito}`, 
+        `${observacionesMeli}. Coordinar con línea ${telefonoDestinatario}, Producto: ${skuFormateado} ${producto}`,
+        observacionesMeli,
+        productoObj 
+    );
+}
+// FIN ENVIAR PEDIDO BRAINSYS  
 
 // Llama a cargarDatos para iniciar el proceso
 cargarDatos();
