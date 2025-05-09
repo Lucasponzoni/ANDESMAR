@@ -1608,6 +1608,7 @@ function descargarTablaExcel() {
 }
 // FIN DESCARGAR TABLA EN EXCEL
 
+// CALENDARIO HISTORIAL DE TIPEO
 // Evento al hacer clic en los botones de historial
 $('.historial-Andreani, .historial-Andesmar, .historial-oca, .historial-cds').on('click', function () {
     const btn = $(this);
@@ -1793,3 +1794,4 @@ function getSeguimientoLink(logistica, etiqueta) {
             return '#';
     }
 }
+// FIN CALENDARIO HISTORIAL DE TIPEO
