@@ -42,7 +42,7 @@ const obtenerCredencialesCDS = async () => {
         brainsysUser = data[16];
         brainsysPass = data[17];
         brainsysPoint = data[18];
-        console.log(`Credentials OK`);
+        console.log(`ℹ️ Credentials OK`);
     } catch (error) {
         console.error('Error al obtener cred de Fire:', error);
     }
@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 firebase.database().ref('ventasWeb').once('value')
     .then(snapshot => {
         if (snapshot.exists()) {
-            console.log("Conexión exitosa a Firebase, datos disponibles.");
         } else {
             console.log("No hay datos en 'ventasWeb'.");
         }
@@ -120,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
 
                         if (allData.length > 0) {
-                            console.log("Datos encontrados: ", allData);
                             const processedData = allData.map(item => {
                                 const { key, data } = item;
                                 return {
@@ -270,8 +268,6 @@ function cargarDatos() {
                         break; // Salir del bucle for...of
                     }
                 }
-
-                console.log("Datos encontrados: ", allData);
                 
                 // Limitar los resultados a itemsPerPage después de filtrar
                 const paginatedData = allData.slice(0, itemsPerPage);
@@ -557,10 +553,6 @@ data.items.forEach(item => {
         cantidades.push(item.cantidad);
     }
 });
-
-// Resultado final
-console.log(codigosAlfa); // Array de códigos alfa
-console.log(cantidades);   // Array de cantidades
 
 // Crear el contenedor de productos
 let productosHTML2 = '';
@@ -1358,8 +1350,6 @@ function obtenerFechas() {
     const utcDate = hoy.getTime() + (hoy.getTimezoneOffset() * 60 * 1000);
     const fechaActual = new Date(utcDate + (offset * 60 * 1000));
 
-    console.log("Fecha actual (Argentina):", fechaActual);
-
     // Determinar el próximo día hábil
     let fechaEntrega = new Date(fechaActual);
 
@@ -1372,31 +1362,25 @@ function obtenerFechas() {
         fechaEntrega.setDate(fechaActual.getDate() + 1); // Avanzar al siguiente día
     }
 
-    console.log("Próximo día hábil:", fechaEntrega);
-
     // Sumar 48 horas a la fecha de entrega
     fechaEntrega.setHours(fechaEntrega.getHours() + 72);
-    console.log("Fecha de entrega después de sumar 96 horas:", fechaEntrega);
 
     // Asegurarse de que la fecha de entrega sea un día hábil
     while (fechaEntrega.getDay() === 0 || fechaEntrega.getDay() === 6) { // 0 = domingo, 6 = sábado
         fechaEntrega.setDate(fechaEntrega.getDate() + 1);
     }
 
-    console.log("Fecha final de entrega:", fechaEntrega);
-
     // Formatear las fechas
     const diaActual = `${diasDeLaSemana[fechaActual.getDay()]} ${fechaActual.getDate()} de ${fechaActual.toLocaleString('default', { month: 'long' })}`;
     const diaEntrega = `${diasDeLaSemana[fechaEntrega.getDay()]} ${fechaEntrega.getDate()} de ${fechaEntrega.toLocaleString('default', { month: 'long' })}`;
 
     const mensajeFinal = `Plazo de entrega entre ${diaActual} y ${diaEntrega}`;
-    console.log("Mensaje final:", mensajeFinal); // Imprimir el mensaje final
-
+    
     return mensajeFinal;
 }
 
 // Ejecutar la función para probar
-console.log(obtenerFechas());
+console.log("Mensaje final a imprimir Hoy:", obtenerFechas());
 // FIN OBTENER FECHAS PLACE IT
 
 // Función para actualizar la paginación

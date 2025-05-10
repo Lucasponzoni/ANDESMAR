@@ -72,31 +72,115 @@ async function enviarPedido(sesion, depositoId, almacenCodigo, emplazamientoCodi
         deposito: { id: depositoId },
         pedidos: [pedido] 
     };
+console.log('🧠 Datos enviados a BrainSys:', requestData);
 
-    console.log(requestData);
+try {
+    // Obtener los datos desde la base de datos
+    const snapshot = await window.dbCDS.ref('LogiPaq').once('value');
+    const data = snapshot.val();
+    const url = data[19]; 
+    const live = data[7]; 
 
-    try {
-        const response = await fetch("https://proxy.cors.sh/http://190.210.249.71:8001/brainsys_test_api/deposito/servicios/Pedidos.asmx/Crear", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
-            },
-            body: JSON.stringify(requestData) 
-        });
-    
-        const result = await response.json(); 
-        console.log(result);
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            'x-cors-api-key': live
+        },
+        body: JSON.stringify(requestData) 
+    });
+
+    const result = await response.json(); 
+
+    // Mostrar respuesta de BrainSys con emojis
+    if (result.d[0].tipo === 0) {
+        console.log('✅ Éxito:', result);
         
-        console.log('✅ Pedido enviado con éxito a BrainSys.');
-    } catch (error) {
-        console.error('Error al enviar el pedido a BrainSys:', error); 
-
+        // Mensaje de éxito que se elimina después de 10 segundos
         Swal.fire({
-            title: '❌ Error',
-            text: 'Error al enviar el pedido a BrainSys',
-            icon: 'error',
+            title: "✅ Éxito",
+            html: `
+                <div style="max-width: 500px; padding: 20px; border-radius: 10px; background-color: #E3FDE0FF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;">
+                    <strong>El pedido fue creado en BrainSys.</strong>
+                    <p style="margin: 10px 0;">El pedido #${result.d[0].pedido.numero} se procesó correctamente.</p>
+                </div>
+            `,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 10000, // 10 segundos
+            timerProgressBar: true
+        });
+
+        // Enviar notificación a Slack
+        const slackWebhookUrl = data[20]; // URL del webhook de Slack
+        const mensajeSlack = {
+            text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🟢 *${referenciaAdicional}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n✅ ¡Éxito! El pedido para *${referencia}* fue creado correctamente.\n\n🗺️ Localidad: *${localidadCodigo}*, 🏠 Domicilio: *${domicilio}*, *${provincia}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
+        };
+
+        // Enviar mensaje a Slack
+        await fetch(slackWebhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mensajeSlack)
+        });
+
+    } else {
+        // Advertencia o Error
+        const mensajeError = result.d[0].mensaje;
+        Swal.fire({
+            title: "⚠️ Alerta",
+            html: `
+                <div style="max-width: 500px; padding: 20px; border-radius: 10px; background-color: #f0f0f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;">
+                    <strong>El pedido no pudo ser creado en BrainSys.</strong>
+                    <p style="margin: 10px 0;">${mensajeError}</p>
+                </div>
+            `,
+            icon: 'warning',
             confirmButtonText: 'Aceptar'
         });
-    }    
+
+        // Enviar notificación a Slack con mensaje de error
+        const slackWebhookUrl = data[20]; // URL del webhook de Slack
+        const mensajeSlack = {
+            text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🟡 *${referenciaAdicional}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n⚠️ Alerta: El pedido no pudo ser creado en BrainSys.\n\n<>${mensajeError}\n\n🗺️ Localidad: *${localidadCodigo}*, 🏠 Domicilio: *${domicilio}*, *${provincia}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
+        };
+
+        // Enviar mensaje a Slack
+        await fetch(slackWebhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mensajeSlack)
+        });
+    }
+
+} catch (error) {
+    console.error('Error al enviar el pedido a BrainSys:', error); 
+
+    Swal.fire({
+        title: '❌ Error',
+        text: 'Error al enviar el pedido a BrainSys',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+    });
+
+    // Enviar notificación a Slack en caso de error
+    const slackWebhookUrl = data[20]; // URL del webhook de Slack
+    const mensajeSlack = {
+        text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🔴 *${referenciaAdicional}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\nError al enviar el pedido a BrainSys.\n\n🛑 Detalles del error: ${error.message}\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
+    };
+
+    // Enviar mensaje a Slack
+    await fetch(slackWebhookUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(mensajeSlack)
+    });
+}
+
 }

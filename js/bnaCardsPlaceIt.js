@@ -3104,13 +3104,12 @@ function obtenerFechas() {
     const diaEntrega = `${diasDeLaSemana[fechaEntrega.getDay()]} ${fechaEntrega.getDate()} de ${fechaEntrega.toLocaleString('default', { month: 'long' })}`;
 
     const mensajeFinal = `Plazo de entrega entre ${diaActual} y ${diaEntrega}`;
-    console.log("Mensaje final:", mensajeFinal); // Imprimir el mensaje final
-
+    
     return mensajeFinal;
 }
 
 // Ejecutar la función para probar
-console.log(obtenerFechas());
+console.log("Mensaje final a imprimir Hoy:", obtenerFechas());
 // FIN OBTENER FECHAS PLACE IT
 
 // FECHA BRAINSYS

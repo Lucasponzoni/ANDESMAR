@@ -1205,8 +1205,6 @@ function obtenerFechas() {
     const utcDate = hoy.getTime() + (hoy.getTimezoneOffset() * 60 * 1000);
     const fechaActual = new Date(utcDate + (offset * 60 * 1000));
 
-    console.log("Fecha actual (Argentina):", fechaActual);
-
     // Determinar el próximo día hábil
     let fechaEntrega = new Date(fechaActual);
 
@@ -1219,31 +1217,25 @@ function obtenerFechas() {
         fechaEntrega.setDate(fechaActual.getDate() + 1); // Avanzar al siguiente día
     }
 
-    console.log("Próximo día hábil:", fechaEntrega);
-
     // Sumar 48 horas a la fecha de entrega
     fechaEntrega.setHours(fechaEntrega.getHours() + 72);
-    console.log("Fecha de entrega después de sumar 96 horas:", fechaEntrega);
 
     // Asegurarse de que la fecha de entrega sea un día hábil
     while (fechaEntrega.getDay() === 0 || fechaEntrega.getDay() === 6) { // 0 = domingo, 6 = sábado
         fechaEntrega.setDate(fechaEntrega.getDate() + 1);
     }
 
-    console.log("Fecha final de entrega:", fechaEntrega);
-
     // Formatear las fechas
     const diaActual = `${diasDeLaSemana[fechaActual.getDay()]} ${fechaActual.getDate()} de ${fechaActual.toLocaleString('default', { month: 'long' })}`;
     const diaEntrega = `${diasDeLaSemana[fechaEntrega.getDay()]} ${fechaEntrega.getDate()} de ${fechaEntrega.toLocaleString('default', { month: 'long' })}`;
 
     const mensajeFinal = `Plazo de entrega entre ${diaActual} y ${diaEntrega}`;
-    console.log("Mensaje final:", mensajeFinal); // Imprimir el mensaje final
-
+    
     return mensajeFinal;
 }
 
 // Ejecutar la función para probar
-console.log(obtenerFechas());
+console.log("Mensaje final a imprimir Hoy:", obtenerFechas());
 // FIN OBTENER FECHAS PLACE IT
 
 // Función para actualizar la paginación
