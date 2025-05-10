@@ -144,7 +144,7 @@ try {
         // Enviar notificación a Slack con mensaje de error
         const slackWebhookUrl = data[20]; // URL del webhook de Slack
         const mensajeSlack = {
-            text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🟡 *${referenciaAdicional}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n⚠️ Alerta: El pedido no pudo ser creado en BrainSys.\n\n<>${mensajeError}\n\n🗺️ Localidad: *${localidadCodigo}*, 🏠 Domicilio: *${domicilio}*, *${provincia}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
+            text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🟡 *${referenciaAdicional}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n⚠️ Alerta: El pedido para *${referencia}* no pudo ser creado en BrainSys.\n\n<>${mensajeError}\n\n🗺️ Localidad: *${localidadCodigo}*, 🏠 Domicilio: *${domicilio}*, *${provincia}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
         };
 
         // Enviar mensaje a Slack
@@ -170,7 +170,7 @@ try {
     // Enviar notificación a Slack en caso de error
     const slackWebhookUrl = data[20]; // URL del webhook de Slack
     const mensajeSlack = {
-        text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🔴 *${referenciaAdicional}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\nError al enviar el pedido a BrainSys.\n\n🛑 Detalles del error: ${error.message}\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
+        text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🔴 *${referenciaAdicional}*\n\n* * * * * * * * * * * * * * * * * * * * * * * *\nError al enviar el pedido de *${referencia}* a BrainSys.\n\n🛑 Detalles del error: ${error.message}\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
     };
 
     // Enviar mensaje a Slack
