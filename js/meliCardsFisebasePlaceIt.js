@@ -1176,7 +1176,7 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 }
 // FIN GENERAR ETIQUETA LOGISTICA PLACE IT
 
-// FECHA PLACE IT
+// FECHA BRAINSYS
 function obtenerFechaFormatoPlaceIt(date) {
     return new Date(date).toISOString();
 }
@@ -1351,6 +1351,10 @@ async function obtenerSesionBrainsys() {
   }
 //SESION BRAINSYS
 
+function transformarTotal(total) {
+    return Number(total.replace(/\$|\./g, '').replace(',', '.'));
+}
+
 // ENVIAR PEDIDO BRAINSYS  
 async function enviarPedidoBrainsys(NombreyApellido, Cp, provincia, numeroRemito, cliente, calleDestinatario, alturaDestinatario, telefonoDestinatario, email, total, producto, skuFormateado, cantidad, fechadeOrigen, fechadeEntrega, observacionesMeli) {
     
@@ -1368,6 +1372,9 @@ async function enviarPedidoBrainsys(NombreyApellido, Cp, provincia, numeroRemito
         cantidad: cantidad,
         entregaParcial: true
     };
+
+    // Transformar el total
+    const totalTransformado = transformarTotal(total).toString().replace('.', '');
 
     await enviarPedido(
         sesion,
@@ -1391,7 +1398,7 @@ async function enviarPedidoBrainsys(NombreyApellido, Cp, provincia, numeroRemito
         "001",
         1,
         false,
-        total,
+        totalTransformado,
         1,
         1,
         `Cliente: ${cliente}`, 
@@ -1423,7 +1430,7 @@ async function enviarPedidoBrainsys(NombreyApellido, Cp, provincia, numeroRemito
         "001",
         1,
         false,
-        total,
+        totalTransformado,
         1,
         1,
         `Cliente: ${cliente}`, 

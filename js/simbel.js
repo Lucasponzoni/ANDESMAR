@@ -25,6 +25,34 @@ const firebaseConfig2 = {
     measurementId: "G-64DDP7D6Q2"
 };
 
+const obtenerCredencialesCDS = async () => {
+    try {
+        const snapshot = await window.dbCDS.ref('LogiPaq').once('value');
+        const data = snapshot.val();
+        idCDS = data[3];
+        usuarioCDS = data[4];
+        passCDS = data[5];
+        HookTv = data[14];
+        HookMd = data[10];
+        live = data[7];
+        corsh = data[6];
+        token = data[11];
+        channel = data[8];
+        chat = data[15];
+        brainsysUser = data[16];
+        brainsysPass = data[17];
+        brainsysPoint = data[18];
+        console.log(`Credentials OK`);
+    } catch (error) {
+        console.error('Error al obtener cred de Fire:', error);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await obtenerCredencialesCDS();
+    await obtenerSesionBrainsys();
+  });
+
 firebase.database().ref('ventasWeb').once('value')
     .then(snapshot => {
         if (snapshot.exists()) {
@@ -518,6 +546,22 @@ function crearCard(data) {
         `;
     }
 
+const codigosAlfa = [];
+const cantidades = [];
+
+data.items.forEach(item => {
+    if (item.cod_alfa !== "110") {
+        // Asegurar que el código alfa tenga 15 caracteres
+        const codigoFormateado = item.cod_alfa.padStart(15, '0');
+        codigosAlfa.push(codigoFormateado);
+        cantidades.push(item.cantidad);
+    }
+});
+
+// Resultado final
+console.log(codigosAlfa); // Array de códigos alfa
+console.log(cantidades);   // Array de cantidades
+
 // Crear el contenedor de productos
 let productosHTML2 = '';
 let productosTexto = '';
@@ -712,7 +756,7 @@ const skusTexto = skus.join(', ');
     <button class="mt-1 mb-0 btn btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', 'NOV${data.idOperacion}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}', '${productosTexto}', '${skusTexto}', ${totalCantidad})">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', 'NOV${data.idOperacion}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${data.Recibe}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones'}', '${productosTexto}', '${skusTexto}', ${totalCantidad}, '${codigosAlfa}', '${cantidades}')">
         <span>
             ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
         </span>
@@ -971,7 +1015,7 @@ async function solicitarCliente() {
 }
 
 // ETIQUETA LOGISTICA PROPIA
-async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, SKU, total, comentarios, productosTexto, skus, cantidadTotal) {
+async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDestinatario, alturaDestinatario, telefonoDestinatario, observaciones, peso, volumenM3, cantidad, medidas, producto, localidad, provincia, recibe, SKU, total, comentarios, productosTexto, skus, cantidadTotal, codigosAlfa, cantidades) { 
     // Solicitar el número de remito
     const numeroRemito = await solicitarNumeroRemito();
     if (!numeroRemito) return; // Si se cancela, salir de la función
@@ -979,6 +1023,50 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     // Solicitar el cliente
     const cliente = await solicitarCliente();
     if (!cliente) return; // Si se cancela, salir de la función
+
+    // Obtener fechas
+    const hoy = new Date();
+    const fechadeOrigen = obtenerFechaFormatoPlaceIt(new Date(hoy));
+    const fechaEntregaDate = sumarDiasHabiles(hoy, 3); // suma 3 días hábiles
+    const fechadeEntrega = obtenerFechaFormatoPlaceIt(fechaEntregaDate);
+
+    // Enviar el pedido de forma asíncrona
+    enviarPedidoBrainsys(
+        NombreyApellido,
+        Cp,
+        provincia,
+        numeroRemito,
+        cliente,
+        calleDestinatario,
+        alturaDestinatario,
+        telefonoDestinatario,
+        total,
+        codigosAlfa,
+        cantidades,
+        fechadeOrigen,
+        fechadeEntrega,
+        observaciones,
+        productosTexto
+    );
+
+    console.log(
+        NombreyApellido,
+        Cp,
+        provincia,
+        numeroRemito,
+        cliente,
+        calleDestinatario,
+        alturaDestinatario,
+        telefonoDestinatario,
+        email,
+        total,
+        producto,
+        codigosAlfa,
+        cantidades,
+        fechadeOrigen,
+        fechadeEntrega,
+        observaciones
+    )
 
     const { jsPDF } = window.jspdf;
 
@@ -1241,6 +1329,25 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
 
+// FECHA BRAINSYS
+function obtenerFechaFormatoPlaceIt(date) {
+    return new Date(date).toISOString();
+}
+  
+  function sumarDiasHabiles(fecha, diasHabiles) {
+    let resultado = new Date(fecha);
+    let sumados = 0;
+    while (sumados < diasHabiles) {
+      resultado.setDate(resultado.getDate() + 1);
+      const dia = resultado.getDay();
+      if (dia !== 0 && dia !== 6) { // 0 = Domingo, 6 = Sábado
+        sumados++;
+      }
+    }
+    return resultado;
+  }
+// FECHA BRAINSYS
+
 // OBTENER FECHAS PLACE IT
 function obtenerFechas() {
     const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
@@ -1341,6 +1448,156 @@ function updatePagination(totalItems) {
         paginationContainer.appendChild(backItem);
     }
 }
+
+// SESION BRAINSYS
+async function obtenerSesionBrainsys() {
+    const storageKey = 'brainsysSesion';
+    const timestampKey = 'brainsysSesionTimestamp';
+    const ahora = Date.now();
+    const cincoHoras = 5 * 60 * 60 * 1000;
+  
+    let sesion = null;
+  
+    try {
+      const sesionGuardada = localStorage.getItem(storageKey);
+      const timestampGuardado = localStorage.getItem(timestampKey);
+  
+      if (sesionGuardada && timestampGuardado && (ahora - parseInt(timestampGuardado)) < cincoHoras) {
+        console.log("⏳ Sesión válida BrainSys encontrada.");
+        sesion = JSON.parse(sesionGuardada);
+        return sesion;
+      }
+  
+      console.log("🔁 No hay sesión BrainSys válida, autenticando...");
+  
+      const authData = {
+        usuario: brainsysUser,
+        contrasenia: brainsysPass
+      };
+  
+      const response = await fetch(`${brainsysPoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'x-cors-api-key': `${live}`,
+        },
+        body: JSON.stringify(authData)
+      });
+  
+      const result = await response.json();
+  
+      if (result.d.tipo === 0) {
+        sesion = result.d.sesion;
+        console.log("✅ Autenticación exitosa BrainSys");
+  
+        localStorage.setItem(storageKey, JSON.stringify(sesion));
+        localStorage.setItem(timestampKey, ahora.toString());
+      } else {
+        console.warn("⚠️ Error en autenticación:", result.d.mensaje);
+      }
+  
+    } catch (error) {
+      console.error("❌ Error al autenticar:", error);
+    }
+  
+    return sesion;
+  }
+// SESION BRAINSYS  
+
+function transformarTotal(total) {
+    return Number(total.replace(/\$|\./g, '').replace(',', '.'));
+}
+
+// ENVIAR PEDIDO BRAINSYS  
+async function enviarPedidoBrainsys(NombreyApellido, Cp, provincia, numeroRemito, cliente, calleDestinatario, alturaDestinatario, telefono, precio_venta, skusString, cantidadesString, fechadeOrigen, fechadeEntrega, observaciones, productosTexto) {
+    
+    const sesion = localStorage.getItem('sesion');
+    const depositoId = "001";
+    const remitoTransformado = numeroRemito.slice(3).replace(/^0000/, '');
+
+    // Cadenas en arrays
+    const skus = skusString.split(','); // ['000CD5603AI0-IX', '0000000B120DS20']
+    const cantidades = cantidadesString.split(',').map(Number); // [1, 1]
+
+    const productos = skus.map((sku, index) => ({
+        codigo: sku,
+        companiaCodigo: "NOG", 
+        loteCodigo: "001", 
+        vencimiento: "", 
+        loteUnico: false,
+        estadoCodigo: "DIS", 
+        cantidad: cantidades[index], 
+        entregaParcial: true 
+    }));
+
+    // Transformar el total
+    const totalTransformado = transformarTotal(precio_venta).toString().replace('.', '');
+
+    await enviarPedido(
+        sesion,
+        depositoId,
+        "DEP",
+        "PLA",
+        "PNG",
+        "R",
+        "0254",
+        Number(remitoTransformado),
+        fechadeOrigen,
+        fechadeEntrega,
+        "NOG",
+        "ENO",
+        NombreyApellido,
+        "ARG",
+        provincia,
+        Cp,
+        calleDestinatario,
+        "001",
+        "001",
+        1,
+        false,
+        totalTransformado,
+        1,
+        1,
+        `Cliente: ${cliente}`, 
+        `Remito: ${numeroRemito}`, 
+        `Coordinar con línea ${telefono}, Producto/s: ${productosTexto}`,
+        observaciones,
+        ...productos
+    );
+
+    console.log(
+        sesion,
+        depositoId,
+        "DEP",
+        "PLA",
+        "PNG",
+        "R",
+        "0254",
+        Number(remitoTransformado),
+        fechadeOrigen,
+        fechadeEntrega,
+        "NOG",
+        "ENO",
+        NombreyApellido,
+        "ARG",
+        provincia,
+        Cp,
+        calleDestinatario,
+        "001",
+        "001",
+        1,
+        false,
+        totalTransformado,
+        1,
+        1,
+        `Cliente: ${cliente}`, 
+        `Remito: ${numeroRemito}`, 
+        `Coordinar con línea ${telefono}, Producto/s: ${productosTexto}`,
+        observaciones,
+        ...productos 
+    );
+}
+// FIN ENVIAR PEDIDO BRAINSYS  
 
 // Llama a cargarDatos para iniciar el proceso
 cargarDatos();

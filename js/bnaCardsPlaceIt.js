@@ -3113,7 +3113,7 @@ function obtenerFechas() {
 console.log(obtenerFechas());
 // FIN OBTENER FECHAS PLACE IT
 
-// FECHA PLACE IT
+// FECHA BRAINSYS
 function obtenerFechaFormatoPlaceIt(date) {
     return new Date(date).toISOString();
 }
@@ -4219,6 +4219,8 @@ async function enviarPedidoBrainsys(nombre, cp, provincia, numeroRemito, cliente
         cantidad: cantidad,
         entregaParcial: true
     };
+
+    console.log(producto)
 
     await enviarPedido(
         sesion,
