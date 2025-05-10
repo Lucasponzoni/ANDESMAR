@@ -1432,21 +1432,76 @@ modalDespacho.addEventListener('shown.bs.modal', () => {
   inputRemito.focus();
 });
 
-const agregarDespachoSiNoExiste = async (remito) => {
+const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
     try {
         const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remito}`).once('value');
 
         if (remitoSnapshot.exists()) {
-            // Aquí se obtiene el nodo completo
             const remitoData = remitoSnapshot.val();
-            // Agregar el nodo en la carpeta "Info"
+            const cp = remitoData.cp;
+
+            // Buscar CP en las rutas de logística propia
+            const carpetas = [
+                { nombre: 'CamionBsAs', etiqueta: 'Buenos Aires' },
+                { nombre: 'CamionRafaela', etiqueta: 'Rafaela' },
+                { nombre: 'CamionRosario', etiqueta: 'Rosario' },
+                { nombre: 'CamionSNicolas', etiqueta: 'San Nicolás' },
+                { nombre: 'CamionStaFe', etiqueta: 'Santa Fe' }
+            ];
+
+            let coincidencia = null;
+
+            for (let i = 0; i < carpetas.length; i++) {
+                const snapshot = await dbLogisticasNovo.ref(`${carpetas[i].nombre}/${cp}`).once('value');
+                if (snapshot.exists()) {
+                    coincidencia = carpetas[i].etiqueta;
+                    break;
+                }
+            }
+
+            if (coincidencia) {
+                await Swal.fire({
+                    icon: 'warning',
+                    title: '⚠️ CP incluido en Logística Propia',
+                    text: `Estás intentando despachar un producto que podría estar incluido en Logística Propia: ${coincidencia}. Se notificará al gerente, pero podés continuar.`
+                });
+
+                // Crear cuerpo del email con estilo MacOS
+                const emailBody = `
+                <h2 style="color: #d32f2f; font-size: 22px; margin-bottom: 8px;">📢 LogiPaq Informa</h2>
+                <p style="font-family: 'Helvetica', sans-serif; color: #555;">🚨 <strong>Alerta</strong>: Estás intentando despachar un producto con un código postal (CP) que podría estar incluido en logística propia. 🌍</p>
+                <p style="font-family: 'Helvetica', sans-serif; color: #555;">👉 El remito <strong>${remito}</strong> tiene el CP <strong>${cp}</strong> y está relacionado con <strong>${coincidencia}</strong> (camión de logística propia). Se esta intentando despachar por ${logistica} con etiqueta ${etiqueta}</p>
+
+                <div style="background-color: #f5f5f5; border-radius: 12px; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-family: 'Helvetica', sans-serif; color: #333; margin-top: 20px;">
+                    <p style="font-size: 18px; font-weight: bold; color: #1976d2;">📝 Detalles del Remito:</p>
+                    <pre style="background-color: #fff; padding: 15px; border-radius: 10px; font-size: 14px; color: #333; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); white-space: pre-wrap;">
+                        ${JSON.stringify(remitoData, null, 4)}
+                    </pre>
+                </div>
+
+                <p style="font-family: 'Helvetica', sans-serif; color: #555; margin-top: 20px;">📢 Se notifica un error en el despacho.</p>
+                <p style="font-family: 'Helvetica', sans-serif; color: #555;">🖥️ Este es un aviso automático generado para asegurar la correcta gestión de los envíos. Gracias por tu atención. 🚚</p>
+                `;
+
+                enviarCorreosDeError("Alerta Logística Propia - Remito " + remito, emailBody);
+            }
+
+            // Guardar en Info aunque haya coincidencia
             await dbTipeo.ref(`despachosDelDia/${remito}/Info`).set(remitoData);
             console.log("Remito encontrado y agregado en 'Info':", remitoData);
         } else {
             console.log("Remito no encontrado:", remito);
         }
     } catch (error) {
-        console.error("Error al buscar el remito:", error);
+        console.error("Error al procesar el remito:", error);
+
+        // Enviar un correo en caso de error con el detalle del remito
+        const emailBody = `
+        <h2 style="color: #d32f2f; font-size: 22px; margin-bottom: 8px;">📢 LogiPaq Informa</h2>
+        <p style="font-family: 'Helvetica', sans-serif; color: #555;">❌ Se produjo un error inesperado verificando el remito <strong>${remito}</strong>.</p>
+        <p style="font-family: 'Helvetica', sans-serif; color: #555;"><strong>Error técnico:</strong> ${error.message}</p>
+                `;
+        enviarCorreosDeError("Error de sistema - Verificación de Remito", emailBody);
     }
 };
 
@@ -1460,7 +1515,7 @@ function agregarDespacho(remito, etiqueta, bultos, valor, logistica) {
     };
 
     // Llama a la función para agregar el remito si no existe
-    agregarDespachoSiNoExiste(remito);
+    agregarDespachoSiNoExiste(remito, etiqueta, logistica);
 
     // Agregar el despacho actual
     dbTipeo.ref(`despachosDelDia/${remito}`).set(despachoData)
