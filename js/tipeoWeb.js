@@ -356,64 +356,82 @@ async function finalizarColecta() {
             inputs.forEach(input => input.disabled = false);
         });
 
-        if (result.isConfirmed) {
-            const { pallets, nombre, dni, marcaCamion, patenteCamion } = result.value;
-            const Totalpallets = document.getElementById('cantidadDePallets').value || '';
-            const marcaChasis = document.getElementById('marcaChasis').value || '';
-            const patenteChasis = document.getElementById('patenteChasis').value || '';
-            const fechaHoy = new Date();
-            const fechaFormateada = `${fechaHoy.getFullYear()}-${(fechaHoy.getMonth() + 1).toString().padStart(2, '0')}-${fechaHoy.getDate().toString().padStart(2, '0')}`;
-            const rutaBase = `DespachosHistoricos${logisticaActual.replace(/\s/g, '')}/${fechaFormateada}`;
-            const despachos = [];
-            let entregasNotificadas = 0;
-            let montoTotal = 0;
+if (result.isConfirmed) {
+    const { pallets, nombre, dni, marcaCamion, patenteCamion } = result.value;
+    const Totalpallets = document.getElementById('cantidadDePallets').value || '';
+    const marcaChasis = document.getElementById('marcaChasis').value || '';
+    const patenteChasis = document.getElementById('patenteChasis').value || '';
+    const fechaHoy = new Date();
+    const fechaFormateada = `${fechaHoy.getFullYear()}-${(fechaHoy.getMonth() + 1).toString().padStart(2, '0')}-${fechaHoy.getDate().toString().padStart(2, '0')}`;
+    const rutaBase = `DespachosHistoricos${logisticaActual.replace(/\s/g, '')}/${fechaFormateada}`;
+    const despachos = [];
+    let entregasNotificadas = 0;
+    let montoTotal = 0;
 
-            filas.forEach(fila => {
-                const columnas = fila.querySelectorAll('td');
-                const valor = parseFloat(columnas[5].textContent.replace(/\./g, '').replace(',', '.').replace('$', '').trim());
-                montoTotal += valor;
-                const despacho = {
-                    fechaHora: columnas[0].textContent.trim(),
-                    camion: columnas[1].textContent.trim(),
-                    seguimiento: columnas[2].textContent.trim(),
-                    bultos: columnas[3].textContent.trim(),
-                    remito: columnas[4].textContent.trim(),
-                    valor: columnas[5].textContent.trim(),
-                    info: columnas[6].textContent.trim()
-                };
-                despachos.push(despacho);
-            });
+    // Iterar sobre las filas de la tabla
+    for (const fila of filas) {
+        const columnas = fila.querySelectorAll('td');
+        const remito = columnas[4].textContent.trim();
 
-            dbTipeo.ref(rutaBase).once('value', snapshot => {
-                const nuevoCamion = `CAMION ${Object.keys(snapshot.val() || {}).length + 1}`;
+        try {
+            const remitoSnapshot = await dbTipeo.ref(`despachosDelDia/${remito}`).once('value');
+            let info = 'Presea ❌';
 
-                Swal.fire({
-                    title: "Despachando en Logipaq...",
-                    html: "Por favor, espere mientras se actualizan los despachos.",
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
+            if (remitoSnapshot.exists()) {
+                const remitoData = remitoSnapshot.val();
+                if (remitoData.Info) {
+                    info = remitoData.Info;
+                }
+            }
 
-                const promises = despachos.map(despacho => {
-                    const remito = despacho.remito;
-                    const seguimiento = despacho.seguimiento;
+            const valor = parseFloat(columnas[5].textContent.replace(/\./g, '').replace(',', '.').replace('$', '').trim()) || 0;
+            montoTotal += valor;
 
-                    return dbMeli.ref(`/DespachosLogisticos/${remito}`).once('value').then(snapshot => {
-                        if (snapshot.exists()) {
-                            const fechaHoraDeDespacho = new Date().toLocaleString('es-ES', { timeZone: 'UTC' });
-                            return dbMeli.ref(`/DespachosLogisticos/${remito}`).update({
-                                operadorLogistico: logisticaActual,
-                                fechaHoraDeDespacho: fechaHoraDeDespacho,
-                                numeroDeEnvio: seguimiento,
-                                estado: "Despachado"
-                            }).then(() => {
-                                entregasNotificadas++;
-                            });
-                        }
+            const despacho = {
+                fechaHora: columnas[0].textContent.trim() || '',
+                camion: columnas[1].textContent.trim() || '',
+                seguimiento: columnas[2].textContent.trim() || '',
+                bultos: columnas[3].textContent.trim() || '',
+                remito: remito || '',
+                valor: columnas[5].textContent.trim() || '',
+                info: info 
+            };
+            despachos.push(despacho);
+        } catch (error) {
+            console.error("Error al buscar el remito:", error);
+        }
+    }
+
+    dbTipeo.ref(rutaBase).once('value', snapshot => {
+        const nuevoCamion = `CAMION ${Object.keys(snapshot.val() || {}).length + 1}`;
+
+        Swal.fire({
+            title: "Despachando en Logipaq...",
+            html: "Por favor, espere mientras se actualizan los despachos.",
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const promises = despachos.map(despacho => {
+            const remito = despacho.remito;
+            const seguimiento = despacho.seguimiento;
+
+            return dbMeli.ref(`/DespachosLogisticos/${remito}`).once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    const fechaHoraDeDespacho = new Date().toLocaleString('es-ES', { timeZone: 'UTC' });
+                    return dbMeli.ref(`/DespachosLogisticos/${remito}`).update({
+                        operadorLogistico: logisticaActual,
+                        fechaHoraDeDespacho: fechaHoraDeDespacho,
+                        numeroDeEnvio: seguimiento,
+                        estado: "Despachado"
+                    }).then(() => {
+                        entregasNotificadas++;
                     });
-                });
+                }
+            });
+        });
 
                 Promise.all(promises).then(async () => {
                     // Guardar los remitos directamente bajo el camión
@@ -496,11 +514,41 @@ async function finalizarColecta() {
                         confirmButtonText: 'Aceptar'
                     });
 
+                    finalizarColectaMensaje()
                     limpiarDespachosDelDia();
                 });
             });
         }
     });
+}
+
+function finalizarColectaMensaje() {
+    // Obtener la referencia a la tabla
+    const tablaBody = document.getElementById('tabla-despacho-xLogistica-body');
+
+    // Borrar todas las filas de la tabla
+    while (tablaBody.firstChild) {
+        tablaBody.removeChild(tablaBody.firstChild);
+    }
+
+    // Crear una nueva fila para el mensaje
+    const nuevaFila = document.createElement('tr');
+    const nuevaColumna = document.createElement('td');
+
+    // Ajustar el colspan a 8
+    nuevaColumna.colSpan = 8;
+    nuevaColumna.className = 'text-center'; // Centrar el texto
+
+    // Crear el mensaje con icono de Bootstrap
+    nuevaColumna.innerHTML = `
+        <span class="text-success">Se ha finalizado la colecta con éxito <i class="bi bi-check-circle-fill"></i></span>
+    `;
+
+    // Agregar la nueva columna a la nueva fila
+    nuevaFila.appendChild(nuevaColumna);
+
+    // Agregar la nueva fila al cuerpo de la tabla
+    tablaBody.appendChild(nuevaFila);
 }
 
 async function enviarCorreoConDetalles(destinatarioEmail, nombreDestinatario, nombreTanda, horaSubida, emailBody) {
@@ -770,7 +818,7 @@ function showAlertPosventa(message) {
 // RENDERIZADO DE FILAS EN LA TABLA
 window.onload = async () => {
     await cargarDespachos(); 
-    actualizarTotal();        
+    await actualizarTotales();        
 };
 
 function cargarDespachos() {
@@ -1262,7 +1310,7 @@ inputValor.addEventListener('keydown', (e) => {
       <td>
             <div class="valor-tabla-despacho">${valorFormateado}</div>
       </td>
-      <td class="info-tabla-despacho">OK</td>
+      <td class="info-tabla-despacho" data-remito=${remito}>Esperando...</td>
       <td class="delete-tabla-despacho">
           <button class="btn btn-danger btn-sm" onclick="confirmarEliminacion('${remito}')">
               <i class="bi bi-trash3-fill"></i>
@@ -1344,6 +1392,24 @@ modalDespacho.addEventListener('shown.bs.modal', () => {
   inputRemito.focus();
 });
 
+const agregarDespachoSiNoExiste = async (remito) => {
+    try {
+        const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remito}`).once('value');
+
+        if (remitoSnapshot.exists()) {
+            // Aquí se obtiene el nodo completo
+            const remitoData = remitoSnapshot.val();
+            // Agregar el nodo en la carpeta "Info"
+            await dbTipeo.ref(`despachosDelDia/${remito}/Info`).set(remitoData);
+            console.log("Remito encontrado y agregado en 'Info':", remitoData);
+        } else {
+            console.log("Remito no encontrado:", remito);
+        }
+    } catch (error) {
+        console.error("Error al buscar el remito:", error);
+    }
+};
+
 function agregarDespacho(remito, etiqueta, bultos, valor, logistica) {
     const despachoData = {
         etiqueta: etiqueta,
@@ -1353,6 +1419,10 @@ function agregarDespacho(remito, etiqueta, bultos, valor, logistica) {
         fecha: new Date().toISOString() 
     };
 
+    // Llama a la función para agregar el remito si no existe
+    agregarDespachoSiNoExiste(remito);
+
+    // Agregar el despacho actual
     dbTipeo.ref(`despachosDelDia/${remito}`).set(despachoData)
         .then(() => {
             console.log("Despacho agregado correctamente:", despachoData);
