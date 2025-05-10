@@ -371,11 +371,11 @@ if (result.isConfirmed) {
     // Iterar sobre las filas de la tabla
     for (const fila of filas) {
         const columnas = fila.querySelectorAll('td');
-        const remito = columnas[4].textContent.trim();
+        const remito = columnas[4].querySelector('.remito-tipeo-os')?.textContent.trim() || '';
 
         try {
             const remitoSnapshot = await dbTipeo.ref(`despachosDelDia/${remito}`).once('value');
-            let info = 'Presea ❌';
+            let info = 'Presea ❌'; // Valor por defecto
 
             if (remitoSnapshot.exists()) {
                 const remitoData = remitoSnapshot.val();
@@ -894,40 +894,80 @@ function agregarFilaTabla(remito, despacho, tablaBody) {
     logisticaDiv.appendChild(circuloDiv); 
 
     const etiquetaConPrefijo = logistica === 'Cruz del Sur' ? `NIC-${despacho.etiqueta}` : despacho.etiqueta;
+row.innerHTML = `
+    <td class="fecha-tabla-despacho">${fecha}</td>
+    <td class="logistica-tabla-despacho"></td> <!-- Se dejará vacío para insertar el contenedor -->
+    <td class="seguimiento-tabla-despacho">
+        <div class="seguimiento-contenedor">
+            <a href="${getSeguimientoLink(despacho.logistica, despacho.etiqueta)}" target="_blank">
+                ${etiquetaConPrefijo} 
+                <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+        </div>
+    </td>
+    
+    <td class="bultos-tabla-despacho">
+    <div class="bultos-box" data-bultos="${despacho.bultos}">${despacho.bultos}</div>
+    </td>
+    <td class="remito-tabla-despacho">
+        <div class="remito-tipeo-os">${remito}</div>
+        ${despacho.Info ? generarProductosRemito(despacho.Info) : ''}
+    </td>
+    <td><div class="valor-tabla-despacho">${despacho.valor}</div></td>
+    <td class="info-tabla-despacho">
+        ${despacho.Info ? generarInfoCliente(despacho.Info) : 'Presea ❌'}
+    </td>
+    <td class="delete-tabla-despacho">
+        <button class="btn btn-danger btn-sm" onclick="confirmarEliminacion('${remito}')">
+            <i class="ml-1 bi bi-trash3-fill"></i>
+        </button>
+    </td>
+`;
 
-    row.innerHTML = `
-        <td class="fecha-tabla-despacho">${fecha}</td>
-        <td class="logistica-tabla-despacho"></td> <!-- Se dejará vacío para insertar el contenedor -->
-        <td class="seguimiento-tabla-despacho">
-            <div class="seguimiento-contenedor">
-                <a href="${getSeguimientoLink(despacho.logistica, despacho.etiqueta)}" target="_blank">
-                    ${etiquetaConPrefijo} 
-                    <i class="bi bi-box-arrow-up-right"></i>
-                </a>
+const logisticaCell = row.querySelector('.logistica-tabla-despacho');
+logisticaCell.appendChild(logisticaDiv);
+
+tablaBody.appendChild(row);
+actualizarTotales();
+}
+
+function generarInfoCliente(info) {
+    return `
+        <div class="infoMacOsy">
+            <div class="infoHeaderMacOsy"></div>
+            <div class="infoDetalleMacOsy">
+                <span class="infoUserMac"><i>👤</i> ${info.cliente}</span>
+                <span><i>🏷️</i> ${info.nombre}</span>
+                <span><i>📍</i> ${info.localidad} (${info.cp})</span>
             </div>
-        </td>
-        <td class="bultos-tabla-despacho">
-            <div class="bultos-box" data-bultos="${despacho.bultos}">${despacho.bultos}</div>
-        </td>
-        <td class="remito-tabla-despacho">${remito}</td>
-        <td>
-            <div class="valor-tabla-despacho">${despacho.valor}</div>
-        </td>
-        <td class="info-tabla-despacho">OK</td>
-        <td class="delete-tabla-despacho">
-            <button class="btn btn-danger btn-sm"  
-                    onclick="confirmarEliminacion('${remito}')">
-                <i class="ml-1 bi bi-trash3-fill"></i>
-            </button>
-        </td>
+        </div>
     `;
-      
-    // Insertar el contenedor en la celda correspondiente
-    const logisticaCell = row.querySelector('.logistica-tabla-despacho');
-    logisticaCell.appendChild(logisticaDiv);
+}
 
-    tablaBody.appendChild(row);
-    actualizarTotales(); 
+function generarProductosRemito(info) {
+    const productos = [];
+    for (let i = 1; i <= 2; i++) {
+        const producto = info[`producto${i}`];
+        const cantidad = info[`cantidad${i}`];
+        const descripcion = info[`descripcion${i}`];
+
+        if (producto && producto !== 'ENVIO' && producto !== '110') {
+            // Determinar la clase de cantidad según el valor
+            const cantidadClass = cantidad === 1 ? 'productoCantidadMacOsy' : 'productoCantidadMacOsyMasDos';
+
+            productos.push(`
+                <div class="productoMacOsy">
+                    <div class="productoTopMacOsy">
+                        <div class="productoNombreMacOsy">📦 ${producto}</div>
+                        <div class="${cantidadClass}">${cantidad}</div>
+                    </div>
+                    <div class="productoDescripcionMacOsy">📝 ${descripcion}</div>
+                </div>
+            `);
+        }
+    }
+
+    return `<div class="productosRemitoMacOsy">${productos.join('')}</div>`;
 }
 
 function mostrarMensajeNoHayDespachos() {
@@ -1795,7 +1835,7 @@ function cargarYMostrarTabla(camion, fechaKey, logistica) {
                 'Cruz del Sur': 'cruz-del-sur-tablita'
             }[despacho.camion] || '';
 
-            const etiqueta = despacho.camion === 'Cruz del Sur' ? `${despacho.seguimiento}` : despacho.seguimiento;
+            const etiqueta = despacho.camion === 'Cruz del Sur' ? `NIC-${despacho.seguimiento}` : despacho.seguimiento;
 
             rowsHTML += `
                 <tr>
@@ -1810,20 +1850,30 @@ function cargarYMostrarTabla(camion, fechaKey, logistica) {
                     </td>
                     <td class="seguimiento-tabla-despacho">
                         <div class="seguimiento-contenedor">
-                            <a href="${getSeguimientoLink(despacho.camion, despacho.seguimiento)}" target="_blank">${etiqueta}</a>
-                            <i class="bi bi-box-arrow-up-right ml-1 text-primary"></i>
+                            <a href="${getSeguimientoLink(despacho.camion, despacho.seguimiento)}" target="_blank">
+                                ${etiqueta} 
+                                <i class="bi bi-box-arrow-up-right ml-1 text-primary"></i>
+                            </a>
                         </div>
                     </td>
                     <td class="bultos-tabla-despacho">
                         <div class="bultos-box" data-bultos="${despacho.bultos}">${despacho.bultos}</div>
                     </td>
-                    <td>${despacho.remito}</td>
+                    <td>
+                        <div class="remito-tipeo-os">${despacho.remito}</div>
+                        ${despacho.info ? generarProductosRemito(despacho.info) : ''}
+                    </td>
                     <td>
                         <div class="valor-tabla-despacho">${despacho.valor}</div>
                     </td>
-                    <td>${despacho.info}</td>
+                    <td class="info-tabla-despacho">
+                        ${typeof despacho.info === 'object' ? generarInfoCliente(despacho.info) : 'Presea ❌'}
+                    </td>
                 </tr>
             `;
+
+        console.log(despacho.info);
+
         });
 
         const tablaHTML = `

@@ -8188,9 +8188,15 @@ img.gray-filter {
     margin: 0 auto;
 }
 
-.remito-tabla-despacho {
-    color: #727272 !important;
-    font-weight: bold;
+.remito-tipeo-os {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #007aff;
+    padding: 6px 8px; 
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
 }
 
 .seguimiento-contenedor {
@@ -8294,3 +8300,112 @@ mark {
     border-radius: 3px;
   }
   
+/* PRODCUTOS TABLA TIPEO DESPACHO */
+
+.infoMacOsy {
+    background: #f9fafb;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    font-family: 'SF Pro Text', 'Rubik', sans-serif;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+}
+
+.infoDetalleMacOsy {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.infoUserMac{
+    color: #1d4ed8 !important;
+    font-size: 1rem !important;
+}
+
+.infoDetalleMacOsy span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.infoDetalleMacOsy span i {
+    font-style: normal;
+    font-size: 1rem;
+}
+
+.productosRemitoMacOsy {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.productoMacOsy {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.productoMacOsy:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.productoTopMacOsy {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.productoNombreMacOsy {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1d4ed8;
+}
+
+.productoCantidadMacOsy {
+    background-color: #e0f2fe;
+    margin-left: 10px;
+    color: #0284c7;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.productoCantidadMacOsyMasDos{
+    background-color: #fee2e2;
+    margin-left: 10px;
+    color: #b91c1c;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.productoDescripcionMacOsy {
+    font-size: 0.8125rem;
+    color: #64748b;
+    max-width: 30ch;
+    overflow: hidden;
+    white-space: nowrap; 
+    text-overflow: ellipsis; 
+    display: inline-block; 
+    vertical-align: middle;
+    gap: 6px;
+    padding-right: 2px; 
+}
+
