@@ -8446,58 +8446,55 @@ mark {
   backdrop-filter: blur(6px);
   margin-bottom: 10px;
 }
+.filtros-macos-estadisticas .form-select,
+.filtros-macos-estadisticas .form-control,
+.filtros-macos-estadisticas .btn {
+    border-radius: 8px !important;
+    font-size: 1.1rem;
+    height: 50px;
+}
 
-    .filtros-macos-estadisticas .form-select,
-    .filtros-macos-estadisticas .form-control,
-    .filtros-macos-estadisticas .btn {
-        border-radius: 8px !important;
-        font-size: 1.1rem;
-        height: 50px;
-    }
+.filtros-macos-estadisticas select {
+    padding: 0.5rem;
+    background-color: #f4f4f4;
+    color: #333;
+}
 
-    .filtros-macos-estadisticas select {
-        padding: 0.5rem;
-        background-color: #f4f4f4;
-        color: #333;
-    }
+.filtros-macos-estadisticas select:hover,
+.filtros-macos-estadisticas .form-control:hover {
+    background-color: #e9ecef;
+}
 
-    .filtros-macos-estadisticas select:hover,
-    .filtros-macos-estadisticas .form-control:hover {
-        background-color: #e9ecef;
-    }
+.filtros-macos-estadisticas .btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+}
 
-    .filtros-macos-estadisticas .btn {
-        background-color: #28a745;
-        color: white;
-        border: none;
-    }
+.filtros-macos-estadisticas .btn:hover {
+    background-color: #218838;
+}
 
-    .filtros-macos-estadisticas .btn:hover {
-        background-color: #218838;
-    }
+.filtros-macos-estadisticas i {
+    margin-right: 8px;
+}
 
-    /* Ajuste de íconos en los select */
-    .filtros-macos-estadisticas i {
-        margin-right: 8px;
-    }
+.filtros-macos-estadisticas .form-select {
+    font-size: 1rem;
+    color: #495057;
+}
 
-    /* Estilo de los botones de selección */
-    .filtros-macos-estadisticas .form-select {
-        font-size: 1rem;
-        color: #495057;
-    }
+.resumen-macos {
+    border: none;
+    border-radius: 12px;
+    color: #333;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
+}
 
-        .resumen-macos {
-        border: none;
-        border-radius: 12px;
-        color: #333;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        transition: all 0.2s ease-in-out;
-    }
-
-    .resumen-macos:hover {
-        transform: translateY(-4px);
-    }
+.resumen-macos:hover {
+    transform: translateY(-4px);
+}
 
 .bg-pastel-pink {
     background-color: #fef4f4;
@@ -8535,7 +8532,8 @@ mark {
 }
 
 .resumen-macos .card-title {
-    font-size: 1rem;
+    font-family: "Rubik", sans-serif;
+    font-size: 1.5rem;
     color: #444;
     font-weight: 500;
 }
@@ -8543,7 +8541,20 @@ mark {
 .resumen-macos .card-text {
     font-size: 1.7rem;
     font-weight: 600;
-    color: #222;
+    color: #1d4ed8;
+    font-family: "Rubik", sans-serif;
+}
+
+#valorTotal {
+    font-size: 1.7rem;
+    color: green;
+    font-family: "Rubik", sans-serif;
+    font-weight: 600;
+}
+
+.lista-macos{
+    font-family: "Rubik", sans-serif;
+    font-weight: 600;
 }
 
 .resumen-macos small {
@@ -8643,7 +8654,7 @@ mark {
     border-radius: 8px;
     font-size: 0.85rem;
     padding: 6px 12px;
-    background-color: #4cd964; /* Estilo Apple green */
+    background-color: #4cd964;
     border: none;
     transition: background-color 0.2s ease;
 }
@@ -8683,8 +8694,7 @@ mark {
     border-bottom: none;
 }
 
-.resumen-container-chart {
-    overflow-x: auto; /* Permitir scroll horizontal */
-    white-space: nowrap; /* Evitar que los elementos se envuelvan */
+.macos-title2{
+    margin-top: -80px !important;
 }
 

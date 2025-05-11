@@ -2897,11 +2897,11 @@ function generarReporteDetallado(
           border: 1px solid #dcdcdc;
           background: #f8f9fa;
           box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-          font-family: 'Courier New', monospace;
-          font-size: 14px;
+          font-size: 16px;
           color: #2e2e2e;
       ">
-          📊 <strong>Informe Ejecutivo</strong>
+
+          <div class="macos-title macos-title2">📊 Informe Ejecutivo</div>
 
           Analicé los datos en el rango de <strong>${fechaInicio || 'inicio'}</strong> a <strong>${fechaFin || 'fin'}</strong> para la logística <strong>${$('#selectLogistica').find('option:selected').text().replace('📦', '').trim()}</strong>.
 

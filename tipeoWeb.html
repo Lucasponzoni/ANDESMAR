@@ -408,7 +408,7 @@
                     <option value="100">Top 100</option>
                 </select>
             </div>
-            <div class="d-inline-block me-2 ml-1">
+            <div class="d-inline-block me-2 ml-2">
                 <button class="btn btn-success" id="btnFiltrar">
                     <i class="bi bi-funnel-fill"></i> Aplicar Filtros
                 </button>
@@ -455,77 +455,86 @@
             </div>
         </div>
 
-                <!-- Sección de Controles de Gráficos -->
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="btn-group w-100">
-                            <button class="btn btn-outline-secondary active" data-grafico="productos">
-                                <i class="bi bi-box-seam"></i> Productos
+        <!-- Sección de Controles de Gráficos -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="btn-group w-100">
+                    <button class="btn btn-outline-secondary active" data-grafico="productos">
+                        <i class="bi bi-box-seam"></i> Productos
+                    </button>
+                    <button class="btn btn-outline-secondary" data-grafico="localidades">
+                        <i class="bi bi-geo-alt"></i> Localidades
+                    </button>
+                    <button class="btn btn-outline-secondary" data-grafico="logisticas">
+                        <i class="bi bi-truck"></i> Logísticas
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Gráfico Principal -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="h-100 grafico-macos">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="card-title mb-0" id="tituloGrafico1">🏆 Productos más enviados</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Opciones
                             </button>
-                            <button class="btn btn-outline-secondary" data-grafico="localidades">
-                                <i class="bi bi-geo-alt"></i> Localidades
-                            </button>
-                            <button class="btn btn-outline-secondary" data-grafico="logisticas">
-                                <i class="bi bi-truck"></i> Logísticas
-                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" data-action="exportar" data-grafico="1">Exportar imagen</a></li>
+                                <li><a class="dropdown-item" href="#" data-action="ampliar" data-grafico="1">Ampliar</a></li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="btn-group w-100">
-                            <button class="btn btn-outline-secondary active" data-grafico="comparativa">
-                                <i class="bi bi-bar-chart-line"></i> Comparativa
-                            </button>
-                            <button class="btn btn-outline-secondary" data-grafico="apiladoYbultos">
-                                <i class="bi bi-bar-chart"></i> Comparativa por Valor y Butos
-                            </button>
+                    <div class="card-body">
+                        <div class="chart-container" style="position: relative; height:300px;">
+                            <canvas id="graficoPrincipal"></canvas>
                         </div>
                     </div>
                 </div>
-                    <!-- Sección de Gráficos -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="h-100 grafico-macos">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h5 class="card-title mb-0" id="tituloGrafico1">🏆 Productos más enviados</h5>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Opciones
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="#" data-action="exportar" data-grafico="1">Exportar imagen</a></li>
-                                            <li><a class="dropdown-item" href="#" data-action="ampliar" data-grafico="1">Ampliar</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart-container" style="position: relative; height:300px;">
-                                        <canvas id="graficoPrincipal"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="h-100 grafico-macos">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h5 class="card-title mb-0" id="tituloGrafico2">ℹ️ Comparativa por logística</h5>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Opciones
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="#" data-action="exportar" data-grafico="2">Exportar imagen</a></li>
-                                            <li><a class="dropdown-item" href="#" data-action="ampliar" data-grafico="2">Ampliar</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart-container" style="position: relative; height:300px;">
-                                        <canvas id="graficoSecundario"></canvas>
-                                    </div>
-                                </div>
-                            </div>
+            </div>
+        </div>
+
+        <!-- Sección de Controles Comparativa -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="btn-group w-100">
+                    <button class="btn btn-outline-secondary active" data-grafico="comparativa">
+                        <i class="bi bi-bar-chart-line"></i> Comparativa
+                    </button>
+                    <button class="btn btn-outline-secondary" data-grafico="apiladoYbultos">
+                        <i class="bi bi-bar-chart"></i> Comparativa por Valor y Bultos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Gráfico Comparativo -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="h-100 grafico-macos">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="card-title mb-0" id="tituloGrafico2">ℹ️ Comparativa por logística</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Opciones
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" data-action="exportar" data-grafico="2">Exportar imagen</a></li>
+                                <li><a class="dropdown-item" href="#" data-action="ampliar" data-grafico="2">Ampliar</a></li>
+                            </ul>
                         </div>
                     </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="position: relative; height:300px;">
+                            <canvas id="graficoSecundario"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
                     <!-- Sección de Informe Detallado -->
                     <div class="row mt-4">
