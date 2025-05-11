@@ -2002,3 +2002,1100 @@ document.getElementById('searchDespachosLogistica').addEventListener('input', fu
     }
 });
 // FIN BUSCADOR
+
+// ESTADISTICAS
+$(document).ready(function() {
+    // ██████████████████████████ 1. INICIALIZACIÓN ██████████████████████████
+    $("#rangoFechas").flatpickr({
+        mode: "range",
+        dateFormat: "Y-m-d",
+        maxDate: new Date(),
+        locale: "es"
+    });
+
+    // ██████████████████████████ 2. VARIABLES GLOBALES ██████████████████████████
+    let datosFiltrados = [];
+    let chartPrincipal = null;
+    let chartSecundario = null;
+    let tipoGraficoActual = 'productos';
+    let tipoVisualizacion = $('#selectTipoGrafico').val() || 'bar';
+    let topN = parseInt($('#selectTop').val()) || 10;
+    let fechaInicioGlobal = null;
+    let fechaFinGlobal = null;
+
+    // ██████████████████████████ 3. FUNCIÓN PRINCIPAL - CARGAR DATOS ██████████████████████████
+    async function cargarDatos(logistica, fechaInicio, fechaFin) {
+        try {
+            // ► Validación crítica de elementos del DOM
+            const canvasPrincipal = document.getElementById('graficoPrincipal');
+            const canvasSecundario = document.getElementById('graficoSecundario');
+            
+            if (!canvasPrincipal || !canvasSecundario) {
+                throw new Error(`
+                    Error: Contenedores de gráficos no encontrados. 
+                    Asegúrese de tener estos elementos en su HTML:
+                    <canvas id="graficoPrincipal"></canvas>
+                    <canvas id="graficoSecundario"></canvas>
+                `);
+            }
+
+            showLoading();
+            
+            let ref;
+            datosFiltrados = [];
+            const camionesPorLogistica = {};
+            const camionesUnicos = new Set();
+
+            // ► Lógica para "Todas las logísticas"
+            if (logistica === 'todas') {
+                const refs = [
+                    dbTipeo.ref('DespachosHistoricosAndesmar'),
+                    dbTipeo.ref('DespachosHistoricosAndreani'),
+                    dbTipeo.ref('DespachosHistoricosCruzdelSur'),
+                    dbTipeo.ref('DespachosHistoricosOca')
+                ];
+                
+                const snapshots = await Promise.all(refs.map(ref => ref.once('value')));
+                
+                snapshots.forEach(snapshot => {
+                    const logisticaKey = snapshot.key.replace('DespachosHistoricos', '');
+                    camionesPorLogistica[logisticaKey] = new Set();
+                    
+                    snapshot.forEach(fechaSnap => {
+                        const fecha = fechaSnap.key;
+                        if ((!fechaInicio || fecha >= fechaInicio) && (!fechaFin || fecha <= fechaFin)) {
+                            fechaSnap.forEach(camionSnap => {
+                                const camionKey = `${logisticaKey}|${camionSnap.key}`;
+                                camionesUnicos.add(camionKey);
+                                camionesPorLogistica[logisticaKey].add(camionSnap.key);
+                                
+                                camionSnap.forEach(remitoSnap => {
+                                    const remitoData = remitoSnap.val();
+                                    if (remitoData) {
+                                        datosFiltrados.push({
+                                            ...remitoData,
+                                            logistica: obtenerNombreLogistica(logisticaKey),
+                                            fecha: fecha,
+                                            camionKey: camionKey
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    });
+                });
+            } 
+            // ► Lógica para logística específica
+            else {
+                const refPath = `DespachosHistoricos${logistica}`;
+                ref = dbTipeo.ref(refPath);
+                const snapshot = await ref.once('value');
+                
+                camionesPorLogistica[logistica] = new Set();
+                
+                snapshot.forEach(fechaSnap => {
+                    const fecha = fechaSnap.key;
+                    if ((!fechaInicio || fecha >= fechaInicio) && (!fechaFin || fecha <= fechaFin)) {
+                        fechaSnap.forEach(camionSnap => {
+                            const camionKey = `${logistica}|${camionSnap.key}`;
+                            camionesUnicos.add(camionKey);
+                            camionesPorLogistica[logistica].add(camionSnap.key);
+                            
+                            camionSnap.forEach(remitoSnap => {
+                                const remitoData = remitoSnap.val();
+                                if (remitoData) {
+                                    datosFiltrados.push({
+                                        ...remitoData,
+                                        logistica: obtenerNombreLogistica(logistica),
+                                        fecha: fecha,
+                                        camionKey: camionKey
+                                    });
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+            
+            // Guardar fechas para el reporte
+            fechaInicioGlobal = fechaInicio;
+            fechaFinGlobal = fechaFin;
+            
+            procesarDatos(camionesUnicos.size, camionesPorLogistica);
+        } catch (error) {
+            console.error("Error completo en cargarDatos:", error);
+            mostrarErrorGraficos(error.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al cargar datos',
+                html: `<small>${error.message}</small>`
+            });
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // ██████████████████████████ 4. PROCESAMIENTO DE DATOS ██████████████████████████
+    function procesarDatos(totalCamiones, camionesPorLogistica) {
+        try {
+            // ► Validación de datos vacíos
+            if (!datosFiltrados || datosFiltrados.length === 0) {
+                throw new Error("No hay datos para los filtros seleccionados");
+            }
+
+            // ► Cálculo de resumen general
+            let totalEnvios = datosFiltrados.length;
+            let totalBultos = 0;
+            let totalValor = 0;
+            
+            // ► Cálculo por logística
+            const resumenLogisticas = {};
+            const enviosPorLogistica = {};
+            const bultosPorLogistica = {};
+            const valorPorLogistica = {};
+            
+            datosFiltrados.forEach(remito => {
+                const logistica = remito.logistica;
+                
+                if (!enviosPorLogistica[logistica]) {
+                    enviosPorLogistica[logistica] = 0;
+                    bultosPorLogistica[logistica] = 0;
+                    valorPorLogistica[logistica] = 0;
+                }
+                
+                enviosPorLogistica[logistica]++;
+                bultosPorLogistica[logistica] += parseInt(remito.bultos) || 0;
+                
+                const valorStr = remito.valor.replace(/[^\d,]/g, '').replace(',', '.');
+                const valor = parseFloat(valorStr) || 0;
+                valorPorLogistica[logistica] += valor;
+                
+                totalBultos += parseInt(remito.bultos) || 0;
+                totalValor += valor;
+            });
+
+            // ► Actualización de la UI
+            $('#totalCamiones').text(totalCamiones);
+            $('#totalEnvios').text(totalEnvios);
+            $('#totalBultos').text(totalBultos);
+            $('#valorTotal').text(formatearMoneda(totalValor).replace(/,00$/, ''));
+            
+            actualizarDetalleResumen('#detalleCamiones', camionesPorLogistica, 'camiones');
+            actualizarDetalleResumen('#detalleEnvios', enviosPorLogistica, 'envíos');
+            actualizarDetalleResumen('#detalleBultos', bultosPorLogistica, 'bultos');
+            actualizarDetalleResumen('#detalleValor', valorPorLogistica, 'valor', true);
+
+            // ► Procesamiento para gráficos
+            const productosMap = new Map();
+            const localidadesMap = new Map();
+            const logisticasMap = new Map();
+            
+            datosFiltrados.forEach(remito => {
+                // Procesamiento de productos
+                if (typeof remito.info === 'object' && remito.info !== null) {
+                    let i = 1;
+                    while (remito.info[`producto${i}`]) {
+                        const producto = remito.info[`producto${i}`];
+                        const descripcion = remito.info[`descripcion${i}`] || 'Sin descripción';
+                        
+                        if (!['110', 'ENVIO', 'COSTO DE ENVIO', 'ENVIO LOGISTICA WEB'].includes(producto.toUpperCase())) {
+                            const cantidad = parseInt(remito.info[`cantidad${i}`]) || 1;
+                            
+                            if (productosMap.has(producto)) {
+                                productosMap.get(producto).cantidad += cantidad;
+                            } else {
+                                productosMap.set(producto, {
+                                    cantidad: cantidad,
+                                    descripcion: descripcion
+                                });
+                            }
+                        }
+                        i++;
+                    }
+                    
+                    // Procesamiento de localidades
+                    if (remito.info.localidad && remito.info.cp) {
+                        const localidadKey = `${remito.info.localidad} (${remito.info.cp})`;
+                        localidadesMap.set(localidadKey, (localidadesMap.get(localidadKey) || 0) + 1);
+                    }
+                }
+                
+                // Procesamiento de logísticas
+                logisticasMap.set(remito.logistica, (logisticasMap.get(remito.logistica) || 0) + 1);
+            });
+
+            // ► Generación de datos ordenados
+            const productosTop = Array.from(productosMap.entries())
+                .sort((a, b) => b[1].cantidad - a[1].cantidad)
+                .slice(0, topN);
+                
+            const localidadesTop = Array.from(localidadesMap.entries())
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, topN);
+                
+            const logisticasTop = Array.from(logisticasMap.entries())
+                .sort((a, b) => b[1] - a[1]);
+
+            // ► Generación de gráficos e informe
+            generarGraficos(productosTop, localidadesTop, logisticasTop, enviosPorLogistica, bultosPorLogistica, valorPorLogistica);
+            generarReporteDetallado(
+                fechaInicioGlobal, fechaFinGlobal, 
+                totalCamiones, totalEnvios, totalBultos, totalValor, 
+                productosTop, localidadesTop, logisticasTop, 
+                camionesPorLogistica, enviosPorLogistica, 
+                bultosPorLogistica, valorPorLogistica
+            );
+
+        } catch (error) {
+            console.error("Error en procesarDatos:", error);
+            mostrarErrorGraficos(error.message);
+            Swal.fire('Error', error.message, 'error');
+        }
+    }
+
+// ██████████████████████████ 5. GENERACIÓN DE GRÁFICOS ██████████████████████████
+function generarGraficos(productosTop, localidadesTop, logisticasTop, enviosPorLogistica, bultosPorLogistica, valorPorLogistica) {
+    try {
+        // ► Solo destruir el gráfico principal si vamos a cambiarlo
+        if (window.chartPrincipal) {
+            window.chartPrincipal.destroy();
+        }
+
+        // ► Validación de contextos de canvas
+        const canvasPrincipal = document.getElementById('graficoPrincipal');
+        const canvasSecundario = document.getElementById('graficoSecundario');
+
+        if (!canvasPrincipal || !canvasSecundario) {
+            throw new Error("Elementos canvas no encontrados");
+        }
+
+        const ctxPrincipal = canvasPrincipal.getContext('2d');
+        const ctxSecundario = canvasSecundario.getContext('2d');
+        
+        if (!ctxPrincipal || !ctxSecundario) {
+            throw new Error("No se pudo obtener el contexto de los gráficos");
+        }
+
+        // ► Destruir gráficos anteriores si existen
+        if (window.chartPrincipal) {
+            window.chartPrincipal.destroy();
+        }
+        if (window.chartSecundario) {
+            window.chartSecundario.destroy();
+        }
+
+        // ► Generar gráfico principal según el tipo seleccionado
+        switch(tipoGraficoActual) {
+            case 'productos':
+                generarGraficoProductos(ctxPrincipal, productosTop);
+                $('#tituloGrafico1').html(`📦 Productos más enviados (Top ${topN})`);
+                break;
+            case 'localidades':
+                generarGraficoLocalidades(ctxPrincipal, localidadesTop);
+                $('#tituloGrafico1').html(`🗺️ Localidades con más envíos (Top ${topN})`);
+                break;
+            case 'logisticas':
+                generarGraficoLogisticas(ctxPrincipal, logisticasTop);
+                $('#tituloGrafico1').html(`📌 Distribución por logística`);
+                break;
+        }
+        
+        // ► Determinar tipo de gráfico secundario según botón activo
+        const tipoGraficoSecundario = $('.btn-group button[data-grafico].active').data('grafico') || 'comparativa';
+
+        // ► Generar gráfico secundario según selección
+        switch(tipoGraficoSecundario) {
+            case 'comparativa':
+                generarGraficoComparativa(ctxSecundario, enviosPorLogistica, bultosPorLogistica, valorPorLogistica);
+                generarGraficoProductos(ctxPrincipal, productosTop);
+                $('#tituloGrafico1').html(`📦 Productos más enviados (Top ${topN})`);
+                $('#tituloGrafico2').html(`<i class="bi bi-bar-chart-line"></i> Comparativa por logística`);
+                break;  
+            case 'apiladoYbultos':
+                generarGraficoApiladoYBultos(ctxSecundario, enviosPorLogistica, bultosPorLogistica, valorPorLogistica);
+                generarGraficoProductos(ctxPrincipal, productosTop);
+                $('#tituloGrafico1').html(`📦 Productos más enviados (Top ${topN})`);
+                $('#tituloGrafico2').html(`<i class="bi bi-bar-chart"></i> Comparativa Apilada y Evolución de Bultos`);
+                break;
+            default:
+                generarGraficoComparativa(ctxSecundario, enviosPorLogistica, bultosPorLogistica, valorPorLogistica);
+        }
+
+        // ► Configurar eventos para los gráficos recién creados
+        configurarEventosGraficos();
+
+    } catch (error) {
+        console.error("Error en generarGraficos:", error);
+        mostrarErrorGraficos(error.message);
+    }
+}
+
+// ► Función para configurar eventos de exportación y ampliación
+function configurarEventosGraficos() {
+    $('[data-action="exportar"]').off('click');
+    $('[data-action="ampliar"]').off('click');
+
+    // Configurar exportación
+    $('[data-action="exportar"]').on('click', function (e) {
+        e.preventDefault();
+        const graficoId = String($(this).data('grafico')); 
+        const canvasMap = {
+            '1': 'graficoPrincipal',
+            '2': 'graficoSecundario'
+        };
+        const canvasId = canvasMap[graficoId];
+        const canvas = document.getElementById(canvasId);
+
+        if (!canvas) {
+            Swal.fire('Error', `No se encontró el canvas ${canvasId}`, 'error');
+            return;
+        }
+
+        const grafico = Chart.getChart(canvas);
+        if (!grafico) {
+            Swal.fire('Error', `El gráfico ${graficoId} no está inicializado`, 'error');
+            return;
+        }
+
+        // Crear enlace de descarga con mejor calidad
+        const link = document.createElement('a');
+        link.download = `grafico-${graficoId}-${new Date().toISOString().slice(0, 10)}.png`;
+        link.href = grafico.toBase64Image('image/png', 1);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    // Configurar ampliación
+    function ampliarGrafico(graficoId) {
+        const canvasMap = {
+            '1': 'graficoPrincipal',
+            '2': 'graficoSecundario'
+        };
+
+        const canvasId = canvasMap[graficoId];
+        if (!canvasId) {
+            console.error('ID de gráfico no válido');
+            return;
+        }
+
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            Swal.fire('Error', `No se encontró el canvas ${canvasId}`, 'error');
+            return;
+        }
+
+        const grafico = Chart.getChart(canvas);
+        if (!grafico) {
+            Swal.fire('Error', `El gráfico ${graficoId} no está inicializado`, 'error');
+            return;
+        }
+
+        Swal.fire({
+            title: document.querySelector(`#tituloGrafico${graficoId}`)?.textContent || `Gráfico ${graficoId}`,
+            html: `<div style="width: 100%; overflow: auto;">
+                    <img src="${grafico.toBase64Image()}" 
+                         style="max-width: 90vw; max-height: 80vh; display: block; margin: 0 auto;">
+                  </div>`,
+            width: '90%',
+            padding: '1rem',
+            showConfirmButton: false,
+            background: '#ffffff',
+            showCloseButton: true,
+            backdrop: 'rgba(0,0,0,0.7)'
+        });
+    }
+
+    // Event listeners para ampliación
+    document.querySelectorAll('[data-action="ampliar"]').forEach(btn => {
+        btn.onclick = (e) => {
+            e.preventDefault();
+            ampliarGrafico(e.currentTarget.dataset.grafico);
+        };
+    });
+}
+
+function actualizarGraficos(tipo) {
+    tipoGraficoActual = tipo;
+    if (window.chartPrincipal) {
+        window.chartPrincipal.destroy();
+    }
+    if (window.chartSecundario) {
+        window.chartSecundario.destroy();
+    }
+
+    // Re-procesar datos con el nuevo tipo de gráfico
+    if (datosFiltrados && datosFiltrados.length > 0) {
+        procesarDatos(totalCamionesActuales, camionesPorLogisticaActual);
+    } else {
+        const logistica = $('#selectLogistica').val();
+        const rangoFechas = $('#rangoFechas').val();
+        cargarDatos(logistica, ...(rangoFechas ? rangoFechas.split(' a ') : [null, null]));
+    }
+}
+
+// ► Función para gráfico de productos
+function generarGraficoProductos(ctx, datos) {
+    const tipo = $('#selectTipoGrafico').val() || 'bar';
+    
+    window.chartPrincipal = new Chart(ctx, {
+        type: tipo,
+        data: {
+            labels: datos.map(item => `${item[0]} - ${item[1].descripcion}`.substring(0, 30)),
+            datasets: [{
+                label: 'Cantidad enviada',
+                data: datos.map(item => item[1].cantidad),
+                backgroundColor: generarColores(datos.length),
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: getChartOptions(`Top ${topN} Productos`, 'Cantidad', tipo)
+    });
+}
+
+// ► Función para gráfico de localidades
+function generarGraficoLocalidades(ctx, datos) {
+    const tipo = $('#selectTipoGrafico').val() || 'bar';
+    
+    window.chartPrincipal = new Chart(ctx, {
+        type: tipo,
+        data: {
+            labels: datos.map(item => item[0].substring(0, 30)),
+            datasets: [{
+                label: 'Envios',
+                data: datos.map(item => item[1]),
+                backgroundColor: generarColores(datos.length),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: getChartOptions(`Top ${topN} Localidades`, 'Envios', tipo)
+    });
+}
+
+// ► Función para gráfico de logísticas
+function generarGraficoLogisticas(ctx, datos) {
+    const tipo = $('#selectTipoGrafico').val() || 'bar';
+    
+    window.chartPrincipal = new Chart(ctx, {
+        type: tipo,
+        data: {
+            labels: datos.map(item => item[0]),
+            datasets: [{
+                label: 'Envios',
+                data: datos.map(item => item[1]),
+                backgroundColor: generarColores(datos.length),
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: getChartOptions('Distribución por logística', 'Envios', tipo)
+    });
+}
+
+function generarGraficoApiladoYBultos(ctx, envios, bultos, valor) {
+    const logisticas = Object.keys(envios);
+    const datasets = [];
+
+    // Dataset para Envíos (barras apiladas)
+    datasets.push({
+        label: 'Envios',
+        data: logisticas.map(log => envios[log]),
+        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+        stack: 'stack1',
+        yAxisID: 'y'
+    });
+
+    // Dataset para Valor (barras apiladas)
+    datasets.push({
+        label: 'Valor ($)',
+        data: logisticas.map(log => valor[log]),
+        backgroundColor: 'rgba(255, 206, 86, 0.7)', // Amarillo
+        borderColor: 'rgba(255, 159, 64, 1)',
+        borderWidth: 1,
+        stack: 'stack1', // Apilado
+        yAxisID: 'y'
+    });
+
+    // Dataset para Bultos (línea)
+    datasets.push({
+        label: 'Bultos',
+        data: logisticas.map(log => bultos[log]),
+        backgroundColor: 'rgba(75, 192, 192, 0.7)', // Verde
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 2,
+        type: 'line', // Línea
+        tension: 0.3,
+        yAxisID: 'y1'
+    });
+
+    window.chartSecundario = new Chart(ctx, {
+        type: 'bar', // Tipo de gráfico base
+        data: {
+            labels: logisticas,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Comparativa Apilada de Envios y Valor + Evolución de Bultos',
+                    font: {
+                        size: 16
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label === 'Valor ($)') {
+                                return `${label}: ${formatearMoneda(context.raw)}`;
+                            }
+                            return `${label}: ${context.raw.toLocaleString()}`;
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Envios y Valor ($)',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        drawOnChartArea: true
+                    },
+                    stacked: true 
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Bultos',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    },
+                    stacked: false,
+                    afterFit: function(scale) {
+                        scale.right += 50;
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ► Función para gráfico de comparativa (mejorada)
+function generarGraficoComparativa(ctx, envios, bultos, valor) {
+    const logisticas = Object.keys(envios);
+    const datasets = [];
+    
+    // Dataset para Envíos (barras)
+    datasets.push({
+        label: 'Envios',
+        data: logisticas.map(log => envios[log]),
+        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+        yAxisID: 'y'
+    });
+
+    // Dataset para Bultos (línea)
+    datasets.push({
+        label: 'Bultos',
+        data: logisticas.map(log => bultos[log]),
+        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 2,
+        type: 'line',
+        tension: 0.3,
+        yAxisID: 'y1'
+    });
+
+    // Dataset para Valor (línea)
+    datasets.push({
+        label: 'Valor ($)',
+        data: logisticas.map(log => valor[log]),
+        backgroundColor: 'rgba(255, 206, 86, 0.7)',
+        borderColor: 'rgba(255, 159, 64, 1)',
+        borderWidth: 2,
+        type: 'line',
+        tension: 0.3,
+        yAxisID: 'y2'
+    });
+
+    window.chartSecundario = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: logisticas,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Comparativa por Logística',
+                    font: {
+                        size: 16
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label === 'Valor ($)') {
+                                return `${label}: ${formatearMoneda(context.raw)}`;
+                            }
+                            return `${label}: ${context.raw.toLocaleString()}`;
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Envios',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        drawOnChartArea: true
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Bultos',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                },
+                y2: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Valor ($)',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return formatearMoneda(value);
+                        }
+                    },
+                    // Ajustar posición para no solaparse con y1
+                    afterFit: function(scale) {
+                        scale.right += 50;
+                    }
+                }
+            }
+        }
+    });
+}
+
+    // ██████████████████████████ 6. GENERACIÓN DE INFORME ██████████████████████████
+
+function generarReporteDetallado(
+  fechaInicio,
+  fechaFin,
+  totalCamiones,
+  totalEnvios,
+  totalBultos,
+  totalValor,
+  productosTop,
+  localidadesTop,
+  logisticasTop,
+  camionesPorLogistica,
+  enviosPorLogistica,
+  bultosPorLogistica,
+  valorPorLogistica,
+) {
+  try {
+    let html = `
+    <div class="macos-chat p-3 rounded border bg-light">
+      <div class="macos-title">📅 Período analizado: <strong>${fechaInicio || 'Inicio'} al ${fechaFin || 'Fin'}</strong></div>
+
+      <div class="macos-title">📊 Resumen General</div>
+      <table class="table table-sm table-bordered align-middle mb-0 mt-2">
+        <thead class="table-light">
+          <tr>
+            <th colspan="2" class="text-center">🧾 <strong>Totales y Cantidades</strong></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🚚 <strong>Total de Camiones</strong></td>
+            <td><strong style="color:#1d3557;">${totalCamiones}</strong></td>
+          </tr>
+          <tr>
+            <td>📦 <strong>Total de Envíos</strong></td>
+            <td><strong style="color:#457b9d;">${totalEnvios}</strong></td>
+          </tr>
+          <tr>
+            <td>📬 <strong>Total de Bultos</strong></td>
+            <td><strong style="color:#1d3557;">${totalBultos}</strong></td>
+          </tr>
+          <tr>
+            <td>💰 <strong>Valor Total</strong></td>
+            <td><strong style="color:#2a9d8f;">${formatearMoneda(totalValor)}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="macos-title">🚚 Detalle por logística</div>
+      <table class="table table-sm table-bordered align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>📦 Logística</th>
+            <th>🚚 Camiones</th>
+            <th>📦 Envíos</th>
+            <th>📬 Bultos</th>
+            <th>💰 Valor</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+    Object.entries(camionesPorLogistica).forEach(([logistica, camiones]) => {
+      const nombreLogistica = obtenerNombreLogistica(logistica);
+      html += `
+          <tr>
+            <td><strong>${nombreLogistica}</strong></td>
+            <td><strong style="color:#1d3557;">${camiones.size}</strong></td>
+            <td><strong style="color:#457b9d;">${enviosPorLogistica[nombreLogistica] || 0}</strong></td>
+            <td><strong style="color:#1d3557;">${bultosPorLogistica[nombreLogistica] || 0}</strong></td>
+            <td><strong style="color:#2a9d8f;">${formatearMoneda(valorPorLogistica[nombreLogistica] || 0)}</strong></td>
+          </tr>`;
+    });
+
+    html += `</tbody></table>`;
+
+    if (productosTop.length > 0) {
+      html += `
+      <div class="macos-title mt-3">🏆 Productos más enviados (Top ${Math.min(topN, productosTop.length)})</div>
+      <table class="table table-sm table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>📦 Producto</th>
+            <th>📝 Descripción</th>
+            <th>🔢 Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>`;
+      productosTop.slice(0, topN).forEach((item, index) => {
+        html += `
+          <tr>
+            <td>${index + 1}</td>
+            <td><strong>${item[0]}</strong></td>
+            <td>${item[1].descripcion}</td>
+            <td><strong style="color:#2a9d8f;">${item[1].cantidad}</strong></td>
+          </tr>`;
+      });
+      html += `</tbody></table>`;
+    }
+
+    if (localidadesTop.length > 0) {
+      html += `
+      <div class="macos-title mt-3">📍 Localidades con más envíos (Top ${Math.min(topN, localidadesTop.length)})</div>
+      <table class="table table-sm table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>📍 Localidad</th>
+            <th>📦 Envíos</th>
+          </tr>
+        </thead>
+        <tbody>`;
+      localidadesTop.slice(0, topN).forEach((item, index) => {
+        html += `
+          <tr>
+            <td>${index + 1}</td>
+            <td><strong>${item[0]}</strong></td>
+            <td><strong style="color:#457b9d;">${item[1]}</strong></td>
+          </tr>`;
+      });
+      html += `</tbody></table>`;
+    }
+
+    html += `</div>`;
+
+    // Agregar el bloque de informe ejecutivo correctamente
+    html += `
+    <div style="position: relative;">
+      <div id="resumenEjecutivo" style="
+          padding: 1rem;
+          border-radius: 8px;
+          border: 1px solid #dcdcdc;
+          background: #f8f9fa;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+          font-family: 'Courier New', monospace;
+          font-size: 14px;
+          color: #2e2e2e;
+      ">
+          📊 <strong>Informe Ejecutivo</strong>
+
+          Analicé los datos en el rango de <strong>${fechaInicio || 'inicio'}</strong> a <strong>${fechaFin || 'fin'}</strong> para la logística <strong>${$('#selectLogistica').find('option:selected').text().replace('📦', '').trim()}</strong>.
+
+          🚛 Camiones utilizados: ${totalCamiones}
+          📦 Envíos realizados: ${totalEnvios}
+          📦 Total de bultos: ${totalBultos}
+          💵 Valor transportado: ${formatearMoneda(totalValor)}
+          ${productosTop.length > 0 ? `
+          🏷️ Producto más enviado: ${productosTop[0][0]} (${productosTop[0][1].cantidad} unidades)
+          ${productosTop.length > 1 ? `🏷️ Segundo producto: ${productosTop[1][0]} (${productosTop[1][1].cantidad} unidades)` : ''}
+          ${productosTop.length > 2 ? `🏷️ Tercer producto: ${productosTop[2][0]} (${productosTop[2][1].cantidad} unidades)` : ''}
+          ` : ''}
+          ${localidadesTop.length > 0 ? `
+          🌍 Localidades más frecuentes:
+          ${localidadesTop.slice(0, topN).map((item, index) => `   ${index + 1}. ${item[0]}`).join('\n')}
+          ` : ''}
+      </div>
+    </div>`;
+
+    // Asignar el contenido HTML generado al contenedor
+    $('#reporteDetallado').html(html);
+
+  } catch (error) {
+    console.error('Error en generarReporteDetallado:', error);
+    $('#reporteDetallado').html(`<p class="text-danger">Error al generar el informe: ${error.message}</p>`);
+  }
+}
+
+    // ██████████████████████████ 7. FUNCIONES AUXILIARES ██████████████████████████
+    function formatearMoneda(valor) {
+        return new Intl.NumberFormat('es-AR', { 
+            style: 'currency', 
+            currency: 'ARS',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(valor);
+    }
+
+function actualizarDetalleResumen(selector, dataObj, label, esMoneda = false) {
+    const contenedor = $(selector);
+    contenedor.empty();
+
+    const ul = $('<ul class="lista-macos"></ul>');
+
+    for (const key in dataObj) {
+        if (dataObj.hasOwnProperty(key)) {
+            let valor = dataObj[key];
+            
+            // Si el valor es un Set (camiones), contamos la cantidad de camiones
+            if (valor instanceof Set) {
+                valor = valor.size;
+            }
+
+            // Si es moneda, aplicamos el formato
+            if (esMoneda) {
+                valor = formatearMoneda(valor);
+                valor = valor.replace(/,00$/, '');  
+            }
+
+            ul.append(`<li>${key}: ${valor}</li>`);
+        }
+    }
+
+    contenedor.append(ul); 
+}
+
+
+    function generarColores(cantidad) {
+        const colores = [];
+        const hueStep = 360 / cantidad;
+        
+        for (let i = 0; i < cantidad; i++) {
+            const hue = i * hueStep;
+            colores.push(`hsla(${hue}, 70%, 60%, 0.7)`);
+        }
+        
+        return colores;
+    }
+
+    function getChartOptions(title, label, tipo) {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: title
+                },
+                legend: {
+                    display: tipo === 'pie' || tipo === 'doughnut',
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${label}: ${context.raw}`;
+                        }
+                    }
+                }
+            },
+            scales: tipo !== 'pie' && tipo !== 'doughnut' ? {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: label
+                    }
+                }
+            } : {}
+        };
+    }
+
+    function showLoading() {
+        $('#loadingGrafico1, #loadingGrafico2').show();
+        $('#errorGrafico1, #errorGrafico2').hide();
+        $('#reporteDetallado').html('<p class="text-muted">Cargando datos...</p>');
+    }
+
+    function hideLoading() {
+        $('#loadingGrafico1, #loadingGrafico2').hide();
+    }
+
+    function mostrarErrorGraficos(mensaje) {
+        $('#errorGrafico1, #errorGrafico2').html(`<i class="bi bi-exclamation-triangle"></i> ${mensaje}`).show();
+        $('#loadingGrafico1, #loadingGrafico2').hide();
+    }
+
+    // ██████████████████████████ 8. EVENT LISTENERS ██████████████████████████
+    $('#btnFiltrar').click(function() {
+        const logistica = $('#selectLogistica').val();
+        const rangoFechas = $('#rangoFechas').val();
+        
+        let fechaInicio = null;
+        let fechaFin = null;
+        
+        if (rangoFechas) {
+            const fechas = rangoFechas.split(' a ');
+            fechaInicio = fechas[0];
+            fechaFin = fechas[1] || fechas[0];
+        }
+        
+        topN = parseInt($('#selectTop').val()) || 10;
+        tipoVisualizacion = $('#selectTipoGrafico').val() || 'bar';
+        
+        cargarDatos(logistica, fechaInicio, fechaFin);
+    });
+
+    $('[data-grafico]').click(function() {
+        $('[data-grafico]').removeClass('active');
+        $(this).addClass('active');
+        tipoGraficoActual = $(this).data('grafico');
+        
+        if (datosFiltrados.length > 0) {
+            $('#btnFiltrar').click();
+        }
+        
+    });
+
+    $('#btnCopiarInforme').click(function() {
+        const texto = $('#reporteDetallado').text();
+        navigator.clipboard.writeText(texto).then(() => {
+            $(this).html('<i class="bi bi-check"></i> Copiado');
+            setTimeout(() => {
+                $(this).html('<i class="bi bi-clipboard"></i> Copiar');
+            }, 2000);
+        }).catch(err => {
+            console.error("Error al copiar:", err);
+            $(this).html('<i class="bi bi-x-circle"></i> Error');
+        });
+    });
+
+    $('#modalEstadisticas').on('shown.bs.modal', function() {
+        const rangoFechas = $('#rangoFechas').val();
+        if (rangoFechas) {
+            $('#btnFiltrar').click();
+        }
+    });
+});
+
+/**
+ * @param {string} idLogistica - Identificador técnico (ej: "Andesmar")
+ * @returns {string} - Nombre formateado (ej: "Andesmar")
+ */
+
+function obtenerNombreLogistica(idLogistica) {
+    const mapeoLogisticas = {
+        'Andesmar': 'Andesmar',
+        'Andreani': 'Andreani',
+        'CruzdelSur': 'Cruz del Sur',
+        'Oca': 'Oca'
+    };
+    
+    return mapeoLogisticas[idLogistica] || 
+           idLogistica.replace(/([a-z])([A-Z])/g, '$1 $2')
+                     .replace(/\b\w/g, c => c.toUpperCase());
+}
+// FIN ESTADÍSTICAS

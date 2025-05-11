@@ -116,16 +116,19 @@
                 </div>
             </div>
     
-            <div class="col-12 mb-3 d-flex justify-content-end ingreso-egreso" style="overflow-x: auto; white-space: nowrap;">
-                <div style="min-width: 100%;">
-                    <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
-                        <i class="bi bi-arrow-return-left" style="font-size: 22px;"></i> Atrás
-                    </button>
-                    <button class="btn btn-light" id="btnIniciarEscaneo" type="button" data-bs-toggle="modal" data-bs-target="#modalDespacho">
-                        <i class="bi bi-clipboard-pulse" style="font-size: 22px; color: #a517be;"></i> Iniciar Escaneo
-                    </button>
-                </div>                                                           
-            </div>  
+                <div class="col-12 mb-3 d-flex justify-content-end ingreso-egreso" style="overflow-x: auto; white-space: nowrap;">
+                    <div style="min-width: 100%;">
+                        <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
+                            <i class="bi bi-arrow-return-left" style="font-size: 22px;"></i> Atrás
+                        </button>
+                        <button class="btn btn-light" id="btnIniciarEscaneo" type="button" data-bs-toggle="modal" data-bs-target="#modalDespacho">
+                            <i class="bi bi-clipboard-pulse" style="font-size: 22px; color: #a517be;"></i> Iniciar Escaneo
+                        </button>
+                        <button class="btn btn-light" id="btnEstadisticas" type="button" data-bs-toggle="modal" data-bs-target="#modalEstadisticas">
+                        <i class="bi bi-bar-chart" style="font-size: 22px; color: #1776be;"></i> Estadísticas
+                        </button>
+                    </div>                                                           
+                </div>
         </div>
     </div>                
 
@@ -361,6 +364,191 @@
         </div>
     </div>
     <!-- Fin Modal para Agregar Emails -->
+
+    <!-- Modal Estadisticas -->
+    <div class="modal fade" id="modalEstadisticas" tabindex="-1" role="dialog" aria-labelledby="modalEstadisticasLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header sku-modal-header">
+                    <h5 class="modal-title sku-modal-title" id="modalEstadisticasLabel">📊 Estadísticas Avanzadas de Despachos</h5>
+                    <button type="button" class="btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <div class="modal-body">
+
+        <!-- Sección de Filtros -->
+        <div class="row mr-2 mb-4 g-3 align-items-center filtros-macos-estadisticas">
+            <div class="d-inline-block me-2">
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" id="rangoFechas" placeholder="Seleccionar rango">
+                </div>
+            </div>
+            <div class="d-inline-block me-2 ml-1">
+                <select class="form-select form-select-lg" id="selectLogistica">
+                    <option value="todas">📦 Todas las logísticas</option>
+                    <option value="Andesmar">🚛 Andesmar</option>
+                    <option value="Andreani">✉️ Andreani</option>
+                    <option value="CruzdelSur">🚚 Cruz del Sur</option>
+                    <option value="Oca">📦 OCA</option>
+                </select>
+            </div>
+            <div class="d-inline-block me-2 ml-1">
+                <select class="form-select form-select-lg" id="selectTipoGrafico">
+                    <option value="bar">📊 Barras</option>
+                    <option value="line">📈 Líneas</option>
+                    <option value="pie">🥧 Circular</option>
+                    <option value="doughnut">🍩 Dona</option>
+                    <option value="radar">🛰 Radar</option>
+                </select>
+            </div>
+            <div class="d-inline-block me-2 ml-1">
+                <select class="form-select form-select-lg" id="selectTop">
+                    <option value="10">Top 10</option>
+                    <option value="20">Top 20</option>
+                    <option value="50">Top 50</option>
+                    <option value="100">Top 100</option>
+                </select>
+            </div>
+            <div class="d-inline-block me-2 ml-1">
+                <button class="btn btn-success" id="btnFiltrar">
+                    <i class="bi bi-funnel-fill"></i> Aplicar Filtros
+                </button>
+            </div>
+        </div>
+
+        <!-- Sección de Resumen -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-3">
+                <div class="card resumen-macos bg-pastel-pink h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-truck"></i> Camiones</h5>
+                        <h2 class="card-text" id="totalCamiones">0</h2>
+                        <small id="detalleCamiones">Por logística</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="card resumen-macos bg-pastel-green h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-box-seam"></i> Envíos</h5>
+                        <h2 class="card-text" id="totalEnvios">0</h2>
+                        <small id="detalleEnvios">Por logística</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="card resumen-macos bg-pastel-blue h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-boxes"></i> Bultos</h5>
+                        <h2 class="card-text" id="totalBultos">0</h2>
+                        <small id="detalleBultos">Por logística</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="card resumen-macos bg-pastel-yellow h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-currency-dollar"></i> Valor Total</h5>
+                        <h2 class="card-text" id="valorTotal">$0</h2>
+                        <small id="detalleValor">Por logística</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                <!-- Sección de Controles de Gráficos -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="btn-group w-100">
+                            <button class="btn btn-outline-secondary active" data-grafico="productos">
+                                <i class="bi bi-box-seam"></i> Productos
+                            </button>
+                            <button class="btn btn-outline-secondary" data-grafico="localidades">
+                                <i class="bi bi-geo-alt"></i> Localidades
+                            </button>
+                            <button class="btn btn-outline-secondary" data-grafico="logisticas">
+                                <i class="bi bi-truck"></i> Logísticas
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="btn-group w-100">
+                            <button class="btn btn-outline-secondary active" data-grafico="comparativa">
+                                <i class="bi bi-bar-chart-line"></i> Comparativa
+                            </button>
+                            <button class="btn btn-outline-secondary" data-grafico="apiladoYbultos">
+                                <i class="bi bi-bar-chart"></i> Comparativa por Valor y Butos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                    <!-- Sección de Gráficos -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="h-100 grafico-macos">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h5 class="card-title mb-0" id="tituloGrafico1">🏆 Productos más enviados</h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Opciones
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" data-action="exportar" data-grafico="1">Exportar imagen</a></li>
+                                            <li><a class="dropdown-item" href="#" data-action="ampliar" data-grafico="1">Ampliar</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container" style="position: relative; height:300px;">
+                                        <canvas id="graficoPrincipal"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="h-100 grafico-macos">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h5 class="card-title mb-0" id="tituloGrafico2">ℹ️ Comparativa por logística</h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Opciones
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" data-action="exportar" data-grafico="2">Exportar imagen</a></li>
+                                            <li><a class="dropdown-item" href="#" data-action="ampliar" data-grafico="2">Ampliar</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container" style="position: relative; height:300px;">
+                                        <canvas id="graficoSecundario"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección de Informe Detallado -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="informe-macos">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h5 class="card-title mb-0"><i class="bi bi-file-text"></i> Informe Detallado</h5>
+                                    <button class="btn btn-sm btn-success" id="btnCopiarInforme">
+                                        <i class="bi bi-clipboard"></i> Copiar
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="reporteDetallado" style="white-space: pre-line;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- modal-body -->
+            </div> <!-- modal-content -->
+        </div> <!-- modal-dialog -->
+    </div>
+    <!-- Fin Modal Estadisticas -->
 
     <!-- Modal -->
     <div class="modal fade" id="modalDespacho" tabindex="-1" role="dialog" aria-labelledby="modalDespachoLabel" aria-hidden="true">
@@ -806,8 +994,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <!-- Cargar jsPDF -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- BOT -->
     <script src="./js/firebase-init-Bot.js"></script>
