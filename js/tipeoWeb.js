@@ -1469,7 +1469,7 @@ const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
                 // Crear cuerpo del email con estilo MacOS
                 const emailBody = `
                 <h2 style="color: #d32f2f; font-size: 22px; margin-bottom: 8px;">📢 LogiPaq Informa</h2>
-                <p style="font-family: 'Helvetica', sans-serif; color: #555;">🚨 <strong>Alerta</strong>: Estás intentando despachar un producto con un código postal (CP) que podría estar incluido en logística propia. 🌍</p>
+                <p style="font-family: 'Helvetica', sans-serif; color: #555;">🚨 <strong>Alerta</strong>: Estan intentando despachar un producto con un código postal (CP) que podría estar incluido en logística propia. 🌍</p>
                 <p style="font-family: 'Helvetica', sans-serif; color: #555;">👉 El remito <strong>${remito}</strong> tiene el CP <strong>${cp}</strong> y está relacionado con <strong>${coincidencia}</strong> (camión de logística propia). Se esta intentando despachar por ${logistica} con etiqueta ${etiqueta}</p>
 
                 <div style="background-color: #f5f5f5; border-radius: 12px; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-family: 'Helvetica', sans-serif; color: #333; margin-top: 20px;">
