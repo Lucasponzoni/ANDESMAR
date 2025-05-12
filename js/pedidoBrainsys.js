@@ -161,10 +161,15 @@ try {
     console.error('Error al enviar el pedido a BrainSys:', error); 
 
     Swal.fire({
-        title: '❌ Error',
-        text: 'Error al enviar el pedido a BrainSys',
-        icon: 'error',
-        confirmButtonText: 'Aceptar'
+        title: "❌ Error",
+        html: `
+            <div style="max-width: 500px; padding: 20px; border-radius: 10px; background-color: #f0f0f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;">
+                <strong>Error al enviar el pedido a BrainSys.</strong>
+                <p style="margin: 10px 0;">${mensajeError}</p>
+            </div>
+        `,
+        icon: 'warning',
+        confirmButtonText: 'Aceptar'    
     });
 
     // Enviar notificación a Slack en caso de error
