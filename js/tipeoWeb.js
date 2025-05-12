@@ -1433,6 +1433,10 @@ modalDespacho.addEventListener('shown.bs.modal', () => {
 });
 
 const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
+    if (logistica.toLowerCase() === "oca") {
+        console.log("La logística es 'oca', no se ejecutará la busqueda de Logistica Propia");
+        return;
+    }
     try {
         const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remito}`).once('value');
 
