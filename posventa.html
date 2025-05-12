@@ -166,7 +166,7 @@
                     </span>
                 </button>                
             
-                <button class="btn btn-light ml-2" id="sinRevisar" title="Promedio Despacho: Xd Yh Zm" onclick="contarFilasSinControlDesdeDOM()">
+                <button class="btn btn-light ml-2" id="sinRevisar" title="Promedio Despacho: Xd Yh Zm">
                     <i class="bi bi-calculator"></i> Calculando sin Revisar...
                 </button>                
             
@@ -293,60 +293,67 @@
             </script>
 
             <script>
+            // Función para contar filas pendientes
             function contarFilasPendientes() {
                 const hoy = new Date();
                 const dia = String(hoy.getDate()).padStart(2, '0');
                 const mes = String(hoy.getMonth() + 1).padStart(2, '0');
                 const anio = hoy.getFullYear();
                 const fechaHoy = `${dia}/${mes}/${anio}`;
-            
+
                 const filas = document.querySelectorAll("#data-table tbody tr");
                 let contadorPendientes = 0;
-            
+
                 filas.forEach(fila => {
                     const mensaje = fila.querySelector(".mensaje-filaDeDatos");
-            
+
                     if (!mensaje) {
                         contadorPendientes++;
                     } else {
                         const texto = mensaje.innerText;
                         const match = texto.match(/(\d{2}\/\d{2}\/\d{4})/);
-            
+
                         if (!match || match[1] !== fechaHoy) {
                             contadorPendientes++;
                         }
                     }
                 });
-            
+
                 const badge = document.getElementById("contadorCards2");
                 badge.innerHTML = contadorPendientes;
-            }
-            
-            // Mostrar spinner al iniciar
-            document.getElementById("contadorCards2").innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            // Modo filtro y "ir atrás"
-            document.getElementById("btnPendientesControlar").addEventListener("click", function () {
+                // Actualizar el botón con el número de filas pendientes
+                const boton = document.getElementById("sinRevisar");
+                if (contadorPendientes === 0) {
+                    boton.title = "Nada por Ahora ☕️";
+                    boton.innerHTML = `<i class="fas fa-cog"></i> Nada por Ahora ☕️`;
+                } else {
+                    boton.title = `Promedio Despacho: ${contadorPendientes} sin Revisar`;
+                    boton.innerHTML = `<i class="fas fa-cog fa-spin"></i> Quedan ${contadorPendientes}`;
+                }
+            }
+
+            // Función para manejar la lógica del botón "btnPendientesControlar"
+            function manejarPendientesControlar() {
                 const hoy = new Date();
                 const dia = String(hoy.getDate()).padStart(2, '0');
                 const mes = String(hoy.getMonth() + 1).padStart(2, '0');
                 const anio = hoy.getFullYear();
                 const fechaHoy = `${dia}/${mes}/${anio}`;
-            
+
                 const filas = document.querySelectorAll("#data-table tbody tr");
-            
                 let algunaPendiente = false;
-            
+
                 filas.forEach(fila => {
                     const mensaje = fila.querySelector(".mensaje-filaDeDatos");
-            
+
                     if (!mensaje) {
                         fila.style.display = "";
                         algunaPendiente = true;
                     } else {
                         const texto = mensaje.innerText;
                         const match = texto.match(/(\d{2}\/\d{2}\/\d{4})/);
-            
+
                         if (!match || match[1] !== fechaHoy) {
                             fila.style.display = "";
                             algunaPendiente = true;
@@ -355,21 +362,34 @@
                         }
                     }
                 });
-            
+
                 if (algunaPendiente) {
                     document.getElementById("btnIrAtras").classList.remove("d-none");
                 }
+            }
+
+            // Evento para el botón "sinRevisar"
+            document.getElementById("sinRevisar").addEventListener("click", function () {
+                contarFilasPendientes(); // Llama a la función para contar filas pendientes
+                manejarPendientesControlar(); // Llama a la función para manejar los pendientes
             });
-            
+
+            // Evento para el botón "btnPendientesControlar"
+            document.getElementById("btnPendientesControlar").addEventListener("click", manejarPendientesControlar);
+
+            // Evento para el botón "btnIrAtras"
             document.getElementById("btnIrAtras").addEventListener("click", function () {
                 const filas = document.querySelectorAll("#data-table tbody tr");
-            
+
                 filas.forEach(fila => {
                     fila.style.display = "";
                 });
-            
+
                 this.classList.add("d-none");
             });
+
+            // Mostrar spinner al iniciar
+            document.getElementById("contadorCards2").innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             </script> 
             
         <!-- Modal de Control de Minutas -->
