@@ -1044,6 +1044,12 @@ const emailsError = [
 
 const verificarRemitoYEtiqueta = async (remito, etiqueta) => {
   try {
+    // Verificar si el remito está en el rango de 23000006572 a 23000006590
+    if (remito >= '23000006572' && remito <= '23000006590') {
+        console.log('No se requiere verificación para el remito:', remito);
+        return true;
+    }
+
     const filas = tablaBody.getElementsByTagName('tr');
 
     const remitoEnTabla = Array.from(filas).some(row =>
@@ -1371,7 +1377,12 @@ inputValor.addEventListener('keydown', (e) => {
     inputValor.value = '';
     inputLogistica.value = '';
     inputBultos.disabled = false;
+
+    // Desmarcar el checkbox
+    document.getElementById('checkboxRepuesto').checked = false;
+
     inputRemito.focus();
+
   }
 
   function crearCirculo(logistica) {
@@ -1430,11 +1441,22 @@ const limpiarValidacion = (input) => {
 const modalDespacho = document.getElementById('modalDespacho');
 modalDespacho.addEventListener('shown.bs.modal', () => {
   inputRemito.focus();
+  // Desmarcar el checkbox
+  document.getElementById('checkboxRepuesto').checked = false;
 });
 
 const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
+    // Convertir el remito a número para la comparación
+    const remitoNumero = parseInt(remito);
+
+    // Verificar si el remito está entre 6572 y 6590
+    if (remitoNumero >= 23000006572 && remitoNumero <= 23000006590) {
+        console.log("El remito es un repuesto de Posventa no ejecutare la busqueda.");
+        return;
+    }
+
     if (logistica.toLowerCase() === "oca") {
-        console.log("La logística es 'oca', no se ejecutará la busqueda de Logistica Propia");
+        console.log("La logística es 'oca', no se ejecutará la búsqueda de Logística Propia");
         return;
     }
     try {

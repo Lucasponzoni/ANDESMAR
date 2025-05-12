@@ -592,6 +592,15 @@
                             <label for="inputLogistica" class="form-label">Logística 🚚</label>
                             <input type="text" class="form-control" id="inputLogistica" disabled>
                         </div>
+
+                        <!-- Nuevo mensaje y checkbox -->
+                        <div class="mb-3" style="font-size: 0.9em; color: #555; text-align: center;">
+                            <p>¿Vas a despachar un repuesto?</p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="checkboxRepuesto">
+                                <label class="form-check-label" for="checkboxRepuesto"></label>
+                            </div>
+                        </div>
                     </form>                    
                 </div>
                 <div class="modal-footer">
@@ -602,6 +611,40 @@
         </div>
     </div>
     <!-- Modal -->
+
+    <script>
+        document.getElementById('checkboxRepuesto').addEventListener('change', function() {
+            const remitoInput = document.getElementById('inputRemito');
+            const etiquetaInput = document.getElementById('inputEtiqueta'); 
+
+            if (this.checked) {
+                // Verificar si el remito ya existe
+                let remitoBase = '23000006572';
+                let remitoFinal = remitoBase;
+                let contador = 0; // Comenzamos desde 0 para sumar correctamente
+
+                const remitosExistentes = Array.from(document.querySelectorAll('.remito-tipeo-os')); 
+
+                // Verificar si el remito ya existe
+                let remitoExistente = remitosExistentes.some(remito => {
+                    return remito.textContent.trim() === remitoFinal; 
+                });
+
+                while (remitoExistente) {
+                    contador++;
+                    remitoFinal = (parseInt(remitoBase) + contador).toString(); 
+                    remitoExistente = remitosExistentes.some(remito => {
+                        return remito.textContent.trim() === remitoFinal;
+                    });
+                }
+
+                remitoInput.value = remitoFinal;
+                etiquetaInput.focus(); 
+            } else {
+                remitoInput.value = ''; 
+            }
+        });
+    </script>
 
     <!-- Modal Impresion -->
     <div class="modal fade" id="modalDespachoPorLogistica" tabindex="-1" role="dialog" aria-labelledby="modalDespachoPorLogisticaLabel" aria-hidden="true">
