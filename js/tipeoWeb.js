@@ -516,6 +516,7 @@ if (result.isConfirmed) {
 
                     finalizarColectaMensaje()
                     limpiarDespachosDelDia();
+                    actualizarTotales();
                 });
             });
         }
