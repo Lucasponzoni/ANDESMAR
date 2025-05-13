@@ -669,19 +669,17 @@ function agregarFila(data) {
 
 function confirmarEliminacion(id) {
     Swal.fire({
-        title: 'Clave de Eliminacion 🔒',
-        input: 'password',
-        inputLabel: 'Solicitarla al Gerente',
+        title: '¿Confirmar eliminación?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Eliminar',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar',
-        preConfirm: (password) => {
-            // Validar la contraseña
-            if (password !== '6572') { // Cambiar '6572' por la lógica de validación que necesites
-                Swal.showValidationMessage('Contraseña incorrecta');
-            } else {
-                eliminarFila(id);
-            }
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            eliminarFila(id);
         }
     });
 }
@@ -1001,13 +999,15 @@ async function enviarCorreoDespacho(destinatarioEmail) {
 }
 
 document.getElementById('cerrarButton').onclick = async function() {
+    console.log('Iniciando proceso de cierre de colecta...');
     const tableBody = document.getElementById('data-table-body');
     const totalCantidad = document.getElementById('totalCantidad').innerText;
 
     // Verificar si hay datos en la tabla
     if (tableBody.querySelectorAll('tr').length <= 1 || totalCantidad === 'Total Cantidad: 0') {
+        console.log('No hay datos en la colecta - abortando');
         showAlertError('<i class="bi bi-exclamation-triangle-fill"></i> No hay datos en la colecta.');
-        return; // Salir de la función si no hay datos
+        return;
     }
 
     const destinatarios = [
@@ -1020,37 +1020,34 @@ document.getElementById('cerrarButton').onclick = async function() {
         "mauricio.villan@novogar.com.ar"
     ];
 
-    const { value: password } = await Swal.fire({
-        title: 'Clave de Cierre de Colecta 🔒',
-        input: 'password',
-        inputLabel: 'Solicitarla al Preparador',
-        inputAttributes: {
-            autocapitalize: 'off'
-        },
+    const { value: confirm } = await Swal.fire({
+        title: '¿Está seguro que desea finalizar la colecta?',
+        text: 'Aceptar para confirmar, o cancelar para volver.',
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Enviar',
-        cancelButtonText: 'Cancelar',
-        inputValidator: (value) => {
-            if (!value) {
-                return 'Necesitas ingresar la contraseña!';
-            } else if (value !== '6572') {
-                return 'Contraseña incorrecta!';
-            }
-        }
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
     });
 
-    if (password === '6572') {
+    if (confirm) {
+        console.log('Usuario confirmó el cierre - verificando paquetes no egresados');
+        
         // Contar paquetes no egresados
         const snapshot = await database.ref('/despachoDelDiaMeli').once('value');
         let noEgresados = [];
         snapshot.forEach(childSnapshot => {
             const data = childSnapshot.val();
-            if (!data.estado || data.estado !== 'preparado') {
-                noEgresados.push(childSnapshot.key); // Guardar el ID de los no egresados
+            console.log(`Verificando paquete ${childSnapshot.key}: estado=${data.estado || 'no definido'}`);
+            
+            // Verificar si el estado no está definido o es diferente de "preparado"
+            if (typeof data.estado === 'undefined' || data.estado !== 'preparado') {
+                console.log(`Paquete ${childSnapshot.key} no está preparado - agregando a noEgresados`);
+                noEgresados.push(childSnapshot.key);
             }
         });
 
-        const totalPaquetes = snapshot.numChildren(); // Total de paquetes
+        const totalPaquetes = snapshot.numChildren();
+        console.log(`Total paquetes: ${totalPaquetes}, No egresados: ${noEgresados.length}`);
 
         if (noEgresados.length > 0) {
             const mensaje = `
@@ -1072,9 +1069,29 @@ document.getElementById('cerrarButton').onclick = async function() {
                 cancelButtonText: '<i class="bi bi-x-circle"></i> Cierre Total'
             });
 
-            if (result.isDismissed) return;
+            if (result.isDismissed) {
+                console.log('Usuario seleccionó Cierre Total - procediendo');
+                // Lógica para Cierre Total
+                for (const email of destinatarios) {
+                    await enviarCorreoDespacho(email);
+                }
+
+                const firebaseUrl = 'https://despachos-meli-novogar-default-rtdb.firebaseio.com/despachoDelDiaMeli.json';
+                await fetch(firebaseUrl, {
+                    method: 'DELETE'
+                });
+
+                tableBody.innerHTML = '<tr><td colspan="7" class="no-data">No has comenzado una colecta aún, manos a la obra 😎</td></tr>';
+                document.getElementById('totalCantidad').innerHTML = '<i class="bi bi-box-seam-fill"></i> Total Unidades: 0';
+                document.getElementById('totalFila').innerHTML = '<i class="bi bi-bookmark-check-fill"></i> Total Etiquetas: 0';
+
+                showAlert('<i class="bi bi-check-circle"></i> Colecta cerrada y datos enviados exitosamente.');
+                return;
+            }
 
             if (result.isConfirmed) {
+                console.log('Usuario seleccionó cierre parcial - iniciando proceso');
+                
                 // Mostrar spinner
                 const spinnerContainer = document.createElement('div');
                 spinnerContainer.style.position = 'fixed';
@@ -1095,87 +1112,77 @@ document.getElementById('cerrarButton').onclick = async function() {
 
                 // Cierre Parcial
                 const proximaColectaRef = database.ref('/DespachosProximaColecta');
+                console.log('Preparando mover paquetes no egresados a próxima colecta');
 
                 for (const id of noEgresados) {
+                    console.log(`Procesando paquete ${id}`);
                     const data = await database.ref('/despachoDelDiaMeli/' + id).once('value');
-                    await proximaColectaRef.child(id).set(data.val()); // Mover a nueva carpeta
-                    await database.ref('/despachoDelDiaMeli/' + id).remove(); // Eliminar de la actual
-                    $(`#data-table-body tr[data-id="${id}"]`).remove(); // Eliminar del DOM
+                    console.log(`Moviendo paquete ${id} a DespachosProximaColecta`);
+                    await proximaColectaRef.child(id).set(data.val());
+                    console.log(`Eliminando paquete ${id} de despachoDelDiaMeli`);
+                    await database.ref('/despachoDelDiaMeli/' + id).remove();
+                    $(`#data-table-body tr[data-id="${id}"]`).remove();
                 }
 
-                // Recalcular contadores
+                console.log('Recalculando contadores');
                 actualizarContador();
 
-                // Enviar emails
+                console.log('Enviando correos a destinatarios');
                 for (const email of destinatarios) {
                     await enviarCorreoDespacho(email);
                 }
 
-                // Limpiar contenido de "despachoDelDiaMeli" antes de recuperar datos
-                await database.ref('/despachoDelDiaMeli').remove(); // Eliminar contenido de despachoDelDiaMeli
+                console.log('Limpiando despachoDelDiaMeli');
+                await database.ref('/despachoDelDiaMeli').remove();
 
-                // Recuperar datos de "DespachosProximaColecta"
+                console.log('Recuperando datos de DespachosProximaColecta');
                 const despachosSnapshot = await proximaColectaRef.once('value');
-                const despachos = despachosSnapshot.val(); // Obtener el objeto completo
+                const despachos = despachosSnapshot.val();
 
                 if (despachos) {
+                    console.log(`Moviendo ${Object.keys(despachos).length} paquetes de vuelta a despachoDelDiaMeli`);
                     for (const key in despachos) {
                         const data = despachos[key];
-                        if (!data.estado || data.estado !== 'preparado') {
-                            await database.ref('/despachoDelDiaMeli').child(key).set(data); // Copiar a despachoDelDiaMeli
+                        if (typeof data.estado === 'undefined' || data.estado !== 'preparado') {
+                            console.log(`Moviendo paquete ${key} de vuelta a despachoDelDiaMeli`);
+                            await database.ref('/despachoDelDiaMeli').child(key).set(data);
                         }
                     }
                 }
 
-                await proximaColectaRef.remove(); // Eliminar contenido de DespachosProximaColecta
+                console.log('Limpiando DespachosProximaColecta');
+                await proximaColectaRef.remove();
 
+                console.log('Recargando página en 6 segundos');
                 setTimeout(() => {
-                    location.reload(); // Recargar la página
-                }, 6000); // 6 segundos de espera
-            } else {
-                // Cierre Total
-                for (const email of destinatarios) {
-                    await enviarCorreoDespacho(email);
-                }
-
-                // Eliminar el nodo en Firebase
-                const firebaseUrl = 'https://despachos-meli-novogar-default-rtdb.firebaseio.com/despachoDelDiaMeli.json';
-                await fetch(firebaseUrl, {
-                    method: 'DELETE'
-                });
-                console.log('Nodo eliminado de Firebase');
-
-                // Resetear la tabla
-                tableBody.innerHTML = '<tr><td colspan="7" class="no-data">No has comenzado una colecta aún, manos a la obra 😎</td></tr>';
-                document.getElementById('totalCantidad').innerHTML = '<i class="bi bi-box-seam-fill"></i> Total Unidades: 0';
-                document.getElementById('totalFila').innerHTML = '<i class="bi bi-bookmark-check-fill"></i> Total Etiquetas: 0';
-
-                // Eliminar el spinner
-                document.body.removeChild(spinner);
-                showAlert('<i class="bi bi-check-circle"></i> Colecta cerrada y datos enviados exitosamente.');
+                    location.reload();
+                }, 6000);
             }
         } else {
+            console.log('No hay paquetes sin egresar - procediendo con cierre total directo');
+            
             // Cierre Total directamente si no hay paquetes sin egresar
+            console.log('Enviando correos a destinatarios');
             for (const email of destinatarios) {
                 await enviarCorreoDespacho(email);
             }
 
-            // Eliminar el nodo en Firebase
+            console.log('Eliminando nodo despachoDelDiaMeli de Firebase');
             const firebaseUrl = 'https://despachos-meli-novogar-default-rtdb.firebaseio.com/despachoDelDiaMeli.json';
             await fetch(firebaseUrl, {
                 method: 'DELETE'
             });
-            console.log('Nodo eliminado de Firebase');
 
-            // Resetear la tabla
+            console.log('Reseteando tabla');
             tableBody.innerHTML = '<tr><td colspan="7" class="no-data">No has comenzado una colecta aún, manos a la obra 😎</td></tr>';
             document.getElementById('totalCantidad').innerHTML = '<i class="bi bi-box-seam-fill"></i> Total Unidades: 0';
             document.getElementById('totalFila').innerHTML = '<i class="bi bi-bookmark-check-fill"></i> Total Etiquetas: 0';
 
-            // Eliminar el spinner
-            document.body.removeChild(spinner);
+            console.log('Mostrando alerta de éxito');
             showAlert('<i class="bi bi-check-circle"></i> Colecta cerrada y datos enviados exitosamente.');
         }
+    } else {
+        console.log('Usuario canceló el cierre de colecta');
     }
 };
 
