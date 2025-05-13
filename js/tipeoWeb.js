@@ -1054,7 +1054,7 @@ const verificarRemitoYEtiqueta = async (remito, etiqueta) => {
     const filas = tablaBody.getElementsByTagName('tr');
 
     const remitoEnTabla = Array.from(filas).some(row =>
-      row.querySelector('.remito-tabla-despacho')?.textContent.trim() === remito
+      row.querySelector('.remito-tipeo-os')?.textContent.trim() === remito
     );
 
     const etiquetaEnTabla = Array.from(filas).some(row =>
