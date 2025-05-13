@@ -1166,31 +1166,49 @@ const formatearPesos = (valor) => {
 
 inputRemito.addEventListener('keydown', async (e) => {
     if (e.key === 'Enter') {
-      const val = inputRemito.value.trim();
-      const esValido = validPrefixes.some(pref => val.startsWith(pref)) && val.length >= 10 && val.length <= 11;
-      
-      if (!esValido) {
-        inputRemito.classList.add('is-invalid');
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Remito inválido. Debe iniciar con 83, 89, 230, 231, 233 o 254 y tener entre 10 y 11 caracteres.',
-          allowOutsideClick: false
-        });
         e.preventDefault();
-        return;
-      }
-  
-      const etiqueta = inputEtiqueta.value.trim();
-      const verificacion = await verificarRemitoYEtiqueta(val, etiqueta);
-      if (!verificacion) {
-        e.preventDefault();
-        return; // Detener el flujo si hay un error
-      }
-  
-      inputRemito.classList.remove('is-invalid');
-      e.preventDefault();
-      inputEtiqueta.focus();
+        const val = inputRemito.value.trim();
+        const esValido = validPrefixes.some(pref => val.startsWith(pref)) && val.length >= 10 && val.length <= 11;
+        
+        if (!esValido) {
+            inputRemito.classList.add('is-invalid');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Remito inválido. Debe iniciar con 83, 89, 230, 231, 233 o 254 y tener entre 10 y 11 caracteres.',
+                allowOutsideClick: false
+            });
+            return;
+        }
+
+        // Verificar si el checkbox de múltiples etiquetas está activo
+        const checkboxEtiquetas = document.getElementById('checkboxEtiquetas');
+        
+        if (checkboxEtiquetas.checked) {
+            // Buscar remitos existentes (ignorando M+número al final)
+            const remitosExistentes = Array.from(document.querySelectorAll('.remito-tipeo-os'));
+            const baseRemito = val.replace(/M\d+$/, '');
+            
+            // Filtrar coincidencias (sin considerar M+número)
+            const coincidencias = remitosExistentes.filter(remito => {
+                return remito.textContent.trim().replace(/M\d+$/, '') === baseRemito;
+            });
+
+            if (coincidencias.length > 0) {
+                // Agregar M+número secuencial
+                inputRemito.value = baseRemito + 'M' + (coincidencias.length + 1);
+            }
+        }
+
+        const etiqueta = inputEtiqueta.value.trim();
+        const verificacion = await verificarRemitoYEtiqueta(inputRemito.value.trim(), etiqueta);
+        
+        if (!verificacion) {
+            return; // Detener el flujo si hay un error
+        }
+
+        inputRemito.classList.remove('is-invalid');
+        inputEtiqueta.focus();
     }
 });
 
@@ -1381,6 +1399,7 @@ inputValor.addEventListener('keydown', (e) => {
 
     // Desmarcar el checkbox
     document.getElementById('checkboxRepuesto').checked = false;
+    document.getElementById('checkboxEtiquetas').checked = false;
 
     inputRemito.focus();
 
@@ -1444,11 +1463,18 @@ modalDespacho.addEventListener('shown.bs.modal', () => {
   inputRemito.focus();
   // Desmarcar el checkbox
   document.getElementById('checkboxRepuesto').checked = false;
+  document.getElementById('checkboxEtiquetas').checked = false;
 });
 
 const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
+
+    const remitoOriginal = remito;
+
     // Convertir el remito a número para la comparación
-    const remitoNumero = parseInt(remito);
+    const remitoLimpio = remito.replace(/M=?\d+$/, '');
+    
+    // Convertir a número (según tu nueva solicitud)
+    const remitoNumero = parseInt(remitoLimpio);
 
     // Verificar si el remito está entre 6572 y 6590 (repuestos posventa)
     const esRepuestoPosventa = remitoNumero >= 23000006572 && remitoNumero <= 23000006590;
@@ -1456,9 +1482,9 @@ const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
     if (esRepuestoPosventa) {
         console.log("El remito es un repuesto de Posventa. Solo se agregará a Info.");
         try {
-            const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remito}`).once('value');
+            const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remitoLimpio}`).once('value');
             if (remitoSnapshot.exists()) {
-                await dbTipeo.ref(`despachosDelDia/${remito}/Info`).set(remitoSnapshot.val());
+                await dbTipeo.ref(`despachosDelDia/${remitoOriginal}/Info`).set(remitoSnapshot.val());
                 console.log("Remito de posventa agregado en 'Info'");
             }
         } catch (error) {
@@ -1473,7 +1499,7 @@ const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
     }
 
     try {
-        const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remito}`).once('value');
+        const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remitoLimpio}`).once('value');
 
         if (remitoSnapshot.exists()) {
             const remitoData = remitoSnapshot.val();
@@ -1526,7 +1552,7 @@ const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
             }
 
             // Guardar en Info para todos los casos (incluyendo repuestos posventa)
-            await dbTipeo.ref(`despachosDelDia/${remito}/Info`).set(remitoData);
+            await dbTipeo.ref(`despachosDelDia/${remitoOriginal}/Info`).set(remitoData);
             console.log("Remito encontrado y agregado en 'Info':", remitoData);
         } else {
             console.log("Remito no encontrado:", remito);
@@ -1547,6 +1573,9 @@ const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
 };
 
 function agregarDespacho(remito, etiqueta, bultos, valor, logistica) {
+    // Limpiar el remito quitando "M+número" si existe
+    const remitoLimpio = remito.replace(/M\d+$/, '');
+    
     const despachoData = {
         etiqueta: etiqueta,
         bultos: bultos,
@@ -1555,10 +1584,10 @@ function agregarDespacho(remito, etiqueta, bultos, valor, logistica) {
         fecha: new Date().toISOString() 
     };
 
-    // Llama a la función para agregar el remito si no existe
+    // Llama a la función para agregar el remito (usando la versión limpia)
     agregarDespachoSiNoExiste(remito, etiqueta, logistica);
 
-    // Agregar el despacho actual
+    // Agregar el despacho actual usando el remito limpio
     dbTipeo.ref(`despachosDelDia/${remito}`).set(despachoData)
         .then(() => {
             console.log("Despacho agregado correctamente:", despachoData);

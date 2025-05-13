@@ -621,11 +621,21 @@
                         </div>
 
                         <!-- Nuevo mensaje y checkbox -->
-                        <div class="mb-3" style="font-size: 0.9em; color: #555; text-align: center;">
-                            <p>¿Vas a despachar un repuesto?</p>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="checkboxRepuesto">
-                                <label class="form-check-label" for="checkboxRepuesto"></label>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <!-- Primera sección: Despacho de repuesto -->
+                            <div class="mb-3" style="font-size: 0.9em; color: #555; text-align: center; width: 48%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <p>¿Vas a despachar un repuesto?</p>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="checkboxRepuesto">
+                                </div>
+                            </div>
+                            
+                            <!-- Segunda sección: Múltiples etiquetas -->
+                            <div class="mb-3" style="font-size: 0.9em; color: #555; text-align: center; width: 48%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <p>¿Posee múltiples etiquetas?</p>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="checkboxEtiquetas">
+                                </div>
                             </div>
                         </div>
                     </form>                    
@@ -640,6 +650,7 @@
     <!-- Modal -->
 
     <script>
+        // Manejo del checkbox de repuesto
         document.getElementById('checkboxRepuesto').addEventListener('change', function() {
             const remitoInput = document.getElementById('inputRemito');
             const etiquetaInput = document.getElementById('inputEtiqueta'); 
@@ -648,11 +659,10 @@
                 // Verificar si el remito ya existe
                 let remitoBase = '23000006572';
                 let remitoFinal = remitoBase;
-                let contador = 0; // Comenzamos desde 0 para sumar correctamente
+                let contador = 0;
 
                 const remitosExistentes = Array.from(document.querySelectorAll('.remito-tipeo-os')); 
 
-                // Verificar si el remito ya existe
                 let remitoExistente = remitosExistentes.some(remito => {
                     return remito.textContent.trim() === remitoFinal; 
                 });
@@ -670,6 +680,17 @@
             } else {
                 remitoInput.value = ''; 
             }
+        });
+
+        // Manejo del checkbox de múltiples etiquetas
+        document.getElementById('checkboxEtiquetas').addEventListener('change', function() {
+            const remitoInput = document.getElementById('inputRemito');
+            
+            if (this.checked) {
+                remitoInput.focus(); // Hace focus en el input de remito al activar el checkbox
+                remitoInput.value = ''; // Limpia el valor si es necesario
+            }
+            // No necesitamos else aquí ya que no queremos hacer nada al desactivar
         });
     </script>
 
