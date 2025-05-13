@@ -1991,7 +1991,7 @@ function cargarYMostrarTabla(camion, fechaKey, logistica) {
 function getSeguimientoLink(logistica, etiqueta) {
     switch (logistica) {
         case 'Andreani':
-            return `https://www.andreani.com/#!/informacion-envio/${etiqueta}`;
+            return `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${etiqueta}`; 
         case 'Andesmar':
             return `https://andesmarcargas.com/seguimiento.html?numero=${etiqueta}&tipo=remito&cod=`;
         case 'Oca':
