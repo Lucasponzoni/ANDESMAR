@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="./styles.css">
     <link rel="shortcut icon" href="./Img/caja.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -415,13 +416,19 @@
             </div>
         </div>
 
+        <div class="container-fluid d-flex justify-content-center align-items-center mb-3">
+            <div id="spinnerbtnFiltrar" class="spinner-border text-success" style="width: 3rem; height: 3rem; display: none;" role="status">
+                <span class="sr-only">Cargando...</span>
+            </div>
+        </div>
+
         <!-- Sección de Resumen -->
         <div class="row mb-4">
             <div class="col-12 col-md-3">
                 <div class="card resumen-macos bg-pastel-pink h-100">
                     <div class="card-body">
                         <h5 class="card-title"><i class="bi bi-truck"></i> Camiones</h5>
-                        <h2 class="card-text" id="totalCamiones">0</h2>
+                        <h2 class="card-text" id="totalCamiones"><i class="fa-solid fa-circle-info fa-beat-fade" style="--fa-beat-fade-opacity: 0.67; --fa-beat-fade-scale: 1.075;"></i>Seleccione Datos</h2>
                         <small id="detalleCamiones">Por logística</small>
                     </div>
                 </div>
@@ -430,7 +437,7 @@
                 <div class="card resumen-macos bg-pastel-green h-100">
                     <div class="card-body">
                         <h5 class="card-title"><i class="bi bi-box-seam"></i> Envíos</h5>
-                        <h2 class="card-text" id="totalEnvios">0</h2>
+                        <h2 class="card-text" id="totalEnvios"><i class="fa-solid fa-circle-info fa-beat-fade" style="--fa-beat-fade-opacity: 0.67; --fa-beat-fade-scale: 1.075;"></i>Seleccione Datos</h2>
                         <small id="detalleEnvios">Por logística</small>
                     </div>
                 </div>
@@ -439,7 +446,7 @@
                 <div class="card resumen-macos bg-pastel-blue h-100">
                     <div class="card-body">
                         <h5 class="card-title"><i class="bi bi-boxes"></i> Bultos</h5>
-                        <h2 class="card-text" id="totalBultos">0</h2>
+                        <h2 class="card-text" id="totalBultos"><i class="fa-solid fa-circle-info fa-beat-fade" style="--fa-beat-fade-opacity: 0.67; --fa-beat-fade-scale: 1.075;"></i>Seleccione Datos</h2>
                         <small id="detalleBultos">Por logística</small>
                     </div>
                 </div>
@@ -448,7 +455,7 @@
                 <div class="card resumen-macos bg-pastel-yellow h-100">
                     <div class="card-body">
                         <h5 class="card-title"><i class="bi bi-currency-dollar"></i> Valor Total</h5>
-                        <h2 class="card-text" id="valorTotal">$0</h2>
+                        <h2 class="card-text" id="valorTotal"><i class="fa-solid fa-circle-info fa-beat-fade" style="--fa-beat-fade-opacity: 0.67; --fa-beat-fade-scale: 1.075;"></i>Seleccione Datos</h2>
                         <small id="detalleValor">Por logística</small>
                     </div>
                 </div>
@@ -464,6 +471,9 @@
                     </button>
                     <button class="btn btn-outline-secondary" data-grafico="localidades">
                         <i class="bi bi-geo-alt"></i> Localidades
+                    </button>
+                    <button class="btn btn-outline-secondary" data-grafico="provincias">
+                        <i class="bi bi-map"></i> Provincias
                     </button>
                     <button class="btn btn-outline-secondary" data-grafico="logisticas">
                         <i class="bi bi-truck"></i> Logísticas
@@ -489,6 +499,13 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <div id="loadingGrafico1" class="text-center py-5" style="display: none;">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden"></span>
+                            </div>
+                            <p class="text-muted mt-2">Generando gráfico...</p>
+                        </div>
+                        <div id="errorGrafico1" class="alert alert-danger" style="display: none;"></div>
                         <div class="chart-container" style="position: relative; height:300px;">
                             <canvas id="graficoPrincipal"></canvas>
                         </div>
@@ -528,6 +545,13 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <div id="loadingGrafico2" class="text-center py-5" style="display: none;">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden"></span>
+                            </div>
+                            <p class="text-muted mt-2">Generando gráfico...</p>
+                        </div>
+                        <div id="errorGrafico2" class="alert alert-danger" style="display: none;"></div>
                         <div class="chart-container" style="position: relative; height:300px;">
                             <canvas id="graficoSecundario"></canvas>
                         </div>
@@ -1063,6 +1087,7 @@
 
     <!-- TIPEO -->
     <script src="./js/features.js"></script>
+    <script src="./js/ciudades.js"></script>
     <script src="./js/firebase-init-stock.js"></script>
     <script src="./js/firebase-init-Meli.js"></script>
     <script src="./js/firebase-init-tipeo.js"></script>

@@ -2161,126 +2161,219 @@ $(document).ready(function() {
         }
     }
 
-    // ██████████████████████████ 4. PROCESAMIENTO DE DATOS ██████████████████████████
-    function procesarDatos(totalCamiones, camionesPorLogistica) {
-        try {
-            // ► Validación de datos vacíos
-            if (!datosFiltrados || datosFiltrados.length === 0) {
-                throw new Error("No hay datos para los filtros seleccionados");
-            }
-
-            // ► Cálculo de resumen general
-            let totalEnvios = datosFiltrados.length;
-            let totalBultos = 0;
-            let totalValor = 0;
-            
-            // ► Cálculo por logística
-            const resumenLogisticas = {};
-            const enviosPorLogistica = {};
-            const bultosPorLogistica = {};
-            const valorPorLogistica = {};
-            
-            datosFiltrados.forEach(remito => {
-                const logistica = remito.logistica;
-                
-                if (!enviosPorLogistica[logistica]) {
-                    enviosPorLogistica[logistica] = 0;
-                    bultosPorLogistica[logistica] = 0;
-                    valorPorLogistica[logistica] = 0;
-                }
-                
-                enviosPorLogistica[logistica]++;
-                bultosPorLogistica[logistica] += parseInt(remito.bultos) || 0;
-                
-                const valorStr = remito.valor.replace(/[^\d,]/g, '').replace(',', '.');
-                const valor = parseFloat(valorStr) || 0;
-                valorPorLogistica[logistica] += valor;
-                
-                totalBultos += parseInt(remito.bultos) || 0;
-                totalValor += valor;
-            });
-
-            // ► Actualización de la UI
-            $('#totalCamiones').text(totalCamiones);
-            $('#totalEnvios').text(totalEnvios);
-            $('#totalBultos').text(totalBultos);
-            $('#valorTotal').text(formatearMoneda(totalValor).replace(/,00$/, ''));
-            
-            actualizarDetalleResumen('#detalleCamiones', camionesPorLogistica, 'camiones');
-            actualizarDetalleResumen('#detalleEnvios', enviosPorLogistica, 'envíos');
-            actualizarDetalleResumen('#detalleBultos', bultosPorLogistica, 'bultos');
-            actualizarDetalleResumen('#detalleValor', valorPorLogistica, 'valor', true);
-
-            // ► Procesamiento para gráficos
-            const productosMap = new Map();
-            const localidadesMap = new Map();
-            const logisticasMap = new Map();
-            
-            datosFiltrados.forEach(remito => {
-                // Procesamiento de productos
-                if (typeof remito.info === 'object' && remito.info !== null) {
-                    let i = 1;
-                    while (remito.info[`producto${i}`]) {
-                        const producto = remito.info[`producto${i}`];
-                        const descripcion = remito.info[`descripcion${i}`] || 'Sin descripción';
-                        
-                        if (!['110', 'ENVIO', 'COSTO DE ENVIO', 'ENVIO LOGISTICA WEB'].includes(producto.toUpperCase())) {
-                            const cantidad = parseInt(remito.info[`cantidad${i}`]) || 1;
-                            
-                            if (productosMap.has(producto)) {
-                                productosMap.get(producto).cantidad += cantidad;
-                            } else {
-                                productosMap.set(producto, {
-                                    cantidad: cantidad,
-                                    descripcion: descripcion
-                                });
-                            }
-                        }
-                        i++;
-                    }
-                    
-                    // Procesamiento de localidades
-                    if (remito.info.localidad && remito.info.cp) {
-                        const localidadKey = `${remito.info.localidad} (${remito.info.cp})`;
-                        localidadesMap.set(localidadKey, (localidadesMap.get(localidadKey) || 0) + 1);
-                    }
-                }
-                
-                // Procesamiento de logísticas
-                logisticasMap.set(remito.logistica, (logisticasMap.get(remito.logistica) || 0) + 1);
-            });
-
-            // ► Generación de datos ordenados
-            const productosTop = Array.from(productosMap.entries())
-                .sort((a, b) => b[1].cantidad - a[1].cantidad)
-                .slice(0, topN);
-                
-            const localidadesTop = Array.from(localidadesMap.entries())
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, topN);
-                
-            const logisticasTop = Array.from(logisticasMap.entries())
-                .sort((a, b) => b[1] - a[1]);
-
-            // ► Generación de gráficos e informe
-            generarGraficos(productosTop, localidadesTop, logisticasTop, enviosPorLogistica, bultosPorLogistica, valorPorLogistica);
-            generarReporteDetallado(
-                fechaInicioGlobal, fechaFinGlobal, 
-                totalCamiones, totalEnvios, totalBultos, totalValor, 
-                productosTop, localidadesTop, logisticasTop, 
-                camionesPorLogistica, enviosPorLogistica, 
-                bultosPorLogistica, valorPorLogistica
-            );
-
-        } catch (error) {
-            console.error("Error en procesarDatos:", error);
-            mostrarErrorGraficos(error.message);
-            Swal.fire('Error', error.message, 'error');
+// ██████████████████████████ 4. PROCESAMIENTO DE DATOS ██████████████████████████
+function procesarDatos(totalCamiones, camionesPorLogistica) {
+    try {
+        // ► Validación de datos vacíos
+        if (!datosFiltrados || datosFiltrados.length === 0) {
+            throw new Error("No hay datos para los filtros seleccionados");
         }
+
+        // ► Cálculo de resumen general
+        let totalEnvios = datosFiltrados.length;
+        let totalBultos = 0;
+        let totalValor = 0;
+        
+        // ► Cálculo por logística
+        const resumenLogisticas = {};
+        const enviosPorLogistica = {};
+        const bultosPorLogistica = {};
+        const valorPorLogistica = {};
+        
+        datosFiltrados.forEach(remito => {
+            const logistica = remito.logistica;
+            
+            if (!enviosPorLogistica[logistica]) {
+                enviosPorLogistica[logistica] = 0;
+                bultosPorLogistica[logistica] = 0;
+                valorPorLogistica[logistica] = 0;
+            }
+            
+            enviosPorLogistica[logistica]++;
+            bultosPorLogistica[logistica] += parseInt(remito.bultos) || 0;
+            
+            const valorStr = remito.valor.replace(/[^\d,]/g, '').replace(',', '.');
+            const valor = parseFloat(valorStr) || 0;
+            valorPorLogistica[logistica] += valor;
+            
+            totalBultos += parseInt(remito.bultos) || 0;
+            totalValor += valor;
+        });
+
+        // ► Actualización de la UI
+        $('#totalCamiones').text(totalCamiones);
+        $('#totalEnvios').text(totalEnvios);
+        $('#totalBultos').text(totalBultos);
+        $('#valorTotal').text(formatearMoneda(totalValor).replace(/,00$/, ''));
+        
+        actualizarDetalleResumen('#detalleCamiones', camionesPorLogistica, 'camiones');
+        actualizarDetalleResumen('#detalleEnvios', enviosPorLogistica, 'envíos');
+        actualizarDetalleResumen('#detalleBultos', bultosPorLogistica, 'bultos');
+        actualizarDetalleResumen('#detalleValor', valorPorLogistica, 'valor', true);
+
+        // ► Procesamiento para gráficos
+        const productosMap = new Map();
+        const localidadesMap = new Map();
+        const logisticasMap = new Map();
+        const provinciasMap = new Map();
+        
+        datosFiltrados.forEach(remito => {
+            // Procesamiento de productos
+            if (typeof remito.info === 'object' && remito.info !== null) {
+                let i = 1;
+                while (remito.info[`producto${i}`]) {
+                    const producto = remito.info[`producto${i}`];
+                    const descripcion = remito.info[`descripcion${i}`] || 'Sin descripción';
+                    
+                    if (!['110', 'ENVIO', 'COSTO DE ENVIO', 'ENVIO LOGISTICA WEB'].includes(producto.toUpperCase())) {
+                        const cantidad = parseInt(remito.info[`cantidad${i}`]) || 1;
+                        
+                        if (productosMap.has(producto)) {
+                            productosMap.get(producto).cantidad += cantidad;
+                        } else {
+                            productosMap.set(producto, {
+                                cantidad: cantidad,
+                                descripcion: descripcion
+                            });
+                        }
+                    }
+                    i++;
+                }
+                
+                // Procesamiento de localidades
+                if (remito.info.localidad && remito.info.cp) {
+                    const localidadKey = `${remito.info.localidad} (${remito.info.cp})`;
+                    localidadesMap.set(localidadKey, (localidadesMap.get(localidadKey) || 0) + 1);
+                }
+                
+                // ► Procesamiento de provincias (integrado dentro del forEach)
+                if (remito.info.cp) {
+                    const provincia = determinarProvincia(remito.info.cp);
+                    if (provincia) {
+                        provinciasMap.set(provincia, (provinciasMap.get(provincia) || 0) + 1);
+                    }
+                }
+            }
+            
+            // Procesamiento de logísticas
+            logisticasMap.set(remito.logistica, (logisticasMap.get(remito.logistica) || 0) + 1);
+        });
+
+        // ► Generación de datos ordenados
+        const productosTop = Array.from(productosMap.entries())
+            .sort((a, b) => b[1].cantidad - a[1].cantidad)
+            .slice(0, topN);
+            
+        const localidadesTop = Array.from(localidadesMap.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, topN);
+            
+        const logisticasTop = Array.from(logisticasMap.entries())
+            .sort((a, b) => b[1] - a[1]);
+            
+        const provinciasTop = Array.from(provinciasMap.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, topN);
+
+        // ► Generación de gráficos e informe
+        generarGraficos(productosTop, localidadesTop, logisticasTop, enviosPorLogistica, bultosPorLogistica, valorPorLogistica, provinciasTop);
+        generarReporteDetallado(
+            fechaInicioGlobal, fechaFinGlobal, 
+            totalCamiones, totalEnvios, totalBultos, totalValor, 
+            productosTop, localidadesTop, logisticasTop, 
+            camionesPorLogistica, enviosPorLogistica, 
+            bultosPorLogistica, valorPorLogistica,
+            provinciasTop
+        );
+
+    } catch (error) {
+        console.error("Error en procesarDatos:", error);
+        mostrarErrorGraficos(error.message);
+        Swal.fire('Error', error.message, 'error');
+    }
+}
+
+// ARRAY SIN USO (EJEMPLO)
+    const provinciasCP = {
+  "Buenos Aires": ["1600-1999", "2700-2919", "6000-6439", "6500-6740", "7000-7539", "7600-8179", "8500-8999"],
+  "CABA": ["C1000-C1499", "C1400-C1499"],
+  "Catamarca": ["4700-4749"],
+  "Chaco": ["3500-3639", "3700-3749"],
+  "Chubut": ["9000-9219", "9100-9121", "9200-9219", "U9100-U9121"],
+  "Córdoba": ["5000-5299", "5800-5879", "5900-5949"],
+  "Corrientes": ["3400-3489", "W3400-W3489"],
+  "Entre Ríos": ["3100-3269", "E3100-E3269"],
+  "Formosa": ["3600-3639"],
+  "Jujuy": ["4600-4649"],
+  "La Pampa": ["6300-6389"],
+  "La Rioja": ["5300-5389"],
+  "Mendoza": ["5500-5619", "M5500-M5619"],
+  "Misiones": ["3300-3389", "N3300-N3389"],
+  "Neuquén": ["8300-8379", "Q8300-Q8379"],
+  "Río Negro": ["8400-8439", "8500-8599", "R8400-R8439"],
+  "Salta": ["4400-4539", "A4400-A4539"],
+  "San Juan": ["5400-5469", "J5400-J5469"],
+  "San Luis": ["5700-5759", "D5700-D5759"],
+  "Santa Cruz": ["9300-9419", "Z9300-Z9419"],
+  "Santa Fe": ["2000-2249", "3000-3089", "S2000-S2249"],
+  "Santiago del Estero": ["4200-4389", "G4200-G4389"],
+  "Tierra del Fuego": ["9410-9419", "V9410-V9419"],
+  "Tucumán": ["4000-4189", "T4000-T4189"]
+};
+
+const cacheProvincias = new Map();
+
+// USANDO HOJA CIUDADES 
+function determinarProvincia(cp) {
+    if (!cp) {
+        console.log("CP vacío o nulo recibido");
+        return null;
     }
 
+    const cpBuscado = cp.toString().trim();
+    
+    // Verificar caché primero
+    if (cacheProvincias.has(cpBuscado)) {
+        return cacheProvincias.get(cpBuscado);
+    }
+
+    try {
+        // Buscar coincidencia exacta
+        for (const localidad of localidades) {
+            if (localidad.codigosPostales.includes(cpBuscado)) {
+                const provincia = localidad.provincia;
+                cacheProvincias.set(cpBuscado, provincia);
+                return provincia;
+            }
+        }
+        
+        // Buscar coincidencia flexible (ignorando ceros iniciales)
+        for (const localidad of localidades) {
+            for (const cpLocalidad of localidad.codigosPostales) {
+                const cpLocalidadClean = cpLocalidad.replace(/^0+/, '');
+                const cpBuscadoClean = cpBuscado.replace(/^0+/, '');
+                
+                if (cpLocalidadClean === cpBuscadoClean) {
+                    const provincia = localidad.provincia;
+                    cacheProvincias.set(cpBuscado, provincia);
+                    return provincia;
+                }
+            }
+        }
+        
+        console.log(`CP no encontrado: ${cpBuscado}`);
+        cacheProvincias.set(cpBuscado, null); // Guardamos null en lugar de 'Desconocido'
+        return null; // Devolvemos null cuando no se encuentra
+        
+    } catch (e) {
+        console.error(`Error al procesar CP: ${cpBuscado}`, e);
+        cacheProvincias.set(cpBuscado, null);
+        return null;
+    }
+}
+
 // ██████████████████████████ 5. GENERACIÓN DE GRÁFICOS ██████████████████████████
-function generarGraficos(productosTop, localidadesTop, logisticasTop, enviosPorLogistica, bultosPorLogistica, valorPorLogistica) {
+function generarGraficos(productosTop, localidadesTop, logisticasTop, enviosPorLogistica, bultosPorLogistica, valorPorLogistica, provinciasTop) {
     try {
         // ► Solo destruir el gráfico principal si vamos a cambiarlo
         if (window.chartPrincipal) {
@@ -2323,6 +2416,10 @@ function generarGraficos(productosTop, localidadesTop, logisticasTop, enviosPorL
             case 'logisticas':
                 generarGraficoLogisticas(ctxPrincipal, logisticasTop);
                 $('#tituloGrafico1').html(`📌 Distribución por logística`);
+                break;
+            case 'provincias':
+                generarGraficoProvincias(ctxPrincipal, provinciasTop);
+                $('#tituloGrafico1').html(`🗺️ Provincias con más envíos (Top ${topN})`);
                 break;
         }
         
@@ -2458,6 +2555,26 @@ function actualizarGraficos(tipo) {
         const rangoFechas = $('#rangoFechas').val();
         cargarDatos(logistica, ...(rangoFechas ? rangoFechas.split(' a ') : [null, null]));
     }
+}
+
+// ► Función para gráfico de Provincias
+function generarGraficoProvincias(ctx, datos) {
+  const tipo = $('#selectTipoGrafico').val() || 'bar';
+  
+  window.chartPrincipal = new Chart(ctx, {
+    type: tipo,
+    data: {
+      labels: datos.map(item => item[0]),
+      datasets: [{
+        label: 'Envios',
+        data: datos.map(item => item[1]),
+        backgroundColor: generarColores(datos.length),
+        borderColor: 'rgba(153, 102, 255, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: getChartOptions(`Top ${topN} Provincias`, 'Envios', tipo)
+  });
 }
 
 // ► Función para gráfico de productos
@@ -2789,7 +2906,6 @@ function generarGraficoComparativa(ctx, envios, bultos, valor) {
 }
 
     // ██████████████████████████ 6. GENERACIÓN DE INFORME ██████████████████████████
-
 function generarReporteDetallado(
   fechaInicio,
   fechaFin,
@@ -2804,6 +2920,7 @@ function generarReporteDetallado(
   enviosPorLogistica,
   bultosPorLogistica,
   valorPorLogistica,
+  provinciasTop // Asegúrate de pasar este parámetro cuando llames a la función
 ) {
   try {
     let html = `
@@ -2890,23 +3007,51 @@ function generarReporteDetallado(
     }
 
     if (localidadesTop.length > 0) {
+    html += `
+    <div class="macos-title mt-3">📍 Localidades con más envíos (Top ${Math.min(topN, localidadesTop.length)})</div>
+    <table class="table table-sm table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>📍 Localidad</th>
+            <th>📦 Envíos</th>
+        </tr>
+        </thead>
+        <tbody>`;
+    localidadesTop.slice(0, topN).forEach((item, index) => {
+        html += `
+        <tr>
+            <td>${index + 1}</td>
+            <td><strong>${item[0]} (${item[1]})</strong></td> <!-- Cambio aquí -->
+            <td><strong style="color:#457b9d;">${item[1]}</strong></td>
+        </tr>`;
+    });
+    html += `</tbody></table>`;
+    }
+
+    // Nueva sección para el Top de Provincias
+    if (provinciasTop && provinciasTop.length > 0) {
       html += `
-      <div class="macos-title mt-3">📍 Localidades con más envíos (Top ${Math.min(topN, localidadesTop.length)})</div>
+      <div class="macos-title mt-3">🗺️ Provincias con más envíos (Top ${Math.min(topN, provinciasTop.length)})</div>
       <table class="table table-sm table-hover">
         <thead class="table-light">
           <tr>
             <th>#</th>
-            <th>📍 Localidad</th>
+            <th>🗺️ Provincia</th>
             <th>📦 Envíos</th>
+            <th>📬 Bultos</th>
+            <th>💰 Valor</th>
           </tr>
         </thead>
         <tbody>`;
-      localidadesTop.slice(0, topN).forEach((item, index) => {
+      provinciasTop.slice(0, topN).forEach((item, index) => {
         html += `
           <tr>
             <td>${index + 1}</td>
             <td><strong>${item[0]}</strong></td>
             <td><strong style="color:#457b9d;">${item[1]}</strong></td>
+            <td><strong style="color:#1d3557;">${item[2] || 0}</strong></td>
+            <td><strong style="color:#2a9d8f;">${formatearMoneda(item[3] || 0)}</strong></td>
           </tr>`;
       });
       html += `</tbody></table>`;
@@ -2914,7 +3059,7 @@ function generarReporteDetallado(
 
     html += `</div>`;
 
-    // Agregar el bloque de informe ejecutivo correctamente
+    // Actualizar el informe ejecutivo para incluir provincias
     html += `
     <div style="position: relative;">
       <div id="resumenEjecutivo" style="
@@ -2942,7 +3087,11 @@ function generarReporteDetallado(
           ` : ''}
           ${localidadesTop.length > 0 ? `
           🌍 Localidades más frecuentes:
-          ${localidadesTop.slice(0, topN).map((item, index) => `   ${index + 1}. ${item[0]}`).join('\n')}
+          ${localidadesTop.slice(0, topN).map((item, index) => `   ${index + 1}. ${item[0]} (${item[1]})`).join('\n')}
+          ` : ''}
+          ${provinciasTop && provinciasTop.length > 0 ? `
+          🗺️ Provincias con más envíos:
+          ${provinciasTop.slice(0, topN).map((item, index) => `   ${index + 1}. ${item[0]} (${item[1]} envíos)`).join('\n')}
           ` : ''}
       </div>
     </div>`;
@@ -3041,18 +3190,18 @@ function actualizarDetalleResumen(selector, dataObj, label, esMoneda = false) {
     }
 
     function showLoading() {
-        $('#loadingGrafico1, #loadingGrafico2').show();
+        $('#loadingGrafico1, #loadingGrafico2, #spinnerbtnFiltrar').show();
         $('#errorGrafico1, #errorGrafico2').hide();
         $('#reporteDetallado').html('<p class="text-muted">Cargando datos...</p>');
     }
 
     function hideLoading() {
-        $('#loadingGrafico1, #loadingGrafico2').hide();
+        $('#loadingGrafico1, #loadingGrafico2, #spinnerbtnFiltrar').hide();
     }
 
     function mostrarErrorGraficos(mensaje) {
         $('#errorGrafico1, #errorGrafico2').html(`<i class="bi bi-exclamation-triangle"></i> ${mensaje}`).show();
-        $('#loadingGrafico1, #loadingGrafico2').hide();
+        $('#loadingGrafico1, #loadingGrafico2, #spinnerbtnFiltrar').hide();
     }
 
     // ██████████████████████████ 8. EVENT LISTENERS ██████████████████████████
