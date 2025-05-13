@@ -1450,9 +1450,20 @@ const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
     // Convertir el remito a número para la comparación
     const remitoNumero = parseInt(remito);
 
-    // Verificar si el remito está entre 6572 y 6590
-    if (remitoNumero >= 23000006572 && remitoNumero <= 23000006590) {
-        console.log("El remito es un repuesto de Posventa no ejecutare la busqueda.");
+    // Verificar si el remito está entre 6572 y 6590 (repuestos posventa)
+    const esRepuestoPosventa = remitoNumero >= 23000006572 && remitoNumero <= 23000006590;
+
+    if (esRepuestoPosventa) {
+        console.log("El remito es un repuesto de Posventa. Solo se agregará a Info.");
+        try {
+            const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remito}`).once('value');
+            if (remitoSnapshot.exists()) {
+                await dbTipeo.ref(`despachosDelDia/${remito}/Info`).set(remitoSnapshot.val());
+                console.log("Remito de posventa agregado en 'Info'");
+            }
+        } catch (error) {
+            console.error("Error al procesar remito de posventa:", error);
+        }
         return;
     }
 
@@ -1460,6 +1471,7 @@ const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
         console.log("La logística es 'oca', no se ejecutará la búsqueda de Logística Propia");
         return;
     }
+
     try {
         const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remito}`).once('value');
 
@@ -1513,7 +1525,7 @@ const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
                 enviarCorreosDeError("Alerta Logística Propia - Remito " + remito, emailBody);
             }
 
-            // Guardar en Info aunque haya coincidencia
+            // Guardar en Info para todos los casos (incluyendo repuestos posventa)
             await dbTipeo.ref(`despachosDelDia/${remito}/Info`).set(remitoData);
             console.log("Remito encontrado y agregado en 'Info':", remitoData);
         } else {
@@ -1522,13 +1534,15 @@ const agregarDespachoSiNoExiste = async (remito, etiqueta, logistica) => {
     } catch (error) {
         console.error("Error al procesar el remito:", error);
 
-        // Enviar un correo en caso de error con el detalle del remito
-        const emailBody = `
-        <h2 style="color: #d32f2f; font-size: 22px; margin-bottom: 8px;">📢 LogiPaq Informa</h2>
-        <p style="font-family: 'Helvetica', sans-serif; color: #555;">❌ Se produjo un error inesperado verificando el remito <strong>${remito}</strong>.</p>
-        <p style="font-family: 'Helvetica', sans-serif; color: #555;"><strong>Error técnico:</strong> ${error.message}</p>
-                `;
-        enviarCorreosDeError("Error de sistema - Verificación de Remito", emailBody);
+        // Enviar un correo en caso de error con el detalle del remito (excepto para repuestos posventa)
+        if (!esRepuestoPosventa) {
+            const emailBody = `
+            <h2 style="color: #d32f2f; font-size: 22px; margin-bottom: 8px;">📢 LogiPaq Informa</h2>
+            <p style="font-family: 'Helvetica', sans-serif; color: #555;">❌ Se produjo un error inesperado verificando el remito <strong>${remito}</strong>.</p>
+            <p style="font-family: 'Helvetica', sans-serif; color: #555;"><strong>Error técnico:</strong> ${error.message}</p>
+                    `;
+            enviarCorreosDeError("Error de sistema - Verificación de Remito", emailBody);
+        }
     }
 };
 
@@ -3275,3 +3289,80 @@ function obtenerNombreLogistica(idLogistica) {
                      .replace(/\b\w/g, c => c.toUpperCase());
 }
 // FIN ESTADÍSTICAS
+
+// BUSCAR REMITO
+document.getElementById('btnBuscarInfoRemitos').addEventListener('click', async function() {
+    // Mostrar loading
+    const loadingSwal = Swal.fire({
+        title: 'Buscando remitos...',
+        html: 'Estamos verificando los remitos sin datos...',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    try {
+        // Obtener todas las filas de la tabla
+        const filas = document.querySelectorAll('#tabla-despacho-body tr');
+        let contadorActualizados = 0;
+
+        // Recorrer cada fila
+        for (const fila of filas) {
+            // Obtener celda de remito
+            const celdaRemito = fila.querySelector('td:nth-child(5) .remito-tipeo-os');
+            if (!celdaRemito) continue;
+
+            // Obtener número de remito
+            const remito = celdaRemito.textContent.trim();
+            
+            // Obtener celda de info
+            const celdaInfo = fila.querySelector('td:nth-child(7)');
+            if (!celdaInfo) continue;
+
+            // Verificar si dice "Presea ❌"
+            if (celdaInfo.textContent.includes('Presea ❌')) {
+                // Buscar en Firebase
+                const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remito}`).once('value');
+                
+                if (remitoSnapshot.exists()) {
+                    // Actualizar en dbTipeo
+                    await dbTipeo.ref(`despachosDelDia/${remito}/Info`).set(remitoSnapshot.val());
+                    contadorActualizados++;
+                    
+                    // Actualizar visualmente la celda de info
+                    celdaInfo.innerHTML = '<span class="badge bg-success">Actualizado</span>';
+                }
+            }
+        }
+
+        // Cerrar loading y mostrar resultado con autocierre
+        const successSwal = Swal.fire({
+            icon: 'success',
+            title: 'Proceso completado',
+            html: `Se actualizó la información de <strong>${contadorActualizados}</strong> remitos<br>
+            Finalizando...`,
+            showConfirmButton: false,
+            timer: 3000, // 5 segundos
+            timerProgressBar: true,
+            willClose: () => {
+                console.log('Mensaje de éxito cerrado automáticamente');
+            }
+        });
+
+    } catch (error) {
+        console.error('Error al buscar remitos:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al buscar los remitos: ' + error.message,
+            confirmButtonText: 'Entendido'
+        });
+    } finally {
+        // Cerrar loading si aún está abierto
+        if (loadingSwal.isActive()) {
+            loadingSwal.close();
+        }
+    }
+});
+// BUSCAR REMITO
