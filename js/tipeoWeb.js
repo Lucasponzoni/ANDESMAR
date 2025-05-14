@@ -610,7 +610,154 @@ async function enviarCorreoConDetalles(destinatarioEmail, nombreDestinatario, no
     }
 }
 
-function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpallets) {
+// FUNCIÓN PARA GENERAR Y SUBIR EXCEL A FIREBASE STORAGE
+async function generarYSubirExcel(logisticaActual) {
+    try {
+        const fechaHora = new Date();
+        const fechaFormateada = fechaHora.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+        const nombreArchivo = `DatosDespacho_${logisticaActual}_${fechaFormateada}.xlsx`;
+        const storagePath = `ExcelDespachos/${logisticaActual}_${fechaFormateada}`;
+
+        // Crear el workbook como en tu función original
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Datos de Despacho');
+
+        const headers = ['Fecha y hora', 'Transporte', 'Seguimiento', 'Bultos', 'Remito', 'Valor', 'Info'];
+        worksheet.addRow(headers);
+
+        // Estilos (copiados de tu función original)
+        const borderStyle = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+        };
+
+        const headerRow = worksheet.getRow(1);
+        headerRow.eachCell(cell => {
+            cell.font = { bold: true, color: { argb: 'FF000000' }, name: "Arial", size: 12 };
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFBFBFBF' }
+            };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.border = borderStyle;
+        });
+        headerRow.height = 25;
+
+        // Agregar datos de la tabla
+        const filas = document.querySelectorAll('#tabla-despacho-xLogistica-body tr');
+        filas.forEach(fila => {
+            const celdas = fila.querySelectorAll('td');
+            const rowData = [];
+
+            celdas.forEach((celda, index) => {
+                if (index === 1) {
+                    rowData.push(logisticaActual);
+                } else if (index < celdas.length - 1) {
+                    if (index === 2) {
+                        const link = celda.querySelector('a');
+                        if (link) {
+                            rowData.push({
+                                text: link.innerText.trim(),
+                                hyperlink: link.href
+                            });
+                        } else {
+                            rowData.push(celda.innerText.trim());
+                        }
+                    } else {
+                        rowData.push(celda.innerText.trim());
+                    }
+                }
+            });
+
+            const nuevaFila = worksheet.addRow(rowData);
+
+            // Colores según transportista (como en tu código original)
+            let colorTransporte = 'FFFFFFFF';
+            if (logisticaActual === 'Andreani') colorTransporte = 'FFFFE0E0';
+            else if (logisticaActual === 'Andesmar') colorTransporte = 'FFB2EBF2';
+            else if (logisticaActual === 'Cruz del Sur') colorTransporte = 'FF90CAF9';
+            else if (logisticaActual === 'Oca') colorTransporte = 'FFE6E6FA';
+
+            const transporteCell = nuevaFila.getCell(2);
+            transporteCell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: colorTransporte }
+            };
+
+            const bultosCell = nuevaFila.getCell(4);
+            const bultos = parseInt(bultosCell.value);
+            if (!isNaN(bultos) && bultos > 1) {
+                bultosCell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFFFF0F0' }
+                };
+            }
+
+            const seguimientoCell = nuevaFila.getCell(3);
+            if (typeof seguimientoCell.value === 'object' && seguimientoCell.value.hyperlink) {
+                seguimientoCell.font = {
+                    color: { argb: 'FF0000FF' },
+                    underline: true
+                };
+            }
+        });
+
+        // Aplicar bordes y alineación a todas las celdas
+        const lastRow = worksheet.lastRow.number;
+        for (let rowNumber = 1; rowNumber <= lastRow; rowNumber++) {
+            const row = worksheet.getRow(rowNumber);
+            row.eachCell(cell => {
+                cell.border = borderStyle;
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            });
+        }
+
+        // Autoajustar ancho de columnas
+        worksheet.columns.forEach(column => {
+            let maxLength = 0;
+            column.eachCell({ includeEmpty: true }, cell => {
+                if (cell.value) {
+                    const value = typeof cell.value === 'object' ? cell.value.text : cell.value;
+                    maxLength = Math.max(maxLength, value.toString().length);
+                }
+            });
+            column.width = maxLength + 2;
+        });
+
+        // Filtro y congelar cabecera
+        worksheet.autoFilter = {
+            from: { row: 1, column: 1 },
+            to: { row: 1, column: headers.length }
+        };
+        worksheet.views = [{ state: 'frozen', ySplit: 1 }];
+
+        // Generar buffer del Excel
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        // Subir a Firebase Storage
+        const storageRef = appTipeo.storage();
+        const fileRef = storageRef.ref().child(storagePath);
+        await fileRef.put(buffer);
+        
+        // Obtener URL de descarga
+        const downloadURL = await fileRef.getDownloadURL();
+        
+        return downloadURL;
+
+    } catch (error) {
+        console.error('Error al generar o subir el archivo Excel:', error);
+        throw error;
+    }
+}
+// FIN FUNCIÓN PARA GENERAR Y SUBIR EXCEL A FIREBASE STORAGE
+
+// FUNCIÓN MODIFICADA PARA GENERAR CUERPO DE EMAIL CON LINK A EXCEL
+async function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpallets) {
     let totalBultos = 0;
     let totalBultosBigger = 0;
     let totalBultosPaqueteria = 0;
@@ -618,7 +765,7 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
     let totalValor = 0;
 
     const filas = tablaBody.querySelectorAll('tr');
-    totalEtiquetas = filas.length; // Total de filas
+    totalEtiquetas = filas.length;
 
     filas.forEach(fila => {
         const columnas = fila.querySelectorAll('td');
@@ -628,7 +775,6 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
         totalBultos += bultos;
         totalValor += valor;
 
-        // Contar bultos según el tipo para Andreani
         if (logisticaActual === 'Andreani') {
             if (columnas[2].textContent.trim().startsWith('40')) {
                 totalBultosBigger += bultos;
@@ -637,6 +783,15 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
             }
         }
     });
+
+    // Generar y subir el Excel
+    let excelDownloadLink = '';
+    try {
+        excelDownloadLink = await generarYSubirExcel(logisticaActual);
+    } catch (error) {
+        console.error('No se pudo generar el archivo Excel:', error);
+        excelDownloadLink = 'Error al generar archivo Excel';
+    }
 
     let cuerpoEmail = `
     <div style="margin-bottom: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
@@ -653,6 +808,16 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
         <hr>
         <div style="background-color: #9B9B9BFF; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #828282FF;">
             <strong>Pallets Utilizados:</strong> <strong style="color: #484848FF;">${Totalpallets} 🪵</strong>
+        </div>
+        
+        <!-- Botón para descargar Excel -->
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="${excelDownloadLink}" 
+               style="display: inline-block; padding: 10px 20px; background-color: #217346; color: white; 
+                      text-decoration: none; border-radius: 5px; font-weight: bold;"
+               target="_blank">
+               <i class="fas fa-file-excel" style="margin-right: 8px;"></i>Descargar Tabla en Excel
+            </a>
         </div>
     </div>
     `;
