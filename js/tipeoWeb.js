@@ -255,78 +255,107 @@ async function finalizarColecta() {
     // Cerrar modal inicial
     $('#modalDespachoPorLogistica').modal('hide');
 
-    Swal.fire({
-        title: '',
-        html: `
-            <style>
-                .macos-header {
-                    background: linear-gradient(135deg, #f2f2f7, #ffffff);
-                    padding: 15px;
-                    border-radius: 12px;
-                    margin-bottom: 20px;
-                    box-shadow: inset 0 -1px 0 rgba(0,0,0,0.05), 0 4px 10px rgba(0,0,0,0.06);
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                    font-size: 18px;
-                    color: #1d1d1f;
-                    text-align: center;
-                    font-weight: 500;
-                }
-                .swal2-input {
-                    border: 1px solid #d1d1d1;
-                    border-radius: 8px;
-                    padding: 10px 14px;
-                    margin: 6px 0;
-                    font-size: 15px;
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                    width: 100%;
-                    background-color: #f9f9f9;
-                    transition: border-color 0.2s;
-                }
-                .swal2-input:focus {
-                    border-color: #007aff;
-                    outline: none;
-                    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
-                }
-                .swal2-popup {
-                    border-radius: 14px;
-                    padding: 25px;
-                    background: #ffffff;
-                    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-                }
-            </style>
-            <div class="macos-header">📋 Información del Transportista 🚛</div>
-            <input id="cantidadDePallets" class="swal2-input" placeholder="🪵Pallets utilizados" required>
-            <hr>
-            <input id="nombreTransportista" class="swal2-input" placeholder="👤 Nombre del transportista" required>
-            <input id="dniTransportista" class="swal2-input" placeholder="🪪 DNI del transportista" required>
-            <input id="marcaCamion" class="swal2-input" placeholder="🚚 Marca del camión" required>
-            <input id="patenteCamion" class="swal2-input" placeholder="🔠 Patente del camión" required>
-            <input id="marcaChasis" class="swal2-input" placeholder="🛠️ Marca del chasis (opcional)">
-            <input id="patenteChasis" class="swal2-input" placeholder="🔡 Patente del chasis (opcional)">
-            <script>
-                const ids = ['nombreTransportista','dniTransportista','marcaCamion','patenteCamion','marcaChasis','patenteChasis'];
-                ids.forEach((id, i) => {
-                    setTimeout(() => {
-                        const input = document.getElementById(id);
-                        if (input) {
-                            input.addEventListener('keydown', e => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    const next = document.getElementById(ids[i+1]);
-                                    if (next) next.focus();
-                                }
-                            });
-                        }
-                    }, 50);
-                });
-            </script>
-        `,
-        confirmButtonText: 'Guardar 🚀',
-        confirmButtonColor: '#007aff',
-        focusConfirm: false,
-        didOpen: () => {
-            document.getElementById('nombreTransportista').focus();
-        },
+Swal.fire({
+    title: '',
+    html: `
+        <style>
+            .macos-header {
+                background: linear-gradient(135deg, #f9f9fb, #ffffff);
+                padding: 15px 20px;
+                border-radius: 14px;
+                margin-bottom: 20px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 -1px 0 rgba(0,0,0,0.06);
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                font-size: 20px;
+                color: #1c1c1e;
+                text-align: center;
+                font-weight: 600;
+            }
+
+            .swal2-input {
+                border: 1px solid #d0d0d5;
+                border-radius: 10px;
+                padding: 12px 16px;
+                margin: 6px 0;
+                font-size: 16px;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                width: 100%;
+                background-color: #f4f4f7;
+                transition: border-color 0.2s, box-shadow 0.2s;
+                color: #1c1c1e;
+            }
+
+            .swal2-input:focus {
+                border-color: #007aff;
+                outline: none;
+                background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.25);
+            }
+
+            .swal2-popup {
+                border-radius: 16px;
+                padding: 30px;
+                background: #ffffff;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            }
+
+            #cantidadDePallets {
+                background: #fffdf5;
+                border: 2px solid #f8c56c;
+                color: #8a5b00;
+                font-weight: 600;
+                box-shadow: 0 0 8px rgba(255, 200, 80, 0.3);
+            }
+
+            #cantidadDePallets::placeholder {
+                color: #a77c22;
+                font-weight: 500;
+            }
+
+            hr {
+                margin: 20px 0;
+                border: none;
+                border-top: 1px solid #e0e0e5;
+            }
+        </style>
+
+        <div class="macos-header">📦 Detalles del Transporte</div>
+
+        <input id="cantidadDePallets" class="swal2-input" placeholder="🪵 Pallets utilizados" required>
+
+        <hr>
+
+        <input id="nombreTransportista" class="swal2-input" placeholder="👤 Nombre del transportista" required>
+        <input id="dniTransportista" class="swal2-input" placeholder="🪪 DNI del transportista" required>
+        <input id="marcaCamion" class="swal2-input" placeholder="🚚 Marca del camión" required>
+        <input id="patenteCamion" class="swal2-input" placeholder="🔠 Patente del camión" required>
+        <input id="marcaChasis" class="swal2-input" placeholder="🛠️ Marca del chasis (opcional)">
+        <input id="patenteChasis" class="swal2-input" placeholder="🔡 Patente del chasis (opcional)">
+
+        <script>
+            const ids = ['cantidadDePallets','nombreTransportista','dniTransportista','marcaCamion','patenteCamion','marcaChasis','patenteChasis'];
+            ids.forEach((id, i) => {
+                setTimeout(() => {
+                    const input = document.getElementById(id);
+                    if (input) {
+                        input.addEventListener('keydown', e => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const next = document.getElementById(ids[i+1]);
+                                if (next) next.focus();
+                            }
+                        });
+                    }
+                }, 50);
+            });
+        </script>
+    `,
+    confirmButtonText: 'Guardar 🚀',
+    confirmButtonColor: '#007aff',
+    focusConfirm: false,
+    didOpen: () => {
+        document.getElementById('cantidadDePallets').focus();
+    },
         preConfirm: () => {
             const pallets = document.getElementById('cantidadDePallets').value;
             const nombre = document.getElementById('nombreTransportista').value;
@@ -487,6 +516,9 @@ if (result.isConfirmed) {
                     if (carpetaLogistica) {
                         dbTipeo.ref(`${carpetaLogistica}/${fechaFormateada}/${nuevoCamion}/`).set(viajeData);
                     }
+
+                    // Generar y subir el Excel para obtener la URL de descarga
+                    const downloadURL = await generarYSubirExcel(logisticaActual);
 
                     // Enviar correos electrónicos
                     const correos = await obtenerCorreosPorLogistica(logisticaActual);
@@ -740,14 +772,14 @@ async function generarYSubirExcel(logisticaActual) {
         const buffer = await workbook.xlsx.writeBuffer();
 
         // Subir a Firebase Storage
-        const storageRef = appTipeo.storage();
-        const fileRef = storageRef.ref().child(storagePath);
-        await fileRef.put(buffer);
+        const storageMeli = firebase.storage(appMeli); // Usa la instancia MELI
+        const fileRef = storageMeli.ref().child(`ExcelDespachos/${logisticaActual}_${new Date().toISOString().split('T')[0]}.xlsx`);        await fileRef.put(buffer);
         
         // Obtener URL de descarga
         const downloadURL = await fileRef.getDownloadURL();
-        
+        console.log('Link descarga de Excel:',downloadURL)
         return downloadURL;
+        
 
     } catch (error) {
         console.error('Error al generar o subir el archivo Excel:', error);
@@ -757,7 +789,7 @@ async function generarYSubirExcel(logisticaActual) {
 // FIN FUNCIÓN PARA GENERAR Y SUBIR EXCEL A FIREBASE STORAGE
 
 // FUNCIÓN MODIFICADA PARA GENERAR CUERPO DE EMAIL CON LINK A EXCEL
-async function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpallets) {
+function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpallets, downloadURL) {
     let totalBultos = 0;
     let totalBultosBigger = 0;
     let totalBultosPaqueteria = 0;
@@ -765,7 +797,7 @@ async function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, T
     let totalValor = 0;
 
     const filas = tablaBody.querySelectorAll('tr');
-    totalEtiquetas = filas.length;
+    totalEtiquetas = filas.length; // Total de filas
 
     filas.forEach(fila => {
         const columnas = fila.querySelectorAll('td');
@@ -775,6 +807,7 @@ async function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, T
         totalBultos += bultos;
         totalValor += valor;
 
+        // Contar bultos según el tipo para Andreani
         if (logisticaActual === 'Andreani') {
             if (columnas[2].textContent.trim().startsWith('40')) {
                 totalBultosBigger += bultos;
@@ -783,15 +816,6 @@ async function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, T
             }
         }
     });
-
-    // Generar y subir el Excel
-    let excelDownloadLink = '';
-    try {
-        excelDownloadLink = await generarYSubirExcel(logisticaActual);
-    } catch (error) {
-        console.error('No se pudo generar el archivo Excel:', error);
-        excelDownloadLink = 'Error al generar archivo Excel';
-    }
 
     let cuerpoEmail = `
     <div style="margin-bottom: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
@@ -809,15 +833,8 @@ async function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, T
         <div style="background-color: #9B9B9BFF; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #828282FF;">
             <strong>Pallets Utilizados:</strong> <strong style="color: #484848FF;">${Totalpallets} 🪵</strong>
         </div>
-        
-        <!-- Botón para descargar Excel -->
         <div style="text-align: center; margin-top: 20px;">
-            <a href="${excelDownloadLink}" 
-               style="display: inline-block; padding: 10px 20px; background-color: #217346; color: white; 
-                      text-decoration: none; border-radius: 5px; font-weight: bold;"
-               target="_blank">
-               <i class="fas fa-file-excel" style="margin-right: 8px;"></i>Descargar Tabla en Excel
-            </a>
+            <a href="${downloadURL}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 5px; font-weight: bold;">Descargar Tabla en Excel</a>
         </div>
     </div>
     `;
@@ -984,7 +1001,11 @@ function showAlertPosventa(message) {
 // RENDERIZADO DE FILAS EN LA TABLA
 window.onload = async () => {
     await cargarDespachos(); 
-    await actualizarTotales();        
+    console.log("Despachos cargados");
+    setTimeout(async () => {
+        await actualizarTotales();
+        console.log("Totales actualizados");
+    }, 2000);
 };
 
 function cargarDespachos() {

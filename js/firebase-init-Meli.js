@@ -11,10 +11,15 @@ const firebaseConfigMeli = {
 
 let appMeli;
 try {
-    appMeli = firebase.app("appMeli"); // Intenta obtener la app existente
+    appMeli = firebase.app("appMeli");
 } catch (error) {
-    appMeli = firebase.initializeApp(firebaseConfigMeli, "appMeli"); // Si no existe, inicializa
+    appMeli = firebase.initializeApp(firebaseConfigMeli, "appMeli");
 }
 
+// Inicializa los servicios después de asegurar que Firebase está cargado
 const dbMeli = appMeli.database();
+const storageMeli = firebase.storage(appMeli);
+
+// Exporta para uso global
 window.dbMeli = dbMeli;
+window.storageMeli = storageMeli;
