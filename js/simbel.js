@@ -362,6 +362,11 @@ function crearCard(data) {
         // Eliminar caracteres no alfabéticos y espacios extra
         return nombreApellido.replace(/[^a-zA-Z\s]/g, '').trim().replace(/\s+/g, ' ');
     } 
+
+    function limpiarTexto(texto) {
+    // Eliminar apóstrofes, comillas simples, comillas dobles, comas y puntos
+    return texto.replace(/['".,]/g, '');
+}
   
     // Función para formatear números en pesos
     function formatCurrency(amount) {
@@ -748,7 +753,7 @@ const skusTexto = skus.join(', ');
     <button class="mt-1 mb-0 btn btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
         id="LogPropiaMeliButton${data.idOperacion}" 
         ${isBlocked ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', 'NOV${data.idOperacion}', '${limpiarNombreApellido(data.Calle)}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${limpiarNombreApellido(data.Recibe)}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${limpiarNombreApellido(data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones')}', '${productosTexto}', '${skusTexto}', ${totalCantidad}, '${codigosAlfa}', '${cantidades}')">
+        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', 'NOV${data.idOperacion}', '${limpiarTexto(data.Calle)}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${limpiarTexto(data.Recibe)}', '${data.SKU}', '${formatCurrency(data.transactionAmount)}', '${limpiarTexto(data.Observaciones!== undefined ? data.Observaciones : 'Sin Observaciones')}', '${productosTexto}', '${skusTexto}', ${totalCantidad}, '${codigosAlfa}', '${cantidades}')">
         <span>
             ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}
         </span>
