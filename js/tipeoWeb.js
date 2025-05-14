@@ -646,9 +646,14 @@ async function enviarCorreoConDetalles(destinatarioEmail, nombreDestinatario, no
 async function generarYSubirExcel(logisticaActual) {
     try {
         const fechaHora = new Date();
+
+        // Formatear la fecha y la hora
         const fechaFormateada = fechaHora.toISOString().split('T')[0]; // Formato YYYY-MM-DD
-        const nombreArchivo = `DatosDespacho_${logisticaActual}_${fechaFormateada}.xlsx`;
-        const storagePath = `ExcelDespachos/${logisticaActual}_${fechaFormateada}`;
+        const horaFormateada = fechaHora.toISOString().split('T')[1].split('.')[0].replace(/:/g, '-'); // Formato HH-MM-SS
+
+        // Crear el nombre del archivo y la ruta de almacenamiento
+        const nombreArchivo = `DatosDespacho_${logisticaActual}_${fechaFormateada}_${horaFormateada}.xlsx`;
+        const storagePath = `ExcelDespachos/${logisticaActual}_${fechaFormateada}_${horaFormateada}`;
 
         // Crear el workbook como en tu función original
         const workbook = new ExcelJS.Workbook();
