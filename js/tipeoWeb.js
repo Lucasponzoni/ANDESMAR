@@ -522,7 +522,7 @@ if (result.isConfirmed) {
 
                     // Enviar correos electrónicos
                     const correos = await obtenerCorreosPorLogistica(logisticaActual);
-                    const emailBody = generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpallets);
+                    const emailBody = generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpallets, downloadURL)
 
                     for (const destinatarioEmail of correos) {
                         await enviarCorreoConDetalles(destinatarioEmail, destinatarioEmail.split('@')[0], `Logística: ${logisticaActual}, Camión: ${nuevoCamion}, Fecha: ${fechaFormateada}`, new Date().toLocaleString(), emailBody);
@@ -794,7 +794,6 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
     let totalBultosBigger = 0;
     let totalBultosPaqueteria = 0;
     let totalEtiquetas = 0;
-    let totalValor = 0;
 
     const filas = tablaBody.querySelectorAll('tr');
     totalEtiquetas = filas.length; // Total de filas
@@ -805,7 +804,6 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
         const valor = parseFloat(columnas[5].textContent.replace(/[$.]/g, '').replace(',', '.').trim());
 
         totalBultos += bultos;
-        totalValor += valor;
 
         // Contar bultos según el tipo para Andreani
         if (logisticaActual === 'Andreani') {
@@ -818,20 +816,20 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
     });
 
     let cuerpoEmail = `
-    <div style="margin-bottom: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-        <h2 style="color: #007aff; text-align: center;">Detalles de Envío 📦</h2>
-        <div style="background-color: #e0f7fa; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #b2ebf2;">
-            <strong>Total de Etiquetas:</strong> <strong style="color: #007aff;">${totalEtiquetas} 🏷️</strong>
+    <div style="margin-bottom: 20px; padding: 20px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <h2 style="color: #333333; text-align: center;">Detalles de Envío</h2>
+        <div style="padding: 15px; margin: 10px 0; text-align: center; border: 1px solid #007aff; border-radius: 8px; background-color: #f0f8ff;">
+            <strong>Total de Etiquetas:</strong> <strong style="color: #007aff;">${totalEtiquetas}</strong>
         </div>
-        <div style="background-color: #ffe0b2; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #ffcc80;">
-            <strong>Total de Bultos:</strong> <strong style="color: #d32f2f;">${totalBultos} 📦</strong>
+        <div style="padding: 15px; margin: 10px 0; text-align: center; border: 1px solid #007aff; border-radius: 8px; background-color: #f0f8ff;">
+            <strong>Total de Bultos:</strong> <strong style="color: #007aff;">${totalBultos}</strong>
         </div>
-        <div style="background-color: #d1c4e9; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #b39ddb;">
-            <strong>Valor Declarado:</strong> <strong style="color: #4a148c;">${montoFormateado} 💰</strong>
+        <div style="padding: 15px; margin: 10px 0; text-align: center; border: 1px solid #4CAF50; border-radius: 8px; background-color: #e8f5e9;">
+            <strong>Valor Declarado:</strong> <strong style="color: #4CAF50;">${montoFormateado}</strong>
         </div>
         <hr>
-        <div style="background-color: #9B9B9BFF; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #828282FF;">
-            <strong>Pallets Utilizados:</strong> <strong style="color: #484848FF;">${Totalpallets} 🪵</strong>
+        <div style="padding: 15px; margin: 10px 0; text-align: center; border: 1px solid #FF9800; border-radius: 8px; background-color: #fff3e0;">
+            <strong>Pallets Utilizados:</strong> <strong>${Totalpallets}</strong>
         </div>
         <div style="text-align: center; margin-top: 20px;">
             <a href="${downloadURL}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 5px; font-weight: bold;">Descargar Tabla en Excel</a>
@@ -841,13 +839,13 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
 
     if (logisticaActual === 'Andreani') {
         cuerpoEmail += `
-            <div style="margin-bottom: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                <h3 style="color: #007aff; text-align: center;">Detalles de Bultos Andreani</h3>
-                <div style="background-color: #c8e6c9; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #a5d6a7;">
-                    <strong>Total Bultos Bigger:</strong> <strong style="color: #388e3c;">${totalBultosBigger} 📦</strong>
+            <div style="margin-bottom: 20px; padding: 20px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <h3 style="color: #333333; text-align: center;">Detalles de Bultos Andreani</h3>
+                <div style="padding: 15px; margin: 10px 0; text-align: center; border: 1px solid #007aff; border-radius: 8px; background-color: #f0f8ff;">
+                    <strong>Total Bultos Bigger:</strong> <strong style="color: #007aff;">${totalBultosBigger}</strong>
                 </div>
-                <div style="background-color: #ffccbc; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; border: 1px solid #ffab91;">
-                    <strong>Total Bultos Paquetería:</strong> <strong style="color: #d32f2f;">${totalBultosPaqueteria} 📦</strong>
+                <div style="padding: 15px; margin: 10px 0; text-align: center; border: 1px solid #007aff; border-radius: 8px; background-color: #f0f8ff;">
+                    <strong>Total Bultos Paquetería:</strong> <strong style="color: #007aff;">${totalBultosPaqueteria}</strong>
                 </div>
             </div>
         `;
@@ -857,13 +855,13 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
         <table style="width: 100%; border-collapse: collapse; text-align: center;">
             <thead>
                 <tr style="background-color: #007aff; color: #ffffff;">
-                    <th style="border: 1px solid #ccc; padding: 8px;">Fecha/Hora</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Camión</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Seguimiento</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Bultos</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Remito</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Valor</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Info</th>
+                    <th style="border: 1px solid #cccccc; padding: 8px;">Fecha/Hora</th>
+                    <th style="border: 1px solid #cccccc; padding: 8px;">Camión</th>
+                    <th style="border: 1px solid #cccccc; padding: 8px;">Seguimiento</th>
+                    <th style="border: 1px solid #cccccc; padding: 8px;">Bultos</th>
+                    <th style="border: 1px solid #cccccc; padding: 8px;">Remito</th>
+                    <th style="border: 1px solid #cccccc; padding: 8px;">Valor</th>
+                    <th style="border: 1px solid #cccccc; padding: 8px;">Info</th>
                 </tr>
             </thead>
             <tbody>
@@ -880,31 +878,28 @@ function generarCuerpoEmail(tablaBody, logisticaActual, montoFormateado, Totalpa
                 // Extraer el hipervínculo en la tercera columna
                 const link = columna.querySelector('a');
                 if (link) {
-                    cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px;"><a href="${link.href}" style="text-decoration: none; color: #007aff;">${link.textContent.trim()}</a></td>`;
+                    cuerpoEmail += `<td style="border: 1px solid #cccccc; padding: 8px;"><a href="${link.href}" style="text-decoration: none; color: #007aff;">${link.textContent.trim()}</a></td>`;
                 } else {
-                    cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px;">${columna.textContent.trim()}</td>`;
+                    cuerpoEmail += `<td style="border: 1px solid #cccccc; padding: 8px;">${columna.textContent.trim()}</td>`;
                 }
             } else if (index === 3) {
                 // Estilo para la columna "Bultos"
                 const bultos = parseInt(columna.textContent.trim());
-                const color = bultos === 1 ? 'gray' : 'red';
-                const textColor = 'white';
-                const textBold = 'bold';
                 cuerpoEmail += `
-                                <td style="border: 1px solid #ccc; padding: 8px; color: ${color}; font-weight: bold;">
+                                <td style="border: 1px solid #cccccc; padding: 8px; font-weight: bold;">
                                     ${bultos}
                                 </td>
                             `;
             } else if (index === 4) {
                 // Estilo para la columna "Remito"
                 const remito = columna.textContent.trim();
-                cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">${remito}</td>`;
+                cuerpoEmail += `<td style="border: 1px solid #cccccc; padding: 8px; font-weight: bold;">${remito}</td>`;
             } else if (index === 5) {
                 // Estilo para la columna "Valor"
                 const valor = columna.textContent.trim();
-                cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px; color: green; font-weight: bold;">${valor}</td>`;
+                cuerpoEmail += `<td style="border: 1px solid #cccccc; padding: 8px; font-weight: bold;">${valor}</td>`;
             } else {
-                cuerpoEmail += `<td style="border: 1px solid #ccc; padding: 8px;">${columna.textContent.trim()}</td>`;
+                cuerpoEmail += `<td style="border: 1px solid #cccccc; padding: 8px;">${columna.textContent.trim()}</td>`;
             }
         }
         
