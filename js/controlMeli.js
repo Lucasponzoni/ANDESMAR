@@ -1713,6 +1713,7 @@ async function handleGenerateClick(event) {
         try {
             const response = await fetch(`https://proxy.cors.sh/${url}`, {
                 headers: {
+                    'Access-Control-Allow-Origin': '*',
                     'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
                 }
             });
@@ -1969,6 +1970,7 @@ function loadFolder(folderPath) {
                 fileRef.getDownloadURL().then(url => {
                     fetch(`https://proxy.cors.sh/${url}`, {
                         headers: {
+                            'Access-Control-Allow-Origin': '*',
                             'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
                         }
                     })
@@ -2362,6 +2364,7 @@ function loadFolder(folderPath) {
         });
 
         document.getElementById('backButton').style.display = folderStack.length > 0 ? 'block' : 'none';
+        document.getElementById('printQueryButton').style.display = folderStack.length > 0 ? 'block' : 'none';
     }).catch(error => {
         console.error('Error al listar archivos en la carpeta:', error);
         showSpinner(false);
@@ -2392,6 +2395,444 @@ function imprimirTabla() {
     win.document.close();
     win.print();
 }
+
+// BOTON IMPRIMIR EN TANDA GENERAL (VERSIÓN COMPLETA CON REINTENTOS)
+document.getElementById('printQueryButton').addEventListener('click', async () => {
+    try {
+        // 1. Configuración inicial
+        const corsHeaders = {
+            'Access-Control-Allow-Origin': '*',
+            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+            'Content-Type': 'application/json'
+        };
+        const corsProxyUrl = 'https://proxy.cors.sh/';
+        const firebaseUrl = 'https://despachos-meli-novogar-default-rtdb.firebaseio.com';
+        const fullUrl = `${corsProxyUrl}${firebaseUrl}/ImpresionEtiquetas/${selectedFolderDate}.json`;
+
+        // 2. Mostrar loader inicial
+        const loadingSwal = Swal.fire({
+            title: 'Iniciando carga de tandas...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        // 3. Función de reintentos mejorada
+        const fetchWithRetry = async (url, options, maxRetries = 3, initialDelay = 1000) => {
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    loadingSwal.update({
+                        title: `Descargando datos (${attempt}/${maxRetries})`,
+                        text: `Por favor espere...`
+                    });
+
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    const data = await response.json();
+                    return data;
+
+                } catch (error) {
+                    console.error(` ${attempt} fallido:`, error);
+                    
+                    if (attempt >= maxRetries) {
+                        throw new Error(`Fallo después de ${maxRetries} intentos: ${error.message}`);
+                    }
+
+                    // Delay exponencial con variación aleatoria
+                    const delay = initialDelay * Math.pow(2, attempt - 1) + (Math.random() * 500);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        };
+
+        // 4. Descargar datos con reintentos
+        let snapshotData;
+        try {
+            snapshotData = await fetchWithRetry(fullUrl, { headers: corsHeaders }, 5, 1500);
+        } catch (error) {
+            await loadingSwal.close();
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error de conexión',
+                text: `No se pudo cargar los datos después de varios intentos: ${error.message}`,
+                confirmButtonText: 'Entendido'
+            });
+            return;
+        }
+
+        // 5. Procesamiento de tandas con reintentos por cada una
+        const tandas = [];
+        if (snapshotData) {
+            const tandaNames = Object.keys(snapshotData);
+            
+            for (let i = 0; i < tandaNames.length; i++) {
+                const tandaName = tandaNames[i];
+                let processed = false;
+                let retryCount = 0;
+                const maxTandaRetries = 3;
+
+                while (!processed && retryCount < maxTandaRetries) {
+                    try {
+                        loadingSwal.update({
+                            title: `Procesando tandas (${i + 1}/${tandaNames.length})`,
+                            text: `${tandaName} - Intento ${retryCount + 1}/${maxTandaRetries}`
+                        });
+
+                        const match = tandaName.match(/TANDA_(\d+)/);
+                        if (match) {
+                            tandas.push({
+                                name: tandaName,
+                                number: parseInt(match[1]),
+                                data: snapshotData[tandaName] // Incluir datos completos
+                            });
+                            processed = true;
+                        }
+
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        
+                    } catch (error) {
+                        retryCount++;
+                        if (retryCount >= maxTandaRetries) {
+                            console.warn(`Tanda omitida: ${tandaName}`, error);
+                        } else {
+                            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+                        }
+                    }
+                }
+            }
+        }
+
+        // 6. Verificación final de datos
+        if (tandas.length === 0) {
+            await loadingSwal.close();
+            await Swal.fire({
+                icon: 'warning',
+                title: 'Sin tandas procesables',
+                text: 'No se encontraron tandas válidas o hubo errores en todas.',
+                confirmButtonText: 'Entendido'
+            });
+            return;
+        }
+
+        // 7. Ordenar y preparar interfaz
+        tandas.sort((a, b) => b.number - a.number);
+        await loadingSwal.close();
+
+        // 8. Generar HTML de la interfaz
+        const checklistHTML = `
+            <div class="tandas-container">
+                <div class="list-group" style="max-height: 60vh; overflow-y: auto;">
+                    ${tandas.map(tanda => `
+                        <label class="list-group-item d-flex gap-2 align-items-center">
+                            <input class="form-check-input flex-shrink-0 ml-2 mr-3" 
+                                   type="checkbox" 
+                                   value="${tanda.number}" 
+                                   id="tanda-${tanda.number}"
+                                   ${tandas.length === 1 ? 'checked' : ''}>
+                            <span class="ms-2">
+                                <strong>${tanda.name}</strong>
+                                <small class="d-block text-muted">${Object.keys(tanda.data).length} registros</small>
+                            </span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="mt-3 d-flex justify-content-between">
+                    <button type="button" id="selectAllBtn" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-check2-square me-1 mr-1"></i>Seleccionar todo
+                    </button>
+                    <button type="button" id="deselectAllBtn" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-x-square me-1 mr-1"></i>Deseleccionar todo
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // 9. Mostrar diálogo de selección
+        const { value: selectedTandas } = await Swal.fire({
+            title: `<i class="bi bi-list-check me-2 mr-1"></i>Tandas disponibles (${selectedFolderDate})`,
+            html: checklistHTML,
+            footer: `<small class="text-muted">Total: ${tandas.length} tandas procesadas</small>`,
+            confirmButtonText: '<i class="bi bi-file-earmark-pdf me-2 mr-1"></i>Generar reporte',
+            cancelButtonText: '<i class="bi bi-x-circle me-2 mr-1"></i>Cancelar',
+            showCancelButton: true,
+            width: '700px',
+            backdrop: 'rgba(0,0,0,0.5)',
+            allowOutsideClick: false,
+            focusConfirm: false,
+            didOpen: () => {
+                // Controladores para selección/deselección
+                document.getElementById('selectAllBtn').addEventListener('click', () => {
+                    tandas.forEach(tanda => {
+                        document.getElementById(`tanda-${tanda.number}`).checked = true;
+                    });
+                });
+
+                document.getElementById('deselectAllBtn').addEventListener('click', () => {
+                    tandas.forEach(tanda => {
+                        document.getElementById(`tanda-${tanda.number}`).checked = false;
+                    });
+                });
+            },
+            preConfirm: () => {
+                const selected = tandas
+                    .filter(tanda => document.getElementById(`tanda-${tanda.number}`).checked)
+                    .map(tanda => tanda.number);
+                
+                if (selected.length === 0) {
+                    Swal.showValidationMessage('Debes seleccionar al menos una tanda');
+                    return false;
+                }
+                return selected;
+            }
+        });
+
+        // 10. Generar reporte si se seleccionaron tandas
+        if (selectedTandas) {
+            try {
+                await generateQueryReport(selectedFolderDate, selectedTandas);
+            } catch (error) {
+                console.error("Error al generar reporte:", error);
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Error al generar',
+                    text: 'Hubo un problema al crear el reporte. Por favor intente nuevamente.',
+                    confirmButtonText: 'Entendido'
+                });
+            }
+        }
+
+    } catch (error) {
+        console.error("Error general en printQueryButton:", error);
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error inesperado',
+            text: 'Ocurrió un error no previsto en el proceso. Detalles en consola.',
+            confirmButtonText: 'Entendido'
+        });
+    }
+});
+// FIN BOTON IMPRIMIR EN TANDA GENERAL
+
+// GENERAR REPORTE EN TANDA GENERAL
+async function generateQueryReport(date, selectedTandas) {
+    // Mostrar loader al inicio
+    const loadingSwal = Swal.fire({
+        title: 'Generando Query...',
+        html: 'Espere por favor',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    try {
+        const agrupado = {};
+        let totalVentas = 0;
+        const firebaseUrl = 'https://despachos-meli-novogar-default-rtdb.firebaseio.com';
+
+        // Configuración de headers para CORS
+        const corsHeaders = {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json'
+        };
+
+        // Procesar cada tanda seleccionada
+        for (const tandaNum of selectedTandas) {
+            try {
+                // 1. Obtener datos de la tanda usando CORS proxy
+                const tandaPath = `/ImpresionEtiquetas/${date}/TANDA_${tandaNum}.json`;
+                const tandaResponse = await fetch(`${firebaseUrl}${tandaPath}`, {
+                    headers: corsHeaders
+                });
+                
+                const tandaData = await tandaResponse.json();
+                const ventaIds = Object.keys(tandaData || {});
+                totalVentas += ventaIds.length;
+
+                // 2. Obtener detalles de cada envío
+                const enviosPromises = ventaIds.map(async id => {
+                    const envioPath = `/envios/${id}.json`;
+                    const response = await fetch(`${firebaseUrl}${envioPath}`, {
+                        headers: corsHeaders
+                    });
+                    return await response.json();
+                });
+
+                const resultados = await Promise.all(enviosPromises);
+
+                // Procesar cada envío encontrado
+                resultados.forEach(data => {
+                    if (!data) return;
+                    
+                    const sku = data.SKU || data.sku || 'SIN_SKU';
+                    const cantidad = Number(data.Cantidad || data.cantidad || 1);
+                    const producto = data.Producto || data.producto || 'Sin descripción';
+
+                    const claveAgrupacion = sku.toUpperCase(); // Eliminada la variante de la clave
+
+                    if (!agrupado[claveAgrupacion]) {
+                        agrupado[claveAgrupacion] = {
+                            sku: sku,
+                            cantidad: 0,
+                            producto: producto,
+                            tandas: new Set()
+                        };
+                    }
+                    
+                    agrupado[claveAgrupacion].cantidad += cantidad;
+                    agrupado[claveAgrupacion].tandas.add(tandaNum);
+                });
+
+            } catch (error) {
+                console.error(`Error procesando tanda ${tandaNum}:`, error);
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Error de conexión',
+                    text: `No se pudo obtener la tanda ${tandaNum}. Verifica la conexión.`
+                });
+                continue;
+            }
+        }
+
+        // Convertir a array y ordenar
+            const arrayAgrupado = Object.values(agrupado);
+            arrayAgrupado.sort((a, b) => b.cantidad - a.cantidad);
+
+            // Headers y URLs
+            const corsHeaders2 = {
+                'Access-Control-Allow-Origin': '*',
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                'Content-Type': 'application/json'
+            };
+            const corsProxyUrl2 = 'https://proxy.cors.sh/';
+            const firebaseUrl2 = 'https://precios-novogar-default-rtdb.firebaseio.com';
+
+            // Iterar para obtener stock
+            for (const item of arrayAgrupado) {
+                const skuLimpio = item.sku.replace(/[-.]/g, '').toUpperCase();
+                console.log(`Buscando SKU ${skuLimpio} en /precios`);
+
+                try {
+                    const url = `${corsProxyUrl2}${firebaseUrl2}/precios/${skuLimpio}.json`;
+                    const response = await fetch(url, { headers: corsHeaders2 });
+                    const dataStock = await response.json();
+                    item.preseaStock = dataStock ? dataStock.stock : '—';
+                } catch (error) {
+                    console.error(`Error al buscar ${skuLimpio} en /precios`, error);
+                    item.preseaStock = '—';
+                }
+            }
+
+        // Generar HTML de la tabla sin scroll vertical
+        let tablaHtml = `
+            <div id="tablaReporte">
+                <h3 style="text-align:center; margin-bottom: 10px;">
+                    Resumen ${date} - ${selectedTandas.length} Tanda(s)
+                </h3>
+                <p style="text-align:center; color:#666;">
+                    Total de ventas procesadas: ${totalVentas}
+                </p>
+                <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">
+                    <thead>
+                        <tr style="background-color: #4CAF50; color: white;">
+                            <th style="border: 1px solid #ddd; padding: 8px; width: 15%;">SKU</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; width: 10%;">⚠️</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; width: 60%;">Descripción</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; width: 10%;">Presea</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; width: 15%;">📦</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        for (const item of arrayAgrupado) {
+            const tandasList = Array.from(item.tandas).sort((a,b) => b-a).join(', ');
+            
+            tablaHtml += `
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.sku}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.cantidad}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${item.producto}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.preseaStock}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 0.8em;">${tandasList}</td>
+                </tr>
+            `;
+        }
+
+        tablaHtml += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // Cerrar loader antes de mostrar resultados
+        await loadingSwal.close();
+
+        // Mostrar con botón de impresión
+        await Swal.fire({
+            title: 'Resumen de Query',
+            html: tablaHtml,
+            width: '900px',
+            showCloseButton: true,
+            confirmButtonText: 'Cerrar',
+            footer: `
+                <button onclick="imprimirTabla()" class="btn btn-success" style="margin-right: 10px;">
+                    <i class="bi bi-printer"></i> Imprimir
+                </button>
+                <small style="color: #666;">Generado el ${new Date().toLocaleDateString()}</small>
+            `,
+            didOpen: () => {
+                // Función de impresión mejorada
+                window.imprimirTabla = function() {
+                    const win = window.open('', '_blank');
+                    win.document.write(`
+                        <html>
+                            <head>
+                                <title>Resumen ${date}</title>
+                                <style>
+                                    body { font-family: Arial; margin: 20px; }
+                                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                                    th, td { border: 1px solid #ddd; padding: 8px; }
+                                    th { background-color: #4CAF50; color: white; }
+                                    @media print {
+                                        @page { size: landscape; margin: 5mm; }
+                                        body { font-size: 12pt; }
+                                        table { page-break-inside: auto; }
+                                        tr { page-break-inside: avoid; page-break-after: auto; }
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <h2 style="text-align:center;">Resumen de producción</h2>
+                                <p><strong>Fecha:</strong> ${date}</p>
+                                <p><strong>Tandas incluidas:</strong> ${selectedTandas.sort((a,b) => b-a).join(', ')}</p>
+                                <p><strong>Total items:</strong> ${arrayAgrupado.length}</p>
+                                <p><strong>Ordenado por:</strong> Cantidad (de mayor a menor)</p>
+                                ${document.querySelector('#tablaReporte').innerHTML}
+                            </body>
+                        </html>
+                    `);
+                    win.document.close();
+                    setTimeout(() => {
+                        win.print();
+                        win.close();
+                    }, 500);
+                };
+            }
+        });
+
+    } catch (error) {
+        await loadingSwal.close();
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al generar el reporte: ' + error.message
+        });
+        console.error('Error en generateQueryReport:', error);
+    }
+}
+// FIN GENERAR REPORTE EN TANDA GENERAL
 
 document.getElementById('backButton').addEventListener('click', () => {
     if (folderStack.length > 0) {
@@ -2431,6 +2872,7 @@ ${crearLista(datosFiltrados)}\n
         await fetch(`${corsh}${HookMeli}`, {
             method: 'POST',
             headers: {
+                'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json',
                 'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
             },
@@ -2502,6 +2944,7 @@ async function enviarCorreoTanda(destinatarioEmail, nombreDestinatario, nombreTa
         const response = await fetch('https://proxy.cors.sh/https://send.mailup.com/API/v2.0/messages/sendmessage', {
             method: 'POST',
             headers: {
+                'Access-Control-Allow-Origin': '*',
                 'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
                 'Content-Type': 'application/json'
             },
