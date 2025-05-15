@@ -2640,7 +2640,7 @@ async function generateQueryReport(date, selectedTandas) {
         // Procesar cada tanda seleccionada
         for (const tandaNum of selectedTandas) {
             try {
-                // 1. Obtener datos de la tanda usando CORS proxy
+                // Obtener datos de la tanda
                 const tandaPath = `/ImpresionEtiquetas/${date}/TANDA_${tandaNum}.json`;
                 const tandaResponse = await fetch(`${firebaseUrl}${tandaPath}`, {
                     headers: corsHeaders
@@ -2650,7 +2650,7 @@ async function generateQueryReport(date, selectedTandas) {
                 const ventaIds = Object.keys(tandaData || {});
                 totalVentas += ventaIds.length;
 
-                // 2. Obtener detalles de cada envío
+                // Obtener detalles de cada envío
                 const enviosPromises = ventaIds.map(async id => {
                     const envioPath = `/envios/${id}.json`;
                     const response = await fetch(`${firebaseUrl}${envioPath}`, {
@@ -2669,7 +2669,7 @@ async function generateQueryReport(date, selectedTandas) {
                     const cantidad = Number(data.Cantidad || data.cantidad || 1);
                     const producto = data.Producto || data.producto || 'Sin descripción';
 
-                    const claveAgrupacion = sku.toUpperCase(); // Eliminada la variante de la clave
+                    const claveAgrupacion = sku.toUpperCase();
 
                     if (!agrupado[claveAgrupacion]) {
                         agrupado[claveAgrupacion] = {
@@ -2695,34 +2695,43 @@ async function generateQueryReport(date, selectedTandas) {
             }
         }
 
+        // Headers y URLs
+        const corsHeaders2 = {
+            'Access-Control-Allow-Origin': '*',
+            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+            'Content-Type': 'application/json'
+        };
+        const corsProxyUrl2 = 'https://proxy.cors.sh/';
+        const firebaseUrl2 = 'https://precios-novogar-default-rtdb.firebaseio.com';
+
         // Convertir a array y ordenar
-            const arrayAgrupado = Object.values(agrupado);
-            arrayAgrupado.sort((a, b) => b.cantidad - a.cantidad);
+        const arrayAgrupado = Object.values(agrupado);
+        arrayAgrupado.sort((a, b) => b.cantidad - a.cantidad);
 
-            // Headers y URLs
-            const corsHeaders2 = {
-                'Access-Control-Allow-Origin': '*',
-                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
-                'Content-Type': 'application/json'
-            };
-            const corsProxyUrl2 = 'https://proxy.cors.sh/';
-            const firebaseUrl2 = 'https://precios-novogar-default-rtdb.firebaseio.com';
+        const totalItems = arrayAgrupado.length;
 
-            // Iterar para obtener stock
-            for (const item of arrayAgrupado) {
-                const skuLimpio = item.sku.replace(/[-.]/g, '').toUpperCase();
-                console.log(`Buscando SKU ${skuLimpio} en /precios`);
+        // Iterar para obtener stock
+        for (let i = 0; i < totalItems; i++) {
+            const item = arrayAgrupado[i];
+            const skuLimpio = item.sku.replace(/[-.]/g, '').toUpperCase();
+            console.log(`Buscando SKU ${skuLimpio} en /precios`);
 
-                try {
-                    const url = `${corsProxyUrl2}${firebaseUrl2}/precios/${skuLimpio}.json`;
-                    const response = await fetch(url, { headers: corsHeaders2 });
-                    const dataStock = await response.json();
-                    item.preseaStock = dataStock ? dataStock.stock : '—';
-                } catch (error) {
-                    console.error(`Error al buscar ${skuLimpio} en /precios`, error);
-                    item.preseaStock = '—';
-                }
+            // Actualizar el porcentaje en el Sweet Alert
+            const porcentaje = Math.round(((i + 1) / totalItems) * 100);
+            loadingSwal.update({
+                html: `Espere por favor... ${porcentaje}% completado`
+            });
+
+            try {
+                const url = `${corsProxyUrl2}${firebaseUrl2}/precios/${skuLimpio}.json`;
+                const response = await fetch(url, { headers: corsHeaders2 });
+                const dataStock = await response.json();
+                item.preseaStock = dataStock ? dataStock.stock : '—';
+            } catch (error) {
+                console.error(`Error al buscar ${skuLimpio} en /precios`, error);
+                item.preseaStock = '—';
             }
+        }
 
         // Generar HTML de la tabla sin scroll vertical
         let tablaHtml = `
