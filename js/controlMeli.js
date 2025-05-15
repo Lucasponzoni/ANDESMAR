@@ -667,6 +667,58 @@ function agregarFila(data) {
     $('.no-data').remove();
 }
 
+function agregarFilaFiltrados(data) {
+    const fechaHora = new Date().toLocaleString('es-AR', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false 
+    }).replace(',', 'h').replace('h', ', '); // Formato "26/10/24, 18:27h"
+
+    // Verificar si ya existe en Firebase antes de guardar
+    database.ref('/despachoDelDiaMeli/' + data.shippingId).once('value').then(snapshot => {
+        if (!snapshot.exists()) {
+            // Si el registro no existe en Firebase, lo agrega con la fecha actual
+            return database.ref('/despachoDelDiaMeli/' + data.shippingId).set({
+                fechaHora: fechaHora,
+                shippingId: data.shippingId,
+                idOperacion: data.idOperacion,
+                Cantidad: data.Cantidad,
+                Producto: data.Producto,
+                pictures: data.pictures
+            }).catch(error => {
+                console.error('Error al guardar en Firebase:', error);
+            });
+        }
+    }).catch(error => {
+        console.error('Error al verificar la existencia en Firebase:', error);
+    });
+
+    // Generar la fila de la tabla
+    const newRow = `
+        <tr data-id="${data.shippingId}">
+            <td>${data.fechaHora || fechaHora}</td>
+            <td><a href="https://www.mercadolibre.com.ar/ventas/${data.idOperacion}/detalle" target="_blank">${data.idOperacion}</a></td>
+            <td id="sku-control-Meli">${data.shippingId}</td>
+            <td id="cantidad-control-Meli">${data.Cantidad}</td>
+            <td>${data.Producto}</td>
+            <td><img src="${data.pictures && data.pictures.length > 0 ? data.pictures[0].secure_url : ''}" alt="Imagen" style="max-width: 200px; height: 80px;"></td>
+            <td><button class="btn btn-danger btn-delete" onclick="confirmarEliminacion('${data.shippingId}')">X</button></td>
+        </tr>
+    `;
+
+    // Agregar la nueva fila al principio de la tabla
+    $('#data-table-body').prepend(newRow);
+
+    actualizarContador();
+    actualizarContadorFilas();
+
+    // Eliminar la fila de "No has comenzado una colecta aún" si existe
+    $('.no-data').remove();
+}
+
 function confirmarEliminacion(id) {
     Swal.fire({
         title: '¿Confirmar eliminación?',
@@ -1615,6 +1667,7 @@ function extractSalesNumbers(content) {
             }
         });
     }
+
     return matches;
 }
 
@@ -1635,7 +1688,7 @@ async function handleGenerateClick(event) {
                 }
             });
             const content = await response.text();
-            const billingContent = await generateBillingFile(content);
+            const billingContent = await generateBillingFile(content, fileName);
             const billingFileName = `Facturacion_${fileName}.txt`;
             downloadBillingFile(billingContent, billingFileName);
             button.innerHTML = '<i class="bi bi-check-all"></i>';
@@ -1667,9 +1720,12 @@ function logMessage(message) {
     }
 }
 
-async function generateBillingFile(content) {
+async function generateBillingFile(content, fileName) {
     const salesNumbers = extractSalesNumbers(content);
     let billingContent = '';
+
+    // Preparar nombre de archivo sin .txt y con guión bajo
+    const fileNameSinExtension = fileName.replace('.txt', '').replace(' ', '_');
 
     for (const [index, number] of salesNumbers.entries()) {
         const shippingIdMatch = number.match(/ShippingID: (\d+)/);
@@ -1686,6 +1742,13 @@ async function generateBillingFile(content) {
                 data = await buscarEnFirebase2(ventaId);
                 if (data) {
                     logMessage(`Encontrado con Exito`);
+
+                    // 👉 Push ventaId a Firebase
+                    firebase.database()
+                    .ref(`ImpresionEtiquetas/${selectedFolderDate}/${fileNameSinExtension}`)
+                    .child(ventaId)
+                    .set({ ventaId });
+
                     const additionalInfo = data.client?.billing_info?.additional_info || [];
                     const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "jujuy");
                     const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "tierra del fuego");
@@ -1700,7 +1763,7 @@ async function generateBillingFile(content) {
                         billingContent += `${index + 1}- ${number} ---- Control Ok.\n`;
                     }
                 } else {
-                    logMessage(`No se logró encontrar el ID de Venta: ${ventaId} en Mercado Lubre, Verifique Manualmente.`);
+                    logMessage(`No se logró encontrar el ID de Venta: ${ventaId} en Mercado Libre, Verifique Manualmente.`);
                     billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
                 }
             } catch (error) {
@@ -1714,6 +1777,13 @@ async function generateBillingFile(content) {
                 data = await buscarEnFirebase2(ventaId);
                 if (data) {
                     logMessage(`Encontrado con Exito`);
+
+                    // 👉 Push ventaId a Firebase
+                    firebase.database()
+                    .ref(`ImpresionEtiquetas/${selectedFolderDate}/${fileNameSinExtension}`)
+                    .child(ventaId)
+                    .set({ ventaId });
+
                     const additionalInfo = data.client?.billing_info?.additional_info || [];
                     const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "jujuy");
                     const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "tierra del fuego");
@@ -1738,15 +1808,12 @@ async function generateBillingFile(content) {
         } else if (shippingIdMatch) {
             const shippingId = shippingIdMatch[1];
             logMessage(`Buscando en Mercado Libre el ShippingID: ${shippingId}...`);
-            // Aquí puedes agregar la lógica para buscar por shippingId si es necesario
-            // Por ahora, solo se busca por ID de venta.
             billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
         } else {
             billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
         }
     }
 
-    // Ocultar el logContainer al finalizar
     const logContainer = document.getElementById('logContainer');
     if (logContainer) {
         logContainer.style.display = 'none';
@@ -1766,6 +1833,9 @@ function downloadBillingFile(content, fileName) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
+
+// Variable global para almacenar la fecha de la carpeta
+let selectedFolderDate = '';
 
 function loadFolder(folderPath) {
     showSpinner(true);
@@ -1806,6 +1876,13 @@ function loadFolder(folderPath) {
             items.push(listItem);
         
             listItem.addEventListener('click', () => {
+                // Extraer la fecha de la carpeta y guardarla en la variable global
+                const parts = folderRef.name.match(/(\d+)-(\d+)-(\d+)/);
+                if (parts) {
+                     selectedFolderDate = `${parts[1]}-${parts[2]}-${parts[3]}`; // Formato: DD-MM-YYYY
+                     console.log('Seleccionada:', selectedFolderDate);
+                }
+
                 folderStack.push(currentFolderPath);
                 currentFolderPath = folderRef.fullPath;
                 loadFolder(currentFolderPath);
@@ -1825,34 +1902,34 @@ function loadFolder(folderPath) {
         // Mostrar los primeros 5 elementos
         items.slice(0, itemsToShow).forEach(item => folderList.appendChild(item));
         
-// Agregar botón "Ver más" si hay más de 5 elementos
-if (items.length > maxItemsToShow) {
-    const showMoreButton = document.createElement('button');
-    showMoreButton.className = 'btn btn-primary mt-2';
-    showMoreButton.innerHTML = 'Ver más <i class="bi bi-chevron-down" style="margin-right: 8px;"></i>';
-    
-    const showLessButton = document.createElement('button');
-    showLessButton.className = 'btn btn-danger mt-2 mb-2';
-    showLessButton.innerHTML = 'Ver menos <i class="bi bi-chevron-up" style="margin-right: 8px;"></i>';
-    showLessButton.style.display = 'none'; // Ocultar inicialmente
+        // Agregar botón "Ver más" si hay más de 5 elementos
+        if (items.length > maxItemsToShow) {
+            const showMoreButton = document.createElement('button');
+            showMoreButton.className = 'btn btn-primary mt-2';
+            showMoreButton.innerHTML = 'Ver más <i class="bi bi-chevron-down" style="margin-right: 8px;"></i>';
+            
+            const showLessButton = document.createElement('button');
+            showLessButton.className = 'btn btn-danger mt-2 mb-2';
+            showLessButton.innerHTML = 'Ver menos <i class="bi bi-chevron-up" style="margin-right: 8px;"></i>';
+            showLessButton.style.display = 'none'; // Ocultar inicialmente
 
-    showMoreButton.addEventListener('click', () => {
-        // Mostrar todos los elementos
-        items.slice(itemsToShow).forEach(item => folderList.appendChild(item));
-        showMoreButton.style.display = 'none'; // Ocultar el botón "Ver más"
-        showLessButton.style.display = 'inline-block'; // Mostrar el botón "Ver menos"
-    });
+            showMoreButton.addEventListener('click', () => {
+                // Mostrar todos los elementos
+                items.slice(itemsToShow).forEach(item => folderList.appendChild(item));
+                showMoreButton.style.display = 'none'; // Ocultar el botón "Ver más"
+                showLessButton.style.display = 'inline-block'; // Mostrar el botón "Ver menos"
+            });
 
-    showLessButton.addEventListener('click', () => {
-        // Ocultar los elementos adicionales y mostrar solo los primeros 5
-        items.slice(maxItemsToShow).forEach(item => item.remove());
-        showLessButton.style.display = 'none'; // Ocultar el botón "Ver menos"
-        showMoreButton.style.display = 'inline-block'; // Mostrar el botón "Ver más"
-    });
+            showLessButton.addEventListener('click', () => {
+                // Ocultar los elementos adicionales y mostrar solo los primeros 5
+                items.slice(maxItemsToShow).forEach(item => item.remove());
+                showLessButton.style.display = 'none'; // Ocultar el botón "Ver menos"
+                showMoreButton.style.display = 'inline-block'; // Mostrar el botón "Ver más"
+            });
 
-    folderList.appendChild(showMoreButton);
-    folderList.appendChild(showLessButton);
-}
+            folderList.appendChild(showMoreButton);
+            folderList.appendChild(showLessButton);
+        }
 
         result.items.forEach(fileRef => {
             showSpinner(true);
@@ -1966,17 +2043,232 @@ if (items.length > maxItemsToShow) {
                                 };
                             }
                         });
-                                              
-                            listItem.querySelector('.badge').addEventListener('click', (event) => {
-                            event.stopPropagation(); // Evitar que el evento de clic se propague al elemento de la lista
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = fileRef.name;
-                            a.target = '_blank'; // Forzar la descarga en una nueva pestaña
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
+
+                        // Evento para manejar clic en el badge
+                        listItem.querySelector('.badge').addEventListener('click', async (event) => {
+                            event.stopPropagation();
+
+                            let fileNameSinExtension = fileRef.name.replace('.txt', '').replace(/ /g, '_');
+                            const refPath = `ImpresionEtiquetas/${selectedFolderDate}/${fileNameSinExtension}`;
+
+                            try {
+                                const snapshot = await firebase.database().ref(refPath).once('value');
+                                if (!snapshot.exists()) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Primero ejecutá el análisis de etiquetas',
+                                        text: 'Debés hacer clic en el botón de descarga después de haber generado las etiquetas.',
+                                        confirmButtonText: 'Entendido'
+                                    });
+                                    return;
+                                }
+
+const { value: opcionElegida } = await Swal.fire({
+    title: '¿Cómo seguimos?',
+    icon: 'question',
+    showCancelButton: true,
+    showDenyButton: true,
+    confirmButtonText: '🖨️ Solo imprimir',
+    denyButtonText: '📦 Imprimir e ingresar',
+    cancelButtonText: '❌ Cancelar',
+    html: `
+        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+            <button id="generarQueryBtn" class="swal2-styled" style="background-color: #09B109FF;">ℹ️ Generar query</button>
+        </div>
+    `,
+    showCloseButton: false,
+    footer: '', // Sin botón adicional en el footer
+    didOpen: () => {
+        const generarQueryBtn = document.getElementById('generarQueryBtn');
+        if (generarQueryBtn) {
+            generarQueryBtn.addEventListener('click', async () => {
+                await generarTablaQuery(snapshot.val(), selectedFolderDate, fileNameSinExtension);
+                // El modal permanece abierto
+            });
+        }
+    }
+});
+
+                                if (opcionElegida === true) {
+                                    // Opción: Solo imprimir
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = fileRef.name;
+                                    a.target = '_blank';
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                } else if (opcionElegida === false) {
+                                    // Opción: Imprimir e ingresar
+                                    Swal.fire({
+                                        title: 'Agregando datos a planilla...',
+                                        html: 'Espere por favor',
+                                        allowOutsideClick: false,
+                                        showConfirmButton: false,
+                                        willOpen: () => {
+                                            Swal.showLoading();
+                                        }
+                                    });
+
+                                    const hijos = Object.keys(snapshot.val());
+                                    const datosAgregados = [];
+                                    const datosNoEncontrados = [];
+                                    const datosFiltrados = [];
+
+                                    for (const ventaid of hijos) {
+                                        const envioSnap = await firebase.database().ref('/envios/' + ventaid).once('value');
+                                        if (!envioSnap.exists()) {
+                                            datosNoEncontrados.push(ventaid);
+                                            console.log('No encontrado:', ventaid); // Log de IDs no encontrados
+                                            continue;
+                                        }
+
+                                        const data = envioSnap.val();
+                                        let esDeProvinciaExcluida = false;
+
+                                        // Verificar si es de Jujuy o Tierra del Fuego
+                                        if (data.client && data.client.billing_info && Array.isArray(data.client.billing_info.additional_info)) {
+                                            esDeProvinciaExcluida = data.client.billing_info.additional_info.some(info =>
+                                                info.type === "STATE_NAME" &&
+                                                ["jujuy", "tierra del fuego"].includes(info.value.toLowerCase())
+                                            );
+                                        }
+
+                                        if (esDeProvinciaExcluida) {
+                                            datosFiltrados.push(ventaid);
+                                            continue;
+                                        }
+
+                                        // Agregar a planilla solo si NO es de provincia excluida
+                                        agregarFila(data);
+                                        datosAgregados.push(ventaid);
+                                    }
+
+                                    // Generar reporte
+                                    let htmlContent = '';
+                                    if (datosFiltrados.length > 0 || datosNoEncontrados.length > 0) {
+                                        htmlContent = `
+                                            <div style="max-height: 200px; overflow-y: auto; text-align: left;">
+                                                ${datosFiltrados.length > 0 ? `<p style="color: red;"><strong>🚫 Excluidos (Jujuy/Tierra del Fuego): ${datosFiltrados.length}</strong><br>${datosFiltrados.join('<br>')}</p>` : ''}
+                                                ${datosNoEncontrados.length > 0 ? `<p style="color: orange;"><strong>❌ No encontrados en BD: ${datosNoEncontrados.length}</strong><br>${datosNoEncontrados.join('<br>')}</p>` : ''}
+                                            </div>
+                                        `;
+                                    }
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: datosAgregados.length > 0 ? 'Proceso completado' : 'Advertencia',
+                                        html: datosAgregados.length > 0
+                                            ? `${htmlContent}<p>✅ Se agregaron ${datosAgregados.length} registros a la planilla.</p>`
+                                            : `${htmlContent}<p>⚠️ No se agregaron registros válidos.</p>`,
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Imprimir tanda',
+                                        cancelButtonText: 'Salir'
+                                    }).then(result => {
+                                        if (result.isConfirmed) {
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = fileRef.name;
+                                            a.target = '_blank';
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            document.body.removeChild(a);
+                                        }
+
+                                        // Enviar el reporte al webhook
+                                        enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados);
+                                    });
+                                }
+                            } catch (error) {
+                                console.error('Error:', error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error inesperado',
+                                    text: 'Ocurrió un problema al procesar las etiquetas.',
+                                    confirmButtonText: 'Cerrar'
+                                });
+                            }
                         });
+
+
+                        async function generarTablaQuery(ventas, selectedFolderDate, fileNameSinExtension) {
+                            const agrupado = {};
+                            const ventaIds = Object.keys(ventas);
+
+                            const promesasEnvios = ventaIds.map(id =>
+                                firebase.database().ref('/envios/' + id).once('value')
+                            );
+
+                            const resultados = await Promise.all(promesasEnvios);
+
+                            resultados.forEach(snap => {
+                                if (!snap.exists()) return;
+                                const data = snap.val();
+                                const sku = data.SKU || data.sku || 'SIN_SKU';
+                                const cantidad = Number(data.Cantidad || data.cantidad || 1);
+                                const producto = data.Producto || data.producto || 'Sin descripción';
+
+                                if (!agrupado[sku]) {
+                                    agrupado[sku] = {
+                                        sku: sku,
+                                        cantidad: 0,
+                                        producto: producto
+                                    };
+                                }
+                                agrupado[sku].cantidad += cantidad;
+                            });
+
+                            const arrayAgrupado = Object.values(agrupado);
+
+                            arrayAgrupado.sort((a, b) => {
+                                const aNum = parseInt(a.sku);
+                                const bNum = parseInt(b.sku);
+                                if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+                                if (!isNaN(aNum)) return -1;
+                                if (!isNaN(bNum)) return 1;
+                                return a.sku.localeCompare(b.sku);
+                            });
+
+                            let tablaHtml = `
+                                <h3 style="text-align:center; margin-bottom: 10px;">${selectedFolderDate} - ${fileNameSinExtension}</h3>
+                                <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">
+                                    <thead>
+                                        <tr style="background-color: #4CAF50; color: white;">
+                                            <th style="border: 1px solid #ddd; padding: 8px;">SKU</th>
+                                            <th style="border: 1px solid #ddd; padding: 8px;">Cantidad</th>
+                                            <th style="border: 1px solid #ddd; padding: 8px;">Descripción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            `;
+
+                            for (const item of arrayAgrupado) {
+                                tablaHtml += `
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.sku}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.cantidad}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px;">${item.producto}</td>
+                                    </tr>
+                                `;
+                            }
+
+                            tablaHtml += '</tbody></table>';
+
+                            // Mostrar tabla en modal SweetAlert
+                            await Swal.fire({
+                                title: 'Resumen de Query',
+                                html: `<div>${tablaHtml}</div>`,
+                                width: '600px',
+                                showCloseButton: true,
+                                confirmButtonText: 'Cerrar 🗙',
+                                footer: `
+                                    <button onclick="imprimirTabla()" style="padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
+                                        Imprimir Tabla 🖨️
+                                    </button>
+                                `
+                            });
+                        }
+
                         items.push({ listItem, tandaNumber });
 
                         // Ordenar los elementos por el número de tanda en orden descendente
@@ -2025,17 +2317,14 @@ if (items.length > maxItemsToShow) {
                     }).catch(error => {
                         console.error('Error al obtener el contenido del archivo:', error);
                         showSpinner(false);
-                        Swal.fire('Error', 'Error al obtener el contenido del archivo.', 'error');
                     });
                 }).catch(error => {
                     console.error('Error al obtener los metadatos del archivo:', error);
                     showSpinner(false);
-                    Swal.fire('Error', 'Error al obtener los metadatos del archivo.', 'error');
                 });
             }).catch(error => {
                 console.error('Error al listar archivos en la carpeta:', error);
                 showSpinner(false);
-                Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
             });
         });
 
@@ -2045,6 +2334,30 @@ if (items.length > maxItemsToShow) {
         showSpinner(false);
         Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
     });
+}
+
+// Función para imprimir la tabla
+function imprimirTabla() {
+    const printContent = document.querySelector('.swal2-html-container').innerHTML;
+    const win = window.open('', '', 'height=600,width=800');
+    win.document.write(`
+        <html>
+            <head>
+                <title>Imprimir Tabla</title>
+                <style>
+                    body { font-family: Arial, sans-serif; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                    th { background-color: #4CAF50; color: white; }
+                </style>
+            </head>
+            <body>
+                ${printContent}
+            </body>
+        </html>
+    `);
+    win.document.close();
+    win.print();
 }
 
 document.getElementById('backButton').addEventListener('click', () => {
@@ -2057,6 +2370,41 @@ document.getElementById('backButton').addEventListener('click', () => {
 $('#etiquetasModal').on('shown.bs.modal', function () {
     loadFolder(currentFolderPath);
 });
+
+async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados) {
+    const fechaHora = new Date().toLocaleString('es-AR', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false 
+    }).replace(',', 'h').replace('h', ', '); // Formato "26/10/24, 18:27h"
+
+    const mensaje = `
+* * * * * * * * * * * * * * * * * * * * * * * *
+*Agregados: 📦* ${datosAgregados.length}\n
+${datosAgregados.map(id => `- ${id}`).join('\n')}\n
+*No Encontrados: ❌* ${datosNoEncontrados.length}\n
+*Excluidos (Jujuy/Tierra del Fuego): 🚫 * ${datosFiltrados.length}\n
+${datosFiltrados.map(id => `- ${id}`).join('\n')}\n
+* * * * * * * * * * * * * * * * * * * * * * * *
+*🕑 Reporte de Envíos (${fechaHora})*
+    `;
+
+    try {
+        await fetch('https://proxy.cors.sh/https://hooks.slack.com/services/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', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+            },
+            body: JSON.stringify({ text: mensaje }),
+        });
+    } catch (error) {
+        console.error('Error al enviar el reporte:', error);
+    }
+}
 
 async function enviarCorreoTanda(destinatarioEmail, nombreDestinatario, nombreTanda, horaSubida) {
     const fecha2 = new Date().toLocaleDateString('es-AR'); 
