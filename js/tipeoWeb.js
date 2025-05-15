@@ -7,39 +7,58 @@ function actualizarTotales() {
 
     const filas = document.querySelectorAll('#tabla-despacho-body tr');
 
+    // Verificar si la tabla está vacía
+    if (filas.length === 0) {
+        const tablaBody = document.querySelector('#tabla-despacho-body');
+        tablaBody.innerHTML = `<tr>
+            <td colspan="8" class="text-center">
+                No hay despachos para cargar <i class="bi bi-exclamation-circle"></i>
+            </td>
+        </tr>`;
+        return; // Salir de la función si no hay despachos
+    }
+
     filas.forEach(fila => {
-        const logistica = fila.querySelector('.logistica-tabla-despacho').textContent.trim();
-        const seguimiento = fila.querySelector('.seguimiento-tabla-despacho').textContent.trim();
-        const bultos = parseInt(fila.querySelector('.bultos-tabla-despacho').textContent) || 0;
-        const valorTexto = fila.querySelector('.valor-tabla-despacho').textContent;
+        const logisticaElem = fila.querySelector('.logistica-tabla-despacho');
+        const seguimientoElem = fila.querySelector('.seguimiento-tabla-despacho');
+        const bultosElem = fila.querySelector('.bultos-tabla-despacho');
+        const valorElem = fila.querySelector('.valor-tabla-despacho');
 
-        // Extraer solo el número del valor
-        const valorNumerico = parseFloat(valorTexto.replace(/\$|\.|\,/g, '').replace(/(\d+)(\d{2})$/, '$1.$2')) || 0;
+        // Verificar si los elementos existen antes de acceder a sus propiedades
+        if (logisticaElem && seguimientoElem && bultosElem && valorElem) {
+            const logistica = logisticaElem.textContent.trim();
+            const seguimiento = seguimientoElem.textContent.trim();
+            const bultos = parseInt(bultosElem.textContent) || 0;
+            const valorTexto = valorElem.textContent;
 
-        // Sumar totales por logística
-        if (logistica === 'Andreani') {
-            totalAndreani += 1; // Contar la fila
+            // Extraer solo el número del valor
+            const valorNumerico = parseFloat(valorTexto.replace(/\$|\.|\,/g, '').replace(/(\d+)(\d{2})$/, '$1.$2')) || 0;
 
-            // Sumar bultos según el prefijo del seguimiento
-            if (seguimiento.startsWith('36')) {
-                bultosAndreani.paqueteria += bultos; // Incrementar bultos de paquetería
-            } else if (seguimiento.startsWith('40')) {
-                bultosAndreani.bigger += bultos; // Incrementar bultos bigger
+            // Sumar totales por logística
+            if (logistica === 'Andreani') {
+                totalAndreani += 1; // Contar la fila
+
+                // Sumar bultos según el prefijo del seguimiento
+                if (seguimiento.startsWith('36')) {
+                    bultosAndreani.paqueteria += bultos; // Incrementar bultos de paquetería
+                } else if (seguimiento.startsWith('40')) {
+                    bultosAndreani.bigger += bultos; // Incrementar bultos bigger
+                }
+
+                montoAndreani += valorNumerico;
+            } else if (logistica === 'Andesmar') {
+                totalAndesmar += 1;
+                bultosAndesmar += bultos;
+                montoAndesmar += valorNumerico;
+            } else if (logistica === 'Oca') {
+                totalOCA += 1;
+                bultosOCA += bultos;
+                montoOCA += valorNumerico;
+            } else if (logistica === 'Cruz del Sur') {
+                totalCDS += 1;
+                bultosCDS += bultos;
+                montoCDS += valorNumerico;
             }
-
-            montoAndreani += valorNumerico;
-        } else if (logistica === 'Andesmar') {
-            totalAndesmar += 1;
-            bultosAndesmar += bultos;
-            montoAndesmar += valorNumerico;
-        } else if (logistica === 'Oca') {
-            totalOCA += 1;
-            bultosOCA += bultos;
-            montoOCA += valorNumerico;
-        } else if (logistica === 'Cruz del Sur') {
-            totalCDS += 1;
-            bultosCDS += bultos;
-            montoCDS += valorNumerico;
         }
     });
 
@@ -1209,6 +1228,7 @@ function eliminarDespacho(remito) {
                 'El despacho ha sido eliminado.',
                 'success'
             );
+            actualizarTotales()
         })
         .catch((error) => {
             console.error("Error al eliminar despacho:", error);
