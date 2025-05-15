@@ -16,6 +16,35 @@ firebase.initializeApp(firebaseConfig);
 const storage = firebase.storage();
 const database = firebase.database();
 
+let idCDS, usuarioCDS, passCDS, HookMeli, corsh
+
+const obtenerCredencialesCDS = async () => {
+    try {
+        const snapshot = await window.dbCDS.ref('LogiPaq').once('value');
+        const data = snapshot.val();
+        idCDS = data[3];
+        usuarioCDS = data[4];
+        passCDS = data[5];
+        HookTv = data[14];
+        HookMd = data[10];
+        live = data[7];
+        corsh = data[6];
+        token = data[11];
+        channel = data[8];
+        chat = data[15];
+        brainsysUser = data[16];
+        brainsysPass = data[17];
+        HookMeli = data[21];
+        console.log(`CDS Credentials OK`);
+    } catch (error) {
+        console.error('Error al obtener cred de Fire:', error);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await obtenerCredencialesCDS();
+});
+
 $(document).ready(function() {
     $('#escaneoColecta').on('hidden.bs.modal', function () {
         actualizarContador();
@@ -2381,19 +2410,21 @@ async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFil
         hour12: false 
     }).replace(',', 'h').replace('h', ', '); // Formato "26/10/24, 18:27h"
 
+    const crearLista = (datos) => datos.map(id => `- ${id}`).join('\n');
+
     const mensaje = `
 * * * * * * * * * * * * * * * * * * * * * * * *
 *Agregados: 📦* ${datosAgregados.length}\n
-${datosAgregados.map(id => `- ${id}`).join('\n')}\n
+${crearLista(datosAgregados)}\n
 *No Encontrados: ❌* ${datosNoEncontrados.length}\n
-*Excluidos (Jujuy/Tierra del Fuego): 🚫 * ${datosFiltrados.length}\n
-${datosFiltrados.map(id => `- ${id}`).join('\n')}\n
+*Excluidos (Jujuy/Tierra del Fuego): 🚫* ${datosFiltrados.length}\n
+${crearLista(datosFiltrados)}\n
 * * * * * * * * * * * * * * * * * * * * * * * *
 *🕑 Reporte de Envíos (${fechaHora})*
     `;
 
     try {
-        await fetch('https://proxy.cors.sh/https://hooks.slack.com/services/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', {
+        await fetch(`${corsh}${HookMeli}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
