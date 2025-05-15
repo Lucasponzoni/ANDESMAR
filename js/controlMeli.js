@@ -2143,6 +2143,7 @@ function loadFolder(folderPath) {
                                     const datosAgregados = [];
                                     const datosNoEncontrados = [];
                                     const datosFiltrados = [];
+                                    const datosNoValidados = []; // Nuevo array para datos no validados
 
                                     for (const ventaid of hijos) {
                                         const envioSnap = await firebase.database().ref('/envios/' + ventaid).once('value');
@@ -2166,6 +2167,9 @@ function loadFolder(folderPath) {
                                         if (esDeProvinciaExcluida) {
                                             datosFiltrados.push(ventaid);
                                             continue;
+                                        } else if (!esDeProvinciaExcluida && !data.client.billing_info.additional_info.some(info => info.type === "STATE_NAME")) {
+                                            // Si no se pudo validar la provincia
+                                            datosNoValidados.push(ventaid);
                                         }
 
                                         // Agregar a planilla solo si NO es de provincia excluida
@@ -2175,11 +2179,12 @@ function loadFolder(folderPath) {
 
                                     // Generar reporte
                                     let htmlContent = '';
-                                    if (datosFiltrados.length > 0 || datosNoEncontrados.length > 0) {
+                                    if (datosFiltrados.length > 0 || datosNoEncontrados.length > 0 || datosNoValidados.length > 0) {
                                         htmlContent = `
                                             <div style="max-height: 200px; overflow-y: auto; text-align: left;">
                                                 ${datosFiltrados.length > 0 ? `<p style="color: red;"><strong>🚫 Excluidos (Jujuy/Tierra del Fuego): ${datosFiltrados.length}</strong><br>${datosFiltrados.join('<br>')}</p>` : ''}
                                                 ${datosNoEncontrados.length > 0 ? `<p style="color: orange;"><strong>❌ No encontrados en BD: ${datosNoEncontrados.length}</strong><br>${datosNoEncontrados.join('<br>')}</p>` : ''}
+                                                ${datosNoValidados.length > 0 ? `<p style="color: yellow;"><strong>⚠️ No se pudo validar provincia: ${datosNoValidados.length}</strong><br>${datosNoValidados.join('<br>')}</p>` : ''}
                                             </div>
                                         `;
                                     }
@@ -2205,7 +2210,7 @@ function loadFolder(folderPath) {
                                         }
 
                                         // Enviar el reporte al webhook
-                                        enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados);
+                                        enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados.concat(datosNoValidados)); // Enviamos los no validados también
                                     });
                                 }
                             } catch (error) {
@@ -2218,7 +2223,6 @@ function loadFolder(folderPath) {
                                 });
                             }
                         });
-
 
                         async function generarTablaQuery(ventas, selectedFolderDate, fileNameSinExtension) {
                             const agrupado = {};
