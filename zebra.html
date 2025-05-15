@@ -27,62 +27,81 @@
   <br>
   <button onclick="ordenarZPLPorSKU()">Ordenar y Descargar</button>
 
-  <script>
-    function ordenarZPLPorSKU() {
-      const input = document.getElementById("zplInput").value;
+<script>
+  function ordenarZPLPorSKU() {
+    const input = document.getElementById("zplInput").value;
 
-      if (!input.trim()) {
-        Swal.fire("Error", "Pegá un código ZPL para procesar.", "error");
-        return;
-      }
-
-      const bloques = input.split("^XA").slice(1).map(b => "^XA" + b.split("^XZ")[0] + "^XZ");
-      const bloquesConSKU = [];
-
-      for (let bloque of bloques) {
-        const matchSKU = bloque.match(/SKU:\s*(.*?)\^FS/);
-        const sku = matchSKU ? matchSKU[1].trim() : "SIN SKU";
-        bloquesConSKU.push({ sku, bloque });
-      }
-
-      // Ordenar alfabéticamente por SKU
-      bloquesConSKU.sort((a, b) => a.sku.localeCompare(b.sku));
-
-      // Generar resumen y preparar contenido del archivo
-      let resumen = '';
-      const conteo = {};
-      let contenidoFinal = '';
-
-      for (let { sku, bloque } of bloquesConSKU) {
-        contenidoFinal += bloque + '\n\n';
-        conteo[sku] = (conteo[sku] || 0) + 1;
-      }
-
-      Object.keys(conteo).sort().forEach(sku => {
-        resumen += `SKU: ${sku} - Cantidad: ${conteo[sku]}\n`;
-      });
-
-      // Descargar el archivo
-      const blob = new Blob([contenidoFinal.trim()], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "bloques_ordenados_por_sku.txt";
-      a.click();
-      URL.revokeObjectURL(url);
-
-      // Mostrar resumen en SweetAlert
-      Swal.fire({
-        title: 'Resumen de SKUs',
-        html: `
-          <p><strong>Total de bloques:</strong> ${bloques.length}</p>
-          <pre style="text-align:left; background:#f0f0f0; padding:10px; max-height:300px; overflow:auto;">${resumen}</pre>
-        `,
-        icon: 'success',
-        width: 600
-      });
+    if (!input.trim()) {
+      Swal.fire("Error", "Pegá un código ZPL para procesar.", "error");
+      return;
     }
-  </script>
+
+    const regexBloques = /\^XA[\s\S]*?\^XZ/g;
+    const bloques = input.match(regexBloques);
+
+    if (!bloques || bloques.length === 0) {
+      Swal.fire("Error", "No se encontraron bloques ZPL válidos.", "error");
+      return;
+    }
+
+    const bloquesConSKU = [];
+
+    for (let bloque of bloques) {
+      const matchSKU = bloque.match(/SKU:\s*([^\^]*)\^FS/i); // busca SKU de forma flexible
+      const sku = matchSKU ? matchSKU[1].trim() : "SIN SKU";
+      bloquesConSKU.push({ sku, bloque });
+    }
+
+    // Ordenar alfabéticamente por SKU
+    bloquesConSKU.sort((a, b) => a.sku.localeCompare(b.sku));
+
+    // Construcción del contenido final
+    let contenidoFinal = '';
+    const conteo = {};
+    const previewBloques = [];
+
+    for (let { sku, bloque } of bloquesConSKU) {
+      const bloqueOrdenado = bloque.trim();
+      contenidoFinal += bloqueOrdenado + '\n\n';
+      conteo[sku] = (conteo[sku] || 0) + 1;
+      previewBloques.push(`SKU: ${sku}\n${bloqueOrdenado}`);
+    }
+
+    // Mostrar resumen + vista previa
+    let resumen = '';
+    Object.keys(conteo).sort().forEach(sku => {
+      resumen += `SKU: ${sku} - Cantidad: ${conteo[sku]}\n`;
+    });
+
+    const vistaPrevia = previewBloques.join('\n\n');
+
+    Swal.fire({
+      title: 'Vista previa del archivo ordenado',
+      html: `
+        <p><strong>Total de bloques:</strong> ${bloques.length}</p>
+        <p><strong>Resumen:</strong></p>
+        <pre style="text-align:left; background:#f0f0f0; padding:10px; max-height:200px; overflow:auto;">${resumen}</pre>
+        <p><strong>Contenido a descargar:</strong></p>
+        <pre style="text-align:left; background:#e8f5e9; padding:10px; max-height:300px; overflow:auto;">${vistaPrevia}</pre>
+      `,
+      icon: 'info',
+      width: 800,
+      showCancelButton: true,
+      confirmButtonText: "Descargar TXT",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const blob = new Blob([contenidoFinal.trim()], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "bloques_ordenados_por_sku.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    });
+  }
+</script>
 
 </body>
 </html>
