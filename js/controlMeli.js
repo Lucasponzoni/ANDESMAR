@@ -2255,14 +2255,8 @@ function loadFolder(folderPath) {
 
                             const arrayAgrupado = Object.values(agrupado);
 
-                            arrayAgrupado.sort((a, b) => {
-                                const aNum = parseInt(a.sku);
-                                const bNum = parseInt(b.sku);
-                                if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
-                                if (!isNaN(aNum)) return -1;
-                                if (!isNaN(bNum)) return 1;
-                                return a.sku.localeCompare(b.sku);
-                            });
+                            // Ordenar por cantidad en orden descendente
+                            arrayAgrupado.sort((a, b) => b.cantidad - a.cantidad);
 
                             let tablaHtml = `
                                 <h3 style="text-align:center; margin-bottom: 10px;">${selectedFolderDate} - ${fileNameSinExtension}</h3>
@@ -2270,7 +2264,7 @@ function loadFolder(folderPath) {
                                     <thead>
                                         <tr style="background-color: #4CAF50; color: white;">
                                             <th style="border: 1px solid #ddd; padding: 8px;">SKU</th>
-                                            <th style="border: 1px solid #ddd; padding: 8px;">Cantidad</th>
+                                            <th style="border: 1px solid #ddd; padding: 8px;">⚠️</th>
                                             <th style="border: 1px solid #ddd; padding: 8px;">Descripción</th>
                                         </tr>
                                     </thead>
@@ -2295,7 +2289,7 @@ function loadFolder(folderPath) {
                                 html: `<div>${tablaHtml}</div>`,
                                 width: '600px',
                                 showCloseButton: true,
-                                confirmButtonText: 'Cerrar 🗙',
+                                confirmButtonText: 'Cerrar',
                                 footer: `
                                     <button onclick="imprimirTabla()" style="padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
                                         Imprimir Tabla 🖨️
