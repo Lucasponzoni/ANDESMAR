@@ -5036,98 +5036,68 @@ input[disabled] {
 }
 
 
-.contadores{
+.contadores {
     display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.counter {
+.counter,
+.counterfila,
+.fixed-counter,
+.fixed-counter2 {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: fit-content;
     font-weight: 600;
-    background-color: #007aff; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); 
-    color: white; 
-    padding: 5px 10px 5px 10px; 
-    border-radius: 12px; 
-    text-align: center; 
-    font-size: 24px; 
-    transition: transform 0.3s, box-shadow 0.3s; 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+    color: #1d1d1f;
+    padding: 15px 25px;
+    text-align: center;
+    font-size: 22px;
+    transition: all 0.3s ease;
+    text-shadow: none;
 }
 
-.counter:hover {
-    transform: scale(1.05); 
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); 
+.counter:hover,
+.counterfila:hover,
+.fixed-counter:hover,
+.fixed-counter2:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
     cursor: pointer;
+}
+
+.counter {
+    color: #007aff; /* Azul macOS */
+    font-weight: 700;
 }
 
 .counterfila {
-    margin-left: 5px;
-    background-color: #34c759; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-    color: white;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    font-size: 24px;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.counterfila:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
+    color: #34c759; /* Verde macOS */
+    font-weight: 700;
 }
 
 .fixed-counter {
-    font-weight: 600;
-    width: 300px;
-    background-color: #007aff; 
-    color: white; 
-    padding: 20px; 
-    border-radius: 12px;
-    text-align: center; 
-    font-size: 24px; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); 
-    transition: transform 0.3s, box-shadow 0.3s; 
     position: fixed;
     bottom: 20px;
-    left: 150px; 
-    z-index: 1000; 
-}
-
-.fixed-counter:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
+    left: 110px;
+    z-index: 1000;
+    color: #007aff;
 }
 
 .fixed-counter2 {
-    font-weight: 600;
-    width: 300px;
-    background-color: #34c759; 
-    color: white; 
-    padding: 20px; 
-    border-radius: 12px;
-    text-align: center; 
-    font-size: 24px; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); 
-    transition: transform 0.3s, box-shadow 0.3s; 
     position: fixed;
     bottom: 100px;
-    left: 145px; 
-    z-index: 1000; 
-}
-
-.fixed-counter2:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
+    left: 110px;
+    margin-bottom: -5px;
+    z-index: 1000;
+    color: #34c759;
 }
 
 #cantidad-control-Meli {
