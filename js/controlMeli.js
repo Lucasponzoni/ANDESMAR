@@ -2063,31 +2063,31 @@ function loadFolder(folderPath) {
                                     return;
                                 }
 
-const { value: opcionElegida } = await Swal.fire({
-    title: '¿Cómo seguimos?',
-    icon: 'question',
-    showCancelButton: true,
-    showDenyButton: true,
-    confirmButtonText: '🖨️ Solo imprimir',
-    denyButtonText: '📦 Imprimir e ingresar',
-    cancelButtonText: '❌ Cancelar',
-    html: `
-        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
-            <button id="generarQueryBtn" class="swal2-styled" style="background-color: #09B109FF;">ℹ️ Generar query</button>
-        </div>
-    `,
-    showCloseButton: false,
-    footer: '', // Sin botón adicional en el footer
-    didOpen: () => {
-        const generarQueryBtn = document.getElementById('generarQueryBtn');
-        if (generarQueryBtn) {
-            generarQueryBtn.addEventListener('click', async () => {
-                await generarTablaQuery(snapshot.val(), selectedFolderDate, fileNameSinExtension);
-                // El modal permanece abierto
-            });
-        }
-    }
-});
+                                const { value: opcionElegida } = await Swal.fire({
+                                    title: '¿Cómo seguimos?',
+                                    icon: 'question',
+                                    showCancelButton: true,
+                                    showDenyButton: true,
+                                    confirmButtonText: '🖨️ Solo imprimir',
+                                    denyButtonText: '📦 Imprimir e ingresar',
+                                    cancelButtonText: '❌ Cancelar',
+                                    html: `
+                                        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+                                            <button id="generarQueryBtn" class="swal2-styled" style="background-color: #09B109FF;">ℹ️ Generar query</button>
+                                        </div>
+                                    `,
+                                    showCloseButton: false,
+                                    footer: '', // Sin botón adicional en el footer
+                                    didOpen: () => {
+                                        const generarQueryBtn = document.getElementById('generarQueryBtn');
+                                        if (generarQueryBtn) {
+                                            generarQueryBtn.addEventListener('click', async () => {
+                                                await generarTablaQuery(snapshot.val(), selectedFolderDate, fileNameSinExtension);
+                                                // El modal permanece abierto
+                                            });
+                                        }
+                                    }
+                                });
 
                                 if (opcionElegida === true) {
                                     // Opción: Solo imprimir
