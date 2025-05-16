@@ -2111,8 +2111,16 @@ function loadFolder(folderPath) {
                                     denyButtonText: '📦 Imprimir e ingresar',
                                     cancelButtonText: '❌ Cancelar',
                                     html: `
-                                        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
-                                            <button id="generarQueryBtn" class="swal2-styled" style="background-color: #09B109FF;">ℹ️ Generar query</button>
+                                        <hr style="margin: 15px 0; border: 1px solid #e0e0e0; width: 90%;">
+                                        <div style="display: flex; justify-content: center; gap: 15px; margin: 10px 0 20px;">
+                                            <button id="generarQueryBtn" class="swal2-styled" 
+                                                    style="background-color: #09B109; padding: 8px 20px; font-weight: bold;">
+                                                ℹ️ Generar query
+                                            </button>
+                                            <button id="tandaNovogarBtn" class="swal2-styled" 
+                                                    style="background-color: #EA8900; padding: 8px 20px; font-weight: bold;">
+                                                ✨ Tanda Novogar
+                                            </button>
                                         </div>
                                     `,
                                     showCloseButton: false,
@@ -2125,7 +2133,187 @@ function loadFolder(folderPath) {
                                                 // El modal permanece abierto
                                             });
                                         }
+                                        const tandaNovogarBtn = document.getElementById('tandaNovogarBtn');
+                                        if (tandaNovogarBtn) {
+                                        tandaNovogarBtn.addEventListener('click', async () => {
+                                            // Mostrar loader al inicio
+                                            const loadingSwal = Swal.fire({
+                                                title: 'Generando Tanda Novogar',
+                                                html: 'Validando envíos con Mercado Libre...',
+                                                allowOutsideClick: false,
+                                                showConfirmButton: false,
+                                                willOpen: () => {
+                                                    Swal.showLoading();
+                                                }
+                                            });
+
+                                            try {
+                                                // 1. Obtener contenido original
+                                                const response = await fetch("https://proxy.cors.sh/" + url, {
+                                                    headers: corsHeaders
+                                                });
+                                                
+                                                if (!response.ok) throw new Error('No se pudo descargar el archivo original');
+                                                
+                                                let originalText = await response.text();
+                                                
+                                                // 2. Procesar cada etiqueta individualmente
+                                                const etiquetas = originalText.split('^XZ').filter(etq => etq.trim() !== '');
+                                                let contadorExcluidas = 0;
+                                                
+                                                const etiquetasModificadas = await Promise.all(etiquetas.map(async (etiqueta, index) => {
+                                                    // Actualizar progreso
+                                                    loadingSwal.update({
+                                                        html: `Procesando etiqueta ${index + 1} de ${etiquetas.length}<br>
+                                                            Envíos excluidos detectados: ${contadorExcluidas}`
+                                                    });
+                                                    
+                                                    // Extraer número de venta completo (precio + venta)
+                                                    const ventaMatch = etiqueta.match(/\^FO188,245\^A0N,30,30\^FD(\d+)\^FS/);
+                                                    const precioMatch = etiqueta.match(/\^FO124,249\^A0N,25,25\^FD(\d+)\^FS/);
+                                                    
+                                                    const venta = ventaMatch ? ventaMatch[1] : '00000';
+                                                    const precio = precioMatch ? precioMatch[1] : '00000';
+                                                    const ventaCompleta = precio + venta;
+                                                    
+                                                    // Extraer otros datos necesarios
+                                                    const cantidadMatch = etiqueta.match(/\^FO30,80\^A0N,70,70\^FB160,1,0,C\^FD(\d+)\^FS/);
+                                                    const skuMatch = etiqueta.match(/\^FDSKU:\^FS\s*\^FO265,192\^A0N,25,25\^FB510,1,-1\^FH\^FD([^\^]+)\^FS/);
+                                                    const descripcionMatch = etiqueta.match(/\^FO200,15\^A0N,29,29\^FB570,2,-1\^FH\^FD([^\^]+)\^FS/);
+                                                    
+                                                    const cantidad = cantidadMatch ? cantidadMatch[1] : '1';
+                                                    const sku = skuMatch ? skuMatch[1].trim() : 'SKU_N/A';
+                                                    let descripcion = descripcionMatch ? descripcionMatch[1].trim() : '';
+                                                    descripcion = descripcion.substring(0, 30);
+                                                    
+                                                    // Verificar en Firebase si es de provincia excluida
+                                                    let esDeProvinciaExcluida = false;
+                                                    try {
+                                                        console.log(`Consultando Firebase para venta: ${ventaCompleta}`);
+                                                        const snapshot = await firebase.database().ref('/envios/' + ventaCompleta).once('value');
+                                                        const data = snapshot.val();
+                                                        
+                                                        if (data && data.client && data.client.billing_info && 
+                                                            Array.isArray(data.client.billing_info.additional_info)) {
+                                                            esDeProvinciaExcluida = data.client.billing_info.additional_info.some(info =>
+                                                                info.type === "STATE_NAME" &&
+                                                                ["jujuy", "tierra del fuego"].includes(info.value.toLowerCase())
+                                                            );
+                                                            
+                                                            if (esDeProvinciaExcluida) {
+                                                                contadorExcluidas++;
+                                                                console.log(`Envío ${ventaCompleta} es de provincia excluida`);
+                                                            }
+                                                        }
+                                                    } catch (firebaseError) {
+                                                        console.error(`Error al consultar Firebase para ${ventaCompleta}:`, firebaseError);
+                                                    }
+                                                    
+                                                    // Construir bloques según si es provincia excluida o no
+                                                    const bloquesSuperiores = esDeProvinciaExcluida ? 
+                                                        `^FX LAST CLUSTER  ^FS
+                                        ^FO20,1^GB760,45,45^FS
+                                        ^FO20,6^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
+                                        ^FX END LAST CLUSTER  ^FS
+
+                                        ^FX LAST CLUSTER  ^FS
+                                        ^FO20,60^GB760,45,45^FS
+                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
+                                        ^FX END LAST CLUSTER  ^FS
+
+                                        ^FX LAST CLUSTER  ^FS
+                                        ^FO20,120^GB760,45,45^FS
+                                        ^FO20,126^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
+                                        ^FX END LAST CLUSTER  ^FS
+                                        ` : 
+                                                        `^FX LAST CLUSTER  ^FS
+                                        ^FO20,1^GB760,45,45^FS
+                                        ^FO20,6^A0N,45,45^FB760,1,0,C^FR^FDVENTA: ${ventaCompleta}^FS
+                                        ^FX END LAST CLUSTER  ^FS
+
+                                        ^FX LAST CLUSTER  ^FS
+                                        ^FO20,60^GB760,45,45^FS
+                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FR^FDU: ${cantidad} / SKU: ${sku}^FS
+                                        ^FX END LAST CLUSTER  ^FS
+
+                                        ^FX LAST CLUSTER  ^FS
+                                        ^FO20,120^GB760,45,45^FS
+                                        ^FO20,126^A0N,45,45^FB760,1,0,C^FR^FD${descripcion}^FS
+                                        ^FX END LAST CLUSTER  ^FS
+                                        `;
+                                                    
+                                                    // Eliminar elementos redundantes
+                                                    let etiquetaLimpia = etiqueta;
+                                                    [
+                                                        /\^FO30,80\^A0N,70,70\^FB160,1,0,C\^FD\d+\^FS/,
+                                                        /\^FO30,150\^A0N,25,25\^FB150,1,0,C\^FDCantidad\^FS/,
+                                                        /\^FO200,15\^A0N,29,29\^FB570,2,-1\^FH\^FD[^\^]+\^FS/,
+                                                        /\^FO200,95\^A0N,24,24\^FB570,1,-1\^FH\^FDColor:[^\^]+\^FS/,
+                                                        /\^FO201,95\^A0N,24,24\^FB570,1,-1\^FH\^FDColor:\^FS/,
+                                                        /\^FO200,190\^A0N,30,30\^FH\^FDSKU:\^FS/,
+                                                        /\^FO265,192\^A0N,25,25\^FB510,1,-1\^FH\^FD[^\^]+\^FS/,
+                                                        /\^FX LAST CLUSTER.*?\^FX END LAST CLUSTER\s*\^FS/gs
+                                                    ].forEach(regex => {
+                                                        etiquetaLimpia = etiquetaLimpia.replace(regex, '');
+                                                    });
+                                                    
+                                                    // Insertar nuevos bloques después de ^LH0,90
+                                                    const posInsert = etiquetaLimpia.indexOf('^LH0,90');
+                                                    if (posInsert !== -1) {
+                                                        const endOfLine = etiquetaLimpia.indexOf('\n', posInsert);
+                                                        const insertionPoint = endOfLine !== -1 ? endOfLine : posInsert + '^LH0,90'.length;
+                                                        
+                                                        return etiquetaLimpia.slice(0, insertionPoint) + 
+                                                            '\n' + bloquesSuperiores + 
+                                                            etiquetaLimpia.slice(insertionPoint);
+                                                    }
+                                                    
+                                                    return etiquetaLimpia;
+                                                }));
+                                                
+                                                // Cerrar loader
+                                                loadingSwal.close();
+                                                
+                                                // 3. Reconstruir el archivo
+                                                let nuevoContenido = etiquetasModificadas.join('^XZ').trim() + '^XZ';
+                                                
+                                                // 4. Mostrar resumen antes de descargar
+                                                await Swal.fire({
+                                                    title: 'Proceso completado',
+                                                    html: `Total etiquetas procesadas: ${etiquetas.length}<br>
+                                                        Envíos a provincias excluidas: ${contadorExcluidas}`,
+                                                    icon: 'success',
+                                                    confirmButtonText: 'Descargar Archivo'
+                                                });
+                                                
+                                                // 5. Crear y descargar archivo modificado
+                                                const blob = new Blob([nuevoContenido], { type: 'text/plain' });
+                                                const blobUrl = URL.createObjectURL(blob);
+                                                
+                                                const a = document.createElement('a');
+                                                a.href = blobUrl;
+                                                a.download = `${selectedFolderDate}_TandaNovogar_Validada_${fileRef.name}`;
+                                                document.body.appendChild(a);
+                                                a.click();
+                                                
+                                                // Limpieza
+                                                setTimeout(() => {
+                                                    document.body.removeChild(a);
+                                                    URL.revokeObjectURL(blobUrl);
+                                                }, 100);
+                                                
+                                            } catch (error) {
+                                                loadingSwal.close();
+                                                console.error('Error al generar tanda Novogar validada:', error);
+                                                Swal.fire('Error', `No se pudo generar la tanda Novogar validada: ${error.message}`, 'error');
+                                            }
+
+                                            });
+                }
+
+                                        
                                     }
+                                    
                                 });
                                 if (opcionElegida === true) {
                                     try {
@@ -2389,6 +2577,24 @@ function loadFolder(folderPath) {
         showSpinner(false);
         Swal.fire('Error', 'Error al listar archivos en la carpeta.', 'error');
     });
+}
+
+// Función para modificar el ZPL (agregar fuera del evento click)
+function modificarZPLParaLogiPaq(zplOriginal) {
+    // Dividir por etiquetas individuales (separadas por ^XZ)
+    const etiquetas = zplOriginal.split('^XZ').filter(e => e.trim() !== '');
+    
+    // Modificar cada etiqueta
+    const etiquetasModificadas = etiquetas.map(etiqueta => {
+        // Insertar después de ^XA^MCY^CI28^LH0,90
+        return etiqueta.replace(
+            /(\^XA.*?\^MCY\s*\^CI28\s*\^LH0,90)/,
+            `$1\n^FX LAST CLUSTER ^FS\n^FO20,150^GB760,45,45^FS\n^FO20,156^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR, SEPARAR - LOGIPAQ^FS\n^FX END LAST CLUSTER ^FS`
+        );
+    });
+    
+    // Reconstruir el ZPL con las modificaciones
+    return etiquetasModificadas.join('^XZ\n') + '^XZ';
 }
 
 // Función para imprimir la tabla
