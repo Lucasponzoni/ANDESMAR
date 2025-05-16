@@ -1251,58 +1251,34 @@ const emailsError = [
 
 const verificarRemitoYEtiqueta = async (remito, etiqueta) => {
   try {
-    // Verificar si el remito está en el rango de 23000006572 a 23000006590
+    // Verificar si el remito está en el rango
     if (remito >= '23000006572' && remito <= '23000006590') {
-        console.log('No se requiere verificación para el remito:', remito);
-        return true;
+      console.log('No se requiere verificación para el remito:', remito);
+      return true;
     }
 
     const filas = tablaBody.getElementsByTagName('tr');
+    const remitosEnTabla = new Set(Array.from(filas).map(row => row.querySelector('.remito-tipeo-os')?.textContent.trim()));
+    const etiquetasEnTabla = new Set(Array.from(filas).map(row => row.querySelector('.seguimiento-tabla-despacho a')?.textContent.trim()));
 
-    const remitoEnTabla = Array.from(filas).some(row =>
-      row.querySelector('.remito-tipeo-os')?.textContent.trim() === remito
-    );
+    const [remitosSnapshot, etiquetasSnapshot] = await Promise.all([
+      dbTipeo.ref('despachosHistoricosRemitos').once('value'),
+      dbTipeo.ref('despachosHistoricosEtiquetas').once('value')
+    ]);
 
-    const etiquetaEnTabla = Array.from(filas).some(row =>
-      row.querySelector('.seguimiento-tabla-despacho a')?.textContent.trim() === etiqueta
-    );
+    const remitosFirebase = new Set(Object.values(remitosSnapshot.val() || {}).map(item => item.remito));
+    const etiquetasFirebase = new Set(Object.values(etiquetasSnapshot.val() || {}).map(item => item.seguimiento));
 
-    const remitosSnapshot = await dbTipeo.ref('despachosHistoricosRemitos').once('value');
-    const etiquetasSnapshot = await dbTipeo.ref('despachosHistoricosEtiquetas').once('value');
+    const remitoDuplicado = remitosEnTabla.has(remito) || remitosFirebase.has(remito);
+    const etiquetaDuplicada = etiquetasEnTabla.has(etiqueta) || etiquetasFirebase.has(etiqueta);
 
-    const remitoExiste = Object.keys(remitosSnapshot.val() || {}).some(key =>
-      remitosSnapshot.val()[key]?.remito === remito
-    );
-
-    const etiquetaExiste = Object.keys(etiquetasSnapshot.val() || {}).some(key =>
-      etiquetasSnapshot.val()[key]?.seguimiento === etiqueta
-    );
-
-    // Remito usado
-    if (remitoEnTabla || remitoExiste) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Remito duplicado 📦',
-        text: 'El remito ya fue despachado anteriormente.',
-        allowOutsideClick: false
-      });
-
-      const emailBody = generarEmailErrorHTML(remito, etiqueta, remitoExiste, remitoEnTabla, false, false);
-      enviarCorreosDeError("Remito duplicado", emailBody);
+    if (remitoDuplicado) {
+      await manejarError('Remito duplicado 📦', remito, etiqueta, true, false);
       return false;
     }
 
-    // Etiqueta usada
-    if (etiquetaEnTabla || etiquetaExiste) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Etiqueta duplicada 🏷️',
-        text: 'La etiqueta ya fue utilizada antes.',
-        allowOutsideClick: false
-      });
-
-      const emailBody = generarEmailErrorHTML(remito, etiqueta, false, false, etiquetaExiste, etiquetaEnTabla);
-      enviarCorreosDeError("Etiqueta duplicada", emailBody);
+    if (etiquetaDuplicada) {
+      await manejarError('Etiqueta duplicada 🏷️', remito, etiqueta, false, true);
       return false;
     }
 
@@ -1310,20 +1286,21 @@ const verificarRemitoYEtiqueta = async (remito, etiqueta) => {
 
   } catch (error) {
     console.error("Error en la verificación:", error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'Ocurrió un error al verificar remito o etiqueta.',
-      allowOutsideClick: false
-    });
-
-    const emailBody = `<h2 style="color: #d32f2f; font-size: 22px; margin-bottom: 8px;">📢 LogiPaq Informa</h2>
-    <p style="font-family: monospace; color: #555;">❌ Se produjo un error inesperado verificando el remito <strong>${remito}</strong> y la etiqueta <strong>${etiqueta}</strong>.</p>
-    <p><strong>Error técnico:</strong> ${error.message}</p>`;
-
-    enviarCorreosDeError("Error de sistema", emailBody);
+    await manejarError('Error', remito, etiqueta, error.message);
     return false;
   }
+};
+
+const manejarError = async (titulo, remito, etiqueta, remitoFirebase = false, etiquetaFirebase = false) => {
+  Swal.fire({
+    icon: 'error',
+    title: titulo,
+    text: `El ${titulo.includes('Remito') ? 'remito' : 'etiqueta'} ya fue utilizado anteriormente.`,
+    allowOutsideClick: false
+  });
+
+  const emailBody = generarEmailErrorHTML(remito, etiqueta, remitoFirebase, false, etiquetaFirebase, false);
+  await enviarCorreosDeError(titulo, emailBody);
 };
 
 const enviarCorreosDeError = async (nombreTanda, emailBody) => {

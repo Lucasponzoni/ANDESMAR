@@ -2133,6 +2133,7 @@ function loadFolder(folderPath) {
                                                 // El modal permanece abierto
                                             });
                                         }
+                                        // GENERACION DE TXT PARA ZEBRA
                                         const tandaNovogarBtn = document.getElementById('tandaNovogarBtn');
                                         if (tandaNovogarBtn) {
                                         tandaNovogarBtn.addEventListener('click', async () => {
