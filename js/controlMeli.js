@@ -2094,6 +2094,14 @@ function loadFolder(folderPath) {
                                     return;
                                 }
 
+                                const corsHeaders = {
+                                    'Access-Control-Allow-Origin': '*',
+                                    'Access-Control-Allow-Methods': 'GET',
+                                    'Access-Control-Allow-Headers': 'Content-Type',
+                                    'Access-Control-Allow-Origin': '*',
+                                    'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
+                                };
+
                                 const { value: opcionElegida } = await Swal.fire({
                                     title: '¿Cómo seguimos?',
                                     icon: 'question',
@@ -2119,16 +2127,33 @@ function loadFolder(folderPath) {
                                         }
                                     }
                                 });
-
                                 if (opcionElegida === true) {
-                                    // Opción: Solo imprimir
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = fileRef.name;
-                                    a.target = '_blank';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
+                                    try {
+                                        const response = await fetch("https://proxy.cors.sh/" + url, {
+                                            headers: corsHeaders  
+                                        });
+                                        
+                                        if (!response.ok) throw new Error('Falló la descarga');
+                                        
+                                        const blob = await response.blob();
+                                        const blobUrl = URL.createObjectURL(blob);
+                                        
+                                        const a = document.createElement('a');
+                                        a.href = blobUrl;
+                                        a.download = selectedFolderDate + "_" + fileRef.name;
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        
+                                        // Limpieza
+                                        setTimeout(() => {
+                                            document.body.removeChild(a);
+                                            URL.revokeObjectURL(blobUrl);
+                                        }, 100);
+                                        
+                                    } catch (error) {
+                                        console.error('Error:', error);
+                                        Swal.fire('Error', 'No se pudo descargar el TXT', 'error');
+                                    }
                                 } else if (opcionElegida === false) {
                                     // Opción: Imprimir e ingresar
                                     Swal.fire({
