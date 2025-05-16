@@ -2107,19 +2107,19 @@ function loadFolder(folderPath) {
                                     icon: 'question',
                                     showCancelButton: true,
                                     showDenyButton: true,
-                                    confirmButtonText: '🖨️ Solo imprimir',
-                                    denyButtonText: '📦 Imprimir e ingresar',
+                                    confirmButtonText: '🖨️ Solo Imprimir',
+                                    denyButtonText: '📦 Solo Ingresar',
                                     cancelButtonText: '❌ Cancelar',
                                     html: `
                                         <hr style="margin: 15px 0; border: 1px solid #e0e0e0; width: 90%;">
                                         <div style="display: flex; justify-content: center; gap: 15px; margin: 10px 0 20px;">
                                             <button id="generarQueryBtn" class="swal2-styled" 
-                                                    style="background-color: #09B109; padding: 8px 20px; font-weight: bold;">
-                                                ℹ️ Generar query
+                                                    style="background-color: #187FBBFF; padding: 8px 20px; font-weight: bold;">
+                                                ℹ️ Generar Query
                                             </button>
                                             <button id="tandaNovogarBtn" class="swal2-styled" 
-                                                    style="background-color: #EA8900; padding: 8px 20px; font-weight: bold;">
-                                                ✨ Tanda Novogar
+                                                    style="background-color: #187FBBFF; padding: 8px 20px; font-weight: bold;">
+                                                ⚠️ Tanda Novogar
                                             </button>
                                         </div>
                                     `,
@@ -2165,6 +2165,9 @@ function loadFolder(folderPath) {
                                                     // Extraer SKU
                                                     const skuMatch = etiqueta.match(/\^FDSKU:\^FS\s*\^FO265,192\^A0N,25,25\^FB510,1,-1\^FH\^FD([^\^]+)\^FS/);
                                                     const sku = skuMatch ? skuMatch[1].trim().toUpperCase() : 'ZZZ_SIN_SKU_EN_MELI'; // Usamos ZZZ_ para que vaya al final
+                                                    const descripcionMatch = etiqueta.match(/\^FO200,15\^A0N,29,29\^FB570,2,-1\^FH\^FD([^\^]+)\^FS/);
+                                                    let descripcion = descripcionMatch ? descripcionMatch[1].trim() : '';
+                                                    descripcion = descripcion.substring(0, 30);
                                                     
                                                     // Extraer otros datos necesarios para mantener la funcionalidad anterior
                                                     const ventaMatch = etiqueta.match(/\^FO188,245\^A0N,30,30\^FD(\d+)\^FS/);
@@ -2193,6 +2196,7 @@ function loadFolder(folderPath) {
                                                     // Devolvemos objeto con etiqueta, SKU y datos para ordenamiento
                                                     return {
                                                         sku,
+                                                        descripcion,
                                                         etiquetaOriginal: etiqueta,
                                                         esDeProvinciaExcluida,
                                                         ventaCompleta
@@ -2247,7 +2251,7 @@ function loadFolder(folderPath) {
 
                                         ^FX LAST CLUSTER  ^FS
                                         ^FO20,120^GB760,45,45^FS
-                                        ^FO20,126^A0N,45,45^FB760,1,0,C^FR^FD${item.sku}^FS
+                                        ^FO20,126^A0N,45,45^FB760,1,0,C^FR^FD${item.descripcion}^FS
                                         ^FX END LAST CLUSTER  ^FS
                                         `;
                                                     
