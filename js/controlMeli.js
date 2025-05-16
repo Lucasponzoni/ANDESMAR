@@ -2165,7 +2165,8 @@ function loadFolder(folderPath) {
                                                 const etiquetasConSku = await Promise.all(etiquetas.map(async (etiqueta, index) => {
                                                     // Extraer SKU
                                                     const skuMatch = etiqueta.match(/\^FDSKU:\^FS\s*\^FO265,192\^A0N,25,25\^FB510,1,-1\^FH\^FD([^\^]+)\^FS/);
-                                                    const sku = skuMatch ? skuMatch[1].trim().toUpperCase() : 'ZZZ_SIN_SKU_EN_MELI'; // Usamos ZZZ_ para que vaya al final
+                                                    const rawSku = skuMatch ? skuMatch[1].trim().toUpperCase() : 'ZZZ_SIN_SKU_EN_MELI';
+                                                    const sku = rawSku.replace(/_([0-9A-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
                                                     const descripcionMatch = etiqueta.match(/\^FO200,15\^A0N,29,29\^FB570,2,-1\^FH\^FD([^\^]+)\^FS/);
                                                     let descripcion = descripcionMatch ? descripcionMatch[1].trim() : '';
                                                     descripcion = descripcion.substring(0, 30);
@@ -2240,20 +2241,21 @@ function loadFolder(folderPath) {
                                         ^FO20,126^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
                                         ^FX END LAST CLUSTER  ^FS
                                         ` : 
-                                                        `^FX LAST CLUSTER  ^FS
-                                        ^FO20,1^GB760,45,45^FS
-                                        ^FO20,6^A0N,45,45^FB760,1,0,C^FR^FDVENTA: ${item.ventaCompleta}^FS
-                                        ^FX END LAST CLUSTER  ^FS
+                                                        `    
+                                        ^FX LAST CLUSTER ^FS
+                                        ^FO20,1^GB760,45,1^FS
+                                        ^FO20,6^A0N,45,45^FB760,1,0,C^FDVENTA: ${item.ventaCompleta}^FS
+                                        ^FX END LAST CLUSTER ^FS
 
-                                        ^FX LAST CLUSTER  ^FS
-                                        ^FO20,60^GB760,45,45^FS
-                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FR^FDU: ${1} / SKU: ${item.sku}^FS
-                                        ^FX END LAST CLUSTER  ^FS
+                                        ^FX LAST CLUSTER ^FS
+                                        ^FO20,60^GB760,45,1^FS
+                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FDU: ${1} / SKU: ${item.sku}^FS
+                                        ^FX END LAST CLUSTER ^FS
 
-                                        ^FX LAST CLUSTER  ^FS
-                                        ^FO20,120^GB760,45,45^FS
-                                        ^FO20,126^A0N,45,45^FB760,1,0,C^FR^FD${item.descripcion}^FS
-                                        ^FX END LAST CLUSTER  ^FS
+                                        ^FX LAST CLUSTER ^FS
+                                        ^FO20,120^GB760,45,1^FS
+                                        ^FO20,126^A0N,45,45^FB760,1,0,C^FD${item.descripcion}^FS
+                                        ^FX END LAST CLUSTER ^FS
                                         `;
                                                     
                                                     // Limpiar etiqueta original
