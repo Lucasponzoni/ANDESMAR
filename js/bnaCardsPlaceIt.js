@@ -389,7 +389,7 @@ function loadEnviosFromFirebase() {
             });
 
             // Escuchar cambios en 'enviosBNA'
-            const databaseRef = firebase.database().ref('enviosBNA').limitToLast(300);
+            const databaseRef = firebase.database().ref('enviosBNA').limitToLast(800);
             databaseRef.on('value', snapshot => {
                 allData = [];
                 let sinPrepararCount = 0;
