@@ -491,7 +491,7 @@ try {
         .filter(([_, estado]) => estado.seleccionado !== false)
         .map(([_, estado]) => estado.nombre.toLowerCase());
 
-    const posventaSnapshot = await firebase.database().ref('posventa').limitToLast(40000).once('value');
+    const posventaSnapshot = await firebase.database().ref('posventa').limitToLast(60000).once('value');
     const posventaData = posventaSnapshot.val() || {};
 
     const ventasFiltradas = Object.entries(posventaData).filter(([ventaId, venta]) => {
