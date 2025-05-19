@@ -35,6 +35,7 @@ const obtenerCredencialesCDS = async () => {
         brainsysUser = data[16];
         brainsysPass = data[17];
         HookMeli = data[21];
+        HookMeli2 = data[22];
         console.log(`CDS Credentials OK`);
     } catch (error) {
         console.error('Error al obtener cred de Fire:', error);
@@ -2374,6 +2375,7 @@ function loadFolder(folderPath) {
                                     const hijos = Object.keys(snapshot.val());
                                     const datosAgregados = [];
                                     const datosNoEncontrados = [];
+                                    const datosFiltradosConProvincia = [];
                                     const datosFiltrados = [];
                                     const datosNoValidados = []; // Nuevo array para datos no validados
 
@@ -2390,24 +2392,31 @@ function loadFolder(folderPath) {
 
                                         // Verificar si es de Jujuy o Tierra del Fuego
                                         if (data.client && data.client.billing_info && Array.isArray(data.client.billing_info.additional_info)) {
-                                            esDeProvinciaExcluida = data.client.billing_info.additional_info.some(info =>
-                                                info.type === "STATE_NAME" &&
-                                                ["jujuy", "tierra del fuego"].includes(info.value.toLowerCase())
+                                            const infoProvincia = data.client.billing_info.additional_info.find(info =>
+                                                info.type === "STATE_NAME"
                                             );
-                                        }
 
-                                        if (esDeProvinciaExcluida) {
-                                            datosFiltrados.push(ventaid);
-                                            continue;
-                                        } else if (!esDeProvinciaExcluida && !data.client.billing_info.additional_info.some(info => info.type === "STATE_NAME")) {
-                                            // Si no se pudo validar la provincia
-                                            datosNoValidados.push(ventaid);
-                                        }
+                                            if (infoProvincia) {
+                                                const provincia = infoProvincia.value.toLowerCase();
+                                                const esDeProvinciaExcluida = ["jujuy", "tierra del fuego"].includes(provincia);
 
-                                        // Agregar a planilla solo si NO es de provincia excluida
-                                        agregarFila(data);
-                                        datosAgregados.push(ventaid);
-                                    }
+                                                if (esDeProvinciaExcluida) {
+                                                    datosFiltrados.push(ventaid);
+                                                    datosFiltradosConProvincia.push({
+                                                        ventaid,
+                                                        provincia // Agregar la provincia al objeto
+                                                    });
+                                                    continue;
+                                                } else {
+                                                    // Si no es de provincia excluida, agregar a planilla
+                                                    agregarFila(data);
+                                                    datosAgregados.push(ventaid);
+                                                }
+                                            } else {
+                                                // Si no se pudo validar la provincia
+                                                datosNoValidados.push(ventaid);
+                                            }
+                                        }}
 
                                     // Generar reporte
                                     let htmlContent = '';
@@ -2442,7 +2451,9 @@ function loadFolder(folderPath) {
                                         }
 
                                         // Enviar el reporte al webhook
-                                        enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados.concat(datosNoValidados)); // Enviamos los no validados también
+                                        enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados.concat(datosNoValidados));
+                                        enviarReporteWebhookFacturacion(datosFiltradosConProvincia.concat(datosNoValidados));
+
                                     });
                                 }
                             } catch (error) {
@@ -3095,6 +3106,51 @@ document.getElementById('backButton').addEventListener('click', () => {
 $('#etiquetasModal').on('shown.bs.modal', function () {
     loadFolder(currentFolderPath);
 });
+
+async function enviarReporteWebhookFacturacion(datosFiltrados) {
+    // Verificar si no hay datos filtrados
+    if (datosFiltrados.length === 0) {
+        console.log('No hay datos filtrados para enviar.');
+        return; // No enviar el reporte si no hay datos
+    }
+
+    const fechaHora = new Date().toLocaleString('es-AR', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false 
+    }).replace(',', 'h').replace('h', ', '); // Formato "26/10/24, 18:27h"
+
+    // Crear lista con emojis según la provincia
+    const crearLista = (datos) => datos.map(({ ventaid, provincia }) => {
+        const emoji = provincia.toLowerCase() === 'tierra del fuego' ? '🌋' : '🏔️';
+        return `${ventaid} - ${provincia} ${emoji}`;
+    }).join('\n');
+
+    const mensaje = `
+* * * * * * * * * * * * * * * * * * * * * * * *
+*Excluidos 🚫* ${datosFiltrados.length}\n
+${crearLista(datosFiltrados)}\n
+* * * * * * * * * * * * * * * * * * * * * * * *
+*🕑 Reporte de Envíos (${fechaHora})*
+    `;
+
+    try {
+        await fetch(`${corsh}${HookMeli2}`, {
+            method: 'POST',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json',
+                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+            },
+            body: JSON.stringify({ text: mensaje }),
+        });
+    } catch (error) {
+        console.error('Error al enviar el reporte:', error);
+    }
+}
 
 async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados) {
     const fechaHora = new Date().toLocaleString('es-AR', { 
