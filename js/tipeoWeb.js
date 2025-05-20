@@ -2368,8 +2368,6 @@ async function cargarDatos(logistica, fechaInicio, fechaFin) {
         }
         
         // Debugging: Mostrar los camiones únicos y por logística
-        console.log(`Camiones Únicos: ${Array.from(camionesUnicos)}`);
-        console.log(`Camiones por Logística:`, camionesPorLogistica);
 
         let camionesGlobal = Object.values(camionesPorLogistica).reduce((total, lista) => total + lista.length, 0);
 
@@ -3371,29 +3369,20 @@ function actualizarDetalleResumen(selector, dataObj, label, esMoneda = false) {
 
     const ul = $('<ul class="lista-macos"></ul>');
 
-    console.log(`Selector: ${selector}`);
-    console.log(`Data Object:`, dataObj);
-    console.log(`Label: ${label}`);
-    console.log(`Es Moneda: ${esMoneda}`);
-
     let total = 0; // Para acumular el total de camiones
 
     for (const key in dataObj) {
         if (dataObj.hasOwnProperty(key)) {
             let valor = dataObj[key];
 
-            console.log(`Procesando: ${key}, Valor Original: ${valor}`);
-
             // Si el valor es un Set (camiones), contamos la cantidad de camiones
             if (valor instanceof Set) {
                 valor = valor.size;
-                console.log(`Valor es un Set. Nuevo Valor: ${valor}`);
             }
 
             // Si el valor es un objeto y representa camiones, sumamos las cantidades
             if (typeof valor === 'object' && !Array.isArray(valor)) {
                 valor = Object.values(valor).reduce((acc, curr) => acc + curr, 0); // Sumar cantidades
-                console.log(`Valor es un objeto. Suma de Cantidades: ${valor}`);
             }
 
             // Si es un número, simplemente lo usamos
@@ -3403,7 +3392,6 @@ function actualizarDetalleResumen(selector, dataObj, label, esMoneda = false) {
                 if (esMoneda) {
                     valor = formatearMoneda(valor);
                     valor = valor.replace(/,00$/, '');
-                    console.log(`Valor formateado como moneda: ${valor}`);
                 }
             }
 
@@ -3412,7 +3400,6 @@ function actualizarDetalleResumen(selector, dataObj, label, esMoneda = false) {
     }
 
     // Mostrar el total de camiones si es necesario
-    console.log(`Total de ${label}: ${total}`);
     contenedor.append(ul);
 }
 
