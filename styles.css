@@ -8509,15 +8509,23 @@ mark {
 }
 
 .resumen-macos .card-text {
-    font-size: 1.7rem;
+    font-size: 1.3rem;
     font-weight: 600;
     color: #1d4ed8;
+    background: lightblue;
+    border-radius: 10px;
+    width: fit-content;
+    padding: 10px;
     font-family: "Rubik", sans-serif;
 }
 
 #valorTotal {
-    font-size: 1.7rem;
+    font-size: 1.3rem;
     color: green;
+    background: lightgreen;
+    border-radius: 10px;
+    width: fit-content;
+    padding: 10px;
     font-family: "Rubik", sans-serif;
     font-weight: 600;
 }

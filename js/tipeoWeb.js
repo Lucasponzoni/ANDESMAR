@@ -3478,11 +3478,25 @@ function actualizarDetalleResumen(selector, dataObj, label, esMoneda = false) {
 
     // ██████████████████████████ 8. EVENT LISTENERS ██████████████████████████
     $('#btnFiltrar').click(function() {
+        // ► 1. Reiniciar variables globales
+        datosFiltrados = [];  // Vacía el array de datos acumulados
+        fechaInicioGlobal = null;
+        fechaFinGlobal = null;
+        
+        // ► 2. Destruir gráficos existentes
+        if (chartPrincipal) {
+            chartPrincipal.destroy();
+            chartPrincipal = null;
+        }
+        if (chartSecundario) {
+            chartSecundario.destroy();
+            chartSecundario = null;
+        }
+
+        // ► 3. Obtener nuevos filtros y recalcular
         const logistica = $('#selectLogistica').val();
         const rangoFechas = $('#rangoFechas').val();
-        
-        let fechaInicio = null;
-        let fechaFin = null;
+        let fechaInicio = null, fechaFin = null;
         
         if (rangoFechas) {
             const fechas = rangoFechas.split(' a ');
