@@ -2077,7 +2077,7 @@ function loadFolder(folderPath) {
                             }
                         });
 
-                        // Evento para manejar clic en el badge
+                        // EVENTO AL HACER CLICK EN EL BADGE DE ETIQUETA
                         listItem.querySelector('.badge').addEventListener('click', async (event) => {
                             event.stopPropagation();
 
@@ -2379,6 +2379,7 @@ function loadFolder(folderPath) {
                                     const datosFiltradosConProvincia = [];
                                     const datosFiltrados = [];
                                     const datosNoValidados = []; // Nuevo array para datos no validados
+                                    const etiquetasDuplicadas = []; // Array para etiquetas duplicadas
 
                                     for (const ventaid of hijos) {
                                         const envioSnap = await firebase.database().ref('/envios/' + ventaid).once('value');
@@ -2399,7 +2400,7 @@ function loadFolder(folderPath) {
 
                                             if (infoProvincia) {
                                                 const provincia = infoProvincia.value.toLowerCase();
-                                                const esDeProvinciaExcluida = ["jujuy", "tierra del fuego"].includes(provincia);
+                                                esDeProvinciaExcluida = ["jujuy", "tierra del fuego"].includes(provincia);
 
                                                 if (esDeProvinciaExcluida) {
                                                     datosFiltrados.push(ventaid);
@@ -2410,14 +2411,39 @@ function loadFolder(folderPath) {
                                                     continue;
                                                 } else {
                                                     // Si no es de provincia excluida, agregar a planilla
-                                                    agregarFila(data);
-                                                    datosAgregados.push(ventaid);
+                                                    const preparedDate = new Date().toLocaleString('es-AR', {
+                                                        day: '2-digit',
+                                                        month: '2-digit',
+                                                        year: '2-digit',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                        hour12: false
+                                                    }).replace(',', 'h').replace('h', ', ');
+
+                                                    // Verificar si ya existe "preparadoEnColecta"
+                                                    if (data.preparadoEnColecta) {
+                                                        etiquetasDuplicadas.push(`${ventaid} - Fue preparado en la colecta ${data.preparadoEnColecta} / Existe en planilla`);
+                                                    } else {
+                                                        // Pushear la fecha en el nodo
+                                                        await firebase.database().ref('/envios/' + ventaid).update({
+                                                            preparadoEnColecta: preparedDate
+                                                        });
+
+                                                        // Verificar si el ID ya existe en la tabla antes de agregar
+                                                        if (!idYaExiste(ventaid)) {
+                                                            agregarFila(data);
+                                                            datosAgregados.push(ventaid);
+                                                        } else {
+                                                            etiquetasDuplicadas.push(`${ventaid} - Existe en planilla`);
+                                                        }
+                                                    }
                                                 }
                                             } else {
                                                 // Si no se pudo validar la provincia
                                                 datosNoValidados.push(ventaid);
                                             }
-                                        }}
+                                        }
+                                    }
 
                                     // Generar reporte
                                     let htmlContent = '';
@@ -2452,7 +2478,7 @@ function loadFolder(folderPath) {
                                         }
 
                                         // Enviar el reporte al webhook
-                                        enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados.concat(datosNoValidados));
+                                        enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados.concat(datosNoValidados), etiquetasDuplicadas);
                                         enviarReporteWebhookFacturacion(datosFiltradosConProvincia.concat(datosNoValidados));
 
                                     });
@@ -2624,6 +2650,21 @@ function modificarZPLParaLogiPaq(zplOriginal) {
     
     // Reconstruir el ZPL con las modificaciones
     return etiquetasModificadas.join('^XZ\n') + '^XZ';
+}
+
+function idYaExiste(ventaid) {
+    // Seleccionar la tabla y todas las filas
+    const tabla = document.querySelector('.table-responsive table');
+    const filas = tabla.querySelectorAll('tbody tr'); // Suponiendo que las filas están en el <tbody>
+
+    // Recorrer cada fila de la tabla
+    for (const fila of filas) {
+        const celdaId = fila.cells[2]; // Suponiendo que el ID está en la tercera columna (índice 2)
+        if (celdaId && celdaId.textContent.trim() === ventaid) {
+            return true; // El ID ya existe en la tabla
+        }
+    }
+    return false; // El ID no se encontró en la tabla
 }
 
 // Función para imprimir la tabla
@@ -3153,7 +3194,7 @@ ${crearLista(datosFiltrados)}\n
     }
 }
 
-async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados) {
+async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados, etiquetasDuplicadas) {
     const fechaHora = new Date().toLocaleString('es-AR', { 
         day: '2-digit', 
         month: '2-digit', 
@@ -3161,20 +3202,32 @@ async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFil
         hour: '2-digit', 
         minute: '2-digit', 
         hour12: false 
-    }).replace(',', 'h').replace('h', ', '); // Formato "26/10/24, 18:27h"
+    }).replace(',', 'h').replace('h', ', '); // Formato "20/05/25, 09:23"
 
-    const crearLista = (datos) => datos.map(id => `- ${id}`).join('\n');
+    const crearLista = (datos) => datos.map(id => `• ${id}`).join('\n');
 
-    const mensaje = `
+    let mensaje = `
 * * * * * * * * * * * * * * * * * * * * * * * *
-*Agregados: 📦* ${datosAgregados.length}\n
-${crearLista(datosAgregados)}\n
-*No Encontrados: ❌* ${datosNoEncontrados.length}\n
-*Excluidos (Jujuy/Tierra del Fuego): 🚫* ${datosFiltrados.length}\n
-${crearLista(datosFiltrados)}\n
-* * * * * * * * * * * * * * * * * * * * * * * *
-*🕑 Reporte de Envíos (${fechaHora})*
-    `;
+*⏰ Reporte de Envíos* (${fechaHora})
+\n`;
+
+    mensaje += `*🟢 Agregados:* ${datosAgregados.length}\n${crearLista(datosAgregados) || 'Ninguno'}\n\n`;
+
+    if (datosNoEncontrados.length > 0) {
+        mensaje += `*🔴 No Encontrados:* ${datosNoEncontrados.length}\n${crearLista(datosNoEncontrados)}\n\n`;
+    }
+
+    if (datosFiltrados.length > 0) {
+        mensaje += `*🚫 Excluidos (Jujuy/Tierra del Fuego):* ${datosFiltrados.length}\n${crearLista(datosFiltrados)}\n\n`;
+    }
+
+    if (etiquetasDuplicadas.length > 0) {
+        mensaje += `*⚠️ Duplicados:* ${etiquetasDuplicadas.length}\n${etiquetasDuplicadas.map(item => `• ${item}`).join('\n')}\n\n`;
+    } else {
+        mensaje += `*⚠️ Duplicados:* 0\n\n`;
+    }
+
+    mensaje += `* * * * * * * * * * * * * * * * * * * * * * * *\n`;
 
     try {
         await fetch(`${corsh}${HookMeli}`, {
