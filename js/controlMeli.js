@@ -1716,6 +1716,8 @@ async function handleGenerateClick(event) {
             const response = await fetch(`https://proxy.cors.sh/${url}`, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET',
+                    'Access-Control-Allow-Headers': 'Content-Type',
                     'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
                 }
             });
@@ -1973,6 +1975,8 @@ function loadFolder(folderPath) {
                     fetch(`https://proxy.cors.sh/${url}`, {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Methods': 'GET',
+                            'Access-Control-Allow-Headers': 'Content-Type',
                             'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd'
                         }
                     })
@@ -2447,12 +2451,13 @@ function loadFolder(folderPath) {
 
                                     // Generar reporte
                                     let htmlContent = '';
-                                    if (datosFiltrados.length > 0 || datosNoEncontrados.length > 0 || datosNoValidados.length > 0) {
+                                    if (datosFiltrados.length > 0 || datosNoEncontrados.length > 0 || datosNoValidados.length > 0 || etiquetasDuplicadas.length > 0) {
                                         htmlContent = `
                                             <div style="max-height: 200px; overflow-y: auto; text-align: left;">
                                                 ${datosFiltrados.length > 0 ? `<p style="color: red;"><strong>🚫 Excluidos (Jujuy/Tierra del Fuego): ${datosFiltrados.length}</strong><br>${datosFiltrados.join('<br>')}</p>` : ''}
                                                 ${datosNoEncontrados.length > 0 ? `<p style="color: orange;"><strong>❌ No encontrados en BD: ${datosNoEncontrados.length}</strong><br>${datosNoEncontrados.join('<br>')}</p>` : ''}
                                                 ${datosNoValidados.length > 0 ? `<p style="color: yellow;"><strong>⚠️ No se pudo validar provincia: ${datosNoValidados.length}</strong><br>${datosNoValidados.join('<br>')}</p>` : ''}
+                                                ${etiquetasDuplicadas.length > 0 ? `<p style="color: #800020;"><strong>🧨 Duplicados: ${etiquetasDuplicadas.length}</strong><br>${etiquetasDuplicadas.map(item => `• ${item}`).join('<br>')}</p>` : ''}
                                             </div>
                                         `;
                                     }
@@ -2482,6 +2487,7 @@ function loadFolder(folderPath) {
                                         enviarReporteWebhookFacturacion(datosFiltradosConProvincia.concat(datosNoValidados));
 
                                     });
+
                                 }
                             } catch (error) {
                                 console.error('Error:', error);
@@ -2697,6 +2703,8 @@ document.getElementById('printQueryButton').addEventListener('click', async () =
         // 1. Configuración inicial
         const corsHeaders = {
             'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
             'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
             'Content-Type': 'application/json'
         };
@@ -2910,6 +2918,23 @@ document.getElementById('printQueryButton').addEventListener('click', async () =
 
 // GENERAR REPORTE EN TANDA GENERAL
 async function generateQueryReport(date, selectedTandas) {
+    // Preguntar si se desea excluir ventas ya sumadas
+    const { value: excludePrevious } = await Swal.fire({
+        title: '⚠️ <span style="color:#d33">¡Atención!</span>',
+        html: `
+            <p style="font-size: 16px;">
+                ¿Deseás <strong style="color:#e55353">excluir</strong> las ventas que ya fueron <span style="color:#3399ff">agregadas</span> en una <strong style="color:#20c997">consulta anterior</strong>? 🛑
+            </p>
+            <p style="font-size: 14px; color: #666;">Esta acción evitará duplicar ventas ya sumadas previamente.</p>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '✅ Sí, excluir',
+        cancelButtonText: '❌ No, incluir todo',
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#dc3545'
+    });
+
     // Mostrar loader al inicio
     const loadingSwal = Swal.fire({
         title: 'Generando Query...',
@@ -2923,12 +2948,15 @@ async function generateQueryReport(date, selectedTandas) {
 
     try {
         const agrupado = {};
+        const excluidos = []; // Array para almacenar los IDs excluidos
         let totalVentas = 0;
         const firebaseUrl = 'https://despachos-meli-novogar-default-rtdb.firebaseio.com';
 
         // Configuración de headers para CORS
         const corsHeaders = {
             'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
             'Content-Type': 'application/json'
         };
 
@@ -2951,15 +2979,37 @@ async function generateQueryReport(date, selectedTandas) {
                     const response = await fetch(`${firebaseUrl}${envioPath}`, {
                         headers: corsHeaders
                     });
-                    return await response.json();
+                    return { id, data: await response.json(), path: envioPath }; // Devolver el ID junto con los datos
                 });
 
                 const resultados = await Promise.all(enviosPromises);
 
                 // Procesar cada envío encontrado
-                resultados.forEach(data => {
-                    if (!data) return;
-                    
+                for (const { id, data, path } of resultados) {
+                    if (!data) continue;
+
+                    // Verificar si existe imprensoEnQuery
+                    if (data.imprensoEnQuery) {
+                        excluidos.push(id); // Agregar ID a la lista de excluidos
+                        continue; // No sumar ni procesar este SKU
+                    }
+
+                    // Verificar si es de Jujuy o Tierra del Fuego
+                    const infoProvincia = data.client?.billing_info?.additional_info?.find(info => info.type === "STATE_NAME");
+                    const isExcludedState = infoProvincia && (infoProvincia.value === "Jujuy" || infoProvincia.value === "Tierra del Fuego");
+
+                    // Si se desea excluir y el estado es Jujuy o Tierra del Fuego
+                    if (isExcludedState) {
+                        excluidos.push(id); // Agregar ID a la lista de excluidos
+                        continue;
+                    }
+
+                    // Verificar si se debe excluir por duplicado
+                    if (excludePrevious === 'Sí') {
+                        excluidos.push(id); // Agregar ID a la lista de excluidos
+                        continue;
+                    }
+
                     const sku = data.SKU || data.sku || 'SIN_SKU';
                     const cantidad = Number(data.Cantidad || data.cantidad || 1);
                     const producto = data.Producto || data.producto || 'Sin descripción';
@@ -2977,7 +3027,15 @@ async function generateQueryReport(date, selectedTandas) {
                     
                     agrupado[claveAgrupacion].cantidad += cantidad;
                     agrupado[claveAgrupacion].tandas.add(tandaNum);
-                });
+
+                    // Actualizar imprensoEnQuery con fecha y hora en cada envío si no existe
+                    const fechaHora = new Date().toLocaleString('es-ES', { timeZone: 'America/Argentina/Buenos_Aires' });
+                    await fetch(`${firebaseUrl}${path}`, {
+                        method: 'PATCH',
+                        headers: corsHeaders,
+                        body: JSON.stringify({ imprensoEnQuery: fechaHora })
+                    });
+                }
 
             } catch (error) {
                 console.error(`Error procesando tanda ${tandaNum}:`, error);
@@ -2993,6 +3051,8 @@ async function generateQueryReport(date, selectedTandas) {
         // Headers y URLs
         const corsHeaders2 = {
             'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
             'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
             'Content-Type': 'application/json'
         };
@@ -3036,6 +3096,16 @@ async function generateQueryReport(date, selectedTandas) {
                 </h3>
                 <p style="text-align:center; color:#666;">
                     Total de ventas procesadas: ${totalVentas}
+                </p>
+                <p style="text-align:center; color:#666;">
+                    Total IDs excluidos (por imprensoEnQuery): ${excluidos.length > 0 ? excluidos.length : 0}
+                </p>
+                ${excludePrevious === 'Sí' && excluidos.length > 0 ? `<p style="text-align:center; color:#666;">Preparados Antes (Excluidos): ${excluidos.join(', ')}</p>` : ''}
+                <p style="text-align:center; color:#666;">
+                    Total SKU distintos: ${arrayAgrupado.length}
+                </p>
+                <p style="text-align:center; color:#666;">
+                    Ordenado por: Cantidad (de mayor a menor)
                 </p>
                 <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">
                     <thead>
@@ -3112,6 +3182,8 @@ async function generateQueryReport(date, selectedTandas) {
                                 <p><strong>Fecha:</strong> ${date}</p>
                                 <p><strong>Tandas incluidas:</strong> ${selectedTandas.sort((a,b) => b-a).join(', ')}</p>
                                 <p><strong>Total items:</strong> ${arrayAgrupado.length}</p>
+                                <p><strong>Total IDs excluidos (por imprensoEnQuery):</strong> ${excluidos.length > 0 ? excluidos.length : 0}</p>
+                                ${excludePrevious === 'Sí' && excluidos.length > 0 ? `<p><strong>Preparados Antes (Excluidos):</strong> ${excluidos.join(', ')}</p>` : ''}
                                 <p><strong>Ordenado por:</strong> Cantidad (de mayor a menor)</p>
                                 ${document.querySelector('#tablaReporte').innerHTML}
                             </body>
@@ -3184,6 +3256,8 @@ ${crearLista(datosFiltrados)}\n
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET',
+                'Access-Control-Allow-Headers': 'Content-Type',
                 'Content-Type': 'application/json',
                 'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
             },
@@ -3234,6 +3308,8 @@ async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFil
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET',
+                'Access-Control-Allow-Headers': 'Content-Type',
                 'Content-Type': 'application/json',
                 'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
             },
@@ -3306,6 +3382,8 @@ async function enviarCorreoTanda(destinatarioEmail, nombreDestinatario, nombreTa
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET',
+                'Access-Control-Allow-Headers': 'Content-Type',
                 'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
                 'Content-Type': 'application/json'
             },
