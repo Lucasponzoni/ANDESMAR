@@ -2276,90 +2276,57 @@ $(document).ready(function() {
     let fechaInicioGlobal = null;
     let fechaFinGlobal = null;
 
-    // ██████████████████████████ 3. FUNCIÓN PRINCIPAL - CARGAR DATOS ██████████████████████████
-    async function cargarDatos(logistica, fechaInicio, fechaFin) {
-        try {
-            // ► Validación crítica de elementos del DOM
-            const canvasPrincipal = document.getElementById('graficoPrincipal');
-            const canvasSecundario = document.getElementById('graficoSecundario');
-            
-            if (!canvasPrincipal || !canvasSecundario) {
-                throw new Error(`
-                    Error: Contenedores de gráficos no encontrados. 
-                    Asegúrese de tener estos elementos en su HTML:
-                    <canvas id="graficoPrincipal"></canvas>
-                    <canvas id="graficoSecundario"></canvas>
-                `);
-            }
+// ██████████████████████████ 3. FUNCIÓN PRINCIPAL - CARGAR DATOS ██████████████████████████
+async function cargarDatos(logistica, fechaInicio, fechaFin) {
+    console.log(fechaInicio);
+    console.log(fechaFin);
+    
+    try {
+        const canvasPrincipal = document.getElementById('graficoPrincipal');
+        const canvasSecundario = document.getElementById('graficoSecundario');
+        
+        if (!canvasPrincipal || !canvasSecundario) {
+            throw new Error(`
+                Error: Contenedores de gráficos no encontrados. 
+                Asegúrese de tener estos elementos en su HTML:
+                <canvas id="graficoPrincipal"></canvas>
+                <canvas id="graficoSecundario"></canvas>
+            `);
+        }
 
-            showLoading();
-            
-            let ref;
-            datosFiltrados = [];
-            const camionesPorLogistica = {};
-            const camionesUnicos = new Set();
+        showLoading();
+        
+        const camionesPorLogistica = {};
+        const camionesUnicos = new Set();
 
-            // ► Lógica para "Todas las logísticas"
-            if (logistica === 'todas') {
-                const refs = [
-                    dbTipeo.ref('DespachosHistoricosAndesmar'),
-                    dbTipeo.ref('DespachosHistoricosAndreani'),
-                    dbTipeo.ref('DespachosHistoricosCruzdelSur'),
-                    dbTipeo.ref('DespachosHistoricosOca')
-                ];
-                
-                const snapshots = await Promise.all(refs.map(ref => ref.once('value')));
-                
-                snapshots.forEach(snapshot => {
-                    const logisticaKey = snapshot.key.replace('DespachosHistoricos', '');
-                    camionesPorLogistica[logisticaKey] = new Set();
-                    
-                    snapshot.forEach(fechaSnap => {
-                        const fecha = fechaSnap.key;
-                        if ((!fechaInicio || fecha >= fechaInicio) && (!fechaFin || fecha <= fechaFin)) {
-                            fechaSnap.forEach(camionSnap => {
-                                const camionKey = `${logisticaKey}|${camionSnap.key}`;
-                                camionesUnicos.add(camionKey);
-                                camionesPorLogistica[logisticaKey].add(camionSnap.key);
-                                
-                                camionSnap.forEach(remitoSnap => {
-                                    const remitoData = remitoSnap.val();
-                                    if (remitoData) {
-                                        datosFiltrados.push({
-                                            ...remitoData,
-                                            logistica: obtenerNombreLogistica(logisticaKey),
-                                            fecha: fecha,
-                                            camionKey: camionKey
-                                        });
-                                    }
-                                });
-                            });
-                        }
-                    });
-                });
-            } 
-            // ► Lógica para logística específica
-            else {
-                const refPath = `DespachosHistoricos${logistica}`;
-                ref = dbTipeo.ref(refPath);
-                const snapshot = await ref.once('value');
-                
-                camionesPorLogistica[logistica] = new Set();
+        if (logistica === 'todas') {
+            const refs = [
+                dbTipeo.ref('DespachosHistoricosAndesmar'),
+                dbTipeo.ref('DespachosHistoricosAndreani'),
+                dbTipeo.ref('DespachosHistoricosCruzdelSur'),
+                dbTipeo.ref('DespachosHistoricosOca')
+            ];
+            
+            const snapshots = await Promise.all(refs.map(ref => ref.once('value')));
+            
+            snapshots.forEach(snapshot => {
+                const logisticaKey = snapshot.key.replace('DespachosHistoricos', '');
+                camionesPorLogistica[logisticaKey] = [];
                 
                 snapshot.forEach(fechaSnap => {
                     const fecha = fechaSnap.key;
                     if ((!fechaInicio || fecha >= fechaInicio) && (!fechaFin || fecha <= fechaFin)) {
                         fechaSnap.forEach(camionSnap => {
-                            const camionKey = `${logistica}|${camionSnap.key}`;
+                            const camionKey = `${logisticaKey}|${camionSnap.key}`;
                             camionesUnicos.add(camionKey);
-                            camionesPorLogistica[logistica].add(camionSnap.key);
-                            
+                            camionesPorLogistica[logisticaKey].push(camionSnap.key);
+
                             camionSnap.forEach(remitoSnap => {
                                 const remitoData = remitoSnap.val();
                                 if (remitoData) {
                                     datosFiltrados.push({
                                         ...remitoData,
-                                        logistica: obtenerNombreLogistica(logistica),
+                                        logistica: obtenerNombreLogistica(logisticaKey),
                                         fecha: fecha,
                                         camionKey: camionKey
                                     });
@@ -2368,25 +2335,62 @@ $(document).ready(function() {
                         });
                     }
                 });
-            }
-            
-            // Guardar fechas para el reporte
-            fechaInicioGlobal = fechaInicio;
-            fechaFinGlobal = fechaFin;
-            
-            procesarDatos(camionesUnicos.size, camionesPorLogistica);
-        } catch (error) {
-            console.error("Error completo en cargarDatos:", error);
-            mostrarErrorGraficos(error.message);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error al cargar datos',
-                html: `<small>${error.message}</small>`
             });
-        } finally {
-            hideLoading();
+        } else {
+            const refPath = `DespachosHistoricos${logistica}`;
+            const ref = dbTipeo.ref(refPath);
+            const snapshot = await ref.once('value');
+            
+            camionesPorLogistica[logistica] = [];
+            
+            snapshot.forEach(fechaSnap => {
+                const fecha = fechaSnap.key;
+                if ((!fechaInicio || fecha >= fechaInicio) && (!fechaFin || fecha <= fechaFin)) {
+                    fechaSnap.forEach(camionSnap => {
+                        const camionKey = `${logistica}|${camionSnap.key}`;
+                        camionesUnicos.add(camionKey);
+                        camionesPorLogistica[logistica].push(camionSnap.key);
+
+                        camionSnap.forEach(remitoSnap => {
+                            const remitoData = remitoSnap.val();
+                            if (remitoData) {
+                                datosFiltrados.push({
+                                    ...remitoData,
+                                    logistica: obtenerNombreLogistica(logistica),
+                                    fecha: fecha,
+                                    camionKey: camionKey
+                                });
+                            }
+                        });
+                    });
+                }
+            });
         }
+        
+        // Debugging: Mostrar los camiones únicos y por logística
+        console.log(`Camiones Únicos: ${Array.from(camionesUnicos)}`);
+        console.log(`Camiones por Logística:`, camionesPorLogistica);
+
+        let camionesGlobal = Object.values(camionesPorLogistica).reduce((total, lista) => total + lista.length, 0);
+
+        // Guardar fechas para el reporte
+        fechaInicioGlobal = fechaInicio;
+        fechaFinGlobal = fechaFin;
+        
+        procesarDatos(camionesGlobal, camionesPorLogistica);
+        console.log(`Total Camiones:`, camionesGlobal);
+    } catch (error) {
+        console.error("Error completo en cargarDatos:", error);
+        mostrarErrorGraficos(error.message);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error al cargar datos',
+            html: `<small>${error.message}</small>`
+        });
+    } finally {
+        hideLoading();
     }
+}
 
 // ██████████████████████████ 4. PROCESAMIENTO DE DATOS ██████████████████████████
 function procesarDatos(totalCamiones, camionesPorLogistica) {
@@ -2432,8 +2436,25 @@ function procesarDatos(totalCamiones, camionesPorLogistica) {
         $('#totalEnvios').text(totalEnvios);
         $('#totalBultos').text(totalBultos);
         $('#valorTotal').text(formatearMoneda(totalValor).replace(/,00$/, ''));
-        
-        actualizarDetalleResumen('#detalleCamiones', camionesPorLogistica, 'camiones');
+
+        // ► Contar camiones totales por logística
+        const camionesTotalesPorLogistica = {};
+        for (const [logistica, camiones] of Object.entries(camionesPorLogistica)) {
+            // Asegúrate de que 'camiones' sea un array de objetos que contengan la cantidad
+            if (Array.isArray(camiones)) {
+                camionesTotalesPorLogistica[logistica] = camiones.reduce((total, camion) => {
+                    return total + (camion.cantidad || 1); // Asumiendo que cada camión tiene una propiedad 'cantidad'
+                }, 0);
+            } else {
+                camionesTotalesPorLogistica[logistica] = 0; // Si no es un array, asignar 0
+            }
+        }
+
+        // Mostrar total de camiones por logística
+        console.log(camionesTotalesPorLogistica); // Esto mostrará el conteo por logística
+
+        // Actualiza el resumen
+        actualizarDetalleResumen('#detalleCamiones', camionesTotalesPorLogistica, 'camiones');
         actualizarDetalleResumen('#detalleEnvios', enviosPorLogistica, 'envíos');
         actualizarDetalleResumen('#detalleBultos', bultosPorLogistica, 'bultos');
         actualizarDetalleResumen('#detalleValor', valorPorLogistica, 'valor', true);
@@ -3194,19 +3215,21 @@ function generarReporteDetallado(
         </thead>
         <tbody>`;
 
-    Object.entries(camionesPorLogistica).forEach(([logistica, camiones]) => {
-      const nombreLogistica = obtenerNombreLogistica(logistica);
-      html += `
-          <tr>
+        Object.entries(camionesPorLogistica).forEach(([logistica, camiones]) => {
+        const nombreLogistica = obtenerNombreLogistica(logistica);
+        console.log(`${nombreLogistica}: ${camiones.length}`);
+
+        html += `
+            <tr>
             <td><strong>${nombreLogistica}</strong></td>
-            <td><strong style="color:#1d3557;">${camiones.size}</strong></td>
+            <td><strong style="color:#1d3557;">${camiones.length}</strong></td>
             <td><strong style="color:#457b9d;">${enviosPorLogistica[nombreLogistica] || 0}</strong></td>
             <td><strong style="color:#1d3557;">${bultosPorLogistica[nombreLogistica] || 0}</strong></td>
             <td><strong style="color:#2a9d8f;">${formatearMoneda(valorPorLogistica[nombreLogistica] || 0)}</strong></td>
-          </tr>`;
-    });
+            </tr>`;
+        });
 
-    html += `</tbody></table>`;
+        html += `</tbody></table>`;
 
     if (productosTop.length > 0) {
       html += `
@@ -3348,28 +3371,50 @@ function actualizarDetalleResumen(selector, dataObj, label, esMoneda = false) {
 
     const ul = $('<ul class="lista-macos"></ul>');
 
+    console.log(`Selector: ${selector}`);
+    console.log(`Data Object:`, dataObj);
+    console.log(`Label: ${label}`);
+    console.log(`Es Moneda: ${esMoneda}`);
+
+    let total = 0; // Para acumular el total de camiones
+
     for (const key in dataObj) {
         if (dataObj.hasOwnProperty(key)) {
             let valor = dataObj[key];
-            
+
+            console.log(`Procesando: ${key}, Valor Original: ${valor}`);
+
             // Si el valor es un Set (camiones), contamos la cantidad de camiones
             if (valor instanceof Set) {
                 valor = valor.size;
+                console.log(`Valor es un Set. Nuevo Valor: ${valor}`);
             }
 
-            // Si es moneda, aplicamos el formato
-            if (esMoneda) {
-                valor = formatearMoneda(valor);
-                valor = valor.replace(/,00$/, '');  
+            // Si el valor es un objeto y representa camiones, sumamos las cantidades
+            if (typeof valor === 'object' && !Array.isArray(valor)) {
+                valor = Object.values(valor).reduce((acc, curr) => acc + curr, 0); // Sumar cantidades
+                console.log(`Valor es un objeto. Suma de Cantidades: ${valor}`);
+            }
+
+            // Si es un número, simplemente lo usamos
+            if (typeof valor === 'number') {
+                total += valor; // Acumular el total
+                // Si es moneda, aplicamos el formato
+                if (esMoneda) {
+                    valor = formatearMoneda(valor);
+                    valor = valor.replace(/,00$/, '');
+                    console.log(`Valor formateado como moneda: ${valor}`);
+                }
             }
 
             ul.append(`<li>${key}: ${valor}</li>`);
         }
     }
 
-    contenedor.append(ul); 
+    // Mostrar el total de camiones si es necesario
+    console.log(`Total de ${label}: ${total}`);
+    contenedor.append(ul);
 }
-
 
     function generarColores(cantidad) {
         const colores = [];
