@@ -2181,6 +2181,8 @@ function loadFolder(folderPath) {
                                                     const ventaMatch = etiqueta.match(/\^FO188,245\^A0N,30,30\^FD(\d+)\^FS/);
                                                     const precioMatch = etiqueta.match(/\^FO124,249\^A0N,25,25\^FD(\d+)\^FS/);
                                                     const ventaCompleta = (precioMatch ? precioMatch[1] : '') + (ventaMatch ? ventaMatch[1] : '');
+                                                    const cantidadMatch = etiqueta.match(/\^FO30,80\^A0N,70,70\^FB160,1,0,C\^FD(\d+)\^FS/);
+                                                    const cantidad = cantidadMatch ? cantidadMatch[1].trim() : '0'; // Asignar '0' si no se 
                                                     
                                                     // Verificación de provincia excluida (mantenemos la lógica anterior)
                                                     let esDeProvinciaExcluida = false;
@@ -2207,7 +2209,8 @@ function loadFolder(folderPath) {
                                                         descripcion,
                                                         etiquetaOriginal: etiqueta,
                                                         esDeProvinciaExcluida,
-                                                        ventaCompleta
+                                                        ventaCompleta,
+                                                        cantidad,
                                                     };
                                                 }));
                                                 
@@ -2255,7 +2258,7 @@ function loadFolder(folderPath) {
 
                                         ^FX LAST CLUSTER ^FS
                                         ^FO20,60^GB760,45,1^FS
-                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FDU: ${1} / SKU: ${item.sku}^FS
+                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FDU: ${item.cantidad} / SKU: ${item.sku}^FS
                                         ^FX END LAST CLUSTER ^FS
 
                                         ^FX LAST CLUSTER ^FS
