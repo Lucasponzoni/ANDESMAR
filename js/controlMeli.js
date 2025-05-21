@@ -2998,10 +2998,10 @@ async function generateQueryReport(date, selectedTandas) {
                 for (const { id, data, path } of resultados) {
                     if (!data) continue;
 
-                    // Verificar si existe imprensoEnQuery
-                    if (data.imprensoEnQuery) {
-                        excluidos.push(id); // Agregar ID a la lista de excluidos
-                        continue; // No sumar ni procesar este SKU
+                    // Si se debe excluir y ya fue impreso previamente
+                    if (excludePrevious && data.imprensoEnQuery) {
+                        excluidos.push(id);
+                        continue;
                     }
 
                     // Verificar si es de Jujuy o Tierra del Fuego
