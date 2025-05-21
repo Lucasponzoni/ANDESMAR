@@ -2159,88 +2159,97 @@ function loadFolder(folderPath) {
                                                 const response = await fetch("https://proxy.cors.sh/" + url, {
                                                     headers: corsHeaders
                                                 });
-
+                                                
                                                 if (!response.ok) throw new Error('No se pudo descargar el archivo original');
-
+                                                
                                                 let originalText = await response.text();
-
-                                                // 1.5 Obtener solo los envíos desde /envios/ventaCompleta
-                                                let enviosSnapshot;
-                                                try {
-                                                    enviosSnapshot = await firebase.database().ref('/envios/ventaCompleta').once('value');
-                                                } catch (e) {
-                                                    console.error('Error al obtener los envíos de ventaCompleta:', e);
-                                                }
-                                                const enviosData = enviosSnapshot?.val() || {};
-
+                                                
                                                 // 2. Procesar cada etiqueta y extraer SKU para ordenamiento
                                                 const etiquetas = originalText.split('^XZ').filter(etq => etq.trim() !== '');
-
+                                                
+                                                // Array para almacenar etiquetas con sus SKUs
                                                 const etiquetasConSku = await Promise.all(etiquetas.map(async (etiqueta, index) => {
+                                                    // Extraer SKU
                                                     const skuMatch = etiqueta.match(/\^FDSKU:\^FS\s*\^FO265,192\^A0N,25,25\^FB510,1,-1\^FH\^FD([^\^]+)\^FS/);
                                                     const rawSku = skuMatch ? skuMatch[1].trim().toUpperCase() : 'ZZZ_SIN_SKU_EN_MELI';
                                                     const sku = rawSku.replace(/_([0-9A-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-
                                                     const descripcionMatch = etiqueta.match(/\^FO200,15\^A0N,29,29\^FB570,2,-1\^FH\^FD([^\^]+)\^FS/);
                                                     let descripcion = descripcionMatch ? descripcionMatch[1].trim() : '';
                                                     descripcion = descripcion.substring(0, 30);
-
+                                                    
+                                                    // Extraer otros datos necesarios para mantener la funcionalidad anterior
                                                     const ventaMatch = etiqueta.match(/\^FO188,245\^A0N,30,30\^FD(\d+)\^FS/);
                                                     const precioMatch = etiqueta.match(/\^FO124,249\^A0N,25,25\^FD(\d+)\^FS/);
                                                     const ventaCompleta = (precioMatch ? precioMatch[1] : '') + (ventaMatch ? ventaMatch[1] : '');
-
                                                     const cantidadMatch = etiqueta.match(/\^FO30,80\^A0N,70,70\^FB160,1,0,C\^FD(\d+)\^FS/);
-                                                    const cantidadEtiqueta = cantidadMatch ? cantidadMatch[1].trim() : '0';
+                                                    const cantidad = cantidadMatch ? cantidadMatch[1].trim() : '0'; // Asignar '0' si no se encuentra
 
-                                                    // Usar los datos de Firebase cargados
-                                                    const datosEnvio = enviosData[ventaCompleta];
+                                                    // Extraer información de Firebase en una sola llamada
                                                     let textoEnvio = '';
-                                                    let cantidad = cantidadEtiqueta;
                                                     let esDeProvinciaExcluida = false;
-
-                                                    if (datosEnvio) {
-                                                        cantidad = datosEnvio.Cantidad || cantidadEtiqueta;
-                                                        textoEnvio = `VERIFICADO: ${sku} - Cantidad: ${cantidad}`;
-
-                                                        if (
-                                                            datosEnvio.client?.billing_info?.additional_info &&
-                                                            Array.isArray(datosEnvio.client.billing_info.additional_info)
-                                                        ) {
-                                                            esDeProvinciaExcluida = datosEnvio.client.billing_info.additional_info.some(info =>
-                                                                info.type === "STATE_NAME" &&
-                                                                ["jujuy", "tierra del fuego"].includes(info.value?.toLowerCase())
-                                                            );
+                                                    let cantidadFirebase = 'X';
+                                                    
+                                                    if (ventaCompleta && ventaCompleta !== '00000') {
+                                                        try {
+                                                            const snapshot = await firebase.database().ref('/envios/' + ventaCompleta).once('value');
+                                                            const data = snapshot.val();
+                                                            
+                                                            if (data) {
+                                                                // Obtener cantidad
+                                                                cantidadFirebase = data.Cantidad || 'X';
+                                                                textoEnvio = `VERIFICADO: ${sku} - Cantidad: ${cantidadFirebase}`;
+                                                                
+                                                                // Verificar provincia excluida
+                                                                if (data.client && data.client.billing_info && 
+                                                                    Array.isArray(data.client.billing_info.additional_info)) {
+                                                                    esDeProvinciaExcluida = data.client.billing_info.additional_info.some(info =>
+                                                                        info.type === "STATE_NAME" &&
+                                                                        ["jujuy", "tierra del fuego"].includes(info.value.toLowerCase())
+                                                                    );
+                                                                }
+                                                            }
+                                                        } catch (firebaseError) {
+                                                            console.error(`Error al consultar Firebase para venta ${ventaCompleta}:`, firebaseError);
                                                         }
                                                     }
-
+                                                    
+                                                    // Devolvemos objeto con etiqueta, SKU y datos para ordenamiento
                                                     return {
                                                         sku,
                                                         descripcion,
                                                         etiquetaOriginal: etiqueta,
                                                         esDeProvinciaExcluida,
                                                         ventaCompleta,
-                                                        cantidad,
+                                                        cantidad: cantidadFirebase !== 'X' ? cantidadFirebase : cantidad,
                                                         textoEnvio,
                                                     };
                                                 }));
-
-                                                // 3. Ordenar y procesar etiquetas
-                                                etiquetasConSku.sort((a, b) => a.sku.localeCompare(b.sku));
-
+                                                
+                                                // 3. Ordenar etiquetas alfabéticamente por SKU
+                                                etiquetasConSku.sort((a, b) => {
+                                                    // Ordenamos alfabéticamente ignorando mayúsculas/minúsculas
+                                                    return a.sku.localeCompare(b.sku);
+                                                });
+                                                
+                                                // 4. Procesar las etiquetas ordenadas
                                                 let contadorExcluidas = 0;
                                                 const etiquetasOrdenadasModificadas = etiquetasConSku.map((item, index) => {
+                                                    // Actualizar progreso
                                                     loadingSwal.update({
                                                         html: `Procesando etiqueta ${index + 1} de ${etiquetasConSku.length}<br>
                                                             Ordenadas por SKU | Envíos excluidos: ${contadorExcluidas}`
                                                     });
+                                                    
+                                                    if (item.esDeProvinciaExcluida) {
+                                                        contadorExcluidas++;
+                                                    }
 
-                                                    if (item.esDeProvinciaExcluida) contadorExcluidas++;
-
-                                                    const bloquesSuperiores = item.esDeProvinciaExcluida ?
+                                                    // Construir bloques según si es provincia excluida o no
+                                                    const bloquesSuperiores = item.esDeProvinciaExcluida ? 
                                                         `^FX LAST CLUSTER  ^FS
                                                         ^FO20,1^GB760,45,45^FS
                                                         ^FO20,6^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
-                                                        ^FX END LAST CLUSTER  ^FS` :
+                                                        ^FX END LAST CLUSTER  ^FS` : 
                                                         `    
                                                         ^FX LAST CLUSTER ^FS
                                                         ^FO20,1^GB760,45,1^FS
@@ -2248,13 +2257,13 @@ function loadFolder(folderPath) {
                                                         ^FX END LAST CLUSTER ^FS
 
                                                         ^FX LAST CLUSTER ^FS
-                                                        ${item.cantidad > 1 ? 
-                                                            `^FO20,60^GB760,50,50^FS
-                                                            ^FO20,66^A0N,45,45^FB760,1,0,C^FR^FDU: ${item.cantidad} / SKU: ${item.sku}^FS` : 
-                                                            `^FO20,60^GB760,45,1^FS
-                                                            ^FO20,66^A0N,45,45^FB760,1,0,C^FDU: ${item.cantidad} / SKU: ${item.sku}^FS`
-                                                        }
-                                                        ^FX END LAST CLUSTER ^FS
+                                                    ${item.cantidad > 1 ? 
+                                                        `^FO20,60^GB760,50,50^FS
+                                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FR^FDU: ${item.cantidad} / SKU: ${item.sku}^FS` : 
+                                                        `^FO20,60^GB760,45,1^FS
+                                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FDU: ${item.cantidad} / SKU: ${item.sku}^FS`
+                                                    }
+                                                    ^FX END LAST CLUSTER ^FS
 
                                                         ^FX LAST CLUSTER ^FS
                                                         ^FO20,120^GB760,45,1^FS
@@ -2265,6 +2274,7 @@ function loadFolder(folderPath) {
                                                         ^FO20,190^A0N,30,30^FB760,3,10,C^FD${item.textoEnvio}^FS
                                                         ^FX END LAST CLUSTER ^FS`;
 
+                                                    // Limpiar etiqueta original
                                                     let etiquetaLimpia = item.etiquetaOriginal;
                                                     [
                                                         /\^FO30,80\^A0N,70,70\^FB160,1,0,C\^FD\d+\^FS/,
@@ -2278,17 +2288,21 @@ function loadFolder(folderPath) {
                                                     ].forEach(regex => {
                                                         etiquetaLimpia = etiquetaLimpia.replace(regex, '');
                                                     });
-
+                                                    
+                                                    // Insertar nuevos bloques
                                                     const posInsert = etiquetaLimpia.indexOf('^LH0,90');
                                                     if (posInsert !== -1) {
                                                         const endOfLine = etiquetaLimpia.indexOf('\n', posInsert);
                                                         const insertionPoint = endOfLine !== -1 ? endOfLine : posInsert + '^LH0,90'.length;
-                                                        return etiquetaLimpia.slice(0, insertionPoint) + '\n' + bloquesSuperiores + etiquetaLimpia.slice(insertionPoint);
+                                                        
+                                                        return etiquetaLimpia.slice(0, insertionPoint) + 
+                                                            '\n' + bloquesSuperiores + 
+                                                            etiquetaLimpia.slice(insertionPoint);
                                                     }
-
+                                                    
                                                     return etiquetaLimpia;
                                                 });
-
+                                                                                                
                                                 // Cerrar loader
                                                 loadingSwal.close();
                                                 
