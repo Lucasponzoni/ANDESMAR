@@ -2183,7 +2183,22 @@ function loadFolder(folderPath) {
                                                     const ventaCompleta = (precioMatch ? precioMatch[1] : '') + (ventaMatch ? ventaMatch[1] : '');
                                                     const cantidadMatch = etiqueta.match(/\^FO30,80\^A0N,70,70\^FB160,1,0,C\^FD(\d+)\^FS/);
                                                     const cantidad = cantidadMatch ? cantidadMatch[1].trim() : '0'; // Asignar '0' si no se 
-                                                    
+
+                                                    // Extraer información de Firebase
+                                                    let textoEnvio = '';
+                                                    try {
+                                                        const snapshot = await firebase.database().ref('/envios/' + ventaCompleta).once('value');
+                                                        const data = snapshot.val();
+                                                        
+                                                        if (data) {
+                                                            const cantidad = data.Cantidad || 'X'; 
+                                                            const shippingId = data.shippingId || 'X';
+                                                            textoEnvio = `${sku} - Cantidad: ${cantidad} - ID: ${shippingId}`;
+                                                        }
+                                                    } catch (firebaseError) {
+                                                        console.error(`Error al consultar Firebase para SKU: ${sku}`, firebaseError);
+                                                    }
+
                                                     // Verificación de provincia excluida (mantenemos la lógica anterior)
                                                     let esDeProvinciaExcluida = false;
                                                     if (ventaCompleta && ventaCompleta !== '00000') {
@@ -2211,6 +2226,7 @@ function loadFolder(folderPath) {
                                                         esDeProvinciaExcluida,
                                                         ventaCompleta,
                                                         cantidad,
+                                                        textoEnvio,
                                                     };
                                                 }));
                                                 
@@ -2264,6 +2280,10 @@ function loadFolder(folderPath) {
                                         ^FX LAST CLUSTER ^FS
                                         ^FO20,120^GB760,45,1^FS
                                         ^FO20,126^A0N,45,45^FB760,1,0,C^FD${item.descripcion}^FS
+                                        ^FX END LAST CLUSTER ^FS
+
+                                        ^FX LAST CLUSTER ^FS
+                                        ^FO20,190^A0N,30,30^FB760,3,10,C^FD${item.textoEnvio}^FS
                                         ^FX END LAST CLUSTER ^FS
                                         `;
                                                     
