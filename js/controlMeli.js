@@ -2193,7 +2193,7 @@ function loadFolder(folderPath) {
                                                         if (data) {
                                                             const cantidad = data.Cantidad || 'X'; 
                                                             const shippingId = data.shippingId || 'X';
-                                                            textoEnvio = `${sku} - Cantidad: ${cantidad} - ID: ${shippingId}`;
+                                                            textoEnvio = `VERIFICADO: ${sku} - Cantidad: ${cantidad}`;
                                                         }
                                                     } catch (firebaseError) {
                                                         console.error(`Error al consultar Firebase para SKU: ${sku}`, firebaseError);
@@ -2248,45 +2248,37 @@ function loadFolder(folderPath) {
                                                     if (item.esDeProvinciaExcluida) {
                                                         contadorExcluidas++;
                                                     }
-                                                    
+
                                                     // Construir bloques según si es provincia excluida o no
                                                     const bloquesSuperiores = item.esDeProvinciaExcluida ? 
                                                         `^FX LAST CLUSTER  ^FS
-                                        ^FO20,1^GB760,45,45^FS
-                                        ^FO20,6^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
-                                        ^FX END LAST CLUSTER  ^FS
-
-                                        ^FX LAST CLUSTER  ^FS
-                                        ^FO20,60^GB760,45,45^FS
-                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
-                                        ^FX END LAST CLUSTER  ^FS
-
-                                        ^FX LAST CLUSTER  ^FS
-                                        ^FO20,120^GB760,45,45^FS
-                                        ^FO20,126^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
-                                        ^FX END LAST CLUSTER  ^FS
-                                        ` : 
+                                                        ^FO20,1^GB760,45,45^FS
+                                                        ^FO20,6^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
+                                                        ^FX END LAST CLUSTER  ^FS` : 
                                                         `    
-                                        ^FX LAST CLUSTER ^FS
-                                        ^FO20,1^GB760,45,1^FS
-                                        ^FO20,6^A0N,45,45^FB760,1,0,C^FDVENTA: ${item.ventaCompleta}^FS
-                                        ^FX END LAST CLUSTER ^FS
+                                                        ^FX LAST CLUSTER ^FS
+                                                        ^FO20,1^GB760,45,1^FS
+                                                        ^FO20,6^A0N,45,45^FB760,1,0,C^FDVENTA: ${item.ventaCompleta}^FS
+                                                        ^FX END LAST CLUSTER ^FS
 
-                                        ^FX LAST CLUSTER ^FS
-                                        ^FO20,60^GB760,45,1^FS
-                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FDU: ${item.cantidad} / SKU: ${item.sku}^FS
-                                        ^FX END LAST CLUSTER ^FS
+                                                        ^FX LAST CLUSTER ^FS
+                                                    ${item.cantidad > 1 ? 
+                                                        `^FO20,60^GB760,50,50^FS
+                                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FR^FDU: ${item.cantidad} / SKU: ${item.sku}^FS` : 
+                                                        `^FO20,60^GB760,45,1^FS
+                                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FDU: ${item.cantidad} / SKU: ${item.sku}^FS`
+                                                    }
+                                                    ^FX END LAST CLUSTER ^FS
 
-                                        ^FX LAST CLUSTER ^FS
-                                        ^FO20,120^GB760,45,1^FS
-                                        ^FO20,126^A0N,45,45^FB760,1,0,C^FD${item.descripcion}^FS
-                                        ^FX END LAST CLUSTER ^FS
+                                                        ^FX LAST CLUSTER ^FS
+                                                        ^FO20,120^GB760,45,1^FS
+                                                        ^FO20,126^A0N,45,45^FB760,1,0,C^FD${item.descripcion}^FS
+                                                        ^FX END LAST CLUSTER ^FS
 
-                                        ^FX LAST CLUSTER ^FS
-                                        ^FO20,190^A0N,30,30^FB760,3,10,C^FD${item.textoEnvio}^FS
-                                        ^FX END LAST CLUSTER ^FS
-                                        `;
-                                                    
+                                                        ^FX LAST CLUSTER ^FS
+                                                        ^FO20,190^A0N,30,30^FB760,3,10,C^FD${item.textoEnvio}^FS
+                                                        ^FX END LAST CLUSTER ^FS`;
+
                                                     // Limpiar etiqueta original
                                                     let etiquetaLimpia = item.etiquetaOriginal;
                                                     [
@@ -2315,7 +2307,7 @@ function loadFolder(folderPath) {
                                                     
                                                     return etiquetaLimpia;
                                                 });
-                                                
+                                                                                                
                                                 // Cerrar loader
                                                 loadingSwal.close();
                                                 
