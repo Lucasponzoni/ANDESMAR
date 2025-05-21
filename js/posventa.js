@@ -3199,47 +3199,50 @@ function ejecutarControlRapido() {
     const anioHoy = hoy.getFullYear();
     const fechaHoyStr = `${diaHoy}/${mesHoy}/${anioHoy}`; // Formato DD/MM/YYYY
 
-tableRows.forEach(row => {
-    const estadoDiv = row.querySelector('.vencimientoPlazoDiv');
-    const mensajeDiv = row.querySelector('.mensaje-filaDeDatos');
-    const contenedorCasos = row.querySelector('.contenedorCasos');
-    const textoFila = row.textContent.trim();
-    const ventaId = row.querySelector('.venta-id a')?.textContent.trim();
+    tableRows.forEach(row => {
+        const estadoDiv = row.querySelector('.vencimientoPlazoDiv');
+        const mensajeDiv = row.querySelector('.mensaje-filaDeDatos');
+        const contenedorCasos = row.querySelector('.contenedorCasos');
+        const textoFila = row.textContent.trim();
+        const ventaId = row.querySelector('.venta-id a')?.textContent.trim();
 
-    let tieneFechaDeHoy = false;
+        let tieneFechaDeHoy = false;
 
-    if (mensajeDiv) {
-        const textoMensaje = mensajeDiv.textContent.trim();
-        const matchFecha = textoMensaje.match(/(\d{2}\/\d{2}\/\d{4})/);
-        if (matchFecha) {
-            const fechaExtraida = matchFecha[1];
-            if (fechaExtraida === fechaHoyStr) {
-                tieneFechaDeHoy = true;
+        // Verificar si existe mensajeDiv antes de continuar
+        if (mensajeDiv) {
+            const textoMensaje = mensajeDiv.textContent.trim();
+            const matchFecha = textoMensaje.match(/(\d{2}\/\d{2}\/\d{4})/);
+            if (matchFecha) {
+                const fechaExtraida = matchFecha[1];
+                if (fechaExtraida === fechaHoyStr) {
+                    tieneFechaDeHoy = true;
+                }
+            }
+
+            // ✅ VALIDACIÓN 2: "Faltan" + fecha distinta de hoy
+            if (contenedorCasos && contenedorCasos.innerText.includes('Faltan') && !tieneFechaDeHoy && ventaId) {
+                count++;
+                idsToControl.push(ventaId);
+                return; // Evita doble conteo si cumple también la otra condición
+            }
+
+            // ✅ VALIDACIÓN 1: Estado válido + frase clave + fecha distinta de hoy
+            const estadoValido = estadoDiv && (
+                estadoDiv.textContent.includes('Plazo máximo') ||
+                estadoDiv.textContent.includes('¡Vence hoy!')
+            );
+
+            const mensajeValido = textoFila.includes('Llega entre') ||
+                                  textoFila.includes('No pudimos entregar el producto a la persona que lo compró') ||
+                                  textoFila.includes('Lo enviaremos de regreso') ||
+                                  textoFila.includes('No se pudo entregar el paquete a la persona que realizó la compra.');
+
+            if (estadoValido && mensajeValido && !tieneFechaDeHoy && ventaId) {
+                count++;
+                idsToControl.push(ventaId);
             }
         }
-    }
-
-    // ✅ VALIDACIÓN 2: "Faltan" + fecha distinta de hoy
-    if (contenedorCasos && contenedorCasos.innerText.includes('Faltan') && !tieneFechaDeHoy && ventaId) {
-        count++;
-        idsToControl.push(ventaId);
-        return; // Evita doble conteo si cumple también la otra condición
-    }
-
-    // ✅ VALIDACIÓN 1: Estado válido + frase clave + fecha distinta de hoy
-    const estadoValido = estadoDiv && (
-        estadoDiv.textContent.includes('Plazo máximo') ||
-        estadoDiv.textContent.includes('¡Vence hoy!')
-    );
-
-    const mensajeValido = textoFila.includes('Llega entre') ||
-                          textoFila.includes('No pudimos entregar el producto a la persona que lo compró');
-
-    if (estadoValido && mensajeValido && !tieneFechaDeHoy && ventaId) {
-        count++;
-        idsToControl.push(ventaId);
-    }
-});
+    });
 
     if (count > 0) {
         Swal.fire({
