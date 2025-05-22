@@ -1840,13 +1840,24 @@ async function generateBillingFile(content, fileName) {
                 billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
             }
         } else if (shippingIdMatch) {
-            const shippingId = shippingIdMatch[1];
-            logMessage(`Buscando en Mercado Libre el ShippingID: ${shippingId}...`);
-            billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
-        } else {
-            billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
-        }
+    const shippingId = shippingIdMatch[1];
+    logMessage(`Buscando en Mercado Libre el ShippingID: ${shippingId}...`);
+
+    // Extraer el Pack ID si está presente en la cadena
+    const packId = packIdMatch ? packIdMatch[1] : null;
+
+    // Aquí puedes hacer el push a Firebase usando el Pack ID
+    if (packId) {
+        firebase.database()
+        .ref(`ImpresionEtiquetas/${selectedFolderDate}/${fileNameSinExtension}`)
+        .child(packId)
+        .set({ packId });
+        
+        billingContent += `${index + 1}- ${number} ---- Pack ID: ${packId} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
+    } else {
+        billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
     }
+    }}
 
     const logContainer = document.getElementById('logContainer');
     if (logContainer) {
@@ -2465,7 +2476,7 @@ function loadFolder(folderPath) {
                                         htmlContent = `
                                             <div style="max-height: 200px; overflow-y: auto; text-align: left;">
                                                 ${datosFiltrados.length > 0 ? `<p style="color: red;"><strong>🚫 Excluidos (Jujuy/Tierra del Fuego): ${datosFiltrados.length}</strong><br>${datosFiltrados.join('<br>')}</p>` : ''}
-                                                ${datosNoEncontrados.length > 0 ? `<p style="color: orange;"><strong>❌ No encontrados en BD: ${datosNoEncontrados.length}</strong><br>${datosNoEncontrados.join('<br>')}</p>` : ''}
+                                                ${datosNoEncontrados.length > 0 ? `<p style="color: orange;"><strong>❌ No encontrados en Base (Posibles Carritos): ${datosNoEncontrados.length}</strong><br>${datosNoEncontrados.join('<br>')}</p>` : ''}
                                                 ${datosNoValidados.length > 0 ? `<p style="color: yellow;"><strong>⚠️ No se pudo validar provincia: ${datosNoValidados.length}</strong><br>${datosNoValidados.join('<br>')}</p>` : ''}
                                                 ${etiquetasDuplicadas.length > 0 ? `<p style="color: #800020;"><strong>🧨 Duplicados: ${etiquetasDuplicadas.length}</strong><br>${etiquetasDuplicadas.map(item => `• ${item}`).join('<br>')}</p>` : ''}
                                             </div>
