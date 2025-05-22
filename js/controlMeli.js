@@ -3573,3 +3573,141 @@ function borrarElemento() {
     });
 }
 // FIN BORRAR DATOS DE PLANILLA
+
+// BUSCADOR DE TANDAS
+function searchTanda(codigo) {
+  const resultsDiv = document.getElementById('searchResults');
+  resultsDiv.innerHTML = `
+    <div class="search-result-item">
+      <span class="result-icon result-loading"><i class="bi bi-arrow-repeat"></i></span>
+      <span>Buscando en tandas...</span>
+    </div>
+  `;
+  
+  const dbRef = firebase.database().ref('ImpresionEtiquetas');
+  
+  dbRef.once('value').then((snapshot) => {
+    let found = false;
+    let resultHtml = '';
+    
+    snapshot.forEach((fechaSnapshot) => {
+      const fecha = fechaSnapshot.key;
+      
+      fechaSnapshot.forEach((tandaSnapshot) => {
+        const tanda = tandaSnapshot.key;
+        
+        tandaSnapshot.forEach((ventaSnapshot) => {
+          if (ventaSnapshot.key === codigo) {
+            found = true;
+            resultHtml = `
+              <div class="search-result-item">
+                <span class="result-icon result-success"><i class="bi bi-check-circle"></i></span>
+                <span>Encontrado en <strong>${tanda}</strong> del <strong>${fecha}</strong></span>
+              </div>
+            `;
+            return true;
+          }
+        });
+        
+        if (found) return true;
+      });
+      
+      if (found) return true;
+    });
+    
+    if (!found) {
+      resultHtml = `
+        <div class="search-result-item">
+          <span class="result-icon result-error"><i class="bi bi-exclamation-circle"></i></span>
+          <span>El código no existe en ninguna tanda registrada</span>
+        </div>
+      `;
+    }
+    
+    resultsDiv.innerHTML = resultHtml;
+  }).catch((error) => {
+    resultsDiv.innerHTML = `
+      <div class="search-result-item">
+        <span class="result-icon result-error"><i class="bi bi-x-circle"></i></span>
+        <span>Error al buscar: ${error.message}</span>
+      </div>
+    `;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Mostrar/ocultar campo de búsqueda
+  document.getElementById('searchButton').addEventListener('click', function() {
+    const container = document.getElementById('searchInputContainer');
+    container.style.display = 'block';
+    this.style.display = 'none';
+    document.getElementById('tandaSearchInput').focus();
+    resetSearchTimeout();
+  });
+
+  // Evento para el input de búsqueda
+  document.getElementById('tandaSearchInput').addEventListener('input', function(e) {
+    resetSearchTimeout();
+    const value = e.target.value.trim();
+    if (value.length === 16 && /^\d+$/.test(value)) {
+      searchTanda(value);
+    }
+  });
+
+  // Variable para el timeout y contador
+  let searchTimeout = null;
+  let countdownInterval = null;
+  let secondsLeft = 10;
+
+  function resetSearchTimeout() {
+    // Limpiar intervalos existentes
+    if (searchTimeout) clearTimeout(searchTimeout);
+    if (countdownInterval) clearInterval(countdownInterval);
+    
+    // Resetear contador
+    secondsLeft = 10;
+    updateCountdownText();
+    
+    // Crear nuevo timeout
+    searchTimeout = setTimeout(() => {
+      closeSearch();
+    }, 10000); // 10 segundos
+    
+    // Iniciar contador visible
+    countdownInterval = setInterval(() => {
+      secondsLeft--;
+      updateCountdownText();
+      if (secondsLeft <= 0) {
+        clearInterval(countdownInterval);
+      }
+    }, 1000);
+  }
+
+  function updateCountdownText() {
+    const countdownElement = document.getElementById('countdownText');
+    if (countdownElement) {
+      countdownElement.textContent = `El buscador se cerrará en ${secondsLeft} segundos...`;
+      
+      // Cambiar color cuando quedan pocos segundos
+      if (secondsLeft <= 3) {
+        countdownElement.style.color = '#ff6b6b';
+      } else {
+        countdownElement.style.color = '#666';
+      }
+    }
+  }
+
+  function closeSearch() {
+    document.getElementById('searchInputContainer').style.display = 'none';
+    document.getElementById('searchButton').style.display = 'inline-block';
+    document.getElementById('searchResults').innerHTML = '';
+    document.getElementById('tandaSearchInput').value = '';
+    
+    // Limpiar el texto del contador
+    const countdownElement = document.getElementById('countdownText');
+    if (countdownElement) {
+      countdownElement.textContent = '';
+    }
+  }
+});
+// FIN BUSCADOR DE TANDAS

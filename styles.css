@@ -8676,3 +8676,91 @@ mark {
     margin-top: -80px !important;
 }
 
+/* BUSCADOR DE TANDAS */
+.search-button-macos {
+  border-radius: 15px;
+  padding: 5px 12px;
+  font-size: 13px;
+  border: 1px solid #d1d1d1;
+  background-color: #f8f9fa;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.search-button-macos:hover {
+  background-color: #e9ecef;
+  border-color: #c4c4c4;
+}
+
+.search-input-container-macos {
+  position: relative;
+  margin-top: 8px;
+}
+
+.search-input-macos {
+  border-radius: 15px;
+  padding: 5px 15px;
+  font-size: 13px;
+  border: 1px solid #d1d1d1;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.search-results-macos {
+  margin-top: 8px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  border: 1px solid #e0e0e0;
+  font-size: 13px;
+  color: #333;
+}
+
+/* Spinner estilo macOS */
+#spinnerTandas {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+  margin: 0 auto;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.result-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.result-success {
+  color: #28a745;
+}
+
+.result-error {
+  color: #dc3545;
+}
+
+.result-loading {
+  color: #007bff;
+} 
+
+.list-group-numbered{
+    margin-top: -30px;
+}
+
+#countdownText {
+  font-size: 0.8em;
+  margin-top: 8px;
+  color: #666;
+  transition: color 0.3s ease;
+  font-style: italic;
+}
+/* FIN BUSCADOR DE TANDAS */
