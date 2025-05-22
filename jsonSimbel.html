@@ -199,29 +199,11 @@
             </div>
 
             <div class="mac-header">
-                <h1><i class="bi bi-braces-asterisk"></i> Exportar JSON a Pedidos Web</h1>
+                <h1><i class="bi bi-braces-asterisk"></i> Crear Etiqueta WEB para PLACEIT</h1>
             </div>
 
             <div class="mac-content">
-                <div class="form-group">
-                    <label for="nodo">Nombre del Nodo:</label>
-                    <input type="text" id="nodo" class="form-control" placeholder="Ej: 417021" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="jsonData">JSON a enviar:</label>
-                    <textarea id="jsonData" class="form-control" rows="12" placeholder='{"conf_cliente":{...}}' required style="border-radius: 10px !important;"></textarea>
-                </div>
-
-                <div class="text-center" id="spinner">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="sr-only">Cargando...</span>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" onclick="pushData()">
-                    <i class="bi bi-box-arrow-up-right me-1"></i> Enviar JSON
-                </button>
+ACA VA A IR EL FORMULARIO
             </div>
         </div>
 
@@ -242,64 +224,6 @@
 
         // Inicializa Firebase
         firebase.initializeApp(firebaseConfig);
-
-        // Función para hacer push del JSON
-        function pushData() {
-            const nodo = document.getElementById('nodo').value.trim();
-            const jsonData = document.getElementById('jsonData').value.trim();
-
-            console.log('Nodo:', nodo);
-            console.log('Datos JSON ingresados:', jsonData);
-
-            if (!nodo || !jsonData) {
-                Swal.fire('Error', 'Por favor, completa ambos campos.', 'error');
-                return;
-            }
-
-            try {
-                const objeto = JSON.parse(jsonData); // Intenta parsear el JSON
-                console.log('JSON parseado:', objeto);
-
-                // Verifica si el JSON tiene datos antes de enviarlo
-                if (Object.keys(objeto).length === 0) {
-                    Swal.fire('Error', 'El JSON está vacío. Por favor, ingresa datos válidos.', 'error');
-                    return;
-                }
-
-                // Crea la estructura personalizada
-                const data = {
-                    [nodo]: {
-                        metodo: "despachanvtav",
-                        objeto: objeto
-                    }
-                };
-
-                // Muestra el spinner
-                document.getElementById('spinner').style.display = 'block';
-
-                // Pushea el JSON al nodo especificado
-                firebase.database().ref('/ventasWeb/' + nodo).set(data[nodo])
-                    .then(() => {
-                        console.log('Datos guardados con éxito en Firebase.');
-                        Swal.fire('Éxito', 'Datos guardados con éxito en Firebase.', 'success');
-
-                        // Limpia los campos de entrada
-                        document.getElementById('nodo').value = '';
-                        document.getElementById('jsonData').value = '';
-                    })
-                    .catch((error) => {
-                        console.error('Error al guardar los datos en Firebase: ', error);
-                        Swal.fire('Error', 'Error al guardar los datos: ' + error.message, 'error');
-                    })
-                    .finally(() => {
-                        // Oculta el spinner
-                        document.getElementById('spinner').style.display = 'none';
-                    });
-            } catch (error) {
-                console.error('Error en el formato JSON: ', error);
-                Swal.fire('Error', 'Error en el formato JSON: ' + error.message, 'error');
-            }
-        }
     </script>
 
     <!-- Botón de flecha hacia arriba -->

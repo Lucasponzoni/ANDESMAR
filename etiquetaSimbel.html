@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+        const userType = localStorage.getItem('userType');
+        if (userType === 'placeit') {
+            localStorage.setItem('accessDenied', 'true');
+            window.location.replace('MeliArPlaceit.html');
+        } else {
+            const savedTimestamp = localStorage.getItem('loginTimestamp');
+            const isExpired = !savedTimestamp || (Date.now() - savedTimestamp) > 28800000;
+            if (isExpired) {
+                window.location.replace('logipaq.html');
+            }
+        }
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Signika:wght@300..700&family=Titan+One&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="./Img/caja.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Scripts Firebase-->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body class="envios-body">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="./Img/Novogar N.png" alt="Logo" class="navbar-logo">
+                <span class="navbar-brand-text">L<span class="navbar-brand-text4">gi</span><span class="navbar-brand-text2">Paq</span> <img class="blackCat" src="./Img/Location.gif" alt="LogiPaq" srcset=""> </span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a href="./index.html" class="nav-link">Etiquetado</a></li>
+                    <li class="nav-item"><a href="./envios.html" class="nav-link">Envios Andesmar</a></li>
+                    <li class="nav-item"><a href="./despachos.html" class="nav-link">Logistica</a></li>
+                    <li class="nav-item"><a href="./bna.html" class="nav-link">Tiendas Virtuales</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            MeLi <img id="meli-logo" src="./Img/meli.png">
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="./facturacionMl.html">Facturacion Mercado libre</a>
+                            <a class="dropdown-item" href="./meliAr.html">Envios Mercado Libre</a>
+                            <a class="dropdown-item" href="./controlMeli.html">Colecta Mercado libre</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Más
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="./tipeoWeb.html">Despacho Logistico</a>
+                            <a class="dropdown-item" href="./MeliArPlaceit.html">Mercado Libre PlaceIt</a>
+                            <a class="dropdown-item" href="./bnaPlaceIt.html">Tiendas Virtuales PlaceIt</a>
+                            <a class="dropdown-item" href="./simbel.html">Venta Web PlaceIt</a>
+                            <a class="dropdown-item" href="./panelPlaceIt.html"><i class="bi bi-gear-fill mr-1"></i>Panel PlaceIt</a>
+                            <a class="dropdown-item" href="./catalogo.html">Catalogo de Productos</a>
+                            <a class="dropdown-item active" href="#">Etiqueta WEB PlaceIt</a>
+                            <a class="dropdown-item" href="./jsonSimbel.html">Export Json Simbel</a>
+                            <a class="dropdown-item" href="./posventa.html">Posventa</a> 
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center align-items-center search-filter-container">
+            <div class="text-center">
+                <i class="fas bi bi-code-slash mb-2" style="font-size: 2rem; color: #51a5ff;"></i>
+            </div>
+        </div>
+    </div>    
+
+    <div class="container mt-5" id="cards-container">  
+        
+                <style>
+            #ventana-mac {
+                max-width: 800px;
+                margin: auto;
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+                background-color: #ffffff;
+                border: 1px solid #dcdcdc;
+            }
+
+            .mac-window-bar {
+                height: 36px;
+                background: #e5e5ea;
+                display: flex;
+                align-items: center;
+                padding-left: 12px;
+                gap: 8px;
+            }
+
+            .mac-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }
+
+            .dot-red { background: #ff605c; }
+            .dot-yellow { background: #ffbd44; }
+            .dot-green { background: #00ca4e; }
+
+            .mac-header {
+                text-align: center;
+                padding: 32px 24px 16px;
+            }
+
+            .mac-header h1 {
+                font-size: 1.9rem;
+                font-weight: 600;
+                margin: 0;
+                color: #1d1d1f;
+                text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .mac-header h1 i {
+                font-size: 1.8rem;
+                color: #007aff;
+            }
+
+            .mac-content {
+                padding: 24px;
+                padding-top: 0;
+            }
+
+            .form-group label {
+                font-weight: 500;
+                margin-top: 12px;
+                margin-bottom: 6px;
+                display: block;
+            }
+
+            .form-control {
+                border-radius: 12px;
+                border: 1px solid #d1d1d6;
+                padding: 12px;
+                font-size: 1rem;
+                background-color: #fafafa;
+                box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            }
+
+            .btn-primary {
+                background-color: #007aff;
+                border: none;
+                padding: 12px;
+                font-size: 1rem;
+                border-radius: 12px;
+                box-shadow: 0 2px 5px rgba(0,122,255,0.3);
+                width: 100%;
+            }
+
+            .btn-primary:hover {
+                background-color: #005ecb;
+            }
+
+            #spinner {
+                margin: 20px 0;
+                display: none;
+            }
+
+            .spinner-border {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+        </style>
+
+        <div id="ventana-mac">
+            <div class="mac-window-bar">
+                <div class="mac-dot dot-red"></div>
+                <div class="mac-dot dot-yellow"></div>
+                <div class="mac-dot dot-green"></div>
+            </div>
+
+            <div class="mac-header">
+                <h1><i class="bi bi-braces-asterisk"></i> Crear Etiqueta WEB para PLACEIT</h1>
+            </div>
+
+            <div class="mac-content">
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label for="numeroPedido">Número de Pedido sin NOV</label>
+                        <input type="text" class="form-control" id="numeroPedido" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nombres">Nombre</label>
+                        <input type="text" class="form-control" id="nombres" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellido">Apellido</label>
+                        <input type="text" class="form-control" id="apellido" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cPostal">Código Postal</label>
+                        <input type="text" class="form-control" id="cPostal" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cuit">CUIT / DNI</label>
+                        <input type="number" class="form-control" id="cuit" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="localidad">Localidad</label>
+                        <input type="text" class="form-control" id="localidad" value="CABA" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="provincia">Provincia</label>
+                        <input type="text" class="form-control" id="provincia" value="BUENOS AIRES" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="text" class="form-control" id="telefono" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="domicilio">Domicilio</label>
+                        <input type="text" class="form-control" id="domicilio" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="referencia">Autorizado</label>
+                        <input type="text" class="form-control" id="referencia" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="obs">Observaciones</label>
+                        <input type="text" class="form-control" id="obs">
+                    </div>
+
+                    <div class="highlighted-section mb-2" style="border: 2px dashed #007bff; padding: 10px; margin-top: 20px; border-radius: 10px;">
+                        <h5 style="color: #007aff;">Productos</h5>
+                        <div id="productInputs">
+                            <div class="product-item">
+                                <div class="form-group">
+                                    <label for="cantidad1">Cantidad</label>
+                                    <input type="number" class="form-control" id="cantidad1" value="1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="codAlfa1">Código Alfa</label>
+                                    <input type="text" class="form-control" id="codAlfa1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="detalle1">Detalle</label>
+                                    <input type="text" class="form-control" id="detalle1" required>
+                                </div>
+                                <button type="button" class="btn btn-danger removeProductButton mb-2">Eliminar</button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="addProductButton">Agregar Producto</button>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <script>
+                // Inicializa Firebase
+                const firebaseConfig = {
+                    apiKey: "AIzaSyCMu2vPvNzhv0cM3b4RItmqZybRhhR_HJM",
+                    authDomain: "despachos-meli-novogar.firebaseapp.com",
+                    databaseURL: "https://despachos-meli-novogar-default-rtdb.firebaseio.com",
+                    projectId: "despachos-meli-novogar",
+                    storageBucket: "despachos-meli-novogar.appspot.com",
+                    messagingSenderId: "774252628334",
+                    appId: "1:774252628334:web:623aa84bc3b1cebd3f997f",
+                    measurementId: "G-E0E9K4TEDW"
+                };
+
+                // Inicializa Firebase
+                firebase.initializeApp(firebaseConfig);
+
+                document.getElementById('addProductButton').addEventListener('click', function() {
+                    const productInputs = document.getElementById('productInputs');
+                    const productCount = productInputs.children.length + 1;
+
+                    const newProductDiv = document.createElement('div');
+                    newProductDiv.classList.add('product-item');
+
+                    newProductDiv.innerHTML = `
+                        <div class="form-group">
+                            <label for="cantidad${productCount}">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad${productCount}" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="codAlfa${productCount}">Código Alfa</label>
+                            <input type="text" class="form-control" id="codAlfa${productCount}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="detalle${productCount}">Detalle</label>
+                            <input type="text" class="form-control" id="detalle${productCount}" required>
+                        </div>
+                        <button type="button" class="btn btn-danger removeProductButton mb-2">Eliminar</button>
+                    `;
+
+                    productInputs.appendChild(newProductDiv);
+
+                    // Agregar evento de eliminación al nuevo botón
+                    newProductDiv.querySelector('.removeProductButton').addEventListener('click', function() {
+                        productInputs.removeChild(newProductDiv);
+                    });
+                });
+
+                document.getElementById('orderForm').addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    const numeroPedido = document.getElementById('numeroPedido').value.trim();
+                    const apellido = document.getElementById('apellido').value.trim();
+                    const cPostal = document.getElementById('cPostal').value.trim();
+                    const cuit = document.getElementById('cuit').value.trim();
+                    const localidad = document.getElementById('localidad').value.trim();
+                    const provincia = document.getElementById('provincia').value.trim();
+                    const telefono = document.getElementById('telefono').value.trim();
+                    const domicilio = document.getElementById('domicilio').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    const nombres = document.getElementById('nombres').value.trim();
+                    const referencia = document.getElementById('referencia').value.trim();
+                    const obs = document.getElementById('obs').value.trim();
+
+                    const fecha = new Date().toLocaleDateString('es-AR');
+
+                    const items = [];
+                    const productItems = document.querySelectorAll('.product-item');
+
+                    productItems.forEach((item, index) => {
+                        const cantidadInput = item.querySelector('input[type="number"]');
+                        const codAlfaInput = item.querySelector('input[type="text"]#codAlfa' + (index + 1));
+                        const detalleInput = item.querySelector('input[type="text"]#detalle' + (index + 1));
+
+                        // Verifica que los inputs existen antes de acceder a su valor
+                        const cantidad = cantidadInput ? cantidadInput.value.trim() : '';
+                        const codAlfa = codAlfaInput ? codAlfaInput.value.trim() : '';
+                        const detalle = detalleInput ? detalleInput.value.trim() : '';
+
+                        // Solo agrega el item si la cantidad es válida y codAlfa y detalle no están vacíos
+                        if (cantidad && codAlfa && detalle) {
+                            items.push({
+                                cantidad: parseInt(cantidad),
+                                cod_alfa: codAlfa,
+                                codigo: "",
+                                deposito: 9,
+                                detalle: detalle,
+                                listapre: "OFERTA",
+                                precio: 999999,
+                                tipo_entr: 30,
+                                verlistapre: 1
+                            });
+                        } else {
+                            console.warn(`El campo cantidad, cod_alfa o detalle está vacío para el producto ${codAlfa}.`);
+                        }
+                    });
+
+                    const dataToPush = {
+                        metodo: "despachanvtav",
+                        objeto: {
+                            cliente: {
+                                apellido: apellido,
+                                c_postal: cPostal,
+                                cuit: cuit,
+                                dom_entregas: [{
+                                    c_postal: cPostal,
+                                    domicilio: domicilio,
+                                    localidad: localidad,
+                                    provincia: provincia,
+                                    telefono: telefono
+                                }],
+                                domicilio: domicilio,
+                                e_mail: email,
+                                localidad: localidad,
+                                nombres: nombres,
+                                provincia: provincia,
+                                referencia: referencia,
+                                tipo_doc: 96,
+                                tipo_resp: 5
+                            },
+                            comprobante: {
+                                cabecera: {
+                                    cliente: "",
+                                    codpromo: "VTAWEB",
+                                    condicion: 3,
+                                    deposito: 9,
+                                    dom_entrega: "",
+                                    fecha: fecha,
+                                    listapre: "OFERTA",
+                                    num_compro: Math.floor(Math.random() * 1000000),
+                                    obs: obs,
+                                    verlistapre: 1,
+                                    versionpromo: 1
+                                },
+                                items: items
+                            },
+                            conf_cliente: {
+                                accion: "ALTA/MODIFICACION",
+                                campos: "CUIT, TIPO_DOC",
+                                disponible: ""
+                            },
+                            conf_comprobante: {
+                                autopvta: "ECOMMERCE",
+                                centro: "09",
+                                cfgvta: "ECOMMERCE",
+                                empresa: 9
+                            },
+                            valores: [{
+                                c_postal: parseInt(cPostal),
+                                cod_auto: 112398536356,
+                                cotiza: 1,
+                                cuotas: 3,
+                                e_cheq: "N",
+                                endosable: "N",
+                                importe: 999999,
+                                moneda: 1,
+                                n_bco: 1454,
+                                n_cheque: "112398536356",
+                                nro_cuit: 0,
+                                nro_lote: 11,
+                                propio: "N",
+                                sucu_bco: 0,
+                                vto: fecha
+                            }]
+                        }
+                    };
+
+                    // Pushear a Firebase
+                    firebase.database().ref('/ventasWeb/' + numeroPedido).set(dataToPush)
+                        .then(() => {
+                            Swal.fire('Éxito', 'Datos enviados correctamente', 'success');
+                            document.getElementById('orderForm').reset();
+                            document.getElementById('productInputs').innerHTML = ''; // Limpiar productos
+                        })
+                        .catch((error) => {
+                            Swal.fire('Error', 'No se pudo enviar los datos: ' + error.message, 'error');
+                        });
+                });
+
+                // Manejar el evento de eliminación para los productos existentes
+                document.querySelectorAll('.removeProductButton').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const productItem = button.parentElement;
+                        productItem.parentElement.removeChild(productItem);
+                    });
+                });
+            </script>
+
+
+    <!-- Botón de flecha hacia arriba -->
+    <a href="#" id="scrollToTop" class="btn btn-warning" style="display: none;">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- Botón de flecha hacia abajo -->
+    <a href="#" id="scrollToDown" class="btn btn-warning" style="display: none;">
+        <i class="fas fa-arrow-down"></i>
+    </a>
+
+    <footer class="center">
+        <img class="logo-foot" src="./Img/Novogar N.png" alt="Logo Novogar">
+        <a class="www" href="https://novogar.com.ar/" target="_blank">NOVOGAR</a>
+        <a href="https://novogar.com.ar/info/empresa" target="_blank">Quienes somos</a>
+        <a href="https://novogar.com.ar/info/Sucursales" target="_blank">Sucursales</a>
+        <a href="https://novogar.com.ar/info/ventaTelefonica" target="_blank">Atención al cliente</a>
+        <button id="logoutButton" class="btn btn-danger mt-3"><i class="bi bi-person-gear mr-1"></i>Cerrar Sesión</button>
+    </footer>   
+
+    <!-- SweetAlert JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Scripts Bootstrap-->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+</body>
+</html>
