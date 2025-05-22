@@ -1427,7 +1427,7 @@ inputEtiqueta.addEventListener('input', (e) => {
         logistica = 'Cruz del Sur';
         inputBultos.value = parseInt(val.slice(-4), 10);        // últimos 4 dígitos
         inputBultos.disabled = true;
-        inputEtiqueta.value = val.slice(4, -4);                 // 5º al 12º dígito (8 caracteres)
+        inputEtiqueta.value = val.slice(3, 12);
         inputValor.focus();    
       } else if (/^4146\d{15,}-\d+$/.test(val)) {
         logistica = 'Oca';
@@ -2143,7 +2143,13 @@ function cargarYMostrarTabla(camion, fechaKey, logistica) {
                 'Cruz del Sur': 'cruz-del-sur-tablita'
             }[despacho.camion] || '';
 
-            const etiqueta = despacho.camion === 'Cruz del Sur' ? `NIC-${despacho.seguimiento}` : despacho.seguimiento;
+            let seguimiento = despacho.seguimiento.startsWith('NIC-') 
+            ? despacho.seguimiento.slice(4) 
+            : despacho.seguimiento;
+
+            const etiqueta = despacho.camion === 'Cruz del Sur' 
+            ? `NIC-${seguimiento}` 
+            : seguimiento;
 
             rowsHTML += `
                 <tr>

@@ -345,7 +345,9 @@ function calcularPorcentajes(data, startDate, endDate) {
                     countAndreaniBigger++;
                 }
                 countAndreani++;
-            } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) || 
+            } else if ((numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) ||
+                        (numeroDeEnvio.length === 13 && numeroDeEnvio.startsWith('NIC'))||
+                        (numeroDeEnvio.length === 12 && numeroDeEnvio.startsWith('NIC')) || 
                        (numeroDeEnvio.length === 9 && numeroDeEnvio.startsWith('1'))) {
                 countCruzDelSur++;
             } else if (numeroDeEnvio.length === 19 && numeroDeEnvio.startsWith('4')) { 
@@ -835,8 +837,20 @@ function renderCards(data) {
             let operadorLogistico = '';
 
             if (item.numeroDeEnvio) {
-                const numeroDeEnvio = item.numeroDeEnvio;
+                let numeroDeEnvio = String(item.numeroDeEnvio);
                 let link, imgSrc;
+
+                // Limpiar el número de envío si empieza con "NIC-" o "NIC"
+                if (numeroDeEnvio.startsWith('NIC-')) {
+                    numeroDeEnvio = numeroDeEnvio.slice(4);
+                } else if (numeroDeEnvio.startsWith('NIC')) {
+                    numeroDeEnvio = numeroDeEnvio.slice(3);
+                }
+
+                // Si tiene 8 caracteres, agregar un 1 al principio
+                if (numeroDeEnvio.length === 8) {
+                    numeroDeEnvio = '1' + numeroDeEnvio;
+                }
             
             // Verificar si el operador logístico es "PlaceIt"
             if (item.operadorLogistico === "PlaceIt" && item.estado === "Envio Express PlaceIt") {
@@ -847,7 +861,7 @@ function renderCards(data) {
                 link = `https://lucasponzoni.github.io/Tracking-Andreani/?trackingNumber=${numeroDeEnvio}`;
                 imgSrc = './Img/andreani-mini.png'; // Ruta de la imagen
                 operadorLogistico = `<a href="${link}" target="_blank" class="btn-ios btn-andreani"><img src="${imgSrc}" alt="Andreani" class="img-transporte"></a>`;
-            } else if (numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1')) {
+            } else if (numeroDeEnvio.length === 10 && numeroDeEnvio.startsWith('1') || (numeroDeEnvio.length === 13 && numeroDeEnvio.startsWith('NIC')) || (numeroDeEnvio.length === 12 && numeroDeEnvio.startsWith('NIC')))  {
                 const numeroDeEnvioCorto = numeroDeEnvio.slice(0, -1);
                 link = `https://www.cruzdelsur.com/herramientas_seguimiento_resultado.php?nic=${numeroDeEnvioCorto}`;
                 imgSrc = './Img/cds-mini.png'; // Ruta de la imagen
