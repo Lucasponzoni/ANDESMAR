@@ -202,272 +202,272 @@
                 <h1><i class="bi bi-braces-asterisk"></i> Crear Etiqueta WEB para PLACEIT</h1>
             </div>
 
-<div class="mac-content">
-    <form id="orderForm">
-        <div class="form-group">
-            <label for="numeroPedido">Número de Pedido sin NOV</label>
-            <input type="text" class="form-control" id="numeroPedido" required>
-        </div>
-        <div class="form-group">
-            <label for="nombres">Nombre</label>
-            <input type="text" class="form-control" id="nombres" required>
-        </div>
-        <div class="form-group">
-            <label for="apellido">Apellido</label>
-            <input type="text" class="form-control" id="apellido" required>
-        </div>
-        <div class="form-group">
-            <label for="cPostal">Código Postal</label>
-            <input type="text" class="form-control" id="cPostal" required>
-        </div>
-        <div class="form-group">
-            <label for="cuit">CUIT / DNI</label>
-            <input type="number" class="form-control" id="cuit" required>
-        </div>
-        <div class="form-group">
-            <label for="localidad">Localidad</label>
-            <input type="text" class="form-control" id="localidad" value="CABA" required>
-        </div>
-        <div class="form-group">
-            <label for="provincia">Provincia</label>
-            <input type="text" class="form-control" id="provincia" value="BUENOS AIRES" required>
-        </div>
-        <div class="form-group">
-            <label for="telefono">Teléfono</label>
-            <input type="text" class="form-control" id="telefono" required>
-        </div>
-        <div class="form-group">
-            <label for="domicilio">Domicilio</label>
-            <input type="text" class="form-control" id="domicilio" required>
-        </div>
-        <div class="form-group">
-            <label for="email">E-mail</label>
-            <input type="email" class="form-control" id="email" required>
-        </div>
-        <div class="form-group">
-            <label for="referencia">Autorizado</label>
-            <input type="text" class="form-control" id="referencia" required>
-        </div>
-        <div class="form-group">
-            <label for="obs">Observaciones</label>
-            <input type="text" class="form-control" id="obs">
-        </div>
+            <div class="mac-content">
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label for="numeroPedido">Número de Pedido sin NOV</label>
+                        <input type="text" class="form-control" id="numeroPedido" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nombres">Nombre</label>
+                        <input type="text" class="form-control" id="nombres" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellido">Apellido</label>
+                        <input type="text" class="form-control" id="apellido" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cPostal">Código Postal</label>
+                        <input type="text" class="form-control" id="cPostal" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cuit">CUIT / DNI</label>
+                        <input type="number" class="form-control" id="cuit" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="localidad">Localidad</label>
+                        <input type="text" class="form-control" id="localidad" value="CABA" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="provincia">Provincia</label>
+                        <input type="text" class="form-control" id="provincia" value="BUENOS AIRES" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="text" class="form-control" id="telefono" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="domicilio">Domicilio</label>
+                        <input type="text" class="form-control" id="domicilio" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="referencia">Autorizado</label>
+                        <input type="text" class="form-control" id="referencia" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="obs">Observaciones</label>
+                        <input type="text" class="form-control" id="obs">
+                    </div>
 
-        <div class="highlighted-section mb-2" style="border: 2px dashed #007bff; padding: 10px; margin-top: 20px; border-radius: 10px;">
-            <h5 style="color: #007aff;">Productos</h5>
-            <div id="productInputs">
-                <div class="product-item">
-                    <div class="form-group">
-                        <label for="cantidad1">Cantidad</label>
-                        <input type="number" class="form-control" id="cantidad1" value="1" required>
+                    <div class="highlighted-section mb-2" style="border: 2px dashed #007bff; padding: 10px; margin-top: 20px; border-radius: 10px;">
+                        <h5 style="color: #007aff;">Productos</h5>
+                        <div id="productInputs">
+                            <div class="product-item">
+                                <div class="form-group">
+                                    <label for="cantidad1">Cantidad</label>
+                                    <input type="number" class="form-control" id="cantidad1" value="1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="codAlfa1">Código Alfa</label>
+                                    <input type="text" class="form-control" id="codAlfa1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="detalle1">Detalle</label>
+                                    <input type="text" class="form-control" id="detalle1" required>
+                                </div>
+                                <button type="button" class="btn btn-danger removeProductButton mb-2">Eliminar</button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="addProductButton">Agregar Producto</button>
                     </div>
-                    <div class="form-group">
-                        <label for="codAlfa1">Código Alfa</label>
-                        <input type="text" class="form-control" id="codAlfa1" required>
+
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                        </form>
                     </div>
-                    <div class="form-group">
-                        <label for="detalle1">Detalle</label>
-                        <input type="text" class="form-control" id="detalle1" required>
-                    </div>
-                    <button type="button" class="btn btn-danger removeProductButton mb-2">Eliminar</button>
                 </div>
+
             </div>
-            <button type="button" class="btn btn-secondary" id="addProductButton">Agregar Producto</button>
-        </div>
 
-        <button type="submit" class="btn btn-primary">Enviar</button>
-            </form>
-        </div>
-    </div>
+            <script>
+                // Inicializa Firebase
+                const firebaseConfig = {
+                    apiKey: "AIzaSyCMu2vPvNzhv0cM3b4RItmqZybRhhR_HJM",
+                    authDomain: "despachos-meli-novogar.firebaseapp.com",
+                    databaseURL: "https://despachos-meli-novogar-default-rtdb.firebaseio.com",
+                    projectId: "despachos-meli-novogar",
+                    storageBucket: "despachos-meli-novogar.appspot.com",
+                    messagingSenderId: "774252628334",
+                    appId: "1:774252628334:web:623aa84bc3b1cebd3f997f",
+                    measurementId: "G-E0E9K4TEDW"
+                };
 
-</div>
+                // Inicializa Firebase
+                firebase.initializeApp(firebaseConfig);
 
-<script>
-    // Inicializa Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyCMu2vPvNzhv0cM3b4RItmqZybRhhR_HJM",
-        authDomain: "despachos-meli-novogar.firebaseapp.com",
-        databaseURL: "https://despachos-meli-novogar-default-rtdb.firebaseio.com",
-        projectId: "despachos-meli-novogar",
-        storageBucket: "despachos-meli-novogar.appspot.com",
-        messagingSenderId: "774252628334",
-        appId: "1:774252628334:web:623aa84bc3b1cebd3f997f",
-        measurementId: "G-E0E9K4TEDW"
-    };
+                document.getElementById('addProductButton').addEventListener('click', function() {
+                    const productInputs = document.getElementById('productInputs');
+                    const productCount = productInputs.children.length + 1;
 
-    // Inicializa Firebase
-    firebase.initializeApp(firebaseConfig);
+                    const newProductDiv = document.createElement('div');
+                    newProductDiv.classList.add('product-item');
 
-    document.getElementById('addProductButton').addEventListener('click', function() {
-        const productInputs = document.getElementById('productInputs');
-        const productCount = productInputs.children.length + 1;
+                    newProductDiv.innerHTML = `
+                        <div class="form-group">
+                            <label for="cantidad${productCount}">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad${productCount}" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="codAlfa${productCount}">Código Alfa</label>
+                            <input type="text" class="form-control" id="codAlfa${productCount}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="detalle${productCount}">Detalle</label>
+                            <input type="text" class="form-control" id="detalle${productCount}" required>
+                        </div>
+                        <button type="button" class="btn btn-danger removeProductButton mb-2">Eliminar</button>
+                    `;
 
-        const newProductDiv = document.createElement('div');
-        newProductDiv.classList.add('product-item');
+                    productInputs.appendChild(newProductDiv);
 
-        newProductDiv.innerHTML = `
-            <div class="form-group">
-                <label for="cantidad${productCount}">Cantidad</label>
-                <input type="number" class="form-control" id="cantidad${productCount}" value="1" required>
-            </div>
-            <div class="form-group">
-                <label for="codAlfa${productCount}">Código Alfa</label>
-                <input type="text" class="form-control" id="codAlfa${productCount}" required>
-            </div>
-            <div class="form-group">
-                <label for="detalle${productCount}">Detalle</label>
-                <input type="text" class="form-control" id="detalle${productCount}" required>
-            </div>
-            <button type="button" class="btn btn-danger removeProductButton mb-2">Eliminar</button>
-        `;
-
-        productInputs.appendChild(newProductDiv);
-
-        // Agregar evento de eliminación al nuevo botón
-        newProductDiv.querySelector('.removeProductButton').addEventListener('click', function() {
-            productInputs.removeChild(newProductDiv);
-        });
-    });
-
-    document.getElementById('orderForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const numeroPedido = document.getElementById('numeroPedido').value.trim();
-        const apellido = document.getElementById('apellido').value.trim();
-        const cPostal = document.getElementById('cPostal').value.trim();
-        const cuit = document.getElementById('cuit').value.trim();
-        const localidad = document.getElementById('localidad').value.trim();
-        const provincia = document.getElementById('provincia').value.trim();
-        const telefono = document.getElementById('telefono').value.trim();
-        const domicilio = document.getElementById('domicilio').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const nombres = document.getElementById('nombres').value.trim();
-        const referencia = document.getElementById('referencia').value.trim();
-        const obs = document.getElementById('obs').value.trim();
-
-        const fecha = new Date().toLocaleDateString('es-AR');
-
-        const items = [];
-        const productItems = document.querySelectorAll('.product-item');
-
-        productItems.forEach((item, index) => {
-            const cantidadInput = item.querySelector('input[type="number"]');
-            const codAlfaInput = item.querySelector('input[type="text"]#codAlfa' + (index + 1));
-            const detalleInput = item.querySelector('input[type="text"]#detalle' + (index + 1));
-
-            // Verifica que los inputs existen antes de acceder a su valor
-            const cantidad = cantidadInput ? cantidadInput.value.trim() : '';
-            const codAlfa = codAlfaInput ? codAlfaInput.value.trim() : '';
-            const detalle = detalleInput ? detalleInput.value.trim() : '';
-
-            // Solo agrega el item si la cantidad es válida y codAlfa y detalle no están vacíos
-            if (cantidad && codAlfa && detalle) {
-                items.push({
-                    cantidad: parseInt(cantidad),
-                    cod_alfa: codAlfa,
-                    codigo: "",
-                    deposito: 9,
-                    detalle: detalle,
-                    listapre: "OFERTA",
-                    precio: 999999,
-                    tipo_entr: 30,
-                    verlistapre: 1
+                    // Agregar evento de eliminación al nuevo botón
+                    newProductDiv.querySelector('.removeProductButton').addEventListener('click', function() {
+                        productInputs.removeChild(newProductDiv);
+                    });
                 });
-            } else {
-                console.warn(`El campo cantidad, cod_alfa o detalle está vacío para el producto ${codAlfa}.`);
-            }
-        });
 
-        const dataToPush = {
-            metodo: "despachanvtav",
-            objeto: {
-                cliente: {
-                    apellido: apellido,
-                    c_postal: cPostal,
-                    cuit: cuit,
-                    dom_entregas: [{
-                        c_postal: cPostal,
-                        domicilio: domicilio,
-                        localidad: localidad,
-                        provincia: provincia,
-                        telefono: telefono
-                    }],
-                    domicilio: domicilio,
-                    e_mail: email,
-                    localidad: localidad,
-                    nombres: nombres,
-                    provincia: provincia,
-                    referencia: referencia,
-                    tipo_doc: 96,
-                    tipo_resp: 5
-                },
-                comprobante: {
-                    cabecera: {
-                        cliente: "",
-                        codpromo: "VTAWEB",
-                        condicion: 3,
-                        deposito: 9,
-                        dom_entrega: "",
-                        fecha: fecha,
-                        listapre: "OFERTA",
-                        num_compro: Math.floor(Math.random() * 1000000),
-                        obs: obs,
-                        verlistapre: 1,
-                        versionpromo: 1
-                    },
-                    items: items
-                },
-                conf_cliente: {
-                    accion: "ALTA/MODIFICACION",
-                    campos: "CUIT, TIPO_DOC",
-                    disponible: ""
-                },
-                conf_comprobante: {
-                    autopvta: "ECOMMERCE",
-                    centro: "09",
-                    cfgvta: "ECOMMERCE",
-                    empresa: 9
-                },
-                valores: [{
-                    c_postal: parseInt(cPostal),
-                    cod_auto: 112398536356,
-                    cotiza: 1,
-                    cuotas: 3,
-                    e_cheq: "N",
-                    endosable: "N",
-                    importe: 999999,
-                    moneda: 1,
-                    n_bco: 1454,
-                    n_cheque: "112398536356",
-                    nro_cuit: 0,
-                    nro_lote: 11,
-                    propio: "N",
-                    sucu_bco: 0,
-                    vto: fecha
-                }]
-            }
-        };
+                document.getElementById('orderForm').addEventListener('submit', function(event) {
+                    event.preventDefault();
 
-        // Pushear a Firebase
-        firebase.database().ref('/ventasWeb/' + numeroPedido).set(dataToPush)
-            .then(() => {
-                Swal.fire('Éxito', 'Datos enviados correctamente', 'success');
-                document.getElementById('orderForm').reset();
-                document.getElementById('productInputs').innerHTML = ''; // Limpiar productos
-            })
-            .catch((error) => {
-                Swal.fire('Error', 'No se pudo enviar los datos: ' + error.message, 'error');
-            });
-    });
+                    const numeroPedido = document.getElementById('numeroPedido').value.trim();
+                    const apellido = document.getElementById('apellido').value.trim();
+                    const cPostal = document.getElementById('cPostal').value.trim();
+                    const cuit = document.getElementById('cuit').value.trim();
+                    const localidad = document.getElementById('localidad').value.trim();
+                    const provincia = document.getElementById('provincia').value.trim();
+                    const telefono = document.getElementById('telefono').value.trim();
+                    const domicilio = document.getElementById('domicilio').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    const nombres = document.getElementById('nombres').value.trim();
+                    const referencia = document.getElementById('referencia').value.trim();
+                    const obs = document.getElementById('obs').value.trim();
 
-    // Manejar el evento de eliminación para los productos existentes
-    document.querySelectorAll('.removeProductButton').forEach(button => {
-        button.addEventListener('click', function() {
-            const productItem = button.parentElement;
-            productItem.parentElement.removeChild(productItem);
-        });
-    });
-</script>
+                    const fecha = new Date().toLocaleDateString('es-AR');
+
+                    const items = [];
+                    const productItems = document.querySelectorAll('.product-item');
+
+                    productItems.forEach((item, index) => {
+                        const cantidadInput = item.querySelector('input[type="number"]');
+                        const codAlfaInput = item.querySelector('input[type="text"]#codAlfa' + (index + 1));
+                        const detalleInput = item.querySelector('input[type="text"]#detalle' + (index + 1));
+
+                        // Verifica que los inputs existen antes de acceder a su valor
+                        const cantidad = cantidadInput ? cantidadInput.value.trim() : '';
+                        const codAlfa = codAlfaInput ? codAlfaInput.value.trim() : '';
+                        const detalle = detalleInput ? detalleInput.value.trim() : '';
+
+                        // Solo agrega el item si la cantidad es válida y codAlfa y detalle no están vacíos
+                        if (cantidad && codAlfa && detalle) {
+                            items.push({
+                                cantidad: parseInt(cantidad),
+                                cod_alfa: codAlfa,
+                                codigo: "",
+                                deposito: 9,
+                                detalle: detalle,
+                                listapre: "OFERTA",
+                                precio: 999999,
+                                tipo_entr: 30,
+                                verlistapre: 1
+                            });
+                        } else {
+                            console.warn(`El campo cantidad, cod_alfa o detalle está vacío para el producto ${codAlfa}.`);
+                        }
+                    });
+
+                    const dataToPush = {
+                        metodo: "despachanvtav",
+                        objeto: {
+                            cliente: {
+                                apellido: apellido,
+                                c_postal: cPostal,
+                                cuit: cuit,
+                                dom_entregas: [{
+                                    c_postal: cPostal,
+                                    domicilio: domicilio,
+                                    localidad: localidad,
+                                    provincia: provincia,
+                                    telefono: telefono
+                                }],
+                                domicilio: domicilio,
+                                e_mail: email,
+                                localidad: localidad,
+                                nombres: nombres,
+                                provincia: provincia,
+                                referencia: referencia,
+                                tipo_doc: 96,
+                                tipo_resp: 5
+                            },
+                            comprobante: {
+                                cabecera: {
+                                    cliente: "",
+                                    codpromo: "VTAWEB",
+                                    condicion: 3,
+                                    deposito: 9,
+                                    dom_entrega: "",
+                                    fecha: fecha,
+                                    listapre: "OFERTA",
+                                    num_compro: Math.floor(Math.random() * 1000000),
+                                    obs: obs,
+                                    verlistapre: 1,
+                                    versionpromo: 1
+                                },
+                                items: items
+                            },
+                            conf_cliente: {
+                                accion: "ALTA/MODIFICACION",
+                                campos: "CUIT, TIPO_DOC",
+                                disponible: ""
+                            },
+                            conf_comprobante: {
+                                autopvta: "ECOMMERCE",
+                                centro: "09",
+                                cfgvta: "ECOMMERCE",
+                                empresa: 9
+                            },
+                            valores: [{
+                                c_postal: parseInt(cPostal),
+                                cod_auto: 112398536356,
+                                cotiza: 1,
+                                cuotas: 3,
+                                e_cheq: "N",
+                                endosable: "N",
+                                importe: 999999,
+                                moneda: 1,
+                                n_bco: 1454,
+                                n_cheque: "112398536356",
+                                nro_cuit: 0,
+                                nro_lote: 11,
+                                propio: "N",
+                                sucu_bco: 0,
+                                vto: fecha
+                            }]
+                        }
+                    };
+
+                    // Pushear a Firebase
+                    firebase.database().ref('/ventasWeb/' + numeroPedido).set(dataToPush)
+                        .then(() => {
+                            Swal.fire('Éxito', 'Datos enviados correctamente', 'success');
+                            document.getElementById('orderForm').reset();
+                            document.getElementById('productInputs').innerHTML = ''; // Limpiar productos
+                        })
+                        .catch((error) => {
+                            Swal.fire('Error', 'No se pudo enviar los datos: ' + error.message, 'error');
+                        });
+                });
+
+                // Manejar el evento de eliminación para los productos existentes
+                document.querySelectorAll('.removeProductButton').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const productItem = button.parentElement;
+                        productItem.parentElement.removeChild(productItem);
+                    });
+                });
+            </script>
 
 
     <!-- Botón de flecha hacia arriba -->
