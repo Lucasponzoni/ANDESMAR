@@ -2502,7 +2502,7 @@ function loadFolder(folderPath) {
                                         }
 
                                         // Enviar el reporte al webhook
-                                        enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados.concat(datosNoValidados), etiquetasDuplicadas);
+                                        enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados.concat(datosNoValidados), etiquetasDuplicadas, selectedFolderDate, fileNameSinExtension);
                                         enviarReporteWebhookFacturacion(datosFiltradosConProvincia.concat(datosNoValidados));
 
                                     });
@@ -3287,7 +3287,7 @@ ${crearLista(datosFiltrados)}\n
     }
 }
 
-async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados, etiquetasDuplicadas) {
+async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados, etiquetasDuplicadas, selectedFolderDate, fileNameSinExtension) {
     const fechaHora = new Date().toLocaleString('es-AR', { 
         day: '2-digit', 
         month: '2-digit', 
@@ -3301,13 +3301,14 @@ async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFil
 
     let mensaje = `
 * * * * * * * * * * * * * * * * * * * * * * * *
-*⏰ Reporte de Envíos* (${fechaHora})
+*⏰ Reporte de Envíos* (${fechaHora})\n
+🖨️ Imprimiste *${fileNameSinExtension}* del dia *${selectedFolderDate}*
 \n`;
 
     mensaje += `*🟢 Agregados:* ${datosAgregados.length}\n${crearLista(datosAgregados) || 'Ninguno'}\n\n`;
 
     if (datosNoEncontrados.length > 0) {
-        mensaje += `*🔴 No Encontrados:* ${datosNoEncontrados.length}\n${crearLista(datosNoEncontrados)}\n\n`;
+        mensaje += `*🔴 No Encontrados (Posible Carrito):* ${datosNoEncontrados.length}\n${crearLista(datosNoEncontrados)}\n\n`;
     }
 
     if (datosFiltrados.length > 0) {
