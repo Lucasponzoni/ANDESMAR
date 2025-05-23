@@ -1810,7 +1810,7 @@ async function generateBillingFile(content, fileName) {
             try {
                 data = await buscarEnFirebase2(ventaId);
                 if (data) {
-                    logMessage(`Encontrado con Exito`);
+                    logMessage(`Encontrado con Éxito`);
 
                     // 👉 Push ventaId a Firebase
                     firebase.database()
@@ -1826,8 +1826,6 @@ async function generateBillingFile(content, fileName) {
                         billingContent += `${index + 1}- ${number} ---- NO FACTURAR JUJUY\n`;
                     } else if (estadoTierraDelFuego) {
                         billingContent += `${index + 1}- ${number} ---- NO FACTURAR TIERRA DEL FUEGO\n`;
-                    } else if (data.Provincia.toLowerCase() === 'jujuy' || data.Provincia.toLowerCase() === 'tierra del fuego') {
-                        billingContent += `${index + 1}- ${number} ---- NO FACTURAR ${data.Provincia.toUpperCase()}\n`;
                     } else {
                         billingContent += `${index + 1}- ${number} ---- Control Ok.\n`;
                     }
@@ -1835,10 +1833,10 @@ async function generateBillingFile(content, fileName) {
                     logMessage(`No se logró encontrar el ID de Venta para Pack ID: ${ventaId} en Mercado Libre.`);
                     billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
                 }
-            } catch (error) {
-                logMessage(`Error al buscar el ID de Venta para Pack ID: ${ventaId}`);
-                billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
-            }
+    } catch (error) {
+        logMessage(`Error al buscar el ID de Venta para Pack ID: ${ventaId}`);
+        billingContent += `${index + 1}- ${number} ---- No se logró validar, VERIFICAR MANUALMENTE\n`;
+    }
         } else if (shippingIdMatch) {
     const shippingId = shippingIdMatch[1];
     logMessage(`Buscando en Mercado Libre el ShippingID: ${shippingId}...`);
