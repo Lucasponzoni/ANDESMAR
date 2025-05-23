@@ -1805,7 +1805,7 @@ const avatares = [
 // Función para obtener la ruta del avatar por nombre
 function obtenerAvatarPorNombre(nombreOperador) {
   const avatar = avatares.find(av => av.nombre === nombreOperador);
-  return avatar ? `./Img/${avatar.imagen}` : './Img/default_avatar.png'; // Retorna una imagen por defecto si no se encuentra
+  return avatar ? `./Img/${avatar.imagen}` : './Img/avatar-black.png'; // Retorna una imagen por defecto si no se encuentra
 }
 
 async function controlarCaso(ventaId, iconElement) {
