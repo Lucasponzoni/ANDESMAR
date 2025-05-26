@@ -529,6 +529,7 @@ try {
           "venta cancelada. no despachés",
           "cancelada por el comprador",
           "venta cancelada",
+          "Le devolviste el dinero al comprador",
           "paquete cancelado",
           "cancelá la venta",
           "cancelamos la venta",
