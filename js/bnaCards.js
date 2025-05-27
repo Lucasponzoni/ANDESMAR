@@ -3335,7 +3335,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
                 calleDelDestinatario: calle,
                 numeroDeCalle: "S/N",
                 telefono: telefono,
-                remito: `BNA${remito}`, 
+                remito: `BNA${remito}${concatenatedNumbers}`, 
                 cotizacion: `$${precio_venta - suborden_total}` 
             });
             console.log("Nueva entrada agregada a Firebase:", { nombre, nroPedido: data.NroPedido, cp, localidad, calle, telefono });
