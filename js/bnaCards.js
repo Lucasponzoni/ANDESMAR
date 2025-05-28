@@ -4404,7 +4404,7 @@ if (isSplit) {
 }
 
     const requestData = {
-        "contrato": volumenCm3 > 100000 ? "351002753" : "400017259",
+        "contrato": cantidadBultos > 1 ? "351002753" : (volumenCm3 > 100000 ? "351002753" : "400017259"),
         "idPedido": `${remito}-BNA`.toUpperCase(),
         "origen": {
             "postal": {
