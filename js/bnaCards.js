@@ -278,6 +278,7 @@ function verificarRemitosDuplicados() {
 verificarRemitosDuplicados();
 // FIN VERIFICA ORDENES DUPLICADAS
 
+// IMPORTAR CSV
 let allData = [];
 let currentPage = 1;
 let itemsPerPage = 60; // Número de elementos por página
@@ -292,165 +293,270 @@ document.getElementById('importButton').addEventListener('click', function() {
     const cardsContainer = document.getElementById('meli-cards');
     const spinner = document.createElement('div');
 
-    // Mostrar spinner mientras se cargan los datos
     spinner.className = 'spinner-border text-primary';
     spinner.role = 'status';
     spinner.innerHTML = `<span class="sr-only">Cargando...</span>`;
     cardsContainer.appendChild(spinner);
 
     if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const content = e.target.result.trim();
-            const data = content.split(/\r?\n/).map(row => {
-                // Usar expresión regular para dividir correctamente en comas
-                return row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => {
-                    // Limpiar espacios y manejar celdas vacías
-                    return cell.trim() === "" ? "" : cell.trim();
-                });
-            });
+        // Usar PapaParse para leer el archivo CSV
+        Papa.parse(file, {
+            header: true, // Usar la primera fila como cabeceras
+            complete: async function(results) {
+                const data = results.data;
 
-            const headers = data[0].map(header => sanitizeHeader(header));
-            const dataRows = data.slice(1);
-            let importedCount = 0;
-            let existingCount = 0;
-            let skippedCount = 0;
-            let changedInfo = 0;
-            const promises = [];
+                // Validación del archivo
+                const headers = Object.keys(data[0] || {});
 
-            let spinner2 = document.getElementById("spinner2");
-            spinner2.style.display = "flex";
+                const tieneOrdenOUOrigin = headers.includes('orden_') || headers.includes('Origin');
+                const contieneOrdenSanitizado = headers.some(header => sanitizeHeader(header) === 'orden_');
 
-            dataRows.forEach(row => {
-                if (row.length > 0) {
-                    const envioData = {};
-            
-                    // Construir el objeto usando las cabeceras
-                    headers.forEach((header, index) => {
-                        envioData[header] = row[index] !== undefined ? sanitizeValue(row[index]) : ""; // Asignar cadena vacía si está vacío
-                    });
-            
-                    const orden = envioData['orden_']; 
-            
-                    // Verificar si ya existe en Firebase
-                    const envioRef = firebase.database().ref('enviosBNA');
-                    promises.push(
-                        envioRef.orderByChild('orden_').equalTo(orden).once('value').then(snapshot => {
-                            if (!snapshot.exists()) {
-                                return envioRef.push().set(envioData).then(() => {
-                                    importedCount++;
-                                });
-                            } else {
-                                existingCount++;
-                                const existingData = snapshot.val();
-                                const existingKey = Object.keys(existingData)[0]; // Obtener la clave del primer registro encontrado
-                    
-                                // Comprobar si los valores son diferentes y actualizar si es necesario
-                                const existingSeguimiento = existingData[existingKey].numero_de_seguimiento;
-                                const existingMedioEnvio = existingData[existingKey].medio_de_envio;
-                                const existingEstadoEnvio = existingData[existingKey].estado_del_envio;
-                    
-                                // Verificar y actualizar los campos si son diferentes
-                                let needsUpdate = false;
-                                const updates = {};
-                    
-                                if (existingSeguimiento !== envioData.numero_de_seguimiento) {
-                                    updates.numero_de_seguimiento = envioData.numero_de_seguimiento;
-                                    needsUpdate = true;
-                                }
-                                if (existingMedioEnvio !== envioData.medio_de_envio) {
-                                    updates.medio_de_envio = envioData.medio_de_envio;
-                                    needsUpdate = true;
-                                }
-                                if (existingEstadoEnvio !== envioData.estado_del_envio) {
-                                    updates.estado_del_envio = envioData.estado_del_envio;
-                                    needsUpdate = true;
-                                }
-                    
-                                // Actualizar en Firebase si hay cambios
-                                if (needsUpdate) {
-                                    // Actualizar marcaEntregado si estado_del_envio es "Entregado"
-                                    if (envioData.estado_del_envio === "entregado") {
-                                        updates.marcaEntregado = "Si";
-                                    }
-                    
-                                    // Actualizar marcaPreparado si estado_del_envio no es "Sin despachar"
-                                    if (envioData.estado_del_envio !== "sin despachar") {
-                                        updates.marcaPreparado = "Si";
-                                    }
-                    
-                                    return envioRef.child(existingKey).update(updates).then(() => {
-                                        changedInfo++;
-                                    });
-                                }
-                            }
-                        }).catch(error => {
-                            console.error('Error al verificar existencia en Firebase:', error);
-                        })
-                    );
-                } else {
-                    skippedCount++; // Incrementar si la fila está vacía
-                }
-            });
-
-            Promise.all(promises)
-                .then(() => {
-                    spinner2.style.display = "none";
-                    Swal.fire({
-                        title: 'Importación completada',
-                        html: `
-                            <div style="text-align: left; font-size: 1.1em;">
-                                <p><span class="counter2 imported">${importedCount}</span> Ventas importadas a la base de datos.</p>
-                                <p><span class="counter2 existing">${existingCount}</span> Ya se encontraban en planilla.</p>
-                                <p><span class="counter2 skipped">${skippedCount}</span> Registros omitidos por estar vacíos.</p>
-                                <p><span class="counter2 changed">${changedInfo}</span> Registros de envíos actualizados.</p>
-                            </div>
-                        `,
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        customClass: {
-                            popup: 'ios-style-popup',
-                            title: 'ios-style-title',
-                            content: 'ios-style-content',
-                            confirmButton: 'ios-style-confirm-button'
-                        }
-                    }).then(() => {
-                        location.reload();
-                    });
-                })
-                .catch(error => {
-                    spinner2.style.display = "none";
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Ocurrió un error al importar los datos',
+                if (data.length === 0 || (!tieneOrdenOUOrigin && !contieneOrdenSanitizado)) {
+                    cardsContainer.removeChild(spinner);
+                    await Swal.fire({ 
                         icon: 'error',
-                        confirmButtonText: 'OK',
-                        customClass: {
-                            popup: 'ios-style-popup',
-                            title: 'ios-style-title',
-                            content: 'ios-style-content',
-                            confirmButton: 'ios-style-confirm-button'
-                        }
+                        title: 'Archivo inválido',
+                        html: `<div style="text-align:left;">
+                            <p>❌ <b>No es un resumen de ventas válido</b></p>
+                            <p>No contiene <code>orden_ (Avenida)</code> o <code>Origin (Bapro)</code></p>
+                        </div>`,
+                        confirmButtonText: 'Entendido'
                     });
-                });            
-        };
+                    return;
+                }
 
-        reader.readAsText(file);
+                let importedCount = 0;
+                let existingCount = 0;
+                let skippedCount = 0;
+                let changedInfo = 0;
+                const promises = [];
+
+                let spinner2 = document.getElementById("spinner2");
+                spinner2.style.display = "flex";
+
+                const keysMapping = {
+                    "apellido": "Client Last Name",
+                    "cantidad": "Quantity_SKU",
+                    "celular_factura": "Phone", 
+                    "telefono": "Phone",
+                    "ciudad": "City",
+                    "ciudad_factura": "City",
+                    "codigo_postal": "Postal Code",
+                    "codigo_postal_factura": "Postal Code",
+                    "dni": "Client Document",
+                    "doc_pago": "Client Document",
+                    "documento_factura": "Client Document",
+                    "email": "Email",
+                    "email_factura": "Email",
+                    "fecha_creacion_orden": "Creation Date",
+                    "info_factura": "Street + Number",
+                    "marca_de_tarjeta": "Payment System Name",
+                    "monto_cobrado": "Shipping Value",
+                    "nombre": "Client Name",
+                    "nombre_completo_envio": "Receiver Name",
+                    "nombre_factura": "Receiver Name",
+                    "nombre_y_apellido_tarjeta": "Receiver Name",
+                    "nro_de_cuotas": "Installments",
+                    "numeros_tarjeta": "Card Last Digits",
+                    "orden_": "Order",
+                    "orden_publica_": "Order",
+                    "precio_producto": "SKU Value",
+                    "precio_venta": "SKU Selling Price",
+                    "producto_nombre": "SKU Name",
+                    "provincia": "UF",
+                    "provincia_factura": "UF",
+                    "sku_externo": "Reference Code",
+                    "suborden_": "Order",
+                    "suborden_total": "Total Value",
+                    "total_dinero": "Total Value",
+                    "direccion": "Street + Number",
+                    "direccion_facturacion": "Street + Number"
+                };
+
+                data.forEach(row => {
+                    if (Object.keys(row).length > 0) {
+                        const envioData = {};
+
+                        // Sanitizar y mapear datos
+                        for (const key in keysMapping) {
+                            const headerDestino = keysMapping[key];
+
+                            if (headerDestino.includes('+')) {
+                                // Concatenar datos si el encabezado tiene un '+'
+                                const parts = headerDestino.split('+').map(part => part.trim());
+                                envioData[key] = parts.map(part => {
+                                    const partValue = row[part];
+                                    return partValue !== undefined ? sanitizeValue(partValue) : '';
+                                }).filter(Boolean).join(' ');
+                            } else if (row[headerDestino] !== undefined) {
+                                let value = sanitizeValue(row[headerDestino]);
+
+                                // Si el header destino es "Phone", quitar +54
+                                if (headerDestino === "Phone") {
+                                    value = value.replace(/^\+54/, '').trim();
+                                }
+                                // Si el header destino es "Creation Date", formatear fecha
+                                if (headerDestino === "Creation Date") {
+                                    value = formatDate(row[headerDestino]);
+                                }
+                                envioData[key] = value;
+                            }
+                        }
+
+                        // Además, sanitizar los headers originales por si hay otros campos
+                        for (const header in row) {
+                            if (row[header] !== undefined && row[header] !== '') { // Verificar que no sea undefined o vacío
+                                let value = sanitizeValue(row[header]);
+
+                                // Eliminar +54 de teléfono y celular
+                                if (header === "telefono" || header === "celular_factura") {
+                                    value = value.replace(/^\+54/, '').trim();
+                                }
+
+                                // Formatear fecha si es "fecha_creacion_orden"
+                                if (header === "fecha_creacion_orden") {
+                                    value = formatDate(value);
+                                }
+
+                                envioData[sanitizeHeader(header)] = value;
+                            }
+                        }
+
+                        const orden = envioData['orden_'] || envioData['origin']; // Usar 'origin' si no hay 'orden_'
+
+                        // Verificar si 'orden' o 'origin' no están vacíos
+                        if (!orden) {
+                            skippedCount++; // Contar como omitido si está vacío
+                            return; // Salir de este ciclo para no procesar el registro
+                        }
+
+                        // Verificar si ya existe en Firebase
+                        const envioRef = firebase.database().ref('enviosBNA');
+                        promises.push(
+                            envioRef.orderByChild('orden_').equalTo(orden).once('value').then(snapshot => {
+                                if (!snapshot.exists()) {
+                                    return envioRef.push().set(envioData).then(() => {
+                                        importedCount++;
+                                    });
+                                } else {
+                                    existingCount++;
+                                    const existingData = snapshot.val();
+                                    const existingKey = Object.keys(existingData)[0];
+
+                                    // Comprobar si los valores son diferentes y actualizar si es necesario
+                                    const existingSeguimiento = existingData[existingKey].numero_de_seguimiento;
+                                    const existingMedioEnvio = existingData[existingKey].medio_de_envio;
+                                    const existingEstadoEnvio = existingData[existingKey].estado_del_envio;
+
+                                    let needsUpdate = false;
+                                    const updates = {};
+
+                                    if (existingSeguimiento !== envioData.numero_de_seguimiento) {
+                                        updates.numero_de_seguimiento = envioData.numero_de_seguimiento;
+                                        needsUpdate = true;
+                                    }
+                                    if (existingMedioEnvio !== envioData.medio_de_envio) {
+                                        updates.medio_de_envio = envioData.medio_de_envio;
+                                        needsUpdate = true;
+                                    }
+                                    if (existingEstadoEnvio !== envioData.estado_del_envio) {
+                                        updates.estado_del_envio = envioData.estado_del_envio;
+                                        needsUpdate = true;
+                                    }
+
+                                    if (needsUpdate) {
+                                        if (envioData.estado_del_envio === "entregado") {
+                                            updates.marcaEntregado = "Si";
+                                        }
+                                        if (envioData.estado_del_envio !== "sin despachar") {
+                                            updates.marcaPreparado = "Si";
+                                        }
+
+                                        return envioRef.child(existingKey).update(updates).then(() => {
+                                            changedInfo++;
+                                        });
+                                    }
+                                }
+                            }).catch(error => {
+                                console.error('Error al verificar existencia en Firebase:', error);
+                            })
+                        );
+                    } else {
+                        skippedCount++;
+                    }
+                });
+
+                Promise.all(promises)
+                    .then(() => {
+                        spinner2.style.display = "none";
+                        Swal.fire({
+                            title: 'Importación completada',
+                            html: `
+                                <div style="text-align: left; font-size: 1.1em;">
+                                    <p><span class="counter2 imported">${importedCount}</span> Ventas importadas a la base de datos.</p>
+                                    <p><span class="counter2 existing">${existingCount}</span> Ya se encontraban en planilla.</p>
+                                    <p><span class="counter2 skipped">${skippedCount}</span> Registros omitidos por estar vacíos.</p>
+                                    <p><span class="counter2 changed">${changedInfo}</span> Registros de envíos actualizados.</p>
+                                </div>
+                            `,
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                popup: 'ios-style-popup',
+                                title: 'ios-style-title',
+                                content: 'ios-style-content',
+                                confirmButton: 'ios-style-confirm-button'
+                            }
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        spinner2.style.display = "none";
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Ocurrió un error al importar los datos',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                popup: 'ios-style-popup',
+                                title: 'ios-style-title',
+                                content: 'ios-style-content',
+                                confirmButton: 'ios-style-confirm-button'
+                            }
+                        });
+                    });
+            }
+        });
     }
 });
+// FIN IMPORTAR CSV
 
 // Función para sanitizar cabeceras
 function sanitizeHeader(header) {
-    return header.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[.#$\/\[\]]/g, ''); // Eliminar acentos y caracteres no permitidos
+    return header.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[.#$\/\[\]]/g, '');
 }
 
 // Función para sanitizar valores
 function sanitizeValue(value) {
-    return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); // Eliminar acentos y convertir a minúsculas
+    return value ? value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : ''; // Verificar que el valor no sea undefined
+}
+
+// Función para formatear la fecha (LOCAL)
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
 }
 
 function capitalizeWords(str) {
-    if (!str) return ''; // Retornar cadena vacía si str es undefined o null
+    if (!str) return '';
     return str
         .toLowerCase()
         .split(' ')
@@ -459,7 +565,7 @@ function capitalizeWords(str) {
 }
 
 function lowercaseWords(str) {
-    return str ? str.toLowerCase() : ''; // Retornar cadena vacía si str es undefined o null
+    return str ? str.toLowerCase() : '';
 }
 
 // CARGAR PRECIOS Y STOCK
@@ -685,7 +791,15 @@ async function loadEnviosFromFirebase() {
 
 // Función para obtener la URL
 function getOrderUrl(ordenPublica) {
-    const shopCode = ordenPublica.split('-').pop(); // Obtener los últimos 4 dígitos
+    let shopCode;
+
+    // Si comienza con "bpr", usar código 6572
+    if (ordenPublica.toLowerCase().startsWith('bpr')) {
+        shopCode = "6572";
+    } else {
+        shopCode = ordenPublica.split('-').pop(); // Obtener los últimos 4 dígitos
+    }
+
     switch (shopCode) {
         case "2941":
             return `https://api.avenida.com/manage/shops/2941/orders/${ordenPublica}`;
@@ -697,6 +811,8 @@ function getOrderUrl(ordenPublica) {
             return `https://api-macro.avenida.com/manage/shops/1914/orders/${ordenPublica}`;
         case "1915":
             return `https://api-macro.avenida.com/manage/shops/1915/orders/${ordenPublica}`;
+        case "6572":
+            return `https://novogar252.myvtex.com/admin/orders`;
         default:
             return '#'; // URL por defecto si no coincide
     }
@@ -847,19 +963,25 @@ const cpsPlaceIt = [
     const ahora = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" });
     const fechaActual = new Date(ahora);
 
-    const getShopImage = (shopCode) => {
-        switch (shopCode) {
-            case "2941":
-            case "2942":
-            case "2943":
-                return '<img id="TiendaBNA" src="./Img/bna-logo.png" alt="BNA">';
-            case "1914":
-            case "1915":
-                return '<img id="TiendaMacro" src="./Img/premia-logo.png" alt="Macro">';
-            default:
-                return '';
-        }
-    };
+const getShopImage = (ordenPublica) => {
+    if (typeof ordenPublica === 'string' && ordenPublica.toLowerCase().startsWith('bpr')) {
+        return '<img id="TiendaBapro" src="./Img/bapro-logo.png" alt="BaPro">';
+    }
+
+    const shopCode = ordenPublica.split('-').pop();
+
+    switch (shopCode) {
+        case "2941":
+        case "2942":
+        case "2943":
+            return '<img id="TiendaBNA" src="./Img/bna-logo.png" alt="BNA">';
+        case "1914":
+        case "1915":
+            return '<img id="TiendaMacro" src="./Img/premia-logo.png" alt="Macro">';
+        default:
+            return '';
+    }
+};
 
     for (let i = startIndex; i < endIndex; i++) {
         const card = document.createElement('div');
@@ -914,24 +1036,37 @@ const cpsPlaceIt = [
 
         const precioVenta = parseFloat(data[i].precio_venta * data[i].cantidad);
         const montoCobrado = parseFloat(data[i].monto_cobrado);
-        const equivalencia_puntos_pesos = parseFloat(data[i].equivalencia_puntos_pesos);
+        const equivalencia_puntos_pesos = parseFloat(data[i].equivalencia_puntos_pesos) || 0;
 
         const total = (precioVenta + montoCobrado) - equivalencia_puntos_pesos;
         const puntosBna = (data[i].equivalencia_puntos_pesos);
 
-        const shopCode = data[i].orden_publica_.split('-').pop();
-        const shopImage = getShopImage(shopCode);
+        const ordenPublica2 = data[i].orden_publica_;
+        const shopImage = getShopImage(ordenPublica2);
 
         // Verificar si el SKU está incluido en el listado
         const isSkuIncluded = skusList.includes(data[i].sku);
         const isSkuIncludedPlaceIt = skusPlaceItList.includes(data[i].sku);
 
-        const storeCode = data[i].orden_publica_.split('-').pop();
+        // Determinar el storeCode
+        let storeCode;
+
+        if (data[i].orden_publica_.toLowerCase().startsWith('bpr')) {
+            storeCode = "6573"; // Bapro
+        } else {
+            storeCode = data[i].orden_publica_.split('-').pop();
+        }
 
         // Función para verificar si el storeCode es de Macro
         const isMacro = (storeCode) => {
             const macroCodes = ["1914", "1915"];
             return macroCodes.includes(storeCode);
+        };
+
+        // Función para verificar si el storeCode es de Bapro
+        const isBaPro = (storeCode) => {
+            const baproCodes = ["6573"];
+            return baproCodes.includes(storeCode);
         };
 
         // Función para verificar si el storeCode es de BNA
@@ -940,7 +1075,14 @@ const cpsPlaceIt = [
             return bnaCodes.includes(storeCode);
         };
 
-        const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'card-body-macro' : '';
+        // Asignar la clase correspondiente según el storeCode
+        const cardBodyClass = isBNA(storeCode)
+            ? 'card-body-bna'
+            : isMacro(storeCode)
+            ? 'card-body-macro'
+            : isBaPro(storeCode)
+            ? 'card-body-bapro'
+            : '';
 
         // VERIFICAR STOCK Y PRECIO
         // Función para sanitizar el SKU
@@ -1005,6 +1147,12 @@ const cpsPlaceIt = [
         </div>
         `;
         // FIN VERIFICAR STOCK Y PRECIO
+
+    const palabras = data[i].nombre.trim().split(" ");
+    const ultima = palabras.pop();
+    const resto = palabras.join(" ");
+    const nombreFormateadoTV = `${resto} <span class="ultima-palabra">${ultima}</span>`;
+
 
 // Agregar la tarjeta al contenedor
 const carritoContenido = data[i].carrito ? `
@@ -1452,6 +1600,9 @@ COMPRA CON USO DE PUNTOS BNA
                     <div class="card-body ${cardBodyClass}">
 
 <div class="${(() => {
+    const orden = data[i].orden_publica_.toLowerCase();
+    if (orden.startsWith('bpr')) return 'em-circle-state7';
+
     const shopCode = data[i].orden_publica_.split('-').pop(); 
     switch (shopCode) {
         case "2941":
@@ -1461,11 +1612,17 @@ COMPRA CON USO DE PUNTOS BNA
         case "1914":
         case "1915":
             return 'em-circle-state6';
+        case "6572":
+        case "6573":
+            return 'em-circle-state7';
         default:
             return 'em-circle-state-unknown'; 
     }
 })()}">
     ${(() => {
+        const orden = data[i].orden_publica_.toLowerCase();
+        if (orden.startsWith('bpr')) return 'BaPro Compras';
+
         const shopCode = data[i].orden_publica_.split('-').pop(); 
         switch (shopCode) {
             case "2941":
@@ -1493,7 +1650,7 @@ COMPRA CON USO DE PUNTOS BNA
                             <button class="btn-delete-bna btn btn-outline-danger" onclick="eliminarNodo('${data[i].id}')"><i class="bi bi-trash3-fill"></i></button>
 
                             <div class="em-state-bna">${shopImage}</div>
-                            <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
+                            <h5 class="card-title">${nombreFormateadoTV}</h5>
                             <div class="d-flex align-items-center">
                             
 
@@ -1594,7 +1751,9 @@ COMPRA CON USO DE PUNTOS BNA
         <i class="bi bi-clipboard"></i>
     </button>
 
+    <div class="contenedorPrompter">
     <p class="orden mx-2">${data[i].remito}</p>
+    </div>
 
     <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3" 
         onclick="window.open(getOrderUrl('${data[i].orden_publica_}'), '_blank');">
@@ -1732,7 +1891,7 @@ COMPRA CON USO DE PUNTOS BNA
                                 <div class="${isMacro(storeCode) ? '' : 'hidden'}" style="background-color: #f0f0f5; border-radius: 12px; padding: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; max-width: 400px; margin-bottom: 5px; border: 1px solid #d0d0d5; ">
                                     <h2 style="font-size: 20px; color: #333; margin-bottom: 15px;">Datos PayWay 💰</h2>
                                     <p class="card-text-pago" style="color: #333; margin: 10px 0;"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta.replace(/\D/g, '')}</p>
-                                    <p class="card-text-pago" style="color: #333; margin: 10px 0;"><strong>Código de Autorización:</strong> ${data[i].cod_aut}</p>
+                                    <p class="card-text-pago hidden" style="color: #333; margin: 10px 0;"><strong>Código de Autorización:</strong> ${data[i].cod_aut}</p>
                                 </div>
 
                                     <p class="card-text-pago"><strong>Entidad:</strong> ${(data[i].brand_name && data[i].brand_name !== '0') ? data[i].brand_name : data[i].marca_de_tarjeta || 'N/A'}</p>
@@ -2034,6 +2193,13 @@ COMPRA CON USO DE PUNTOS BNA
                 function cleanString(value) {
                     return value.replace(/["']/g, "");
                 } 
+
+                document.querySelectorAll('.orden').forEach(el => {
+                const texto = el.textContent.trim().toLowerCase();
+                if (texto.startsWith('bpr')) {
+                    el.classList.add('scroll');
+                }
+                });
 
 // Evento para manejar el cambio del switch "Preparación"
 document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', function() {
@@ -6252,7 +6418,7 @@ const spinnerBusqueda = document.getElementById('spinnerBusquedaAvanzada');
 
 subOrderInput.addEventListener('input', async function () {
     const value = subOrderInput.value.trim();
-    const validFormat = /^(\d+)(-\d+)*$/.test(value);
+    const validFormat = /^(\d+(-\d+)*)$|^(bpr-\d+(-\d+)+)$/i.test(value);
 
     if (!validFormat) return;
 

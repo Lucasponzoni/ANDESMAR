@@ -1729,6 +1729,10 @@ margin-bottom: -1rem;
     text-overflow: ellipsis;
 }
 
+.ultima-palabra {
+    font-weight: 700;
+}
+
 .card-title-meli {
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     text-transform: capitalize;
@@ -2022,11 +2026,34 @@ input[disabled] {
     margin-bottom: 8px;
 }
 
-.orden{
-    font-family: "Rubik", sans-serif;
-    font-size: x-large;
-    font-weight: 400;
-    margin: 0;
+.contenedorPrompter {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background: #fff; /* Opcional */
+}
+
+.orden {
+  display: inline-block;
+  white-space: nowrap;
+  font-family: "Rubik", sans-serif;
+  font-size: x-large;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* Animación solo si se le agrega la clase */
+.scroll {
+  animation: mover 6s linear infinite;
+}
+
+@keyframes mover {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .contenedorRemito{
@@ -2770,6 +2797,14 @@ div.card-body > p > i{
     background-repeat: no-repeat; 
 }
 
+.card-body-bapro {
+    border-radius: 15px;
+    background-image: url('./Img/bapro-premia-back2.png');
+    background-size: 100% auto; 
+    background-position: top; 
+    background-repeat: no-repeat; 
+}
+
 .trio-de-botones-container {
     overflow-x: auto;
     white-space: nowrap;
@@ -2781,45 +2816,84 @@ div.card-body > p > i{
 }
 
 .em-circle-state5 {
-    font-weight: 600;
     font-family: "Helvetica Neue", Arial, sans-serif;
-    font-size: 0.7rem; 
-    padding: 3px 8px; 
-    border-radius: 15px 0 15px 0; 
-    position: relative;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: rgb(255, 255, 255);
+    text-shadow: 0 0px 3px rgba(0, 0, 0, 0.553);
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 25px;
+    padding: 3px 8px;
+    border-radius: 15px 0 15px 0;
     width: fit-content;
     margin-bottom: -15px;
-    top: -20px; 
+    position: relative;
+    top: -20px;
     left: -20px;
-    right: -20px;
-    background-color: #007bffdd;
-    text-transform: uppercase;
-    color: white;
-    display: flex; 
-    align-items: flex-end; 
-    justify-content: center;
-    height: 25px; 
+
+    background: rgba(255, 255, 255, 0.25); 
+    backdrop-filter: blur(10px);          
+    -webkit-backdrop-filter: blur(10px);  
+    border: 1px solid rgba(255, 255, 255, 0.3); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
 }
 
 .em-circle-state6 {
-    font-weight: 600;
     font-family: "Helvetica Neue", Arial, sans-serif;
-    font-size: 0.7rem; 
-    padding: 3px 8px; 
-    border-radius: 15px 0 15px 0; 
-    position: relative;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: rgb(255, 255, 255);
+    text-shadow: 0 0px 3px rgba(0, 0, 0, 0.553);
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 25px;
+    padding: 3px 8px;
+    border-radius: 15px 0 15px 0;
     width: fit-content;
     margin-bottom: -15px;
-    top: -20px; 
+    position: relative;
+    top: -20px;
     left: -20px;
-    right: -20px;
-    background-color: #ff448e;
+
+    background: rgba(255, 255, 255, 0.25); 
+    backdrop-filter: blur(10px);          
+    -webkit-backdrop-filter: blur(10px);  
+    border: 1px solid rgba(255, 255, 255, 0.3); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+}
+
+.em-circle-state7 {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
     text-transform: uppercase;
-    color: white;
-    display: flex; 
-    align-items: flex-end; 
+    color: rgb(255, 255, 255);
+    text-shadow: 0 0px 3px rgba(0, 0, 0, 0.553);
+
+    display: flex;
+    align-items: flex-end;
     justify-content: center;
-    height: 25px; 
+    height: 25px;
+    padding: 3px 8px;
+    border-radius: 15px 0 15px 0;
+    width: fit-content;
+    margin-bottom: -15px;
+    position: relative;
+    top: -20px;
+    left: -20px;
+
+    background: rgba(255, 255, 255, 0.25); 
+    backdrop-filter: blur(10px);          
+    -webkit-backdrop-filter: blur(10px);  
+    border: 1px solid rgba(255, 255, 255, 0.3); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
 }
 
 .em-circle-state-unknown {
@@ -6862,13 +6936,13 @@ img.gray-filter {
 
 #fecha-tiendas-virtuales{
     position: relative;
-    padding: 20px 5px 2px 5px;
+    padding: 2px 5px 2px 5px;
     font-size: small;
     font-weight: 600 !important;
-    margin-bottom: -25px;
-    top: -25px;
+    margin-bottom: -10px;
+    top: -8px;
+    left: 15px;
     width: fit-content;
-    z-index: -1;
     border-radius: 0 0 10px 10px;
     color: white;
     border: solid 1px #007aff;
