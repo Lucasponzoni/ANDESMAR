@@ -7802,7 +7802,7 @@ img.gray-filter {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 10;
+    z-index: 1000;
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición suave para el transform y box-shadow */
 }
 
