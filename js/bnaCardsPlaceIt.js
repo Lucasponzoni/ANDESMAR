@@ -530,7 +530,15 @@ function loadEnviosFromFirebase() {
 
 // Función para obtener la URL
 function getOrderUrl(ordenPublica) {
-    const shopCode = ordenPublica.split('-').pop(); // Obtener los últimos 4 dígitos
+    let shopCode;
+
+    // Si comienza con "bpr", usar código 6572
+    if (ordenPublica.toLowerCase().startsWith('bpr')) {
+        shopCode = "6572";
+    } else {
+        shopCode = ordenPublica.split('-').pop(); // Obtener los últimos 4 dígitos
+    }
+
     switch (shopCode) {
         case "2941":
             return `https://api.avenida.com/manage/shops/2941/orders/${ordenPublica}`;
@@ -542,6 +550,8 @@ function getOrderUrl(ordenPublica) {
             return `https://api-macro.avenida.com/manage/shops/1914/orders/${ordenPublica}`;
         case "1915":
             return `https://api-macro.avenida.com/manage/shops/1915/orders/${ordenPublica}`;
+        case "6572":
+            return `https://novogar252.myvtex.com/admin/orders`;
         default:
             return '#'; // URL por defecto si no coincide
     }
@@ -627,19 +637,25 @@ const cpsCDS = [
     const ahora = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" });
     const fechaActual = new Date(ahora);
 
-    const getShopImage = (shopCode) => {
-        switch (shopCode) {
-            case "2941":
-            case "2942":
-            case "2943":
-                return '<img id="TiendaBNA" src="./Img/bna-logo.png" alt="BNA">';
-            case "1914":
-            case "1915":
-                return '<img id="TiendaMacro" src="./Img/premia-logo.png" alt="Macro">';
-            default:
-                return '';
-        }
-    };
+const getShopImage = (ordenPublica) => {
+    if (typeof ordenPublica === 'string' && ordenPublica.toLowerCase().startsWith('bpr')) {
+        return '<img id="TiendaBapro" src="./Img/bapro-logo.png" alt="BaPro">';
+    }
+
+    const shopCode = ordenPublica.split('-').pop();
+
+    switch (shopCode) {
+        case "2941":
+        case "2942":
+        case "2943":
+            return '<img id="TiendaBNA" src="./Img/bna-logo.png" alt="BNA">';
+        case "1914":
+        case "1915":
+            return '<img id="TiendaMacro" src="./Img/premia-logo.png" alt="Macro">';
+        default:
+            return '';
+    }
+};
 
     for (let i = startIndex; i < endIndex; i++) {
         const card = document.createElement('div');
@@ -700,7 +716,7 @@ const cpsCDS = [
         const total = (precioVenta * cantidad) + montoCobrado - equivalencia_puntos_pesos;
         const puntosBna = (data[i].equivalencia_puntos_pesos);
 
-        const shopCode = data[i].orden_publica_.split('-').pop();
+        const shopCode = data[i].orden_publica_;
         const shopImage = getShopImage(shopCode);
 
         // Agregar la tarjeta al contenedor
@@ -717,24 +733,49 @@ const descuentoContenido = data[i].equivalencia_puntos_pesos > 0 ? `
 COMPRA CON USO DE PUNTOS BNA
 </p>` : '';
 
+const palabras = data[i].nombre.trim().split(" ");
+const ultima = palabras.pop();
+const resto = palabras.join(" ");
+const nombreFormateadoTV = `${resto} <span class="ultima-palabra">${ultima}</span>`;
+
 // Verificar si el SKU está incluido en el listado
 const isSkuIncluded = skusList.includes(data[i].sku);
 
-const storeCode = data[i].orden_publica_.split('-').pop();
+        // Determinar el storeCode
+        let storeCode;
 
-// Función para verificar si el storeCode es de Macro
-const isMacro = (storeCode) => {
-    const macroCodes = ["1914", "1915"];
-    return macroCodes.includes(storeCode);
-};
+        if (data[i].orden_publica_.toLowerCase().startsWith('bpr')) {
+            storeCode = "6573"; // Bapro
+        } else {
+            storeCode = data[i].orden_publica_.split('-').pop();
+        }
 
-// Función para verificar si el storeCode es de BNA
-const isBNA = (storeCode) => {
-    const bnaCodes = ["2941", "2942", "2943"];
-    return bnaCodes.includes(storeCode);
-};
+        // Función para verificar si el storeCode es de Macro
+        const isMacro = (storeCode) => {
+            const macroCodes = ["1914", "1915"];
+            return macroCodes.includes(storeCode);
+        };
 
-const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'card-body-macro' : '';
+        // Función para verificar si el storeCode es de Bapro
+        const isBaPro = (storeCode) => {
+            const baproCodes = ["6573"];
+            return baproCodes.includes(storeCode);
+        };
+
+        // Función para verificar si el storeCode es de BNA
+        const isBNA = (storeCode) => {
+            const bnaCodes = ["2941", "2942", "2943"];
+            return bnaCodes.includes(storeCode);
+        };
+
+        // Asignar la clase correspondiente según el storeCode
+        const cardBodyClass = isBNA(storeCode)
+            ? 'card-body-bna'
+            : isMacro(storeCode)
+            ? 'card-body-macro'
+            : isBaPro(storeCode)
+            ? 'card-body-bapro'
+            : '';
         
         // Agregar la tarjeta al contenedor
         cardsContainer.appendChild(card);
@@ -1131,6 +1172,9 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                         <div class="card-body ${cardBodyClass}">
 
 <div class="${(() => {
+    const orden = data[i].orden_publica_.toLowerCase();
+    if (orden.startsWith('bpr')) return 'em-circle-state7';
+
     const shopCode = data[i].orden_publica_.split('-').pop(); 
     switch (shopCode) {
         case "2941":
@@ -1140,11 +1184,17 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
         case "1914":
         case "1915":
             return 'em-circle-state6';
+        case "6572":
+        case "6573":
+            return 'em-circle-state7';
         default:
             return 'em-circle-state-unknown'; 
     }
 })()}">
     ${(() => {
+        const orden = data[i].orden_publica_.toLowerCase();
+        if (orden.startsWith('bpr')) return 'BaPro Compras';
+
         const shopCode = data[i].orden_publica_.split('-').pop(); 
         switch (shopCode) {
             case "2941":
@@ -1172,7 +1222,7 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                             <button class="btn-delete-bna btn btn-outline-danger hidden" onclick="eliminarNodo('${data[i].id}')"><i class="bi bi-trash3-fill"></i></button>
 
                             <div class="em-state-bna">${shopImage}</div>
-                            <h5 class="card-title"><i class="bi bi-person-bounding-box"></i> ${data[i].nombre}</h5>
+                            <h5 class="card-title">${nombreFormateadoTV}</h5>
                             <div class="d-flex align-items-center">
                             
 
@@ -1256,7 +1306,9 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
         <i class="bi bi-clipboard"></i>
     </button>
 
+    <div class="contenedorPrompter">
     <p class="orden mx-2">${data[i].remito}</p>
+    </div>
 
     <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3 disabled" 
         onclick="window.open(getOrderUrl('${data[i].orden_publica_}'), '_blank');">
@@ -1628,6 +1680,13 @@ const cardBodyClass = isBNA(shopCode) ? 'card-body-bna' : isMacro(shopCode) ? 'c
                 function cleanString(value) {
                     return value.replace(/["']/g, "");
                 } 
+
+                document.querySelectorAll('.orden').forEach(el => {
+                const texto = el.textContent.trim().toLowerCase();
+                if (texto.startsWith('bpr')) {
+                    el.classList.add('scroll');
+                }
+                });
 
 // Evento para manejar el cambio del switch "Preparación"
 document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', function() {

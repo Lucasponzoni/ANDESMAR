@@ -2787,6 +2787,7 @@ div.card-body > p > i{
     background-size: 100% auto; 
     background-position: top; 
     background-repeat: no-repeat; 
+    background-color: white;
 }
 
 .card-body-macro {
@@ -2794,7 +2795,8 @@ div.card-body > p > i{
     background-image: url('./Img/macro-premia-back.png');
     background-size: 100% auto; 
     background-position: top; 
-    background-repeat: no-repeat; 
+    background-repeat: no-repeat;
+    background-color: white; 
 }
 
 .card-body-bapro {
@@ -2803,6 +2805,7 @@ div.card-body > p > i{
     background-size: 100% auto; 
     background-position: top; 
     background-repeat: no-repeat; 
+    background-color: white;
 }
 
 .trio-de-botones-container {
