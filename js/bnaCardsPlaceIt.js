@@ -417,6 +417,8 @@ function loadEnviosFromFirebase() {
                         telefono_facturacion: data.telefono_facturacion,
                         email: lowercaseWords(data.email),
                         remito: data.orden_,
+                        sequence: data.sequence,
+                        order: data.order,
                         carrito: data.carritoCompra2,
                         diaPlaceIt: data.diaPlaceIt,
                         observaciones: data.observaciones,
@@ -776,6 +778,15 @@ const isSkuIncluded = skusList.includes(data[i].sku);
             : isBaPro(storeCode)
             ? 'card-body-bapro'
             : '';
+
+    let remito;
+    const ordenFull = data[i].orden_publica_.toLowerCase();
+
+    if (ordenFull.startsWith('bpr')) {
+        remito = data[i].sequence;
+    } else {
+        remito = data[i].remito;
+    }
         
         // Agregar la tarjeta al contenedor
         cardsContainer.appendChild(card);
@@ -1307,7 +1318,7 @@ const isSkuIncluded = skusList.includes(data[i].sku);
     </button>
 
     <div class="contenedorPrompter">
-    <p class="orden mx-2">${data[i].remito}</p>
+    <p class="orden mx-2">${remito}</p>
     </div>
 
     <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3 disabled" 
@@ -1316,6 +1327,23 @@ const isSkuIncluded = skusList.includes(data[i].sku);
     </button>
 
 </div>
+
+${data[i].order ? `
+<div class="ordenBaPro d-flex justify-content-center align-items-center">
+  <p class="mb-0 me-2">${data[i].order}</p>
+  <i class="bi bi-clipboard" style="cursor: pointer;" 
+     onclick="navigator.clipboard.writeText('${data[i].order}').then(() => {
+       const icon = this;
+       icon.classList.remove('bi-clipboard');
+       icon.classList.add('bi-clipboard-fill');
+       setTimeout(() => {
+         icon.classList.remove('bi-clipboard-fill');
+         icon.classList.add('bi-clipboard');
+       }, 5000);
+     });">
+  </i>
+</div>
+` : `<p class="ordenBaPro hidden"></p>`}
     
                             <!-- Seguimiento -->
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">

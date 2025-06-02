@@ -676,6 +676,9 @@ async function loadEnviosFromFirebase() {
                         telefono_facturacion: data.telefono_facturacion,
                         email: lowercaseWords(data.email),
                         remito: data.orden_,
+                        sequence: data.sequence,
+                        order: data.order,
+                        reference: data.reference,
                         carrito: data.carritoCompra2,
                         diaPlaceIt: data.diaPlaceIt,
                         observaciones: data.observaciones,
@@ -812,7 +815,7 @@ function getOrderUrl(ordenPublica) {
         case "1915":
             return `https://api-macro.avenida.com/manage/shops/1915/orders/${ordenPublica}`;
         case "6572":
-            return `https://novogar252.myvtex.com/admin/orders`;
+            return `https://novogar252.myvtex.com/admin/orders/${ordenPublica}`;
         default:
             return '#'; // URL por defecto si no coincide
     }
@@ -1030,16 +1033,15 @@ const getShopImage = (ordenPublica) => {
         card.appendChild(mensajeElement);
 
         const direccionEnvio = data[i].direccion;
-        const ordenPublica = data[i].orden_publica.replace(/-/g, '');
+        const ordenPublica = data[i].orden_publica.replace(/bpr/g, '').replace(/-/g, '');
         const cupon = ordenPublica.substring(0, 13); 
-        const autorizacion = ordenPublica.substring(ordenPublica.length - 4); 
 
         const precioVenta = parseFloat(data[i].precio_venta * data[i].cantidad);
         const montoCobrado = parseFloat(data[i].monto_cobrado);
         const equivalencia_puntos_pesos = parseFloat(data[i].equivalencia_puntos_pesos) || 0;
 
         const total = (precioVenta + montoCobrado) - equivalencia_puntos_pesos;
-        const puntosBna = (data[i].equivalencia_puntos_pesos);
+        const puntosBna = (data[i].equivalencia_puntos_pesos !== undefined) ? data[i].equivalencia_puntos_pesos : 0;
 
         const ordenPublica2 = data[i].orden_publica_;
         const shopImage = getShopImage(ordenPublica2);
@@ -1052,7 +1054,7 @@ const getShopImage = (ordenPublica) => {
         let storeCode;
 
         if (data[i].orden_publica_.toLowerCase().startsWith('bpr')) {
-            storeCode = "6573"; // Bapro
+            storeCode = "6572"; // Bapro
         } else {
             storeCode = data[i].orden_publica_.split('-').pop();
         }
@@ -1065,7 +1067,7 @@ const getShopImage = (ordenPublica) => {
 
         // Función para verificar si el storeCode es de Bapro
         const isBaPro = (storeCode) => {
-            const baproCodes = ["6573"];
+            const baproCodes = ["6572"];
             return baproCodes.includes(storeCode);
         };
 
@@ -1153,7 +1155,6 @@ const getShopImage = (ordenPublica) => {
     const resto = palabras.join(" ");
     const nombreFormateadoTV = `${resto} <span class="ultima-palabra">${ultima}</span>`;
 
-
 // Agregar la tarjeta al contenedor
 const carritoContenido = data[i].carrito ? `
     <p class="carrito">
@@ -1207,6 +1208,15 @@ const descuentoContenido = data[i].equivalencia_puntos_pesos > 0 ? `
 <i class="bi bi-award-fill puntos-icon"></i>
 COMPRA CON USO DE PUNTOS BNA
 </p>` : '';
+
+    let remito;
+    const ordenFull = data[i].orden_publica_.toLowerCase();
+
+    if (ordenFull.startsWith('bpr')) {
+        remito = data[i].sequence;
+    } else {
+        remito = data[i].remito;
+    }
         
         // Agregar la tarjeta al contenedor
         cardsContainer.appendChild(card);
@@ -1239,10 +1249,12 @@ COMPRA CON USO DE PUNTOS BNA
                             </div>
                         </div>
                         <div class="row mb-2">
-                            <div class="col">
-                                <label for="metodo_pago_${data[i].id}">Método de Pago:</label>
-                                <input type="text" id="metodo_pago_${data[i].id}" value="${isMacro(storeCode) ? 'TIENDA BANCO MACRO' : 'BNA TIENDA BANCO NACION'}" disabled>
-                            </div>
+                        <div class="col">
+                            <label for="metodo_pago_${data[i].id}">Método de Pago:</label>
+                            <input type="text" id="metodo_pago_${data[i].id}" 
+                                value="${isBaPro(storeCode) ? 'TIENDA BCO PROVINCIA' : (isMacro(storeCode) ? 'TIENDA BANCO MACRO' : 'BNA TIENDA BANCO NACION')}" 
+                                disabled>
+                        </div>
                             <div class="col">
                                 <label for="numero_lote_${data[i].id}">Número de Lote:</label>
                                 <input type="text" id="numero_lote_${data[i].id}" value="11" disabled>
@@ -1255,7 +1267,7 @@ COMPRA CON USO DE PUNTOS BNA
                             </div>
                             <div class="col">
                                 <label for="cod_autorizacion_${data[i].id}">Código de Autorización:</label>
-                                <input type="text" id="cod_autorizacion_${data[i].id}" value="${autorizacion}" disabled>
+                                <input type="text" id="cod_autorizacion_${data[i].id}" value="${data[i].numeros_tarjeta.replace(/\D/g, '')}" disabled>
                             </div>
                         </div>
                         <div class="row mb-2">
@@ -1265,7 +1277,7 @@ COMPRA CON USO DE PUNTOS BNA
                             </div>
                             <div class="col">
                                 <label for="codigo_pago_${data[i].id}">Código de Pago:</label>
-                                <input type="text" id="codigo_pago_${data[i].id}" value="${data[i].remito}" disabled>
+                                <input type="text" id="codigo_pago_${data[i].id}" value="${data[i].remito.replace(/bpr/g, '').replace(/-/g, '')}" disabled>
                             </div>
                         </div>
                         <div class="row mb-2">
@@ -1273,10 +1285,12 @@ COMPRA CON USO DE PUNTOS BNA
                                 <label for="cuotas_${data[i].id}">Cuotas:</label>
                                 <input type="text" id="cuotas_${data[i].id}" value="${(data[i].cuotas && data[i].cuotas !== '0') ? data[i].cuotas : data[i].nro_de_cuotas}" disabled>
                             </div>
-                            <div class="col">
-                                <label for="banco_${data[i].id}">Banco:</label>
-                                <input type="text" id="banco_${data[i].id}" value="${isMacro(storeCode) ? 'BANCO MACRO' : 'BANCO NACION'}" disabled>
-                            </div>
+                        <div class="col">
+                            <label for="banco_${data[i].id}">Banco:</label>
+                            <input type="text" id="banco_${data[i].id}" 
+                                value="${isBaPro(storeCode) ? 'BANCO PROVINCIA' : (isMacro(storeCode) ? 'BANCO MACRO' : 'BANCO NACION')}" 
+                                disabled>
+                        </div>
                         </div>
                         <div class="row mb-2">
                             <div class="col">
@@ -1354,10 +1368,12 @@ COMPRA CON USO DE PUNTOS BNA
                                 <label for="descuentos_${data[i].id}">Descuentos (Puntos):</label>
                                 <input type="text" id="descuentos_${data[i].id}" value="${puntosBna}" disabled>
                             </div>
-                            <div class="col">
-                                <label for="iva_${data[i].id}">IVA:</label>
-                                <input type="text" id="iva_${data[i].id}" value="${data[i].iva2}" disabled>
-                            </div>
+                        <div class="col">
+                            <label for="iva_${data[i].id}">IVA:</label>
+                            <input type="text" id="iva_${data[i].id}" 
+                                value="${data[i].iva2 !== undefined ? data[i].iva2 : '21.00%'}" 
+                                disabled>
+                        </div>
                         </div>
                         <div class="row align-items-center mb-2">
                             <div class="col">
@@ -1544,10 +1560,14 @@ COMPRA CON USO DE PUNTOS BNA
                                 </div>
                             </div>
                             <div class="row mb-2">
-                                <div class="col">
-                                    <label for="otros_comentarios_entrega_${data[i].id}">Otros Comentarios de Entrega:</label>
-                                    <input type="text" id="otros_comentarios_entrega_${data[i].id}" value="${isMacro(storeCode) ? 'GUIA OCA: ' + data[i].numeroSeguimiento : (data[i].otros_comentarios_entrega !== undefined ? data[i].otros_comentarios_entrega : `Coordinar a Línea ${data[i].telefono}`)}" disabled>
-                                </div>
+                            <div class="col">
+                                <label for="otros_comentarios_entrega_${data[i].id}">Otros Comentarios de Entrega:</label>
+                                <input type="text" id="otros_comentarios_entrega_${data[i].id}" 
+                                    value="${isBaPro(storeCode) ? `Orden: ${data[i].order} - Coordinar a Línea ${data[i].telefono}, Notas: ${data[i].reference !== undefined ? data[i].reference : 'sin notas'}` : 
+                                            (isMacro(storeCode) ? 'GUIA OCA: ' + data[i].numeroSeguimiento : 
+                                            (data[i].otros_comentarios_entrega !== undefined ? data[i].otros_comentarios_entrega : `Coordinar a Línea ${data[i].telefono}`))}" 
+                                    disabled>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -1752,7 +1772,7 @@ COMPRA CON USO DE PUNTOS BNA
     </button>
 
     <div class="contenedorPrompter">
-    <p class="orden mx-2">${data[i].remito}</p>
+    <p class="orden mx-2">${remito}</p>
     </div>
 
     <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3" 
@@ -1763,7 +1783,24 @@ COMPRA CON USO DE PUNTOS BNA
 </div>
 
     ${tooltip}
-                            
+
+${data[i].order ? `
+<div class="ordenBaPro d-flex justify-content-center align-items-center">
+  <p class="mb-0 me-2">${data[i].order}</p>
+  <i class="bi bi-clipboard" style="cursor: pointer;" 
+     onclick="navigator.clipboard.writeText('${data[i].order}').then(() => {
+       const icon = this;
+       icon.classList.remove('bi-clipboard');
+       icon.classList.add('bi-clipboard-fill');
+       setTimeout(() => {
+         icon.classList.remove('bi-clipboard-fill');
+         icon.classList.add('bi-clipboard');
+       }, 5000);
+     });">
+  </i>
+</div>
+` : `<p class="ordenBaPro hidden"></p>`}
+
                             <!-- Seguimiento -->
                             <p class="numeroDeEnvioGeneradoBNA" id="numeroDeEnvioGeneradoBNA${data[i].id}">
                                 ${isLogPlaceIt ? 
@@ -1948,9 +1985,9 @@ COMPRA CON USO DE PUNTOS BNA
                             <div class="text-center">
                             <strong class="text-primary">AUTORIZACION:</strong>
                             <div class="d-flex justify-content-center align-items-center">
-                            <span class="me-2">${autorizacion}</span>
+                            <span class="me-2">${data[i].numeros_tarjeta.replace(/\D/g, '')}</span>
                             
-                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${autorizacion}')">
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].numeros_tarjeta.replace(/\D/g, '')}')">
                             <i class="bi bi-clipboard"></i>
                             </button>
 
@@ -6496,6 +6533,9 @@ async function loadEnviosFromFirebaseAvanzado(subOrderValue) {
                     telefono_facturacion: data.telefono_facturacion,
                     email: lowercaseWords(data.email),
                     remito: data.orden_,
+                    sequence: data.sequence,
+                    order: data.order,
+                    reference: data.reference,
                     carrito: data.carritoCompra2,
                     diaPlaceIt: data.diaPlaceIt,
                     observaciones: data.observaciones,

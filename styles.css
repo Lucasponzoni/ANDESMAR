@@ -737,15 +737,16 @@ button:hover {
     width: fit-content;
     text-align: center;
     padding: 8px;
-    margin-bottom: -5px;
+    padding-bottom: 3px;
+    margin-bottom: -1px;
     color: indigo;
     font-weight: 500;
     border-radius: 12px 12px 0 0;
     border: 1px solid #ccc;
+    border-bottom: none;
     background-color: rgb(231, 220, 255); 
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fuente de macOS */
     transition: background-color 0.3s ease, box-shadow 0.3s ease; 
-    z-index: -100;
 }
 
 .clientePosventa {
@@ -3251,6 +3252,21 @@ div.card-body > p > i{
     background-color: #ecf0f1; 
     border: 1px solid #bdc3c7; 
     padding: 12px 16px; 
+    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.1); 
+    transition: background-color 0.3s, box-shadow 0.3s; 
+}
+
+.ordenBaPro {
+    font-family: "Rubik", sans-serif;
+    font-weight: 600;
+    text-align: center;
+    color: #279e3a; 
+    margin-bottom: 0px;
+    border-right: 1px solid #bdc3c7;
+    border-left: 1px solid #bdc3c7;
+    border-top: 1px solid #bdc3c7;
+    padding: 6px 8px; 
+    background-color: #d9edd8;
     box-shadow: 0 0px 8px rgba(0, 0, 0, 0.1); 
     transition: background-color 0.3s, box-shadow 0.3s; 
 }
