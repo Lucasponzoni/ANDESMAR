@@ -595,15 +595,17 @@ function loadTable(data, estadoFilter = null) {
                 // Verifica el estado de manera segura
                 if (operation.client && operation.client.billing_info && Array.isArray(operation.client.billing_info.additional_info)) {
                     const stateName = operation.client.billing_info.additional_info.find(info => info.type === "STATE_NAME")?.value;
+                    const stateName2 = operation.Provincia;
 
                     // Verifica si el SKU está en la lista de Firebase y si el Cp está en cpsPlaceIt
                     const isSkuInList = skusPlaceItList.includes(operation.SKU);
                     const isCpInCpsPlaceIt = cpsPlaceIt.includes(Number(operation.Cp)); // Asegúrate de comparar como número
 
-                    // Prioridad para "Jujuy" y "Kuegi" para el envío express
-                    if (["Jujuy", "Misiones", "Tierra del Fuego"].includes(stateName)) {
-                        shippingCell.innerHTML = `<strong class="alerta">⚠️ ${stateName.toUpperCase()}</strong>`;
-                    } else if (isSkuInList && isCpInCpsPlaceIt) {
+                    // Lista de estados para envío prohibido
+                    const estadosProhibidos = ["Jujuy", "Misiones", "Tierra del Fuego"];
+
+                    if (estadosProhibidos.includes(stateName) || estadosProhibidos.includes(stateName2)) {
+                        shippingCell.innerHTML = `<strong class="alerta">⚠️ ${(stateName || stateName2).toUpperCase()}</strong>`;                    } else if (isSkuInList && isCpInCpsPlaceIt) {
                         shippingCell.innerHTML = `
                             <strong class="express-meli" style="color: yellow;">⚡ EXPRESS</strong><br>
                             <span class="express-meli-sub" style="font-size: smaller;">Condición: 40-60</span>
