@@ -605,7 +605,8 @@ function loadTable(data, estadoFilter = null) {
                     const estadosProhibidos = ["Jujuy", "Misiones", "Tierra del Fuego"];
 
                     if (estadosProhibidos.includes(stateName) || estadosProhibidos.includes(stateName2)) {
-                        shippingCell.innerHTML = `<strong class="alerta">⚠️ ${(stateName || stateName2).toUpperCase()}</strong>`;                    } else if (isSkuInList && isCpInCpsPlaceIt) {
+                        shippingCell.innerHTML = `<strong class="alerta">⚠️ ${(stateName || stateName2).toUpperCase()}</strong>`;                    
+                    } else if (isSkuInList && isCpInCpsPlaceIt) {
                         shippingCell.innerHTML = `
                             <strong class="express-meli" style="color: yellow;">⚡ EXPRESS</strong><br>
                             <span class="express-meli-sub" style="font-size: smaller;">Condición: 40-60</span>
