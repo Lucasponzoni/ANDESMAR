@@ -3505,8 +3505,8 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             const template = "emailTemplateAndesmar";
             const transporte = "Andesmar Cargas";
             const linkEtiqueta = `https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.NroPedido}`;
-            const linkSeguimiento = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}&tipo=remito&cod=`;
-            const linkSeguimiento2 = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}&tipo=remito&cod=`;
+            const linkSeguimiento = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}${concatenatedNumbers}&tipo=remito&cod=`;
+            const linkSeguimiento2 = `https://andesmarcargas.com/seguimiento.html?numero=BNA${remito}${concatenatedNumbers}&tipo=remito&cod=`;
 
             // Actualizar el texto del botón
             text.innerHTML = `<i class="bi bi-filetype-pdf"></i> Descargar ${data.NroPedido}`;
