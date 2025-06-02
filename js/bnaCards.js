@@ -1793,9 +1793,9 @@ ${data[i].order ? `
      onclick="navigator.clipboard.writeText('${data[i].order}').then(() => {
        const icon = this;
        icon.classList.remove('bi-clipboard');
-       icon.classList.add('bi-clipboard-fill');
+       icon.classList.add('bi bi-clipboard-check-fill');
        setTimeout(() => {
-         icon.classList.remove('bi-clipboard-fill');
+         icon.classList.remove('bi bi-clipboard-check-fill');
          icon.classList.add('bi-clipboard');
        }, 5000);
      });">
@@ -2413,7 +2413,9 @@ if (hasCancelado) {
         // Lógica del botón de copiar al portapapeles
         const copyButton = card.querySelector('.copy-btn');
         copyButton.addEventListener('click', () => {
-            navigator.clipboard.writeText(data[i].remito).then(() => {
+            const textToCopy = isBaPro(storeCode) ? data[i].sequence : data[i].remito;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
                 copyButton.innerHTML = '<i class="bi bi-clipboard-check-fill"></i>';
                 setTimeout(() => {
                     copyButton.innerHTML = '<i class="bi bi-clipboard"></i>';
