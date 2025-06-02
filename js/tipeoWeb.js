@@ -537,7 +537,7 @@ if (result.isConfirmed) {
                     }
 
                     // Generar y subir el Excel para obtener la URL de descarga
-                    const downloadURL = await generarYSubirExcel(logisticaActual);
+                    const downloadURL = await generarYSubirExcel(logisticaActual, nuevoCamion);
 
                     // Enviar correos electrónicos
                     const correos = await obtenerCorreosPorLogistica(logisticaActual);
@@ -662,7 +662,7 @@ async function enviarCorreoConDetalles(destinatarioEmail, nombreDestinatario, no
 }
 
 // FUNCIÓN PARA GENERAR Y SUBIR EXCEL A FIREBASE STORAGE
-async function generarYSubirExcel(logisticaActual) {
+async function generarYSubirExcel(logisticaActual, nuevoCamion) {
     try {
         const fechaHora = new Date();
 
@@ -797,7 +797,8 @@ async function generarYSubirExcel(logisticaActual) {
 
         // Subir a Firebase Storage
         const storageMeli = firebase.storage(appMeli); // Usa la instancia MELI
-        const fileRef = storageMeli.ref().child(`ExcelDespachos/${logisticaActual}_${new Date().toISOString().split('T')[0]}.xlsx`);        await fileRef.put(buffer);
+        const fileRef = storageMeli.ref().child(`ExcelDespachos/${logisticaActual}_${new Date().toISOString().split('T')[0]}_${nuevoCamion}.xlsx`);        
+        await fileRef.put(buffer);
         
         // Obtener URL de descarga
         const downloadURL = await fileRef.getDownloadURL();
@@ -2144,12 +2145,12 @@ function cargarYMostrarTabla(camion, fechaKey, logistica) {
             }[despacho.camion] || '';
 
             let seguimiento = despacho.seguimiento.startsWith('NIC-') 
-            ? despacho.seguimiento.slice(4) 
-            : despacho.seguimiento;
+                ? despacho.seguimiento.slice(4) 
+                : despacho.seguimiento;
 
             const etiqueta = despacho.camion === 'Cruz del Sur' 
-            ? `NIC-${seguimiento}` 
-            : seguimiento;
+                ? `NIC-${seguimiento}` 
+                : seguimiento;
 
             rowsHTML += `
                 <tr>
@@ -2185,18 +2186,22 @@ function cargarYMostrarTabla(camion, fechaKey, logistica) {
                     </td>
                 </tr>
             `;
-
-        console.log(despacho.info);
-
         });
 
         const tablaHTML = `
+            <div class="mb-4">
+                <button id="btnExcelDescarga" class="btn btn-success mb-3" disabled>
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Buscando Excel...
+                </button>
+                <div id="infoTransporte" class="bg-white p-4 rounded shadow-sm border" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial; font-size: 1.05rem;"></div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover table-striped">
-                    <thead>
+                    <thead class="table-dark">
                         <tr>
                             <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
-                            <th><i class="bi bi-truck"></i></th>
+                            <th><i class="bi bi-truck"></i> Transporte</th>
                             <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
                             <th><i class="bi bi-box-seam"></i> Bultos</th>
                             <th><i class="bi bi-receipt"></i> Remito</th>
@@ -2216,7 +2221,76 @@ function cargarYMostrarTabla(camion, fechaKey, logistica) {
             html: tablaHTML,
             width: '90%',
             customClass: 'swal-wide',
-            showCloseButton: true
+            showCloseButton: true,
+            didOpen: () => {
+                const btnExcel = document.getElementById('btnExcelDescarga');
+                const infoDiv = document.getElementById('infoTransporte');
+
+                const logisticaLimpia = logistica.replace(/^DespachosHistoricos_?/, '');
+                const nombreArchivo = `${logisticaLimpia}_${fechaKey}_${camion}.xlsx`;
+                const storageRef = storageMeli.ref().child(`ExcelDespachos/${nombreArchivo}`);
+
+                // Buscar Excel
+                storageRef.getDownloadURL()
+                    .then((url) => {
+                        btnExcel.innerHTML = `<i class="bi bi-file-earmark-excel-fill me-2"></i> Descargar Camión en EXCEL`;
+                        btnExcel.classList.add('btn-success');
+                        btnExcel.disabled = false;
+                        btnExcel.onclick = () => window.open(url, '_blank');
+                    })
+                    .catch((error) => {
+                        console.warn("Excel no disponible:", error);
+                        btnExcel.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> Excel No disponible ⚠️`;
+                        btnExcel.classList.remove('btn-success');
+                        btnExcel.classList.add('btn-danger');
+                        btnExcel.disabled = true;
+                    });
+
+                // Determinar ruta segura según logística
+                let rutaSeguro = '';
+                switch (logisticaLimpia) {
+                    case 'CruzdelSur':
+                        rutaSeguro = 'seguroCDS';
+                        break;
+                    case 'Oca':
+                        rutaSeguro = 'SeguroOca';
+                        break;
+                    case 'Andreani':
+                        rutaSeguro = 'seguroAndreani';
+                        break;
+                    case 'Andesmar':
+                        rutaSeguro = 'SeguroAndesmar';
+                        break;
+                    default:
+                        rutaSeguro = 'seguroDesconocido';
+                        break;
+                }
+
+                // Mostrar info del transporte
+                dbTipeo.ref(`${rutaSeguro}/${fechaKey}/${camion}`).once('value')
+                    .then(snapshot => {
+                        console.log(`${rutaSeguro}/${fechaKey}/${camion}`);
+                        const data = snapshot.val();
+                        if (!data) {
+                            infoDiv.innerHTML = `<div class="text-muted"><i class="bi bi-info-circle me-1"></i> Sin datos del transporte.</div>`;
+                            return;
+                        }
+
+                        const infoHTML = `
+                            <div class="transport-info-grid">
+                                <div><i class="bi bi-person-fill text-primary"></i> <strong>Transportista:</strong> ${data.nombreTransportista || '-'}</div>
+                                <div><i class="bi bi-card-text text-primary"></i> <strong>DNI:</strong> ${data.dniTransportista || '-'}</div>
+                                <div><i class="bi bi-truck-front text-success"></i> <strong>Camión:</strong> ${data.marcaCamion || '-'} - ${data.patenteCamion || '-'}</div>
+                                ${data.patenteChasis && data.marcaChasis ? `<div><i class="bi bi-car-front text-secondary"></i> <strong>Chasis:</strong> ${data.marcaChasis} - ${data.patenteChasis}</div>` : ''}
+                                <div><i class="bi bi-geo-alt-fill text-danger"></i> <strong>Planta:</strong> ${data.planta || '-'}</div>
+                                <div><i class="bi bi-stack text-warning"></i> <strong>Pallets:</strong> ${data.pallets || '0'}</div>
+                                <div><i class="bi bi-currency-dollar text-success"></i> <strong>Total:</strong> ${data.montoTotal || '0,00'}</div>
+                            </div>
+                        `;
+
+                        infoDiv.innerHTML = infoHTML;
+                    });
+            }
         });
     });
 }
