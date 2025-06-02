@@ -899,7 +899,9 @@ const isSkuIncluded = skusList.includes(data[i].sku);
         <div class="row mb-2">
             <div class="col">
                 <label for="codigo_promocion_${data[i].id}">Código Promoción:</label>
-                <input type="text" id="codigo_promocion_${data[i].id}" value="${isMacro(storeCode) ? '5001' : '5000'}" disabled>
+                <input type="text" id="codigo_promocion_${data[i].id}" 
+                    value="${isBaPro(storeCode) ? '5003' : (isMacro(storeCode) ? '5001' : '5000')}" 
+                    disabled>
             </div>
             <div class="col">
                 <label for="codigo_item_${data[i].id}">Código Item:</label>
