@@ -1793,9 +1793,9 @@ ${data[i].order ? `
      onclick="navigator.clipboard.writeText('${data[i].order}').then(() => {
        const icon = this;
        icon.classList.remove('bi-clipboard');
-       icon.classList.add('bi bi-clipboard-check-fill');
+       icon.classList.add('bi-clipboard-check-fill');
        setTimeout(() => {
-         icon.classList.remove('bi bi-clipboard-check-fill');
+         icon.classList.remove('bi-clipboard-check-fill');
          icon.classList.add('bi-clipboard');
        }, 5000);
      });">
