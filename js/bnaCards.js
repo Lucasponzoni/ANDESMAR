@@ -6324,7 +6324,8 @@ async function verificarMensajes() {
                     // Buscar en enviosBNA
                     const snapshotEnvios = await firebaseRefEnvios.once('value');
                     snapshotEnvios.forEach((envio) => {
-                        if (envio.val().orden_ === numero) {
+                        const data = envio.val();
+                        if (data.orden_ === numero || data.sequence === numero) {
                             envio.ref.child('errorSlack').set(true);
                             envio.ref.child('errorSlackMensaje').set(errorMensaje);
                         }
