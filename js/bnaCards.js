@@ -1483,10 +1483,10 @@ COMPRA CON USO DE PUNTOS BNA
                                 <label for="domicilio_fiscal_${data[i].id}">Domicilio Fiscal:</label>
                                 <input type="text" id="domicilio_fiscal_${data[i].id}" value="" placeholder="Completar en caso de factura A" disabled>
                             </div>
-                            <div class="col">
-                                <label for="email_${data[i].id}">Email:</label>
-                                <input type="text" id="email_${data[i].id}" value="${data[i].email}" disabled>
-                            </div>
+                        <div class="col">
+                            <label for="email_${data[i].id}">Email:</label>
+                            <input type="text" id="email_${data[i].id}" value="${isBaPro(storeCode) ? 'querynovogar@gmail.com' : data[i].email}" disabled>
+                        </div>
                         </div>
                         <div class="row mb-2">
                             <div class="col">
