@@ -8861,3 +8861,7 @@ mark {
     font-size: 1.1rem;
     line-height: 1.6;
 }
+
+.btn-seguro{
+    height: 47px !important;
+}

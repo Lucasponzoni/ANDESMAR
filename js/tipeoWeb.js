@@ -681,7 +681,6 @@ async function generarYSubirExcel(logisticaActual, nuevoCamion) {
         const headers = ['Fecha y hora', 'Transporte', 'Seguimiento', 'Bultos', 'Remito', 'Valor', 'Info'];
         worksheet.addRow(headers);
 
-        // Estilos (copiados de tu función original)
         const borderStyle = {
             top: { style: 'thin' },
             left: { style: 'thin' },
@@ -3704,3 +3703,283 @@ document.getElementById('btnBuscarInfoRemitos').addEventListener('click', async 
     }
 });
 // BUSCAR REMITO
+
+// REPORTE DE SEGURO
+$('#btnReporteSeguro').on('click', function () {
+    // Eliminar flatpickr anterior si existe
+    if($('#inputFlatpickrSeguro').data('flatpickr')) {
+        $('#inputFlatpickrSeguro').flatpickr().destroy();
+    }
+    flatpickr("#inputFlatpickrSeguro", {
+        mode: 'range',
+        dateFormat: 'Y-m-d',
+        maxDate: new Date(),
+        locale: 'es',
+        onClose: function (selectedDates) {
+            if (!selectedDates || selectedDates.length < 2) return;
+            const desde = selectedDates[0].toISOString().split('T')[0];
+            const hasta = selectedDates[1].toISOString().split('T')[0];
+
+            // Mostrar spinner y deshabilitar botón
+            $('#btnReporteSeguro').prop('disabled', true);
+            $('#spinnerSeguro').removeClass('d-none');
+            $('#iconoSeguro').addClass('d-none');
+            $('#textoSeguro').text('Generando excel...');
+
+            // Mostrar selector de logísticas
+            mostrarSelectorSeguros(desde, hasta);
+        }
+    });
+    $('#inputFlatpickrSeguro')[0]._flatpickr.open();
+});
+
+function mostrarSelectorSeguros(desde, hasta) {
+    Swal.fire({
+        title: 'Seleccioná las Logisticas',
+        html: `
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="seguroAndreani" checked>
+                <label class="form-check-label" for="seguroAndreani">Seguro Correo Andreani</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="seguroAndesmar" checked>
+                <label class="form-check-label" for="seguroAndesmar">Seguro Andesmar</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="seguroOca" checked>
+                <label class="form-check-label" for="seguroOca">Seguro Oca</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="seguroCruzdelSur" checked>
+                <label class="form-check-label" for="seguroCruzdelSur">Seguro Cruz del Sur</label>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Generar Excel',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+            return {
+                Andreani: $('#seguroAndreani').is(':checked'),
+                Andesmar: $('#seguroAndesmar').is(':checked'),
+                Oca: $('#seguroOca').is(':checked'),
+                CruzdelSur: $('#seguroCruzdelSur').is(':checked'),
+            }
+        }
+    }).then(result => {
+        if (result.isConfirmed) {
+            $('#inputFlatpickrSeguro').addClass('d-none');
+            const seleccionados = result.value;
+            generarReporteSeguro(desde, hasta, seleccionados);
+        } else {
+            // Si cancela, restaurar el botón y spinner
+            $('#btnReporteSeguro').prop('disabled', false);
+            $('#spinnerSeguro').addClass('d-none');
+            $('#iconoSeguro').removeClass('d-none');
+            $('#textoSeguro').text('Reporte de Seguro');
+        }
+    });
+}
+
+async function generarReporteSeguro(desde, hasta, seleccionados) {
+    const rutas = {
+        Andreani: { activo: seleccionados.Andreani, ruta: 'seguroAndreani' },
+        Andesmar: { activo: seleccionados.Andesmar, ruta: 'SeguroAndesmar' },
+        Oca: { activo: seleccionados.Oca, ruta: 'SeguroOca' },
+        CruzdelSur: { activo: seleccionados.CruzdelSur, ruta: 'seguroCDS' },
+    };
+
+    const fechas = [];
+    let fechaActual = new Date(desde);
+    const hastaDate = new Date(hasta);
+
+    // Generar array de fechas entre desde y hasta (inclusive)
+    while (fechaActual <= hastaDate) {
+        fechas.push(fechaActual.toISOString().split('T')[0]);
+        fechaActual.setDate(fechaActual.getDate() + 1);
+    }
+
+    // Acumulador de filas
+    let filas = [];
+
+    // Recorrer cada seguro seleccionado
+    for (const key in rutas) {
+        if (!rutas[key].activo) continue;
+        const rutaSeguro = rutas[key].ruta;
+
+        for (const fecha of fechas) {
+            // Leer camiones en esa fecha
+            const snapshot = await dbTipeo.ref(`${rutaSeguro}/${fecha}`).once('value');
+            if (!snapshot.exists()) continue;
+
+            snapshot.forEach(child => {
+                const data = child.val();
+                filas.push({
+                    fecha,
+                    nombreTransportista: (data.nombreTransportista || '').toUpperCase(),
+                    dniTransportista: (data.dniTransportista || '').toUpperCase(),
+                    marcaCamion: (data.marcaCamion || '').toUpperCase(),
+                    patenteCamion: (data.patenteCamion || '').toUpperCase(),
+                    marcaChasis: (data.marcaChasis || '').toUpperCase(),
+                    patenteChasis: (data.patenteChasis || '').toUpperCase(),
+                    viaje: (data.viaje || '').toUpperCase(),
+                    planta: (data.planta || '').toUpperCase(),
+                    claseDeMercaderia: (data.claseDeMercaderia || '').toUpperCase(),
+                    montoTotal: (data.montoTotal || '').toUpperCase(),
+                    logisticaActual: (key === 'CruzdelSur' ? 'Cruz del Sur' : key)
+                });
+            });
+        }
+    }
+
+    // Ordenar por fecha ascendente
+    filas.sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+    // Crear y descargar Excel
+    await descargarExcelSeguro(filas, desde, hasta);
+}
+
+async function descargarExcelSeguro(filas, desde, hasta) {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Reporte Seguro');
+
+    // Cabeceras
+    const headers = [
+        'CHOFER',
+        'CAMION MARCA Y PATENTE',
+        'ACOPLADO MARCA Y PATENTE',
+        'FECHA DE INICIO VIAJE',
+        'DESDE',
+        'LOGÍSTICA',
+        'MERCADERÍA ASEGURADA',
+        'SUMA ASEGURADA (VALOR DECLARADO)'
+    ];
+    sheet.addRow(headers);
+
+    // Filas de datos
+    filas.forEach(fila => {
+        sheet.addRow([
+            `${fila.nombreTransportista} ,DNI: ${fila.dniTransportista}`,
+            `${fila.marcaCamion} ${fila.patenteCamion}`,
+            `${fila.marcaChasis} ${fila.patenteChasis}`,
+            fila.fecha,
+            fila.viaje,
+            fila.planta, // <-- LOGÍSTICA VIENE DE PLANTA
+            fila.claseDeMercaderia,
+            fila.montoTotal
+        ]);
+    });
+
+    // ==== ESTILOS ====
+    // Bordes
+    const borderStyle = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+    };
+
+    // Cabecera: bold, gris, centrado, filtro, inmovilizada
+    const headerRow = sheet.getRow(1);
+    headerRow.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: 'FF000000' }, name: "Arial", size: 12 };
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFBFBFBF' }
+        };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = borderStyle;
+    });
+    headerRow.height = 25;
+
+    // Filtros y freeze
+    sheet.autoFilter = {
+        from: 'A1',
+        to: String.fromCharCode(65 + headers.length - 1) + '1'
+    };
+    sheet.views = [{ state: 'frozen', ySplit: 1 }];
+
+    // Filas de datos
+    for (let i = 0; i < filas.length; i++) {
+        const row = sheet.getRow(i + 2); // +2 porque la cabecera es la 1
+        row.height = 20;
+        row.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+
+        // Todas las celdas: bordes
+        row.eachCell(cell => {
+            cell.border = borderStyle;
+            cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+        });
+
+        // Celda F: pintar según logística (ahora usando PLANTA)
+        const logistica = (filas[i].planta || '').trim().toUpperCase();
+        let colorTransporte = 'FFFFFFFF';
+        if (logistica === 'ANDREANI') colorTransporte = 'FFFFE0E0';
+        else if (logistica === 'ANDESMAR') colorTransporte = 'FFB2EBF2';
+        else if (logistica === 'CRUZ DEL SUR' || logistica === 'CRUZDELSUR') colorTransporte = 'FF90CAF9';
+        else if (logistica === 'OCA') colorTransporte = 'FFE6E6FA';
+
+        // Celda F es la columna 6
+        row.getCell(6).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: colorTransporte }
+        };
+
+        row.getCell(4).font = { color: { argb: '0000' }, bold: true, name: 'Arial' };
+
+        // Celda H (SUMA ASEGURADA): verde y bold
+        row.getCell(8).font = { color: { argb: 'FF008000' }, bold: true, name: 'Arial' };
+    }
+
+    // Ajustar ancho de columnas automáticamente (cabecera y datos)
+    sheet.columns.forEach((column, i) => {
+        let maxLength = headers[i].length; // Empieza con la longitud de la cabecera
+        column.eachCell({ includeEmpty: true }, function(cell) {
+            let cellValue = cell.value ? cell.value.toString() : '';
+            maxLength = Math.max(maxLength, cellValue.length + 2);
+        });
+        column.width = maxLength;
+    });
+
+    // SUMATORIA TOTAL EN CELDA H (columna 8)
+    let total = 0;
+    for (let i = 0; i < filas.length; i++) {
+        // Suponiendo que los montos vienen como "$ 1.234.567"
+        let valor = filas[i].montoTotal.replace(/[^0-9,.-]+/g,"").replace(/\./g,'').replace(',','.');
+        total += parseFloat(valor) || 0;
+    }
+    const totalRowNum = filas.length + 2;
+    const totalCell = sheet.getCell(`H${totalRowNum}`);
+    totalCell.value = `TOTAL: $ ${total.toLocaleString('es-AR')}`;
+    totalCell.font = { bold: true, color: { argb: 'FF000000' }, name: "Arial", size: 13 };
+    totalCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFFFF00' }
+    };
+    totalCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    // Bordes para toda la fila total
+    const totalRow = sheet.getRow(totalRowNum);
+    totalRow.eachCell(cell => {
+        cell.border = borderStyle;
+        cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    });
+
+    // Descargar
+    const nombreArchivo = `Reporte de Seguro de ${desde} a ${hasta}.xlsx`;
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nombreArchivo;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    // Restaurar botón y spinner
+    $('#btnReporteSeguro').prop('disabled', false);
+    $('#spinnerSeguro').addClass('d-none');
+    $('#iconoSeguro').removeClass('d-none');
+    $('#textoSeguro').text('Reporte de Seguro');
+}
