@@ -8304,8 +8304,10 @@ img.gray-filter {
 .badge-camiones-historial-tipeo {
     position: absolute;
     top: -2px;
+    top: 1px;
     right: 0px;
     background-color: red;
+    border: 1px solid pink;
     color: white;
     font-size: 10px;
     font-weight: bold;
