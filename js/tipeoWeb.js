@@ -2225,8 +2225,14 @@ function cargarYMostrarTabla(camion, fechaKey, logistica) {
                 const btnExcel = document.getElementById('btnExcelDescarga');
                 const infoDiv = document.getElementById('infoTransporte');
 
-                const logisticaLimpia = logistica.replace(/^DespachosHistoricos_?/, '');
-                const nombreArchivo = `${logisticaLimpia}_${fechaKey}_${camion}.xlsx`;
+                let logisticaLimpia = logistica.replace(/^DespachosHistoricos_?/, '');
+                let logisticaLimpia2;
+                if (logisticaLimpia === 'CruzdelSur') {
+                    logisticaLimpia2 = 'Cruz del Sur';
+                } else {
+                    logisticaLimpia2 = logisticaLimpia;
+                }
+                const nombreArchivo = `${logisticaLimpia2}_${fechaKey}_${camion}.xlsx`;
                 const storageRef = storageMeli.ref().child(`ExcelDespachos/${nombreArchivo}`);
 
                 // Buscar Excel
