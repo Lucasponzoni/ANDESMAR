@@ -3771,6 +3771,7 @@ function mostrarSelectorSeguros(desde, hasta) {
             const seleccionados = result.value;
             generarReporteSeguro(desde, hasta, seleccionados);
         } else {
+            $('#inputFlatpickrSeguro').addClass('d-none');
             // Si cancela, restaurar el botón y spinner
             $('#btnReporteSeguro').prop('disabled', false);
             $('#spinnerSeguro').addClass('d-none');
