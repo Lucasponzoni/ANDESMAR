@@ -329,6 +329,7 @@ document.getElementById('importButton').addEventListener('click', function() {
                 let existingCount = 0;
                 let skippedCount = 0;
                 let changedInfo = 0;
+                let cancelledCount = 0; // NUEVO CONTADOR
                 const promises = [];
 
                 let spinner2 = document.getElementById("spinner2");
@@ -375,6 +376,18 @@ document.getElementById('importButton').addEventListener('click', function() {
 
                 data.forEach(row => {
                     if (Object.keys(row).length > 0) {
+
+                        const statusHeader = headers.find(h => h.toLowerCase() === 'status');
+                        if (
+                            headers.includes('Origin') &&
+                            statusHeader &&
+                            row[statusHeader] &&
+                            row[statusHeader].toLowerCase().trim() === 'cancelado'
+                        ) {
+                            cancelledCount++;
+                            return; // Ignorar este registro
+                        }
+
                         const envioData = {};
 
                         // Sanitizar y mapear datos
@@ -497,6 +510,7 @@ document.getElementById('importButton').addEventListener('click', function() {
                                     <p><span class="counter2 existing">${existingCount}</span> Ya se encontraban en planilla.</p>
                                     <p><span class="counter2 skipped">${skippedCount}</span> Registros omitidos por estar vacíos.</p>
                                     <p><span class="counter2 changed">${changedInfo}</span> Registros de envíos actualizados.</p>
+                                    <p><span class="counter2 cancelled">${cancelledCount}</span> Excluidos por estar cancelado.</p>
                                 </div>
                             `,
                             icon: 'success',

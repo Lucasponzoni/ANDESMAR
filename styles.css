@@ -6464,6 +6464,10 @@ img.gray-filter {
     background-color: #2196f3; /* Azul */
 }
 
+.counter2.cancelled {
+    background-color: orchid; /* Orquidea */
+}
+
 /* Estilo MacOS para SweetAlert2 */
 .swal2-macos-popup {
     border-radius: 16px !important;
