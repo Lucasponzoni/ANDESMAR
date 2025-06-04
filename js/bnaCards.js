@@ -1241,7 +1241,7 @@ COMPRA CON USO DE PUNTOS BNA
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="order_id_${data[i].id}">Order ID:</label>
-                                <input type="text" id="order_id_${data[i].id}" value="${data[i].carrito ? Math.floor(Math.random() * 900 + 100) + '-carrito-' : ''}${data[i].remito}" disabled>
+                                <input type="text" id="order_id_${data[i].id}" value="${isBaPro(storeCode) ? data[i].sequence : (data[i].carrito ? Math.floor(Math.random() * 900 + 100) + '-carrito-' : '') + data[i].remito}" disabled>
                             </div>
                             <div class="col">
                                 <label for="estado_${data[i].id}">Estado:</label>
@@ -1263,7 +1263,7 @@ COMPRA CON USO DE PUNTOS BNA
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="cupon_pago_${data[i].id}">Cupón de Pago:</label>
-                                <input type="text" id="cupon_pago_${data[i].id}" value="${data[i].cupon ? data[i].cupon : cupon}" disabled>
+                                <input type="text" id="cupon_pago_${data[i].id}" value="${isBaPro(storeCode) ? data[i].sequence : (data[i].cupon ? data[i].cupon : cupon)}" disabled>
                             </div>
                             <div class="col">
                                 <label for="cod_autorizacion_${data[i].id}">Código de Autorización:</label>
@@ -1275,10 +1275,10 @@ COMPRA CON USO DE PUNTOS BNA
                                 <label for="numero_tarjeta_visible_${data[i].id}">Número de Tarjeta Visible:</label>
                                 <input type="text" id="numero_tarjeta_visible_${data[i].id}" value="${data[i].numeros_tarjeta.replace(/\D/g, '')}" disabled>
                             </div>
-                            <div class="col">
-                                <label for="codigo_pago_${data[i].id}">Código de Pago:</label>
-                                <input type="text" id="codigo_pago_${data[i].id}" value="${data[i].remito.replace(/bpr/g, '').replace(/-/g, '')}" disabled>
-                            </div>
+                        <div class="col">
+                            <label for="codigo_pago_${data[i].id}">Código de Pago:</label>
+                            <input type="text" id="codigo_pago_${data[i].id}" value="${isBaPro(storeCode) ? data[i].sequence : data[i].remito.replace(/bpr/g, '').replace(/-/g, '')}" disabled>
+                        </div>
                         </div>
                         <div class="row mb-2">
                             <div class="col">
@@ -6324,7 +6324,8 @@ async function verificarMensajes() {
                     // Buscar en enviosBNA
                     const snapshotEnvios = await firebaseRefEnvios.once('value');
                     snapshotEnvios.forEach((envio) => {
-                        if (envio.val().orden_ === numero) {
+                        const data = envio.val();
+                        if (data.orden_ === numero || data.sequence === numero) {
                             envio.ref.child('errorSlack').set(true);
                             envio.ref.child('errorSlackMensaje').set(errorMensaje);
                         }

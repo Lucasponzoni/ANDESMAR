@@ -738,7 +738,7 @@ button:hover {
     text-align: center;
     padding: 8px;
     padding-bottom: 3px;
-    margin-bottom: -1px;
+    margin-bottom: 0px;
     color: indigo;
     font-weight: 500;
     border-radius: 12px 12px 0 0;
