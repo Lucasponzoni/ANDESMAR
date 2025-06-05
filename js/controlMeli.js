@@ -1784,8 +1784,14 @@ async function generateBillingFile(content, fileName) {
                     .set({ ventaId });
 
                     const additionalInfo = data.client?.billing_info?.additional_info || [];
-                    const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "jujuy");
-                    const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "tierra del fuego");
+
+                    const estadoJujuy = additionalInfo.find(
+                        info => info.type === "STATE_NAME" && info.value?.toLowerCase() === "jujuy"
+                    ) || (data.Provincia?.toLowerCase() === "jujuy" ? { type: "STATE_NAME", value: "jujuy" } : undefined);
+
+                    const estadoTierraDelFuego = additionalInfo.find(
+                        info => info.type === "STATE_NAME" && info.value?.toLowerCase() === "tierra del fuego"
+                    ) || (data.Provincia?.toLowerCase() === "tierra del fuego" ? { type: "STATE_NAME", value: "tierra del fuego" } : undefined);
 
                     if (estadoJujuy) {
                         billingContent += `${index + 1}- ${number} ---- NO FACTURAR JUJUY\n`;
@@ -1819,8 +1825,14 @@ async function generateBillingFile(content, fileName) {
                     .set({ ventaId });
 
                     const additionalInfo = data.client?.billing_info?.additional_info || [];
-                    const estadoJujuy = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "jujuy");
-                    const estadoTierraDelFuego = additionalInfo.find(info => info.type === "STATE_NAME" && info.value.toLowerCase() === "tierra del fuego");
+
+                    const estadoJujuy = additionalInfo.find(
+                        info => info.type === "STATE_NAME" && info.value?.toLowerCase() === "jujuy"
+                    ) || (data.Provincia?.toLowerCase() === "jujuy" ? { type: "STATE_NAME", value: "jujuy" } : undefined);
+
+                    const estadoTierraDelFuego = additionalInfo.find(
+                        info => info.type === "STATE_NAME" && info.value?.toLowerCase() === "tierra del fuego"
+                    ) || (data.Provincia?.toLowerCase() === "tierra del fuego" ? { type: "STATE_NAME", value: "tierra del fuego" } : undefined);
 
                     if (estadoJujuy) {
                         billingContent += `${index + 1}- ${number} ---- NO FACTURAR JUJUY\n`;
@@ -2198,29 +2210,43 @@ function loadFolder(folderPath) {
                                                     let esDeProvinciaExcluida = false;
                                                     let cantidadFirebase = 'X';
                                                     
-                                                    if (ventaCompleta && ventaCompleta !== '00000') {
-                                                        try {
-                                                            const snapshot = await firebase.database().ref('/envios/' + ventaCompleta).once('value');
-                                                            const data = snapshot.val();
-                                                            
-                                                            if (data) {
-                                                                // Obtener cantidad
-                                                                cantidadFirebase = data.Cantidad || 'X';
-                                                                textoEnvio = `VERIFICADO: ${sku} - Cantidad: ${cantidadFirebase}`;
-                                                                
-                                                                // Verificar provincia excluida
-                                                                if (data.client && data.client.billing_info && 
-                                                                    Array.isArray(data.client.billing_info.additional_info)) {
-                                                                    esDeProvinciaExcluida = data.client.billing_info.additional_info.some(info =>
-                                                                        info.type === "STATE_NAME" &&
-                                                                        ["jujuy", "tierra del fuego"].includes(info.value.toLowerCase())
-                                                                    );
-                                                                }
+                                                if (ventaCompleta && ventaCompleta !== '00000') {
+                                                    try {
+                                                        const snapshot = await firebase.database().ref('/envios/' + ventaCompleta).once('value');
+                                                        const data = snapshot.val();
+
+                                                        if (data) {
+                                                            // Obtener cantidad
+                                                            cantidadFirebase = data.Cantidad || 'X';
+                                                            textoEnvio = `VERIFICADO: ${sku} - Cantidad: ${cantidadFirebase}`;
+
+                                                            // Buscar provincia en additional_info
+                                                            let provincia = undefined;
+                                                            if (
+                                                                data.client &&
+                                                                data.client.billing_info &&
+                                                                Array.isArray(data.client.billing_info.additional_info)
+                                                            ) {
+                                                                const infoProvincia = data.client.billing_info.additional_info.find(
+                                                                    info => info.type === "STATE_NAME"
+                                                                );
+                                                                provincia = infoProvincia?.value?.toLowerCase();
                                                             }
-                                                        } catch (firebaseError) {
-                                                            console.error(`Error al consultar Firebase para venta ${ventaCompleta}:`, firebaseError);
+
+                                                            // Si no se encontró en additional_info, buscar en data.Provincia
+                                                            if (data.Provincia) {
+                                                                provincia2 = data.Provincia.toLowerCase();
+                                                            }
+
+                                                            // Verificar provincia excluida
+                                                                                                                        // Verificar provincia excluida
+                                                            const provinciasExcluidas = ["jujuy", "tierra del fuego"];
+                                                            esDeProvinciaExcluida = provinciasExcluidas.includes(provincia) || provinciasExcluidas.includes(provincia2);
                                                         }
+                                                    } catch (firebaseError) {
+                                                        console.error(`Error al consultar Firebase para venta ${ventaCompleta}:`, firebaseError);
                                                     }
+                                                }
                                                     
                                                     // Devolvemos objeto con etiqueta, SKU y datos para ordenamiento
                                                     return {
@@ -2414,59 +2440,71 @@ function loadFolder(folderPath) {
 
                                         const data = envioSnap.val();
                                         let esDeProvinciaExcluida = false;
+                                        let provincia = undefined;
 
-                                        // Verificar si es de Jujuy o Tierra del Fuego
-                                        if (data.client && data.client.billing_info && Array.isArray(data.client.billing_info.additional_info)) {
-                                            const infoProvincia = data.client.billing_info.additional_info.find(info =>
-                                                info.type === "STATE_NAME"
+                                        // Buscar provincia en additional_info
+                                        if (
+                                            data.client &&
+                                            data.client.billing_info &&
+                                            Array.isArray(data.client.billing_info.additional_info)
+                                        ) {
+                                            const infoProvincia = data.client.billing_info.additional_info.find(
+                                                info => info.type === "STATE_NAME"
                                             );
+                                            provincia = infoProvincia?.value?.toLowerCase();
+                                        }
 
-                                            if (infoProvincia) {
-                                                const provincia = infoProvincia.value.toLowerCase();
-                                                esDeProvinciaExcluida = ["jujuy", "tierra del fuego"].includes(provincia);
+                                        // Si no se encontró en additional_info, buscar en data.Provincia
+                                        if (!provincia && data.Provincia) {
+                                            provincia = data.Provincia.toLowerCase();
+                                        }
 
-                                                if (esDeProvinciaExcluida) {
-                                                    datosFiltrados.push(ventaid);
-                                                    datosFiltradosConProvincia.push({
-                                                        ventaid,
-                                                        provincia // Agregar la provincia al objeto
-                                                    });
-                                                    continue;
+                                        // Validar provincia excluida
+                                        esDeProvinciaExcluida = ["jujuy", "tierra del fuego"].includes(provincia);
+
+                                        if (provincia) {
+                                            if (esDeProvinciaExcluida) {
+                                                datosFiltrados.push(ventaid);
+                                                datosFiltradosConProvincia.push({
+                                                    ventaid,
+                                                    provincia // Agregar la provincia al objeto
+                                                });
+                                                continue;
+                                            } else {
+                                                // Si no es de provincia excluida, agregar a planilla
+                                                const preparedDate = new Date().toLocaleString('es-AR', {
+                                                    day: '2-digit',
+                                                    month: '2-digit',
+                                                    year: '2-digit',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                    hour12: false
+                                                }).replace(',', 'h').replace('h', ', ');
+
+                                                // Verificar si ya existe "preparadoEnColecta"
+                                                if (data.preparadoEnColecta) {
+                                                    etiquetasDuplicadas.push(`${ventaid} - Fue preparado en la colecta ${data.preparadoEnColecta} / Existe en planilla`);
                                                 } else {
-                                                    // Si no es de provincia excluida, agregar a planilla
-                                                    const preparedDate = new Date().toLocaleString('es-AR', {
-                                                        day: '2-digit',
-                                                        month: '2-digit',
-                                                        year: '2-digit',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit',
-                                                        hour12: false
-                                                    }).replace(',', 'h').replace('h', ', ');
+                                                    // Pushear la fecha en el nodo
+                                                    await firebase.database().ref('/envios/' + ventaid).update({
+                                                        preparadoEnColecta: preparedDate
+                                                    });
 
-                                                    // Verificar si ya existe "preparadoEnColecta"
-                                                    if (data.preparadoEnColecta) {
-                                                        etiquetasDuplicadas.push(`${ventaid} - Fue preparado en la colecta ${data.preparadoEnColecta} / Existe en planilla`);
+                                                    // Verificar si el ID ya existe en la tabla antes de agregar
+                                                    if (!idYaExiste(ventaid)) {
+                                                        agregarFila(data);
+                                                        datosAgregados.push(ventaid);
                                                     } else {
-                                                        // Pushear la fecha en el nodo
-                                                        await firebase.database().ref('/envios/' + ventaid).update({
-                                                            preparadoEnColecta: preparedDate
-                                                        });
-
-                                                        // Verificar si el ID ya existe en la tabla antes de agregar
-                                                        if (!idYaExiste(ventaid)) {
-                                                            agregarFila(data);
-                                                            datosAgregados.push(ventaid);
-                                                        } else {
-                                                            etiquetasDuplicadas.push(`${ventaid} - Existe en planilla`);
-                                                        }
+                                                        etiquetasDuplicadas.push(`${ventaid} - Existe en planilla`);
                                                     }
                                                 }
-                                            } else {
-                                                // Si no se pudo validar la provincia
-                                                datosNoValidados.push(ventaid);
                                             }
+                                        } else {
+                                            // Si no se pudo validar la provincia
+                                            datosNoValidados.push(ventaid);
                                         }
                                     }
+
 
                                     // Generar reporte
                                     let htmlContent = '';
