@@ -1255,7 +1255,7 @@ COMPRA CON USO DE PUNTOS BNA
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="order_id_${data[i].id}">Order ID:</label>
-                                <input type="text" id="order_id_${data[i].id}" value="${isBaPro(storeCode) ? data[i].sequence : (data[i].carrito ? Math.floor(Math.random() * 900 + 100) + '-carrito-' : '') + data[i].remito}" disabled>
+                                <input type="text" id="order_id_${data[i].id}" value="${isBaPro(storeCode) ? data[i].sequence : (data[i].carrito ? Math.floor(Math.random() * 900 + 100) + '-CARR-' : '') + data[i].remito}" disabled>
                             </div>
                             <div class="col">
                                 <label for="estado_${data[i].id}">Estado:</label>
@@ -3146,7 +3146,7 @@ async function marcarFacturado3(id, email, nombre, remito) {
     // Obtener el order_id para usarlo como ID del nodo
     const orderId = document.getElementById(`order_id_${id}`)?.value;
     const randomNum = Math.floor(100 + Math.random() * 900); // Random 3 Numeros
-    const refFacturacion = firebase.database().ref(`facturacionBna/${randomNum}-reproceso-${orderId}`);
+    const refFacturacion = firebase.database().ref(`facturacionBna/${randomNum}-REP-${orderId}`);
 
     // Obtener el SKU desde ambos campos
     const skuInput = document.getElementById(`sku_${id}`);
@@ -3160,14 +3160,14 @@ async function marcarFacturado3(id, email, nombre, remito) {
 
     // Crear objeto con los datos
     const datos = {
-        order_id: `${randomNum}-reproceso-${orderId}` || '',
+        order_id: `${randomNum}-REP-${orderId}` || '',
         estado: 'Aprobado',
         metodo_pago: document.getElementById(`metodo_pago_${id}`)?.value || '',
         numero_lote: '11',
         cupon_pago: document.getElementById(`cupon_pago_${id}`)?.value || '',
         cod_autorizacion: document.getElementById(`cod_autorizacion_${id}`)?.value || '',
         numero_tarjeta_visible: document.getElementById(`numero_tarjeta_visible_${id}`)?.value || '',
-        codigo_pago: document.getElementById(`codigo_pago_${id}`)?.value || '',
+        codigo_pago: (document.getElementById(`codigo_pago_${id}`)?.value || '') + randomNum,
         cuotas: document.getElementById(`cuotas_${id}`)?.value || '',
         banco: '',
         tipo_entrega: document.getElementById(`tipo_entrega_${id}`)?.value || '',
@@ -6294,9 +6294,9 @@ async function verificarMensajes() {
                 }
 
                 // Verificar si el mensaje cumple con el formato esperado
-                if (mensaje.user === `${chat}` && /^\(\d+(-reproceso-\d+|-carrito-\d+)?\)/.test(mensaje.text)) {
+                if (mensaje.user === `${chat}` && /^\(\d+(-REP-\d+|-CARR-\d+)?\)/.test(mensaje.text)) {
                     let numero;
-                    const match = mensaje.text.match(/^\((\d+)(?:-(reproceso|carrito)-(\d+))?\)/);
+                    const match = mensaje.text.match(/^\((\d+)(?:-(REP|carrito)-(\d+))?\)/);
 
                     if (match) {
                         numero = match[3] ? match[3] : match[1];
@@ -6305,7 +6305,7 @@ async function verificarMensajes() {
                         continue;
                     }
 
-                    const errorMensaje = mensaje.text.replace(/^\(\d+(-reproceso-\d+|-carrito-\d+)?\)\s*/, '');
+                    const errorMensaje = mensaje.text.replace(/^\(\d+(-REP-\d+|-CARR-\d+)?\)\s*/, '');
                     let nuevoNumero = numero;
                     let contador = 1;
 
@@ -6328,7 +6328,7 @@ async function verificarMensajes() {
                             break;
                         } else {
                             contador++;
-                            nuevoNumero = `${numero}-${match[2] || 'reproceso'}-${contador}`;
+                            nuevoNumero = `${numero}-${match[2] || 'REP'}-${contador}`;
                         }
                     }
 
