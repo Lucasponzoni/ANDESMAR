@@ -1499,7 +1499,7 @@ COMPRA CON USO DE PUNTOS BNA
                             </div>
                         <div class="col">
                             <label for="email_${data[i].id}">Email:</label>
-                            <input type="text" id="email_${data[i].id}" value="${isBaPro(storeCode) ? 'querynovogar@gmail.com' : data[i].email}" disabled>
+                            <input type="text" id="email_${data[i].id}" value="querynovogar@gmail.com" disabled>
                         </div>
                         </div>
                         <div class="row mb-2">
