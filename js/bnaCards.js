@@ -2170,7 +2170,7 @@ ${data[i].order ? `
                             <button class="btn mt-1 btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
                                 id="CDSButton${data[i].id}" 
                                 ${isAndreani || isAndesmar || data[i].cancelado ? 'disabled' : ''}
-                                onclick="${isCDS ? `descargarEtiquetaCDS('${data[i].cotizacion}', '${data[i].trackingNumber}', '${data[i].id}')` : `enviarDatosCDS('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
+                                onclick="${isCDS ? `descargarEtiquetaCDS('${data[i].cotizacion}', '${data[i].trackingNumber}', '${data[i].id}')` : `enviarDatosCDS('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
                                 <span id="CDSText${data[i].id}">
                                 ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
                                 </span>
@@ -2181,7 +2181,7 @@ ${data[i].order ? `
                             <button class="btn mt-1 ${isAndesmar ? 'btn-success' : 'btn-primary'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}" 
                                 id="andesmarButton${data[i].id}" 
                                 ${isAndreani || isCDS || data[i].cancelado ? 'disabled' : ''} 
-                                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
+                                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
                                 <span id="andesmarText${data[i].id}">
                                 ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
                                 </span>
@@ -2192,7 +2192,7 @@ ${data[i].order ? `
                             <button class="btn mt-1 btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
                                 id="andreaniButton${data[i].id}" 
                                 ${isAndesmar || isCDS || data[i].cancelado ? 'disabled' : ''} 
-                                onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
+                                onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
                                 <span id="andreaniText${data[i].id}">
                                 ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
                                 </span>
@@ -2206,7 +2206,7 @@ ${data[i].order ? `
                             <button class="btn mt-1 btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
                             id="LogPropiaMeliButton${data[i].id}" 
                             ${data[i].cancelado ? 'disabled' : ''} 
-                            onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}',)">
+                            onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}',)">
                             <span>
                             ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
                             </span>
