@@ -6957,19 +6957,20 @@ img.gray-filter {
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-#fecha-tiendas-virtuales{
+#fecha-tiendas-virtuales {
     position: relative;
-    padding: 2px 5px 2px 5px;
-    font-size: small;
-    font-weight: 600 !important;
-    margin-bottom: -10px;
-    top: -8px;
-    left: 15px;
+    padding: 4px 10px;
+    font-size: 13px;
+    font-weight: 500;
     width: fit-content;
-    border-radius: 0 0 10px 10px;
-    color: white;
-    border: solid 1px #007aff;
-    background-color: #000000a8; 
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #007aff;
+    border: 1px solid rgba(0, 122, 255, 0.3);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    font-family: "San Francisco", "Helvetica Neue", sans-serif;
 }
 
 .dropdown-menu {
@@ -8883,11 +8884,17 @@ mark {
     font-size: 15px;
     border: 1px solid #ededed;
     color: #333;
+    font-family: "Rubik", sans-serif;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.factura-tv:hover {
+    background: lemonchiffon;
+    cursor: pointer;
 }
 
 .factura-tv.disponible {
     color: #19ac19;
-    border: 1px solid #b6e7b6;
     font-size: 12px;
 }
 
