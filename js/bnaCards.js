@@ -1782,21 +1782,32 @@ COMPRA CON USO DE PUNTOS BNA
                                 
                             ${isSkuIncluded ? `<p class="card-text-isSkuIncluded"><i class="bi bi-lightning-charge-fill"></i> SKU <strong>${data[i].sku}</strong> con imei</p>` : ''}
 
-<div class="d-flex align-items-center justify-content-center contenedorRemito">
-    <button class="btn btn-link btn-sm text-decoration-none copy-btn me-2 ios-icon3">
-        <i class="bi bi-clipboard"></i>
-    </button>
+    
 
-    <div class="contenedorPrompter">
-    <p class="orden mx-2">${remito}</p>
+
+<div class="d-flex flex-column align-items-center justify-content-center contenedorRemito">
+
+    <div class="d-flex align-items-center mt-2">
+        <button class="btn btn-link btn-sm text-decoration-none copy-btn me-2 ios-icon3">
+            <i class="bi bi-clipboard"></i>
+        </button>
+
+        <div class="contenedorPrompter">
+            <p class="orden mx-2">${remito}</p>
+        </div>
+
+        <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3" 
+            onclick="window.open(getOrderUrl('${data[i].orden_publica_}'), '_blank');">
+            <i class="bi bi-bag-check"></i>
+        </button>
     </div>
 
-    <button class="btn btn-link btn-sm text-decoration-none copy-btn ms-2 ios-icon3" 
-        onclick="window.open(getOrderUrl('${data[i].orden_publica_}'), '_blank');">
-        <i class="bi bi-bag-check"></i>
-    </button>
+        <p class="factura-tv" id="factura-tv-${data[i].id}">
+            <i class="fas fa-spinner fa-pulse fa-2x" style="color: cornflowerblue;"></i>
+        </p>
 
 </div>
+    
 
     ${tooltip}
 
@@ -2253,6 +2264,14 @@ ${data[i].order ? `
                     el.classList.add('scroll');
                 }
                 });
+
+buscarFacturaDisponible(
+    data[i].id,
+    data[i].cuit,
+    data[i].dni,
+    data[i].fechaDeCreacion,
+    tipoFactura 
+);
 
 // Evento para manejar el cambio del switch "Preparación"
 document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', function() {
@@ -6657,3 +6676,70 @@ async function loadEnviosFromFirebaseAvanzado(subOrderValue) {
     }
 }
 // FIN BUSQUEDA AVANZADA
+
+// BUSCAR FACTURA
+async function buscarFacturaDisponible(id, cuit, dni, fechaDeCreacion, tipoFactura) {
+    // Espera 3 segundos antes de continuar
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    function formatFechaForNode(fechaString) {
+        const [d, m, y] = fechaString.split(' ')[0].split('-');
+        return `${d}_${m}_${y}`;
+    }
+
+    const persona = (cuit && cuit !== '0') ? cuit : dni;
+    const fechaNodo = formatFechaForNode(fechaDeCreacion);
+    const facturasRef = dbStock.ref('facturas');
+    const snapshot = await facturasRef.once('value');
+    const facturas = snapshot.val();
+
+    let facturaEncontrada = null;
+    let linkPDF = null;
+    let numeroFactura = null;
+    let fechaFactura = null;
+    let tipo_factura = tipoFactura || "Factura";
+
+    if (facturas) {
+        for (const key in facturas) {
+            const partes = key.split('_');
+            if (partes.length < 5) continue;
+            const numFactura = partes[0];
+            const fecha = `${partes[1]}_${partes[2]}_${partes[3]}`;
+            const dniCuit = partes.slice(4).join('_');
+            if (dniCuit === persona) {
+                const fechaCard = new Date(fechaDeCreacion.split(' ')[0].split('-').reverse().join('-'));
+                const fechaFacturaNode = new Date(fecha.split('_').reverse().join('-'));
+                const diferenciaDias = Math.floor((fechaFacturaNode - fechaCard) / (1000 * 60 * 60 * 24));
+                if (diferenciaDias >= 0 && diferenciaDias <= 3) {
+                    if (facturas[key].pdf) {
+                        facturaEncontrada = key;
+                        linkPDF = facturas[key].pdf;
+                        numeroFactura = numFactura;
+                        fechaFactura = fecha;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    const el = document.getElementById(`factura-tv-${id}`);
+    if (facturaEncontrada && linkPDF) {
+        el.classList.remove("no-disponible");
+        el.classList.add("disponible");
+        el.innerHTML = `
+            <i class="bi bi-receipt-cutoff"></i>
+            <a href="${linkPDF}" target="_blank" style="color: inherit; text-decoration: underline;">
+                ${tipo_factura} - <strong>${numeroFactura}</strong>
+            </a>
+            <button class="btn-clipboard" title="Copiar link" onclick="copiarAlPortapapeles('${linkPDF}', this)">
+                <i class="fas fa-clipboard icono-factura-tv"></i>
+            </button>
+        `;
+    } else {
+        el.classList.remove("disponible");
+        el.classList.add("no-disponible");
+        el.innerHTML = `<i class="bi bi-receipt-cutoff"></i> Factura no disponible`;
+    }
+}
+// FIN BUSCAR FACTURA

@@ -8871,3 +8871,47 @@ mark {
 .btn-seguro{
     height: 47px !important;
 }
+
+.factura-tv {
+    margin-bottom: 2px;
+    padding: 5px 7px;
+    border-radius: 14px;
+    background: #f5f5fa;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    border: 1px solid #ededed;
+    color: #333;
+}
+
+.factura-tv.disponible {
+    color: #19ac19;
+    border: 1px solid #b6e7b6;
+    font-size: 12px;
+}
+
+.factura-tv.no-disponible {
+    color: #e14d4d;
+}
+
+.factura-tv .btn-clipboard {
+    background: #fff;
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    padding: 2px 8px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    margin: 0 !important;
+    transition: background 0.2s;
+}
+
+.factura-tv .btn-clipboard:hover {
+    background: #ffe5b3;
+    color: green;
+}
+
+.icono-factura-tv{
+    font-size: 12px;
+}
