@@ -6742,4 +6742,14 @@ async function buscarFacturaDisponible(id, cuit, dni, fechaDeCreacion, tipoFactu
         el.innerHTML = `<i class="bi bi-receipt-cutoff"></i> Factura no disponible`;
     }
 }
+
+// Función global para copiar al portapapeles
+function copiarAlPortapapeles(texto, btn) {
+    navigator.clipboard.writeText(texto).then(() => {
+        btn.innerHTML = `<i class="bi-clipboard-check-fill icono-factura-tv" style="color:green"></i>`;
+        setTimeout(() => {
+            btn.innerHTML = `<i class="fas fa-clipboard icono-factura-tv"></i>`;
+        }, 1200);
+    });
+}
 // FIN BUSCAR FACTURA
