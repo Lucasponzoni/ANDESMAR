@@ -3260,15 +3260,15 @@ div.card-body > p > i{
     font-family: "Rubik", sans-serif;
     font-weight: 600;
     text-align: center;
-    color: #279e3a; 
+    color: #2563eb;
     margin-bottom: 0px;
-    border-right: 1px solid #bdc3c7;
-    border-left: 1px solid #bdc3c7;
-    border-top: 1px solid #bdc3c7;
-    padding: 6px 8px; 
-    background-color: #d9edd8;
-    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.1); 
-    transition: background-color 0.3s, box-shadow 0.3s; 
+    border-right: 1px solid #c7d4f8;
+    border-left: 1px solid #c7d4f8;
+    border-top: 1px solid #c7d4f8;
+    padding: 8px 12px;
+    background-color: #e6eeff;
+    box-shadow: 0 2px 8px rgba(60, 80, 200, 0.08);
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .numeroDeEnvioGeneradoBNA a {
