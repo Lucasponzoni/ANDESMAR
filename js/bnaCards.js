@@ -703,6 +703,7 @@ async function loadEnviosFromFirebase() {
                         nro_de_cuotas: data.nro_de_cuotas,
                         envio: data.medio_de_envio,
                         cupon: data.cupon,
+                        cupon_2: data.cupon_2,
                         numeroSeguimiento: data.numero_de_seguimiento,
                         cotizacion: data.cotizacion,
                         trackingNumber: data.trackingNumber,
@@ -713,7 +714,7 @@ async function loadEnviosFromFirebase() {
                         precio_producto: data.precio_producto,
                         suborden_total: data.suborden_total,
                         suborden_: data.suborden_,
-                        numerosTarjeta: data.numeros_tarjeta || data.numeros_tarjeta_2 || "0000",
+                        numerosTarjeta: (data.numeros_tarjeta?.trim() !== '-' && data.numeros_tarjeta?.trim()) || (data.numeros_tarjeta_2?.trim() !== '-' && data.numeros_tarjeta_2?.trim()) || "0000",
                         orden_publica: data.orden_publica_,
                         sku: data.sku_externo.toUpperCase(),
                         cantidad: data.cantidad,
@@ -1048,7 +1049,11 @@ const getShopImage = (ordenPublica) => {
 
         const direccionEnvio = data[i].direccion;
         const ordenPublica = data[i].orden_publica.replace(/bpr/g, '').replace(/-/g, '');
-        const cupon = ordenPublica.substring(0, 13); 
+        const cupon = (
+        (data[i].cupon && data[i].cupon.trim() !== '-' && data[i].cupon.trim()) ||
+        (data[i].cupon_2 && data[i].cupon_2.trim() !== '-' && data[i].cupon_2.trim()) ||
+        ordenPublica.substring(0, 13)
+        );
 
         const precioVenta = parseFloat(data[i].precio_venta * data[i].cantidad);
         const montoCobrado = parseFloat(data[i].monto_cobrado);
@@ -1277,7 +1282,7 @@ COMPRA CON USO DE PUNTOS BNA
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="cupon_pago_${data[i].id}">Cupón de Pago:</label>
-                                <input type="text" id="cupon_pago_${data[i].id}" value="${isBaPro(storeCode) ? data[i].sequence : (data[i].cupon ? data[i].cupon : cupon)}" disabled>
+                                <input type="text" id="cupon_pago_${data[i].id}" value="${isBaPro(storeCode) ? data[i].sequence : cupon}" disabled>
                             </div>
                             <div class="col">
                                 <label for="cod_autorizacion_${data[i].id}">Código de Autorización:</label>
@@ -2000,9 +2005,9 @@ ${data[i].order ? `
                             <div class="mb-3 text-center">
                             <strong class="text-primary">CUPON:</strong>
                             <div class="d-flex justify-content-center align-items-center">
-                            <span class="me-2">${data[i].cupon ? data[i].cupon : cupon}</span>
+                            <span class="me-2">${cupon}</span>
                             
-                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].cupon ? data[i].cupon : cupon}')">
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${cupon}')">
                             <i class="bi bi-clipboard"></i>
                             </button>
 
@@ -6584,6 +6589,7 @@ async function loadEnviosFromFirebaseAvanzado(subOrderValue) {
                     nro_de_cuotas: data.nro_de_cuotas,
                     envio: data.medio_de_envio,
                     cupon: data.cupon,
+                    cupon_2: data.cupon_2,
                     numeroSeguimiento: data.numero_de_seguimiento,
                     cotizacion: data.cotizacion,
                     trackingNumber: data.trackingNumber,
