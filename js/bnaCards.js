@@ -713,7 +713,7 @@ async function loadEnviosFromFirebase() {
                         precio_producto: data.precio_producto,
                         suborden_total: data.suborden_total,
                         suborden_: data.suborden_,
-                        numeros_tarjeta: data.numeros_tarjeta,
+                        numerosTarjeta: data.numeros_tarjeta || data.numeros_tarjeta_2 || "0000",
                         orden_publica: data.orden_publica_,
                         sku: data.sku_externo.toUpperCase(),
                         cantidad: data.cantidad,
@@ -1281,13 +1281,13 @@ COMPRA CON USO DE PUNTOS BNA
                             </div>
                             <div class="col">
                                 <label for="cod_autorizacion_${data[i].id}">Código de Autorización:</label>
-                                <input type="text" id="cod_autorizacion_${data[i].id}" value="${data[i].numeros_tarjeta.replace(/\D/g, '')}" disabled>
+                                <input type="text" id="cod_autorizacion_${data[i].id}" value="${data[i].numerosTarjeta.replace(/\D/g, '')}" disabled>
                             </div>
                         </div>
                         <div class="row mb-2">
                             <div class="col">
                                 <label for="numero_tarjeta_visible_${data[i].id}">Número de Tarjeta Visible:</label>
-                                <input type="text" id="numero_tarjeta_visible_${data[i].id}" value="${data[i].numeros_tarjeta.replace(/\D/g, '')}" disabled>
+                                <input type="text" id="numero_tarjeta_visible_${data[i].id}" value="${data[i].numerosTarjeta.replace(/\D/g, '')}" disabled>
                             </div>
                         <div class="col">
                             <label for="codigo_pago_${data[i].id}">Código de Pago:</label>
@@ -1954,13 +1954,13 @@ ${data[i].order ? `
                                 
                                 <div class="${isMacro(storeCode) ? '' : 'hidden'}" style="background-color: #f0f0f5; border-radius: 12px; padding: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; max-width: 400px; margin-bottom: 5px; border: 1px solid #d0d0d5; ">
                                     <h2 style="font-size: 20px; color: #333; margin-bottom: 15px;">Datos PayWay 💰</h2>
-                                    <p class="card-text-pago" style="color: #333; margin: 10px 0;"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta.replace(/\D/g, '')}</p>
+                                    <p class="card-text-pago" style="color: #333; margin: 10px 0;"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numerosTarjeta.replace(/\D/g, '')}</p>
                                     <p class="card-text-pago hidden" style="color: #333; margin: 10px 0;"><strong>Código de Autorización:</strong> ${data[i].cod_aut}</p>
                                 </div>
 
                                     <p class="card-text-pago"><strong>Entidad:</strong> ${(data[i].brand_name && data[i].brand_name !== '0') ? data[i].brand_name : data[i].marca_de_tarjeta || 'N/A'}</p>
                                     <p class="card-text-pago"><strong>Cuotas:</strong> ${(data[i].cuotas && data[i].cuotas !== '0') ? data[i].cuotas : data[i].nro_de_cuotas || 'N/A'}</p>
-                                    <p class="card-text-pago ${isMacro(storeCode) ? 'hidden' : ''}"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numeros_tarjeta.replace(/\D/g, '')}</p>
+                                    <p class="card-text-pago ${isMacro(storeCode) ? 'hidden' : ''}"><strong>Número de Tarjeta:</strong> **** **** **** ${data[i].numerosTarjeta.replace(/\D/g, '')}</p>
      
 
                       <p class="card-text-pago">
@@ -2012,9 +2012,9 @@ ${data[i].order ? `
                             <div class="text-center">
                             <strong class="text-primary">AUTORIZACION:</strong>
                             <div class="d-flex justify-content-center align-items-center">
-                            <span class="me-2">${data[i].numeros_tarjeta.replace(/\D/g, '')}</span>
+                            <span class="me-2">${data[i].numerosTarjeta.replace(/\D/g, '')}</span>
                             
-                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].numeros_tarjeta.replace(/\D/g, '')}')">
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${data[i].numerosTarjeta.replace(/\D/g, '')}')">
                             <i class="bi bi-clipboard"></i>
                             </button>
 
