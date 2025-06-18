@@ -157,7 +157,7 @@ function verificarActualizacionBaseDeDatos2() {
 
             // Mostrar el spinner por al menos 3 segundos
 setTimeout(() => {
-    descargarDatosDesdeFirebase(2500).then(() => {
+    descargarDatosDesdeFirebase(1500).then(() => {
                     const fechaActual = new Date().toLocaleString('es-AR', {
                         day: '2-digit',
                         month: '2-digit',
@@ -201,7 +201,7 @@ function verificarActualizacionBaseDeDatos() {
         
         // Mostrar el spinner por al menos 3 segundos
         setTimeout(() => {
-            descargarDatosDesdeFirebase(2500).then(() => {
+            descargarDatosDesdeFirebase(1500).then(() => {
                 const fechaActual = new Date().toLocaleString('es-AR', {
                     day: '2-digit',
                     month: '2-digit',
