@@ -2005,9 +2005,9 @@ ${data[i].order ? `
                             <div class="mb-3 text-center">
                             <strong class="text-primary">CUPON:</strong>
                             <div class="d-flex justify-content-center align-items-center">
-                            <span class="me-2">${cupon}</span>
+                            <span class="me-2">${isBaPro(storeCode) ? data[i].sequence : cupon}</span>
                             
-                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${cupon}')">
+                            <button class="btn btn-link btn-sm" onclick="navigator.clipboard.writeText('${isBaPro(storeCode) ? data[i].sequence : cupon}')">
                             <i class="bi bi-clipboard"></i>
                             </button>
 
