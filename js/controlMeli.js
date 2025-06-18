@@ -1659,44 +1659,69 @@ function countLabels(content) {
     return Math.min(startCount, endCount);
 }
 
-function extractSalesNumbers(content) {
+async function extractSalesNumbers(content) {
     const labelRegex = /\^XA[\s\S]*?\^XZ/g;
     const saleRegex = /(?:\^FO120,120\^A0N,24,24\^FD(Venta|Pack ID): (\d+)\^FS[\s\S]*?\^FO(\d+),117\^A0N,27,27\^FD(\d+)\^FS)/g;
-    const idRegex = /"id":"(\d+)"/g; // Regex para buscar el ID
-    const ventaRegex = /\^FO40,245\^A0N,28,28\^FH\^FDVenta:\^FS[\s\S]*?\^FO124,249\^A0N,25,25\^FD(\d+)\^FS[\s\S]*?\^FO188,245\^A0N,30,30\^FD(\d+)\^FS/g; // Regex para buscar el número de venta
+    const idRegex = /"id":"(\d+)"/g;
+
     const matches = [];
-    
+
     const labels = content.match(labelRegex); // Obtener todas las etiquetas
+    console.log(`🔍 Se encontraron ${labels?.length || 0} etiquetas ZPL`);
+
     if (labels) {
-        labels.forEach(labelContent => {
+        for (const labelContent of labels) {
             let idMatch = idRegex.exec(labelContent); // Buscar el ID en el contenido de la etiqueta
             let saleMatch;
+
             while ((saleMatch = saleRegex.exec(labelContent)) !== null) {
                 const saleType = saleMatch[1]; // "Venta" o "Pack ID"
-                const saleNumber = saleMatch[2]; // Número asociado
-                const additionalNumber = saleMatch[4]; // El número adicional que sigue
-                const shippingId = idMatch ? idMatch[1] : 'No ID'; // Obtener el ID o usar 'No ID' si no se encuentra
-                
-                // Concatenar el número de venta o Pack ID con el número adicional
-                const fullSaleNumber = `${saleNumber}${additionalNumber}`; // Formar el número completo
-                
-                let ventaNumber = 'No ID';
+                const saleNumber = saleMatch[2];
+                const additionalNumber = saleMatch[4];
+                const shippingId = idMatch ? idMatch[1] : 'No ID';
+                const fullSaleNumber = `${saleNumber}${additionalNumber}`;
+
+                console.log(`📦 Tipo: ${saleType}, Número: ${fullSaleNumber}, ShippingID: ${shippingId}`);
+
+                let ventaNumber = 'SIN INFO DE NUMERO DE VENTA';
+
                 if (saleType === "Pack ID") {
-                    const ventaMatch = labelContent.match(/\^FO124,249\^A0N,25,25\^FD(\d+)\^FS[\s\S]*?\^FO188,245\^A0N,30,30\^FD(\d+)\^FS/);
-                    if (ventaMatch) {
-                        ventaNumber = `${ventaMatch[1]}${ventaMatch[2]}`;
+                    console.log(`🔎 Buscando en Firebase /enviosId que termine en SHIP-${shippingId}`);
+
+                    const snapshot = await firebase.database().ref('/enviosID').once('value');
+                    const envios = snapshot.val();
+
+                    let encontrado = false;
+
+                    for (const key in envios) {
+                        if (key.endsWith(`SHIP-${shippingId}`)) {
+                            console.log(`✅ Nodo encontrado: ${key}`);
+                            const matchVenta = key.match(/V-(\d+)_/);
+                            if (matchVenta) {
+                                ventaNumber = matchVenta[1];
+                                console.log(`🆔 Venta extraída: ${ventaNumber}`);
+                            } else {
+                                console.warn(`⚠️ No se pudo extraer venta desde el nodo: ${key}`);
+                            }
+                            encontrado = true;
+                            break;
+                        }
+                    }
+
+                    if (!encontrado) {
+                        console.warn(`❌ No se encontró ningún nodo que termine con SHIP-${shippingId}`);
                     }
                 }
-                
+
                 if (saleType === "Pack ID") {
                     matches.push(`${saleType}: ${fullSaleNumber} / V: ${ventaNumber} ---- ShippingID: ${shippingId}`);
                 } else {
                     matches.push(`${saleType}: ${fullSaleNumber} ---- ShippingID: ${shippingId}`);
                 }
-                
-                idMatch = idRegex.exec(labelContent); // Avanzar al siguiente ID en la misma etiqueta
+
+                idMatch = idRegex.exec(labelContent); // Avanzar al siguiente ID si hay más
             }
-        });
+        }
     }
 
     return matches;
@@ -1755,7 +1780,7 @@ function logMessage(message) {
 }
 
 async function generateBillingFile(content, fileName) {
-    const salesNumbers = extractSalesNumbers(content);
+    const salesNumbers = await extractSalesNumbers(content);
     let billingContent = '';
 
     // Preparar nombre de archivo sin .txt y con guión bajo
@@ -2160,225 +2185,322 @@ function loadFolder(folderPath) {
                                                 // El modal permanece abierto
                                             });
                                         }
-                                        // GENERACION DE TXT PARA ZEBRA
-                                        const tandaNovogarBtn = document.getElementById('tandaNovogarBtn');
-                                        if (tandaNovogarBtn) {
-                                        tandaNovogarBtn.addEventListener('click', async () => {
-                                            // Mostrar loader al inicio
-                                            const loadingSwal = Swal.fire({
-                                                title: 'Generando Tanda Novogar',
-                                                html: 'Procesando y ordenando etiquetas...',
-                                                allowOutsideClick: false,
-                                                showConfirmButton: false,
-                                                willOpen: () => {
-                                                    Swal.showLoading();
-                                                }
-                                            });
+// GENERACION DE TXT PARA ZEBRA
+const tandaNovogarBtn = document.getElementById('tandaNovogarBtn');
+if (tandaNovogarBtn) {
+    tandaNovogarBtn.addEventListener('click', async () => {
+        // Mostrar loader al inicio
+        const loadingSwal = Swal.fire({
+            title: 'Generando Tanda Novogar',
+            html: 'Procesando y ordenando etiquetas...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
-                                            try {
-                                                // 1. Obtener contenido original
-                                                const response = await fetch("https://proxy.cors.sh/" + url, {
-                                                    headers: corsHeaders
-                                                });
-                                                
-                                                if (!response.ok) throw new Error('No se pudo descargar el archivo original');
-                                                
-                                                let originalText = await response.text();
-                                                
-                                                // 2. Procesar cada etiqueta y extraer SKU para ordenamiento
-                                                const etiquetas = originalText.split('^XZ').filter(etq => etq.trim() !== '');
-                                                
-                                                // Array para almacenar etiquetas con sus SKUs
-                                                const etiquetasConSku = await Promise.all(etiquetas.map(async (etiqueta, index) => {
-                                                    // Extraer SKU
-                                                    const skuMatch = etiqueta.match(/\^FDSKU:\^FS\s*\^FO265,192\^A0N,25,25\^FB510,1,-1\^FH\^FD([^\^]+)\^FS/);
-                                                    const rawSku = skuMatch ? skuMatch[1].trim().toUpperCase() : 'ZZZ_SIN_SKU_EN_MELI';
-                                                    const sku = rawSku.replace(/_([0-9A-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-                                                    const descripcionMatch = etiqueta.match(/\^FO200,15\^A0N,29,29\^FB570,2,-1\^FH\^FD([^\^]+)\^FS/);
-                                                    let descripcion = descripcionMatch ? descripcionMatch[1].trim() : '';
-                                                    descripcion = descripcion.substring(0, 30);
-                                                    
-                                                    // Extraer otros datos necesarios para mantener la funcionalidad anterior
-                                                    const ventaMatch = etiqueta.match(/\^FO188,245\^A0N,30,30\^FD(\d+)\^FS/);
-                                                    const precioMatch = etiqueta.match(/\^FO124,249\^A0N,25,25\^FD(\d+)\^FS/);
-                                                    const ventaCompleta = (precioMatch ? precioMatch[1] : '') + (ventaMatch ? ventaMatch[1] : '');
-                                                    const cantidadMatch = etiqueta.match(/\^FO30,80\^A0N,70,70\^FB160,1,0,C\^FD(\d+)\^FS/);
-                                                    const cantidad = cantidadMatch ? cantidadMatch[1].trim() : '0'; // Asignar '0' si no se encuentra
+        try {
+            // 1. Obtener contenido original
+            const response = await fetch("https://proxy.cors.sh/" + url, {
+                headers: corsHeaders
+            });
 
-                                                    // Extraer información de Firebase en una sola llamada
-                                                    let textoEnvio = '';
-                                                    let esDeProvinciaExcluida = false;
-                                                    let cantidadFirebase = 'X';
-                                                    
-                                                if (ventaCompleta && ventaCompleta !== '00000') {
-                                                    try {
-                                                        const snapshot = await firebase.database().ref('/envios/' + ventaCompleta).once('value');
-                                                        const data = snapshot.val();
+            if (!response.ok) throw new Error('No se pudo descargar el archivo original');
 
-                                                        if (data) {
-                                                            // Obtener cantidad
-                                                            cantidadFirebase = data.Cantidad || 'X';
-                                                            textoEnvio = `VERIFICADO: ${sku} - Cantidad: ${cantidadFirebase}`;
+            let originalText = await response.text();
 
-                                                            // Buscar provincia en additional_info
-                                                            let provincia = undefined;
-                                                            if (
-                                                                data.client &&
-                                                                data.client.billing_info &&
-                                                                Array.isArray(data.client.billing_info.additional_info)
-                                                            ) {
-                                                                const infoProvincia = data.client.billing_info.additional_info.find(
-                                                                    info => info.type === "STATE_NAME"
-                                                                );
-                                                                provincia = infoProvincia?.value?.toLowerCase();
-                                                            }
+            // 2. Procesar cada etiqueta y extraer SKU para ordenamiento
+            const etiquetas = originalText.split('^XZ').filter(etq => etq.trim() !== '');
 
-                                                            // Si no se encontró en additional_info, buscar en data.Provincia
-                                                            if (data.Provincia) {
-                                                                provincia2 = data.Provincia.toLowerCase();
-                                                            }
+            // Array para almacenar etiquetas con sus SKUs
+            const etiquetasConSku = await Promise.all(etiquetas.map(async (etiqueta, index) => {
+                // --- FORMATO ANTIGUO ---
+                // SKU: ^FO265,192^A0N,25,25^FB510,1,-1^FH^FD[SKU]^FS
+                // Descripción: ^FO200,15^A0N,29,29^FB570,2,-1^FH^FD[Descripción]^FS
+                const skuAntiguoMatch = etiqueta.match(/\^FO265,192\^A0N,25,25\^FB510,1,-1\^FH\^FD([^\^]+)\^FS/);
+                const descAntiguoMatch = etiqueta.match(/\^FO200,15\^A0N,29,29\^FB570,2,-1\^FH\^FD([^\^]+)\^FS/);
 
-                                                            // Verificar provincia excluida
-                                                                                                                        // Verificar provincia excluida
-                                                            const provinciasExcluidas = ["jujuy", "tierra del fuego"];
-                                                            esDeProvinciaExcluida = provinciasExcluidas.includes(provincia) || provinciasExcluidas.includes(provincia2);
-                                                        }
-                                                    } catch (firebaseError) {
-                                                        console.error(`Error al consultar Firebase para venta ${ventaCompleta}:`, firebaseError);
-                                                    }
-                                                }
-                                                    
-                                                    // Devolvemos objeto con etiqueta, SKU y datos para ordenamiento
-                                                    return {
-                                                        sku,
-                                                        descripcion,
-                                                        etiquetaOriginal: etiqueta,
-                                                        esDeProvinciaExcluida,
-                                                        ventaCompleta,
-                                                        cantidad: cantidadFirebase !== 'X' ? cantidadFirebase : cantidad,
-                                                        textoEnvio,
-                                                    };
-                                                }));
-                                                
-                                                // 3. Ordenar etiquetas alfabéticamente por SKU
-                                                etiquetasConSku.sort((a, b) => {
-                                                    // Ordenamos alfabéticamente ignorando mayúsculas/minúsculas
-                                                    return a.sku.localeCompare(b.sku);
-                                                });
-                                                
-                                                // 4. Procesar las etiquetas ordenadas
-                                                let contadorExcluidas = 0;
-                                                const etiquetasOrdenadasModificadas = etiquetasConSku.map((item, index) => {
-                                                    // Actualizar progreso
-                                                    loadingSwal.update({
-                                                        html: `Procesando etiqueta ${index + 1} de ${etiquetasConSku.length}<br>
-                                                            Ordenadas por SKU | Envíos excluidos: ${contadorExcluidas}`
-                                                    });
-                                                    
-                                                    if (item.esDeProvinciaExcluida) {
-                                                        contadorExcluidas++;
-                                                    }
+                // --- FORMATO NUEVO ---
+                // Descripción: ^FO200,100^A0N,27,27^FB570,3,-1^FH^FD[Descripción]^FS
+                // SKU: ^FO200,181^A0N,24,24^FB570,3,-1^FH^FD...SKU: [SKU]^FS
+                const descNuevoMatch = etiqueta.match(/\^FO200,100\^A0N,27,27\^FB570,3,-1\^FH\^FD([^\^]+)\^FS/);
+                const skuNuevoMatch = etiqueta.match(/\^FO200,181\^A0N,24,24\^FB570,3,-1\^FH\^FD.*SKU:\s*([A-Za-z0-9_\-]+)[^\^]*\^FS/);
 
-                                                    // Construir bloques según si es provincia excluida o no
-                                                    const bloquesSuperiores = item.esDeProvinciaExcluida ? 
-                                                        `^FX LAST CLUSTER  ^FS
-                                                        ^FO20,1^GB760,45,45^FS
-                                                        ^FO20,6^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
-                                                        ^FX END LAST CLUSTER  ^FS` : 
-                                                        `    
-                                                        ^FX LAST CLUSTER ^FS
-                                                        ^FO20,1^GB760,45,1^FS
-                                                        ^FO20,6^A0N,45,45^FB760,1,0,C^FDVENTA: ${item.ventaCompleta}^FS
-                                                        ^FX END LAST CLUSTER ^FS
+                let sku = '', descripcion = '';
+                let esFormatoNuevo = false;
 
-                                                        ^FX LAST CLUSTER ^FS
-                                                    ${item.cantidad > 1 ? 
-                                                        `^FO20,60^GB760,50,50^FS
-                                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FR^FDU: ${item.cantidad} / SKU: ${item.sku}^FS` : 
-                                                        `^FO20,60^GB760,45,1^FS
-                                                        ^FO20,66^A0N,45,45^FB760,1,0,C^FDU: ${item.cantidad} / SKU: ${item.sku}^FS`
-                                                    }
-                                                    ^FX END LAST CLUSTER ^FS
-
-                                                        ^FX LAST CLUSTER ^FS
-                                                        ^FO20,120^GB760,45,1^FS
-                                                        ^FO20,126^A0N,45,45^FB760,1,0,C^FD${item.descripcion}^FS
-                                                        ^FX END LAST CLUSTER ^FS
-
-                                                        ^FX LAST CLUSTER ^FS
-                                                        ^FO20,190^A0N,30,30^FB760,3,10,C^FD${item.textoEnvio}^FS
-                                                        ^FX END LAST CLUSTER ^FS`;
-
-                                                    // Limpiar etiqueta original
-                                                    let etiquetaLimpia = item.etiquetaOriginal;
-                                                    [
-                                                        /\^FO30,80\^A0N,70,70\^FB160,1,0,C\^FD\d+\^FS/,
-                                                        /\^FO30,150\^A0N,25,25\^FB150,1,0,C\^FDCantidad\^FS/,
-                                                        /\^FO200,15\^A0N,29,29\^FB570,2,-1\^FH\^FD[^\^]+\^FS/,
-                                                        /\^FO200,95\^A0N,24,24\^FB570,1,-1\^FH\^FDColor:[^\^]+\^FS/,
-                                                        /\^FO201,95\^A0N,24,24\^FB570,1,-1\^FH\^FDColor:\^FS/,
-                                                        /\^FO200,190\^A0N,30,30\^FH\^FDSKU:\^FS/,
-                                                        /\^FO265,192\^A0N,25,25\^FB510,1,-1\^FH\^FD[^\^]+\^FS/,
-                                                        /\^FX LAST CLUSTER.*?\^FX END LAST CLUSTER\s*\^FS/gs
-                                                    ].forEach(regex => {
-                                                        etiquetaLimpia = etiquetaLimpia.replace(regex, '');
-                                                    });
-                                                    
-                                                    // Insertar nuevos bloques
-                                                    const posInsert = etiquetaLimpia.indexOf('^LH0,90');
-                                                    if (posInsert !== -1) {
-                                                        const endOfLine = etiquetaLimpia.indexOf('\n', posInsert);
-                                                        const insertionPoint = endOfLine !== -1 ? endOfLine : posInsert + '^LH0,90'.length;
-                                                        
-                                                        return etiquetaLimpia.slice(0, insertionPoint) + 
-                                                            '\n' + bloquesSuperiores + 
-                                                            etiquetaLimpia.slice(insertionPoint);
-                                                    }
-                                                    
-                                                    return etiquetaLimpia;
-                                                });
-                                                                                                
-                                                // Cerrar loader
-                                                loadingSwal.close();
-                                                
-                                                // 5. Reconstruir el archivo con etiquetas ordenadas
-                                                let nuevoContenido = etiquetasOrdenadasModificadas.join('^XZ').trim() + '^XZ';
-                                                
-                                                // 6. Mostrar resumen antes de descargar
-                                                await Swal.fire({
-                                                    title: 'Proceso completado',
-                                                    html: `Total etiquetas procesadas: ${etiquetasConSku.length}<br>
-                                                        Ordenadas alfabéticamente por SKU<br>
-                                                        Envíos a provincias excluidas: ${contadorExcluidas}`,
-                                                    icon: 'success',
-                                                    confirmButtonText: 'Descargar Archivo'
-                                                });
-                                                
-                                                // 7. Crear y descargar archivo modificado y ordenado
-                                                const blob = new Blob([nuevoContenido], { type: 'text/plain' });
-                                                const blobUrl = URL.createObjectURL(blob);
-                                                
-                                                const a = document.createElement('a');
-                                                a.href = blobUrl;
-                                                a.download = `${selectedFolderDate}_TandaNovogar_Validada_${fileRef.name}`;
-                                                document.body.appendChild(a);
-                                                a.click();
-                                                
-                                                // Limpieza
-                                                setTimeout(() => {
-                                                    document.body.removeChild(a);
-                                                    URL.revokeObjectURL(blobUrl);
-                                                }, 100);
-                                                
-                                            } catch (error) {
-                                                loadingSwal.close();
-                                                console.error('Error al generar tanda Novogar ordenada:', error);
-                                                Swal.fire('Error', `No se pudo generar la tanda Novogar ordenada: ${error.message}`, 'error');
-                                            }
-
-                                            });
+                // --- LÓGICA DE DETECCIÓN Y EXTRACCIÓN ---
+                if (skuAntiguoMatch || descAntiguoMatch) {
+                    // FORMATO ANTIGUO
+                    // Extraigo y decodifico el SKU si viene en formato especial
+                    let rawSku = skuAntiguoMatch ? skuAntiguoMatch[1].trim().toUpperCase() : 'ZZZ_SIN_SKU_EN_MELI';
+                    sku = rawSku.replace(/_([0-9A-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+                    descripcion = descAntiguoMatch ? descAntiguoMatch[1].trim() : '';
+                    descripcion = descripcion.substring(0, 30);
+                    esFormatoNuevo = false;
+                } else if (skuNuevoMatch || descNuevoMatch) {
+                    // FORMATO NUEVO
+                    sku = skuNuevoMatch ? skuNuevoMatch[1].trim().toUpperCase() : 'ZZZ_SIN_SKU_EN_MELI';
+                    descripcion = descNuevoMatch ? descNuevoMatch[1].trim() : '';
+                    descripcion = descripcion.substring(0, 30);
+                    esFormatoNuevo = true;
+                } else {
+                    // No se detectó formato, fallback
+                    sku = 'ZZZ_SIN_SKU_EN_MELI';
+                    descripcion = '';
+                    esFormatoNuevo = false;
                 }
 
+                // --- ANTIGUO ---
+                const ventaMatch = etiqueta.match(/\^FO188,245\^A0N,30,30\^FD(\d+)\^FS/);
+                const precioMatch = etiqueta.match(/\^FO124,249\^A0N,25,25\^FD(\d+)\^FS/);
+                // --- NUEVO ---
+                const ventaNuevoMatch = etiqueta.match(/\^FO19[89],40\^A0N,30,30\^FD(\d+)\^FS/);
+                const codigoMatch = etiqueta.match(/\^FO134,39\^A0N,25,25\^FD(\d+)\^FS/);
+
+                // Determinar ventaCompleta según formato
+                let ventaCompleta = '';
+                if (ventaMatch || precioMatch) {
+                    ventaCompleta = (precioMatch ? precioMatch[1] : '') + (ventaMatch ? ventaMatch[1] : '');
+                } else if (ventaNuevoMatch) {
+                    // Si existe código especial, anteponerlo
+                    if (codigoMatch) {
+                        ventaCompleta = codigoMatch[1] + ventaNuevoMatch[1];
+                    } else {
+                        ventaCompleta = ventaNuevoMatch[1];
+                    }
+                }
+
+                // --- ANTIGUO ---
+                const cantidadMatch = etiqueta.match(/\^FO30,80\^A0N,70,70\^FB160,1,0,C\^FD(\d+)\^FS/);
+                // --- NUEVO ---
+                // ^FO10,130^A0N,70,70^FB160,1,0,C^FD1^FS
+                const cantidadNuevoMatch = etiqueta.match(/\^FO10,130\^A0N,70,70\^FB160,1,0,C\^FD(\d+)\^FS/);
+
+                // Determinar cantidad según formato
+                let cantidad = '0';
+                if (cantidadMatch) {
+                    cantidad = cantidadMatch[1].trim();
+                } else if (cantidadNuevoMatch) {
+                    cantidad = cantidadNuevoMatch[1].trim();
+                }
+
+                // Extraer información de Firebase en una sola llamada
+                let textoEnvio = '';
+                let esDeProvinciaExcluida = false;
+                let cantidadFirebase = 'X';
+
+                if (ventaCompleta && ventaCompleta !== '00000') {
+                    try {
+                        // Obtener todos los envíos de /enviosID
+                        const snapshot = await firebase.database().ref('/enviosID').once('value');
+                        const allEnvios = snapshot.val();
+
+                        let nodoEncontrado = null;
+
+                        if (allEnvios) {
+                            const claves = Object.keys(allEnvios);
+
+                            // Buscar clave que contenga exactamente `P-ventaCompleta` o `V-ventaCompleta`
+                            nodoEncontrado = claves.find(key => key.includes(`P-${ventaCompleta}`)) ||
+                                            claves.find(key => key.includes(`V-${ventaCompleta}`));
+
+                            if (nodoEncontrado) {
+                                const data = allEnvios[nodoEncontrado];
+
+                                // Obtener cantidad
+                                cantidadFirebase = data.Cantidad || 'X';
+                                textoEnvio = `VERIFICADO: ${sku} - Cantidad: ${cantidadFirebase}`;
+
+                                // Buscar provincia en additional_info
+                                let provincia = undefined;
+                                let provincia2 = undefined;
+
+                                if (
+                                    data.client &&
+                                    data.client.billing_info &&
+                                    Array.isArray(data.client.billing_info.additional_info)
+                                ) {
+                                    const infoProvincia = data.client.billing_info.additional_info.find(
+                                        info => info.type === "STATE_NAME"
+                                    );
+                                    provincia = infoProvincia?.value?.toLowerCase();
+                                }
+
+                                // Si no se encontró en additional_info, buscar en data.Provincia
+                                if (data.Provincia) {
+                                    provincia2 = data.Provincia.toLowerCase();
+                                }
+
+                                // Verificar provincia excluida
+                                const provinciasExcluidas = ["jujuy", "tierra del fuego"];
+                                esDeProvinciaExcluida = provinciasExcluidas.includes(provincia) || provinciasExcluidas.includes(provincia2);
+                            }
+                        }
+                    } catch (firebaseError) {
+                        console.error(`Error al consultar Firebase para venta ${ventaCompleta}:`, firebaseError);
+                    }
+                }
+
+                // Devolvemos objeto con etiqueta, SKU y datos para ordenamiento
+                return {
+                    sku,
+                    descripcion,
+                    etiquetaOriginal: etiqueta,
+                    esDeProvinciaExcluida,
+                    ventaCompleta,
+                    cantidad: cantidadFirebase !== 'X' ? cantidadFirebase : cantidad,
+                    textoEnvio,
+                    esFormatoNuevo,
+                };
+            }));
+
+            // 3. Ordenar etiquetas alfabéticamente por SKU
+            etiquetasConSku.sort((a, b) => {
+                // Ordenamos alfabéticamente ignorando mayúsculas/minúsculas
+                return a.sku.localeCompare(b.sku);
+            });
+
+            // 4. Procesar las etiquetas ordenadas
+            let contadorExcluidas = 0;
+            const etiquetasOrdenadasModificadas = etiquetasConSku.map((item, index) => {
+                // Actualizar progreso
+                loadingSwal.update({
+                    html: `Procesando etiqueta ${index + 1} de ${etiquetasConSku.length}<br>
+                        Ordenadas por SKU | Envíos excluidos: ${contadorExcluidas}`
+                });
+
+                if (item.esDeProvinciaExcluida) {
+                    contadorExcluidas++;
+                }
+
+                const bloqueGFA = item.esFormatoNuevo
+                ? `^FO50,250^GFA,4838,4838,82,,:::kI0401J04L02K04,jW03F9FC3F0FC7F3F070FE1F80FE3F1FC,jW03FDFE7F8FE7F3F870FF3FC0FE7F9FE,jW039DC661DC660318F8E330E0C761DC66,jW039DCE60D807E3C0D8E33060C660DCE6,jW03F9FCE0D807F1F0DCE3F060FEE0DFC2,jW03F1F8E0D8060079FCE3F060FCE0DF8,jW0381DC61DC660719FCE330E0C061DDC,gS03FI0FI03F803FC003FC00FF003FC00FFK0FF8I01FE001IFP0381CE7B9EE603BB8EEF3DC0C07B9CE2,gS07FC01F8007FC03FC00IF81FF807FE07FFCI03IFI03FE001JF8N0381C73F8FC7FBFB06FE1FC0C03F9C76,gS0FFE01FC007FE03FC03IFC0FF807FC0JFI0JF8003FF001JFEI0FJ0100830E0387F0E306780700C00E0832,gR01IF03FC007FF03FC07JF0FF807FC3JF801JFE007FF001KFI0F,gR01IF03FC007FF03FC0KF87FC0FF87JFC03JFC007FF801KF800F,gR03IF81FE007FF83FC1KF87FC0FF87JFE07JF8007FF801KF800F,gR03IF81FE007FFC3FC3KFC7FC0FF8LF07JF800IFC01KFC00FW03E,gR03IFC1FE007FFE3FC3FF8FFE3FE1FF1FFC7FF0FFE1FI0IFC01FF1FFC00FW07F8,gR03IFC1FE007IF3FC3FE07FE3FE1FF1FF01FF0FF806001IFC01FE07FC00FI0FS0FF800IFC,gR03IFE1FE007IF3FC7FC03FE1FE1FE1FF00FF9FFK01IFE01FE03FC00F007F8R0FF803JF,gR07FBFE1FE007KFC7FC01FF1FF3FE3FE00FF9FFK03IFE01FE03FC00F00FF8R07F803JF8,gR07F9FE1FE007KFC7F801FF1FF3FE3FE007F9FE0IF03FDFF01FE07FC00F00FF8R03E003JFC,gR07F9FF1FE007KFC7F801FF0FF3FC3FE007F9FE0IF03FCFF01KF800F00FF8I0FE001EM03JFC00FCI07FC,gR07F8FF1FE007KFC7F801FF0JFC3FE007F9FE0IF07FCFF01KF800F00FF8007FFC07FBFC3F003FE7FE0IF803IF8,gR07F8FF9FE007KFC7F801FF07IF83FE007F9FE0IF07F8FF81KFI0F00FF801IFE0FFBFC7F803FE3FE1IFC0JF8,gR07F8FF9FE007FDIFC7FC01FF07IF83FE00FF9FF0IF0FF87F81JFEI0F00FF803JF0JFCFF803FE3FE3IFE0JF8,gR07F87F9FE007FCIFC7FC03FE07IF81FF00FF9FF00FF0KFC1JFCI0F00FF803JF1JFCFF803FE3FE3JF1JF8,gR07F87FDFE007FCIFC3FE07FE03IF01FF81FF0FF80FF0KFC1JFCI0F00FF807FCFF9FF7FCFF803FE3FE1JF1FE7F8,gR07F83IFC007FC7FFC3KFC03IF01LF0FFE0FF1KFE1FE7FCI0F00FF807FCFF9FE7FCFF803FE3FE0C1FF3FE7F8,gR07F83IFC007FC3FFC1KFC01FFE00KFE07KF1KFE1FE3FEI0F00FF807FCFF9FE7FCFF803FE7FC001FF3FC7F8,gR07F83IFC007FC1FFC1KF801FFE007JFE07KF3KFE1FE3FFI0F00FF807FCFF9FE7FCFF803JFC07IF3FC7F8,gR07F81IF8007FC0FFC0KF001FFE003JFC03KF3LF1FE1FFI0F00FF807FCFF9FE7FCFF803JFC1JF3FC7F8,gR03F80IF8007FC07FC07IFEI0FFC001JF801JFE7FC01FF1FE0FF800F00FF807FCFF9FE7FCFF803JF83JF3FC7F8,gR03FC07FFI07FC07FC03IFCI0FFCI0IFEI07IFC7FC00FF9FE0FFC00F00FF807FCFF9FF7FCFF803JF07FCFF3FC7F8,gR03FC03FEI07FC03FC00IFJ07F8I03FFCI03IF07F800FF9FE07FC00F00JF7FCFF9FF7FCFF803IFE07FCFF3FE7F8,gR03FC00FS01F8Q07CK03FX0F00JF7FCFF8JFCFF803FEI07FCFF3FE7F8,gR03FChW0F00JF3JF0JFCFF803FEI07FDFF3JF8,gR01FC2I038hQ0F00JF3JF07FBFCFF803FEI07JF3JF8,gR01FC3I07ChQ0F00JF1IFEI03FCFF803FEI03JF1JF8,gS0FC3800F8hQ0F00IFE0IF8I03FCFF803FEI03FEFF0JF8,gS0F81F07F8hQ0F007FFE03FF003CFFC7F001FCJ0FCFF07E7F8,gV0JFhR0FR07IF8X07F8,gV07FFEhR0FR07IF8X07F8,gV03FFChR0FR07IFY07F8,gW0FFiL07FFEY07F8,kK01FFg038,,::::::::::^FS`
+                : '';
+
+                // Construir bloques según si es provincia excluida o no
+                const bloquesSuperiores = item.esDeProvinciaExcluida ?
+                    `^FX LAST CLUSTER  ^FS
+                    ^FO20,1^GB760,45,45^FS
+                    ^FO20,6^A0N,45,45^FB760,1,0,C^FR^FDNO ENVIAR - LOGIPAQ^FS
+                    ^FX END LAST CLUSTER  ^FS` :
+                    `    
+                    ^FX LAST CLUSTER ^FS
+                    ^FO20,1^GB760,45,1^FS
+                    ^FO20,6^A0N,45,45^FB760,1,0,C^FDVENTA: ${item.ventaCompleta}^FS
+                    ^FX END LAST CLUSTER ^FS
+
+                    ^FX LAST CLUSTER ^FS
+                ${item.cantidad > 1 ?
+                        `^FO20,60^GB760,50,50^FS
+                    ^FO20,66^A0N,45,45^FB760,1,0,C^FR^FDU: ${item.cantidad} / SKU: ${item.sku}^FS` :
+                        `^FO20,60^GB760,45,1^FS
+                    ^FO20,66^A0N,45,45^FB760,1,0,C^FDU: ${item.cantidad} / SKU: ${item.sku}^FS`
+                    }
+                ^FX END LAST CLUSTER ^FS
+
+                    ^FX LAST CLUSTER ^FS
+                    ^FO20,120^GB760,45,1^FS
+                    ^FO20,126^A0N,45,45^FB760,1,0,C^FD${item.descripcion}^FS
+                    ^FX END LAST CLUSTER ^FS
+
+                    ^FX LAST CLUSTER ^FS
+                    ^FO20,190^A0N,30,30^FB760,3,10,C^FD${item.textoEnvio}^FS
+                    ^FX END LAST CLUSTER ^FS
+
+                    ${bloqueGFA}
+                    `;
+
+                // Limpiar etiqueta original
+                let etiquetaLimpia = item.etiquetaOriginal;
+
+                // --- LIMPIEZA PARA AMBOS FORMATOS ---
+[
+    // --- ANTIGUO ---
+    /\^FO30,80\^A0N,70,70\^FB160,1,0,C\^FD\d+\^FS/,
+    /\^FO30,150\^A0N,25,25\^FB150,1,0,C\^FDCantidad\^FS/,
+    /\^FO200,15\^A0N,29,29\^FB570,2,-1\^FH\^FD[^\^]+\^FS/,
+    /\^FO200,95\^A0N,24,24\^FB570,1,-1\^FH\^FDColor:[^\^]+\^FS/,
+    /\^FO201,95\^A0N,24,24\^FB570,1,-1\^FH\^FDColor:\^FS/,
+    /\^FO200,190\^A0N,30,30\^FH\^FDSKU:\^FS/,
+    /\^FO265,192\^A0N,25,25\^FB510,1,-1\^FH\^FD[^\^]+\^FS/,
+    // --- NUEVO ---
+    /\^FO10,130\^A0N,70,70\^FB160,1,0,C\^FD\d+\^FS/,
+    /\^FO10,210\^A0N,25,25\^FB150,1,0,C\^FDUnidad\^FS/,
+    /\^FO10,210\^A0N,25,25\^FB150,1,0,C\^FDUnidades\^FS/,
+    /\^FO200,100\^A0N,27,27\^FB570,3,-1\^FH\^FD[^\^]+\^FS/,
+    /\^FO200,181\^A0N,24,24\^FB570,3,-1\^FH\^FD.*SKU:\s*[A-Za-z0-9_\-]+[^\^]*\^FS/,
+    // --- NUEVOS PEDIDOS ---
+    /\^FO30,40\^A0N,28,28\^FH\^FDVenta ID:\^FS/,
+    /\^FO31,40\^A0N,28,28\^FH\^FDVenta ID:\^FS/,
+    /\^FO30,40\^A0N,28,28\^FH\^FDPack ID:\^FS/,
+    /\^FO31,40\^A0N,28,28\^FH\^FDPack ID:\^FS/,
+    /\^FO134,39\^A0N,25,25\^FD\d+\^FS/,
+    /\^FO198,40\^A0N,30,30\^FD\d+\^FS/,
+    /\^FO199,40\^A0N,30,30\^FD\d+\^FS/,
+    /\^FO450,30\^A0N,20,20\^FB330,2,0,L\^FH\^FDRecortá esta parte de la etiqueta para que tu paquete viaje seguro.\^FS/,
+    /\^FO0,90\^GB810,2,1\^FS/,
+    /\^FO150,100\^GB30,30,3\^FS/,
+    // --- BLOQUES PROPIOS DEL SISTEMA ---
+    /\^FX LAST CLUSTER.*?\^FX END LAST CLUSTER\s*\^FS/gs
+].forEach(regex => {
+    etiquetaLimpia = etiquetaLimpia.replace(regex, '');
+});
+
+                // Insertar nuevos bloques
+                const posInsert = etiquetaLimpia.indexOf('^LH0,90');
+                if (posInsert !== -1) {
+                    const endOfLine = etiquetaLimpia.indexOf('\n', posInsert);
+                    const insertionPoint = endOfLine !== -1 ? endOfLine : posInsert + '^LH0,90'.length;
+
+                    return etiquetaLimpia.slice(0, insertionPoint) +
+                        '\n' + bloquesSuperiores +
+                        etiquetaLimpia.slice(insertionPoint);
+                }
+
+                return etiquetaLimpia;
+            });
+
+            // Cerrar loader
+            loadingSwal.close();
+
+            // 5. Reconstruir el archivo con etiquetas ordenadas
+            let nuevoContenido = etiquetasOrdenadasModificadas.join('^XZ').trim() + '^XZ';
+
+            // 6. Mostrar resumen antes de descargar
+            await Swal.fire({
+                title: 'Proceso completado',
+                html: `Total etiquetas procesadas: ${etiquetasConSku.length}<br>
+                    Ordenadas alfabéticamente por SKU<br>
+                    Envíos a provincias excluidas: ${contadorExcluidas}`,
+                icon: 'success',
+                confirmButtonText: 'Descargar Archivo'
+            });
+
+            // 7. Crear y descargar archivo modificado y ordenado
+            const blob = new Blob([nuevoContenido], { type: 'text/plain' });
+            const blobUrl = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `${selectedFolderDate}_TandaNovogar_Validada_${fileRef.name}`;
+            document.body.appendChild(a);
+            a.click();
+
+            // Limpieza
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            }, 100);
+
+        } catch (error) {
+            loadingSwal.close();
+            console.error('Error al generar tanda Novogar ordenada:', error);
+            Swal.fire('Error', `No se pudo generar la tanda Novogar ordenada: ${error.message}`, 'error');
+        }
+    });
+}
                                         
                                     }
                                     
