@@ -1020,16 +1020,15 @@ const paymentHTML = `
 
 </div>
                 
-                <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked || isLogPlaceIt || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'background-color: #d0ffd1;' : ''}">
-                    ${isBlocked ? '<i class="bi bi-info-square-fill"></i> Despacho Bloqueado por Facturación, separar remito para realizar circuito' : ''}
-                    ${isLogPlaceIt ? `<i class="bi bi-info-square-fill"></i> <strong>Logistica Placeit</strong> Plazo de entrega entre ${data.diasPlaceIt}` : ''}
-                    ${logBsCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Buenos Aires, se ha bloqueado el despacho por logistica privada.' : ''}
-                    ${logStaFeCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Santa Fe, se ha bloqueado el despacho por logistica privada.' : ''}
-                    ${logRafaelaCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Rafaela, se ha bloqueado el despacho por logistica privada.' : ''}
-                    ${logSanNicolasCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion San Nicolás, se ha bloqueado el despacho por logistica privada.' : ''}
-                    ${(logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp))) ? `<button class="btn btn-sm btn-warning mt-2" id="unlockLogisticsButton${data.idOperacion}" onclick="desbloquearLogisticas('${data.idOperacion}')"><i class="bi bi-unlock-fill"></i> Desbloquear Logisticas</button>` : ''}
-                </div>
-
+            <div id="resultado${data.idOperacion}" class="mt-2 errorMeli" style="${isBlocked || isLogPlaceIt || (isME2 ? false : (logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)))) ? 'background-color: #d0ffd1;' : ''}">
+                ${isBlocked ? '<i class="bi bi-info-square-fill"></i> Despacho Bloqueado por Facturación, separar remito para realizar circuito' : ''}
+                ${isLogPlaceIt ? `<i class="bi bi-info-square-fill"></i> <strong>Logistica Placeit</strong> Plazo de entrega entre ${data.diasPlaceIt}` : ''}
+                ${isME2 ? '' : (logBsCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Buenos Aires, se ha bloqueado el despacho por logistica privada.' : '')}
+                ${isME2 ? '' : (logStaFeCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Santa Fe, se ha bloqueado el despacho por logistica privada.' : '')}
+                ${isME2 ? '' : (logRafaelaCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion Rafaela, se ha bloqueado el despacho por logistica privada.' : '')}
+                ${isME2 ? '' : (logSanNicolasCps.includes(Number(data.Cp)) ? '<i class="bi bi-info-square-fill"></i> Logistica propia NOVOGAR Camion San Nicolás, se ha bloqueado el despacho por logistica privada.' : '')}
+                ${(isME2 ? false : (logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)))) ? `<button class="btn btn-sm btn-warning mt-2" id="unlockLogisticsButton${data.idOperacion}" onclick="desbloquearLogisticas('${data.idOperacion}')"><i class="bi bi-unlock-fill"></i> Desbloquear Logisticas</button>` : ''}
+            </div>
                             
             </div>
 
