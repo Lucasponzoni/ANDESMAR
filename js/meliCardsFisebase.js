@@ -3532,8 +3532,5 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
 }
 // FIN GENERAR ETIQUETA LOGISTICA PROPIA
 
-// Llama a cargarDatos para iniciar el proceso
-cargarDatos();
-
 
 
