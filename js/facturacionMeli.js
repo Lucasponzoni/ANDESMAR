@@ -687,6 +687,11 @@ function loadTable(data, estadoFilter = null) {
                         paymentMethodImage = './Img/mercadopago.png';
                         paymentDetails = '<strong>Dinero en Cuenta</strong>';
                         break;
+                    case 'debin_transfer':
+                    case 'bank_transfer ':
+                        paymentMethodImage = './Img/debin_transfer.png';
+                        paymentDetails = '<strong>Debin Bancario</strong>';
+                        break;
                     case 'visa':
                     case 'debvisa':
                         paymentMethodImage = './Img/visa.png';
@@ -715,11 +720,23 @@ function loadTable(data, estadoFilter = null) {
                         break;
                 }
     
-                if (payment.payment_method_id !== 'consumer_credits' && payment.payment_method_id !== 'account_money' && payment.payment_method_id !== 'pagofacil' && payment.payment_method_id !== 'rapipago') {
-                    const paymentType = payment.payment_type === 'credit_card' ? '<strong>Crédito</strong>' : payment.payment_type === 'debit_card' ? '<strong>Débito</strong>' : payment.payment_type;
-                    paymentDetails = `${paymentType} en ${payment.installments} cuota/s de ${formatCurrency(payment.installment_amount)}`;
+                if (
+                    payment.payment_method_id !== 'consumer_credits' &&
+                    payment.payment_method_id !== 'account_money' &&
+                    payment.payment_method_id !== 'pagofacil' &&
+                    payment.payment_method_id !== 'rapipago'
+                ) {
+                    if (payment.payment_type === 'credit_card') {
+                        paymentDetails = `<strong>Crédito</strong> en ${payment.installments} cuota/s de ${formatCurrency(payment.installment_amount)}`;
+                    } else if (payment.payment_type === 'debit_card') {
+                        paymentDetails = `<strong>Débito</strong> en ${payment.installments} cuota/s de ${formatCurrency(payment.installment_amount)}`;
+                    } else if (payment.payment_type === 'debin_transfer' || payment.payment_type === 'bank_transfer') {
+                        paymentDetails = `<strong>Debin Bancario inmediato</strong>`;
+                    } else {
+                        paymentDetails = payment.payment_type;
+                    }
                 }
-    
+
                 paymentCell.innerHTML = `
                     <div class="payment-cell">
                         <img src="${paymentMethodImage}" alt="${payment.payment_method_id}">
