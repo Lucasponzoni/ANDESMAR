@@ -690,6 +690,8 @@ if (data.payment_method_id !== 'consumer_credits' && data.payment_method_id !== 
     paymentDetails = `${paymentType} en ${data.installments} cuota/s de ${formatCurrency(data.installment_amount)}`;
 }
 
+const isME2 = data.shippingMode && data.shippingMode.toLowerCase() === 'me2';
+
 const paymentHTML = `
     <div class="payment-cell">
         <img src="${paymentMethodImage}" alt="${payment.payment_method_id}">
@@ -900,61 +902,83 @@ const paymentHTML = `
 
                 <div class="conjuntoDeBotonesMeli" style="display: flex; flex-direction: column;">
     
+    <!-- Aviso SOLO si es ME2 -->
+    ${isME2 ? `
+    <div class="alert-macos-meli-me2" id="alertME2-${data.idOperacion}">
+        <i class="bi bi-shield-lock-fill shield-me2"></i>
+        <div>
+        <strong class="unlock-title">¿Por qué está bloqueado el envío?</strong><br>
+        Esta compra posee despacho con colecta de Mercado Envíos. No debe despacharse.<br>
+        <b>LogiPaq</b> bloquea la generación de etiquetas.
+        </div>
+        <button type="button" class="unlock-btn unlock-me2" onclick="desbloquearEnvios('${data.idOperacion}')">
+        <i class="bi bi-unlock"></i> Desbloquear envíos
+        </button>
+    </div>
+    ` : ''}
+
     <div class="bg-Hr-primary mb-1">
     <p><i class="bi bi-tags-fill"></i> Logistica Privada</p>
     </div>
 
     <!-- Botón Cruz del Sur -->
-        <button class="btn mb-1 ${isCDS ? 'btn-success' : 'btn-dark-blue'} btnCDSMeli" 
-        id="CDSButton${data.idOperacion}" 
-        ${isAndesmar || isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
-        ${isBlocked ? 'disabled' : ''}
-        ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}', '${data.SKU}')`}">
-        <span id="CDSText${data.idOperacion}">
+    <button class="btn mb-1 ${isCDS ? 'btn-success' : 'btn-dark-blue'} btnCDSMeli ${isME2 ? 'disabled' : ''}" 
+    id="CDSButton${data.idOperacion}" 
+    ${isAndesmar || isAndreani || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
+    ${isBlocked ? 'disabled' : ''}
+    ${isLogPlaceIt ? 'disabled' : ''} 
+    ${isME2 ? 'disabled' : ''}
+    data-opid="${data.idOperacion}"
+    onclick="${isCDS ? `descargarEtiqueta('${data.cotizacion}', '${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosCDS('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}', '${data.SKU}')`}">
+    <span id="CDSText${data.idOperacion}">
         ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
-        </span>
-        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerCDS${data.idOperacion}" style="display:none;"></span>
-        </button>
+    </span>
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerCDS${data.idOperacion}" style="display:none;"></span>
+    </button>
     <!-- Botón Cruz del Sur -->
-
 
     <div class="conjuntoDeBotonesMeli" style="display: flex; flex-direction: row; align-items: center;">
     <!-- Botón Andesmar --> 
-    <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} btnAndesmarMeli" 
+    <button class="btn ${isAndesmar ? 'btn-success' : 'btn-primary'} btnAndesmarMeli ${isME2 ? 'disabled' : ''}" 
         id="andesmarButton${data.idOperacion}" 
         ${isAndreani || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
         ${isBlocked ? 'disabled' : ''} 
         ${isLogPlaceIt ? 'disabled' : ''} 
+        ${isME2 ? 'disabled' : ''}
+        data-opid="${data.idOperacion}"
         ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data.andesmarId}', '_blank')"` : `onclick="enviarDatosAndesmar('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}','${email}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}', '${data.SKU}')`}">
         <span id="andesmarText${data.idOperacion}">
-            ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>'}
+        ${isAndesmar ? '<i class="bi bi-filetype-pdf"></i> Descargar PDF ' + data.andesmarId : '<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>'}
         </span>
         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;" id="spinnerAndesmar${data.idOperacion}"></span>
     </button>
     <!-- Botón Andesmar --> 
 
     <!-- Nuevo botón para descargar la etiqueta Mini-->
-    <button class="btn btn-success mini-etiqueta-andi mb-1 ${isAndesmar ? '' : 'hidden'}" 
-            id="downloadButton${data.idOperacion}" 
-            style="margin-left: 2px;" 
-            onclick="descargarEtiquetaMini('${limpiarNombreApellido(data.NombreyApellido || data.Recibe)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${limpiarProducto(data.Producto)}', '${data.idOperacion}', '${data.SKU}')" 
-            ${isBlocked ? 'disabled' : ''}>
+    <button class="btn btn-success mini-etiqueta-andi mb-1 ${isAndesmar ? '' : 'hidden'} ${isME2 ? 'disabled' : ''}" 
+        id="downloadButton${data.idOperacion}" 
+        style="margin-left: 2px;" 
+        onclick="descargarEtiquetaMini('${limpiarNombreApellido(data.NombreyApellido || data.Recibe)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${limpiarProducto(data.Producto)}', '${data.idOperacion}', '${data.SKU}')" 
+        ${isBlocked ? 'disabled' : ''}
+        ${isME2 ? 'disabled' : ''}
+        data-opid="${data.idOperacion}">
         <i class="bi bi-lightning-charge-fill"></i> Mini
     </button>
     </div>
 
     <!-- Botón Andreani -->
-    <button class="btn ${isAndreani ? 'btn-success' : 'btn-danger'} btnAndreaniMeli" 
-        id="andreaniButton${data.idOperacion}" 
-        ${isAndesmar || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
-        ${isBlocked ? 'disabled' : ''} 
-        ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}', '${formatCurrency(data.transactionAmount)}', '${data.Cantidad}', '${data.SKU}')`}">
-        <span id="andreaniText${data.idOperacion}">
-            ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
-        </span>
-        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.idOperacion}" style="display:none;"></span>
+    <button class="btn ${isAndreani ? 'btn-success' : 'btn-danger'} btnAndreaniMeli ${isME2 ? 'disabled' : ''}" 
+    id="andreaniButton${data.idOperacion}" 
+    ${isAndesmar || isCDS || logBsCps.includes(Number(data.Cp)) || logStaFeCps.includes(Number(data.Cp)) || logRafaelaCps.includes(Number(data.Cp)) || logSanNicolasCps.includes(Number(data.Cp)) ? 'disabled' : ''} 
+    ${isBlocked ? 'disabled' : ''} 
+    ${isLogPlaceIt ? 'disabled' : ''} 
+    ${isME2 ? 'disabled' : ''}
+    data-opid="${data.idOperacion}"
+    onclick="${isAndreani ? `handleButtonClick('${data.trackingNumber}', '${data.idOperacion}')` : `enviarDatosAndreani('${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.localidad}', '${data.Provincia}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}','${email}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenCM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${recibeSinCaracteresEspeciales}', '${data.transactionAmount}', '${formatCurrency(data.transactionAmount)}', '${data.Cantidad}', '${data.SKU}')`}">
+    <span id="andreaniText${data.idOperacion}">
+        ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar PDF ${data.trackingNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
+    </span>
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerAndreani${data.idOperacion}" style="display:none;"></span>
     </button>
     <!-- Botón Andreani -->
 
@@ -963,15 +987,17 @@ const paymentHTML = `
     </div>
 
     <!-- Botón Logística Propia --> 
-    <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'}"
-        id="LogPropiaMeliButton${data.idOperacion}" 
-        ${isBlocked ? 'disabled' : ''} 
-        ${isLogPlaceIt ? 'disabled' : ''} 
-        onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}')">
-        <span>
-            ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
-        </span>
-        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data.idOperacion}" style="display:none;"></span>
+    <button class="mt-1 btn btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'} ${isME2 ? 'disabled' : ''}"
+    id="LogPropiaMeliButton${data.idOperacion}" 
+    ${isBlocked ? 'disabled' : ''} 
+    ${isLogPlaceIt ? 'disabled' : ''} 
+    ${isME2 ? 'disabled' : ''}
+    data-opid="${data.idOperacion}"
+    onclick="generarPDF('${email}', '${data.idOperacion}', '${limpiarNombreApellido(data.NombreyApellido)}', '${data.Cp}', '${data.idOperacion}ME1', '${data.Calle}', '${data.Altura}', '${data.Telefono}', '${observacionesSanitizadas}', ${Math.round(data.Peso / 1000)}, ${data.VolumenM3}, ${data.Cantidad}, '${data.medidas}', '${limpiarProducto(data.Producto)}', '${data.localidad}', '${data.Provincia}', '${recibeSinCaracteresEspeciales}', '${formatCurrency(data.transactionAmount)}')">
+    <span>
+        ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
+    </span>
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data.idOperacion}" style="display:none;"></span>
     </button>
     <!-- Botón Logística Propia -->
     
@@ -1031,6 +1057,17 @@ copyButton.addEventListener('click', () => {
 });
 
     return cardDiv;
+}
+
+function desbloquearEnvios(opId) {
+  // Selecciona todos los botones de la card con el mismo data-opid
+  document.querySelectorAll('button[data-opid="'+opId+'"]').forEach(btn=>{
+    btn.classList.remove('disabled');
+    btn.removeAttribute('disabled');
+  });
+  // Oculta el aviso
+  var aviso = document.getElementById('alertME2-'+opId);
+  if(aviso) aviso.style.display = 'none';
 }
 
 function habilitarEdicion(id) {
@@ -1168,101 +1205,299 @@ async function handleButtonClick(numeroDeEnvio, id) {
     document.getElementById(`spinnerAndreani${id}`).style.display = 'none';
 }
 
-// Función para solicitar el número de cliente usando SweetAlert
-async function solicitarCliente() {
-    const { value: numeroCliente } = await Swal.fire({
-        title: '¿Cuál es el número de cliente?',
-        html: `
-            <div class="input-container">
-                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
-                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
-            </div>
-        `,
-        icon: 'question',
-        showCancelButton: false,
-        confirmButtonText: 'Aceptar',
-        customClass: {
-            popup: 'macos-popup',
-            input: 'macos-input',
-            title: 'macos-title',
-            confirmButton: 'macos-button',
-        },
-        didOpen: () => {
-            const input = document.getElementById('numeroCliente');
-            input.focus();
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    Swal.clickConfirm();
-                }
-            });
-        },
-        preConfirm: () => {
-            const input = document.getElementById('numeroCliente').value;
-            // Validaciones
-            if (!/^\d{2,8}$/.test(input)) {
-                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
-                return false;
-            }
-            return input;
-        },
-        allowEnterKey: true
-    });
+// MODAL CLIENTE & REMITO
+function mostrarModalLiquidGlass({
+    titulo = '',
+    placeholder = '',
+    emoji = '',
+    descripcion = '',
+    validacion = (v) => true,
+    mensajeError = 'Dato inválido',
+    maxlength = 8
+}) {
+    return new Promise((resolve) => {
+        if (document.getElementById('modal-liquid-glass-ios')) {
+            document.getElementById('modal-liquid-glass-ios').remove();
+        }
 
-    // Si el usuario cancela, salir de la función
-    if (!numeroCliente) {
-        return null; // Retorna null si se cancela
-    }
+        // Overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'modal-liquid-glass-ios';
+        overlay.style = `
+            position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;
+            background:rgba(0,0,0,0.12);backdrop-filter:blur(2px);
+            display:flex;align-items:center;justify-content:center;
+            animation:fadeInOverlay 0.28s;
+        `;
+
+        // Modal
+        const modal = document.createElement('div');
+        modal.style = `
+            min-width:320px;max-width:94vw;
+            background:rgba(255,255,255,0.68);
+            border-radius:22px;
+            box-shadow:0 8px 32px 0 #0003;
+            backdrop-filter:blur(18px) saturate(160%);
+            border:1.5px solid rgba(200,200,230,0.18);
+            padding:2.1em 1.5em 1.2em 1.5em;
+            display:flex;flex-direction:column;align-items:center;
+            position:relative;
+            overflow:hidden;
+            animation:popInModal 0.42s cubic-bezier(.23,1.25,.32,1) both;
+        `;
+
+        // Fondo SVG animado con 4 waves y colores vibrantes
+        modal.innerHTML = `
+            <svg style="
+                position:absolute;left:0;top:0;width:100%;height:100%;
+                z-index:0;pointer-events:none;opacity:0.62;
+            " viewBox="0 0 400 220" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="siriGradient1" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#00cfff"/> <!-- azul cyan -->
+                    <stop offset="50%" stop-color="#3b8dff"/> <!-- azul intermedio -->
+                    <stop offset="100%" stop-color="#9a4dff"/> <!-- violeta contraste -->
+                </linearGradient>
+                
+                <linearGradient id="siriGradient2" x1="0" y1="1" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#64d3ff"/> <!-- celeste pastel -->
+                    <stop offset="100%" stop-color="#005eff"/> <!-- azul fuerte -->
+                </linearGradient>
+                
+                <linearGradient id="siriGradient3" x1="1" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#00f2ff"/> <!-- turquesa claro -->
+                    <stop offset="100%" stop-color="#0074ff"/> <!-- azul saturado -->
+                </linearGradient>
+                
+                <linearGradient id="siriGradient4" x1="1" y1="1" x2="0" y2="0">
+                    <stop offset="0%" stop-color="#6a5fff"/> <!-- violeta azulado -->
+                    <stop offset="100%" stop-color="#33e0ff"/> <!-- celeste neón -->
+                </linearGradient>
+            </defs>
+                <path fill="url(#siriGradient1)" opacity="0.48">
+                    <animate attributeName="d" dur="7s" repeatCount="indefinite"
+                        values="
+                            M0,120 Q100,180 200,120 T400,120 V220 H0Z;
+                            M0,120 Q100,100 200,160 T400,120 V220 H0Z;
+                            M0,120 Q100,180 200,120 T400,120 V220 H0Z
+                        " />
+                </path>
+                <path fill="url(#siriGradient2)" opacity="0.33">
+                    <animate attributeName="d" dur="9s" repeatCount="indefinite"
+                        values="
+                            M0,140 Q100,100 200,160 T400,140 V220 H0Z;
+                            M0,140 Q100,180 200,120 T400,140 V220 H0Z;
+                            M0,140 Q100,100 200,160 T400,140 V220 H0Z
+                        " />
+                </path>
+                <path fill="url(#siriGradient3)" opacity="0.29">
+                    <animate attributeName="d" dur="11s" repeatCount="indefinite"
+                        values="
+                            M0,130 Q100,170 200,110 T400,130 V220 H0Z;
+                            M0,130 Q100,90 200,150 T400,130 V220 H0Z;
+                            M0,130 Q100,170 200,110 T400,130 V220 H0Z
+                        " />
+                </path>
+                <path fill="url(#siriGradient4)" opacity="0.22">
+                    <animate attributeName="d" dur="13s" repeatCount="indefinite"
+                        values="
+                            M0,125 Q100,185 200,125 T400,125 V220 H0Z;
+                            M0,125 Q100,95 200,145 T400,125 V220 H0Z;
+                            M0,125 Q100,185 200,125 T400,125 V220 H0Z
+                        " />
+                </path>
+            </svg>
+            <div style="position:relative;z-index:1;width:100%;">
+
+            <div style="position: relative; width: 100%; text-align: center; margin-bottom: 1.5em;">
+                <!-- Contenido con emoji y título -->
+                <div style="display:flex; align-items:center; justify-content:center; gap:0.7em; font-size:1.18em; font-weight:600; color:#222; position: relative; z-index: 1;">
+                    <span class="titulo-modal-liquid-glass">${titulo}</span>
+                </div>
+            </div>
+            
+                <input id="input-modal-lg"
+                    style="
+                        width:100%;
+                        background:rgba(255,255,255,0.88);
+                        border-radius:14px;
+                        border:1px solid #e3e3e6;
+                        box-shadow:0 1px 4px #0001;
+                        font-size:1.15em;
+                        padding:0.7em 1em;
+                        margin-bottom:0.8em;
+                        outline:none;
+                        transition:border 0.2s;
+                    "
+                    maxlength="${maxlength}"
+                    placeholder="${placeholder}"
+                    autocomplete="off"
+                    autofocus
+                >
+                <div style="
+                    display:flex;justify-content:center;margin-bottom:1.1em;
+                ">
+                  <div style="
+                      background:rgba(255,255,255,0.38);
+                      border-radius:15px;
+                      box-shadow:0 2px 8px #007aff11;
+                      padding:0.8em 1.2em;
+                      display:flex;align-items:center;gap:0.5em;
+                      font-size:1em;
+                      color:#565656FF;
+                      font-family:'Rubik',sans-serif;
+                      font-weight:500;
+                      text-align:center;
+                      text-shadow:0 2px 8px #c0e3ff66;
+                  ">
+                    <span style="font-size:1.25em;">✨</span>
+                    <span style="display:inline-block;">${descripcion}</span>
+                  </div>
+                </div>
+                <div id="error-modal-lg" style="
+                    display:none;
+                    background:rgba(255, 0, 64, 0.22);
+                    color:white;
+                    font-family:'Rubik',sans-serif;
+                    text-align:center;
+                    font-size:0.97em;
+                    font-weight:500;
+                    border-radius:17px;
+                    margin-bottom:0.7em;
+                    padding:0.7em 1em 0.7em 1em;
+                    backdrop-filter:blur(8px) saturate(180%);
+                    border:1.5px solid rgba(255,0,64,0.16);
+                    transition:all 0.18s;
+                "></div>
+                <div style="display:flex;gap:1em;justify-content:center;width:100%;">
+                    <button id="btn-modal-lg-ok" style="
+                        background:#007aff;color:#fff;
+                        font-size:1.05em;font-weight:600;padding:0.62em 2.1em;
+                        border:none;border-radius:13px;box-shadow:0 2px 8px #007aff22;
+                        cursor:pointer;transition:background 0.18s,transform 0.18s,box-shadow 0.18s;
+                        outline:none;
+                    ">Aceptar</button>
+                    <button id="btn-modal-lg-cancel" style="
+                        background:rgba(230,230,235,0.85);color:#444;
+                        font-size:1.05em;font-weight:500;padding:0.62em 2.1em;
+                        border:none;border-radius:13px;box-shadow:0 2px 8px #0001;
+                        cursor:pointer;transition:background 0.18s,transform 0.18s,box-shadow 0.18s;
+                        outline:none;
+                    ">Cancelar</button>
+                </div>
+            </div>
+        `;
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        // Animación de salida
+        function cerrar(valor) {
+            overlay.style.animation = "fadeOutOverlay 0.22s";
+            modal.style.animation = "popOutModal 0.38s cubic-bezier(.23,1.25,.32,1) both";
+            setTimeout(() => {
+                overlay.remove();
+                resolve(valor);
+            }, 220);
+        }
+
+        // Foco automático
+        setTimeout(() => document.getElementById('input-modal-lg').focus(), 100);
+
+        // Botón aceptar
+        document.getElementById('btn-modal-lg-ok').onclick = () => {
+            const val = document.getElementById('input-modal-lg').value.trim();
+            const err = document.getElementById('error-modal-lg');
+            if (!validacion(val)) {
+                err.innerHTML = mensajeError;
+                err.style.display = 'block';
+                document.getElementById('input-modal-lg').style.border = '1.5px solid #ff3b30';
+            } else {
+                err.style.display = 'none';
+                cerrar(val);
+            }
+        };
+
+        // Botón cancelar/Escape
+        document.getElementById('btn-modal-lg-cancel').onclick = () => cerrar(null);
+        overlay.onclick = (e) => { if (e.target === overlay) cerrar(null); };
+        document.onkeydown = (e) => {
+            if (e.key === 'Escape') cerrar(null);
+            if (e.key === 'Enter') document.getElementById('btn-modal-lg-ok').click();
+        };
+
+        // Efectos hover en botones
+        const btns = [document.getElementById('btn-modal-lg-ok'), document.getElementById('btn-modal-lg-cancel')];
+        btns.forEach(btn => {
+            btn.onmouseenter = () => {
+                btn.style.transform = "scale(1.06)";
+                btn.style.boxShadow = "0 4px 16px #007aff33";
+                if (btn.id === 'btn-modal-lg-ok') {
+                    btn.style.background = "#339cff";
+                } else {
+                    btn.style.background = "#f3f3f8";
+                }
+            };
+            btn.onmouseleave = () => {
+                btn.style.transform = "scale(1.00)";
+                btn.style.boxShadow = btn.id === 'btn-modal-lg-ok'
+                    ? "0 2px 8px #007aff22"
+                    : "0 2px 8px #0001";
+                btn.style.background = btn.id === 'btn-modal-lg-ok'
+                    ? "#007aff"
+                    : "rgba(230,230,235,0.85)";
+            };
+        });
+
+        // Animaciones CSS (solo una vez)
+        if (!document.getElementById('modal-lg-animations')) {
+            const style = document.createElement('style');
+            style.id = 'modal-lg-animations';
+            style.innerHTML = `
+                @keyframes fadeInOverlay { from { opacity:0; } to { opacity:1; } }
+                @keyframes fadeOutOverlay { from { opacity:1; } to { opacity:0; } }
+                @keyframes popInModal {
+                    0% { opacity:0; transform:scale(0.84) translateY(60px);}
+                    80% { opacity:1; transform:scale(1.03) translateY(-4px);}
+                    100% { opacity:1; transform:scale(1) translateY(0);}
+                }
+                @keyframes popOutModal {
+                    0% { opacity:1; transform:scale(1) translateY(0);}
+                    100% { opacity:0; transform:scale(0.84) translateY(40px);}
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    });
+}
+
+// USO: Solicitar Cliente
+async function solicitarCliente() {
+    const numeroCliente = await mostrarModalLiquidGlass({
+        titulo: 'Número de Cliente 🙋‍♂️',
+        placeholder: 'N° Cliente',
+        emoji: '👤',
+        descripcion: 'Ingresá tu <b>número de cliente</b> (máx. 8 dígitos)',
+        maxlength: 8,
+        validacion: v => /^\d{2,8}$/.test(v),
+        mensajeError: 'Por favor, ingresá un cliente válido'
+    });
     return numeroCliente;
 }
 
-// Función para solicitar el número de remito usando SweetAlert
+// USO: Solicitar Remito
 async function solicitarNumeroRemito() {
-    const { value: numeroRemito } = await Swal.fire({
-        title: '¿Cuál es el número de remito?',
-        html: `
-            <div class="input-container">
-                <input id="numeroRemito" class="swal2-input" placeholder="Número de Remito" maxlength="20" required>
-                <small class="input-description">Ingresar número de remito (mínimo 10 dígitos, solo números)</small>
-            </div>
-        `,
-        icon: 'question',
-        showCancelButton: false,
-        confirmButtonText: 'Aceptar',
-        customClass: {
-            popup: 'macos-popup',
-            input: 'macos-input',
-            title: 'macos-title',
-            confirmButton: 'macos-button',
-        },
-        didOpen: () => {
-            const input = document.getElementById('numeroRemito');
-            input.focus();
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    Swal.clickConfirm();
-                }
-            });
-        },
-        preConfirm: () => {
-            const input = document.getElementById('numeroRemito').value;
-            // Validaciones
-            if (!/^\d{10,}$/.test(input)) {
-                Swal.showValidationMessage('Por favor, ingrese un número de remito válido');
-                return false;
-            }
-            return input;
-        },
-        allowEnterKey: true
+    const numeroRemito = await mostrarModalLiquidGlass({
+        titulo: 'Número de Remito 📋',
+        placeholder: 'N° Remito',
+        emoji: '📄',
+        descripcion: 'Ingresá el <b>número de remito</b> (mín. 10 dígitos)',
+        maxlength: 20,
+        validacion: v => /^\d{10,}$/.test(v),
+        mensajeError: 'Ingresá un número de remito válido'
     });
-
-    // Si el usuario cancela, salir de la función
-    if (!numeroRemito) {
-        return null; // Retorna null si se cancela
-    }
     return numeroRemito;
 }
+// FIN MODAL CLIENTE & REMITO
 
 const fechaHora = new Date(); // Obtener la fecha y hora actual
 
@@ -1364,11 +1599,11 @@ async function enviarDatosCDS(id, NombreyApellido, Cp, localidad, Provincia, idO
     const botonAndesmar = document.getElementById(`andesmarButton${id}`);
     const botonAndreani = document.getElementById(`andreaniButton${id}`);
 
-    // Solicitar el cliente
     const cliente = await solicitarCliente();
+    if (!cliente) return;
+
     const remitoCliente = await solicitarNumeroRemito();
-    if (!cliente) return; 
-    if (!remitoCliente) return; 
+    if (!remitoCliente) return;
 
     // Mostrar spinner y cambiar texto
     spinner.style.display = 'inline-block';
@@ -1771,9 +2006,10 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
     });
 
     const cliente = await solicitarCliente();
+    if (!cliente) return;
+
     const remitoCliente = await solicitarNumeroRemito();
-    if (!cliente) return; 
-    if (!remitoCliente) return; 
+    if (!remitoCliente) return;
 
     const resultadoDiv = document.getElementById(`resultado${id}`);
     const botonCDS = document.getElementById(`CDSButton${id}`);
@@ -1805,11 +2041,10 @@ async function enviarDatosAndesmar(id, NombreyApellido, Cp, idOperacion, calleDe
         ? "CARGAS LOG RTO C Y SEGUIMIENTO"
         : "cargas remito conformado";
         
-    // Definir los datos que se enviarán a la API
     const requestObj = {
-        CalleRemitente: "Mendoza", // Reemplaza con el valor correcto
-        CalleNroRemitente: "2799", // Reemplaza con el valor correcto
-        CodigoPostalRemitente: "2000", // Reemplaza con el valor correcto
+        CalleRemitente: "Mendoza",
+        CalleNroRemitente: "2799", 
+        CodigoPostalRemitente: "2000", 
         NombreApellidoDestinatario: NombreyApellido || recibe,
         CodigoPostalDestinatario: Cp,
         CalleDestinatario: calleDestinatario,
@@ -2082,9 +2317,10 @@ async function enviarDatosAndreani(id, NombreyApellido, Cp, localidad, Provincia
     const idOperacionFinalAndreani = idOperacion.replace(/^20000[0-9]/, '');
 
     const cliente = await solicitarCliente();
+    if (!cliente) return;
+
     const remitoCliente = await solicitarNumeroRemito();
-    if (!cliente) return; 
-    if (!remitoCliente) return; 
+    if (!remitoCliente) return;
 
     // Mostrar spinner y cambiar texto
     spinnerAndr.style.display = 'inline-block';
@@ -2987,6 +3223,12 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     let spinner = document.getElementById(`spinnerLogPropia${id}`);
     let spinner2 = document.getElementById("spinner2");
 
+    const numeroCliente = await solicitarCliente();
+    if (!numeroCliente) return;
+
+    const numeroRemito = await solicitarNumeroRemito();
+    if (!numeroRemito) return;
+
     // Obtener la fecha actual al inicio
     const fechaActual = new Date();
 
@@ -3112,98 +3354,6 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
         const fechaEntregaFormateada = fechaEntrega.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
         diaFormateado = `Entre ${fechaInicioFormateada} y ${fechaEntregaFormateada}`;
         console.log(`CP ${cp} no pertenece a ninguna logística específica. Fecha inicio: ${fechaInicioFormateada}, Fecha entrega: ${fechaEntregaFormateada}`);
-    }
-
-    // SweetAlert para el número de cliente
-    const { value: numeroCliente } = await Swal.fire({
-        title: '¿Cuál es el número de cliente?',
-        html: `
-            <div class="input-container">
-                <input id="numeroCliente" class="swal2-input" placeholder="Número Cliente 🧑🏻‍💻" maxlength="8" required>
-                <small class="input-description">Ingresar cliente de presea (máximo 8 dígitos, solo números)</small>
-            </div>
-        `,
-        icon: 'question',
-        showCancelButton: false, // Eliminando el botón de cancelar
-        confirmButtonText: 'Aceptar',
-        customClass: {
-            popup: 'macos-popup',
-            input: 'macos-input',
-            title: 'macos-title',
-            confirmButton: 'macos-button',
-        },
-        didOpen: () => {
-            const input = document.getElementById('numeroCliente');
-            input.focus(); // Hacer foco en el input al abrir el modal
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    Swal.clickConfirm(); // Simular clic en el botón de aceptar
-                }
-            });
-        },
-        preConfirm: () => {
-            const input = document.getElementById('numeroCliente').value;
-            // Validaciones
-            if (!/^\d{2,8}$/.test(input)) {
-                Swal.showValidationMessage('Por favor, ingrese un cliente válido');
-                return false; // Evita que se acepte el valor
-            }
-            return input; // Retorna el valor si es válido
-        },
-        allowEnterKey: true // Permitir que Enter funcione como aceptar
-    });
-
-    // Si el usuario cancela, salir de la función
-    if (!numeroCliente) {
-        return;
-    }
-
-    const { value: numeroRemito } = await Swal.fire({
-        title: '¿Cuál es el número de remito?',
-        html: `
-            <div class="input-container">
-                <input id="numeroRemito" class="swal2-input" placeholder="Número de Remito" maxlength="20" required>
-                <small class="input-description">Ingresar número de remito (mínimo 10 dígitos, solo números)</small>
-            </div>
-        `,
-        icon: 'question',
-        showCancelButton: false,
-        confirmButtonText: 'Aceptar',
-        customClass: {
-            popup: 'macos-popup',
-            input: 'macos-input',
-            title: 'macos-title',
-            confirmButton: 'macos-button',
-        },
-        didOpen: () => {
-            const input = document.getElementById('numeroRemito');
-            input.focus();
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    Swal.clickConfirm();
-                }
-            });
-        },
-        preConfirm: () => {
-            const input = document.getElementById('numeroRemito').value;
-            // Validaciones
-            if (!/^\d{10,}$/.test(input)) {
-                Swal.showValidationMessage('Por favor, ingrese un número de remito válido');
-                return false;
-            }
-            return input;
-        },
-        allowEnterKey: true // Permitir que Enter funcione como aceptar
-    });
-
-    // Si el usuario cancela, salir de la función
-    if (!numeroRemito) {
-        spinner.style.display = "none";
-        button.innerHTML = '<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>';
-        button.disabled = false;  
-        return;
     }
 
     spinner2.style.display = "flex";
