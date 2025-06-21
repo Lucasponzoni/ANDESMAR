@@ -2551,5 +2551,32 @@ $(document).ready(function () {
 });
 // FIN DESCARGAR REPORTE
 
-// Cargar datos al iniciar la página
-window.onload = cargarDatos;
+// CARGAR PAGINA
+window.onload = async function () {
+    await cargarDatos();
+
+    setTimeout(() => {
+        // Buscar el botón con el texto "1"
+        const pageLinks = document.querySelectorAll('#pagination a.page-link');
+        let paginaUno = null;
+
+        pageLinks.forEach(link => {
+            if (link.textContent.trim() === '1') {
+                paginaUno = link;
+            }
+        });
+
+        if (paginaUno) {
+            // Forzamos el click aunque ya esté activa
+            paginaUno.dispatchEvent(new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+            }));
+            console.log("Cargue pagina 1 de pagination");
+        } else {
+            console.log("No se encontró el botón de la página 1 del paginador");
+        }
+    }, 3000);
+};
+// FIN CARGAR PAGINA
