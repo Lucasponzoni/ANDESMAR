@@ -8987,3 +8987,25 @@ mark {
   opacity: 0.6 !important;
   filter: grayscale(0.2);
 }
+
+/* Botón ACEPTAR CLIENTE & REMITO Liquid Glass*/
+#btn-modal-lg-ok {
+  transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+}
+
+#btn-modal-lg-ok:hover {
+  background: #339cff;
+  transform: scale(1.06);
+  box-shadow: 0 4px 16px #007aff33;
+}
+
+/* Botón CANCELAR CLIENTE & REMITO Liquid Glass*/
+#btn-modal-lg-cancel {
+  transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+}
+
+#btn-modal-lg-cancel:hover {
+  background: #f3f3f8;
+  transform: scale(1.06);
+  box-shadow: 0 4px 16px #ccc;
+}

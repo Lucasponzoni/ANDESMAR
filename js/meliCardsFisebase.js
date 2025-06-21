@@ -1205,6 +1205,16 @@ async function handleButtonClick(numeroDeEnvio, id) {
 }
 
 // MODAL CLIENTE & REMITO
+function beep() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(600, ctx.currentTime);
+    oscillator.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 0.15);
+}
+
 function mostrarModalLiquidGlass({
     titulo = '',
     placeholder = '',
@@ -1219,7 +1229,6 @@ function mostrarModalLiquidGlass({
             document.getElementById('modal-liquid-glass-ios').remove();
         }
 
-        // Overlay
         const overlay = document.createElement('div');
         overlay.id = 'modal-liquid-glass-ios';
         overlay.style = `
@@ -1229,7 +1238,6 @@ function mostrarModalLiquidGlass({
             animation:fadeInOverlay 0.28s;
         `;
 
-        // Modal
         const modal = document.createElement('div');
         modal.style = `
             min-width:320px;max-width:94vw;
@@ -1245,151 +1253,78 @@ function mostrarModalLiquidGlass({
             animation:popInModal 0.42s cubic-bezier(.23,1.25,.32,1) both;
         `;
 
-        // Fondo SVG animado con 4 waves y colores vibrantes
         modal.innerHTML = `
-            <svg style="
-                position:absolute;left:0;top:0;width:100%;height:100%;
-                z-index:0;pointer-events:none;opacity:0.62;
-            " viewBox="0 0 400 220" preserveAspectRatio="none">
-            <defs>
-                <linearGradient id="siriGradient1" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#00cfff"/> <!-- azul cyan -->
-                    <stop offset="50%" stop-color="#3b8dff"/> <!-- azul intermedio -->
-                    <stop offset="100%" stop-color="#9a4dff"/> <!-- violeta contraste -->
-                </linearGradient>
-                
-                <linearGradient id="siriGradient2" x1="0" y1="1" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#64d3ff"/> <!-- celeste pastel -->
-                    <stop offset="100%" stop-color="#005eff"/> <!-- azul fuerte -->
-                </linearGradient>
-                
-                <linearGradient id="siriGradient3" x1="1" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#00f2ff"/> <!-- turquesa claro -->
-                    <stop offset="100%" stop-color="#0074ff"/> <!-- azul saturado -->
-                </linearGradient>
-                
-                <linearGradient id="siriGradient4" x1="1" y1="1" x2="0" y2="0">
-                    <stop offset="0%" stop-color="#6a5fff"/> <!-- violeta azulado -->
-                    <stop offset="100%" stop-color="#33e0ff"/> <!-- celeste neón -->
-                </linearGradient>
-            </defs>
+            <svg style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.62;" viewBox="0 0 400 220" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="siriGradient1" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#00cfff"/>
+                        <stop offset="50%" stop-color="#3b8dff"/>
+                        <stop offset="100%" stop-color="#9a4dff"/>
+                    </linearGradient>
+                    <linearGradient id="siriGradient2" x1="0" y1="1" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#64d3ff"/>
+                        <stop offset="100%" stop-color="#005eff"/>
+                    </linearGradient>
+                    <linearGradient id="siriGradient3" x1="1" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#00f2ff"/>
+                        <stop offset="100%" stop-color="#0074ff"/>
+                    </linearGradient>
+                    <linearGradient id="siriGradient4" x1="1" y1="1" x2="0" y2="0">
+                        <stop offset="0%" stop-color="#6a5fff"/>
+                        <stop offset="100%" stop-color="#33e0ff"/>
+                    </linearGradient>
+                </defs>
                 <path fill="url(#siriGradient1)" opacity="0.48">
                     <animate attributeName="d" dur="7s" repeatCount="indefinite"
-                        values="
-                            M0,120 Q100,180 200,120 T400,120 V220 H0Z;
-                            M0,120 Q100,100 200,160 T400,120 V220 H0Z;
-                            M0,120 Q100,180 200,120 T400,120 V220 H0Z
-                        " />
+                        values="M0,120 Q100,180 200,120 T400,120 V220 H0Z;
+                                M0,120 Q100,100 200,160 T400,120 V220 H0Z;
+                                M0,120 Q100,180 200,120 T400,120 V220 H0Z" />
                 </path>
                 <path fill="url(#siriGradient2)" opacity="0.33">
                     <animate attributeName="d" dur="9s" repeatCount="indefinite"
-                        values="
-                            M0,140 Q100,100 200,160 T400,140 V220 H0Z;
-                            M0,140 Q100,180 200,120 T400,140 V220 H0Z;
-                            M0,140 Q100,100 200,160 T400,140 V220 H0Z
-                        " />
+                        values="M0,140 Q100,100 200,160 T400,140 V220 H0Z;
+                                M0,140 Q100,180 200,120 T400,140 V220 H0Z;
+                                M0,140 Q100,100 200,160 T400,140 V220 H0Z" />
                 </path>
                 <path fill="url(#siriGradient3)" opacity="0.29">
                     <animate attributeName="d" dur="11s" repeatCount="indefinite"
-                        values="
-                            M0,130 Q100,170 200,110 T400,130 V220 H0Z;
-                            M0,130 Q100,90 200,150 T400,130 V220 H0Z;
-                            M0,130 Q100,170 200,110 T400,130 V220 H0Z
-                        " />
+                        values="M0,130 Q100,170 200,110 T400,130 V220 H0Z;
+                                M0,130 Q100,90 200,150 T400,130 V220 H0Z;
+                                M0,130 Q100,170 200,110 T400,130 V220 H0Z" />
                 </path>
                 <path fill="url(#siriGradient4)" opacity="0.22">
                     <animate attributeName="d" dur="13s" repeatCount="indefinite"
-                        values="
-                            M0,125 Q100,185 200,125 T400,125 V220 H0Z;
-                            M0,125 Q100,95 200,145 T400,125 V220 H0Z;
-                            M0,125 Q100,185 200,125 T400,125 V220 H0Z
-                        " />
+                        values="M0,125 Q100,185 200,125 T400,125 V220 H0Z;
+                                M0,125 Q100,95 200,145 T400,125 V220 H0Z;
+                                M0,125 Q100,185 200,125 T400,125 V220 H0Z" />
                 </path>
             </svg>
             <div style="position:relative;z-index:1;width:100%;">
-
-            <div style="position: relative; width: 100%; text-align: center; margin-bottom: 1.5em;">
-                <!-- Contenido con emoji y título -->
-                <div style="display:flex; align-items:center; justify-content:center; gap:0.7em; font-size:1.18em; font-weight:600; color:#222; position: relative; z-index: 1;">
-                    <span class="titulo-modal-liquid-glass">${titulo}</span>
+                <div style="text-align: center; margin-bottom: 1.5em;">
+                    <div style="display:flex; align-items:center; justify-content:center; gap:0.7em; font-size:1.18em; font-weight:600; color:#222;">
+                        <span class="titulo-modal-liquid-glass">${titulo}</span>
+                    </div>
                 </div>
-            </div>
-            
                 <input id="input-modal-lg"
-                    style="
-                        width:100%;
-                        background:rgba(255,255,255,0.88);
-                        border-radius:14px;
-                        border:1px solid #e3e3e6;
-                        box-shadow:0 1px 4px #0001;
-                        font-size:1.15em;
-                        padding:0.7em 1em;
-                        margin-bottom:0.8em;
-                        outline:none;
-                        transition:border 0.2s;
-                    "
-                    maxlength="${maxlength}"
-                    placeholder="${placeholder}"
-                    autocomplete="off"
-                    autofocus
-                >
-                <div style="
-                    display:flex;justify-content:center;margin-bottom:1.1em;
-                ">
-                  <div style="
-                      background:rgba(255,255,255,0.38);
-                      border-radius:15px;
-                      box-shadow:0 2px 8px #007aff11;
-                      padding:0.8em 1.2em;
-                      display:flex;align-items:center;gap:0.5em;
-                      font-size:1em;
-                      color:#565656FF;
-                      font-family:'Rubik',sans-serif;
-                      font-weight:500;
-                      text-align:center;
-                      text-shadow:0 2px 8px #c0e3ff66;
-                  ">
-                    <span style="font-size:1.25em;">✨</span>
-                    <span style="display:inline-block;">${descripcion}</span>
-                  </div>
+                    style="width:100%;background:rgba(255,255,255,0.88);border-radius:14px;border:1px solid #e3e3e6;font-size:1.15em;padding:0.7em 1em;margin-bottom:0.8em;outline:none;"
+                    maxlength="${maxlength}" placeholder="${placeholder}" autocomplete="off" autofocus>
+                <div style="display:flex;justify-content:center;margin-bottom:1.1em;">
+                    <div style="background:rgba(255,255,255,0.38);border-radius:15px;padding:0.8em 1.2em;font-size:1em;color:#565;">
+                        <span style="font-size:1.25em;">✨</span>
+                        <span>${descripcion}</span>
+                    </div>
                 </div>
-                <div id="error-modal-lg" style="
-                    display:none;
-                    background:rgba(255, 0, 64, 0.22);
-                    color:white;
-                    font-family:'Rubik',sans-serif;
-                    text-align:center;
-                    font-size:0.97em;
-                    font-weight:500;
-                    border-radius:17px;
-                    margin-bottom:0.7em;
-                    padding:0.7em 1em 0.7em 1em;
-                    backdrop-filter:blur(8px) saturate(180%);
-                    border:1.5px solid rgba(255,0,64,0.16);
-                    transition:all 0.18s;
-                "></div>
+                <div id="error-modal-lg" style="display:none;background:rgba(255, 0, 64, 0.22);color:white;font-size:0.97em;font-weight:500;border-radius:17px;margin-bottom:0.7em;padding:0.7em 1em;text-align:center;"></div>
                 <div style="display:flex;gap:1em;justify-content:center;width:100%;">
-                    <button id="btn-modal-lg-ok" style="
-                        background:#007aff;color:#fff;
-                        font-size:1.05em;font-weight:600;padding:0.62em 2.1em;
-                        border:none;border-radius:13px;box-shadow:0 2px 8px #007aff22;
-                        cursor:pointer;transition:background 0.18s,transform 0.18s,box-shadow 0.18s;
-                        outline:none;
-                    ">Aceptar</button>
-                    <button id="btn-modal-lg-cancel" style="
-                        background:rgba(230,230,235,0.85);color:#444;
-                        font-size:1.05em;font-weight:500;padding:0.62em 2.1em;
-                        border:none;border-radius:13px;box-shadow:0 2px 8px #0001;
-                        cursor:pointer;transition:background 0.18s,transform 0.18s,box-shadow 0.18s;
-                        outline:none;
-                    ">Cancelar</button>
+                    <button id="btn-modal-lg-ok" style="background:#007aff;color:#fff;font-size:1.05em;font-weight:600;padding:0.62em 2.1em;border:none;border-radius:13px;cursor:pointer;">Aceptar</button>
+                    <button id="btn-modal-lg-cancel" style="background:#eee;color:#444;font-size:1.05em;font-weight:500;padding:0.62em 2.1em;border:none;border-radius:13px;cursor:pointer;">Cancelar</button>
                 </div>
             </div>
         `;
+
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
 
-        // Animación de salida
         function cerrar(valor) {
             overlay.style.animation = "fadeOutOverlay 0.22s";
             modal.style.animation = "popOutModal 0.38s cubic-bezier(.23,1.25,.32,1) both";
@@ -1399,24 +1334,27 @@ function mostrarModalLiquidGlass({
             }, 220);
         }
 
-        // Foco automático
         setTimeout(() => document.getElementById('input-modal-lg').focus(), 100);
 
-        // Botón aceptar
         document.getElementById('btn-modal-lg-ok').onclick = () => {
             const val = document.getElementById('input-modal-lg').value.trim();
             const err = document.getElementById('error-modal-lg');
-            if (!validacion(val)) {
-                err.innerHTML = mensajeError;
+            const result = validacion(val);
+            if (result !== true) {
+                err.innerHTML = result;
                 err.style.display = 'block';
                 document.getElementById('input-modal-lg').style.border = '1.5px solid #ff3b30';
+                beep();
+                modal.style.animation = 'shakeModal 0.4s';
+                setTimeout(() => {
+                    modal.style.animation = 'popInModal 0.42s cubic-bezier(.23,1.25,.32,1) both';
+                }, 400);
             } else {
                 err.style.display = 'none';
                 cerrar(val);
             }
         };
 
-        // Botón cancelar/Escape
         document.getElementById('btn-modal-lg-cancel').onclick = () => cerrar(null);
         overlay.onclick = (e) => { if (e.target === overlay) cerrar(null); };
         document.onkeydown = (e) => {
@@ -1424,30 +1362,6 @@ function mostrarModalLiquidGlass({
             if (e.key === 'Enter') document.getElementById('btn-modal-lg-ok').click();
         };
 
-        // Efectos hover en botones
-        const btns = [document.getElementById('btn-modal-lg-ok'), document.getElementById('btn-modal-lg-cancel')];
-        btns.forEach(btn => {
-            btn.onmouseenter = () => {
-                btn.style.transform = "scale(1.06)";
-                btn.style.boxShadow = "0 4px 16px #007aff33";
-                if (btn.id === 'btn-modal-lg-ok') {
-                    btn.style.background = "#339cff";
-                } else {
-                    btn.style.background = "#f3f3f8";
-                }
-            };
-            btn.onmouseleave = () => {
-                btn.style.transform = "scale(1.00)";
-                btn.style.boxShadow = btn.id === 'btn-modal-lg-ok'
-                    ? "0 2px 8px #007aff22"
-                    : "0 2px 8px #0001";
-                btn.style.background = btn.id === 'btn-modal-lg-ok'
-                    ? "#007aff"
-                    : "rgba(230,230,235,0.85)";
-            };
-        });
-
-        // Animaciones CSS (solo una vez)
         if (!document.getElementById('modal-lg-animations')) {
             const style = document.createElement('style');
             style.id = 'modal-lg-animations';
@@ -1463,6 +1377,14 @@ function mostrarModalLiquidGlass({
                     0% { opacity:1; transform:scale(1) translateY(0);}
                     100% { opacity:0; transform:scale(0.84) translateY(40px);}
                 }
+                @keyframes shakeModal {
+                    0% { transform: translateX(0); }
+                    20% { transform: translateX(-8px); }
+                    40% { transform: translateX(8px); }
+                    60% { transform: translateX(-6px); }
+                    80% { transform: translateX(6px); }
+                    100% { transform: translateX(0); }
+                }
             `;
             document.head.appendChild(style);
         }
@@ -1476,8 +1398,13 @@ async function solicitarCliente() {
         placeholder: 'N° Cliente',
         emoji: '👤',
         descripcion: 'Ingresá tu <b>número de cliente</b> (máx. 8 dígitos)',
-        maxlength: 8,
-        validacion: v => /^\d{2,8}$/.test(v),
+        maxlength: 10,
+        validacion: v => {
+            if (!/^\d+$/.test(v)) return 'Solo se permiten números sin caracteres especiales';
+            if (v.length < 2) return 'Debe tener al menos 2 dígitos';
+            if (v.length > 8) return 'No puede tener más de 8 dígitos';
+            return true;
+        },
         mensajeError: 'Por favor, ingresá un cliente válido'
     });
     return numeroCliente;
@@ -1491,7 +1418,11 @@ async function solicitarNumeroRemito() {
         emoji: '📄',
         descripcion: 'Ingresá el <b>número de remito</b> (mín. 10 dígitos)',
         maxlength: 20,
-        validacion: v => /^\d{10,}$/.test(v),
+        validacion: v => {
+            if (!/^\d+$/.test(v)) return 'Solo se permiten números sin caracteres especiales';
+            if (v.length < 10) return 'Debe tener al menos 10 dígitos';
+            return true;
+        },
         mensajeError: 'Ingresá un número de remito válido'
     });
     return numeroRemito;
