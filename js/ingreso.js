@@ -423,7 +423,7 @@ function calcularPorcentajes(data, startDate, endDate) {
     <div class="pie-chart pie-chart33" 
          style="--paqueteria: ${paqueteriaPorcentaje}%; 
                 --bigger: ${biggerPorcentaje}%; 
-                --fin: ${finAndreani}%;">
+                --fin: ${andreaniPorcentajeFloat}%;">
     </div>
     <div style="margin-top: 5px; line-height: 1.5;">
         <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 5px;">
