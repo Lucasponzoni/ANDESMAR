@@ -2996,8 +2996,8 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
     const cliente = await solicitarCliente();
     if (!cliente) return;
 
-    const remitoCliente = await solicitarNumeroRemito();
-    if (!remitoCliente) return;
+    const numeroRemito = await solicitarNumeroRemito();
+    if (!numeroRemito) return;
 
     // Formatear SKU
     const skuFormateado = SKU.toUpperCase().padStart(15, '0');
