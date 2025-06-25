@@ -4348,6 +4348,13 @@ div .form-check {
     border-radius: 5px;
 }
 
+.express-meli2{
+    background-color: orangered;
+    color:  white !important;
+    padding: 5px;
+    border-radius: 5px;
+}
+
 .express-meli-sub{
     font-weight: 400 !important;
 }

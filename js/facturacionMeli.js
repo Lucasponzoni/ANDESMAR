@@ -36,9 +36,35 @@ function obtenerSkus() {
         });
 }
 
+// Obtener los SKUs Forzados y Fecha
+const skusForzadosyFecha = []; // Array para almacenar los SKUs y sus fechas
+
+function obtenerSkusForzados() {
+    db.ref('skuForzado/').once('value')
+        .then(skuSnapshot => {
+            let count = 0; // Contador para los SKUs
+            skuSnapshot.forEach(childSnapshot => {
+                const sku = childSnapshot.val().sku; // Obtiene el SKU del objeto
+                const fecha = childSnapshot.val().fecha; // Obtiene la fecha del objeto
+
+                if (sku) {
+                    // Guarda el SKU y la fecha en el array
+                    skusForzadosyFecha.push({ sku: sku, fecha: fecha });
+                    count++; // Incrementa el contador si el SKU existe
+                }
+            });
+            console.log("Se obtuvieron los SKU de PlaceIt con éxito. Cantidad:", count);
+            console.log("SKUs y fechas almacenados:", skusForzadosyFecha); // Muestra los SKUs y fechas almacenados
+        })
+        .catch(error => {
+            console.error("Error al obtener los datos: ", error);
+        });
+}
+
 // Llama a la función para obtener los SKUs
 obtenerSkus();
-cargarPrecios()
+cargarPrecios();
+obtenerSkusForzados()
 
 // CARGAR PRECIOS Y STOCK
 let preciosArray = [];
@@ -88,6 +114,167 @@ function cargarPrecios() {
         });
 }
 // FIN CARGAR PRECIOS Y STOCK
+
+// CARGA SKU
+// Función para cargar SKU desde Firebase
+function cargarSKUs(ref, listBodyId, loadingSpinnerId) {
+    const skuListBody = document.getElementById(listBodyId);
+    const loadingSpinner = document.getElementById(loadingSpinnerId);
+    loadingSpinner.style.display = 'block'; // Mostrar spinner
+
+    firebase.database().ref(ref).once('value').then(snapshot => {
+        skuListBody.innerHTML = ''; // Limpiar la tabla
+        snapshot.forEach(childSnapshot => {
+            const sku = childSnapshot.val().sku; // Asegúrate que 'sku' sea la propiedad correcta
+            const stock = childSnapshot.val().stock || 0; // Obtener stock, default a 0 si no existe
+            const fecha = childSnapshot.val().fecha || 'No establecida'; // Obtener fecha
+
+            // Calcular si la fecha está dentro de los últimos 7 días
+            const partesFecha = fecha.split(",")[0].split("/");
+            const dia = parseInt(partesFecha[0], 10);
+            const mes = parseInt(partesFecha[1], 10) - 1; // Los meses en JavaScript van de 0 a 11
+            const anio = parseInt(partesFecha[2], 10);
+            const fechaGuardada = new Date(anio, mes, dia);
+            const diasDesdeFecha = Math.floor((new Date() - fechaGuardada) / (1000 * 60 * 60 * 24)); // Días desde la fecha
+
+            // Determinar el estado del badge y el botón
+            let badgeClass = 'badge bg-success'; // Activo
+            let badgeText = 'Activo';
+            let buttonClass = 'btn btn-success btn-lg'; // Botón activo
+
+            if (diasDesdeFecha > 7) {
+                badgeClass = 'badge bg-danger'; // Vencido
+                badgeText = 'Vencido';
+                buttonClass = 'btn btn-danger btn-lg'; // Botón de peligro
+            }
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <span style="flex: 1;"><strong>${sku}</strong></span> <!-- Aquí se carga el SKU -->
+                </td>
+                <td>
+                    <span style="font-size: 0.75em; color: #2f3e51; background: #e8f0fe; padding: 4px 10px; border-radius: 6px; margin-left: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                    Stock: <strong style="font-weight: 800;">${stock}</strong>
+                    </span>
+                </td>
+                <td>
+                    <span style="font-size: 0.75em; color: #2f3e51;">Fecha: ${fecha}</span><br>
+                    <span class="${badgeClass}">${badgeText}</span> <!-- Badge de estado -->
+                </td>
+                <td>
+                    <button class="${buttonClass}" onclick="renovarFecha('${ref}', '${childSnapshot.key}', '${listBodyId}', '${loadingSpinnerId}')">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-lg" onclick="eliminarSKU('${ref}', '${childSnapshot.key}', '${listBodyId}', '${loadingSpinnerId}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            skuListBody.appendChild(row);
+        });
+        loadingSpinner.style.display = 'none'; // Ocultar spinner
+    }).catch(error => {
+        console.error("Error al cargar SKU: ", error);
+        loadingSpinner.style.display = 'none'; // Ocultar spinner
+    });
+}
+
+// Función para agregar nuevo SKU
+function agregarSKU(ref, inputId, alertContainerId, loadingSpinnerId, listBodyId) {
+    const newSku = document.getElementById(inputId).value;
+    const alertContainer = document.getElementById(alertContainerId);
+    const fechaActual = new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
+
+    if (newSku) {
+        const newRef = firebase.database().ref(ref + '/' + newSku.replace(/\s+/g, '_'));
+
+        // Verificar si el SKU ya existe
+        newRef.once('value').then(snapshot => {
+            if (snapshot.exists()) {
+                // SKU ya existe
+                mostrarAlerta(alertContainerId, 'El SKU ya existe en el listado', 'danger');
+            } else {
+                // Agregar nuevo SKU
+                newRef.set({ sku: newSku, stock: 0, fecha: fechaActual }) // Agregar la fecha actual
+                    .then(() => {
+                        console.log(`SKU agregado: ${newSku}`);
+                        mostrarAlerta(alertContainerId, 'Se ha agregado el SKU al listado', 'success');
+                        cargarSKUs(ref, listBodyId, loadingSpinnerId); // Recargar la lista de SKU
+                        document.getElementById(inputId).value = ''; // Limpiar input
+                    })
+                    .catch(error => {
+                        console.error("Error al agregar SKU: ", error);
+                    });
+            }
+        });
+    }
+}
+
+// Función para renovar la fecha
+function renovarFecha(ref, key, listBodyId, loadingSpinnerId) {
+    const fechaActual = new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
+    const skuRef = firebase.database().ref(ref + '/' + key);
+
+    skuRef.update({ fecha: fechaActual })
+        .then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Fecha renovada',
+                text: 'La fecha se ha actualizado exitosamente.',
+            });
+            cargarSKUs(ref, listBodyId, loadingSpinnerId); // Recargar la lista de SKU
+        })
+        .catch(error => {
+            console.error("Error al renovar la fecha: ", error);
+        });
+}
+
+// Función para mostrar alertas
+function mostrarAlerta(alertContainerId, mensaje, tipo) {
+    const alertContainer = document.getElementById(alertContainerId);
+    alertContainer.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            <i class="${tipo === 'danger' ? 'fas fa-exclamation-triangle' : 'fas fa-check'}"></i>
+            ${mensaje}
+        </div>
+    `;
+    alertContainer.style.display = 'block'; // Mostrar alerta
+
+    // Ocultar alerta después de 5 segundos
+    setTimeout(() => {
+        alertContainer.style.display = 'none';
+    }, 5000);
+}
+
+// Función para eliminar SKU
+function eliminarSKU(ref, key, listBodyId, loadingSpinnerId) {
+    firebase.database().ref(ref + '/' + key).remove()
+        .then(() => {
+            console.log(`SKU eliminado: ${key}`);
+            cargarSKUs(ref, listBodyId, loadingSpinnerId); // Recargar la lista de SKU
+        })
+        .catch(error => {
+            console.error("Error al eliminar SKU: ", error);
+        });
+}
+
+// Limpiar el input y cargar los SKU al abrir el modal
+$('#skuModal').on('show.bs.modal', () => {
+    document.getElementById('newSkuInput').value = ''; // Limpiar el input
+    cargarSKUs('skuForzado', 'skuForcedBody', 'loadingSpinner'); // Cargar los SKU al abrir el modal
+    
+    // Agregar event listener para agregar SKU en el modal
+    const addSkuButton = document.getElementById('addSkuButton');
+    if (addSkuButton) {
+        addSkuButton.addEventListener('click', () => {
+            agregarSKU('skuForzado', 'newSkuInput', 'alertContainer', 'loadingSpinner', 'skuForcedBody');
+        });
+    }
+});
+// FIN CARGA SKU
 
 let allData = [];
 let currentPage = 1;
@@ -597,37 +784,64 @@ function loadTable(data, estadoFilter = null) {
                     const stateName = operation.client.billing_info.additional_info.find(info => info.type === "STATE_NAME")?.value;
                     const stateName2 = operation.Provincia;
 
-                    // Verifica si el SKU está en la lista de Firebase y si el Cp está en cpsPlaceIt
-                    const isSkuInList = skusPlaceItList.includes(operation.SKU);
-                    const isCpInCpsPlaceIt = cpsPlaceIt.includes(Number(operation.Cp)); // Asegúrate de comparar como número
+                // Verifica si el SKU está en la lista de Firebase y si el Cp está en cpsPlaceIt
+                const isSkuInList = skusPlaceItList.includes(operation.SKU);
+                const isCpInCpsPlaceIt = cpsPlaceIt.includes(Number(operation.Cp)); // Asegúrate de comparar como número
 
-                    // Lista de estados para envío prohibido
-                    const estadosProhibidos = ["Jujuy", "Misiones", "Tierra del Fuego"];
+                // Lista de estados para envío prohibido
+                const estadosProhibidos = ["Jujuy", "Misiones", "Tierra del Fuego"];
 
-                    if (estadosProhibidos.includes(stateName) || estadosProhibidos.includes(stateName2)) {
-                        shippingCell.innerHTML = `<strong class="alerta">⚠️ ${(stateName || stateName2).toUpperCase()}</strong>`;                    
-                    } else if (isSkuInList && isCpInCpsPlaceIt) {
-                        shippingCell.innerHTML = `
-                            <strong class="express-meli" style="color: yellow;">⚡ FACTURAR EXPRESS </strong><br>
-                            <span class="express-meli-sub" style="font-size: smaller;">Condición: 40-60</span>
-                        `;
-                    } else if (isCpInCpsPlaceIt) {
-                        shippingCell.innerHTML = `
-                            <strong class="express-meli2" style="color: orangered;">⚡ LOCALIDAD EXPRESS</strong><br>
-                            <span class="express-meli-sub" style="font-size: smaller;"><strong>SIN STOCK</strong> disponible en dep. 60</span>
-                        `;
-                    } else if (["Misiones", "Tierra del Fuego"].includes(stateName)) {
-                        shippingCell.innerHTML = `<strong class="alerta">⚠️ ${stateName.toUpperCase()}</strong>`;
-                    } else if (shippingCost > 0) {
-                        shippingCell.innerHTML = `<strong class="shipping-value" style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
-                    } else {
-                        // Solo muestra "GRATUITO" si no hay envío express
-                        shippingCell.innerHTML = `<strong class="gratuito" style="color: orangered;">GRATUITO</strong>`;
-                    }
-                    } else {
-                        console.warn("Información de facturación no disponible para la operación:", operation.idOperacion);
-                        shippingCell.innerHTML = `<strong style="color: red;">X</strong>`;
-                    }
+                // Verificar si el SKU está en el array de skusForzadosyFecha
+                const skuForzado = skusForzadosyFecha.find(item => item.sku === operation.SKU);
+
+                let fechaForzadaReciente = false;
+                let diasDesdeFecha = 0; // Inicializar la variable para días desde la fecha
+
+                if (skuForzado) {
+                    // Convertir la fecha guardada al formato correcto
+                    const partesFecha = skuForzado.fecha.split(",")[0].split("/"); // Obtener solo la parte de la fecha
+                    const dia = parseInt(partesFecha[0], 10);
+                    const mes = parseInt(partesFecha[1], 10) - 1; // Los meses en JavaScript van de 0 a 11
+                    const anio = parseInt(partesFecha[2], 10);
+                    
+                    const fechaGuardada = new Date(anio, mes, dia); // Crear el objeto Date
+
+                    // Comprobar si la fecha es dentro de los últimos 7 días
+                    fechaForzadaReciente = (new Date() - fechaGuardada) <= 7 * 24 * 60 * 60 * 1000; // 7 días en milisegundos
+
+                    // Calcular días desde la fecha
+                    diasDesdeFecha = Math.floor((new Date() - fechaGuardada) / (1000 * 60 * 60 * 24)); // Calcula días desde la fecha
+                }
+
+                if (estadosProhibidos.includes(stateName) || estadosProhibidos.includes(stateName2)) {
+                    shippingCell.innerHTML = `<strong class="alerta">⚠️ ${(stateName || stateName2).toUpperCase()}</strong>`;                    
+                } else if (isSkuInList && isCpInCpsPlaceIt) {
+                    shippingCell.innerHTML = `
+                        <strong class="express-meli" style="color: yellow;">⚡ FACTURAR EXPRESS </strong><br>
+                        <span class="express-meli-sub" style="font-size: smaller;">Condición: 40-60</span>
+                    `;
+                } else if (skuForzado && fechaForzadaReciente) {
+                    shippingCell.innerHTML = `
+                        <strong class="express-meli2" style="color: yellow;">⚡ FACTURAR EXPRESS </strong><br>
+                        <span class="express-meli-sub" style="font-size: smaller;">Forzado en fecha ${skuForzado.fecha}<br><strong>(hace ${diasDesdeFecha} días)</span></span>
+                    `;
+                } else if (isCpInCpsPlaceIt) {
+                    shippingCell.innerHTML = `
+                        <strong class="express-meli3" style="color: orangered;">⚡ LOCALIDAD EXPRESS</strong><br>
+                        <span class="express-meli-sub" style="font-size: smaller;"><strong>SIN STOCK</strong> disponible en dep. 60</span>
+                    `;
+                } else if (["Misiones", "Tierra del Fuego"].includes(stateName)) {
+                    shippingCell.innerHTML = `<strong class="alerta">⚠️ ${stateName.toUpperCase()}</strong>`;
+                } else if (shippingCost > 0) {
+                    shippingCell.innerHTML = `<strong class="shipping-value" style="color: rgb(52,152,219);">${formatCurrency(shippingCost)}</strong>`;
+                } else {
+                    // Solo muestra "GRATUITO" si no hay envío express
+                    shippingCell.innerHTML = `<strong class="gratuito" style="color: orangered;">GRATUITO</strong>`;
+                }
+                } else {
+                    console.warn("Información de facturación no disponible para la operación:", operation.idOperacion);
+                    shippingCell.innerHTML = `<strong style="color: red;">X</strong>`;
+                }
 
                 row.appendChild(shippingCell);
 
