@@ -608,8 +608,13 @@ function loadTable(data, estadoFilter = null) {
                         shippingCell.innerHTML = `<strong class="alerta">⚠️ ${(stateName || stateName2).toUpperCase()}</strong>`;                    
                     } else if (isSkuInList && isCpInCpsPlaceIt) {
                         shippingCell.innerHTML = `
-                            <strong class="express-meli" style="color: yellow;">⚡ EXPRESS</strong><br>
+                            <strong class="express-meli" style="color: yellow;">⚡ FACTURAR EXPRESS </strong><br>
                             <span class="express-meli-sub" style="font-size: smaller;">Condición: 40-60</span>
+                        `;
+                    } else if (isCpInCpsPlaceIt) {
+                        shippingCell.innerHTML = `
+                            <strong class="express-meli2" style="color: orangered;">⚡ LOCALIDAD EXPRESS</strong><br>
+                            <span class="express-meli-sub" style="font-size: smaller;"><strong>SIN STOCK</strong> disponible en dep. 60</span>
                         `;
                     } else if (["Misiones", "Tierra del Fuego"].includes(stateName)) {
                         shippingCell.innerHTML = `<strong class="alerta">⚠️ ${stateName.toUpperCase()}</strong>`;
@@ -619,10 +624,10 @@ function loadTable(data, estadoFilter = null) {
                         // Solo muestra "GRATUITO" si no hay envío express
                         shippingCell.innerHTML = `<strong class="gratuito" style="color: orangered;">GRATUITO</strong>`;
                     }
-                } else {
-                    console.warn("Información de facturación no disponible para la operación:", operation.idOperacion);
-                    shippingCell.innerHTML = `<strong style="color: red;">X</strong>`;
-                }
+                    } else {
+                        console.warn("Información de facturación no disponible para la operación:", operation.idOperacion);
+                        shippingCell.innerHTML = `<strong style="color: red;">X</strong>`;
+                    }
 
                 row.appendChild(shippingCell);
 
