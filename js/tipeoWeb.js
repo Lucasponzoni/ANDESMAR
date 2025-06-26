@@ -2191,10 +2191,15 @@ function cargarYMostrarTabla(camion, fechaKey, logistica) {
 
         const tablaHTML = `
             <div class="mb-4">
-                <button id="btnExcelDescarga" class="btn btn-success mb-3" disabled>
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Buscando Excel...
-                </button>
+                <div class="d-flex gap-3 mb-3 conjuntoDeBtnnes">
+                    <button id="btnExcelDescarga" class="btn btn-success" disabled>
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Buscando Excel...
+                    </button>
+                    <button id="btnPdfDescarga" class="btn btn-primary">
+                        <i class="bi bi-file-earmark-pdf-fill me-2"></i> Descargar Documentación de envío
+                    </button>
+                </div>
                 <div id="infoTransporte" class="bg-white p-4 rounded shadow-sm border" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial; font-size: 1.05rem;"></div>
             </div>
             <div class="table-responsive">
@@ -2225,8 +2230,104 @@ function cargarYMostrarTabla(camion, fechaKey, logistica) {
             showCloseButton: true,
             didOpen: () => {
                 const btnExcel = document.getElementById('btnExcelDescarga');
+                const btnPdf = document.getElementById('btnPdfDescarga');
                 const infoDiv = document.getElementById('infoTransporte');
 
+                // 1. Verificar disponibilidad de documentación
+                let logisticaNormalizada = logistica;
+                if (logistica === 'DespachosHistoricosAndreani') {
+                    logisticaNormalizada = 'Andreani';
+                } else if (logistica === 'DespachosHistoricosAndesmar') {
+                    logisticaNormalizada = 'Andesmar';
+                } else if (logistica === 'DespachosHistoricosOca') {
+                    logisticaNormalizada = 'Oca';
+                } else if (logistica === 'DespachosHistoricosCruzdelSur') {
+                    logisticaNormalizada = 'Cruz del Sur';
+                }
+
+                const docRef = storageMeli.ref(`DocumentacionDespachos/${fechaKey}/${logisticaNormalizada}/${camion}`);
+                console.log("Verificando documentación en:", `DocumentacionDespachos/${fechaKey}/${logisticaNormalizada}/${camion}`);
+                
+                docRef.listAll().then(result => {
+                    if (result.items.length === 0) {
+                        btnPdf.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Documentación PDF no disponible';
+                        btnPdf.classList.remove('btn-primary');
+                        btnPdf.classList.add('btn-secondary');
+                        btnPdf.disabled = true;
+                    }
+                }).catch(error => {
+                    console.error("Error verificando documentación:", error);
+                    btnPdf.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Error al verificar';
+                    btnPdf.classList.remove('btn-primary');
+                    btnPdf.classList.add('btn-danger');
+                    btnPdf.disabled = true;
+                });
+
+                // 2. Configurar evento de descarga PDF
+                btnPdf.addEventListener('click', async () => {
+                    const originalContent = btnPdf.innerHTML;
+                    btnPdf.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Generando PDF...';
+                    btnPdf.disabled = true;
+
+                    try {
+                        // Obtener todas las imágenes de la documentación
+                        const result = await docRef.listAll();
+                        const downloadUrls = await Promise.all(
+                            result.items.map(item => item.getDownloadURL())
+                        );
+
+                        // Crear PDF con jsPDF
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF({
+                            orientation: 'portrait',
+                            unit: 'mm'
+                        });
+
+                        const corsProxy = "https://proxy.cors.sh/";
+                        const corsApiKey = "live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd";
+
+                        // Agregar cada imagen al PDF usando el proxy
+                        for (let i = 0; i < downloadUrls.length; i++) {
+                            if (i > 0) pdf.addPage();
+
+                            // Usar fetch + proxy para evitar CORS
+                            const proxiedUrl = corsProxy + downloadUrls[i];
+                            const response = await fetch(proxiedUrl, {
+                                headers: {
+                                    'x-cors-api-key': corsApiKey
+                                }
+                            });
+                            const blob = await response.blob();
+                            const imgUrl = URL.createObjectURL(blob);
+
+                            const img = new Image();
+                            img.crossOrigin = "anonymous";
+                            img.src = imgUrl;
+
+                            await new Promise(resolve => {
+                                img.onload = () => {
+                                    const width = pdf.internal.pageSize.getWidth() - 20;
+                                    const height = (img.height * width) / img.width;
+                                    pdf.addImage(img, 'JPEG', 10, 10, width, height);
+                                    URL.revokeObjectURL(imgUrl); // Limpia el blob cuando termina
+                                    resolve();
+                                };
+                            });
+                        }
+
+                        // Descargar PDF
+                        pdf.save(`Documentacion_${logisticaNormalizada}_${camion}_${fechaKey}.pdf`);
+
+                    } catch (error) {
+                        console.error("Error generando PDF:", error);
+                        Swal.fire('Error', 'No se pudo generar el PDF', 'error');
+                    } finally {
+                        btnPdf.innerHTML = originalContent;
+                        btnPdf.disabled = false;
+                    }
+                });
+
+                // Resto del código (búsqueda de Excel y info de transporte)
                 let logisticaLimpia = logistica.replace(/^DespachosHistoricos_?/, '');
                 let logisticaLimpia2;
                 if (logisticaLimpia === 'CruzdelSur') {
