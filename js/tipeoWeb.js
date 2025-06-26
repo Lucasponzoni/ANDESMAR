@@ -4020,8 +4020,10 @@ document.addEventListener('DOMContentLoaded', function() {
     modalDoc.addEventListener('shown.bs.modal', cargarModalDocumentacion);
 });
 
-// Función mejorada para verificarDocumentacionPendiente()
 async function verificarDocumentacionPendiente() {
+    const boton = document.getElementById('btnAdjuntarDocumentacion');
+    if (boton) boton.disabled = true;
+
     try {
         const fechaHoy = new Date();
         const fechaInicio = new Date('2025-06-20');
@@ -4072,8 +4074,19 @@ async function verificarDocumentacionPendiente() {
     } catch (error) {
         console.error('Error al verificar documentación:', error);
         actualizarContador('error');
+    } finally {
+        if (boton) boton.disabled = false;
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('modalDocumentacion');
+    if (modal) {
+        modal.addEventListener('hidden.bs.modal', function() {
+            verificarDocumentacionPendiente();
+        });
+    }
+});
 
 // Función para verificar si existe documentación
 async function verificarDocumentacionExistente(ref) {
