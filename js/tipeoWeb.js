@@ -1025,6 +1025,8 @@ window.onload = async () => {
         await actualizarTotales();
         console.log("Totales actualizados");
     }, 2000);
+    await verificarDocumentacionPendiente();
+    await setInterval(verificarDocumentacionPendiente, 30 * 60 * 1000); // Cada 30 minutos
 };
 
 function cargarDespachos() {
@@ -3990,3 +3992,430 @@ async function descargarExcelSeguro(filas, desde, hasta) {
     $('#iconoSeguro').removeClass('d-none');
     $('#textoSeguro').text('Reporte de Seguro');
 }
+
+// ADJUNTAR DOCUMENTACION DE DESPACHO
+function formatearFecha(fechaISO) {
+    const fecha = new Date(fechaISO);
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const año = fecha.getFullYear();
+    return `${dia}-${mes}-${año}`;
+}
+
+// Variables globales
+let documentacionPendiente = {};
+let fotosTomadas = [];
+let camionActual = null;
+let logisticaActual = null;
+let fechaActual = null;
+
+// Inicialización cuando el DOM está listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar event listeners
+    document.getElementById('inputCamara').addEventListener('change', manejarFoto);
+    document.getElementById('btnSubirDocumentacion').addEventListener('click', subirDocumentacion);
+    
+    // Configurar modales
+    const modalDoc = document.getElementById('modalDocumentacion');
+    modalDoc.addEventListener('shown.bs.modal', cargarModalDocumentacion);
+});
+
+// Función mejorada para verificarDocumentacionPendiente()
+async function verificarDocumentacionPendiente() {
+    try {
+        const fechaHoy = new Date();
+        const fechaInicio = new Date('2025-06-20');
+        
+        if (fechaHoy < fechaInicio) {
+            actualizarContador(0);
+            return;
+        }
+        
+        const refs = {
+            'Andesmar': dbTipeo.ref('DespachosHistoricosAndesmar'),
+            'Andreani': dbTipeo.ref('DespachosHistoricosAndreani'),
+            'Cruz del Sur': dbTipeo.ref('DespachosHistoricosCruzdelSur'),
+            'Oca': dbTipeo.ref('DespachosHistoricosOca')
+        };
+        
+        let totalPendientes = 0;
+        const nuevoDocumentacionPendiente = {};
+        
+        await Promise.all(Object.entries(refs).map(async ([logistica, ref]) => {
+            const snapshot = await ref.once('value');
+            const datos = snapshot.val();
+            
+            if (!datos) return;
+            
+            nuevoDocumentacionPendiente[logistica] = {};
+            
+            await Promise.all(Object.entries(datos).map(async ([fecha, camiones]) => {
+                if (new Date(fecha) < fechaInicio) return;
+                
+                const camionesPendientes = await Promise.all(Object.keys(camiones).map(async (camion) => {
+                    const docRef = storageMeli.ref(`DocumentacionDespachos/${fecha}/${logistica}/${camion}`);
+                    const existeDoc = await verificarDocumentacionExistente(docRef);
+                    return existeDoc ? null : camion;
+                }));
+                
+                const camionesFiltrados = camionesPendientes.filter(c => c !== null);
+                
+                if (camionesFiltrados.length > 0) {
+                    nuevoDocumentacionPendiente[logistica][fecha] = camionesFiltrados;
+                    totalPendientes += camionesFiltrados.length;
+                }
+            }));
+        }));
+        
+        documentacionPendiente = nuevoDocumentacionPendiente;
+        actualizarContador(totalPendientes);
+    } catch (error) {
+        console.error('Error al verificar documentación:', error);
+        actualizarContador('error');
+    }
+}
+
+// Función para verificar si existe documentación
+async function verificarDocumentacionExistente(ref) {
+    try {
+        const listResult = await ref.listAll();
+        return listResult.items.length > 0;
+    } catch (error) {
+        if (error.code === 'storage/object-not-found') {
+            return false;
+        }
+        console.error('Error al verificar documentación:', error);
+        return false;
+    }
+}
+
+// Función para actualizar el contador
+function actualizarContador(cantidad) {
+    const contador = document.getElementById('contadorDocumentacionFaltante');
+    
+    if (cantidad === 'error') {
+        contador.innerHTML = '<i class="bi bi-exclamation-triangle"></i>';
+        contador.classList.add('bg-danger');
+        return;
+    }
+    
+    if (cantidad === 0) {
+        contador.textContent = '✓';
+        contador.classList.remove('bg-danger');
+        contador.classList.add('bg-success');
+    } else {
+        contador.textContent = cantidad;
+        contador.classList.remove('bg-success');
+        contador.classList.add('bg-danger');
+    }
+}
+
+// Función para cargar el modal de documentación
+function cargarModalDocumentacion() {
+    const contenido = document.getElementById('contenidoDocumentacion');
+    contenido.innerHTML = '';
+    
+    if (Object.keys(documentacionPendiente).length === 0) {
+        contenido.innerHTML = `
+            <div class="text-center py-5">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                <h4 class="mt-3">¡Todo en orden!</h4>
+                <p class="text-muted">No hay documentación pendiente de cargar.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    for (const [logistica, fechas] of Object.entries(documentacionPendiente)) {
+        if (Object.keys(fechas).length === 0) continue;
+        
+        const totalLogistica = Object.values(fechas).flat().length;
+        
+        const logisticaItem = document.createElement('div');
+        logisticaItem.className = 'mac-logistica-item';
+        logisticaItem.innerHTML = `
+            <div class="mac-logistica-header">
+                <h5 class="mac-logistica-title">
+                    <i class="bi bi-truck mr-1"></i>
+                    <span>${logistica}</span>
+                </h5>
+                <span class="mac-logistica-badge">${totalLogistica}</span>
+            </div>
+            <div class="mac-logistica-content">
+                ${generarContenidoFechas(fechas, logistica)}
+            </div>
+        `;
+        
+        contenido.appendChild(logisticaItem);
+    }
+    
+    // Agregar event listeners a los botones de cargar
+    document.querySelectorAll('.btn-cargar-doc').forEach(btn => {
+        btn.addEventListener('click', function() {
+            logisticaActual = this.getAttribute('data-logistica');
+            fechaActual = this.getAttribute('data-fecha');
+            camionActual = this.getAttribute('data-camion');
+            
+            // Configurar modal de carga
+            document.getElementById('tituloDocumento').textContent = 
+                `${logisticaActual} - ${camionActual} (${fechaActual})`;
+            
+            // Inicializar variables
+            fotosTomadas = [];
+            document.getElementById('contenedorHojas').innerHTML = '';
+            document.getElementById('btnSubirDocumentacion').disabled = true;
+            document.getElementById('progressBarDoc').style.width = '0%';
+            document.getElementById('progressBarDoc').style.background = 'linear-gradient(90deg, #007bff, #17a2b8)';
+            document.querySelector('.progress-text').textContent = '0%';
+            document.getElementById('statusText').textContent = '';
+            
+            // Agregar primera hoja vacía
+            agregarHojaVacia();
+            
+            // Mostrar modal
+            const modalCargar = new bootstrap.Modal(document.getElementById('modalCargarDocumento'), {
+                focus: false,
+                keyboard: false
+            });
+            modalCargar.show();
+        });
+    });
+}
+
+function generarContenidoFechas(fechas, logistica) {
+    let html = '';
+    const fechasOrdenadas = Object.keys(fechas).sort((a, b) => new Date(a) - new Date(b));
+    
+    for (const fecha of fechasOrdenadas) {
+        const camiones = fechas[fecha];
+        
+        html += `
+            <div class="mac-fecha-item">
+                <div class="mac-fecha-header">
+                    <h6 class="mac-fecha-title2">${formatearFecha(fecha)}</h6>
+                    <h6 class="mac-fecha-title hidden">${fecha}</h6>
+                    <span class="mac-fecha-badge">${camiones.length}</span>
+                </div>
+                <ul class="mac-camion-list">
+                    ${generarListadoCamiones(camiones, fecha, logistica)}
+                </ul>
+            </div>
+        `;
+    }
+    
+    return html;
+}
+
+function generarListadoCamiones(camiones, fecha, logistica) {
+    let html = '';
+    
+    for (const camion of camiones) {
+        html += `
+            <li class="mac-camion-item">
+                <div>
+                    <span class="mac-camion-name">${camion}</span>
+                </div>
+                <div>
+                    <button class="btn-cargar-doc btn btn-primary" 
+                            data-logistica="${logistica}" 
+                            data-fecha="${fecha}" 
+                            data-camion="${camion}">
+                        <i class="bi bi-cloud-arrow-up mr-1"></i>
+                        <span>Cargar Documentación</span>
+                    </button>
+                </div>
+            </li>
+            <h6 class="mac-description">Logística ${logistica} del día ${formatearFecha(fecha)} - ${camion}</h6>
+
+        `;
+    }
+    
+    return html;
+}
+
+// Función para agregar hoja vacía
+function agregarHojaVacia() {
+    const contenedor = document.getElementById('contenedorHojas');
+    const numeroHoja = fotosTomadas.length + 1;
+    
+    const hoja = document.createElement('div');
+    hoja.className = 'col-md-6 mb-3';
+    hoja.innerHTML = `
+        <div class="hoja-documento" id="hoja-${numeroHoja}">
+            <i class="bi bi-plus-lg" style="font-size: 2rem; color: #adb5bd;"></i>
+            <span class="hoja-numero">Hoja ${numeroHoja}</span>
+        </div>
+    `;
+    
+    contenedor.appendChild(hoja);
+    
+    // Agregar event listener para tomar foto
+    document.getElementById(`hoja-${numeroHoja}`).addEventListener('click', function() {
+        document.getElementById('inputCamara').click();
+    });
+}
+
+// Función para manejar la foto tomada
+function manejarFoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const numeroHoja = fotosTomadas.length + 1;
+        const hoja = document.getElementById(`hoja-${numeroHoja}`);
+        
+        // Guardar foto en array
+        fotosTomadas.push({
+            file: file,
+            preview: e.target.result
+        });
+        
+        // Actualizar hoja con la imagen
+        hoja.innerHTML = `
+            <img src="${e.target.result}" alt="Hoja ${numeroHoja}">
+            <span class="hoja-numero">Hoja ${numeroHoja}</span>
+        `;
+        
+        // Habilitar botón de subir si hay al menos una foto
+        if (fotosTomadas.length > 0) {
+            document.getElementById('btnSubirDocumentacion').disabled = false;
+        }
+        
+        // Agregar nueva hoja vacía automáticamente
+        agregarHojaVacia();
+        
+        // Resetear input
+        event.target.value = '';
+    };
+    reader.readAsDataURL(file);
+}
+
+// Función para subir documentación
+async function subirDocumentacion() {
+    if (fotosTomadas.length === 0) return;
+    
+    const btnSubir = document.getElementById('btnSubirDocumentacion');
+    const spinner = document.getElementById('spinnerSubirDoc');
+    
+    // Mostrar spinner y deshabilitar botón
+    btnSubir.disabled = true;
+    spinner.classList.remove('d-none');
+    
+    try {
+        // Crear referencia en Storage
+        const refBase = storageMeli.ref(`DocumentacionDespachos/${fechaActual}/${logisticaActual}/${camionActual}`);
+        
+        // Subir cada foto
+        const uploadPromises = fotosTomadas.map((foto, index) => {
+            const nombreArchivo = `hoja_${index + 1}_${Date.now()}${foto.file.name.match(/\..*$/)[0]}`;
+            const refFoto = refBase.child(nombreArchivo);
+            
+            return new Promise((resolve, reject) => {
+                const uploadTask = refFoto.put(foto.file);
+                
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        // Actualizar progreso
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        const totalProgress = ((index + (progress / 100)) / fotosTomadas.length) * 100;
+                        
+                        document.getElementById('statusText').textContent = `Subiendo hoja ${index + 1} de ${fotosTomadas.length}`;
+                        actualizarBarraProgreso(totalProgress);
+                    },
+                    (error) => {
+                        console.error('Error al subir foto:', error);
+                        reject(error);
+                    },
+                    () => {
+                        resolve(uploadTask.snapshot);
+                    }
+                );
+            });
+        });
+        
+        // Esperar a que todas las fotos se suban
+        await Promise.all(uploadPromises);
+        
+        // Actualizar UI
+        actualizarBarraProgreso(100);
+        document.getElementById('statusText').textContent = '¡Documentación subida con éxito!';
+        
+        // Mostrar mensaje de éxito
+        Swal.fire({
+            icon: 'success',
+            title: '¡Documentación cargada!',
+            text: 'La documentación se ha subido correctamente.',
+            confirmButtonText: 'Aceptar',
+            customClass: {
+                popup: 'mac-swal-popup'
+            }
+        }).then(() => {
+            // Cerrar solo el modal de carga
+            bootstrap.Modal.getInstance(document.getElementById('modalCargarDocumento')).hide();
+            
+            // Eliminar el camión cargado del listado
+            if (documentacionPendiente[logisticaActual] && 
+                documentacionPendiente[logisticaActual][fechaActual]) {
+                
+                const index = documentacionPendiente[logisticaActual][fechaActual].indexOf(camionActual);
+                if (index !== -1) {
+                    documentacionPendiente[logisticaActual][fechaActual].splice(index, 1);
+                    
+                    // Si no quedan camiones para esa fecha, eliminar la fecha
+                    if (documentacionPendiente[logisticaActual][fechaActual].length === 0) {
+                        delete documentacionPendiente[logisticaActual][fechaActual];
+                    }
+                    
+                    // Si no quedan fechas para la logística, eliminar la logística
+                    if (Object.keys(documentacionPendiente[logisticaActual]).length === 0) {
+                        delete documentacionPendiente[logisticaActual];
+                    }
+                }
+            }
+            
+            // Actualizar el modal
+            cargarModalDocumentacion();
+
+            // Resetea el estado
+            fotosTomadas = [];
+            document.getElementById('contenedorHojas').innerHTML = '';
+            document.getElementById('btnSubirDocumentacion').disabled = true;
+            document.getElementById('progressBarDoc').style.width = '0%';
+            document.querySelector('.progress-text').textContent = '0%';
+            document.getElementById('statusText').textContent = '';
+            
+            // Actualizar contador
+            verificarDocumentacionPendiente();
+        });
+        
+    } catch (error) {
+        console.error('Error al subir documentación:', error);
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al subir la documentación. Por favor, inténtalo nuevamente.',
+            confirmButtonText: 'Aceptar',
+            customClass: {
+                popup: 'mac-swal-popup'
+            }
+        });
+    } finally {
+        spinner.classList.add('d-none');
+    }
+}
+
+// Función para actualizar barra de progreso
+function actualizarBarraProgreso(porcentaje) {
+    const barra = document.getElementById('progressBarDoc');
+    const texto = document.querySelector('.progress-text');
+    
+    barra.style.width = `${porcentaje}%`;
+    texto.textContent = `${Math.round(porcentaje)}%`;
+    
+    if (porcentaje >= 100) {
+        barra.style.background = 'linear-gradient(90deg, #28a745, #20c997)';
+    }
+}
+// FIN ADJUNTAR DOCUMENTACION DE DESPACHO

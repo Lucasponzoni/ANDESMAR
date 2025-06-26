@@ -132,6 +132,10 @@
                 <button class="btn btn-light" id="btnBuscarInfoRemitos" type="button">
                 <i class="bi bi-binoculars-fill" style="font-size: 22px; color: #fb8e00;"></i> Buscar Remitos
                 </button>
+                <button class="btn btn-light position-relative" id="btnAdjuntarDocumentacion" type="button" data-bs-toggle="modal" data-bs-target="#modalDocumentacion">
+                    <i class="bi bi-paperclip" style="font-size: 22px; color: #17be5e;"></i> Adjuntar documentación
+                    <span id="contadorDocumentacionFaltante" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
+                </button>
                 <button class="btn btn-primary btn-seguro" id="btnReporteSeguro" type="button">
                 <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="spinnerSeguro"></span>
                 <i class="bi bi-shield-lock-fill" style="font-size: 22px; color: #f6ff00;" id="iconoSeguro"></i>
@@ -996,6 +1000,81 @@
         document.getElementById('inputRemito').focus();
         });
     </script>
+
+<!-- CARGA DOCUMENTACION DE DESPACHO -->
+<!-- Modal Documentación Pendiente -->
+<div class="modal fade" id="modalDocumentacion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-mac modal-lg">
+        <div class="modal-content modal-mac">
+            <div class="modal-header modal-mac-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-files me-2 MR-1"></i>
+                    Documentación Pendiente
+                </h5>
+                <button type="button" class="btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body modal-mac-body p-0">
+                <div class="mac-scroll-container" style="max-height: 65vh;">
+                    <div class="mac-logistica-container" id="contenidoDocumentacion">
+                        <!-- Contenido dinámico -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer modal-mac-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cargar Documento -->
+<div class="modal fade" id="modalCargarDocumento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-mac modal-lg">
+        <div class="modal-content modal-mac">
+            <div class="modal-header modal-mac-header">
+                <h5 class="modal-title" id="modalCargarDocumentoLabel">
+                    <i class="bi bi-cloud-arrow-up me-2 mr-2"></i>
+                    <span id="tituloDocumento">Cargar Documentación</span>
+                </h5>
+                <button type="button" class="btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body modal-mac-body">
+                <div class="mac-alert mb-3">
+                    <i class="bi bi-info-circle-fill me-2 mr-2"></i>
+                    Toma fotos claras de cada hoja del documento y verificar fecha
+                </div>
+                
+                <div class="row g-3" id="contenedorHojas">
+                    <!-- Se agregarán dinámicamente las hojas aquí -->
+                </div>
+                
+                <div class="progress-container mt-4">
+                    <div class="progress-bar-mac" id="progressBarDoc" style="width: 0%">
+                        <span class="progress-text ml-2">0%</span>
+                    </div>
+                    <div class="status-text" id="statusText"></div>
+                </div> 
+            </div>
+            <div class="modal-footer modal-mac-footer">
+                <button type="button" class="btn btn-mac-danger" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-2 mr-1"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-mac-primary" id="btnSubirDocumentacion" disabled>
+                    <span class="spinner-border spinner-border-sm d-none" id="spinnerSubirDoc"></span>
+                    <i class="bi bi-cloud-upload me-2 mr-1"></i>
+                    Subir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Input oculto para la cámara -->
+<input type="file" id="inputCamara" accept="image/*" capture="environment" class="d-none">
+<!-- Fin Documentacion de despacho -->
 
     <!-- Info WiFi -->
     <div id="notification-ios-wifi" class="notification-ios-wifi">
