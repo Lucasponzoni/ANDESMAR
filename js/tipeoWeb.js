@@ -4096,10 +4096,7 @@ async function descargarExcelSeguro(filas, desde, hasta) {
 
 // ADJUNTAR DOCUMENTACION DE DESPACHO
 function formatearFecha(fechaISO) {
-    const fecha = new Date(fechaISO);
-    const dia = fecha.getDate().toString().padStart(2, '0');
-    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-    const año = fecha.getFullYear();
+    const [año, mes, dia] = fechaISO.split('-');
     return `${dia}-${mes}-${año}`;
 }
 
@@ -4127,7 +4124,7 @@ async function verificarDocumentacionPendiente() {
 
     try {
         const fechaHoy = new Date();
-        const fechaInicio = new Date('2025-06-20');
+        const fechaInicio = new Date('2025-06-26');
         
         if (fechaHoy < fechaInicio) {
             actualizarContador(0);
@@ -4316,7 +4313,6 @@ function generarContenidoFechas(fechas, logistica) {
             </div>
         `;
 
-        console.log(camiones, fecha, logistica);
     }
     
     return html;
