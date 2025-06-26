@@ -4297,10 +4297,12 @@ async function subirDocumentacion() {
     
     const btnSubir = document.getElementById('btnSubirDocumentacion');
     const spinner = document.getElementById('spinnerSubirDoc');
+    const iconoDocSubir = document.getElementById('iconoSubirDoc');
     
     // Mostrar spinner y deshabilitar botón
     btnSubir.disabled = true;
     spinner.classList.remove('d-none');
+    iconoDocSubir.classList.add('d-none');
     
     try {
         // Crear referencia en Storage
@@ -4403,6 +4405,7 @@ async function subirDocumentacion() {
         });
     } finally {
         spinner.classList.add('d-none');
+        iconoDocSubir.classList.remove('d-none');
     }
 }
 

@@ -9213,7 +9213,7 @@ mark {
     border-radius: 5px;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    background: lightgray;
+    background: #727272;
     display: inline-block;
     position: relative;
     padding-left: 28px;
