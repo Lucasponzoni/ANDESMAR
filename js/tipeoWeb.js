@@ -4315,6 +4315,8 @@ function generarContenidoFechas(fechas, logistica) {
                 </ul>
             </div>
         `;
+
+        console.log(camiones, fecha, logistica);
     }
     
     return html;
