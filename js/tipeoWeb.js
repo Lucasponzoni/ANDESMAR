@@ -4403,59 +4403,109 @@ function manejarFoto(event) {
     reader.readAsDataURL(file);
 }
 
+// Función para redimensionar y comprimir una imagen antes de subir
+function comprimirImagen(file, maxWidth = 1024, maxHeight = 1024, quality = 0.7) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth || height > maxHeight) {
+                    if (width / height > maxWidth / maxHeight) {
+                        height = height * (maxWidth / width);
+                        width = maxWidth;
+                    } else {
+                        width = width * (maxHeight / height);
+                        height = maxHeight;
+                    }
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob(
+                    (blob) => {
+                        resolve(blob);
+                    },
+                    'image/jpeg',
+                    quality
+                );
+            };
+
+            img.onerror = (err) => reject(err);
+        };
+
+        reader.onerror = (err) => reject(err);
+    });
+}
+
 // Función para subir documentación
 async function subirDocumentacion() {
     if (fotosTomadas.length === 0) return;
-    
+
     const btnSubir = document.getElementById('btnSubirDocumentacion');
     const spinner = document.getElementById('spinnerSubirDoc');
     const iconoDocSubir = document.getElementById('iconoSubirDoc');
-    
+
     // Mostrar spinner y deshabilitar botón
     btnSubir.disabled = true;
     spinner.classList.remove('d-none');
     iconoDocSubir.classList.add('d-none');
-    
+
     try {
-        // Crear referencia en Storage
         const refBase = storageMeli.ref(`DocumentacionDespachos/${fechaActual}/${logisticaActual}/${camionActual}`);
-        
-        // Subir cada foto
-        const uploadPromises = fotosTomadas.map((foto, index) => {
+
+        const uploadPromises = fotosTomadas.map(async (foto, index) => {
             const nombreArchivo = `hoja_${index + 1}_${Date.now()}${foto.file.name.match(/\..*$/)[0]}`;
             const refFoto = refBase.child(nombreArchivo);
-            
-            return new Promise((resolve, reject) => {
-                const uploadTask = refFoto.put(foto.file);
-                
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        // Actualizar progreso
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        const totalProgress = ((index + (progress / 100)) / fotosTomadas.length) * 100;
-                        
-                        document.getElementById('statusText').textContent = `Subiendo hoja ${index + 1} de ${fotosTomadas.length}`;
-                        actualizarBarraProgreso(totalProgress);
-                    },
-                    (error) => {
-                        console.error('Error al subir foto:', error);
-                        reject(error);
-                    },
-                    () => {
-                        resolve(uploadTask.snapshot);
-                    }
-                );
-            });
+
+            try {
+                // Comprimir imagen antes de subir
+                const imagenComprimida = await comprimirImagen(foto.file);
+
+                const uploadTask = refFoto.put(imagenComprimida);
+
+                return new Promise((resolve, reject) => {
+                    uploadTask.on(
+                        'state_changed',
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            const totalProgress = ((index + (progress / 100)) / fotosTomadas.length) * 100;
+
+                            document.getElementById('statusText').textContent = `Subiendo hoja ${index + 1} de ${fotosTomadas.length}`;
+                            actualizarBarraProgreso(totalProgress);
+                        },
+                        (error) => {
+                            console.error('Error al subir foto:', error);
+                            reject(error);
+                        },
+                        () => {
+                            resolve(uploadTask.snapshot);
+                        }
+                    );
+                });
+            } catch (error) {
+                console.error(`Error comprimiendo imagen ${index + 1}:`, error);
+                throw error;
+            }
         });
-        
-        // Esperar a que todas las fotos se suban
+
         await Promise.all(uploadPromises);
-        
-        // Actualizar UI
+
         actualizarBarraProgreso(100);
         document.getElementById('statusText').textContent = '¡Documentación subida con éxito!';
-        
-        // Mostrar mensaje de éxito
+
         Swal.fire({
             icon: 'success',
             title: '¡Documentación cargada!',
@@ -4465,47 +4515,34 @@ async function subirDocumentacion() {
                 popup: 'mac-swal-popup'
             }
         }).then(() => {
-            // Cerrar solo el modal de carga
             bootstrap.Modal.getInstance(document.getElementById('modalCargarDocumento')).hide();
-            
-            // Eliminar el camión cargado del listado
-            if (documentacionPendiente[logisticaActual] && 
-                documentacionPendiente[logisticaActual][fechaActual]) {
-                
+
+            if (documentacionPendiente[logisticaActual] && documentacionPendiente[logisticaActual][fechaActual]) {
                 const index = documentacionPendiente[logisticaActual][fechaActual].indexOf(camionActual);
                 if (index !== -1) {
                     documentacionPendiente[logisticaActual][fechaActual].splice(index, 1);
-                    
-                    // Si no quedan camiones para esa fecha, eliminar la fecha
                     if (documentacionPendiente[logisticaActual][fechaActual].length === 0) {
                         delete documentacionPendiente[logisticaActual][fechaActual];
                     }
-                    
-                    // Si no quedan fechas para la logística, eliminar la logística
                     if (Object.keys(documentacionPendiente[logisticaActual]).length === 0) {
                         delete documentacionPendiente[logisticaActual];
                     }
                 }
             }
-            
-            // Actualizar el modal
+
             cargarModalDocumentacion();
 
-            // Resetea el estado
             fotosTomadas = [];
             document.getElementById('contenedorHojas').innerHTML = '';
             document.getElementById('btnSubirDocumentacion').disabled = true;
             document.getElementById('progressBarDoc').style.width = '0%';
             document.querySelector('.progress-text').textContent = '0%';
             document.getElementById('statusText').textContent = '';
-            
-            // Actualizar contador
+
             verificarDocumentacionPendiente();
         });
-        
     } catch (error) {
         console.error('Error al subir documentación:', error);
-        
         Swal.fire({
             icon: 'error',
             title: 'Error',
