@@ -718,6 +718,7 @@ async function loadEnviosFromFirebase() {
                         orden_publica: data.orden_publica_,
                         sku: data.sku_externo.toUpperCase(),
                         sync: data.MetodoDeImport,
+                        facturaVtex: data.facturaVtex,
                         cantidad: data.cantidad,
                         errorSlack: data.errorSlack,
                         correccionSlack: data.correccionSlack,
@@ -1813,9 +1814,32 @@ COMPRA CON USO DE PUNTOS BNA
         </button>
     </div>
 
-        <p class="factura-tv" id="factura-tv-${data[i].id}">
-            <i class="fas fa-spinner fa-pulse fa-2x" style="color: cornflowerblue;"></i>
-        </p>
+<!-- Estado de sincronización de la factura -->
+<p class="factura-tv" id="factura-tv-${data[i].id}">
+    <i class="fas fa-spinner fa-pulse fa-2x" style="color: cornflowerblue;"></i>
+</p>
+
+<!-- Mensaje de sincronización en Vtex debajo, solo si aplica -->
+${(data[i].facturaVtex === true) ? `
+    <div style="
+        margin-top: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        color: #444;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(8px) saturate(160%);
+        -webkit-backdrop-filter: blur(8px) saturate(160%);
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: inset 0 0 6px rgba(0,0,0,0.05);
+        font-weight: 500;
+    ">
+        <i class="bi bi-check-circle-fill" style="color: #34C759;"></i>
+        Factura sincronizada en Vtex
+    </div>
+` : ''}
 
 </div>
     
@@ -1871,7 +1895,7 @@ ${data[i].order ? `
                             </div>
                             <!-- Fin contenedor para los switches -->
 
-                            <div class="factura-status em-circle-state-time ${isParaFacturar ? 'facturable' : ''}" id="factura-status-${data[i].id}">
+                            <div class="factura-status em-circle-state-time ${isParaFacturar ? 'facturable' : ''}" id="factura-status-${data[i].id}"> 
                                 ${mensajeFactura}
                             </div>
 
@@ -2281,7 +2305,7 @@ buscarFacturaDisponible(
     data[i].cuit,
     data[i].dni,
     data[i].fechaDeCreacion,
-    tipoFactura 
+    tipoFactura
 );
 
 // Evento para manejar el cambio del switch "Preparación"
@@ -6665,6 +6689,7 @@ async function loadEnviosFromFirebaseAvanzado(subOrderValue) {
                         orden_publica: data.orden_publica_,
                         sku: data.sku_externo.toUpperCase(),
                         sync: data.MetodoDeImport,
+                        facturaVtex: data.facturaVtex,
                         cantidad: data.cantidad,
                         errorSlack: data.errorSlack,
                         correccionSlack: data.correccionSlack,
@@ -6796,14 +6821,14 @@ async function buscarFacturaDisponible(id, cuit, dni, fechaDeCreacion, tipoFactu
         el.classList.remove("no-disponible");
         el.classList.add("disponible");
         el.innerHTML = `
-            <i class="bi bi-receipt-cutoff"></i>
-            <a href="${linkPDF}" target="_blank" style="color: inherit; text-decoration: underline;">
-                ${tipo_factura} - <strong>${numeroFactura}</strong>
+            <a title="Abrir PDF en el Navegador" href="${linkPDF}" target="_blank">
+                ${tipo_factura} - ${numeroFactura}
             </a>
             <button class="btn-clipboard" title="Copiar link" onclick="copiarAlPortapapeles('${linkPDF}', this)">
                 <i class="fas fa-clipboard icono-factura-tv"></i>
             </button>
         `;
+
     } else {
         el.classList.remove("disponible");
         el.classList.add("no-disponible");
