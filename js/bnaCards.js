@@ -781,7 +781,7 @@ async function loadEnviosFromFirebase() {
                 // Renderizar las tarjetas y la paginación
                 allData.reverse();
                 renderCards(allData);
-                updatePagination(allData.length);
+                updatePagination(allData);
 
                 // Actualizar el contador en el botón
                 document.getElementById('contadorCards').innerText = sinPrepararCount;
@@ -970,6 +970,132 @@ const cpsPlaceIt = [
     1896, 1897, 1898, 1900, 1902, 1904, 1906, 1910, 1912, 1914,
     1916, 1725, 1726, 1728, 1729, 1730, 1732, 1734
 ];
+
+// FILTRAR POR TIENDAS
+let activeFilters = []; // Guarda los filtros aplicados
+
+document.getElementById('filterByShopButton').addEventListener('click', async () => {
+    const tiendas = [
+        { code: '6572', name: 'Provincia - 6572', detalle: 'Tienda Bapro Vtex', logo: './Img/bapro-logo.png' },
+        { code: '2941', name: 'Nación - 2941', detalle: 'Tienda Novogarbna 12 Cuotas', logo: './Img/bna-logo.png' },
+        { code: '2942', name: 'Nación - 2942', detalle: 'Tienda Novogarbnapromo 18 Cuotas', logo: './Img/bna-logo.png' },
+        { code: '2943', name: 'Nación - 2943', detalle: 'Tienda Novogarbnapromo2 30 Cuotas', logo: './Img/bna-logo.png' },
+        { code: '1914', name: 'Macro - 1914', detalle: 'Tienda Macro Novogarmp 6-12 Cuotas', logo: './Img/premia-logo.png' },
+        { code: '1915', name: 'Macro - 1915', detalle: 'Tienda Macro Especial', logo: './Img/premia-logo.png' },
+    ];
+
+    let checklistHTML = `
+        <style>
+            .grid-tiendas {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 10px;
+                background: #f8f9fa;
+            }
+            .item-tienda {
+                border: 1px solid #ced4da;
+                border-radius: 6px;
+                padding: 8px 10px;
+                background: white;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .item-tienda label {
+                font-weight: bold;
+                margin-bottom: 2px;
+            }
+            .item-tienda small {
+                font-size: 11px;
+                color: #6c757d;
+            }
+            .logo-tienda {
+                width: 60px;
+                height: auto;
+                object-fit: contain;
+                margin-right: 8px;
+            }
+        </style>
+        <div class="grid-tiendas">
+            ${tiendas.map(tienda => `
+                <div class="item-tienda">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="shop-${tienda.code}" value="${tienda.code}" ${activeFilters.includes(tienda.code) ? 'checked' : ''}>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <img src="${tienda.logo}" class="logo-tienda" alt="${tienda.name}">
+                        <div>
+                            <label for="shop-${tienda.code}">${tienda.name}</label><br>
+                            <small>${tienda.detalle}</small>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    const result = await Swal.fire({
+        title: `<i class="fas fa-store-alt me-2"></i> Filtrar por Tiendas`,
+        html: checklistHTML,
+        confirmButtonText: '<i class="bi bi-filter-circle me-2"></i>Aplicar Filtro',
+        cancelButtonText: '<i class="bi bi-x-circle me-2"></i>Cancelar',
+        showCancelButton: true,
+        showDenyButton: true,
+        denyButtonText: '<i class="bi bi-x-octagon me-2"></i>Borrar Filtros',
+        width: '700px',
+        backdrop: 'rgba(0,0,0,0.5)',
+        allowOutsideClick: false,
+        focusConfirm: false,
+        preConfirm: () => {
+            const selected = tiendas
+                .filter(tienda => document.getElementById(`shop-${tienda.code}`).checked)
+                .map(tienda => tienda.code);
+
+            if (selected.length === 0) {
+                Swal.showValidationMessage('Debes seleccionar al menos una tienda o borrar los filtros');
+                return false;
+            }
+            return selected;
+        }
+    });
+
+    if (result.isConfirmed && result.value) {
+        // ✅ Aplicar filtro
+        activeFilters = result.value;
+
+        const filteredData = allData.filter(item => {
+            const shopCode = getShopCode(item.orden_publica_);
+            return activeFilters.includes(shopCode);
+        });
+
+        renderCards(filteredData);
+        updatePagination(filteredData);
+
+    } else if (result.isDenied) {
+        // ✅ Borrar filtros
+        activeFilters = [];
+        renderCards(allData);
+        updatePagination(allData);
+    } else if (result.isDismissed) {
+        // ✅ Cancelar (no hace nada, solo cerrar el popup)
+        console.log('Filtro cancelado');
+    }
+});
+// FIN FILTRAR POR TIENDAS
+
+// Función para sacar el shop code de la orden
+function getShopCode(ordenPublica) {
+    if (!ordenPublica) return null;
+
+    if (ordenPublica.toLowerCase().startsWith('bpr')) {
+        return '6572';
+    } else {
+        return ordenPublica.split('-').pop();
+    }
+}
 
     function renderCards(data) {
 
@@ -1742,7 +1868,7 @@ COMPRA CON USO DE PUNTOS BNA
                     </div>
 
                     <div class="contenedor-fecha-vtex" style="display: flex; align-items: center; gap: 10px;">
-                        <div class="fecha-tiendas-virtuales">
+                        <div class="${data[i].sync === 'Sincronizado con Vtex' ? 'fecha-tiendas-virtuales-vtex' : 'fecha-tiendas-virtuales'}">
                             ${data[i].fechaDeCreacion}
                         </div>
                         <div class="estado-sincronizacion ${data[i].sync === 'Sincronizado con Vtex' ? '' : 'hidden'}">
@@ -3171,7 +3297,7 @@ const monto_envio = document.getElementById(`monto_envio_${id}`)?.value || '0';
 
 // Enviar notificación a Slack
 const mensajeSlack = {
-    text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n➡️📄 Estoy procesando la factura de la Orden *${codigo_pago}* de *${metodo_pago_TV}*\n\n 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n ${mensajeTipo} 🎉 \n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
+    text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n➡️📄 Estoy procesando la factura de la Orden *\`${codigo_pago}\`* de *${metodo_pago_TV}*\n\n 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n ${mensajeTipo} 🎉 \n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
 };
 
 fetch(`${corsh}${HookTv}`, {
@@ -3330,7 +3456,7 @@ async function marcarFacturado3(id, email, nombre, remito) {
 
     // Enviar notificación a Slack
     const mensajeSlack = {
-        text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🔁📄 Estoy *Re-Procesando por ERROR DE SLACK* la factura de la Orden *${codigo_pago}* de *${metodo_pago_TV}*\n\n 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n 🟡 **REPROCESO:** Error de Slack \n\n ${mensajeTipo} 🎉 \n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
+        text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🔁📄 Estoy *Re-Procesando por ERROR DE SLACK* la factura de la Orden *\`${codigo_pago}\`* de *${metodo_pago_TV}*\n\n 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n 🟡 **REPROCESO:** Error de Slack \n\n ${mensajeTipo} 🎉 \n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
     };
 
     fetch(`${corsh}${HookTv}`, {
@@ -5515,13 +5641,13 @@ medidasDiv.appendChild(medidasTextoDiv);
 }
 
 // INICIO PAGINATION
-
-function updatePagination(totalItems) {
+function updatePagination(dataArray) {
     paginationContainer.innerHTML = "";
+    const totalItems = dataArray.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     let startPage = currentPageGroup + 1;
     let endPage = Math.min(currentPageGroup + 6, totalPages);
-    
+
     for (let i = startPage; i <= endPage; i++) {
         const pageItem = document.createElement("li");
         pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
@@ -5529,8 +5655,8 @@ function updatePagination(totalItems) {
         pageItem.addEventListener("click", (e) => {
             e.preventDefault();
             currentPage = i;
-            renderCards(allData);
-            updatePagination(totalItems);
+            renderCards(dataArray);        // <- Renderizar sólo el array actual (filtrado o completo)
+            updatePagination(dataArray);   // <- Volver a armar paginador según el array actual
         });
         paginationContainer.appendChild(pageItem);
     }
@@ -5542,8 +5668,8 @@ function updatePagination(totalItems) {
         loadMoreItem.addEventListener("click", (e) => {
             e.preventDefault();
             currentPageGroup += 6;
-            updatePagination(totalItems);
-            renderCards(allData);
+            updatePagination(dataArray);
+            renderCards(dataArray);
         });
         paginationContainer.appendChild(loadMoreItem);
     }
@@ -5555,8 +5681,8 @@ function updatePagination(totalItems) {
         backItem.addEventListener("click", (e) => {
             e.preventDefault();
             currentPageGroup -= 6;
-            updatePagination(totalItems);
-            renderCards(allData);
+            updatePagination(dataArray);
+            renderCards(dataArray);
         });
         paginationContainer.appendChild(backItem);
     }

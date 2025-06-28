@@ -126,6 +126,11 @@
                 <!-- Botones -->
                 <div class="trio-de-botones-container">
                     <div class="trio-de-botones">
+
+                        <button id="filterByShopButton" type="button" class="btn btn-primary position-relative" style="white-space: nowrap;">
+                            <i class="bi bi-funnel-fill" style="font-size: 22px; color: yellow;"></i> Filtrar por Tiendas
+                        </button>
+
                         <button id="btnFacturar" type="button" class="btn btn-light position-relative" style="white-space: nowrap;">
                             <i class="bi bi-cart-check-fill" style="font-size: 22px; color: #007aff;"></i> Facturar
                             <span id="contadorCardsFacturar" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-large">
@@ -158,12 +163,12 @@
                         </button>
 
                         <button id="duplicateButton" type="button" class="btn btn-light position-relative" style="white-space: nowrap;">
-                            <i class="fas fa-clone" style="font-size: 22px; color: #ec812e;"></i> Duplicados
+                            <i class="fas fa-clone" style="font-size: 22px; color: #ec812e;"></i>
                             <span id="contadorCards3" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
                         </button>
                                     
                         <button class="btn btn-light position-relative" data-toggle="modal" data-target="#skuModal" id="openSkuModal" type="button" style="white-space: nowrap;">
-                            <i class="fas fa-laptop" style="font-size: 22px; color: #c0392b;"></i> Cargar Imei
+                            <i class="fas fa-laptop" style="font-size: 22px; color: #c0392b;"></i> Imei
                         </button>
 
                         <button class="btn btn-light position-relative" data-toggle="modal" data-target="#skuPlaceItModal" id="openSkuPlaceItModal" type="button" style="white-space: nowrap;">

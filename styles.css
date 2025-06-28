@@ -9478,12 +9478,10 @@ i[class^="bi-"] + em {
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     background: rgba(255, 255, 255, 0.15);
     border-radius: 14px;
-    border-bottom: 1px solid rgba(100, 149, 237, 0.5);
-    border-right: 1px solid rgba(100, 149, 237, 0.5);
     padding: 4px 10px;
     display: flex;
     width: fit-content;
-    color: #555;
+    color: cornflowerblue;
     height: 30px !important;
     font-size: small;
     font-weight: 600;
@@ -9499,10 +9497,29 @@ i[class^="bi-"] + em {
 }
 
 .estado-sincronizacion {
-    left: -20px;
+    left: -10px;
     border-radius: 0 14px 14px 0;
     z-index: 1;
     border: none;
+}
+
+.fecha-tiendas-virtuales-vtex{
+    border-radius: 14px 0 0 14px;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background: rgba(255, 255, 255, 0.15);
+    padding: 4px 10px;
+    display: flex;
+    width: fit-content;
+    color: cornflowerblue;
+    height: 30px !important;
+    font-size: small;
+    font-weight: 600;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    box-shadow: inset 0 0 10px rgba(100, 149, 237, 0.15);
 }
 
 .fecha-tiendas-virtuales {
@@ -9522,9 +9539,9 @@ i[class^="bi-"] + em {
     background: linear-gradient(
         120deg,
         rgba(255, 255, 255, 0.0) 0%,
-        rgba(100, 149, 237, 0.15) 30%,
+        rgba(247, 25, 99, 0.15) 30%,          /* VTEX pink (fucsia) suave */
         rgba(255, 255, 255, 0.4) 50%,
-        rgba(100, 149, 237, 0.15) 70%,
+        rgba(247, 25, 99, 0.15) 70%,          /* VTEX pink (fucsia) suave */
         rgba(255, 255, 255, 0.0) 100%
     );
     transform: rotate(25deg);
@@ -9553,10 +9570,10 @@ i[class^="bi-"] + em {
 
 @keyframes innerPulse {
     0%, 100% {
-        box-shadow: inset 0 0 12px rgba(100, 149, 237, 0.2);
+        box-shadow: inset 0 0 12px rgba(247, 25, 99, 0.2);     /* VTEX pink */
     }
     50% {
-        box-shadow: inset 0 0 25px rgba(100, 149, 237, 0.35);
+        box-shadow: inset 0 0 25px rgba(247, 25, 99, 0.35);    /* Más fuerte en el medio */
     }
 }
 
