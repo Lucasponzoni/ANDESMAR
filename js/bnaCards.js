@@ -1822,7 +1822,6 @@ COMPRA CON USO DE PUNTOS BNA
 <!-- Mensaje de sincronización en Vtex debajo, solo si aplica -->
 ${(data[i].facturaVtex === true) ? `
     <div style="
-        margin-top: 6px;
         padding: 4px 10px;
         font-size: 12px;
         color: #444;
