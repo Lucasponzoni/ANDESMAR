@@ -995,42 +995,57 @@ document.getElementById('filterByShopButton').addEventListener('click', async ()
                 padding: 10px;
                 background: #f8f9fa;
             }
+            @media (max-width: 600px) {
+                .grid-tiendas {
+                    grid-template-columns: 1fr;
+                }
+            }
             .item-tienda {
                 border: 1px solid #ced4da;
                 border-radius: 6px;
-                padding: 8px 10px;
+                padding: 10px;
                 background: white;
                 display: flex;
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+            .item-tienda-top {
+                display: flex;
+                flex-direction: column;
                 align-items: center;
-                gap: 10px;
+                justify-content: center;
+                gap: 8px;
+            }
+            .logo-tienda {
+                width: 50px;
+                height: auto;
+                object-fit: contain;
             }
             .item-tienda label {
                 font-weight: bold;
-                margin-bottom: 2px;
+                font-size: 13px;
+                margin-bottom: 4px;
+                display: block;
             }
             .item-tienda small {
                 font-size: 11px;
                 color: #6c757d;
-            }
-            .logo-tienda {
-                width: 60px;
-                height: auto;
-                object-fit: contain;
-                margin-right: 8px;
+                display: block;
             }
         </style>
         <div class="grid-tiendas">
             ${tiendas.map(tienda => `
                 <div class="item-tienda">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="shop-${tienda.code}" value="${tienda.code}" ${activeFilters.includes(tienda.code) ? 'checked' : ''}>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="item-tienda-top">
                         <img src="${tienda.logo}" class="logo-tienda" alt="${tienda.name}">
-                        <div>
-                            <label for="shop-${tienda.code}">${tienda.name}</label><br>
-                            <small>${tienda.detalle}</small>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="shop-${tienda.code}" value="${tienda.code}" ${activeFilters.includes(tienda.code) ? 'checked' : ''}>
                         </div>
+                    </div>
+                    <div>
+                        <label for="shop-${tienda.code}">${tienda.name}</label>
+                        <small>${tienda.detalle}</small>
                     </div>
                 </div>
             `).join('')}
@@ -1063,24 +1078,18 @@ document.getElementById('filterByShopButton').addEventListener('click', async ()
     });
 
     if (result.isConfirmed && result.value) {
-        // ✅ Aplicar filtro
         activeFilters = result.value;
-
         const filteredData = allData.filter(item => {
             const shopCode = getShopCode(item.orden_publica_);
             return activeFilters.includes(shopCode);
         });
-
         renderCards(filteredData);
         updatePagination(filteredData);
-
     } else if (result.isDenied) {
-        // ✅ Borrar filtros
         activeFilters = [];
         renderCards(allData);
         updatePagination(allData);
     } else if (result.isDismissed) {
-        // ✅ Cancelar (no hace nada, solo cerrar el popup)
         console.log('Filtro cancelado');
     }
 });
