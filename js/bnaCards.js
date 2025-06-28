@@ -717,6 +717,7 @@ async function loadEnviosFromFirebase() {
                         numerosTarjeta: (data.numeros_tarjeta?.trim() !== '-' && data.numeros_tarjeta?.trim()) || (data.numeros_tarjeta_2?.trim() !== '-' && data.numeros_tarjeta_2?.trim()) || "0000",
                         orden_publica: data.orden_publica_,
                         sku: data.sku_externo.toUpperCase(),
+                        sync: data.MetodoDeImport,
                         cantidad: data.cantidad,
                         errorSlack: data.errorSlack,
                         correccionSlack: data.correccionSlack,
@@ -1739,9 +1740,14 @@ COMPRA CON USO DE PUNTOS BNA
                         <ul id="suggestions-${data[i].id}" class="suggestions-container list-group"></ul>
                     </div>
 
-                    <p id= "fecha-tiendas-virtuales" class="fecha-tiendas-virtuales">
-                    ${data[i].fechaDeCreacion}
-                    </p>
+                    <div class="contenedor-fecha-vtex" style="display: flex; align-items: center; gap: 10px;">
+                        <div class="fecha-tiendas-virtuales">
+                            ${data[i].fechaDeCreacion}
+                        </div>
+                        <div class="estado-sincronizacion ${data[i].sync === 'Sincronizado con Vtex' ? '' : 'hidden'}">
+                            <img src="./Img/VtexSync.png" alt="Vtex Sync" style="height: 20px;">
+                        </div>
+                    </div>
 
                 <div id="direccion-bna" class="ios-card"> 
                     
@@ -6658,6 +6664,7 @@ async function loadEnviosFromFirebaseAvanzado(subOrderValue) {
                         numerosTarjeta: (data.numeros_tarjeta?.trim() !== '-' && data.numeros_tarjeta?.trim()) || (data.numeros_tarjeta_2?.trim() !== '-' && data.numeros_tarjeta_2?.trim()) || "0000",
                         orden_publica: data.orden_publica_,
                         sku: data.sku_externo.toUpperCase(),
+                        sync: data.MetodoDeImport,
                         cantidad: data.cantidad,
                         errorSlack: data.errorSlack,
                         correccionSlack: data.correccionSlack,
