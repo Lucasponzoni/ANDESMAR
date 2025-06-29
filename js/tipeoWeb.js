@@ -222,7 +222,7 @@ function imprimirTabla() {
 
     let bloqueTbody = $('<tbody></tbody>');
     let alturaAcumulada = 0;
-    const maxAlturaHoja = 1100; // Ajustar según impresora y papel
+    const maxAlturaHoja = 1900; // Ajustar según impresora y papel
     const alturaPie = 150;
     const alturaHeaderPrimeraHoja = 150; // Espacio total para título + resumen (aproximado)
     let esPrimeraHoja = true;
