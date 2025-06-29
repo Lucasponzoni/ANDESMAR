@@ -271,7 +271,7 @@ function imprimirTabla() {
         if (celda.find('.infoMacOsy').length > 0) {
             // Limitar ancho y forzar quiebre de línea
             celda.css({
-                'max-width': '180px',      // ajustá según te convenga
+                'max-width': '120px',      // ajustá según te convenga
                 'white-space': 'normal',   // permitir saltos de línea
                 'word-wrap': 'break-word',
                 'overflow-wrap': 'break-word',
@@ -280,7 +280,7 @@ function imprimirTabla() {
 
             // También a infoDetalleMacOsy, para reforzar
             celda.find('.infoDetalleMacOsy').css({
-                'max-width': '180px',
+                'max-width': '120px',
                 'white-space': 'normal',
                 'word-wrap': 'break-word',
                 'overflow-wrap': 'break-word'
