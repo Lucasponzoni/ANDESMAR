@@ -100,7 +100,6 @@ function formatearPesos2(valor) {
 function imprimirTabla() {
     const now = new Date();
 
-    // Fecha y hora en formato 24hs
     const fechaHoraStr = now.toLocaleString('es-AR', {
         year: 'numeric',
         month: '2-digit',
@@ -110,62 +109,94 @@ function imprimirTabla() {
         hour12: false
     });
 
-    // Asignar fecha de impresión a cada campo
     document.querySelectorAll('.fecha-impresion').forEach(el => {
         el.innerText = fechaHoraStr;
     });
 
-    // Obtener el título del modal
     const tituloModal = document.getElementById('modalDespachoPorLogisticaLabel')?.innerText.trim() || 'Impresión';
     const tituloFinal = `${tituloModal} - ${fechaHoraStr}`;
 
-    // Ocultar la última columna
     const tabla = $('#tabla-container-xLogistica');
     const ultimaColumna = tabla.find('tr').find('td:last-child, th:last-child');
     ultimaColumna.hide();
 
-    // Verificar si hay filas en la tabla
-    const filas = tabla.find('tr').not(':empty');
-    console.log(filas.length); 
+    const filas = tabla.find('tbody tr').filter(function () {
+        return $(this).find('td').length > 0;
+    });
+
     if (filas.length === 0) {
         alert('No hay contenido para imprimir.');
         ultimaColumna.show();
-        return; 
+        return;
     }
 
-    const printFrames = window.frames; 
-    for (let i = 0; i < printFrames.length; i++) {
-        if (printFrames[i].document.body.innerHTML.includes("contenido imprimible")) {
-            printFrames[i].document.body.innerHTML = ''; 
-        }
-    }
+    const cantidadEtiquetas = filas.length;
+    let totalBultos = 0;
 
-    // Clonar tabla + pie
+    filas.each(function () {
+        const bultosCell = $(this).find('.bultos-box');
+        const bultos = parseInt(bultosCell.data('bultos')) || 0;
+        totalBultos += bultos;
+    });
+
+    const resumenHTML = `
+        <div style="
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px auto 20px auto;
+            padding: 16px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background-color: #f1f1f1;
+            max-width: 800px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        ">
+            <div style="
+                flex: 1;
+                background-color: #e0e0e0;
+                border: 1px solid #999;
+                border-radius: 6px;
+                padding: 16px;
+                font-size: 16px;
+                font-weight: 700;
+                color: #222;
+            ">
+                CANTIDAD DE ETIQUETAS<br>
+                <span style="font-size: 28px; color: #000;">${cantidadEtiquetas}</span>
+            </div>
+            <div style="
+                flex: 1;
+                background-color: #e0e0e0;
+                border: 1px solid #999;
+                border-radius: 6px;
+                padding: 16px;
+                font-size: 16px;
+                font-weight: 700;
+                color: #222;
+            ">
+                CANTIDAD DE BULTOS<br>
+                <span style="font-size: 28px; color: #000;">${totalBultos}</span>
+            </div>
+        </div>
+    `;
+
     const contenido = tabla.clone();
-    const pie = $('.pie-por-hoja-print').clone();
+    const pieHTML = $('.pie-por-hoja-print').html();
 
-
-    // Solo agregar el pie si hay contenido
-    if (filas.length > 0) {
-        console.log('Añadiendo pie de página');
-        contenido.append(pie);
-    }
-
+    // Reemplazo de logos
     contenido.find('.logistica-tabla-despacho').each(function () {
         const original = $(this);
         const texto = original.find('.logistica-texto').text().trim().toLowerCase();
-    
+
         let src = '';
-        if (texto === 'andreani') {
-            src = 'https://lucasponzoni.github.io/ANDESMAR/Img/andreani-tini.png';
-        } else if (texto === 'andesmar') {
-            src = 'https://lucasponzoni.github.io/ANDESMAR/Img/andesmar-tini.png';
-        } else if (texto === 'oca') {
-            src = 'https://lucasponzoni.github.io/ANDESMAR/Img/oca-tini.png';
-        } else if (texto === 'cruz del sur') {
-            src = 'https://lucasponzoni.github.io/ANDESMAR/Img/Cruz-del-Sur-tini.png';
-        }
-    
+        if (texto === 'andreani') src = 'https://lucasponzoni.github.io/ANDESMAR/Img/andreani-tini.png';
+        else if (texto === 'andesmar') src = 'https://lucasponzoni.github.io/ANDESMAR/Img/andesmar-tini.png';
+        else if (texto === 'oca') src = 'https://lucasponzoni.github.io/ANDESMAR/Img/oca-tini.png';
+        else if (texto === 'cruz del sur') src = 'https://lucasponzoni.github.io/ANDESMAR/Img/Cruz-del-Sur-tini.png';
+
         if (src) {
             const nuevoLogo = `
                 <div style="
@@ -184,12 +215,57 @@ function imprimirTabla() {
             `;
             original.html(nuevoLogo);
         }
-    });    
+    });
 
-    // Contenedor para imprimir
-    const contenedor = $('<div></div>').append(contenido);
+    const contenedor = $('<div></div>').append(resumenHTML);
+    const todasLasFilas = contenido.find('tbody tr').toArray();
 
-    // Configuración de impresión
+    let bloqueTbody = $('<tbody></tbody>');
+    let alturaAcumulada = 0;
+    const maxAlturaHoja = 1100; // Ajustar según impresora y papel
+
+    const alturaPie = 150;
+    const alturaHeaderPrimeraHoja = 150; // Espacio total para título + resumen (aproximado)
+
+    let esPrimeraHoja = true;
+
+    todasLasFilas.forEach((fila, index) => {
+        const tempDiv = $('<table style="visibility:hidden; position:absolute;"></table>').append('<tbody></tbody>').appendTo('body');
+        tempDiv.find('tbody').append($(fila).clone());
+        const alturaFila = tempDiv.height();
+        tempDiv.remove();
+
+        const maxAlturaDisponible = esPrimeraHoja ? (maxAlturaHoja - alturaHeaderPrimeraHoja - alturaPie) : (maxAlturaHoja - alturaPie);
+
+        if ((alturaAcumulada + alturaFila) > maxAlturaDisponible) {
+            const tablaBloque = $('<table class="table table-bordered table-striped"></table>')
+                .append(contenido.find('thead').clone())
+                .append(bloqueTbody.clone());
+            contenedor.append(tablaBloque);
+            contenedor.append(`<div class="pie-por-hoja-print" style="page-break-after: always;">${pieHTML}</div>`);
+
+            bloqueTbody = $('<tbody></tbody>');
+            alturaAcumulada = 0;
+            esPrimeraHoja = false;
+        }
+
+        bloqueTbody.append($(fila).clone());
+        alturaAcumulada += alturaFila;
+
+        if (index === todasLasFilas.length - 1 && bloqueTbody.children().length > 0) {
+            const tablaFinal = $('<table class="table table-bordered table-striped"></table>')
+                .append(contenido.find('thead').clone())
+                .append(bloqueTbody.clone());
+            contenedor.append(tablaFinal);
+            contenedor.append(`<div class="pie-por-hoja-print">${pieHTML}</div>`);
+        }
+    });
+
+    // Eliminar cualquier pie que haya quedado solo sin tabla
+    contenedor.find('.pie-por-hoja-print').each(function () {
+        if ($(this).prev('table').length === 0) $(this).remove();
+    });
+
     contenedor.printThis({
         importCSS: true,
         importStyle: true,
@@ -204,7 +280,6 @@ function imprimirTabla() {
         debug: false
     });
 
-    // Mostrar la última columna nuevamente
     ultimaColumna.show();
 }
 // FIN IMPRESION DE TABLA
