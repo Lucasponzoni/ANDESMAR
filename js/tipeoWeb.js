@@ -269,28 +269,22 @@ function imprimirTabla() {
         const celda = $(this);
 
         if (celda.find('.infoMacOsy').length > 0) {
-            const detalle = celda.find('.infoDetalleMacOsy');
+            // Limitar ancho y forzar quiebre de línea
+            celda.css({
+                'max-width': '180px',      // ajustá según te convenga
+                'white-space': 'normal',   // permitir saltos de línea
+                'word-wrap': 'break-word',
+                'overflow-wrap': 'break-word',
+                'vertical-align': 'top'   
+            });
 
-            if (detalle.length > 0) {
-                // Obtenemos el texto original
-                let textoPlano = detalle.text().trim();
-
-                // Separar por emojis (asumiendo estos emojis específicos)
-                const partes = textoPlano.split(/(👤|🏷️|📍|📝|📦)/g).filter(p => p.trim() !== '');
-
-                // Reconstruir con saltos de línea <br>
-                let nuevoHTML = '';
-
-                for (let i = 0; i < partes.length; i++) {
-                    if (['👤', '🏷️', '📍', '📝', '📦'].includes(partes[i])) {
-                        const texto = partes[i+1] ? partes[i+1].trim() : '';
-                        nuevoHTML += `${partes[i]} ${texto}<br>`;
-                        i++; // saltar texto ya usado
-                    }
-                }
-
-                detalle.html(nuevoHTML);
-            }
+            // También a infoDetalleMacOsy, para reforzar
+            celda.find('.infoDetalleMacOsy').css({
+                'max-width': '180px',
+                'white-space': 'normal',
+                'word-wrap': 'break-word',
+                'overflow-wrap': 'break-word'
+            });
         }
     });
 
