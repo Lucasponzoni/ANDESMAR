@@ -264,32 +264,41 @@ function imprimirTabla() {
         if ($(this).prev('table').length === 0) $(this).remove();
     });
 
-    // FORMATEO ESPECIAL PARA LA COLUMNA INFO (SALTOS DE LINEA POR CADA EMOJI)
-    contenido.find('.infoMacOsy .infoDetalleMacOsy').each(function () {
-        const htmlOriginal = $(this).html();
+    // ====== FORMATEO ESPECIAL COLUMNA INFO PARA IMPRESION ======
+    contenido.find('td').each(function () {
+        const celda = $(this);
 
-        if ($(this).find('span').length > 0) {
-            // Si ya hay spans, forzar bloque por span
-            $(this).find('span').each(function () {
-                $(this).css({
-                    'display': 'block',
-                    'margin-bottom': '4px'
-                });
-            });
-        } else {
-            // Si todo viene como texto plano, detectar emojis y separar por línea
-            const texto = $(this).text();
-            const partes = texto.split(/(👤|🏷️|📍|📝|📦)/g).filter(p => p.trim() !== '');
-            let nuevoHTML = '';
+        // Solo aplicamos a la columna Info (detectala por clase o por contenido específico)
+        if (celda.find('.infoMacOsy').length > 0) {
+            const detalle = celda.find('.infoDetalleMacOsy');
 
-            for (let i = 0; i < partes.length; i++) {
-                if (['👤', '🏷️', '📍', '📝', '📦'].includes(partes[i])) {
-                    nuevoHTML += `<div style="display:block; margin-bottom:4px;">${partes[i]} ${partes[i+1] ? partes[i+1].trim() : ''}</div>`;
-                    i++; // Saltar el siguiente que es el texto después del emoji
+            if (detalle.length > 0) {
+                let textoPlano = detalle.text().trim();
+
+                // Si ya tiene spans o divs, solo forzamos que sean bloques
+                if (detalle.find('span, div').length > 0) {
+                    detalle.find('span, div').each(function () {
+                        $(this).css({
+                            display: 'block',
+                            'margin-bottom': '3px'
+                        });
+                    });
+                } else {
+                    // Si vino como texto plano, forzar cortado por cada emoji conocido
+                    const partes = textoPlano.split(/(👤|🏷️|📍|📝|📦)/g).filter(p => p.trim() !== '');
+                    let nuevoHTML = '';
+
+                    for (let i = 0; i < partes.length; i++) {
+                        if (['👤', '🏷️', '📍', '📝', '📦'].includes(partes[i])) {
+                            const texto = partes[i+1] ? partes[i+1].trim() : '';
+                            nuevoHTML += `<div style="display:block; margin-bottom:3px;">${partes[i]} ${texto}</div>`;
+                            i++; // Saltar el texto ya usado
+                        }
+                    }
+
+                    detalle.html(nuevoHTML);
                 }
             }
-
-            $(this).html(nuevoHTML);
         }
     });
 
