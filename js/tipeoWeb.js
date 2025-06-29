@@ -264,17 +264,33 @@ function imprimirTabla() {
         if ($(this).prev('table').length === 0) $(this).remove();
     });
 
-    // FORZAR SALTO DE LINEA EN INFO Y REMITO PARA LA IMPRESION
-    contenido.find('.infoDetalleMacOsy span').each(function () {
-        $(this).css('display', 'block');
-    });
+    // FORMATEO ESPECIAL PARA LA COLUMNA INFO (SALTOS DE LINEA POR CADA EMOJI)
+    contenido.find('.infoMacOsy .infoDetalleMacOsy').each(function () {
+        const htmlOriginal = $(this).html();
 
-    contenido.find('.productosRemitoMacOsy > div').each(function () {
-        $(this).css('display', 'block');
-    });
+        if ($(this).find('span').length > 0) {
+            // Si ya hay spans, forzar bloque por span
+            $(this).find('span').each(function () {
+                $(this).css({
+                    'display': 'block',
+                    'margin-bottom': '4px'
+                });
+            });
+        } else {
+            // Si todo viene como texto plano, detectar emojis y separar por línea
+            const texto = $(this).text();
+            const partes = texto.split(/(👤|🏷️|📍|📝|📦)/g).filter(p => p.trim() !== '');
+            let nuevoHTML = '';
 
-    contenido.find('.productoTopMacOsy > div').each(function () {
-        $(this).css('display', 'block');
+            for (let i = 0; i < partes.length; i++) {
+                if (['👤', '🏷️', '📍', '📝', '📦'].includes(partes[i])) {
+                    nuevoHTML += `<div style="display:block; margin-bottom:4px;">${partes[i]} ${partes[i+1] ? partes[i+1].trim() : ''}</div>`;
+                    i++; // Saltar el siguiente que es el texto después del emoji
+                }
+            }
+
+            $(this).html(nuevoHTML);
+        }
     });
 
     contenedor.printThis({
