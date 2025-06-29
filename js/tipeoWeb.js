@@ -268,36 +268,23 @@ function imprimirTabla() {
     contenido.find('td').each(function () {
         const celda = $(this);
 
-        // Solo aplicamos a la columna Info (detectala por clase o por contenido específico)
         if (celda.find('.infoMacOsy').length > 0) {
             const detalle = celda.find('.infoDetalleMacOsy');
 
             if (detalle.length > 0) {
-                let textoPlano = detalle.text().trim();
+                // Reemplazar cada span por div
+                detalle.find('span').each(function () {
+                    const contenidoSpan = $(this).html();
+                    $(this).replaceWith(`<div style="margin-bottom:4px;">${contenidoSpan}</div>`);
+                });
 
-                // Si ya tiene spans o divs, solo forzamos que sean bloques
-                if (detalle.find('span, div').length > 0) {
-                    detalle.find('span, div').each(function () {
-                        $(this).css({
-                            display: 'block',
-                            'margin-bottom': '3px'
-                        });
+                // Por seguridad, forzar que cada div hijo sea bloque (en caso de que ya estuvieran como divs)
+                detalle.find('div').each(function () {
+                    $(this).css({
+                        display: 'block',
+                        'margin-bottom': '4px'
                     });
-                } else {
-                    // Si vino como texto plano, forzar cortado por cada emoji conocido
-                    const partes = textoPlano.split(/(👤|🏷️|📍|📝|📦)/g).filter(p => p.trim() !== '');
-                    let nuevoHTML = '';
-
-                    for (let i = 0; i < partes.length; i++) {
-                        if (['👤', '🏷️', '📍', '📝', '📦'].includes(partes[i])) {
-                            const texto = partes[i+1] ? partes[i+1].trim() : '';
-                            nuevoHTML += `<div style="display:block; margin-bottom:3px;">${partes[i]} ${texto}</div>`;
-                            i++; // Saltar el texto ya usado
-                        }
-                    }
-
-                    detalle.html(nuevoHTML);
-                }
+                });
             }
         }
     });
