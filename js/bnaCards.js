@@ -6966,7 +6966,7 @@ async function buscarFacturaDisponible(id, cuit, dni, fechaDeCreacion, tipoFactu
     } else {
         el.classList.remove("disponible");
         el.classList.add("no-disponible");
-        el.innerHTML = `<i class="bi bi-receipt-cutoff"></i> Factura no disponible`;
+        el.innerHTML = `<i class="bi bi-receipt-cutoff"></i> FACTURA NO DISPONIBLE`;
     }
 }
 
