@@ -272,19 +272,24 @@ function imprimirTabla() {
             const detalle = celda.find('.infoDetalleMacOsy');
 
             if (detalle.length > 0) {
-                // Reemplazar cada span por div
-                detalle.find('span').each(function () {
-                    const contenidoSpan = $(this).html();
-                    $(this).replaceWith(`<div style="margin-bottom:4px;">${contenidoSpan}</div>`);
-                });
+                // Obtenemos el texto original
+                let textoPlano = detalle.text().trim();
 
-                // Por seguridad, forzar que cada div hijo sea bloque (en caso de que ya estuvieran como divs)
-                detalle.find('div').each(function () {
-                    $(this).css({
-                        display: 'block',
-                        'margin-bottom': '4px'
-                    });
-                });
+                // Separar por emojis (asumiendo estos emojis específicos)
+                const partes = textoPlano.split(/(👤|🏷️|📍|📝|📦)/g).filter(p => p.trim() !== '');
+
+                // Reconstruir con saltos de línea <br>
+                let nuevoHTML = '';
+
+                for (let i = 0; i < partes.length; i++) {
+                    if (['👤', '🏷️', '📍', '📝', '📦'].includes(partes[i])) {
+                        const texto = partes[i+1] ? partes[i+1].trim() : '';
+                        nuevoHTML += `${partes[i]} ${texto}<br>`;
+                        i++; // saltar texto ya usado
+                    }
+                }
+
+                detalle.html(nuevoHTML);
             }
         }
     });
