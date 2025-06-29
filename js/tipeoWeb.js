@@ -223,10 +223,8 @@ function imprimirTabla() {
     let bloqueTbody = $('<tbody></tbody>');
     let alturaAcumulada = 0;
     const maxAlturaHoja = 1100; // Ajustar según impresora y papel
-
     const alturaPie = 150;
     const alturaHeaderPrimeraHoja = 150; // Espacio total para título + resumen (aproximado)
-
     let esPrimeraHoja = true;
 
     todasLasFilas.forEach((fila, index) => {
@@ -264,6 +262,19 @@ function imprimirTabla() {
     // Eliminar cualquier pie que haya quedado solo sin tabla
     contenedor.find('.pie-por-hoja-print').each(function () {
         if ($(this).prev('table').length === 0) $(this).remove();
+    });
+
+    // FORZAR SALTO DE LINEA EN INFO Y REMITO PARA LA IMPRESION
+    contenido.find('.infoDetalleMacOsy span').each(function () {
+        $(this).css('display', 'block');
+    });
+
+    contenido.find('.productosRemitoMacOsy > div').each(function () {
+        $(this).css('display', 'block');
+    });
+
+    contenido.find('.productoTopMacOsy > div').each(function () {
+        $(this).css('display', 'block');
     });
 
     contenedor.printThis({
