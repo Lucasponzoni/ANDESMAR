@@ -3242,6 +3242,7 @@ function ejecutarControlRapido() {
                                   textoFila.includes('Si no llega para el') ||
                                   textoFila.includes('Llega el') ||
                                   textoFila.includes('Llegará el') ||
+                                  textoFila.includes('Te contactaremos cuando tengamos novedades') ||
                                   textoFila.includes('Te escribiremos antes') ||
                                   textoFila.includes('Estamos comprobando el estado del producto') ||
                                   textoFila.includes('Vamos a revisar el producto') ||
