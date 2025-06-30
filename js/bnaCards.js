@@ -2361,7 +2361,7 @@ ${data[i].order ? `
                             <button class="btn mt-1 ${isAndesmar ? 'btn-success' : 'btn-primary'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}" 
                                 id="andesmarButton${data[i].id}" 
                                 ${isAndreani || isCDS || data[i].cancelado ? 'disabled' : ''} 
-                                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
+                                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${isBaPro(storeCode)}')`}">
                                 <span id="andesmarText${data[i].id}">
                                 ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
                                 </span>
@@ -3629,6 +3629,8 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             bultos *= 2; // Duplicar bultos si es un split y no incluye kit
         }
     }
+
+    console.log();
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();
@@ -6537,9 +6539,9 @@ async function verificarMensajes() {
                 }
 
                 // Verificar si el mensaje cumple con el formato esperado
-                if (mensaje.user === `${chat}` && /^\(\d+(-REP-\d+|-CARR-\d+)?\)/.test(mensaje.text)) {
+                if (mensaje.user === `${chat}` && /^\(\d+(-REP-\d+|-CARR-\d+-\d+)?\)/.test(mensaje.text)) {
                     let numero;
-                    const match = mensaje.text.match(/^\((\d+)(?:-(REP|carrito)-(\d+))?\)/);
+                    const match = mensaje.text.match(/^\((\d+)(?:-(REP|CARR)-(\d+))?\)/);
 
                     if (match) {
                         numero = match[3] ? match[3] : match[1];
@@ -6548,7 +6550,7 @@ async function verificarMensajes() {
                         continue;
                     }
 
-                    const errorMensaje = mensaje.text.replace(/^\(\d+(-REP-\d+|-CARR-\d+)?\)\s*/, '');
+                    const errorMensaje = mensaje.text.replace(/^\(\d+(-REP-\d+|-CARR-\d+-\d+)?\)\s*/, '');
                     let nuevoNumero = numero;
                     let contador = 1;
 
