@@ -3629,7 +3629,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         }
     }
 
-    console.log("Es Vent VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
+    console.log("Es Venta VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();
@@ -4244,7 +4244,7 @@ async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, call
     
     console.log(`Volumen Total en m³: ${volumenTotalcds}`);
 
-    console.log("Es Vent VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
+    console.log("Es Venta VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
 
     const cliente = await solicitarCliente();
     if (!cliente) return;
@@ -4942,7 +4942,7 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
         Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
     `);
 
-    console.log("Es Vent VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
+    console.log("Es Venta VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
 
     const cliente = await solicitarCliente();
     if (!cliente) return;
@@ -6410,7 +6410,7 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
     // Redondear el precio_venta y convertirlo a un entero
     const precioVentaRedondeado = Math.round(precio_venta);
 
-    console.log("Es Vent VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
+    console.log("Es Venta VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();

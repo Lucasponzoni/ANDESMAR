@@ -24,6 +24,7 @@ const obtenerCredencialesCDS = async () => {
         passCDS = data[5];
         HookTv = data[14];
         HookMd = data[10];
+        HookVtex = data[23];
         live = data[7];
         corsh = data[6];
         token = data[11];
@@ -1680,7 +1681,7 @@ ${data[i].order ? `
                             <button class="btn mt-1 btnLogPropiaMeli ${isLogPlaceIt ? 'btn-success' : 'btn-danger'}"
                             id="LogPropiButtonPlaceIt${data[i].id}" 
                             ${data[i].cancelado ? 'disabled' : ''} 
-                            onclick="generarPDFPlaceIt('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${data[i].cantidad}', '${ordenPublica}',)">
+                            onclick="generarPDFPlaceIt('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${data[i].remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${data[i].cantidad}', '${ordenPublica}', '${isBaPro(storeCode)}', '${data[i].order}',)">
                             <span>
                             ${isLogPlaceIt ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta PlaceIt` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta 10x15 <strong>PlaceIt</strong>`}</span>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerLogPropia${data[i].id}" style="display:none;"></span>
@@ -2991,7 +2992,9 @@ async function solicitarNumeroRemito() {
 // FIN MODAL CLIENTE & REMITO
 
 // ETIQUETA LOGISTICA PLACE IT
-async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrden, calle, numero, telefono, email, precio_venta, producto_nombre, SKU, cantidad, orden) {
+async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrden, calle, numero, telefono, email, precio_venta, producto_nombre, SKU, cantidad, orden, isBapro, OrdenBapro) {
+    
+    console.log("Es Venta VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
 
     const cliente = await solicitarCliente();
     if (!cliente) return;
@@ -3266,6 +3269,65 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
     };
 
     reader.readAsDataURL(blob);
+
+            // Notificar envio a VTEX
+            if (isBapro) {
+                // Buscar la carpeta que comienza con OrdenBapro
+                const folderRef = dbVtex.ref(`facturasBaPro`);
+                const snapshot = await folderRef.once('value');
+                let folderKey = null;
+
+                snapshot.forEach(childSnapshot => {
+                    const key = childSnapshot.key;
+                    if (key.startsWith(OrdenBapro)) {
+                        folderKey = key;
+                    }
+                });
+
+                const fecha = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+
+                if (folderKey) {
+                    const trackingData = {
+                        transportCompany: "Logistica Novogar",
+                        trackingLink: "Logistica PlaceIt",
+                        transportCompanyNumber: "Logistica PlaceIt",
+                        fecha: fecha,
+                        remito: numeroRemito,
+                        cliente: cliente
+                    };
+
+                    // Establecer datos en la carpeta "tracking" sin crear un nuevo ID
+                    dbVtex.ref(`facturasBaPro/${folderKey}/tracking`).set(trackingData);
+                    console.log("Datos actualizados en la carpeta tracking de Firebase:", trackingData);
+
+                    // Enviar mensaje a Slack
+                    const separator = "* * * * * * * * * * * * * * * * * * * * * * * *";
+
+                    let text = `${separator}\n`;
+                    text += `:package: *Orden \`${OrdenBapro}\`*\n`;
+                    text += `${separator}\n`;
+                    text += `:bookmark_tabs: *Estado:* Logística Preparó el Envío\n`;
+                    text += `:bust_in_silhouette: *Cliente:* ${cliente.toUpperCase()}\n`;
+                    text += `:id: *Remito:* ${numeroRemito}\n`;
+                    text += `:truck: *Transportista:* Logistica PlaceIt\n`;
+                    text += `:package: *Número de guía:* Logistica PlaceIt\n`;
+                    text += `:calendar: *Importada:* ${fecha}\n`;
+                    text += `${separator}\n`;
+                    text += `_"Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX"_ 📦\n`;
+                    text += `${separator}`;
+
+                    fetch(HookVtex, { 
+                        method: 'POST',
+                        headers: {
+                            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ text })
+                    });
+                    console.log("Mensaje enviado a Slack.");
+                }
+            }
+            // Fin Notificar envio a VTEX
 
     // Enviar el email después de procesar el envío
     const Name = `Confirmación de Compra Novogar`;
@@ -4299,7 +4361,7 @@ function realizarBusqueda() {
     const isNumeric = /^\d+$/.test(searchTerm);
     const isText = /^[a-zA-Z]+$/.test(searchTerm);
     
-    if (!manualSearch && ((isNumeric && searchTerm.length < 7) || (isText && searchTerm.length < 5))) {
+    if (!manualSearch && ((isNumeric && searchTerm.length < 6) || (isText && searchTerm.length < 5))) {
         return; // No realizar la búsqueda si no se cumplen las condiciones y no es una búsqueda manual
     }
     
@@ -4463,7 +4525,7 @@ async function enviarPedidoBrainsys(nombre, cp, provincia, numeroRemito, cliente
         precio_venta,
         1,
         1,
-        `U.${cantidad} - ${skuFormateado}`,
+        `U.${cantidad} - ${sku}`,
         `Remito: ${numeroRemito}`, 
         `Coordinar con línea ${telefono}, Producto: ${sku} ${producto_nombre}`,
         observacionesMeli,
@@ -4495,7 +4557,7 @@ async function enviarPedidoBrainsys(nombre, cp, provincia, numeroRemito, cliente
         precio_venta,
         1,
         1,
-        `U.${cantidad} - ${skuFormateado}`,
+        `U.${cantidad} - ${sku}`,
         `Remito: ${numeroRemito}`, 
         `Coordinar con línea ${telefono}, Producto: ${sku} ${producto_nombre}`,
         observacionesMeli,
