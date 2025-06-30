@@ -718,6 +718,7 @@ async function loadEnviosFromFirebase() {
                         sku: data.sku_externo.toUpperCase(),
                         sync: data.MetodoDeImport,
                         facturaVtex: data.facturaVtex,
+                        trackingVtex: data.trackingVtex,
                         cantidad: data.cantidad,
                         errorSlack: data.errorSlack,
                         correccionSlack: data.correccionSlack,
@@ -1954,7 +1955,7 @@ COMPRA CON USO DE PUNTOS BNA
 </p>
 
 <!-- Mensaje de sincronización en Vtex debajo, solo si aplica -->
-${(data[i].facturaVtex === true) ? `
+${(data[i].facturaVtex === true || data[i].trackingVtex === true) ? `
     <div style="
         padding: 4px 10px;
         font-size: 12px;
@@ -1970,7 +1971,11 @@ ${(data[i].facturaVtex === true) ? `
         font-weight: 500;
     ">
         <i class="bi bi-check-circle-fill" style="color: #34C759;"></i>
-        Factura sincronizada en Vtex
+        ${(data[i].facturaVtex === true && data[i].trackingVtex === true) 
+            ? 'Factura y tracking sincronizados en Vtex' 
+            : (data[i].facturaVtex === true) 
+                ? 'Factura sincronizada en Vtex' 
+                : 'Tracking sincronizado en Vtex'}
     </div>
 ` : ''}
 
@@ -3749,7 +3754,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             const transportData = {
                 transportCompany: "Andesmar",
                 trackingLink: linkSeguimiento,
-                transportCompanyNumber: NroRemito,
+                transportCompanyNumber: data.NroPedido,
                 remito: remitoCliente,
                 cliente: cliente
             };
@@ -3832,7 +3837,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
                         trackingLink: linkSeguimiento,
                         transportCompanyNumber: data.NroPedido,
                         fecha: fecha,
-                        remito: remitoCliente,
+                        remito: NroRemito,
                         cliente: cliente
                     };
 
@@ -7067,6 +7072,7 @@ async function loadEnviosFromFirebaseAvanzado(subOrderValue) {
                         sku: data.sku_externo.toUpperCase(),
                         sync: data.MetodoDeImport,
                         facturaVtex: data.facturaVtex,
+                        trackingVtex: data.trackingVtex,
                         cantidad: data.cantidad,
                         errorSlack: data.errorSlack,
                         correccionSlack: data.correccionSlack,
