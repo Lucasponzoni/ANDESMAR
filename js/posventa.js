@@ -3237,6 +3237,7 @@ function ejecutarControlRapido() {
                                   textoFila.includes('No pudimos entregar el producto a la persona que lo compró') ||
                                   textoFila.includes('Lo enviaremos de regreso') ||
                                   textoFila.includes('Devolución en revisión') ||
+                                  textoFila.includes('Escribinos para poder ayudarte a avanzar con el caso.') ||
                                   textoFila.includes('Devolución en camino a revisión') ||
                                   textoFila.includes('Estamos comprobando el estado del producto') ||
                                   textoFila.includes('Vamos a revisar el producto') ||
