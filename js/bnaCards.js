@@ -3749,7 +3749,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             const transportData = {
                 transportCompany: "Andesmar",
                 trackingLink: linkSeguimiento,
-                transportCompanyNumber: data.NroPedido,
+                transportCompanyNumber: NroRemito,
                 remito: remitoCliente,
                 cliente: cliente
             };
