@@ -3658,6 +3658,8 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         
     const concatenatedNumbers = `${random1}${random2}${random3}`;
 
+    const NroRemito = "BNA" + remito + concatenatedNumbers;
+
     const requestObj = {
         CalleRemitente: "Mendoza",
         CalleNroRemitente: "2799",
@@ -3668,7 +3670,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         CalleNroDestinatario: "S/N",
         TelefonoDestinatario: telefono,
         MailDestinatario: email,
-        NroRemito: "BNA" + remito + concatenatedNumbers,
+        NroRemito: NroRemito,
         Bultos: bultos,
         Peso: peso * cantidad,
         ValorDeclarado: precio_venta * cantidad,
@@ -3835,9 +3837,9 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
                     const trackingData = {
                         transportCompany: "Andesmar",
                         trackingLink: linkSeguimiento,
-                        transportCompanyNumber: data.NroPedido,
+                        transportCompanyNumber: NroRemito,
                         fecha: fecha,
-                        remito: NroRemito,
+                        remito: remitoCliente,
                         cliente: cliente
                     };
 
