@@ -3288,7 +3288,7 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
 
                 if (folderKey) {
                     const trackingData = {
-                        transportCompany: "Logistica Novogar",
+                        transportCompany: "Logistica PlaceIt",
                         trackingLink: "Logistica PlaceIt",
                         transportCompanyNumber: "Logistica PlaceIt",
                         fecha: fecha,
