@@ -24,6 +24,7 @@ const obtenerCredencialesCDS = async () => {
         passCDS = data[5];
         HookTv = data[14];
         HookMd = data[10];
+        HookVtex = data[23];
         live = data[7];
         corsh = data[6];
         token = data[11];
@@ -31,7 +32,6 @@ const obtenerCredencialesCDS = async () => {
         chat = data[15];
         brainsysUser = data[16];
         brainsysPass = data[17];
-        HookVtex = data[23];
         console.log(`CDS Credentials OK`);
     } catch (error) {
         console.error('Error al obtener cred de Fire:', error);
