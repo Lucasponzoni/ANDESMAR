@@ -3237,11 +3237,11 @@ function ejecutarControlRapido() {
                                   textoFila.includes('No pudimos entregar el producto a la persona que lo compró') ||
                                   textoFila.includes('Lo enviaremos de regreso') ||
                                   textoFila.includes('Devolución en revisión') ||
-                                  textoFila.includes('Escribinos para poder ayudarte a avanzar con el caso.') ||
+                                  textoFila.includes('Enviaremos tu producto de regreso porque la persona que lo compró solicitó la cancelación') ||
                                   textoFila.includes('Devolución en camino a revisión') ||
                                   textoFila.includes('Estamos comprobando el estado del producto') ||
                                   textoFila.includes('Vamos a revisar el producto') ||
-                                  textoFila.includes('No se pudo entregar el paquete a la persona que realizó la compra.');
+                                  textoFila.includes('No se pudo entregar el paquete a la persona que realizó la compra');
 
             if (estadoValido && mensajeValido && !tieneFechaDeHoy && ventaId) {
                 count++;
