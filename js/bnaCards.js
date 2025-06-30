@@ -31,6 +31,7 @@ const obtenerCredencialesCDS = async () => {
         chat = data[15];
         brainsysUser = data[16];
         brainsysPass = data[17];
+        HookVtex = data[23];
         console.log(`CDS Credentials OK`);
     } catch (error) {
         console.error('Error al obtener cred de Fire:', error);
@@ -601,7 +602,6 @@ function cargarPrecios() {
                     });
                 });
                 console.log("Stock sincronizado con éxito.");
-                console.log("Contenido de preciosArray:", preciosArray); // Mostrar preciosArray
             } else {
                 console.log("No hay datos en la ruta especificada para precios.");
             }
@@ -620,7 +620,6 @@ function cargarPrecios() {
                     });
                 });
                 console.log("Precios de PlaceIt sincronizados con éxito.");
-                console.log("Contenido de preciosPlaceItArray:", preciosPlaceItArray); // Mostrar preciosPlaceItArray
             } else {
                 console.log("No hay datos en la ruta especificada para precios de PlaceIt.");
             }
@@ -2350,7 +2349,7 @@ ${data[i].order ? `
                             <button class="btn mt-1 btnCDSMeli ${isCDS ? 'btn-success' : 'btn-dark-blue'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
                                 id="CDSButton${data[i].id}" 
                                 ${isAndreani || isAndesmar || data[i].cancelado ? 'disabled' : ''}
-                                onclick="${isCDS ? `descargarEtiquetaCDS('${data[i].cotizacion}', '${data[i].trackingNumber}', '${data[i].id}')` : `enviarDatosCDS('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
+                                onclick="${isCDS ? `descargarEtiquetaCDS('${data[i].cotizacion}', '${data[i].trackingNumber}', '${data[i].id}')` : `enviarDatosCDS('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${isBaPro(storeCode)}', '${data[i].order}')`}">
                                 <span id="CDSText${data[i].id}">
                                 ${isCDS ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="CDSMeli" src="Img/Cruz-del-Sur-tini.png" alt="Cruz del Sur"> Etiqueta <strong>Cruz del Sur</strong>`}
                                 </span>
@@ -2361,7 +2360,7 @@ ${data[i].order ? `
                             <button class="btn mt-1 ${isAndesmar ? 'btn-success' : 'btn-primary'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}" 
                                 id="andesmarButton${data[i].id}" 
                                 ${isAndreani || isCDS || data[i].cancelado ? 'disabled' : ''} 
-                                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${isBaPro(storeCode)}')`}">
+                                ${isAndesmar ? `onclick="window.open('https://andesmarcargas.com/ImprimirEtiqueta.html?NroPedido=${data[i].transportCompanyNumber}', '_blank')"` : `onclick="enviarDatosAndesmar('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${data[i].suborden_total}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${isBaPro(storeCode)}', '${data[i].order}')`}">
                                 <span id="andesmarText${data[i].id}">
                                 ${isAndesmar ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndesmarMeli" src="Img/andesmar-tini.png" alt="Andesmar"> Etiqueta <strong>Andesmar</strong>`}
                                 </span>
@@ -2372,7 +2371,7 @@ ${data[i].order ? `
                             <button class="btn mt-1 btnAndreaniMeli ${isAndreani ? 'btn-success' : 'btn-danger'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
                                 id="andreaniButton${data[i].id}" 
                                 ${isAndesmar || isCDS || data[i].cancelado ? 'disabled' : ''} 
-                                onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}')`}">
+                                onclick="${isAndreani ? `handleButtonClick('${data[i].transportCompanyNumber}', '${data[i].id}')` : `enviarDatosAndreani('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${isBaPro(storeCode)}', '${data[i].order}')`}">
                                 <span id="andreaniText${data[i].id}">
                                 ${isAndreani ? `<i class="bi bi-filetype-pdf"></i> Descargar ${data[i].transportCompanyNumber}` : `<img class="AndreaniMeli" src="Img/andreani-tini.png" alt="Andreani"> Etiqueta <strong>Andreani</strong>`}
                                 </span>
@@ -2386,7 +2385,7 @@ ${data[i].order ? `
                             <button class="btn mt-1 btnLogPropiaMeli ${isLogPropia ? 'btn-success' : 'btn-secondary'} ${isMacro(storeCode) || isLogPlaceIt ? 'hidden' : ''}"
                             id="LogPropiaMeliButton${data[i].id}" 
                             ${data[i].cancelado ? 'disabled' : ''} 
-                            onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}',)">
+                            onclick="generarPDF('${data[i].id}', '${data[i].nombre}', '${data[i].cp}', '${data[i].localidad}', '${data[i].provincia}', '${remito}', '${data[i].calle2}', '${data[i].numero}', '${data[i].telefono}', '${data[i].email}', '${data[i].precio_venta}', '${cleanString(data[i].producto_nombre)}', '${data[i].sku}', '${isBaPro(storeCode)}', '${data[i].order}',)">
                             <span>
                             ${isLogPropia ? `<i class="bi bi-filetype-pdf"></i> Descargar Etiqueta Novogar` : `<img class="NovogarMeli" src="Img/novogar-tini.png" alt="Novogar"> Etiqueta <strong>Novogar</strong>`}
                             </span>
@@ -3513,7 +3512,7 @@ const usuario = "BOM6765";
 const clave = "BOM6765";
 const codigoCliente = "6765";
 
-async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, suborden_total, precio_venta, producto_nombre, sku) {
+async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, suborden_total, precio_venta, producto_nombre, sku, isBapro, OrdenBapro) {
     // Obtener los elementos de volumen
     const volumenCm3Elemento = document.getElementById(`medidas-cm3-${id}`);
     const volumenM3Elemento = document.getElementById(`medidas-m3-${id}`);
@@ -3630,7 +3629,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
         }
     }
 
-    console.log();
+    console.log("Es Vent VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();
@@ -3810,6 +3809,65 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
             }).catch(error => {
                 console.error('Error al actualizar en DespachosLogisticos:', error);
             });
+
+            // Notificar envio a VTEX
+            if (isBapro) {
+                // Buscar la carpeta que comienza con OrdenBapro
+                const folderRef = dbVtex.ref(`facturasBaPro`);
+                const snapshot = await folderRef.once('value');
+                let folderKey = null;
+
+                snapshot.forEach(childSnapshot => {
+                    const key = childSnapshot.key;
+                    if (key.startsWith(OrdenBapro)) {
+                        folderKey = key;
+                    }
+                });
+
+                const fecha = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+
+                if (folderKey) {
+                    const trackingData = {
+                        transportCompany: "Andesmar",
+                        trackingLink: linkSeguimiento,
+                        transportCompanyNumber: data.NroPedido,
+                        fecha: fecha,
+                        remito: remitoCliente,
+                        cliente: cliente
+                    };
+
+                    // Establecer datos en la carpeta "tracking" sin crear un nuevo ID
+                    dbVtex.ref(`facturasBaPro/${folderKey}/tracking`).set(trackingData);
+                    console.log("Datos actualizados en la carpeta tracking de Firebase:", trackingData);
+
+                    // Enviar mensaje a Slack
+                    const separator = "* * * * * * * * * * * * * * * * * * * * * * * *";
+
+                    let text = `${separator}\n`;
+                    text += `:package: *Orden \`${OrdenBapro}\`*\n`;
+                    text += `${separator}\n`;
+                    text += `:bookmark_tabs: *Estado:* Logística Preparó el Envío\n`;
+                    text += `:bust_in_silhouette: *Cliente:* ${cliente.toUpperCase()}\n`;
+                    text += `:id: *Remito:* ${remitoCliente}\n`;
+                    text += `:truck: *Transportista:* Andesmar\n`;
+                    text += `:package: *Número de guía:* ${data.NroPedido}\n`;
+                    text += `:calendar: *Importada:* ${fecha}\n`;
+                    text += `${separator}\n`;
+                    text += `_"Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX"_ 📦\n`;
+                    text += `${separator}`;
+
+                    fetch(HookVtex, { 
+                        method: 'POST',
+                        headers: {
+                            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ text })
+                    });
+                    console.log("Mensaje enviado a Slack.");
+                }
+            }
+            // Fin Notificar envio a VTEX
 
             // Enviar el email después de procesar el envío
             await sendEmail(Name, Subject, template, nombre, email, `BNA${remito}`, linkSeguimiento2, transporte);
@@ -4102,7 +4160,7 @@ function formatearFechaHora(fechaHora) {
 }
 
 // BOTON CRUZ DEL SUR
-async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, sku) {
+async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, sku, isBapro, OrdenBapro) {
     
     // Desactivar la escucha de cambios
     const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
@@ -4185,6 +4243,8 @@ async function enviarDatosCDS(id, nombre, cp, localidad, provincia, remito, call
     const volumenTotalcds = (altoA * anchoA * largoA) / 1000000; 
     
     console.log(`Volumen Total en m³: ${volumenTotalcds}`);
+
+    console.log("Es Vent VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
 
     const cliente = await solicitarCliente();
     if (!cliente) return;
@@ -4311,6 +4371,65 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
                 remito: remitoCliente,
                 cliente: cliente,
             };
+
+            // Notificar envio a VTEX
+            if (isBapro) {
+                // Buscar la carpeta que comienza con OrdenBapro
+                const folderRef = dbVtex.ref(`facturasBaPro`);
+                const snapshot = await folderRef.once('value');
+                let folderKey = null;
+
+                snapshot.forEach(childSnapshot => {
+                    const key = childSnapshot.key;
+                    if (key.startsWith(OrdenBapro)) {
+                        folderKey = key;
+                    }
+                });
+
+                const fecha = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+
+                if (folderKey) {
+                    const trackingData = {
+                        transportCompany: "Cruz del Sur",
+                        trackingLink: trackingLink,
+                        transportCompanyNumber: numeroDeEnvioCDS,
+                        fecha: fecha,
+                        remito: remitoCliente,
+                        cliente: cliente
+                    };
+
+                    // Establecer datos en la carpeta "tracking" sin crear un nuevo ID
+                    dbVtex.ref(`facturasBaPro/${folderKey}/tracking`).set(trackingData);
+                    console.log("Datos actualizados en la carpeta tracking de Firebase:", trackingData);
+
+                    // Enviar mensaje a Slack
+                    const separator = "* * * * * * * * * * * * * * * * * * * * * * * *";
+
+                    let text = `${separator}\n`;
+                    text += `:package: *Orden \`${OrdenBapro}\`*\n`;
+                    text += `${separator}\n`;
+                    text += `:bookmark_tabs: *Estado:* Logística Preparó el Envío\n`;
+                    text += `:bust_in_silhouette: *Cliente:* ${cliente.toUpperCase()}\n`;
+                    text += `:id: *Remito:* ${remitoCliente}\n`;
+                    text += `:truck: *Transportista:* Cruz del Sur\n`;
+                    text += `:package: *Número de guía:* ${numeroDeEnvioCDS}\n`;
+                    text += `:calendar: *Importada:* ${fecha}\n`;
+                    text += `${separator}\n`;
+                    text += `_"Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX"_ 📦\n`;
+                    text += `${separator}`;
+
+                    fetch(HookVtex, { 
+                        method: 'POST',
+                        headers: {
+                            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ text })
+                    });
+                    console.log("Mensaje enviado a Slack.");
+                }
+            }
+            // Fin Notificar envio a VTEX
 
             // Actualizar datos en enviosBNA
             db.ref(`enviosBNA/${id}`).update(transportData)
@@ -4746,7 +4865,7 @@ async function enviarDatosOca(id, nombre, cp, localidad, provincia, remito, call
     }
 }
 
-async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, sku) {
+async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, sku, isBapro, OrdenBapro) {
     
     // Redondear el precio_venta y convertirlo a un entero
     const precioVentaRedondeado = Math.round(precio_venta);
@@ -4822,6 +4941,8 @@ async function enviarDatosAndreani(id, nombre, cp, localidad, provincia, remito,
         ID: ${id}, Nombre: ${nombre}, CP: ${cp}, Localidad: ${localidad}, Remito: ${remito}, Valor Declarado: ${precio_venta},
         Calle: ${calle}, Teléfono: ${telefono}, Email: ${email}, Tipo Electrodoméstico: ${producto_nombre}
     `);
+
+    console.log("Es Vent VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
 
     const cliente = await solicitarCliente();
     if (!cliente) return;
@@ -5050,6 +5171,65 @@ if (isSplit) {
                 remito: remitoCliente,
                 cliente: cliente,
             };
+
+            // Notificar envio a VTEX
+            if (isBapro) {
+                // Buscar la carpeta que comienza con OrdenBapro
+                const folderRef = dbVtex.ref(`facturasBaPro`);
+                const snapshot = await folderRef.once('value');
+                let folderKey = null;
+
+                snapshot.forEach(childSnapshot => {
+                    const key = childSnapshot.key;
+                    if (key.startsWith(OrdenBapro)) {
+                        folderKey = key;
+                    }
+                });
+
+                const fecha = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+
+                if (folderKey) {
+                    const trackingData = {
+                        transportCompany: "Andreani",
+                        trackingLink: linkSeguimiento,
+                        transportCompanyNumber: numeroDeEnvio,
+                        fecha: fecha,
+                        remito: remitoCliente,
+                        cliente: cliente
+                    };
+
+                    // Establecer datos en la carpeta "tracking" sin crear un nuevo ID
+                    dbVtex.ref(`facturasBaPro/${folderKey}/tracking`).set(trackingData);
+                    console.log("Datos actualizados en la carpeta tracking de Firebase:", trackingData);
+
+                    // Enviar mensaje a Slack
+                    const separator = "* * * * * * * * * * * * * * * * * * * * * * * *";
+
+                    let text = `${separator}\n`;
+                    text += `:package: *Orden \`${OrdenBapro}\`*\n`;
+                    text += `${separator}\n`;
+                    text += `:bookmark_tabs: *Estado:* Logística Preparó el Envío\n`;
+                    text += `:bust_in_silhouette: *Cliente:* ${cliente.toUpperCase()}\n`;
+                    text += `:id: *Remito:* ${remitoCliente}\n`;
+                    text += `:truck: *Transportista:* Andreani\n`;
+                    text += `:package: *Número de guía:* ${numeroDeEnvio}\n`;
+                    text += `:calendar: *Importada:* ${fecha}\n`;
+                    text += `${separator}\n`;
+                    text += `_"Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX"_ 📦\n`;
+                    text += `${separator}`;
+
+                    fetch(HookVtex, { 
+                        method: 'POST',
+                        headers: {
+                            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ text })
+                    });
+                    console.log("Mensaje enviado a Slack.");
+                }
+            }
+            // Fin Notificar envio a VTEX
             
               db.ref(`enviosBNA/${id}`).update(transportData)
                 .then(() => {
@@ -6106,7 +6286,7 @@ function realizarBusqueda() {
 // FIN BUSCADOR
 
 // GENERAR ETIQUETA LOGISTICA PROPIA
-async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, SKU) {
+async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, numero, telefono, email, precio_venta, producto_nombre, SKU, isBapro, OrdenBapro) {
     let spinner2 = document.getElementById("spinner2");
 
     // Desactivar la escucha de cambios
@@ -6229,6 +6409,8 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
 
     // Redondear el precio_venta y convertirlo a un entero
     const precioVentaRedondeado = Math.round(precio_venta);
+
+    console.log("Es Vent VTEX:", isBapro, "Orden Bapro:", OrdenBapro);
 
     // Solicitar el cliente
     const cliente = await solicitarCliente();
@@ -6490,6 +6672,65 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
 
         document.body.removeChild(tempDiv);
     };
+
+            // Notificar envio a VTEX
+            if (isBapro) {
+                // Buscar la carpeta que comienza con OrdenBapro
+                const folderRef = dbVtex.ref(`facturasBaPro`);
+                const snapshot = await folderRef.once('value');
+                let folderKey = null;
+
+                snapshot.forEach(childSnapshot => {
+                    const key = childSnapshot.key;
+                    if (key.startsWith(OrdenBapro)) {
+                        folderKey = key;
+                    }
+                });
+
+                const fecha = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+
+                if (folderKey) {
+                    const trackingData = {
+                        transportCompany: "Logistica Novogar",
+                        trackingLink: "Logistica Novogar",
+                        transportCompanyNumber: "Logistica Novogar",
+                        fecha: fecha,
+                        remito: numeroRemito,
+                        cliente: cliente
+                    };
+
+                    // Establecer datos en la carpeta "tracking" sin crear un nuevo ID
+                    dbVtex.ref(`facturasBaPro/${folderKey}/tracking`).set(trackingData);
+                    console.log("Datos actualizados en la carpeta tracking de Firebase:", trackingData);
+
+                    // Enviar mensaje a Slack
+                    const separator = "* * * * * * * * * * * * * * * * * * * * * * * *";
+
+                    let text = `${separator}\n`;
+                    text += `:package: *Orden \`${OrdenBapro}\`*\n`;
+                    text += `${separator}\n`;
+                    text += `:bookmark_tabs: *Estado:* Logística Preparó el Envío\n`;
+                    text += `:bust_in_silhouette: *Cliente:* ${cliente.toUpperCase()}\n`;
+                    text += `:id: *Remito:* ${numeroRemito}\n`;
+                    text += `:truck: *Transportista:* Logistica Novogar\n`;
+                    text += `:package: *Número de guía:* Logistica Novogar\n`;
+                    text += `:calendar: *Importada:* ${fecha}\n`;
+                    text += `${separator}\n`;
+                    text += `_"Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX"_ 📦\n`;
+                    text += `${separator}`;
+
+                    fetch(HookVtex, { 
+                        method: 'POST',
+                        headers: {
+                            'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ text })
+                    });
+                    console.log("Mensaje enviado a Slack.");
+                }
+            }
+            // Fin Notificar envio a VTEX
 
     await reader.readAsDataURL(blob); // Asegúrate de iniciar la lectura del blob
 
