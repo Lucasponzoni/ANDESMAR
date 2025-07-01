@@ -4734,8 +4734,12 @@ function buscarDespachosAvanzado() {
         });
     });
 
-Promise.all(promesas).then(() => {
-    document.getElementById('spinnerBusquedaAvanzada').style.display = 'none';
+    Promise.all(promesas).then(() => {
+        document.getElementById('spinnerBusquedaAvanzada').style.display = 'none';
+
+        resultados.sort((a, b) => {
+            return parseFechaAvanzada(b.fechaHora) - parseFechaAvanzada(a.fechaHora);
+        });
 
         if (resultados.length === 0) {
             document.getElementById('tablaBusquedaAvanzada').innerHTML = `
@@ -4754,115 +4758,143 @@ Promise.all(promesas).then(() => {
         } else {
             let rowsHTML = '';
 
-        resultados.forEach(despacho => {
-            const nombreLogistica = (() => {
-                if (despacho.logistica.includes('Andreani')) return 'Andreani';
-                if (despacho.logistica.includes('Andesmar')) return 'Andesmar';
-                if (despacho.logistica.includes('Oca')) return 'Oca';
-                if (despacho.logistica.includes('CruzdelSur')) return 'Cruz del Sur';
-                return '';
-            })();
+            resultados.forEach(despacho => {
+                const nombreLogistica = (() => {
+                    if (despacho.logistica.includes('Andreani')) return 'Andreani';
+                    if (despacho.logistica.includes('Andesmar')) return 'Andesmar';
+                    if (despacho.logistica.includes('Oca')) return 'Oca';
+                    if (despacho.logistica.includes('CruzdelSur')) return 'Cruz del Sur';
+                    return '';
+                })();
 
-            const imgSrc = {
-                'Andreani': './Img/andreani-tini.png',
-                'Andesmar': './Img/andesmar-tini.png',
-                'Oca': './Img/oca-tini.png',
-                'Cruz del Sur': './Img/Cruz-del-Sur-tini.png'
-            }[nombreLogistica] || '';
+                const imgSrc = {
+                    'Andreani': './Img/andreani-tini.png',
+                    'Andesmar': './Img/andesmar-tini.png',
+                    'Oca': './Img/oca-tini.png',
+                    'Cruz del Sur': './Img/Cruz-del-Sur-tini.png'
+                }[nombreLogistica] || '';
 
-            const iconClass = {
-                'Andreani': 'andreani-tablita',
-                'Andesmar': 'andesmar-tablita',
-                'Oca': 'oca-tablita',
-                'Cruz del Sur': 'cruz-del-sur-tablita'
-            }[nombreLogistica] || '';
+                const iconClass = {
+                    'Andreani': 'andreani-tablita',
+                    'Andesmar': 'andesmar-tablita',
+                    'Oca': 'oca-tablita',
+                    'Cruz del Sur': 'cruz-del-sur-tablita'
+                }[nombreLogistica] || '';
 
-            let seguimiento = despacho.seguimiento || '';
-            seguimiento = seguimiento.startsWith('NIC-') ? seguimiento.slice(4) : seguimiento;
+                let seguimiento = despacho.seguimiento || '';
+                seguimiento = seguimiento.startsWith('NIC-') ? seguimiento.slice(4) : seguimiento;
 
-            const etiqueta = nombreLogistica === 'Cruz del Sur' ? `NIC-${seguimiento}` : seguimiento;
+                const etiqueta = nombreLogistica === 'Cruz del Sur' ? `NIC-${seguimiento}` : seguimiento;
 
-            rowsHTML += `
-                <tr>
-                    <td>
-                        ${despacho.fechaHora || despacho.fecha || ''}
-                        <div style="
-                            color: #6c757d; 
-                            font-size: 0.7rem; 
-                            margin-top: 4px; 
-                            line-height: 1.4; 
-                            border-top: 1px dashed grey; 
-                            padding-top: 3px;
-                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                        ">
-                            🚚 Camión: <span style="font-weight: 500;">${despacho.camion || '-'}</span><br>
-                            🚚 Logística: <span style="font-weight: 500;">${nombreLogistica}</span><br>
-                            📅 Nodo: <span style="font-weight: 500;">${despacho.fecha || '-'}</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="logistica-contenedor">
-                            <span class="logistica-texto">${nombreLogistica}</span>
-                            <div class="logistica-circulo ${iconClass}">
-                                <img src="${imgSrc}" alt="${nombreLogistica}">
+                rowsHTML += `
+                    <tr>
+                        <td>
+                            ${despacho.fechaHora || despacho.fecha || ''}
+                            <div style="
+                                color: #6c757d; 
+                                font-size: 0.7rem; 
+                                margin-top: 4px; 
+                                line-height: 1.4; 
+                                border-top: 1px dashed grey; 
+                                padding-top: 3px;
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                            ">
+                                🚚 Camión: <span style="font-weight: 500;">${despacho.camion || '-'}</span><br>
+                                🚚 Logística: <span style="font-weight: 500;">${nombreLogistica}</span><br>
+                                📅 Nodo: <span style="font-weight: 500;">${despacho.fecha || '-'}</span>
                             </div>
-                        </div>
-                    </td>
-                    <td class="seguimiento-tabla-despacho">
-                        <div class="seguimiento-contenedor">
-                            <a href="${getSeguimientoLink(nombreLogistica, despacho.seguimiento)}" target="_blank">
-                                ${etiqueta} 
-                                <i class="bi bi-box-arrow-up-right ml-1 text-primary"></i>
-                            </a>
-                        </div>
-                    </td>
-                    <td class="bultos-tabla-despacho">
-                        <div class="bultos-box" data-bultos="${despacho.bultos || ''}">${despacho.bultos || ''}</div>
-                    </td>
-                    <td>
-                        <div class="remito-tipeo-os">${despacho.remito || ''}</div>
-                        ${despacho.info ? generarProductosRemito(despacho.info) : ''}
-                    </td>
-                    <td>
-                        <div class="valor-tabla-despacho">${despacho.valor || ''}</div>
-                    </td>
-                    <td class="info-tabla-despacho">
-                        ${typeof despacho.info === 'object' ? generarInfoCliente(despacho.info) : 'Presea ❌'}
-                    </td>
-                </tr>
+                        </td>
+                        <td>
+                            <div class="logistica-contenedor">
+                                <span class="logistica-texto">${nombreLogistica}</span>
+                                <div class="logistica-circulo ${iconClass}">
+                                    <img src="${imgSrc}" alt="${nombreLogistica}">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="seguimiento-tabla-despacho">
+                            <div class="seguimiento-contenedor">
+                                <a href="${getSeguimientoLink(nombreLogistica, despacho.seguimiento)}" target="_blank">
+                                    ${etiqueta} 
+                                    <i class="bi bi-box-arrow-up-right ml-1 text-primary"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td class="bultos-tabla-despacho">
+                            <div class="bultos-box" data-bultos="${despacho.bultos || ''}">${despacho.bultos || ''}</div>
+                        </td>
+                        <td>
+                            <div class="remito-tipeo-os">${despacho.remito || ''}</div>
+                            ${despacho.info ? generarProductosRemito(despacho.info) : ''}
+                        </td>
+                        <td>
+                            <div class="valor-tabla-despacho">${despacho.valor || ''}</div>
+                        </td>
+                        <td class="info-tabla-despacho">
+                            ${typeof despacho.info === 'object' ? generarInfoCliente(despacho.info) : 'Presea ❌'}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const tablaHTML = `
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
+                                <th><i class="bi bi-truck"></i></th>
+                                <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
+                                <th><i class="bi bi-box-seam"></i> Bultos</th>
+                                <th><i class="bi bi-receipt"></i> Remito</th>
+                                <th><i class="bi bi-cash"></i> Valor</th>
+                                <th><i class="bi bi-info-circle"></i> Info</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHTML}
+                        </tbody>
+                    </table>
+                </div>
             `;
-        });
 
-        const tablaHTML = `
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
-                            <th><i class="bi bi-truck"></i></th>
-                            <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
-                            <th><i class="bi bi-box-seam"></i> Bultos</th>
-                            <th><i class="bi bi-receipt"></i> Remito</th>
-                            <th><i class="bi bi-cash"></i> Valor</th>
-                            <th><i class="bi bi-info-circle"></i> Info</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${rowsHTML}
-                    </tbody>
-                </table>
-            </div>
-        `;
+            document.getElementById('tablaBusquedaAvanzada').innerHTML = tablaHTML;
+        }
 
-        document.getElementById('tablaBusquedaAvanzada').innerHTML = tablaHTML;
+        document.getElementById('tablaBusquedaAvanzada').style.display = 'block';
+    }).catch(error => {
+        console.error('Error en búsqueda avanzada:', error);
+        document.getElementById('spinnerBusquedaAvanzada').style.display = 'none';
+        Swal.fire('Error', 'Hubo un problema al buscar en Firebase.', 'error');
+    });
+}
+
+// Función para parsear la fecha en formato "dd/mm/yyyy, hh:mm:ss"
+function parseFechaAvanzada(fechaStr) {
+    if (!fechaStr || typeof fechaStr !== 'string') {
+        console.error('Fecha no definida, vacía o no es string:', fechaStr);
+        return new Date(0); // Retorna fecha por defecto
     }
 
-    document.getElementById('tablaBusquedaAvanzada').style.display = 'block';
-}).catch(error => {
-    console.error('Error en búsqueda avanzada:', error);
-    document.getElementById('spinnerBusquedaAvanzada').style.display = 'none';
-    Swal.fire('Error', 'Hubo un problema al buscar en Firebase.', 'error');
-});
+    const partes = fechaStr.trim().split(', ');
+    if (partes.length !== 2) {
+        console.error('Formato de fecha-hora incorrecto. Se esperaba formato "DD/MM/YYYY, HH:MM:SS". Valor:', fechaStr);
+        return new Date(0);
+    }
 
+    const [fecha, hora] = partes;
+
+    const [dia, mes, año] = fecha.split('/').map(n => parseInt(n, 10));
+    const [horas, minutos, segundos] = hora.split(':').map(n => parseInt(n, 10));
+
+    if (
+        isNaN(dia) || isNaN(mes) || isNaN(año) ||
+        isNaN(horas) || isNaN(minutos) || isNaN(segundos)
+    ) {
+        console.error('Error parseando la fecha o la hora:', fechaStr);
+        return new Date(0);
+    }
+
+    return new Date(año, mes - 1, dia, horas, minutos, segundos); // Mes es base 0
 }
 // FIN BUSQUEDA AVANZADA DE DESPACHOS
