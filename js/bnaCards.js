@@ -3859,8 +3859,9 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
                     text += `:truck: *Transportista:* Andesmar\n`;
                     text += `:package: *Número de guía:* ${data.NroPedido}\n`;
                     text += `:calendar: *Importada:* ${fecha}\n`;
-                    text += `${separator}\n`;
-                    text += `_"Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX"_ 📦\n`;
+                    text += `\n`;
+                    text += `_Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX..._ 📦\n`;
+                    text += `\n`;
                     text += `${separator}`;
 
                     fetch(HookVtex, { 
@@ -4421,8 +4422,9 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
                     text += `:truck: *Transportista:* Cruz del Sur\n`;
                     text += `:package: *Número de guía:* ${numeroDeEnvioCDS}\n`;
                     text += `:calendar: *Importada:* ${fecha}\n`;
-                    text += `${separator}\n`;
-                    text += `_"Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX"_ 📦\n`;
+                    text += `\n`;
+                    text += `_Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX..._ 📦\n`;
+                    text += `\n`;
                     text += `${separator}`;
 
                     fetch(HookVtex, { 
@@ -5221,8 +5223,9 @@ if (isSplit) {
                     text += `:truck: *Transportista:* Andreani\n`;
                     text += `:package: *Número de guía:* ${numeroDeEnvio}\n`;
                     text += `:calendar: *Importada:* ${fecha}\n`;
-                    text += `${separator}\n`;
-                    text += `_"Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX"_ 📦\n`;
+                    text += `\n`;
+                    text += `_Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX..._ 📦\n`;
+                    text += `\n`;
                     text += `${separator}`;
 
                     fetch(HookVtex, { 
@@ -6722,8 +6725,9 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
                     text += `:truck: *Transportista:* Logistica Novogar\n`;
                     text += `:package: *Número de guía:* Logistica Novogar\n`;
                     text += `:calendar: *Importada:* ${fecha}\n`;
-                    text += `${separator}\n`;
-                    text += `_"Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX"_ 📦\n`;
+                    text += `\n`;
+                    text += `_Lo cargué en Firebase y estoy aguardando la próxima llamada para notificarlo en VTEX..._ 📦\n`;
+                    text += `\n`;
                     text += `${separator}`;
 
                     fetch(HookVtex, { 
