@@ -9581,3 +9581,12 @@ i[class^="bi-"] + em {
     animation: innerPulse 5s ease-in-out infinite;
 }
 /* FIN CONTENEDOR FECHAVTEX TIENDAS VIRTUALES */
+
+.titulo-busqueda-avanzada-tipeo{
+    margin-bottom: -20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
