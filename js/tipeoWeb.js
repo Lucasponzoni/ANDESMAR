@@ -4723,7 +4723,7 @@ function buscarDespachosAvanzado() {
                         if (tipoBusqueda === 'remito' && envio.remito === valorBusqueda) match = true;
                         if (tipoBusqueda === 'seguimiento' && envio.seguimiento && envio.seguimiento.includes(valorBusqueda)) match = true;
                         if (tipoBusqueda === 'cliente' && info.cliente && info.cliente.includes(valorBusqueda)) match = true;
-                        if (tipoBusqueda === 'sku' && info.producto1 && info.producto1.includes(valorBusqueda)) match = true;
+                        if (tipoBusqueda === 'sku' && info.producto1 && info.producto1.toUpperCase().includes(valorBusqueda.toUpperCase())) {match = true;}
                         if (tipoBusqueda === 'nombre' && info.nombre && info.nombre.toUpperCase().includes(valorBusqueda.toUpperCase())) {match = true;}
 
                         if (match) {
