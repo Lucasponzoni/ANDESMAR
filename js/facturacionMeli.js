@@ -820,7 +820,7 @@ function loadTable(data, estadoFilter = null) {
                         <strong class="express-meli" style="color: yellow;">⚡ FACTURAR EXPRESS </strong><br>
                         <span class="express-meli-sub" style="font-size: smaller;">Condición: 40-60</span>
                     `;
-                } else if (skuForzado && fechaForzadaReciente) {
+                } else if (skuForzado && fechaForzadaReciente && isCpInCpsPlaceIt) {
                     shippingCell.innerHTML = `
                         <strong class="express-meli2" style="color: yellow;">⚡ FACTURAR EXPRESS </strong><br>
                         <span class="express-meli-sub" style="font-size: smaller;">Forzado en fecha ${skuForzado.fecha}<br><strong>(hace ${diasDesdeFecha} días)</span></span>

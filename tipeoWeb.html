@@ -105,49 +105,81 @@
         </div>
     </nav>
 
-    <div class="container mt-4 search-container-top">
-        <div class="row justify-content-between align-items-center search-filter-container">
-            <div class="col-md-6 mb-3">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="searchDespachosLogistica" placeholder="Buscar por cliente o Remito...">
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <i class="fas fa-search" style="font-size: 22px"></i>
-                        </button>
-                    </div>
+<div class="container mt-4 search-container-top">
+
+    <div class="row justify-content-between align-items-center search-filter-container">
+        <!-- Input de búsqueda -->
+        <div class="col-12 col-md-6 mb-2">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchDespachosLogistica" placeholder="Buscar por cliente o Remito...">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search" style="font-size: 22px;"></i>
+                    </button>
                 </div>
             </div>
-    
-            <div class="col-12 mb-3 d-flex justify-content-end ingreso-egreso" style="overflow-x: auto; white-space: nowrap;">
+
+            <!-- Link Búsqueda Avanzada debajo del input -->
+            <div class="mt-1">
+                <a href="#" id="toggleAdvancedSearch" style="font-size: 12px; color: #007aff; text-decoration: none;">Búsqueda Avanzada ▼</a>
+            </div>
+        </div>
+
+        <!-- Búsqueda Avanzada Opciones (Siempre debajo, 100% ancho) -->
+        <div class="col-12 mb-2" id="advancedSearchOptions" style="display: none; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9; font-size: 12px;">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="filterByDate">
+                <label class="form-check-label" for="filterByDate">Filtrar por Fecha</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="filterByStatus">
+                <label class="form-check-label" for="filterByStatus">Solo pendientes</label>
+            </div>
+            <!-- Más filtros si querés -->
+        </div>
+
+        <!-- Botonera -->
+        <div class="col-12 mb-3 d-flex justify-content-end ingreso-egreso" style="overflow-x: auto; white-space: nowrap;">
             <div style="min-width: 100%;">
                 <button class="btn btn-dark" id="btnVolverAtras" type="button" title="Volver atrás" style="display: none;">
-                <i class="bi bi-arrow-return-left" style="font-size: 22px;"></i> Atrás
+                    <i class="bi bi-arrow-return-left" style="font-size: 22px;"></i> Atrás
                 </button>
                 <button class="btn btn-light" id="btnIniciarEscaneo" type="button" data-bs-toggle="modal" data-bs-target="#modalDespacho">
-                <i class="bi bi-clipboard-pulse" style="font-size: 22px; color: #a517be;"></i> Iniciar Escaneo
+                    <i class="bi bi-clipboard-pulse" style="font-size: 22px; color: #a517be;"></i> Iniciar Escaneo
                 </button>
                 <button class="btn btn-light" id="btnEstadisticas" type="button" data-bs-toggle="modal" data-bs-target="#modalEstadisticas">
-                <i class="bi bi-bar-chart" style="font-size: 22px; color: #1776be;"></i> Estadísticas
+                    <i class="bi bi-bar-chart" style="font-size: 22px; color: #1776be;"></i> Estadísticas
                 </button>
                 <button class="btn btn-light" id="btnBuscarInfoRemitos" type="button">
-                <i class="bi bi-binoculars-fill" style="font-size: 22px; color: #fb8e00;"></i> Buscar Remitos
+                    <i class="bi bi-binoculars-fill" style="font-size: 22px; color: #fb8e00;"></i> Buscar Remitos
                 </button>
                 <button class="btn btn-light position-relative" id="btnAdjuntarDocumentacion" type="button" data-bs-toggle="modal" data-bs-target="#modalDocumentacion">
                     <i class="bi bi-paperclip" style="font-size: 22px; color: #17be5e;"></i> Adjuntar documentación
-                    <span id="contadorDocumentacionFaltante" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
+                    <span id="contadorDocumentacionFaltante" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
                 </button>
                 <button class="btn btn-primary btn-seguro" id="btnReporteSeguro" type="button">
-                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="spinnerSeguro"></span>
-                <i class="bi bi-shield-lock-fill" style="font-size: 22px; color: #f6ff00;" id="iconoSeguro"></i>
-                <span id="textoSeguro">Reporte de Seguro</span>
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="spinnerSeguro"></span>
+                    <i class="bi bi-shield-lock-fill" style="font-size: 22px; color: #f6ff00;" id="iconoSeguro"></i>
+                    <span id="textoSeguro">Reporte de Seguro</span>
                 </button>
                 <!-- Input invisible para flatpickr -->
                 <input type="text" id="inputFlatpickrSeguro" class="input-flatpickr-temp" 
                     style="opacity:0; width:1px; height:1px; border:none; padding:0; margin:0; position:relative; z-index:10;" />
             </div>
-            </div>
         </div>
-    </div>                
+    </div>
+</div>
+
+<script>
+    document.getElementById('toggleAdvancedSearch').addEventListener('click', function(e) {
+        e.preventDefault();
+        const adv = document.getElementById('advancedSearchOptions');
+        adv.style.display = (adv.style.display === 'none') ? 'block' : 'none';
+        this.innerHTML = (adv.style.display === 'block') ? 'Ocultar Búsqueda Avanzada ▲' : 'Búsqueda Avanzada ▼';
+    });
+</script>
 
     <div class="container mt-5" id="cards-container">                   
 
