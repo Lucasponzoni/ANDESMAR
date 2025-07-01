@@ -122,14 +122,13 @@
                 <div class="mt-1">
                     <a href="#" id="toggleAdvancedSearch" style="font-size: 12px; color: #007aff; text-decoration: none;">Búsqueda Avanzada ▼</a>
                 </div>
+                <button id="btnBuscarAvanzado" class="btn btn-primary" style="display:none;">
+                    <i class="bi bi-search"></i> Realizar búsqueda avanzada
+                </button>
             </div>
 
             <!-- Búsqueda Avanzada Opciones (Siempre debajo, 100% ancho) -->
             <div class="col-12 mb-2" id="advancedSearchOptions" style="display: none; padding: 10px; border-radius: 10px; background-color: #f8f8f8;">
-
-                <button id="btnBuscarAvanzado" class="btn btn-primary">
-                    <i class="bi bi-search"></i> Realizar búsqueda avanzada
-                </button>
 
                 <div class="row mb-3">
                     <div class="col-6 text-center titulo-busqueda-avanzada-tipeo">
@@ -184,6 +183,7 @@
                     <div class="col-12 col-md-6 mb-2">
                         <div style="border: 1px solid #e0e0e0; background-color: #ffffff; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                             <div class="row">
+                                <!-- Primera fila: 2 checks -->
                                 <div class="col-6 mb-2 text-center">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="Remito" id="filterRemito" checked>
@@ -200,24 +200,34 @@
                                     </div>
                                 </div>
 
-                                <div class="col-6 mb-2 text-center">
+                                <!-- Segunda fila: 3 checks -->
+                                <div class="col-4 mb-2 text-center">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="Seguimiento" id="filterSeguimiento">
-                                        <label class="form-check-label" for="filterSeguimiento">Seguimiento</label>
-                                        <div class="text-muted" style="font-size: 11px;">Filtrar por número de seguimiento</div>
+                                        <input class="form-check-input" type="checkbox" value="NombreApellidoEmpresa" id="filterNombreApellidoEmpresa">
+                                        <label class="form-check-label" for="filterNombreApellidoEmpresa">Nombre</label>
+                                        <div class="text-muted" style="font-size: 11px;">Filtrar por Titular</div>
                                     </div>
                                 </div>
 
-                                <div class="col-6 mb-2 text-center">
+                                <div class="col-4 mb-2 text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="Seguimiento" id="filterSeguimiento">
+                                        <label class="form-check-label" for="filterSeguimiento">Seguimiento</label>
+                                        <div class="text-muted" style="font-size: 11px;">Filtrar por seguimiento</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-4 mb-2 text-center">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="SKU" id="filterSKU">
                                         <label class="form-check-label" for="filterSKU">SKU</label>
-                                        <div class="text-muted" style="font-size: 11px;">Filtrar por SKU del producto</div>
+                                        <div class="text-muted" style="font-size: 11px;">Filtrar por SKU</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -255,6 +265,7 @@
         </div>
     </div>
 
+    <!-- BUSQUEDA AVANZADA DIVS -->
     <script>
         let busquedaAvanzadaActiva = false;
 
@@ -267,9 +278,21 @@
             this.innerHTML = visible ? 'Búsqueda Avanzada ▼' : 'Ocultar Búsqueda Avanzada ▲';
 
             busquedaAvanzadaActiva = !visible;  // ACTUALIZA EL ESTADO GLOBAL
+
+            // Asegurar que la tabla de despachos esté visible cuando se oculta la búsqueda avanzada
+            if (!visible) {
+                document.getElementById('tablaDespachosActual').style.display = 'none';
+                document.getElementById('btnBuscarAvanzado').style.display = 'block';
+                document.getElementById('contenedor-macos-tipeo').classList.add('hidden');
+            } else {
+                document.getElementById('tablaDespachosActual').style.display = 'block';
+                document.getElementById('tablaBusquedaAvanzada').style.display = 'none';
+                document.getElementById('btnBuscarAvanzado').style.display = 'none';
+                document.getElementById('contenedor-macos-tipeo').classList.remove('hidden');
+            }
         });
 
-        const filtrosObligatorios = ['filterRemito', 'filterCliente', 'filterSeguimiento', 'filterSKU'];
+        const filtrosObligatorios = ['filterRemito', 'filterCliente', 'filterSeguimiento', 'filterNombreApellidoEmpresa', 'filterSKU'];
         const filtrosLogisticas = ['filterAndreani', 'filterAndesmar', 'filterOca', 'filterCruzDelSur'];
 
         document.querySelectorAll('#advancedSearchOptions input[type=checkbox]').forEach(checkbox => {
@@ -290,7 +313,7 @@
                             Swal.fire({
                                 icon: 'warning',
                                 title: 'Atención',
-                                text: 'Debe haber al menos un filtro activo: Remito, Cliente, Seguimiento o SKU.',
+                                text: 'Debe haber al menos un filtro activo: Remito, Cliente, Seguimiento, Titular o SKU.',
                                 confirmButtonText: 'Aceptar',
                                 timer: 3000,
                                 timerProgressBar: true
@@ -317,11 +340,12 @@
             });
         });
     </script>
+    <!-- FIN BUSQUEDA AVANZADA DIVS -->
 
     <div class="container mt-5" id="cards-container">                   
 
 <!-- CONTENEDORES TIPEO -->
-<div class="contenedor-macos-tipeo">
+<div id="contenedor-macos-tipeo" class="contenedor-macos-tipeo">
 
     <!-- Andreani -->
     <div class="tarjeta-tipeo rojo-tipeo">
@@ -474,15 +498,15 @@
   </style>
 
 <!-- SPINNER BUSQUEDA AVANZADA -->
-<div class="text-center mt-3" id="spinnerBusquedaAvanzada" style="display:none; background-color: rgba(255, 255, 255, 0.9); border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); padding: 20px; margin-top: 20px;">
+<div class="text-center mt-3" id="spinnerBusquedaAvanzada" style="display:none;">
     <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; animation: spin 1s linear infinite;">
         <span class="sr-only">Cargando...</span>
     </div>
-    <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial; font-size: 1.2rem; color: #333;">
+     <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial; font-size: 1.2rem; color: #333;">
         Buscando en registros históricos...
     </p>
 </div>
-<!-- FIN SPINNER BUSQUEDA AVANZADA -->
+<!-- FIN SPINNER BUSQUEDA AVANZADA -->                
 
 <!-- TABLA BUSQUEDA AVANZADA -->
 <div id="tablaBusquedaAvanzada" style="display:none; margin-top: 20px;"></div>

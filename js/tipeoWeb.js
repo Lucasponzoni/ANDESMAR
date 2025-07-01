@@ -2507,7 +2507,7 @@ function getSeguimientoLink(logistica, etiqueta) {
         case 'Andesmar':
             return `https://andesmarcargas.com/seguimiento.html?numero=${etiqueta}&tipo=remito&cod=`;
         case 'Oca':
-            return `aftership.com/es/track/oca-ar/${etiqueta}`;
+            return `https://www.aftership.com/es/track/oca-ar/${etiqueta}`;
         case 'Cruz del Sur':
         // Eliminar el prefijo "NIC-" si está presente
         const etiquetaSinNic = etiqueta.startsWith('NIC-') ? etiqueta.substring(4) : etiqueta;
@@ -4666,6 +4666,7 @@ function actualizarBarraProgreso(porcentaje) {
 }
 // FIN ADJUNTAR DOCUMENTACION DE DESPACHO
 
+// BUSQUEDA AVANZADA DE DESPACHOS
 document.getElementById('btnBuscarAvanzado').addEventListener('click', function() {
     buscarDespachosAvanzado();
 });
@@ -4690,6 +4691,7 @@ function buscarDespachosAvanzado() {
     if (document.getElementById('filterSeguimiento').checked) tipoBusqueda = 'seguimiento';
     if (document.getElementById('filterCliente').checked) tipoBusqueda = 'cliente';
     if (document.getElementById('filterSKU').checked) tipoBusqueda = 'sku';
+    if (document.getElementById('filterNombreApellidoEmpresa').checked) tipoBusqueda = 'nombre';
 
     const valorBusqueda = document.getElementById('searchDespachosLogistica').value.trim();
     if (valorBusqueda === '') {
@@ -4716,6 +4718,7 @@ function buscarDespachosAvanzado() {
                         if (tipoBusqueda === 'seguimiento' && envio.seguimiento && envio.seguimiento.includes(valorBusqueda)) match = true;
                         if (tipoBusqueda === 'cliente' && info.cliente && info.cliente.includes(valorBusqueda)) match = true;
                         if (tipoBusqueda === 'sku' && info.producto1 && info.producto1.includes(valorBusqueda)) match = true;
+                        if (tipoBusqueda === 'nombre' && info.nombre && info.nombre.toUpperCase().includes(valorBusqueda.toUpperCase())) {match = true;}
 
                         if (match) {
                             resultados.push({
@@ -4734,10 +4737,22 @@ function buscarDespachosAvanzado() {
 Promise.all(promesas).then(() => {
     document.getElementById('spinnerBusquedaAvanzada').style.display = 'none';
 
-    if (resultados.length === 0) {
-        document.getElementById('tablaBusquedaAvanzada').innerHTML = '<p>No se encontraron resultados.</p>';
-    } else {
-        let rowsHTML = '';
+        if (resultados.length === 0) {
+            document.getElementById('tablaBusquedaAvanzada').innerHTML = `
+                <div style="
+                    text-align: center; 
+                    padding: 20px; 
+                    color: #6c757d; 
+                    font-size: 0.9rem; 
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                ">
+                    <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
+                    <div>No se encontraron resultados.</div>
+                    <div style="font-size: 0.8rem; margin-top: 4px;">Intentá ajustar los filtros o buscar otro término.</div>
+                </div>
+            `;
+        } else {
+            let rowsHTML = '';
 
         resultados.forEach(despacho => {
             const nombreLogistica = (() => {
@@ -4769,7 +4784,22 @@ Promise.all(promesas).then(() => {
 
             rowsHTML += `
                 <tr>
-                    <td>${despacho.fechaHora || despacho.fecha || ''}</td>
+                    <td>
+                        ${despacho.fechaHora || despacho.fecha || ''}
+                        <div style="
+                            color: #6c757d; 
+                            font-size: 0.7rem; 
+                            margin-top: 4px; 
+                            line-height: 1.4; 
+                            border-top: 1px dashed grey; 
+                            padding-top: 3px;
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                        ">
+                            🚚 Camión: <span style="font-weight: 500;">${despacho.camion || '-'}</span><br>
+                            🚚 Logística: <span style="font-weight: 500;">${nombreLogistica}</span><br>
+                            📅 Nodo: <span style="font-weight: 500;">${despacho.fecha || '-'}</span>
+                        </div>
+                    </td>
                     <td>
                         <div class="logistica-contenedor">
                             <span class="logistica-texto">${nombreLogistica}</span>
@@ -4809,7 +4839,7 @@ Promise.all(promesas).then(() => {
                     <thead class="table-dark">
                         <tr>
                             <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
-                            <th><i class="bi bi-truck"></i> Transporte</th>
+                            <th><i class="bi bi-truck"></i></th>
                             <th><i class="bi bi-link-45deg"></i> Seguimiento</th>
                             <th><i class="bi bi-box-seam"></i> Bultos</th>
                             <th><i class="bi bi-receipt"></i> Remito</th>
@@ -4835,3 +4865,4 @@ Promise.all(promesas).then(() => {
 });
 
 }
+// FIN BUSQUEDA AVANZADA DE DESPACHOS
