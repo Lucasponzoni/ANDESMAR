@@ -1116,14 +1116,20 @@ function showAlertPosventa(message) {
 
 // RENDERIZADO DE FILAS EN LA TABLA
 window.onload = async () => {
-    await cargarDespachos(); 
+    await cargarDespachos();
     console.log("Despachos cargados");
+
     setTimeout(async () => {
         await actualizarTotales();
         console.log("Totales actualizados");
     }, 2000);
+
     await verificarDocumentacionPendiente();
-    await setInterval(verificarDocumentacionPendiente, 30 * 60 * 1000); // Cada 30 minutos
+    setInterval(verificarDocumentacionPendiente, 30 * 60 * 1000);
+
+    // Ejecutar buscarRemitos al cargar y luego cada 15 minutos
+    await buscarRemitosBack();
+    setInterval(buscarRemitosBack, 15 * 60 * 1000);
 };
 
 function cargarDespachos() {
@@ -1223,8 +1229,8 @@ row.innerHTML = `
         ${despacho.Info ? generarInfoCliente(despacho.Info) : 'Presea ❌'}
     </td>
     <td class="delete-tabla-despacho">
-        <button class="btn btn-danger btn-sm" onclick="confirmarEliminacion('${remito}')">
-            <i class="ml-1 bi bi-trash3-fill"></i>
+        <button class="btn btn-danger" onclick="confirmarEliminacion('${remito}')">
+            X
         </button>
     </td>
 `;
@@ -4898,3 +4904,37 @@ function parseFechaAvanzada(fechaStr) {
     return new Date(año, mes - 1, dia, horas, minutos, segundos); // Mes es base 0
 }
 // FIN BUSQUEDA AVANZADA DE DESPACHOS
+
+// BUSCAR REMITOS BACK
+async function buscarRemitosBack() {
+    try {
+        const filas = document.querySelectorAll('#tabla-despacho-body tr');
+        let contadorActualizados = 0;
+
+        for (const fila of filas) {
+            const celdaRemito = fila.querySelector('td:nth-child(5) .remito-tipeo-os');
+            if (!celdaRemito) continue;
+
+            const remito = celdaRemito.textContent.trim();
+            const celdaInfo = fila.querySelector('td:nth-child(7)');
+            if (!celdaInfo) continue;
+
+            if (celdaInfo.textContent.includes('Presea ❌')) {
+                const remitoSnapshot = await dbStock.ref(`RemitosWeb/${remito}`).once('value');
+
+                if (remitoSnapshot.exists()) {
+                    await dbTipeo.ref(`despachosDelDia/${remito}/Info`).set(remitoSnapshot.val());
+                    contadorActualizados++;
+
+                    // Actualizar visualmente la celda de info
+                    celdaInfo.innerHTML = '<span class="badge bg-success">Actualizado</span>';
+                }
+            }
+        }
+
+        console.log(`Se actualizaron ${contadorActualizados} remitos.`);
+    } catch (error) {
+        console.error('Error al buscar remitos:', error);
+    }
+}
+// FIN BUSCAR REMITOS BACK
