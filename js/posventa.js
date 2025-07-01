@@ -3242,6 +3242,9 @@ function ejecutarControlRapido() {
                                   textoFila.includes('Si no llega para el') ||
                                   textoFila.includes('Le avisamos a la persona que te compró que ya puede iniciar la devolución') ||
                                   textoFila.includes('Reclamo en espera de respuesta del comprador') ||
+                                  textoFila.includes('Enviaremos el paquete de regreso porque el domicilio de la persona que lo compró estaba incorrecto') ||
+                                  textoFila.includes('No pudimos entregar el producto a la persona que lo compró') ||
+                                  textoFila.includes('Lo enviaremos a tu domicilio') ||
                                   textoFila.includes('Llega el') ||
                                   textoFila.includes('Llegará el') ||
                                   textoFila.includes('Te contactaremos cuando tengamos novedades') ||
