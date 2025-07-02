@@ -115,43 +115,60 @@ function cargarPrecios() {
 }
 // FIN CARGAR PRECIOS Y STOCK
 
-// CARGA SKU
+// CARGA SKU PARA FORZAR STOCK
 // Función para cargar SKU desde Firebase
 function cargarSKUs(ref, listBodyId, loadingSpinnerId) {
     const skuListBody = document.getElementById(listBodyId);
     const loadingSpinner = document.getElementById(loadingSpinnerId);
-    loadingSpinner.style.display = 'block'; // Mostrar spinner
+    loadingSpinner.style.display = 'block';
 
     firebase.database().ref(ref).once('value').then(snapshot => {
-        skuListBody.innerHTML = ''; // Limpiar la tabla
+        skuListBody.innerHTML = '';
+
         snapshot.forEach(childSnapshot => {
-            const sku = childSnapshot.val().sku; // Asegúrate que 'sku' sea la propiedad correcta
-            const stock = childSnapshot.val().stock || 0; // Obtener stock, default a 0 si no existe
-            const fecha = childSnapshot.val().fecha || 'No establecida'; // Obtener fecha
+            const sku = childSnapshot.val().sku;
+            const stock = childSnapshot.val().stock || 0;
+            const fecha = childSnapshot.val().fecha || 'No establecida';
 
-            // Calcular si la fecha está dentro de los últimos 7 días
-            const partesFecha = fecha.split(",")[0].split("/");
-            const dia = parseInt(partesFecha[0], 10);
-            const mes = parseInt(partesFecha[1], 10) - 1; // Los meses en JavaScript van de 0 a 11
-            const anio = parseInt(partesFecha[2], 10);
-            const fechaGuardada = new Date(anio, mes, dia);
-            const diasDesdeFecha = Math.floor((new Date() - fechaGuardada) / (1000 * 60 * 60 * 24)); // Días desde la fecha
+            let diasDesdeFecha = Infinity;
 
-            // Determinar el estado del badge y el botón
-            let badgeClass = 'badge bg-success'; // Activo
+            if (fecha !== 'No establecida') {
+                let soloFecha = fecha.split(',')[0].trim();  // Tomar solo la parte antes de la coma (día/mes/año)
+                const partesFecha = soloFecha.split('/');
+
+                if (partesFecha.length === 3) {
+                    const dia = parseInt(partesFecha[0], 10);
+                    const mes = parseInt(partesFecha[1], 10) - 1;
+                    const anio = parseInt(partesFecha[2], 10);
+
+                    const fechaGuardada = new Date(anio, mes, dia);
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    fechaGuardada.setHours(0, 0, 0, 0);
+
+                    const diferenciaMs = hoy - fechaGuardada;
+                    diasDesdeFecha = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
+                }
+            }
+
+            let badgeClass = 'badge bg-success';
             let badgeText = 'Activo';
-            let buttonClass = 'btn btn-success btn-lg'; // Botón activo
+            let buttonClass = 'btn btn-success btn-lg';
 
             if (diasDesdeFecha > 7) {
-                badgeClass = 'badge bg-danger'; // Vencido
+                badgeClass = 'badge bg-danger';
                 badgeText = 'Vencido';
-                buttonClass = 'btn btn-danger btn-lg'; // Botón de peligro
+                buttonClass = 'btn btn-danger btn-lg';
+            } else if (diasDesdeFecha === 7) {
+                badgeClass = 'badge bg-warning text-dark';
+                badgeText = 'Vence hoy (Último día)';
+                buttonClass = 'btn btn-warning btn-lg';
             }
 
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>
-                    <span style="flex: 1;"><strong>${sku}</strong></span> <!-- Aquí se carga el SKU -->
+                    <span style="flex: 1;"><strong>${sku}</strong></span>
                 </td>
                 <td>
                     <span style="font-size: 0.75em; color: #2f3e51; background: #e8f0fe; padding: 4px 10px; border-radius: 6px; margin-left: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
@@ -160,7 +177,7 @@ function cargarSKUs(ref, listBodyId, loadingSpinnerId) {
                 </td>
                 <td>
                     <span style="font-size: 0.75em; color: #2f3e51;">Fecha: ${fecha}</span><br>
-                    <span class="${badgeClass}">${badgeText}</span> <!-- Badge de estado -->
+                    <span class="${badgeClass}">${badgeText}</span>
                 </td>
                 <td>
                     <button class="${buttonClass}" onclick="renovarFecha('${ref}', '${childSnapshot.key}', '${listBodyId}', '${loadingSpinnerId}')">
@@ -175,10 +192,11 @@ function cargarSKUs(ref, listBodyId, loadingSpinnerId) {
             `;
             skuListBody.appendChild(row);
         });
-        loadingSpinner.style.display = 'none'; // Ocultar spinner
+
+        loadingSpinner.style.display = 'none';
     }).catch(error => {
         console.error("Error al cargar SKU: ", error);
-        loadingSpinner.style.display = 'none'; // Ocultar spinner
+        loadingSpinner.style.display = 'none';
     });
 }
 
@@ -274,7 +292,7 @@ $('#skuModal').on('show.bs.modal', () => {
         });
     }
 });
-// FIN CARGA SKU
+// FIN CARGA SKU PARA FORZAR STOCK
 
 let allData = [];
 let currentPage = 1;
@@ -798,19 +816,22 @@ function loadTable(data, estadoFilter = null) {
                 let diasDesdeFecha = 0; // Inicializar la variable para días desde la fecha
 
                 if (skuForzado) {
-                    // Convertir la fecha guardada al formato correcto
-                    const partesFecha = skuForzado.fecha.split(",")[0].split("/"); // Obtener solo la parte de la fecha
+                    // Obtener solo la parte de la fecha antes de la coma
+                    const partesFecha = skuForzado.fecha.split(",")[0].split("/");
                     const dia = parseInt(partesFecha[0], 10);
-                    const mes = parseInt(partesFecha[1], 10) - 1; // Los meses en JavaScript van de 0 a 11
+                    const mes = parseInt(partesFecha[1], 10) - 1; // Mes en JS va de 0 a 11
                     const anio = parseInt(partesFecha[2], 10);
-                    
-                    const fechaGuardada = new Date(anio, mes, dia); // Crear el objeto Date
 
-                    // Comprobar si la fecha es dentro de los últimos 7 días
-                    fechaForzadaReciente = (new Date() - fechaGuardada) <= 7 * 24 * 60 * 60 * 1000; // 7 días en milisegundos
+                    const fechaGuardada = new Date(anio, mes, dia);
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    fechaGuardada.setHours(0, 0, 0, 0);
 
-                    // Calcular días desde la fecha
-                    diasDesdeFecha = Math.floor((new Date() - fechaGuardada) / (1000 * 60 * 60 * 24)); // Calcula días desde la fecha
+                    const diferenciaMs = hoy - fechaGuardada;
+                    diasDesdeFecha = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
+
+                    // Si es dentro de los últimos 7 días
+                    fechaForzadaReciente = diasDesdeFecha <= 7;
                 }
 
                 if (estadosProhibidos.includes(stateName) || estadosProhibidos.includes(stateName2)) {
@@ -823,9 +844,10 @@ function loadTable(data, estadoFilter = null) {
                 } else if (skuForzado && fechaForzadaReciente && isCpInCpsPlaceIt) {
                     shippingCell.innerHTML = `
                         <strong class="express-meli2" style="color: yellow;">⚡ FACTURAR EXPRESS </strong><br>
-                        <span class="express-meli-sub" style="font-size: smaller;">Forzado en fecha ${skuForzado.fecha}<br><strong>(hace ${diasDesdeFecha} días)</span></span>
+                        <span class="express-meli-sub" style="font-size: smaller;">Forzado en fecha ${skuForzado.fecha}<br><strong>(hace ${diasDesdeFecha} días)</strong></span>
                     `;
-                } else if (isCpInCpsPlaceIt) {
+                }
+                else if (isCpInCpsPlaceIt) {
                     shippingCell.innerHTML = `
                         <strong class="express-meli3" style="color: orangered;">⚡ LOCALIDAD EXPRESS</strong><br>
                         <span class="express-meli-sub" style="font-size: smaller;"><strong>SIN STOCK</strong> disponible en dep. 60</span>
