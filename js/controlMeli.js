@@ -3311,7 +3311,11 @@ async function generateQueryReport(date, selectedTandas) {
                         <span id="icon-collapseDetalle-${index}">▼</span>
                     </button>
                 </td>
-                    <td style="text-align: center;">${item.cantidad}</td>
+                    <td class="cantidad-query-meli">
+                    <span class="cantidad-circulo ${item.cantidad > 1 ? 'multiple' : 'uno'}">
+                        ${item.cantidad}
+                    </span>
+                    </td>
                     <td>${item.producto}</td>
                     <td style="text-align: center;">${item.preseaStock}</td>
                     <td style="text-align: center; font-size: 0.8em;">${tandasList}</td>

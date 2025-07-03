@@ -9615,3 +9615,39 @@ i[class^="bi-"] + em {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.cantidad-query-meli {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+.cantidad-circulo {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 24px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 30px;
+    color: white;
+    text-align: center;
+    padding-top: 8px;
+}
+
+.cantidad-circulo.uno {
+    background-color: #f39c12;
+    transition: .5s ease;
+}
+
+.cantidad-circulo.uno:hover {
+    background-color: red;
+}
+
+.cantidad-circulo.multiple {
+    background-color: #28a745;
+    transition: .5s ease;
+}
+
+.cantidad-circulo.multiple:hover {
+    background-color: red;
+}
