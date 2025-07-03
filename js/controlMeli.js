@@ -2245,10 +2245,11 @@ if (tandaNovogarBtn) {
                     sku = rawSku2.replace(/_([0-9A-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
                     descripcion = descNuevoMatch ? descNuevoMatch[1].trim() : '';
 
-                    // Agregar condición para la descripción específica
+                    // ⚠️ AGREGAR MANUALMENTE SKUS NO RECONOCIDOS POR ML
                     if (descripcion === "Microondas Bgh 28 Litros Digital Eco B228ds20" && !skuNuevoMatch) {
                         sku = "B228DS20";
                     }
+                    // ⚠️ FIN AGREGAR MANUALMENTE SKUS NO RECONOCIDOS POR ML
 
                     descripcion = descripcion.substring(0, 30);
                     esFormatoNuevo = true;
