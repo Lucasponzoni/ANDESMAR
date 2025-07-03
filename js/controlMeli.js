@@ -3205,12 +3205,14 @@ async function generateQueryReport(date, selectedTandas) {
                             sku: sku,
                             cantidad: 0,
                             producto: producto,
-                            tandas: new Set()
+                            tandas: new Set(),
+                            detalles: [] // ← Array para guardar detalles
                         };
                     }
                     
                     agrupado[claveAgrupacion].cantidad += cantidad;
                     agrupado[claveAgrupacion].tandas.add(tandaNum);
+                    agrupado[claveAgrupacion].detalles.push({ id, cantidad }); 
 
                     // Actualizar imprensoEnQuery con fecha y hora en cada envío si no existe
                     const fechaHora = new Date().toLocaleString('es-ES', { timeZone: 'America/Argentina/Buenos_Aires' });
@@ -3278,42 +3280,76 @@ async function generateQueryReport(date, selectedTandas) {
                 <h3 style="text-align:center; margin-bottom: 10px;">
                     Resumen ${date} - ${selectedTandas.length} Tanda(s)
                 </h3>
-                <p style="text-align:center; color:#666;">
-                    Total de ventas procesadas: ${totalVentas}
-                </p>
-                <p style="text-align:center; color:#666;">
-                    Total IDs excluidos (por imprensoEnQuery): ${excluidos.length > 0 ? excluidos.length : 0}
-                </p>
-                ${excludePrevious === 'Sí' && excluidos.length > 0 ? `<p style="text-align:center; color:#666;">Preparados Antes (Excluidos): ${excluidos.join(', ')}</p>` : ''}
-                <p style="text-align:center; color:#666;">
-                    Total SKU distintos: ${arrayAgrupado.length}
-                </p>
-                <p style="text-align:center; color:#666;">
-                    Ordenado por: Cantidad (de mayor a menor)
-                </p>
-                <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">
-                    <thead>
-                        <tr style="background-color: #4CAF50; color: white;">
-                            <th style="border: 1px solid #ddd; padding: 8px; width: 15%;">SKU</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; width: 10%;">⚠️</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; width: 60%;">Descripción</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; width: 10%;">Presea</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; width: 15%;">📦</th>
+                <p style="text-align:center; color:#666;">Total de ventas procesadas: ${totalVentas}</p>
+                <p style="text-align:center; color:#666;">Total IDs excluidos (por imprensoEnQuery): ${excluidos.length || 0}</p>
+                ${excludePrevious === 'Sí' && excluidos.length ? `<p style="text-align:center; color:#666;">Preparados Antes (Excluidos): ${excluidos.join(', ')}</p>` : ''}
+                <p style="text-align:center; color:#666;">Total SKU distintos: ${arrayAgrupado.length}</p>
+                <p style="text-align:center; color:#666;">Ordenado por: Cantidad (de mayor a menor)</p>
+                <table class="table table-bordered table-hover" style="font-family: Arial, sans-serif;">
+                    <thead class="table-success">
+                        <tr>
+                            <th style="width: 25%;">SKU</th>
+                            <th style="width: 10%;">⚠️</th>
+                            <th style="width: 50%;">Descripción</th>
+                            <th style="width: 10%;">Presea</th>
+                            <th style="width: 5%;">📦</th>
                         </tr>
                     </thead>
                     <tbody>
         `;
 
-        for (const item of arrayAgrupado) {
-            const tandasList = Array.from(item.tandas).sort((a,b) => b-a).join(', ');
-            
+        for (let index = 0; index < arrayAgrupado.length; index++) {
+            const item = arrayAgrupado[index];
+            const collapseId = `collapseDetalle-${index}`;
+            const tandasList = Array.from(item.tandas).sort((a, b) => b - a).join(', ');
+
             tablaHtml += `
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.sku}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.cantidad}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${item.producto}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.preseaStock}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 0.8em;">${tandasList}</td>
+                <tr>
+                    <td>
+                        <strong>${item.sku}</strong>
+                        <span 
+                            style="cursor:pointer; color: #999; font-size: 14px; margin-left: 4px;" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#${collapseId}" 
+                            aria-expanded="false" 
+                            aria-controls="${collapseId}"
+                            title="Ver detalles"
+                            onmouseover="this.style.color='#000'" 
+                            onmouseout="this.style.color='#999'">
+                            ▼
+                        </span>
+                    </td>
+                    <td style="text-align: center;">${item.cantidad}</td>
+                    <td>${item.producto}</td>
+                    <td style="text-align: center;">${item.preseaStock}</td>
+                    <td style="text-align: center; font-size: 0.8em;">${tandasList}</td>
+                </tr>
+                <tr class="collapse" id="${collapseId}">
+                    <td colspan="5">
+                        <div class="card-query-collapse mt-2 mb-2" style="padding: 10px; background-color: #f9f9f9; border: 1px solid #ccc;">
+                            <strong>Detalle de IDs y cantidades:</strong>
+                            <table class="table table-sm table-bordered mt-2 mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 80%;">ID</th>
+                                        <th style="width: 20%; text-align: center;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${item.detalles.map(det => `
+                                        <tr>
+                                            <td>
+                                                <a href="https://www.mercadolibre.com.ar/ventas/${det.id}/detalle" target="_blank" rel="noopener noreferrer">
+                                                    ${det.id}
+                                                </a>
+                                            </td>
+                                            <td style="text-align: center;">${det.cantidad}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
                 </tr>
             `;
         }
@@ -3323,6 +3359,19 @@ async function generateQueryReport(date, selectedTandas) {
                 </table>
             </div>
         `;
+
+        // Cambia icono en collapse
+        document.querySelectorAll('.toggle-collapse').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.dataset.target;
+            const row = document.getElementById(targetId);
+            const icon = document.getElementById('icon-' + targetId);
+            const isVisible = row.style.display === 'table-row';
+
+            row.style.display = isVisible ? 'none' : 'table-row';
+            icon.textContent = isVisible ? '▼' : '▲';
+            });
+        });
 
         // Cerrar loader antes de mostrar resultados
         await loadingSwal.close();
@@ -3369,7 +3418,13 @@ async function generateQueryReport(date, selectedTandas) {
                                 <p><strong>Total IDs excluidos (por imprensoEnQuery):</strong> ${excluidos.length > 0 ? excluidos.length : 0}</p>
                                 ${excludePrevious === 'Sí' && excluidos.length > 0 ? `<p><strong>Preparados Antes (Excluidos):</strong> ${excluidos.join(', ')}</p>` : ''}
                                 <p><strong>Ordenado por:</strong> Cantidad (de mayor a menor)</p>
-                                ${document.querySelector('#tablaReporte').innerHTML}
+                                ${
+                                    (() => {
+                                        const clone = document.querySelector('#tablaReporte').cloneNode(true);
+                                        clone.querySelectorAll('.collapse').forEach(el => el.remove());
+                                        return clone.innerHTML;
+                                    })()
+                                }
                             </body>
                         </html>
                     `);
