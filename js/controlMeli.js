@@ -3288,11 +3288,11 @@ async function generateQueryReport(date, selectedTandas) {
                 <table class="table table-bordered table-hover" style="font-family: Arial, sans-serif;">
                     <thead class="table-success">
                         <tr>
-                            <th style="width: 25%;">SKU</th>
+                            <th style="width: 20%;">SKU</th>
                             <th style="width: 10%;">⚠️</th>
                             <th style="width: 50%;">Descripción</th>
                             <th style="width: 10%;">Presea</th>
-                            <th style="width: 5%;">📦</th>
+                            <th style="width: 10%;">📦</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -3305,20 +3305,12 @@ async function generateQueryReport(date, selectedTandas) {
 
             tablaHtml += `
                 <tr>
-                    <td>
-                        <strong>${item.sku}</strong>
-                        <span 
-                            style="cursor:pointer; color: #999; font-size: 14px; margin-left: 4px;" 
-                            data-bs-toggle="collapse" 
-                            data-bs-target="#${collapseId}" 
-                            aria-expanded="false" 
-                            aria-controls="${collapseId}"
-                            title="Ver detalles"
-                            onmouseover="this.style.color='#000'" 
-                            onmouseout="this.style.color='#999'">
-                            ▼
-                        </span>
-                    </td>
+                <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">
+                    <strong>${item.sku}</strong>
+                    <button class="btn btn-sm btn-link toggle-collapse" data-target="collapseDetalle-${index}" style="font-size: 12px; padding-left: 6px;">
+                        <span id="icon-collapseDetalle-${index}">▼</span>
+                    </button>
+                </td>
                     <td style="text-align: center;">${item.cantidad}</td>
                     <td>${item.producto}</td>
                     <td style="text-align: center;">${item.preseaStock}</td>
@@ -3359,19 +3351,6 @@ async function generateQueryReport(date, selectedTandas) {
                 </table>
             </div>
         `;
-
-        // Cambia icono en collapse
-        document.querySelectorAll('.toggle-collapse').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const targetId = btn.dataset.target;
-            const row = document.getElementById(targetId);
-            const icon = document.getElementById('icon-' + targetId);
-            const isVisible = row.style.display === 'table-row';
-
-            row.style.display = isVisible ? 'none' : 'table-row';
-            icon.textContent = isVisible ? '▼' : '▲';
-            });
-        });
 
         // Cerrar loader antes de mostrar resultados
         await loadingSwal.close();
@@ -3434,6 +3413,19 @@ async function generateQueryReport(date, selectedTandas) {
                         win.close();
                     }, 500);
                 };
+
+                // Cambia icono en collapse
+                document.querySelectorAll('.toggle-collapse').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const targetId = btn.dataset.target;
+                        const row = document.getElementById(targetId);
+                        const icon = document.getElementById('icon-' + targetId);
+
+                        const isVisible = row.style.display === 'table-row';
+                        row.style.display = isVisible ? 'none' : 'table-row';
+                        icon.textContent = isVisible ? '▼' : '▲';
+                    });
+                });
             }
         });
 
