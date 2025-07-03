@@ -2473,7 +2473,7 @@ if (tandaNovogarBtn) {
         `;
             } else {
                 // Venta común
-                const sku = skuKeys[0] || item.sku;
+                const sku = item.sku;
                 const cantidad = item.cantidad;
 
                 bloquesSuperiores = `
