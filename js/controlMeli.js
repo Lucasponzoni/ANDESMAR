@@ -2702,7 +2702,9 @@ let etiquetaLimpia = item.etiquetaOriginal;
 
                                                 // Verificar si ya existe "preparadoEnColecta"
                                                 if (data.preparadoEnColecta) {
-                                                    etiquetasDuplicadas.push(`${ventaid} - Fue preparado en la colecta ${data.preparadoEnColecta} / Existe en planilla`);
+                                                etiquetasDuplicadas.push(
+                                                `\`${ventaid}\` - *Fue preparado en la colecta* :package: *${data.preparadoEnColecta}* / *En planilla* :white_check_mark:`
+                                                );
                                                 } else {
                                                     // Pushear la fecha en el nodo
                                                     await firebase.database().ref('/envios/' + ventaid).update({
@@ -3564,19 +3566,45 @@ async function enviarReporteWebhookFacturacion(datosFiltrados) {
         hour12: false 
     }).replace(',', 'h').replace('h', ', '); // Formato "26/10/24, 18:27h"
 
-    // Crear lista con emojis según la provincia
+    // Crear lista con color lateral y formato código y provincia uppercase
     const crearLista = (datos) => datos.map(({ ventaid, provincia }) => {
-        const emoji = provincia.toLowerCase() === 'tierra del fuego' ? '🌋' : '🏔️';
-        return `${ventaid} - ${provincia} ${emoji}`;
-    }).join('\n');
+    const provUpper = provincia.toUpperCase();
+    // Elegir emoji y color lateral
+    let emoji = '🏔️';   // default (otras provincias)
+    let color = '#999999'; // gris por defecto
 
-    const mensaje = `
-* * * * * * * * * * * * * * * * * * * * * * * *
-*Excluidos 🚫* ${datosFiltrados.length}\n
-${crearLista(datosFiltrados)}\n
-* * * * * * * * * * * * * * * * * * * * * * * *
-*🕑 Reporte de Envíos (${fechaHora})*
-    `;
+    if (provUpper === 'TIERRA DEL FUEGO') {
+        emoji = '🌋';
+        color = '#FF0000'; // rojo
+    } else if (provUpper === 'JUJUY') {
+        emoji = '🌄';
+        color = '#FFEB3B'; // amarillo
+    }
+
+    return {
+        color: color,
+        text: `\`${ventaid}\` - ${provUpper} ${emoji}`
+    };
+    });
+
+    // Construir attachments con cada línea
+    const attachments = crearLista(datosFiltrados).map(item => ({
+    color: item.color,
+    text: item.text,
+    mrkdwn_in: ['text']
+    }));
+
+    const mensaje = {
+    text: `Excluidos 🚫* ${datosFiltrados.length}`,
+    attachments: attachments.concat([
+        {
+        color: '#CCCCCC',
+        text: `*🕑 Reporte de Envíos (${fechaHora})*`,
+        mrkdwn_in: ['text']
+        }
+    ])
+    };
+
 
     try {
         await fetch(`${corsh}${HookMeli2}`, {
@@ -3596,56 +3624,109 @@ ${crearLista(datosFiltrados)}\n
 }
 
 async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados, etiquetasDuplicadas, selectedFolderDate, fileNameSinExtension) {
-    const fechaHora = new Date().toLocaleString('es-AR', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: '2-digit', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        hour12: false 
-    }).replace(',', 'h').replace('h', ', '); // Formato "20/05/25, 09:23"
+  const fechaHora = new Date().toLocaleString('es-AR', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: '2-digit', 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    hour12: false 
+  }).replace(',', 'h').replace('h', ', '); // Formato "20/05/25, 09:23"
 
-    const crearLista = (datos) => datos.map(id => `• ${id}`).join('\n');
+  // Función para formatear ids con backticks y color lateral según "tipo" (se puede mejorar si se conoce provincia)
+  const crearAttachments = (datos, color) => {
+    if (!datos || datos.length === 0) return [{
+      color: '#999999',
+      text: '_Ninguno_',
+      mrkdwn_in: ['text']
+    }];
 
-    let mensaje = `
-* * * * * * * * * * * * * * * * * * * * * * * *
-*⏰ Reporte de Envíos* (${fechaHora})\n
-🖨️ Imprimiste *${fileNameSinExtension}* del dia *${selectedFolderDate}*
-\n`;
+    return datos.map(id => ({
+      color: color,
+      text: `• \`${id}\``,
+      mrkdwn_in: ['text']
+    }));
+  };
 
-    mensaje += `*🟢 Agregados:* ${datosAgregados.length}\n${crearLista(datosAgregados) || 'Ninguno'}\n\n`;
+  // Definimos colores para cada tipo
+  const colorAgregados = '#36a64f';      // verde
+  const colorNoEncontrados = '#ff0000';  // rojo
+  const colorFiltrados = '#ffeb3b';      // amarillo
+  const colorDuplicados = '#ff8000';     // naranja
 
-    if (datosNoEncontrados.length > 0) {
-        mensaje += `*🔴 No Encontrados (Posible Carrito):* ${datosNoEncontrados.length}\n${crearLista(datosNoEncontrados)}\n\n`;
-    }
+  // Armar array attachments por secciones
+  let attachments = [];
 
-    if (datosFiltrados.length > 0) {
-        mensaje += `*🚫 Excluidos (Jujuy/Tierra del Fuego):* ${datosFiltrados.length}\n${crearLista(datosFiltrados)}\n\n`;
-    }
+  // Header con resumen general (texto plano)
+  attachments.push({
+    color: '#cccccc',
+    text: `*⏰ Reporte de Envíos* (${fechaHora})\n🖨️ Imprimiste *${fileNameSinExtension}* del día *${selectedFolderDate}*`,
+    mrkdwn_in: ['text']
+  });
 
-    if (etiquetasDuplicadas.length > 0) {
-        mensaje += `*⚠️ Duplicados:* ${etiquetasDuplicadas.length}\n${etiquetasDuplicadas.map(item => `• ${item}`).join('\n')}\n\n`;
-    } else {
-        mensaje += `*⚠️ Duplicados:* 0\n\n`;
-    }
+  // Agregados
+  attachments.push({
+    color: colorAgregados,
+    text: `*🟢 Agregados:* ${datosAgregados.length}`,
+    mrkdwn_in: ['text']
+  });
+  attachments = attachments.concat(crearAttachments(datosAgregados, colorAgregados));
 
-    mensaje += `* * * * * * * * * * * * * * * * * * * * * * * *\n`;
+  // No encontrados
+  attachments.push({
+    color: colorNoEncontrados,
+    text: `*🔴 No Encontrados (Posible Carrito):* ${datosNoEncontrados.length}`,
+    mrkdwn_in: ['text']
+  });
+  attachments = attachments.concat(crearAttachments(datosNoEncontrados, colorNoEncontrados));
 
-    try {
-        await fetch(`${corsh}${HookMeli}`, {
-            method: 'POST',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Content-Type': 'application/json',
-                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
-            },
-            body: JSON.stringify({ text: mensaje }),
-        });
-    } catch (error) {
-        console.error('Error al enviar el reporte:', error);
-    }
+  // Filtrados (Jujuy/Tierra del Fuego)
+  attachments.push({
+    color: colorFiltrados,
+    text: `*🚫 Excluidos (Jujuy/Tierra del Fuego):* ${datosFiltrados.length}`,
+    mrkdwn_in: ['text']
+  });
+  attachments = attachments.concat(crearAttachments(datosFiltrados, colorFiltrados));
+
+// Duplicados
+attachments.push({
+  color: colorDuplicados,
+  text: `*⚠️ Duplicados:* ${etiquetasDuplicadas.length}`,
+  mrkdwn_in: ['text']
+});
+
+// Agrega cada duplicado con formato enriquecido
+etiquetasDuplicadas.forEach((linea) => {
+  attachments.push({
+    color: colorDuplicados,
+    text: linea,
+    mrkdwn_in: ['text']
+  });
+});
+
+// Footer separador
+attachments.push({
+  color: '#cccccc',
+  text: `Procesado por *LogiPaq* - ${fechaHora}`,
+  mrkdwn_in: ['text']
+});
+
+  // Enviar payload completo a Slack webhook
+  try {
+    await fetch(`${corsh}${HookMeli}`, {
+      method: 'POST',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json',
+        'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+      },
+      body: JSON.stringify({ attachments }),
+    });
+  } catch (error) {
+    console.error('Error al enviar el reporte:', error);
+  }
 }
 
 async function enviarCorreoTanda(destinatarioEmail, nombreDestinatario, nombreTanda, horaSubida) {
