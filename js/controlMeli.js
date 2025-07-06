@@ -3551,76 +3551,67 @@ $('#etiquetasModal').on('shown.bs.modal', function () {
 });
 
 async function enviarReporteWebhookFacturacion(datosFiltrados) {
-    // Verificar si no hay datos filtrados
-    if (datosFiltrados.length === 0) {
-        console.log('No hay datos filtrados para enviar.');
-        return; // No enviar el reporte si no hay datos
-    }
+  if (datosFiltrados.length === 0) {
+    console.log('No hay datos filtrados para enviar.');
+    return;
+  }
 
-    const fechaHora = new Date().toLocaleString('es-AR', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: '2-digit', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        hour12: false 
-    }).replace(',', 'h').replace('h', ', '); // Formato "26/10/24, 18:27h"
+  const fechaHora = new Date().toLocaleString('es-AR', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: '2-digit', 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    hour12: false 
+  }).replace(',', 'h').replace('h', ', ');
 
-    // Crear lista con color lateral y formato código y provincia uppercase
-    const crearLista = (datos) => datos.map(({ ventaid, provincia }) => {
-    const provUpper = provincia.toUpperCase();
-    // Elegir emoji y color lateral
-    let emoji = '🏔️';   // default (otras provincias)
-    let color = '#999999'; // gris por defecto
+  // Formatear lista con emojis y colores (solo para texto, el color lateral será único)
+  const formatearListaTexto = (datos) => {
+    if (datos.length === 0) return '_Ninguno_';
+    return datos.map(({ ventaid, provincia }) => {
+      const provUpper = provincia.toUpperCase();
+      let emoji = '🏔️'; // default
 
-    if (provUpper === 'TIERRA DEL FUEGO') {
-        emoji = '🌋';
-        color = '#FF0000'; // rojo
-    } else if (provUpper === 'JUJUY') {
-        emoji = '🌄';
-        color = '#FFEB3B'; // amarillo
-    }
+      if (provUpper === 'TIERRA DEL FUEGO') emoji = '🌋';
+      else if (provUpper === 'JUJUY') emoji = '🌄';
 
-    return {
-        color: color,
-        text: `\`${ventaid}\` - ${provUpper} ${emoji}`
-    };
-    });
+      return `• \`${ventaid}\` - ${provUpper} ${emoji}`;
+    }).join('\n');
+  };
 
-    // Construir attachments con cada línea
-    const attachments = crearLista(datosFiltrados).map(item => ({
-    color: item.color,
-    text: item.text,
-    mrkdwn_in: ['text']
-    }));
+  const textoListado = formatearListaTexto(datosFiltrados);
 
-    const mensaje = {
-    text: `Excluidos 🚫* ${datosFiltrados.length}`,
-    attachments: attachments.concat([
-        {
+  const mensaje = {
+    text: `Excluidos 🚫 *${datosFiltrados.length}*`,
+    attachments: [
+      {
+        color: '#FFEB3B', // Podés usar un color general o manejar lógica más avanzada si querés
+        text: textoListado,
+        mrkdwn_in: ['text']
+      },
+      {
         color: '#CCCCCC',
         text: `*🕑 Reporte de Envíos (${fechaHora})*`,
         mrkdwn_in: ['text']
-        }
-    ])
-    };
+      }
+    ]
+  };
 
-
-    try {
-        await fetch(`${corsh}${HookMeli2}`, {
-            method: 'POST',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Content-Type': 'application/json',
-                'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
-            },
-            body: JSON.stringify({ text: mensaje }),
-        });
-    } catch (error) {
-        console.error('Error al enviar el reporte:', error);
-    }
+  try {
+    await fetch(`${corsh}${HookMeli2}`, {
+      method: 'POST',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json',
+        'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
+      },
+      body: JSON.stringify(mensaje),
+    });
+  } catch (error) {
+    console.error('Error al enviar el reporte:', error);
+  }
 }
 
 async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFiltrados, etiquetasDuplicadas, selectedFolderDate, fileNameSinExtension) {
@@ -3631,87 +3622,37 @@ async function enviarReporteWebhook(datosAgregados, datosNoEncontrados, datosFil
     hour: '2-digit', 
     minute: '2-digit', 
     hour12: false 
-  }).replace(',', 'h').replace('h', ', '); // Formato "20/05/25, 09:23"
+  }).replace(',', 'h').replace('h', ', ');
 
-  // Función para formatear ids con backticks y color lateral según "tipo" (se puede mejorar si se conoce provincia)
-  const crearAttachments = (datos, color) => {
-    if (!datos || datos.length === 0) return [{
-      color: '#999999',
-      text: '_Ninguno_',
-      mrkdwn_in: ['text']
-    }];
-
-    return datos.map(id => ({
+  // Función para convertir array a texto con viñetas y formato monospace
+  const formatearListaComoTexto = (titulo, datos, emoji, color) => {
+    const textoItems = (datos && datos.length > 0)
+      ? datos.map(id => `• \`${id}\``).join('\n')
+      : '_Ninguno_';
+    return {
       color: color,
-      text: `• \`${id}\``,
+      text: `${emoji} *${titulo}:* ${datos.length}\n${textoItems}`,
       mrkdwn_in: ['text']
-    }));
+    };
   };
 
-  // Definimos colores para cada tipo
-  const colorAgregados = '#36a64f';      // verde
-  const colorNoEncontrados = '#ff0000';  // rojo
-  const colorFiltrados = '#ffeb3b';      // amarillo
-  const colorDuplicados = '#ff8000';     // naranja
+  const attachments = [
+    {
+      color: '#cccccc',
+      text: `*⏰ Reporte de Envíos* (${fechaHora})\n🖨️ Imprimiste *${fileNameSinExtension}* del día *${selectedFolderDate}*`,
+      mrkdwn_in: ['text']
+    },
+    formatearListaComoTexto('Agregados', datosAgregados, '🟢', '#36a64f'),
+    formatearListaComoTexto('No Encontrados (Posible Carrito)', datosNoEncontrados, '🔴', '#ff0000'),
+    formatearListaComoTexto('Excluidos (Jujuy/Tierra del Fuego)', datosFiltrados, '🚫', '#ffeb3b'),
+    formatearListaComoTexto('Duplicados', etiquetasDuplicadas, '⚠️', '#ff8000'),
+    {
+      color: '#cccccc',
+      text: `Procesado por *LogiPaq* – ${fechaHora}`,
+      mrkdwn_in: ['text']
+    }
+  ];
 
-  // Armar array attachments por secciones
-  let attachments = [];
-
-  // Header con resumen general (texto plano)
-  attachments.push({
-    color: '#cccccc',
-    text: `*⏰ Reporte de Envíos* (${fechaHora})\n🖨️ Imprimiste *${fileNameSinExtension}* del día *${selectedFolderDate}*`,
-    mrkdwn_in: ['text']
-  });
-
-  // Agregados
-  attachments.push({
-    color: colorAgregados,
-    text: `*🟢 Agregados:* ${datosAgregados.length}`,
-    mrkdwn_in: ['text']
-  });
-  attachments = attachments.concat(crearAttachments(datosAgregados, colorAgregados));
-
-  // No encontrados
-  attachments.push({
-    color: colorNoEncontrados,
-    text: `*🔴 No Encontrados (Posible Carrito):* ${datosNoEncontrados.length}`,
-    mrkdwn_in: ['text']
-  });
-  attachments = attachments.concat(crearAttachments(datosNoEncontrados, colorNoEncontrados));
-
-  // Filtrados (Jujuy/Tierra del Fuego)
-  attachments.push({
-    color: colorFiltrados,
-    text: `*🚫 Excluidos (Jujuy/Tierra del Fuego):* ${datosFiltrados.length}`,
-    mrkdwn_in: ['text']
-  });
-  attachments = attachments.concat(crearAttachments(datosFiltrados, colorFiltrados));
-
-// Duplicados
-attachments.push({
-  color: colorDuplicados,
-  text: `*⚠️ Duplicados:* ${etiquetasDuplicadas.length}`,
-  mrkdwn_in: ['text']
-});
-
-// Agrega cada duplicado con formato enriquecido
-etiquetasDuplicadas.forEach((linea) => {
-  attachments.push({
-    color: colorDuplicados,
-    text: linea,
-    mrkdwn_in: ['text']
-  });
-});
-
-// Footer separador
-attachments.push({
-  color: '#cccccc',
-  text: `Procesado por *LogiPaq* - ${fechaHora}`,
-  mrkdwn_in: ['text']
-});
-
-  // Enviar payload completo a Slack webhook
   try {
     await fetch(`${corsh}${HookMeli}`, {
       method: 'POST',
