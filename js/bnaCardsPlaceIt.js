@@ -3053,8 +3053,7 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
     const productoLimitado = producto_nombre.length > 60 ? producto_nombre.substring(0, 60) + "..." : producto_nombre;
 
     // URL de la API para generar el código de barras
-    const barcodeApiUrl = `https://proxy.cors.sh/https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(numeroRemito)}&code=Code128&dpi=96`;
-
+    const barcodeApiUrl = `https://proxy.cors.sh/https://bwipjs-api.metafloor.com/?bcid=code128&text=${numeroRemito}&scale=3&height=10&includetext`;
     // Obtener el código de barras en formato Base64 usando el proxy CORS
     const response = await fetch(barcodeApiUrl, {
         method: 'GET',
