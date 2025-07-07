@@ -3155,6 +3155,11 @@ async function generarPDFPlaceIt(id, nombre, cp, localidad, provincia, remitoOrd
                 margin: 5px 0; 
                 border-radius: 5px;
             }
+            .campo-extra img {
+                max-width: 100%;
+                height: auto;
+                display: block;
+            }
             </style>
         </head>
         <body>

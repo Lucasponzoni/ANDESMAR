@@ -1859,6 +1859,11 @@ async function descargarEtiquetaMini(NombreyApellido, Cp, localidad, provincia, 
             .contacto p {
                 margin: 5px 0;
             }
+            .campo-extra img {
+                max-width: 100%;
+                height: auto;
+                display: block;
+            }
             </style>
         </head>
         <body>
@@ -3420,7 +3425,11 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
                     margin: 5px 0; 
                     border-radius: 5px;
                 }
-
+                .campo-extra img {
+                    max-width: 100%;
+                    height: auto;
+                    display: block;
+                }
             </style>
         </head>
         <body>

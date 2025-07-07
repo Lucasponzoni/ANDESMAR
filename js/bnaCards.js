@@ -6535,7 +6535,11 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
             .contacto p {
                 margin: 5px 0;
             }
-
+            .campo-extra img {
+                max-width: 100%;
+                height: auto;
+                display: block;
+            }
             hr {
                     border: none; 
                     height: 1px; 
