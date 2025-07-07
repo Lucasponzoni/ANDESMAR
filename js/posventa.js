@@ -3238,6 +3238,7 @@ function ejecutarControlRapido() {
                                   textoFila.includes('Lo enviaremos de regreso') ||
                                   textoFila.includes('Devolución en revisión') ||
                                   textoFila.includes('Enviaremos tu producto de regreso porque la persona que lo compró solicitó la cancelación') ||
+                                  textoFila.includes('Enviaremos tu producto de regreso porque la persona que lo compró rechazó la entrega') ||
                                   textoFila.includes('Devolución en camino a revisión') ||
                                   textoFila.includes('Si no llega para el') ||
                                   textoFila.includes('Le avisamos a la persona que te compró que ya puede iniciar la devolución') ||

@@ -2246,9 +2246,13 @@ if (tandaNovogarBtn) {
                     descripcion = descNuevoMatch ? descNuevoMatch[1].trim() : '';
 
                     // ⚠️ AGREGAR MANUALMENTE SKUS NO RECONOCIDOS POR ML
-                    if (descripcion === "Microondas Bgh 28 Litros Digital Eco B228ds20" && !skuNuevoMatch) {
-                        sku = "B228DS20";
-                    }
+                    if (
+                    (descripcion === "Microondas Bgh 28 Litros Digital Eco B228ds20" || 
+                    descripcion === "Microondas Digital Plata 28lts Con Grill 1250w Bgh") 
+                    && !skuNuevoMatch
+                    ) {
+                    sku = "B228DS20";
+}
                     // ⚠️ FIN AGREGAR MANUALMENTE SKUS NO RECONOCIDOS POR ML
 
                     descripcion = descripcion.substring(0, 30);
@@ -2402,45 +2406,109 @@ if (tandaNovogarBtn) {
         `;
         } else {
             const bloques = item.etiquetaOriginal.split(/\^FS\s*/);
-            const skusConCantidad = [];
 
-            for (let i = 0; i < bloques.length; i++) {
-                const matchSKU = bloques[i].match(/SKU:\s*([A-Z0-9\-_]+)/i);
-                if (matchSKU) {
-                    const sku = matchSKU[1].trim();
-                    let cantidad = 1;
+        // Extraer cantidades por SKU y descripciones
+        let skusConCantidad = [];
+        const descripcionesSKU = {};
 
-                    // Buscar hacia atrás un bloque con ^FD<number>^FS seguido por ^FDUnidades^FS
+        for (let i = 0; i < bloques.length; i++) {
+            const matchSKU = bloques[i].match(/SKU:\s*([A-Z0-9\-_]+)/i);
+            if (matchSKU) {
+                const sku = matchSKU[1].trim();
+                let cantidad = 1;
+
+                // Buscar cantidad en línea anterior con "| 2 u." o similar
+                const lineaAnterior = bloques[i - 1] || '';
+                const matchCantidadEnDescripcion = lineaAnterior.match(/\|\s*(\d+)\s*(u\.|unidad(es)?)?/i);
+                if (matchCantidadEnDescripcion) {
+                    cantidad = parseInt(matchCantidadEnDescripcion[1]);
+                } else {
+                    // Buscar hacia atrás una línea con ^FD<número>^FS + 'Unidades'
                     for (let j = i - 1; j >= 0; j--) {
                         const matchCantidad = bloques[j].match(/\^FD(\d+)\^FS/);
                         const matchUnidades = bloques[j + 1]?.includes('Unidades') || bloques[j + 1]?.includes('Unidad');
-
                         if (matchCantidad && matchUnidades) {
                             cantidad = parseInt(matchCantidad[1]);
                             break;
                         }
                     }
-
-                    skusConCantidad.push({ sku, cantidad });
                 }
+
+                // Buscar descripción hacia atrás ignorando líneas con SKU o Color
+                let descripcion = '';
+                for (let j = i - 1; j >= 0; j--) {
+                    const matchDescripcion = bloques[j].match(/\^FD(.+?)\^FS/);
+                    if (matchDescripcion) {
+                        const texto = matchDescripcion[1].trim();
+                        if (!/SKU:/i.test(texto) && !/Color:/i.test(texto)) {
+                            descripcion = texto;
+                            break;
+                        }
+                    }
+                }
+
+                skusConCantidad.push({ sku, cantidad });
+                descripcionesSKU[sku] = descripcion;
             }
+        }
 
-            // Eliminar duplicados de SKU (puede haber más de una aparición del mismo SKU)
-            const conteoFinal = {};
-            skusConCantidad.forEach(({ sku, cantidad }) => {
-                conteoFinal[sku] = (conteoFinal[sku] || 0) + cantidad;
-            });
+        // Agrupar cantidades por SKU
+        const conteoFinal = {};
+        skusConCantidad.forEach(({ sku, cantidad }) => {
+            conteoFinal[sku] = (conteoFinal[sku] || 0) + cantidad;
+        });
 
-            const skuKeys = Object.keys(conteoFinal);
+        // Buscar total de unidades desde ^FD o ^GB
+        let totalUnidades = 0;
+        for (let k = 0; k < bloques.length; k++) {
+            if (/Unidades/i.test(bloques[k])) {
+                const anterior = bloques[k - 1];
+                console.log("Bloque anterior a 'Unidades':", anterior);
+                
+                // Match más flexible: no requiere ^FS
+                const matchFD = anterior?.match(/\^FD(\d+)/);
+                if (matchFD) {
+                    totalUnidades = parseInt(matchFD[1]);
+                    console.log("Total Unidades extraído con ^FD:", totalUnidades);
+                } else {
+                    // Intentar extraer del bloque ^GB si no se encuentra en ^FD
+                    for (let j = k - 1; j >= 0; j--) {
+                        const matchGB = bloques[j]?.match(/\^GB\d+,\d+,(\d+)\^FS/);
+                        if (matchGB) {
+                            totalUnidades = parseInt(matchGB[1]);
+                            console.log("Total Unidades extraído con ^GB:", totalUnidades);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
 
-            if (skuKeys.length >= 2) {
-                const sku1 = skuKeys[0];
-                const cantidad1 = conteoFinal[sku1];
-                const sku2 = skuKeys[1];
-                const cantidad2 = conteoFinal[sku2];
+        // Armar bloques superiores
+        const skuKeys = Object.keys(conteoFinal);
 
-                 // Carrito de Compras
-                bloquesSuperiores = `
+        if (skuKeys.length >= 2) {
+            const sku1 = skuKeys[0];
+            const sku1Safe = sku1.replace(/-/g, '\\2D');
+            const cantidad1 = conteoFinal[sku1];
+            const sku2 = skuKeys[1];
+            const sku2Safe = sku2.replace(/-/g, '\\2D');
+            const cantidad2 = conteoFinal[sku2];
+
+            const sumaCantidades = cantidad1 + cantidad2;
+
+            const mensajeVerificacion = sumaCantidades === totalUnidades
+                ? "LOGIPAQ: VERIFIQUE CANTIDADES Y COINCIDEN"
+                : "LOGIPAQ: NO COINCIDEN CANTIDADES, VERIFICAR";
+
+            console.log("cantidad1:", cantidad1);
+            console.log("cantidad2:", cantidad2);
+            console.log("sumaCantidades:", sumaCantidades);
+            console.log("totalUnidades (extraído):", totalUnidades);
+            console.log("¿Son iguales?", sumaCantidades === totalUnidades);
+
+            bloquesSuperiores = `
         ^FX LAST CLUSTER ^FS
         ^FO20,1^GB760,45,1^FS
         ^FO20,6^A0N,45,45^FB760,1,0,C^FDVENTA: ${item.ventaCompleta}^FS
@@ -2450,33 +2518,34 @@ if (tandaNovogarBtn) {
         ^FO20,62^GB760,45,1,B,1^FS           
         ^FO20,62^GB760,45,45,B,1^FS         
         ^FO20,67^A0N,45,45^FB760,1,0,C^FR^FH^FD^CI28^CFA,45,45^FS
-        ^FO20,67^A0N,45,45^FB760,1,0,C^FR^FD!!--CARRITO DE COMPRAS--!!^FS  
+        ^FO20,67^A0N,45,45^FB760,1,0,C^FR^FD///CARRITO DE COMPRAS///^FS  
         ^FX END LAST CLUSTER ^FS
 
         ^FX LAST CLUSTER ^FS
         ^FO20,120^GB760,45,1^FS
-        ^FO20,126^A0N,45,45^FB760,1,0,C^FD${cantidad1} / SKU: ${sku1}^FS
+        ^FO20,126^A0N,45,45^FB760,1,0,C^FD${cantidad1} / SKU: ${sku1Safe}^FS
         ^FX END LAST CLUSTER ^FS
 
         ^FX LAST CLUSTER ^FS
-        ^FO20,175^A0N,30,30^FB760,3,10,C^FD${item.descripcion}^FS
+        ^FO20,180^GB760,45,1^FS
+        ^FO20,186^A0N,45,45^FB760,1,0,C^FD${cantidad2} / SKU: ${sku2Safe}^FS
         ^FX END LAST CLUSTER ^FS
 
         ^FX LAST CLUSTER ^FS
-        ^FO20,210^GB760,45,1^FS
-        ^FO20,210^A0N,45,45^FB760,1,0,C^FD${cantidad2} / SKU: ${sku2}^FS
+        ^FO20,240^A0N,30,30^FB760,3,10,C^FD${mensajeVerificacion}^FS
         ^FX END LAST CLUSTER ^FS
 
         ^FX LAST CLUSTER ^FS
-        ^FO20,260^A0N,30,30^FB760,3,10,C^FD${item.descripcion}^FS
+        ^FO20,280^A0N,30,30^FB760,3,10,C^FDTOTAL DETECTADO: ${sumaCantidades} UNIDADES^FS
         ^FX END LAST CLUSTER ^FS
         `;
-            } else {
-                // Venta común
-                const sku = item.sku;
-                const cantidad = item.cantidad;
+        }
+        else {
+            // Venta común
+            const sku = item.sku;
+            const cantidad = item.cantidad;
 
-                bloquesSuperiores = `
+            bloquesSuperiores = `
         ^FX LAST CLUSTER ^FS
         ^FO20,1^GB760,45,1^FS
         ^FO20,6^A0N,45,45^FB760,1,0,C^FDVENTA: ${item.ventaCompleta}^FS
@@ -2502,7 +2571,7 @@ if (tandaNovogarBtn) {
 
         ${bloqueGFA}
         `;
-            }
+        }
         }
 
 // LIMPIEZA ETIQUETA ORIGINAL (ya incluido como lo tenés):
@@ -2539,6 +2608,9 @@ let etiquetaLimpia = item.etiquetaOriginal;
     /\^FO450,30\^A0N,20,20\^FB330,2,0,L\^FH\^FDRecortá esta parte de la etiqueta para que tu paquete viaje seguro.\^FS/,
     /\^FO0,90\^GB810,2,1\^FS/,
     /\^FO150,100\^GB30,30,3\^FS/,
+    /\^FO200,100\^A0N,27,27\^FB570,2,-1\^FH\^FD.*?\^FS/,
+    /\^FO200,154\^A0N,24,24\^FB570,2,-1\^FH\^FDColor:.*?SKU:.*?\^FS/,
+
     /\^FX LAST CLUSTER.*?\^FX END LAST CLUSTER\s*\^FS/gs
 
 ].forEach(regex => {
