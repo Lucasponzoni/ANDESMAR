@@ -2491,6 +2491,7 @@ if (tandaNovogarBtn) {
         if (skuKeys.length >= 2) {
             const sku1 = skuKeys[0];
             const sku1Safe = sku1.replace(/-/g, '\\2D');
+            
             const cantidad1 = conteoFinal[sku1];
             const sku2 = skuKeys[1];
             const sku2Safe = sku2.replace(/-/g, '\\2D');
@@ -2523,12 +2524,12 @@ if (tandaNovogarBtn) {
 
         ^FX LAST CLUSTER ^FS
         ^FO20,120^GB760,45,1^FS
-        ^FO20,126^A0N,45,45^FB760,1,0,C^FD${cantidad1} / SKU: ${sku1Safe}^FS
+        ^FO20,126^A0N,45,45^FB760,1,0,C^FH^FD${cantidad1} / SKU: ${sku1Safe}^FS
         ^FX END LAST CLUSTER ^FS
 
         ^FX LAST CLUSTER ^FS
         ^FO20,180^GB760,45,1^FS
-        ^FO20,186^A0N,45,45^FB760,1,0,C^FD${cantidad2} / SKU: ${sku2Safe}^FS
+        ^FO20,186^A0N,45,45^FB760,1,0,C^FH^FD${cantidad2} / SKU: ${sku2Safe}^FS
         ^FX END LAST CLUSTER ^FS
 
         ^FX LAST CLUSTER ^FS
