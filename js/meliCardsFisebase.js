@@ -1763,7 +1763,7 @@ async function descargarEtiquetaMini(NombreyApellido, Cp, localidad, provincia, 
     const productoLimitado = producto.length > 60 ? producto.substring(0, 60) + "..." : producto;
 
     // URL de la API para generar el código de barras
-    const barcodeApiUrl = `https://bwipjs-api.metafloor.com/?bcid=code128&text=${idOperacionFinal2}&scale=3&height=10&includetext`;
+    const barcodeApiUrl = `https://proxy.cors.sh/https://bwipjs-api.metafloor.com/?bcid=code128&text=${idOperacionFinal2}&scale=3&height=10&includetext`;
 
     // Obtener el código de barras en formato Base64 usando el proxy CORS
     const response = await fetch(barcodeApiUrl, {
