@@ -1719,7 +1719,7 @@ COMPRA CON USO DE PUNTOS BNA
                     <div class="button-container-cds">
                         <button id="facturar-automata-${data[i].id}" 
                                 class="btn ${data[i].cancelado ? 'btn-secondary' : (data[i].datoFacturacion ? 'btn-success' : 'btn-primary')}" 
-                                onclick="marcarFacturado2('${data[i].id}', '${data[i].email}', '${data[i].nombre}', '${data[i].remito}')"
+                                onclick="marcarFacturado2('${data[i].id}', '${data[i].email}', '${data[i].nombre.replace(/'/g, '')}', '${data[i].remito}')"
                                 ${data[i].cancelado ? 'disabled' : (data[i].datoFacturacion ? 'disabled' : '')}>
                             ${data[i].cancelado ? '<i class="bi bi-x-octagon"></i> Sin facturar Cancelado' : (data[i].datoFacturacion ? '<i class="bi bi-check2-circle"></i> Ya Facturado' : '<i class="bi bi-robot"></i> Facturar')}
                         </button>
@@ -2172,13 +2172,13 @@ ${data[i].order ? `
                             </div>
                                     
                                     
-                                    <button id="marcar-facturado-${data[i].id}" type="button" 
-                                    class="btn ${data[i].cancelado ? 'btn-danger' : (hasDatoFacturacion ? 'btn-success' : 'btn-danger')} w-100 mb-1" 
-                                    ${hasDatoFacturacion ? 'disabled' : ''} 
-                                    onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}', '${data[i].email}', '${data[i].nombre}', '${data[i].remito}')`}">
-                                    ${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
-                                    <i class="bi bi-lock-fill icono"></i>
-                                    </button>
+                            <button id="marcar-facturado-${data[i].id}" type="button" 
+                                class="btn ${data[i].cancelado ? 'btn-danger' : (hasDatoFacturacion ? 'btn-success' : 'btn-danger')} w-100 mb-1" 
+                                ${hasDatoFacturacion ? 'disabled' : ''} 
+                                onclick="${hasDatoFacturacion ? '' : `marcarFacturado('${data[i].id}', '${data[i].email}', '${data[i].nombre.replace(/'/g, '')}', '${data[i].remito}')`}">
+                                ${hasDatoFacturacion ? data[i].datoFacturacion : 'Marcar Facturado'} 
+                                <i class="bi bi-lock-fill icono"></i>
+                            </button>
 
                             <!-- Botón para abrir el modal -->
                             <button id="infoFacturacionButton${data[i].id}" class="btn btn-warning mt-1 w-100" data-bs-toggle="modal" data-bs-target="#infoFacturacionModal${data[i].id}">
@@ -3267,12 +3267,12 @@ const cuit = document.getElementById(`cuit_${id}`)?.value || '';
 const monto_total = document.getElementById(`monto_total_${id}`)?.value || '';
 const razon_social = document.getElementById(`razon_social_${id}`)?.value || '';
 
-if (dni && dni !== "") { // Verifica si DNI tiene datos 
+if (dni && dni !== "") {
     tipo = "TIPO B";
-    mensajeTipo = `🟢 **TIPO B:** El total es *$${monto_total}* 💰`;
-} else if (cuit && cuit !== "") { // Verifica si CUIT tiene datos
+    mensajeTipo = `🟢 *TIPO B:* El total es *$${monto_total}* 💰`;
+} else if (cuit && cuit !== "") {
     tipo = "TIPO A";
-    mensajeTipo = `🔴 **TIPO A:** A la RAZÓN SOCIAL *${razon_social}*, el total es *$${monto_total}* 💳`;
+    mensajeTipo = `🔴 *TIPO A:* A la RAZÓN SOCIAL *${razon_social}*, el total es *$${monto_total}* 💳`;
 } else {
     mensajeTipo = `❌ No se proporcionaron datos válidos para determinar el tipo.`;
 }
@@ -3284,9 +3284,49 @@ const codigo_item = document.getElementById(`codigo_item_${id}`)?.value || 'Cód
 const precio_item = document.getElementById(`precio_item_${id}`)?.value || '0';
 const monto_envio = document.getElementById(`monto_envio_${id}`)?.value || '0';
 
-// Enviar notificación a Slack
+// Fecha actual en formato 24 hs
+const fecha = new Date();
+const fechaFormateadaFooter = fecha.toLocaleString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+});
+
 const mensajeSlack = {
-    text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n➡️📄 Estoy procesando la factura de la Orden *\`${codigo_pago}\`* de *${metodo_pago_TV}*\n\n 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n ${mensajeTipo} 🎉 \n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
+    attachments: [
+        {
+            color: "#2eb886", // línea lateral verde
+            pretext: `➡️📄 *Procesando factura de la Orden* \`${codigo_pago}\` desde *${metodo_pago_TV}*`,
+            fields: [
+                {
+                    title: "Producto",
+                    value: `${cantidad_item} x ${codigo_item} 🛒`,
+                    short: true
+                },
+                {
+                    title: "Precio Unitario",
+                    value: `$${precio_item}`,
+                    short: true
+                },
+                {
+                    title: "Envío",
+                    value: `$${monto_envio} 🚚`,
+                    short: true
+                },
+                {
+                    title: "Tipo de Factura",
+                    value: mensajeTipo,
+                    short: false
+                }
+            ],
+            footer: `🧠 LogiPaq ● ${fechaFormateadaFooter}`,
+            ts: Math.floor(Date.now() / 1000)
+        }
+    ]
 };
 
 fetch(`${corsh}${HookTv}`, {
@@ -3417,55 +3457,101 @@ async function marcarFacturado3(id, email, nombre, remito) {
         errorSlack: false,
     });
     
-    // Determinar el tipo basado en los datos de DNI y CUIT
-    let tipo;
-    let mensajeTipo;
+// Determinar el tipo basado en los datos de DNI y CUIT
+let tipo;
+let mensajeTipo;
 
-    const dni = document.getElementById(`dni_${id}`)?.value || '';
-    const cuit = document.getElementById(`cuit_${id}`)?.value || '';
-    const monto_total = document.getElementById(`monto_total_${id}`)?.value || '';
-    const razon_social = document.getElementById(`razon_social_${id}`)?.value || '';
+const dni = document.getElementById(`dni_${id}`)?.value || '';
+const cuit = document.getElementById(`cuit_${id}`)?.value || '';
+const monto_total = document.getElementById(`monto_total_${id}`)?.value || '';
+const razon_social = document.getElementById(`razon_social_${id}`)?.value || '';
 
-    if (dni && dni !== "") { // Verifica si DNI tiene datos 
-        tipo = "TIPO B";
-        mensajeTipo = `🟢 **TIPO B:** El total es *$${monto_total}* 💰`;
-    } else if (cuit && cuit !== "") { // Verifica si CUIT tiene datos
-        tipo = "TIPO A";
-        mensajeTipo = `🔴 **TIPO A:** A la RAZÓN SOCIAL *${razon_social}*, el total es *$${monto_total}* 💳`;
-    } else {
-        mensajeTipo = `❌ No se proporcionaron datos válidos para determinar el tipo.`;
-    }
+if (dni && dni !== "") {
+    tipo = "TIPO B";
+    mensajeTipo = `🟢 *TIPO B:* El total es *$${monto_total}* 💰`;
+} else if (cuit && cuit !== "") {
+    tipo = "TIPO A";
+    mensajeTipo = `🔴 *TIPO A:* A la RAZÓN SOCIAL *${razon_social}*, el total es *$${monto_total}* 💳`;
+} else {
+    mensajeTipo = `❌ No se proporcionaron datos válidos para determinar el tipo.`;
+}
 
-    const codigo_pago = document.getElementById(`codigo_pago_${id}`)?.value || 'Código no disponible';
-    const cantidad_item = document.getElementById(`cantidad_item_${id}`)?.value || '0';
-    const metodo_pago_TV = document.getElementById(`metodo_pago_${id}`)?.value || 'SIN DATO DE LA TIENDA';
-    const codigo_item = document.getElementById(`codigo_item_${id}`)?.value || 'Código no disponible';
-    const precio_item = document.getElementById(`precio_item_${id}`)?.value || '0';
-    const monto_envio = document.getElementById(`monto_envio_${id}`)?.value || '0';
+const codigo_pago = document.getElementById(`codigo_pago_${id}`)?.value || 'Código no disponible';
+const cantidad_item = document.getElementById(`cantidad_item_${id}`)?.value || '0';
+const metodo_pago_TV = document.getElementById(`metodo_pago_${id}`)?.value || 'SIN DATO DE LA TIENDA';
+const codigo_item = document.getElementById(`codigo_item_${id}`)?.value || 'Código no disponible';
+const precio_item = document.getElementById(`precio_item_${id}`)?.value || '0';
+const monto_envio = document.getElementById(`monto_envio_${id}`)?.value || '0';
 
-    // Enviar notificación a Slack
-    const mensajeSlack = {
-        text: `\n\n* * * * * * * * * * * * * * * * * * * * * * * *\n🔁📄 Estoy *Re-Procesando por ERROR DE SLACK* la factura de la Orden *\`${codigo_pago}\`* de *${metodo_pago_TV}*\n\n 🧾 por *${cantidad_item}* U. de *${codigo_item}* 🛒 a *$${precio_item}* por unidad y *$${monto_envio}* de envío 🚚. \n\n 🟡 **REPROCESO:** Error de Slack \n\n ${mensajeTipo} 🎉 \n\n* * * * * * * * * * * * * * * * * * * * * * * *\n\n`
-    };
+// Fecha y hora actual formateada
+const fecha = new Date();
+const fechaFormateadaReProceso = fecha.toLocaleString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+});
 
-    fetch(`${corsh}${HookTv}`, {
-        method: 'POST',
-        headers: {
-            'x-cors-api-key': `${live}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(mensajeSlack)
-    }).then(response => {
-        if (!response.ok) {
-            throw new Error('Error al enviar el mensaje a Slack');
+// Enviar notificación a Slack
+const mensajeSlack = {
+    attachments: [
+        {
+            color: "#FFA500", // línea lateral naranja
+            pretext: `🔁📄 *Re-procesando por ERROR DE SLACK* la factura de la Orden \`${codigo_pago}\` desde *${metodo_pago_TV}*`,
+            fields: [
+                {
+                    title: "Producto",
+                    value: `${cantidad_item} x ${codigo_item} 🛒`,
+                    short: true
+                },
+                {
+                    title: "Precio Unitario",
+                    value: `$${precio_item}`,
+                    short: true
+                },
+                {
+                    title: "Envío",
+                    value: `$${monto_envio} 🚚`,
+                    short: true
+                },
+                {
+                    title: "Reproceso",
+                    value: `🟡 *REPROCESO:* Error de Slack`,
+                    short: false
+                },
+                {
+                    title: "Tipo de Factura",
+                    value: mensajeTipo,
+                    short: false
+                }
+            ],
+            footer: `🧠 LogiPaq ● ${fechaFormateadaReProceso}`,
+            ts: Math.floor(Date.now() / 1000)
         }
-    }).catch(error => {
-        console.error('Error:', error);
-    });
+    ]
+};
 
-    databaseRef.on('value', snapshot => {
-        loadEnviosFromFirebase(); 
-    });      
+fetch(`${corsh}${HookTv}`, {
+    method: 'POST',
+    headers: {
+        'x-cors-api-key': `${live}`,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(mensajeSlack)
+}).then(response => {
+    if (!response.ok) {
+        throw new Error('Error al enviar el mensaje a Slack');
+    }
+}).catch(error => {
+    console.error('Error:', error);
+});
+
+databaseRef.on('value', snapshot => {
+    loadEnviosFromFirebase(); 
+});
 }
 
 function cerrarModal(id) {
