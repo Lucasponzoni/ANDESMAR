@@ -2609,6 +2609,8 @@ let etiquetaLimpia = item.etiquetaOriginal;
     /\^FO450,30\^A0N,20,20\^FB330,2,0,L\^FH\^FDRecortá esta parte de la etiqueta para que tu paquete viaje seguro.\^FS/,
     /\^FO0,90\^GB810,2,1\^FS/,
     /\^FO150,100\^GB30,30,3\^FS/,
+    /\^FO200,202\^A0N,27,27\^FB570,2,-1\^FH\^FD[^\^]+\^FS/,
+    /\^FO200,256\^A0N,24,24\^FB570,2,-1\^FH\^FD[^\^]+\^FS/,
     /\^FO200,100\^A0N,27,27\^FB570,2,-1\^FH\^FD.*?\^FS/,
     /\^FO200,154\^A0N,24,24\^FB570,2,-1\^FH\^FDColor:.*?SKU:.*?\^FS/,
 
