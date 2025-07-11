@@ -32,6 +32,10 @@ const obtenerCredencialesCDS = async () => {
         chat = data[15];
         brainsysUser = data[16];
         brainsysPass = data[17];
+        appK = data[24];
+        appTk = data[25];
+        AcNm = data[26];
+        HookBPro = data[27];
         console.log(`CDS Credentials OK`);
     } catch (error) {
         console.error('Error al obtener cred de Fire:', error);
