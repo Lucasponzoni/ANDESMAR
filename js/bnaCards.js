@@ -2485,7 +2485,7 @@ document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', 
                 title: '🔒 Número de factura requerido',
                 html: `
                     <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:10px;">
-                        <p style="margin:0;font-size:15px;color:#555;">Ingresá el número de factura <b>sin ceros</b> al inicio ni guiones.</p>
+                        <p style="margin:0;font-size:15px;color:#555;">Ingresá el número de factura <b>sin ceros</b> al inicio.</p>
                         <p style="margin:5px 0;font-size:13px;color:gray;">Ejemplo: <code>2450001234</code></p>
                     </div>
                 `,
