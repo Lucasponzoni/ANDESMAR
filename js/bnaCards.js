@@ -2549,9 +2549,11 @@ document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', 
                     <i class="fas fa-spinner fa-spin" style="color: orange;"></i> Paso 3: Enviando notificación a Slack...
                 </li>
             </ul>
-            <button id="glass-ok" style="display:none;margin-top:15px;padding:8px 18px;border:none;border-radius:8px;background:#d33;color:#fff;cursor:pointer;">
+            <div style="text-align:center; margin-top:15px;">
+            <button id="glass-ok" style="display:none;padding:8px 18px;border:none;border-radius:8px;background:#d33;color:#fff;cursor:pointer;">
                 OK
             </button>
+            </div>
         `;
 
         document.body.appendChild(glass);
