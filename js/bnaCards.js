@@ -2471,35 +2471,159 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
     });
 });
 
-// Evento para manejar el cambio del switch "Entregado"
-document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function() {
-    const nuevoEstado = this.checked ? 'Si' : 'No';
+                // Evento para manejar el cambio del switch "Entregado"
+                document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function () {
+                    const nuevoEstado = this.checked ? 'Si' : 'No';
+                    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
+                    databaseRef.off();
 
-    // Desactivar la escucha de cambios
-    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
-    databaseRef.off();
+                    firebase.database().ref('enviosBNA/' + data[i].id).update({ marcaEntregado: nuevoEstado })
+                    .then(async () => {
+                        console.log(`📦 Firebase actualizado: ${nuevoEstado}`);
+                        const cnt = document.getElementById('contadorCards2');
+                        if (cnt) cnt.innerText = this.checked ? Math.max(parseInt(cnt.innerText) || 0 - 1, 0) : parseInt(cnt.innerText) || 0 + 1;
 
-    // Actualizar en Firebase
-    firebase.database().ref('enviosBNA/' + data[i].id).update({
-        marcaEntregado: nuevoEstado
-    }).then(() => {
-        console.log(`Estado de entrega actualizado a: ${nuevoEstado}`);
-        
-        // Actualizar el badge
-        const contadorCards2 = document.getElementById('contadorCards2');
-        if (contadorCards2) {
-            const currentCount = parseInt(contadorCards2.innerText) || 0;
-            contadorCards2.innerText = this.checked ? Math.max(currentCount - 1, 0) : currentCount + 1; // Resta si está marcado, suma si está desmarcado
-        }
-    }).catch(error => {
-        console.error("Error al actualizar el estado de entrega: ", error);
-    }).finally(() => {
-        // Volver a habilitar la escucha de cambios
-        databaseRef.on('value', snapshot => {
-            // Aquí puedes manejar la actualización de datos si es necesario
-        });
-    });
-});
+                        if (nuevoEstado === 'Si' && data[i].orden_publica_?.toUpperCase().startsWith('BPR')) {
+                            const ordenVTEX = data[i].orden_publica_;
+                            const ciudad = data[i].localidad || 'Sin ciudad';
+                            const provincia = data[i].provincia || 'Sin provincia';
+                            const appKey = 'vtexappkey-novogar252-NOVGUS';
+                            const appToken = 'PRQTKHHBSNNCCOFSMOXXEFYTREDZTDUDDUBPELZTPOVEKDIRBTGMAOLIDTVDRPFMAFTUVUAUPQIRRYYSGMXMRBTLWMITNUBZPTDCYYVMZIZQJAGTFNHPLLYDMHGHVLKU';
+                            const accountName = 'novogar252';
+                            const slackWebhook = 'https://hooks.slack.com/services/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';
+                            const ahora = new Date();
+                            const deliveredDate = ahora.toISOString().slice(0, 16).replace('T', ' ');
+
+                            // Obtener el número de factura del contenedor
+                            const facturaTexto = document.getElementById(`factura-tv-${data[i].id}`)?.innerText || '';
+                            let invoiceNumber = facturaTexto.split('-')[1]?.trim() || '';
+
+                            // Si no se puede obtener el invoiceNumber, solicitarlo al usuario
+                            if (!invoiceNumber) {
+                                const { value: inputInvoice } = await Swal.fire({
+                                    title: '⚠️ No pude obtener el número de factura',
+                                    input: 'text',
+                                    inputPlaceholder: 'Ingresa el número de factura (sin ceros ni guiones)',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Aceptar',
+                                    cancelButtonText: 'Cancelar',
+                                    inputValidator: (value) => {
+                                        if (!value) {
+                                            return '¡Debes ingresar un número de factura!';
+                                        }
+                                        return null;
+                                    }
+                                });
+                                if (inputInvoice) {
+                                    invoiceNumber = inputInvoice; // Usar el número ingresado
+                                } else {
+                                    return; // Si se cancela, salir de la función
+                                }
+                            }
+
+                            // Formatos a probar
+                            const formatos = [
+                                invoiceNumber,               // Original
+                                `00251-${invoiceNumber}`,     // Formato 00251-00005075
+                                `251-${invoiceNumber}`,       // Formato 251-00005075
+                                `00${invoiceNumber}`,         // Agregar dos ceros
+                            ].filter(format => format); // Filtrar formatos vacíos
+
+                            const stepsHtml = `
+                                <ul id="timeline" style="text-align:left">
+                                <li id="s1"><i class="fas fa-spinner fa-spin" style="color: orange;"></i> Paso 1: Obteniendo invoiceNumber...</li>
+                                <li id="s2"><i class="fas fa-spinner fa-spin" style="color: orange;"></i> Paso 2: Notificando entrega a VTEX...</li>
+                                <li id="s3"><i class="fas fa-spinner fa-spin" style="color: orange;"></i> Paso 3: Enviando notificación a Slack...</li>
+                                </ul>
+                            `;
+
+                            Swal.fire({
+                            title: '📦 Procesando Entrega',
+                            html: stepsHtml,
+                            allowOutsideClick: false,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            didOpen: async () => {
+                                const ul = document.getElementById('timeline');
+                                try {
+                                // Paso 1: Mostrar el invoiceNumber obtenido
+                                ul.querySelector('#s1').innerHTML = `✅ Paso 1: invoiceNumber obtenido: ${invoiceNumber}`;
+                                ul.querySelector('#s1').style.color = 'green';
+
+                                // 📦 PASO 2: Notificar entrega a VTEX
+                                ul.querySelector('#s2').innerHTML = '🔄 <b>Paso 2:</b> Notificando entrega a VTEX...';
+                                let trackingBody = {
+                                    isDelivered: true,
+                                    deliveredDate,
+                                    events: [{ city: ciudad, state: provincia, description: "Entregado destino final", date: ahora.toISOString() }]
+                                };
+
+                                let success = false;
+                                for (let format of formatos) {
+                                    const respTrack = await fetch(`${corsh}https://${accountName}.vtexcommercestable.com.br/api/oms/pvt/orders/${ordenVTEX}/invoice/${format}/tracking`, {
+                                        method: 'PUT',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-VTEX-API-AppKey': appKey,
+                                            'X-VTEX-API-AppToken': appToken,
+                                            'x-cors-api-key': `${live}`
+                                        },
+                                        body: JSON.stringify(trackingBody)
+                                    });
+
+                                    if (respTrack.ok) {
+                                        ul.querySelector('#s2').innerHTML = `✅ Paso 2: Entrega notificada en VTEX 🎯 con invoiceNumber: ${format}`;
+                                        ul.querySelector('#s2').style.color = 'green';
+                                        success = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!success) {
+                                    throw new Error('No se pudo notificar la entrega a VTEX con ninguno de los formatos.');
+                                }
+
+                                // 📨 PASO 3: Enviar a Slack
+                                ul.querySelector('#s3').innerHTML = '🔄 <b>Paso 3:</b> Enviando a Slack...';
+                                const slackMsg = {
+                                    attachments: [{
+                                        color: "#36a64f",
+                                        pretext: "📬 *Entrega confirmada*",
+                                        title: `✅ Pedido \`${ordenVTEX}\` entregado`,
+                                        text: `El pedido *${ordenVTEX}* fue marcado como *DELIVERED* en VTEX`,
+                                        footer: `🧠 LogiPaq ● ${ahora}`,
+                                        ts: Math.floor(Date.now() / 1000)
+                                    }]
+                                };
+                                const respSlack = await fetch(`${corsh}${slackWebhook}`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'x-cors-api-key': `${live}` },
+                                    body: JSON.stringify(slackMsg)
+                                });
+                                if (!respSlack.ok) throw new Error('Slack error ' + respSlack.status);
+                                ul.querySelector('#s3').innerHTML = '✅ Paso 3: Slack notificado correctamente 📢';
+                                ul.querySelector('#s3').style.color = 'green';
+
+                                Swal.hideLoading();
+                                setTimeout(() => Swal.close(), 1200);
+
+                                } catch (err) {
+                                Swal.hideLoading();
+                                const li = document.createElement('li');
+                                li.style.color = 'red';
+                                li.innerHTML = `❌ Error: ${err.message}<br><b>📸 Por favor notificar a Lucas con una captura</b>`;
+                                ul.appendChild(li);
+                                }
+                            }
+                            });
+                        }
+                    }).catch(err => console.error("❌ Error Firebase:", err))
+                    .finally(() => {
+                        databaseRef.on('value', snapshot => {});
+                    });
+                });
+
                 document.getElementById(`edit-localidad-${data[i].id}`).addEventListener('click', function() {
                     const editDiv = document.getElementById(`edit-input-${data[i].id}`);
                     editDiv.style.display = editDiv.style.display === 'none' ? 'block' : 'none';
