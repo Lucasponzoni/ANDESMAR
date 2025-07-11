@@ -2573,10 +2573,6 @@ document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', 
         const ordenVTEX = data[i].orden_publica_;
         const ahora = new Date();
         const deliveredDate = ahora.toISOString().slice(0, 16).replace('T', ' ');
-        const appKey = 'vtexappkey-novogar252-NOVGUS';
-        const appToken = 'PRQTKHHBSNNCCOFSMOXXEFYTREDZTDUDDUBPELZTPOVEKDIRBTGMAOLIDTVDRPFMAFTUVUAUPQIRRYYSGMXMRBTLWMITNUBZPTDCYYVMZIZQJAGTFNHPLLYDMHGHVLKU';
-        const accountName = 'novogar252';
-        const slackWebhook = 'https://hooks.slack.com/services/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';
 
         const last7 = invoiceNumber.slice(-7);
         const last8 = invoiceNumber.slice(-8);
@@ -2609,13 +2605,13 @@ document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', 
             // Paso 2 - Notificar VTEX
             let success = false;
             for (let format of formatos) {
-                const resp = await fetch(`${corsh}https://${accountName}.vtexcommercestable.com.br/api/oms/pvt/orders/${ordenVTEX}/invoice/${format}/tracking`, {
+                const resp = await fetch(`${corsh}https://${AcNm}.vtexcommercestable.com.br/api/oms/pvt/orders/${ordenVTEX}/invoice/${format}/tracking`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-VTEX-API-AppKey': appKey,
-                        'X-VTEX-API-AppToken': appToken,
-                        'x-cors-api-key': live
+                        'X-VTEX-API-AppKey': `${appK}`,
+                        'X-VTEX-API-AppToken': `${appTk}`,
+                        'x-cors-api-key': `${live}`,
                     },
                     body: JSON.stringify(trackingBody)
                 });
@@ -2642,7 +2638,7 @@ document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', 
                 }]
             };
 
-            const respSlack = await fetch(`${corsh}${slackWebhook}`, {
+            const respSlack = await fetch(`${corsh}${HookBPro}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-cors-api-key': live },
                 body: JSON.stringify(slackPayload)
