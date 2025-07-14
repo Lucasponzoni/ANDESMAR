@@ -9651,3 +9651,8 @@ i[class^="bi-"] + em {
 .cantidad-circulo.multiple:hover {
     background-color: red;
 }
+
+.badge-promos-tv{
+    padding: 10px;
+    height: 33.98px;
+}

@@ -148,17 +148,17 @@
                         </button>
                     
                         <button id="btnSlack" type="button" class="btn btn-light position-relative" style="white-space: nowrap;">
-                            <img src="./Img/slack.png" alt="Slack" style="width: 22px; height: 22px;"> Errores
+                            <img src="./Img/slack.png" alt="Slack" style="width: 22px; height: 22px;">
                             <span id="contadorCards4" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
                         </button>
                         
                         <button id="btnSwitch1" type="button" class="btn btn-light position-relative" style="white-space: nowrap;">
-                            <i class="bi bi-1-circle-fill" style="font-size: 22px; color: #3498db;"></i> Preparado
+                            <i class="bi bi-1-circle-fill" style="font-size: 22px; color: #3498db;"></i>
                             <span id="contadorCards1" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
                         </button>                      
                                             
                         <button id="btnSwitch" type="button" class="btn btn-light position-relative" style="white-space: nowrap;">
-                            <i class="bi bi-2-circle-fill" style="font-size: 22px; color: #2d853c;"></i> Entregado
+                            <i class="bi bi-2-circle-fill" style="font-size: 22px; color: #2d853c;"></i>
                             <span id="contadorCards2" class="badge badge-light position-absolute top-0 start-100 translate-middle rounded-pill ios-badge"><i class="fas fa-spinner fa-spin"></i></span>
                         </button>
 
@@ -173,6 +173,10 @@
 
                         <button class="btn btn-light position-relative" data-toggle="modal" data-target="#skuPlaceItModal" id="openSkuPlaceItModal" type="button" style="white-space: nowrap;">
                             <i class="fas fa-plus-circle" style="font-size: 22px; color: #692cf7;"></i> Express
+                        </button>
+
+                        <button id="btnReglasNegocio" type="button" class="btn btn-light position-relative" data-toggle="modal" data-target="#reglasNegocioModal" style="white-space: nowrap;">
+                            <i class="bi bi-file-earmark-text" style="font-size: 22px; color: #007aff;"></i> Reglas de Negocio
                         </button>
                     </div>
                 </div>
@@ -289,6 +293,133 @@
     </div>
 </div> 
 <!-- Fin Modal para Agregar SKU PlaceIt -->
+
+<!-- Modal para Reglas de Negocio -->
+<div class="modal fade" id="reglasNegocioModal" tabindex="-1" role="dialog" aria-labelledby="reglasNegocioModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content reglasShop">
+      <div class="modal-header sku-modal-header reglasShop">
+        <h5 class="modal-title sku-modal-title reglasShop" id="reglasNegocioModalLabel">Reglas de Negocio</h5>
+        <button type="button" class="close reglasShop" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body reglasShop">
+
+        <!-- Sección de Indicadores Globales -->
+        <div class="mb-4 border rounded shadow-sm p-3 bg-light">
+          <div class="p-3 bg-primary text-white rounded">
+            <h5 class="mb-0"><i class="bi bi-graph-up"></i> Indicadores Globales</h5>
+          </div>
+          <div class="p-3">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <div class="form-check form-switch me-3">
+                    <input class="form-check-input" type="checkbox" id="toggleMarkup-rules">
+                  </div>
+                  <label class="form-label me-2"><del>MarkUp:</del></label>
+                  <input type="number" class="form-control" id="markupInput-rules" value="23" disabled style="width: 80px;">
+                  <span class="ms-2">%</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <div class="form-check form-switch me-3">
+                    <input class="form-check-input" type="checkbox" id="toggleBasePrice-rules">
+                  </div>
+                  <label class="form-label me-2">BasePrice:</label>
+                  <input type="number" class="form-control" id="basePriceInput-rules" value="20" disabled style="width: 80px;">
+                  <span class="ms-2">%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Fecha y hora de finalización (MarkUp):</label>
+                  <input type="datetime-local" class="form-control" id="markupEndDate-rules" disabled>
+                </div>
+                <div id="markupCountdown-rules" class="alert alert-info reglasShop" style="display: none;"></div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Fecha y hora de finalización (BasePrice):</label>
+                  <input type="datetime-local" class="form-control" id="basePriceEndDate-rules" disabled>
+                </div>
+                <div id="basePriceCountdown-rules" class="alert alert-info reglasShop" style="display: none;"></div>
+              </div>
+            </div>
+
+            <div class="text-end mt-2">
+              <button id="guardarGlobalesBtn-rules" class="btn btn-primary reglasShop">
+                <i class="bi bi-save"></i> Guardar Globales
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección para Crear Promoción -->
+        <div class="mb-4 border rounded shadow-sm p-3 bg-light">
+          <div class="p-3 bg-success text-white rounded">
+            <h5 class="mb-0"><i class="bi bi-tag"></i> Crear Promoción</h5>
+          </div>
+          <div class="p-3">
+            <div class="mb-3">
+              <label class="form-label">Título de la promoción:</label>
+              <input type="text" class="form-control" id="promocionTitulo-rules" placeholder="Ej: Promoción 6 cuotas">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Buscar SKU:</label>
+              <input type="text" class="form-control" id="searchSkuInput-rules" placeholder="Ingrese SKU">
+              <div id="skuSuggestions-rules" class="list-group mt-2 reglasShop" style="display: none;"></div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">SKUs seleccionados:</label>
+              <div id="selectedSkusList-rules" class="list-group mb-3 reglasShop"></div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">MarkUp para estos SKUs:</label>
+                <input type="number" class="form-control" id="promoMarkupInput-rules" value="23" style="width: 100px; display: inline-block;">
+                <span>%</span>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">BasePrice para estos SKUs:</label>
+                <input type="number" class="form-control" id="promoBasePriceInput-rules" value="20" style="width: 100px; display: inline-block;">
+                <span>%</span>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Fecha y hora de finalización:</label>
+              <input type="datetime-local" class="form-control" id="promoEndDate-rules">
+            </div>
+
+            <button id="crearPromocionBtn-rules" class="btn btn-success reglasShop">
+              <i class="bi bi-plus-circle"></i> Crear Promoción
+            </button>
+          </div>
+        </div>
+
+        <!-- Listado de Promociones Existentes -->
+        <div class="border rounded shadow-sm p-3 bg-light">
+          <div class="p-3 bg-info text-white rounded">
+            <h5 class="mb-0"><i class="bi bi-list-check"></i> Promociones Activas</h5>
+          </div>
+          <div id="promocionesList-rules" class="list-group mt-3 reglasShop">
+            <!-- Las promociones se cargarán aquí -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Fin Modal Reglas de Negocio -->
 
 <!-- Modal para Agregar SKU -->
 <div class="modal fade" id="skuModal" tabindex="-1" role="dialog" aria-labelledby="skuModalLabel" aria-hidden="true">

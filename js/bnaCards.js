@@ -7424,3 +7424,293 @@ function copiarAlPortapapeles(texto, btn) {
     });
 }
 // FIN BUSCAR FACTURA
+
+// === JS Reglas de Negocio ===
+$(document).ready(function () {
+  const preciosRef = window.dbStock.ref('precios');
+  const reglasNegocioRef = window.dbStock.ref('reglasNegocios');
+
+  let selectedSkusRules = [];
+  let promocionesRules = {};
+  let editandoPromoId = null;
+
+  function initModalRules() {
+    reglasNegocioRef.once('value', (snapshot) => {
+      promocionesRules = snapshot.val() || {};
+      renderPromocionesRules();
+      checkGlobalesExpired();
+    });
+
+    $('#toggleMarkup-rules').change(function () {
+      const isChecked = $(this).is(':checked');
+      $('#markupInput-rules').prop('disabled', !isChecked);
+      $('#markupEndDate-rules').prop('disabled', !isChecked);
+      if (!isChecked) $('#markupCountdown-rules').hide();
+    });
+
+    $('#toggleBasePrice-rules').change(function () {
+      const isChecked = $(this).is(':checked');
+      $('#basePriceInput-rules').prop('disabled', !isChecked);
+      $('#basePriceEndDate-rules').prop('disabled', !isChecked);
+      if (!isChecked) $('#basePriceCountdown-rules').hide();
+    });
+
+    $('#guardarGlobalesBtn-rules').click(saveGlobalesRules);
+
+    $('#searchSkuInput-rules').on('input', function () {
+      const searchTerm = $(this).val().trim();
+      if (searchTerm.length >= 2) {
+        preciosRef.once('value', (snapshot) => {
+          const skus = snapshot.val();
+          const matches = Object.values(skus).filter((sku) =>
+            sku.sku.toLowerCase().includes(searchTerm.toLowerCase()) // Ignorar mayúsculas y minúsculas
+          );
+          renderSkuSuggestionsRules(matches);
+        });
+      } else {
+        $('#skuSuggestions-rules').hide();
+      }
+    });
+
+    $('#crearPromocionBtn-rules').off('click').on('click', function () {
+      if (editandoPromoId) {
+        guardarEdicionPromoRules();
+      } else {
+        crearPromocionRules();
+      }
+    });
+  }
+
+  function renderPromocionesRules() {
+    const $list = $('#promocionesList-rules');
+    $list.empty();
+
+    const now = new Date();
+
+    Object.keys(promocionesRules).forEach((promoId) => {
+      const promo = promocionesRules[promoId];
+      if (promoId === 'globales') return;
+
+      const isPaused = promo.pausado;
+      const end = new Date(promo.endDate);
+      const diff = end - now;
+      let estado = '';
+      let badgeClass = 'badge-promos-tv ';
+      let icon = '';
+
+      if (isPaused) {
+        estado = 'Pausado';
+        badgeClass += 'bg-secondary';
+        icon = '<i class="bi bi-pause-fill"></i>';
+      } else if (diff <= 0) {
+        estado = 'Desactivado';
+        badgeClass += 'bg-danger';
+        icon = '<i class="bi bi-x-circle-fill"></i>';
+      } else if (diff <= 86400000) {
+        estado = 'Último día';
+        badgeClass += 'bg-warning text-dark';
+        icon = '<i class="bi bi-exclamation-triangle-fill"></i>';
+      } else {
+        estado = 'Activo';
+        badgeClass += 'bg-success';
+        icon = '<i class="bi bi-check-circle-fill"></i>';
+      }
+
+      const badgeEstado = `<span class="badge ${badgeClass}" style="vertical-align: middle;">${icon} ${estado}</span>`;
+      const skusBadges = promo.skus.map(sku => `<span class="badge bg-primary me-1">${sku}</span>`).join(' ');
+      const countdownClass = isPaused ? 'text-danger text-decoration-line-through' : '';
+      const countdown = diff > 0 ? `<div class="text-muted mt-1 ${countdownClass}"><i class="bi bi-clock-history"></i> Finaliza en: <span class="fw-bold">${msToTime(diff)}</span></div>` : '';
+
+      const markupHtml = `<span class="fw-bold text-primary">${promo.markup}%</span>`;
+      const baseHtml = `<span class="fw-bold text-success">${promo.basePrice}%</span>`;
+
+      $list.append(`
+        <div class="list-group-item d-flex flex-column reglasShop">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 text-uppercase">${promo.titulo}</h6>
+            <div>
+              ${badgeEstado}
+              <button class="btn btn-sm btn-warning edit-promo-rules ms-2" data-id="${promoId}" style="height:34px;">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-danger delete-promo-rules" data-id="${promoId}" style="height:34px;">
+                <i class="bi bi-trash-fill"></i> <!-- Cambiado el icono de basurero -->
+              </button>
+              <button class="btn btn-sm ${isPaused ? 'btn-success' : 'btn-secondary'} toggle-pausa-rules ms-2 ml-0 mr-0" data-id="${promoId}" style="height:34px;">
+                <i class="bi ${isPaused ? 'bi-play-fill' : 'bi-pause-fill'}"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mt-2">
+            <div>SKUs: ${skusBadges}</div>
+            <div class="mt-1">MarkUp: ${markupHtml} | BasePrice: ${baseHtml}</div>
+            <div class="text-muted"><i class="bi bi-calendar-event"></i> Finaliza: ${new Date(promo.endDate).toLocaleString()}</div>
+            ${countdown}
+          </div>
+        </div>
+      `);
+    });
+
+    $list.off('click');
+
+    $list.on('click', '.delete-promo-rules', function () {
+      const id = $(this).data('id');
+      Swal.fire({
+        icon: 'warning',
+        title: '¿Eliminar promoción?',
+        text: 'Esta acción no se puede deshacer',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then(res => {
+        if (res.isConfirmed) {
+          reglasNegocioRef.child(id).remove().then(() => {
+            delete promocionesRules[id];
+            renderPromocionesRules();
+          });
+        }
+      });
+    });
+
+    $list.on('click', '.edit-promo-rules', function () {
+      const id = $(this).data('id');
+      const promo = promocionesRules[id];
+      if (!promo) return;
+
+      $('#promocionTitulo-rules').val(promo.titulo);
+      $('#promoMarkupInput-rules').val(promo.markup);
+      $('#promoBasePriceInput-rules').val(promo.basePrice);
+      $('#promoEndDate-rules').val(promo.endDate);
+      selectedSkusRules = promo.skus || [];
+      renderSelectedSkusRules();
+
+      editandoPromoId = id;
+      $('#crearPromocionBtn-rules').html('<i class="bi bi-save"></i> Guardar Edición');
+    });
+
+    $list.on('click', '.toggle-pausa-rules', function () {
+      const id = $(this).data('id');
+      const promo = promocionesRules[id];
+      if (!promo) return;
+
+      const nuevoEstado = !promo.pausado;
+      reglasNegocioRef.child(id).update({ pausado: nuevoEstado }).then(() => {
+        promocionesRules[id].pausado = nuevoEstado;
+        renderPromocionesRules();
+      });
+    });
+  }
+
+  function msToTime(duration) {
+    const seconds = Math.floor((duration / 1000) % 60);
+    const minutes = Math.floor((duration / 1000 / 60) % 60);
+    const hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+    const days = Math.floor(duration / (1000 * 60 * 60 * 24));
+
+    const parts = [];
+    if (days > 0) parts.push(`${days}d`);
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}m`);
+    if (seconds > 0 && days === 0) parts.push(`${seconds}s`);
+
+    return parts.join(' ');
+  }
+
+  function renderSelectedSkusRules() {
+    const $selectedList = $('#selectedSkusList-rules');
+    $selectedList.empty();
+
+    selectedSkusRules.forEach((sku) => {
+      const item = $(`
+        <div class="list-group-item d-flex justify-content-between align-items-center reglasShop">
+          <span class="badge bg-primary">${sku}</span>
+          <button class="btn btn-sm btn-danger remove-sku-rules" data-sku="${sku}" style="height: 34px;">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>`);
+      $selectedList.append(item);
+    });
+
+    $selectedList.off('click').on('click', '.remove-sku-rules', function () {
+      const skuToRemove = $(this).data('sku');
+      selectedSkusRules = selectedSkusRules.filter((s) => s !== skuToRemove);
+      renderSelectedSkusRules();
+    });
+  }
+
+  function checkGlobalesExpired() {
+    reglasNegocioRef.child('globales').once('value', (snap) => {
+      const data = snap.val();
+      if (!data) return;
+      const now = new Date();
+
+      if (data.endMarkup && new Date(data.endMarkup) < now) $('#toggleMarkup-rules').prop('checked', false).trigger('change');
+      else $('#toggleMarkup-rules').prop('checked', true).trigger('change');
+
+      if (data.endBase && new Date(data.endBase) < now) $('#toggleBasePrice-rules').prop('checked', false).trigger('change');
+      else $('#toggleBasePrice-rules').prop('checked', true).trigger('change');
+    });
+  }
+
+  function saveGlobalesRules() {
+    const useMarkup = $('#toggleMarkup-rules').is(':checked');
+    const useBase = $('#toggleBasePrice-rules').is(':checked');
+    const markup = useMarkup ? parseFloat($('#markupInput-rules').val()) : null;
+    const basePrice = useBase ? parseFloat($('#basePriceInput-rules').val()) : null;
+    const endMarkup = $('#markupEndDate-rules').val();
+    const endBase = $('#basePriceEndDate-rules').val();
+
+    if ((useMarkup && !endMarkup) || (useBase && !endBase)) {
+      return Swal.fire({ icon: 'warning', title: 'Debes definir fecha y hora para los indicadores globales.', confirmButtonText: 'Ok' });
+    }
+
+    const datos = {
+      globalMarkup: markup,
+      globalBasePrice: basePrice,
+      endMarkup,
+      endBase
+    };
+
+    reglasNegocioRef.child('globales').set(datos).then(() => {
+      Swal.fire({ icon: 'success', title: 'Globales actualizados', confirmButtonText: 'Genial' });
+      reglasNegocioRef.once('value', (snapshot) => {
+        promocionesRules = snapshot.val() || {};
+        renderPromocionesRules();
+      });
+    });
+  }
+
+  function renderSkuSuggestionsRules(skus) {
+    const container = $('#skuSuggestions-rules');
+    container.empty();
+    if (!skus.length) return container.hide();
+
+    skus.forEach((s) => {
+      const item = $(`<a href="#" class="list-group-item list-group-item-action reglasShop">SKU: ${s.sku}</a>`);
+      item.click(function (e) {
+        e.preventDefault();
+        if (!selectedSkusRules.includes(s.sku)) {
+          const conflictPromo = checkSkuConflictRules(s.sku);
+          if (conflictPromo) {
+            Swal.fire({
+              icon: 'warning',
+              title: `El SKU ${s.sku} ya está activo en la promo "${conflictPromo}"`,
+              text: 'Debes pausarla o eliminarla para agregar este SKU.'
+            });
+            return;
+          }
+          selectedSkusRules.push(s.sku);
+          renderSelectedSkusRules();
+        }
+        $('#searchSkuInput-rules').val('');
+        container.hide();
+      });
+      container.append(item);
+    });
+    container.show();
+  }
+
+  $('#reglasNegocioModal').on('shown.bs.modal', initModalRules);
+  if ($('#reglasNegocioModal').hasClass('show')) initModalRules();
+});
+// FIN JS Reglas de Negocio                  
