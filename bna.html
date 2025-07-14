@@ -308,56 +308,72 @@
 
         <!-- Sección de Indicadores Globales -->
         <div class="mb-4 border rounded shadow-sm p-3 bg-light">
-          <div class="p-3 bg-primary text-white rounded">
+        <div class="p-3 bg-primary text-white rounded">
             <h5 class="mb-0"><i class="bi bi-graph-up"></i> Indicadores Globales</h5>
-          </div>
-          <div class="p-3">
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <div class="d-flex align-items-center">
-                  <div class="form-check form-switch me-3">
-                    <input class="form-check-input" type="checkbox" id="toggleMarkup-rules">
-                  </div>
-                  <label class="form-label me-2"><del>MarkUp:</del></label>
-                  <input type="number" class="form-control" id="markupInput-rules" value="23" disabled style="width: 80px;">
-                  <span class="ms-2">%</span>
+        </div>
+        <div class="p-3">
+
+            <!-- Línea de tiempo de precios (responsive) -->
+            <div class="d-flex flex-column flex-md-row align-items-stretch justify-content-between gap-4">
+
+            <!-- Precio de Costo -->
+            <div class="text-center flex-fill">
+                <label class="form-label d-block mb-2">Precio de Costo</label>
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                <div class="form-check form-switch me-2">
+                    <input class="form-check-input" type="checkbox" id="toggleCosto-rules" onchange="document.getElementById('inputCosto-rules').disabled = !this.checked">
                 </div>
-              </div>
-              <div class="col-md-6">
-                <div class="d-flex align-items-center">
-                  <div class="form-check form-switch me-3">
-                    <input class="form-check-input" type="checkbox" id="toggleBasePrice-rules">
-                  </div>
-                  <label class="form-label me-2">BasePrice:</label>
-                  <input type="number" class="form-control" id="basePriceInput-rules" value="20" disabled style="width: 80px;">
-                  <span class="ms-2">%</span>
+                <input type="number" class="form-control" id="inputCosto-rules" value="0" disabled style="width: 80px;">
+                <span class="ms-2">%</span>
                 </div>
-              </div>
+                <small class="text-muted">Si el precio de costo se encuentra en 0% mantendrá el precio contado web</small>
             </div>
 
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Fecha y hora de finalización (MarkUp):</label>
-                  <input type="datetime-local" class="form-control" id="markupEndDate-rules" disabled>
-                </div>
-                <div id="markupCountdown-rules" class="alert alert-info reglasShop" style="display: none;"></div>
-              </div>
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Fecha y hora de finalización (BasePrice):</label>
-                  <input type="datetime-local" class="form-control" id="basePriceEndDate-rules" disabled>
-                </div>
-                <div id="basePriceCountdown-rules" class="alert alert-info reglasShop" style="display: none;"></div>
-              </div>
+            <!-- Flecha -->
+            <div class="text-center d-none d-md-flex align-items-center justify-content-center fs-2 text-secondary">
+                →
             </div>
 
-            <div class="text-end mt-2">
-              <button id="guardarGlobalesBtn-rules" class="btn btn-primary reglasShop">
-                <i class="bi bi-save"></i> Guardar Globales
-              </button>
+            <!-- Precio de Base -->
+            <div class="text-center flex-fill">
+                <label class="form-label d-block mb-2">Precio de Base (MarkUp)</label>
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                <div class="form-check form-switch me-2">
+                    <input class="form-check-input" type="checkbox" id="toggleBasePrice-rules" onchange="document.getElementById('basePriceInput-rules').disabled = !this.checked">
+                </div>
+                <input type="number" class="form-control" id="basePriceInput-rules" value="0" disabled style="width: 80px;">
+                <span class="ms-2">%</span>
+                </div>
+                <small class="text-muted">Precio de costo + MarkUp, este es el precio de venta</small>
             </div>
-          </div>
+
+            <!-- Flecha -->
+            <div class="text-center d-none d-md-flex align-items-center justify-content-center fs-2 text-secondary">
+                →
+            </div>
+
+            <!-- Precio de Lista -->
+            <div class="text-center flex-fill">
+                <label class="form-label d-block mb-2">Precio de Lista</label>
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                <div class="form-check form-switch me-2">
+                    <input class="form-check-input" type="checkbox" id="toggleListaPrice-rules" onchange="document.getElementById('listaPriceInput-rules').disabled = !this.checked">
+                </div>
+                <input type="number" class="form-control" id="listaPriceInput-rules" value="0" disabled style="width: 80px;">
+                <span class="ms-2">%</span>
+                </div>
+                <small class="text-muted">Precio tachado, solo indicar porcentaje que se multiplica a MarkUp</small>
+            </div>
+            </div> 
+
+            <!-- Botón guardar centrado en mobile -->
+            <div class="text-center text-md-end mt-4">
+            <button id="guardarGlobalesBtn-rules" class="btn btn-primary reglasShop">
+                <i class="bi bi-check-circle-fill"></i> Guardar Globales
+            </button>
+            </div>
+        </div>
+        </div>
         </div>
 
         <!-- Sección para Crear Promoción -->
@@ -389,7 +405,7 @@
                 <span>%</span>
               </div>
               <div class="col-md-6">
-                <label class="form-label">BasePrice para estos SKUs:</label>
+                <label class="form-label">List Price para estos SKUs:</label>
                 <input type="number" class="form-control" id="promoBasePriceInput-rules" value="20" style="width: 100px; display: inline-block;">
                 <span>%</span>
               </div>
@@ -401,7 +417,7 @@
             </div>
 
             <button id="crearPromocionBtn-rules" class="btn btn-success reglasShop">
-              <i class="bi bi-plus-circle"></i> Crear Promoción
+              <i class="bi bi-stars"></i> Crear Promoción
             </button>
           </div>
         </div>

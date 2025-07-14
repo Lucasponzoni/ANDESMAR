@@ -9654,5 +9654,6 @@ i[class^="bi-"] + em {
 
 .badge-promos-tv{
     padding: 10px;
-    height: 33.98px;
+    margin-right: 5px;
+    margin-bottom: 5px;
 }
