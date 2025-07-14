@@ -7460,6 +7460,8 @@ $(document).ready(function () {
       setSwitchInput('precioCosto', 'inputCosto-rules', 'toggleCosto-rules');
       setSwitchInput('precioBase', 'basePriceInput-rules', 'toggleBasePrice-rules');
       setSwitchInput('precioLista', 'listaPriceInput-rules', 'toggleListaPrice-rules');
+
+      actualizarVisualizacionPrecios();
     });
   }
 
@@ -7501,20 +7503,27 @@ $(document).ready(function () {
     if (!skus.length) return container.hide();
 
     skus.forEach(skuObj => {
-      const sku = skuObj.sku.replace(/-/g, '');
+      const sku = skuObj.sku;
       const item = $(`<a href="#" class="list-group-item list-group-item-action reglasShop">SKU: ${sku}</a>`);
-      item.click(function (e) {
+        item.click(function (e) {
         e.preventDefault();
-        if (selectedSkus.includes(sku)) return;
-        const enPromo = Object.values(promociones).find(p => p.skus?.includes(sku));
+        const cleanedSku = sku.replace(/-/g, ''); // 🔥 Elimina los guiones
+        if (selectedSkus.includes(cleanedSku)) return;
+
+        const enPromo = Object.values(promociones).find(p => p.skus?.includes(cleanedSku));
         if (enPromo && (!editandoId || promociones[editandoId]?.titulo !== enPromo.titulo)) {
-          return Swal.fire({ icon: 'warning', title: `SKU ya asignado`, text: `El SKU ${sku} ya está en la promoción "${enPromo.titulo}"` });
+            return Swal.fire({
+            icon: 'warning',
+            title: `SKU ya asignado`,
+            text: `El SKU ${sku} ya está en la promoción "${enPromo.titulo}"`
+            });
         }
-        selectedSkus.push(sku);
+
+        selectedSkus.push(cleanedSku); // 🔥 Pusheás sin guiones
         renderSelectedSkus();
         $('#searchSkuInput-rules').val('');
         container.hide();
-      });
+        });
       container.append(item);
     });
     container.show();
@@ -7703,3 +7712,41 @@ $(document).ready(function () {
   if ($('#reglasNegocioModal').hasClass('show')) initModalRules();
 });
 // FIN REGLAS DE NEGOCIO VTEX
+
+// SIMULACION DE PRECIOS
+function actualizarVisualizacionPrecios() {
+  const format = n => `$${n.toFixed(2)}`;
+
+  let base = parseFloat($('#precioBasePresea').val()) || 0;
+  if (base <= 0) base = 0;
+
+  const costoActivo = $('#toggleCosto-rules').is(':checked');
+  const baseActivo = $('#toggleBasePrice-rules').is(':checked');
+  const listaActivo = $('#toggleListaPrice-rules').is(':checked');
+
+  const costoVal = parseFloat($('#inputCosto-rules').val()) || 0;
+  const markupVal = parseFloat($('#basePriceInput-rules').val()) || 0;
+  const listaVal = parseFloat($('#listaPriceInput-rules').val()) || 0;
+
+  // Cálculos
+  const baseFormateado = base;
+  let costo = baseFormateado * (1 + (costoActivo ? costoVal / 100 : 0));
+  let markup = costo * (1 + (baseActivo ? markupVal / 100 : 0));
+  let lista = markup * (1 + (listaActivo ? listaVal / 100 : 0));
+
+  // Actualizar HTML
+  $('#precioBaseFormateado').text(format(baseFormateado));
+  $('#precioCostoSimulado').text(format(costo));
+  $('#precioMarkupSimulado').text(format(markup));
+  $('#precioListaSimulado').text(format(lista));
+
+  // Actualizar porcentajes
+  $('#porcentajeCosto').text(costoActivo ? `+${costoVal}%` : '+0%');
+  $('#porcentajeMarkup').text(baseActivo ? `+${markupVal}%` : '+0%');
+  $('#porcentajeLista').text(listaActivo ? `+${listaVal}%` : '+0%');
+}
+
+// Inicializar y escuchar cambios
+actualizarVisualizacionPrecios();
+$('#precioBasePresea, #inputCosto-rules, #basePriceInput-rules, #listaPriceInput-rules, #toggleCosto-rules, #toggleBasePrice-rules, #toggleListaPrice-rules').on('input change', actualizarVisualizacionPrecios);
+// FIN SIMULACION DE PRECIOS
