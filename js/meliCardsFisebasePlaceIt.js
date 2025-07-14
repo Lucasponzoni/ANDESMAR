@@ -1003,6 +1003,8 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     const numeroRemito = await solicitarNumeroRemito();
     if (!numeroRemito) return;
 
+    generarMiniEtiqueta(numeroRemito);
+
         // Formatear SKU
     const skuFormateado = SKU.toUpperCase().padStart(15, '0');
 
@@ -1307,6 +1309,99 @@ async function generarPDF(email, id, NombreyApellido, Cp, idOperacion, calleDest
     reader.readAsDataURL(blob);
 }
 // FIN GENERAR ETIQUETA LOGISTICA PLACE IT
+
+// MINI ETIQUETA REMITO (dos páginas)
+async function generarMiniEtiqueta(remitoCompleto) {
+  const { jsPDF } = window.jspdf;
+
+  const anchoEtiqueta = 10; // cm
+  const altoEtiqueta = 8;
+
+  const doc = new jsPDF({
+    orientation: "landscape",
+    unit: "cm",
+    format: [anchoEtiqueta, altoEtiqueta],
+  });
+
+  const ultimos4 = remitoCompleto.slice(-4);
+
+  // 🎨 Estilos generales
+  const estilos = {
+    margenLateral: 1,
+    paddingTop: 0.5,
+    fuente: "helvetica",
+    colorTexto: [33, 33, 33],
+    bordeColor: [220, 220, 220],
+  };
+
+  // 🖼️ Cargar imagen
+  const img = new Image();
+  img.src = './Img/Base-Logi.png';
+  await new Promise((resolve) => (img.onload = resolve));
+
+  // 🧱 Función para dibujar UNA página
+  function dibujarEtiqueta() {
+    // Convertir imagen a base64
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    const imgData = canvas.toDataURL("image/png");
+
+    const contX = 0.5;
+    const contY = 0.5;
+    const contAncho = anchoEtiqueta - 1;
+    const contAlto = altoEtiqueta - 1;
+
+    doc.setDrawColor(...estilos.bordeColor);
+    doc.roundedRect(contX, contY, contAncho, contAlto, 0.3, 0.3);
+
+    // Imagen
+    const imgMaxAncho = contAncho - 1;
+    const proporcion = img.height / img.width;
+    const imgAncho = imgMaxAncho;
+    const imgAlto = imgAncho * proporcion;
+    const imgX = contX + (contAncho - imgAncho) / 2;
+    let cursorY = contY + estilos.paddingTop;
+
+    doc.addImage(imgData, "PNG", imgX, cursorY, imgAncho, imgAlto);
+    cursorY += imgAlto + 1;
+
+    // Texto "Remito"
+    doc.setTextColor(...estilos.colorTexto);
+    doc.setFont(estilos.fuente, "normal");
+    doc.setFontSize(20);
+    doc.text("Remito", anchoEtiqueta / 2, cursorY, { align: "center" });
+
+    cursorY += 3;
+
+    // Últimos 4 dígitos (grande)
+    doc.setFont(estilos.fuente, "bold");
+    doc.setFontSize(100);
+    doc.text(ultimos4, anchoEtiqueta / 2, cursorY, { align: "center" });
+
+    cursorY += 1;
+
+    // Remito completo
+    doc.setFont(estilos.fuente, "bold");
+    doc.setFontSize(20);
+    doc.text(remitoCompleto, anchoEtiqueta / 2, cursorY, { align: "center" });
+  }
+
+  // ✅ Página 1
+  dibujarEtiqueta();
+
+  // ✅ Página 2
+  doc.addPage([anchoEtiqueta, altoEtiqueta], 'landscape');
+  dibujarEtiqueta();
+
+  // 🧾 Mostrar
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
+// FIN MINI ETIQUETA REMITO
 
 // FECHA BRAINSYS
 function obtenerFechaFormatoPlaceIt(date) {

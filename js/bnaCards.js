@@ -32,6 +32,10 @@ const obtenerCredencialesCDS = async () => {
         chat = data[15];
         brainsysUser = data[16];
         brainsysPass = data[17];
+        appK = data[24];
+        appTk = data[25];
+        AcNm = data[26];
+        HookBPro = data[27];
         console.log(`CDS Credentials OK`);
     } catch (error) {
         console.error('Error al obtener cred de Fire:', error);
@@ -2471,223 +2475,214 @@ document.getElementById(`preparacion-${data[i].id}`).addEventListener('change', 
     });
 });
 
-                // Evento para manejar el cambio del switch "Entregado"
-                document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', function () {
-                    const nuevoEstado = this.checked ? 'Si' : 'No';
-                    const databaseRef = firebase.database().ref('enviosBNA').limitToLast(1000);
-                    databaseRef.off();
+// MARCA ENTREGADO
+document.getElementById(`entregado-${data[i].id}-1`).addEventListener('change', async function () {
+    const nuevoEstado = this.checked ? 'Si' : 'No';
+    const switchElement = this;
 
-                    firebase.database().ref('enviosBNA/' + data[i].id).update({ marcaEntregado: nuevoEstado })
-                    .then(async () => {
-                        console.log(`📦 Firebase actualizado: ${nuevoEstado}`);
-                        const cnt = document.getElementById('contadorCards2');
-                        if (cnt) cnt.innerText = this.checked ? Math.max(parseInt(cnt.innerText) || 0 - 1, 0) : parseInt(cnt.innerText) || 0 + 1;
+    if (nuevoEstado === 'Si' && data[i].orden_publica_?.toUpperCase().startsWith('BPR')) {
+        const facturaTexto = document.getElementById(`factura-tv-${data[i].id}`)?.innerText || '';
+        let invoiceNumber = facturaTexto.split('-')[1]?.trim() || '';
 
-                        if (nuevoEstado === 'Si' && data[i].orden_publica_?.toUpperCase().startsWith('BPR')) {
-                            const ordenVTEX = data[i].orden_publica_;
-                            const ciudad = data[i].localidad || 'Sin ciudad';
-                            const provincia = data[i].provincia || 'Sin provincia';
-                            const appKey = 'vtexappkey-novogar252-NOVGUS';
-                            const appToken = 'PRQTKHHBSNNCCOFSMOXXEFYTREDZTDUDDUBPELZTPOVEKDIRBTGMAOLIDTVDRPFMAFTUVUAUPQIRRYYSGMXMRBTLWMITNUBZPTDCYYVMZIZQJAGTFNHPLLYDMHGHVLKU';
-                            const accountName = 'novogar252';
-                            const slackWebhook = 'https://hooks.slack.com/services/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';
-                            const ahora = new Date();
-                            const deliveredDate = ahora.toISOString().slice(0, 16).replace('T', ' ');
+        if (!invoiceNumber) {
+            const { value: inputInvoice, isConfirmed } = await Swal.fire({
+                title: '🔒 Número de factura requerido',
+                html: `
+                    <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:10px;">
+                        <p style="margin:0;font-size:15px;color:#555;">Ingresá el número de factura <b>sin ceros</b> al inicio.</p>
+                        <p style="margin:5px 0;font-size:13px;color:gray;">Ejemplo: <code>2450001234</code></p>
+                    </div>
+                `,
+                input: 'text',
+                inputPlaceholder: '2450001234',
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar',
+                background: '#f5f5f7',
+                width: 460,
+                allowOutsideClick: false,
+                inputValidator: (value) => {
+                    if (!value) return '⚠️ Debés ingresar un número de factura válido';
+                    return null;
+                }
+            });
 
-                            // Obtener el número de factura del contenedor
-                            const facturaTexto = document.getElementById(`factura-tv-${data[i].id}`)?.innerText || '';
-                            let invoiceNumber = facturaTexto.split('-')[1]?.trim() || '';
+            if (!isConfirmed || !inputInvoice) {
+                switchElement.checked = false;
+                return;
+            }
 
-                            // Si no se puede obtener el invoiceNumber, solicitarlo al usuario
-                            if (!invoiceNumber) {
-                                const { value: inputInvoice } = await Swal.fire({
-                                    title: '⚠️ No pude obtener el número de factura',
-                                    input: 'text',
-                                    inputPlaceholder: 'Ingresa el número de factura (sin ceros ni guiones)',
-                                    showCancelButton: true,
-                                    confirmButtonText: 'Aceptar',
-                                    cancelButtonText: 'Cancelar',
-                                    inputValidator: (value) => {
-                                        if (!value) {
-                                            return '¡Debes ingresar un número de factura!';
-                                        }
-                                        return null;
-                                    }
-                                });
-                                if (inputInvoice) {
-                                    invoiceNumber = inputInvoice; // Usar el número ingresado
-                                } else {
-                                    return; // Si se cancela, salir de la función
-                                }
-                            }
+            invoiceNumber = inputInvoice.trim();
+        }
 
-                            // Formatos a probar
-                            const formatos = [
-                                invoiceNumber,               // Original
-                                `00251-${invoiceNumber}`,     // Formato 00251-00005075
-                                `251-${invoiceNumber}`,       // Formato 251-00005075
-                                `00${invoiceNumber}`,         // Agregar dos ceros
-                            ].filter(format => format); // Filtrar formatos vacíos
+        // Crear glass alert container
+        let existingAlert = document.getElementById('glass-alert');
+        if (existingAlert) existingAlert.remove();
 
-                            const stepsHtml = `
-                                <ul id="timeline" style="text-align:left">
-                                <li id="s1"><i class="fas fa-spinner fa-spin" style="color: orange;"></i> Paso 1: Obteniendo invoiceNumber...</li>
-                                <li id="s2"><i class="fas fa-spinner fa-spin" style="color: orange;"></i> Paso 2: Notificando entrega a VTEX...</li>
-                                <li id="s3"><i class="fas fa-spinner fa-spin" style="color: orange;"></i> Paso 3: Enviando notificación a Slack...</li>
-                                </ul>
-                            `;
+        const glass = document.createElement('div');
+        glass.id = 'glass-alert';
+        glass.style.cssText = `
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%) scale(1);
+            width: 440px;
+            padding: 20px 25px;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+            border-radius: 20px;
+            font-family: -apple-system,BlinkMacSystemFont,sans-serif;
+            color: #555;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.4s ease;
+        `;
 
-                            Swal.fire({
-                            title: '📦 Procesando Entrega',
-                            html: stepsHtml,
-                            allowOutsideClick: false,
-                            willOpen: () => {
-                                Swal.showLoading();
-                            },
-                            didOpen: async () => {
-                                const ul = document.getElementById('timeline');
-                                try {
-                                // Paso 1: Mostrar el invoiceNumber obtenido
-                                ul.querySelector('#s1').innerHTML = `✅ Paso 1: invoiceNumber obtenido: ${invoiceNumber}`;
-                                ul.querySelector('#s1').style.color = 'green';
+        glass.innerHTML = `
+            <h3 style="margin-bottom: 15px; font-weight: 600;">📦 Procesando entrega</h3>
+            <ul id="glass-steps" style="list-style:none; padding:0; margin:0;">
+                <li id="s1" style="background:#fff;padding:10px;margin-bottom:10px;border-radius:12px;">
+                    <i class="fas fa-spinner fa-spin" style="color: orange;"></i> Paso 1: Obteniendo Número de Factura...
+                </li>
+                <li id="s2" style="background:#fff;padding:10px;margin-bottom:10px;border-radius:12px;">
+                    <i class="fas fa-spinner fa-spin" style="color: orange;"></i> Paso 2: Notificando entrega a VTEX...
+                </li>
+                <li id="s3" style="background:#fff;padding:10px;margin-bottom:10px;border-radius:12px;">
+                    <i class="fas fa-spinner fa-spin" style="color: orange;"></i> Paso 3: Enviando notificación a Slack...
+                </li>
+            </ul>
+            <div style="text-align:center; margin-top:15px;">
+            <button id="glass-ok" style="display:none;padding:8px 18px;border:none;border-radius:8px;background:#d33;color:#fff;cursor:pointer;">
+                OK
+            </button>
+            </div>
+        `;
 
-                                // 📦 PASO 2: Notificar entrega a VTEX
-                                ul.querySelector('#s2').innerHTML = '🔄 <b>Paso 2:</b> Notificando entrega a VTEX...';
-                                let trackingBody = {
-                                    isDelivered: true,
-                                    deliveredDate,
-                                    events: [{ city: ciudad, state: provincia, description: "Entregado destino final", date: ahora.toISOString() }]
-                                };
+        document.body.appendChild(glass);
+        setTimeout(() => {
+            glass.style.opacity = 1;
+        }, 100);
 
-                                let success = false;
-                                for (let format of formatos) {
-                                    const respTrack = await fetch(`${corsh}https://${accountName}.vtexcommercestable.com.br/api/oms/pvt/orders/${ordenVTEX}/invoice/${format}/tracking`, {
-                                        method: 'PUT',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-VTEX-API-AppKey': appKey,
-                                            'X-VTEX-API-AppToken': appToken,
-                                            'x-cors-api-key': `${live}`
-                                        },
-                                        body: JSON.stringify(trackingBody)
-                                    });
+        const ul = document.getElementById('glass-steps');
+        const btnOK = document.getElementById('glass-ok');
 
-                                    if (respTrack.ok) {
-                                        ul.querySelector('#s2').innerHTML = `✅ Paso 2: Entrega notificada en VTEX 🎯 con invoiceNumber: ${format}`;
-                                        ul.querySelector('#s2').style.color = 'green';
-                                        success = true;
-                                        break;
-                                    }
-                                }
+        const ciudad = data[i].localidad || 'Sin ciudad';
+        const provincia = data[i].provincia || 'Sin provincia';
+        const ordenVTEX = data[i].orden_publica_;
+        const ahora = new Date();
+        const deliveredDate = ahora.toISOString().slice(0, 16).replace('T', ' ');
 
-                                if (!success) {
-                                    throw new Error('No se pudo notificar la entrega a VTEX con ninguno de los formatos.');
-                                }
+        const last7 = invoiceNumber.slice(-7);
+        const last8 = invoiceNumber.slice(-8);
 
-                                // 📨 PASO 3: Enviar a Slack
-                                ul.querySelector('#s3').innerHTML = '🔄 <b>Paso 3:</b> Enviando a Slack...';
-                                const slackMsg = {
-                                    attachments: [{
-                                        color: "#36a64f",
-                                        pretext: "📬 *Entrega confirmada*",
-                                        title: `✅ Pedido \`${ordenVTEX}\` entregado`,
-                                        text: `El pedido *${ordenVTEX}* fue marcado como *DELIVERED* en VTEX`,
-                                        footer: `🧠 LogiPaq ● ${ahora}`,
-                                        ts: Math.floor(Date.now() / 1000)
-                                    }]
-                                };
-                                const respSlack = await fetch(`${corsh}${slackWebhook}`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json', 'x-cors-api-key': `${live}` },
-                                    body: JSON.stringify(slackMsg)
-                                });
-                                if (!respSlack.ok) throw new Error('Slack error ' + respSlack.status);
-                                ul.querySelector('#s3').innerHTML = '✅ Paso 3: Slack notificado correctamente 📢';
-                                ul.querySelector('#s3').style.color = 'green';
+        const formatos = [
+            invoiceNumber,
+            `00251-${last7}`, `251-${last7}`,
+            `00251-${last8}`, `251-${last8}`,
+            `00238-${last8}`, `238-${last8}`,
+            `00238-${last7}`, `238-${last7}`,
+            `00${invoiceNumber}`
+        ];
 
-                                Swal.hideLoading();
-                                setTimeout(() => Swal.close(), 1200);
+        const trackingBody = {
+            isDelivered: true,
+            deliveredDate,
+            events: [{
+                city: ciudad,
+                state: provincia,
+                description: "Entregado destino final",
+                date: ahora.toISOString()
+            }]
+        };
 
-                                } catch (err) {
-                                Swal.hideLoading();
-                                const li = document.createElement('li');
-                                li.style.color = 'red';
-                                li.innerHTML = `❌ Error: ${err.message}<br><b>📸 Por favor notificar a Lucas con una captura</b>`;
-                                ul.appendChild(li);
-                                }
-                            }
-                            });
-                        }
-                    }).catch(err => console.error("❌ Error Firebase:", err))
-                    .finally(() => {
-                        databaseRef.on('value', snapshot => {});
-                    });
+        try {
+            // ✅ Paso 1
+            document.getElementById('s1').innerHTML = `✅ Paso 1: Número <code>${invoiceNumber}</code> validado`;
+            document.getElementById('s1').style.color = 'green';
+
+            // Paso 2 - Notificar VTEX
+            let success = false;
+            for (let format of formatos) {
+                const resp = await fetch(`${corsh}https://${AcNm}.vtexcommercestable.com.br/api/oms/pvt/orders/${ordenVTEX}/invoice/${format}/tracking`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-VTEX-API-AppKey': `${appK}`,
+                        'X-VTEX-API-AppToken': `${appTk}`,
+                        'x-cors-api-key': `${live}`,
+                    },
+                    body: JSON.stringify(trackingBody)
                 });
 
-                document.getElementById(`edit-localidad-${data[i].id}`).addEventListener('click', function() {
-                    const editDiv = document.getElementById(`edit-input-${data[i].id}`);
-                    editDiv.style.display = editDiv.style.display === 'none' ? 'block' : 'none';
-                });
-                
-                document.getElementById(`localidad-input-${data[i].id}`).addEventListener('input', function() {
-                    const query = this.value.toLowerCase();
-                    const suggestions = localidades.filter(loc => 
-                        loc.localidad.toLowerCase().includes(query) || 
-                        loc.provincia.toLowerCase().includes(query) || 
-                        loc.codigosPostales.some(cp => cp.includes(query))
-                    ).slice(0, 5); 
-                    
-                    const suggestionsList = document.getElementById(`suggestions-${data[i].id}`);
-                    suggestionsList.innerHTML = '';
-                    
-                    suggestions.forEach(suggestion => {
-                        const li = document.createElement('li');
-                        li.classList.add('list-group-item');
-                
-                        const cp = suggestion.codigosPostales[0];
-                        const localidad = capitalize(suggestion.localidad.trim());
-                        const provincia = capitalize(suggestion.provincia.trim());
-                
-                        li.textContent = `${cp}, ${localidad}, ${provincia}`;
-                        
-                        li.addEventListener('click', function() {
-                            // Actualizar y guardar en Firebase
-                            data[i].cp = cp;
-                            data[i].localidad = localidad;
-                            data[i].provincia = provincia;
-                
-                            // Guardar en Firebase
-                            firebase.database().ref('enviosBNA/' + data[i].id).update({
-                                codigo_postal: cp,
-                                ciudad: localidad,
-                                provincia: provincia
-                            }).then(() => {
-                                const cpLocalidadElement = document.querySelector(`.card[data-id='${data[i].id}'] .cpLocalidad`);
-                                if (cpLocalidadElement) {
-                                    cpLocalidadElement.innerHTML = `<i class="bi bi-geo-alt"></i> ${cp}, ${localidad}, ${provincia}`;
-                                }
-                                document.getElementById(`edit-input-${data[i].id}`).style.display = 'none';
-                
-                                // Mostrar SweetAlert
-                                Swal.fire({
-                                    title: 'Éxito',
-                                    text: 'Localidad actualizada',
-                                    icon: 'success',
-                                    confirmButtonText: 'Aceptar'
-                                }).then(() => {
-                                    // Recargar la página
-                                    location.reload();
-                                });
-                            }).catch(error => {
-                                console.error("Error al actualizar la localidad: ", error);
-                            });
-                        });
-                
-                        suggestionsList.appendChild(li);
-                    });
-                });                             
+                if (resp.ok) {
+                    document.getElementById('s2').innerHTML = `✅ Paso 2: VTEX confirmado con <code>${format}</code>`;
+                    document.getElementById('s2').style.color = 'green';
+                    success = true;
+                    break;
+                }
+            }
 
-                // Lógica para determinar el mensaje estado de Facturacion
+            if (!success) throw new Error('No se pudo notificar a VTEX con ningún formato');
+
+            // Paso 3 - Slack
+            const slackPayload = {
+                attachments: [{
+                    color: "#36a64f",
+                    pretext: "📬 *Entrega confirmada*",
+                    title: `✅ Pedido \`${ordenVTEX}\` entregado`,
+                    text: `*Factura:* \`${invoiceNumber}\`\n*Provincia:* ${provincia}\n*Ciudad:* ${ciudad}\n*Fecha:* ${deliveredDate}`,
+                    footer: `🧠 LogiPaq ● ${ahora.toLocaleString()}`,
+                    ts: Math.floor(Date.now() / 1000)
+                }]
+            };
+
+            const respSlack = await fetch(`${corsh}${HookBPro}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-cors-api-key': live },
+                body: JSON.stringify(slackPayload)
+            });
+
+            if (!respSlack.ok) throw new Error('Slack error ' + respSlack.status);
+            document.getElementById('s3').innerHTML = '✅ Paso 3: Slack notificado correctamente 📢';
+            document.getElementById('s3').style.color = 'green';
+
+            // Marcar en Firebase
+            await firebase.database().ref('enviosBNA/' + data[i].id).update({ marcaEntregado: 'Si' });
+
+            // Actualizar contador
+            const cnt = document.getElementById('contadorCards2');
+            if (cnt) cnt.innerText = parseInt(cnt.innerText || 0) - 1;
+
+            setTimeout(() => {
+                glass.style.opacity = 0;
+                glass.style.transform = 'translateX(-50%) scale(0.95)';
+                setTimeout(() => glass.remove(), 400);
+            }, 1500);
+        } catch (err) {
+            ul.innerHTML += `
+                <li style="background:#fff;padding:10px;margin-top:10px;border-radius:12px;color:red;">
+                    ❌ <b>Error:</b> ${err.message}<br><b>📸 Enviá captura a Lucas</b>
+                </li>
+            `;
+            btnOK.style.display = 'inline-block';
+            btnOK.addEventListener('click', () => {
+                glass.style.opacity = 0;
+                glass.style.transform = 'translateX(-50%) scale(0.95)';
+                setTimeout(() => glass.remove(), 400);
+            });
+            switchElement.checked = false;
+        }
+
+    } else {
+        // Si no es BPR, actualizar directamente en Firebase
+        firebase.database().ref('enviosBNA/' + data[i].id).update({ marcaEntregado: nuevoEstado });
+    }
+});      
+// FIN MARCA ENTREGADO          
+
+// Lógica para determinar el mensaje estado de Facturacion
 const facturaStatusDiv = document.getElementById(`factura-status-${data[i].id}`);
 if (hasCancelado) {
     // Si ha sido cancelado
@@ -4050,7 +4045,7 @@ async function enviarDatosAndesmar(id, nombre, cp, localidad, provincia, remito,
                     text += `\n`;
                     text += `${separator}`;
 
-                    fetch(HookVtex, { 
+                    fetch(HookBPro, { 
                         method: 'POST',
                         headers: {
                             'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
@@ -4613,7 +4608,7 @@ const isSplit = splitTypes.includes(tipoElectrodomestico);
                     text += `\n`;
                     text += `${separator}`;
 
-                    fetch(HookVtex, { 
+                    fetch(HookBPro, { 
                         method: 'POST',
                         headers: {
                             'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
@@ -5414,7 +5409,7 @@ if (isSplit) {
                     text += `\n`;
                     text += `${separator}`;
 
-                    fetch(HookVtex, { 
+                    fetch(HookBPro, { 
                         method: 'POST',
                         headers: {
                             'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
@@ -6919,7 +6914,7 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
                     text += `\n`;
                     text += `${separator}`;
 
-                    fetch(HookVtex, { 
+                    fetch(HookBPro, { 
                         method: 'POST',
                         headers: {
                             'x-cors-api-key': 'live_36d58f4c13cb7d838833506e8f6450623bf2605859ac089fa008cfeddd29d8dd',
