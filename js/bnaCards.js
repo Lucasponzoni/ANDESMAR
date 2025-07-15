@@ -6969,18 +6969,18 @@ async function verificarMensajes() {
                 const autor = mensaje.user;
 
                 // Mostrar detalles básicos del mensaje
-                console.log(`📨 Mensaje recibido:`, { id: mensajeId, user: autor, text: texto });
+                //console.log(`📨 Mensaje recibido:`, { id: mensajeId, user: autor, text: texto });
 
                 // Verificar si ya fue procesado
                 const snapshotMensajeProcesado = await firebaseRefMensajesProcesados.child(mensajeId).once('value');
                 if (snapshotMensajeProcesado.exists()) {
-                    console.log(`⏩ Ya fue procesado antes: ${mensajeId}`);
+                    //console.log(`⏩ Ya fue procesado antes: ${mensajeId}`);
                     continue;
                 }
 
                 const cumpleFormato = /^\((\d+-CARR-\d+|\d+-REP-\d+|\d+)\)/.test(texto);
-                console.log(`👤 Usuario: ${autor} === ${chat} → ${autor === chat}`);
-                console.log(`🧾 Cumple formato esperado: ${cumpleFormato}`);
+                //console.log(`👤 Usuario: ${autor} === ${chat} → ${autor === chat}`);
+                //console.log(`🧾 Cumple formato esperado: ${cumpleFormato}`);
 
                 if (autor === chat && cumpleFormato) {
                     console.log('🔍 Analizando mensaje válido...');
@@ -7047,7 +7047,7 @@ async function verificarMensajes() {
                     });
 
                 } else {
-                    console.log('⛔ Mensaje ignorado por usuario o formato.');
+                    //console.log('⛔ Mensaje ignorado por usuario o formato.');
                 }
             }
 
