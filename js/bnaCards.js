@@ -6940,16 +6940,14 @@ async function generarPDF(id, nombre, cp, localidad, provincia, remito, calle, n
 // SLACK
 const firebaseRefErrores = firebase.database().ref('erroresSlack');
 const firebaseRefEnvios = firebase.database().ref('enviosBNA');
-
-const sonidoToast = new Audio('./Img/error.mp3'); // Cambia la ruta por la de tu archivo
-
-const firebaseRefMensajesProcesados = firebase.database().ref('mensajesProcesados'); // Referencia para mensajes procesados
+const firebaseRefMensajesProcesados = firebase.database().ref('mensajesProcesados');
+const sonidoToast = new Audio('./Img/error.mp3'); // Ruta al sonido
 
 async function verificarMensajes() {
     // Esperar 20 segundos antes de continuar
     await new Promise(resolve => setTimeout(resolve, 20000));
 
-    console.log('Ejecutando búsqueda de errores en Slack...');
+    console.log('🔍 Ejecutando búsqueda de errores en Slack...');
     try {
         const response = await fetch(`${corsh}https://slack.com/api/conversations.history?channel=${channel}`, {
             method: 'GET',
@@ -6966,27 +6964,51 @@ async function verificarMensajes() {
             const ordenesConErrores = [];
 
             for (const mensaje of data.messages) {
-                const mensajeId = mensaje.ts.replace(/\./g, '_'); // Reemplazar puntos por guiones bajos
+                const mensajeId = mensaje.ts.replace(/\./g, '_');
+                const texto = mensaje.text;
+                const autor = mensaje.user;
 
-                // Verificar si el mensaje ya fue procesado
+                // Mostrar detalles básicos del mensaje
+                console.log(`📨 Mensaje recibido:`, { id: mensajeId, user: autor, text: texto });
+
+                // Verificar si ya fue procesado
                 const snapshotMensajeProcesado = await firebaseRefMensajesProcesados.child(mensajeId).once('value');
                 if (snapshotMensajeProcesado.exists()) {
-                    continue; // Si ya fue procesado, saltar al siguiente mensaje
+                    console.log(`⏩ Ya fue procesado antes: ${mensajeId}`);
+                    continue;
                 }
 
-                // Verificar si el mensaje cumple con el formato esperado
-                if (mensaje.user === `${chat}` && /^\(\d+(-REP-\d+|-CARR-\d+-\d+)?\)/.test(mensaje.text)) {
-                    let numero;
-                    const match = mensaje.text.match(/^\((\d+)(?:-(REP|CARR)-(\d+))?\)/);
+                const cumpleFormato = /^\((\d+-CARR-\d+|\d+-REP-\d+|\d+)\)/.test(texto);
+                console.log(`👤 Usuario: ${autor} === ${chat} → ${autor === chat}`);
+                console.log(`🧾 Cumple formato esperado: ${cumpleFormato}`);
 
-                    if (match) {
-                        numero = match[3] ? match[3] : match[1];
-                    } else {
-                        console.error('No se encontró un formato válido en el mensaje:', mensaje.text);
+                if (autor === chat && cumpleFormato) {
+                    console.log('🔍 Analizando mensaje válido...');
+
+                    let numero = null;
+
+                    if (/^\(\d+-CARR-(\d+)\)/.test(texto)) {
+                        const match = texto.match(/^\(\d+-CARR-(\d+)\)/);
+                        numero = match ? match[1] : null;
+                        console.log(`📦 Formato CARR → número extraído: ${numero}`);
+                    } else if (/^\((\d+)-REP-\d+\)/.test(texto)) {
+                        const match = texto.match(/^\((\d+)-REP-\d+\)/);
+                        numero = match ? match[1] : null;
+                        console.log(`📦 Formato REP → número extraído: ${numero}`);
+                    } else if (/^\((\d+)\)/.test(texto)) {
+                        const match = texto.match(/^\((\d+)\)/);
+                        numero = match ? match[1] : null;
+                        console.log(`📦 Formato simple → número extraído: ${numero}`);
+                    }
+
+                    if (!numero) {
+                        console.error('❌ No se pudo extraer número de orden. Saltando...');
                         continue;
                     }
 
-                    const errorMensaje = mensaje.text.replace(/^\(\d+(-REP-\d+|-CARR-\d+-\d+)?\)\s*/, '');
+                    const errorMensaje = texto.replace(/^\(\d+(-REP-\d+|-CARR-\d+)?\)\s*/, '');
+                    console.log(`💬 Mensaje de error: ${errorMensaje}`);
+
                     let nuevoNumero = numero;
                     let contador = 1;
 
@@ -6997,7 +7019,6 @@ async function verificarMensajes() {
                             nuevosErrores++;
                             ordenesConErrores.push(nuevoNumero);
 
-                            // Mostrar el toast y reproducir sonido
                             setTimeout(() => {
                                 mostrarToast(nuevoNumero, errorMensaje);
                                 sonidoToast.currentTime = 0;
@@ -7005,18 +7026,17 @@ async function verificarMensajes() {
                                     console.error('Error al reproducir el sonido:', error);
                                 });
                             }, 1000);
-
                             break;
                         } else {
                             contador++;
-                            nuevoNumero = `${numero}-${match[2] || 'REP'}-${contador}`;
+                            nuevoNumero = `${numero}-REP-${contador}`;
                         }
                     }
 
-                    // Agregar el ID del mensaje a Firebase como procesado
+                    // Guardar como procesado
                     await firebaseRefMensajesProcesados.child(mensajeId).set(true);
 
-                    // Buscar en enviosBNA
+                    // Buscar coincidencias en enviosBNA
                     const snapshotEnvios = await firebaseRefEnvios.once('value');
                     snapshotEnvios.forEach((envio) => {
                         const data = envio.val();
@@ -7025,20 +7045,23 @@ async function verificarMensajes() {
                             envio.ref.child('errorSlackMensaje').set(errorMensaje);
                         }
                     });
+
+                } else {
+                    console.log('⛔ Mensaje ignorado por usuario o formato.');
                 }
             }
 
             if (nuevosErrores > 0) {
-                console.log(`Se han localizado ${nuevosErrores} nuevos errores de Slack que no existían en la base de datos.`);
+                console.log(`✅ Se han localizado ${nuevosErrores} nuevos errores de Slack.`);
                 await enviarNotificacionSlack(ordenesConErrores, nuevosErrores);
             } else {
-                console.log('No se encontraron nuevos errores.');
+                console.log('🟢 No se encontraron nuevos errores.');
             }
         } else {
-            console.error('Error al obtener mensajes:', data.error);
+            console.error('❗ Error al obtener mensajes de Slack:', data.error);
         }
     } catch (error) {
-        console.error('Error en la solicitud:', error);
+        console.error('❗ Error en la solicitud a Slack:', error);
     }
 }
 
