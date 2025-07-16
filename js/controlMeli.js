@@ -2613,7 +2613,8 @@ let etiquetaLimpia = item.etiquetaOriginal;
     /\^FO200,256\^A0N,24,24\^FB570,2,-1\^FH\^FD[^\^]+\^FS/,
     /\^FO200,100\^A0N,27,27\^FB570,2,-1\^FH\^FD.*?\^FS/,
     /\^FO200,154\^A0N,24,24\^FB570,2,-1\^FH\^FDColor:.*?SKU:.*?\^FS/,
-    /\^FX LAST CLUSTER.*?\^FX END LAST CLUSTER\s*\^FS/gs
+    /\^FX LAST CLUSTER.*?\^FX END LAST CLUSTER\s*\^FS/gs,
+    /\^FO\d+,\d+\^A0N,\d+,\d+\^FB\d+,\d+,-?\d+\^FH\^FD(?=.*Color:)(?=.*SKU:).*?\^FS/
 
 ].forEach(regex => {
     etiquetaLimpia = etiquetaLimpia.replace(regex, '');
